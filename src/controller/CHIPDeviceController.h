@@ -29,10 +29,10 @@
 #pragma once
 
 #include <app/InteractionModelDelegate.h>
+#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
 #include <controller/OperationalCredentialsDelegate.h>
-#include <controller/data_model/zap-generated/CHIPClientCallbacks.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
@@ -102,6 +102,10 @@ struct ControllerInitParams
     ByteSpan controllerRCAC;
 
     uint16_t controllerVendorId;
+
+    /* The port used for operational communication to listen for and send messages over UDP/TCP.
+     * The default value of `0` will pick any available port. */
+    uint16_t listenPort = 0;
 };
 
 enum CommissioningStage : uint8_t
@@ -190,7 +194,7 @@ public:
 
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
                       Protocols::InteractionModel::ProtocolCode status) override;
-    CHIP_ERROR ReportError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
+    CHIP_ERROR ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
 
     CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient,
                                    const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
@@ -265,12 +269,11 @@ public:
      *   This function update the device informations asynchronously using mdns.
      *   If new device informations has been found, it will be persisted.
      *
-     * @param[in] deviceId  Node ID for the CHIP devicex
-     * @param[in] fabricId  The fabricId used for mdns resolution
+     * @param[in] deviceId  Node ID for the CHIP device
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR UpdateDevice(NodeId deviceId, uint64_t fabricId);
+    CHIP_ERROR UpdateDevice(NodeId deviceId);
 
     void PersistDevice(Device * device);
 
@@ -291,13 +294,14 @@ public:
     CHIP_ERROR ServiceEvents();
 
     /**
-     * @brief Get the Fabric ID assigned to the device.
-     *
-     * @param[out] fabricId   Fabric ID of the device.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * @brief Get the Compressed Fabric ID assigned to the device.
      */
-    CHIP_ERROR GetFabricId(uint64_t & fabricId);
+    uint64_t GetCompressedFabricId() const { return mLocalId.GetCompressedFabricId(); }
+
+    /**
+     * @brief Get the raw Fabric ID assigned to the device.
+     */
+    uint64_t GetFabricId() const { return mFabricId; }
 
 protected:
     enum class State
@@ -317,7 +321,9 @@ protected:
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
-    NodeId mLocalDeviceId;
+    PeerId mLocalId    = PeerId();
+    FabricId mFabricId = kUndefinedFabricId;
+
     DeviceTransportMgr * mTransportMgr                             = nullptr;
     SecureSessionMgr * mSessionMgr                                 = nullptr;
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
@@ -487,6 +493,25 @@ public:
      *   will use secure session established via CASE handshake.
      */
     CHIP_ERROR OperationalDiscoveryComplete(NodeId remoteDeviceId);
+
+    /**
+     * @brief
+     *   Trigger a paired device to re-enter the pairing mode. The device will exit the pairing mode
+     *   after a successful pairing, or after the given `timeout` time.
+     *
+     * @param[in] deviceId        The device Id.
+     * @param[in] timeout         The pairing mode should terminate after this much time.
+     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+     *                            PAKE passcode verifier to be used for this commissioning.
+     * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
+     * @param[in] option          The pairing window can be opened using the original setup code, or an
+     *                            onboarding token can be generated using a random setup PIN code (or with
+     *                            the PIN code provied in the setupPayload).
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+                                       uint8_t option);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;

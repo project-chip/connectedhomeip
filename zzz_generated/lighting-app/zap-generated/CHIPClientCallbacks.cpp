@@ -21,8 +21,8 @@
 
 #include <cinttypes>
 
+#include <app-common/zap-generated/enums.h>
 #include <app/Command.h>
-#include <app/common/gen/enums.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
@@ -36,7 +36,9 @@
 using namespace ::chip;
 using namespace ::chip::app::List;
 
-constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
+namespace {
+[[maybe_unused]] constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
+} // namespace
 
 #define CHECK_STATUS_WITH_RETVAL(error, retval)                                                                                    \
     if (CHIP_NO_ERROR != error)                                                                                                    \

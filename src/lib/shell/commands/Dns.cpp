@@ -43,7 +43,7 @@ public:
     void OnNodeIdResolved(const Mdns::ResolvedNodeData & nodeData) override
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\n",
-                        ChipLogValueX64(nodeData.mPeerId.GetFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
+                        ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
         streamer_printf(streamer_get(), "   Hostname: %s\n", nodeData.mHostName);
         streamer_printf(streamer_get(), "   IP address: %s\n", nodeData.mAddress.ToString(ipAddressBuf));
         streamer_printf(streamer_get(), "   Port: %" PRIu16 "\n", nodeData.mPort);
@@ -118,7 +118,7 @@ CHIP_ERROR ResolveHandler(int argc, char ** argv)
     streamer_printf(streamer_get(), "Resolving ...\n");
 
     PeerId peerId;
-    peerId.SetFabricId(strtoull(argv[0], NULL, 10));
+    peerId.SetCompressedFabricId(strtoull(argv[0], NULL, 10));
     peerId.SetNodeId(strtoull(argv[1], NULL, 10));
 
     return Mdns::Resolver::Instance().ResolveNodeId(peerId, Inet::kIPAddressType_Any);

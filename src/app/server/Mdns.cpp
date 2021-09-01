@@ -312,19 +312,18 @@ CHIP_ERROR AdvertiseOperational()
         {
             uint8_t mac[8];
 
-            const auto advertiseParameters =
-                chip::Mdns::OperationalAdvertisingParameters()
-                    .SetPeerId(PeerId().SetFabricId(fabricInfo.GetFabricId()).SetNodeId(fabricInfo.GetNodeId()))
-                    .SetMac(FillMAC(mac))
-                    .SetPort(GetSecuredPort())
-                    .SetMRPRetryIntervals(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL,
-                                          CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)
-                    .EnableIpV4(true);
+            const auto advertiseParameters = chip::Mdns::OperationalAdvertisingParameters()
+                                                 .SetPeerId(fabricInfo.GetPeerId())
+                                                 .SetMac(FillMAC(mac))
+                                                 .SetPort(GetSecuredPort())
+                                                 .SetMRPRetryIntervals(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL,
+                                                                       CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)
+                                                 .EnableIpV4(true);
 
             auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
             ChipLogProgress(Discovery, "Advertise operational node " ChipLogFormatX64 "-" ChipLogFormatX64,
-                            ChipLogValueX64(advertiseParameters.GetPeerId().GetFabricId()),
+                            ChipLogValueX64(advertiseParameters.GetPeerId().GetCompressedFabricId()),
                             ChipLogValueX64(advertiseParameters.GetPeerId().GetNodeId()));
             // Should we keep trying to advertise the other operational
             // identities on failure?

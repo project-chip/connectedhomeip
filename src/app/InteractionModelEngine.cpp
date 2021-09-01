@@ -229,8 +229,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                        const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
+                                                        System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -240,9 +241,9 @@ CHIP_ERROR InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * ap
     {
         if (readHandler.IsFree())
         {
-            err = readHandler.Init(mpDelegate);
+            err = readHandler.Init(mpExchangeMgr, mpDelegate, apExchangeContext);
             SuccessOrExit(err);
-            err               = readHandler.OnReadRequest(apExchangeContext, std::move(aPayload));
+            err               = readHandler.OnReadInitialRequest(std::move(aPayload));
             apExchangeContext = nullptr;
             break;
         }
@@ -299,7 +300,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
-        err = OnReadRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+        err = OnReadInitialRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
@@ -317,17 +318,12 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(InteractionModel, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
-CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
-                                                   EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
-                                                   AttributePathParams * apAttributePathParamsList,
-                                                   size_t aAttributePathParamsListSize, EventNumber aEventNumber,
-                                                   uint64_t aAppIdentifier)
+CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier)
 {
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     ReturnErrorOnFailure(NewReadClient(&client, aAppIdentifier));
-    err = client->SendReadRequest(aNodeId, aFabricIndex, apSecureSession, apEventPathParamsList, aEventPathParamsListSize,
-                                  apAttributePathParamsList, aAttributePathParamsListSize, aEventNumber);
+    err = client->SendReadRequest(aReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
         client->Shutdown();

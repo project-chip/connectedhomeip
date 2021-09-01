@@ -252,7 +252,7 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        assert(begin == nullptr || (begin >= iter && begin < &mStates[kMaxConnectionCount]));
+        VerifyOrDie(begin == nullptr || (begin >= iter && begin < &mStates[kMaxConnectionCount]));
 
         if (begin != nullptr)
         {

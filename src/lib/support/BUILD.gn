@@ -80,6 +80,7 @@ static_library("support") {
     "FixedBufferAllocator.h",
     "LifetimePersistedCounter.cpp",
     "LifetimePersistedCounter.h",
+    "ObjectLifeCycle.h",
     "PersistedCounter.cpp",
     "PersistedCounter.h",
     "PersistentStorageMacros.h",

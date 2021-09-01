@@ -45,7 +45,7 @@
 #include <app/util/af.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
-#include <app/common/gen/att-storage.h>
+#include <app-common/zap-generated/att-storage.h>
 #endif
 
 #if !defined(ATTRIBUTE_STORAGE_CONFIGURATION) && defined(EMBER_TEST)
@@ -72,7 +72,7 @@
 #endif
 #endif
 
-#include <app/common/gen/attribute-type.h>
+#include <app-common/zap-generated/attribute-type.h>
 
 #define DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)                                                                        \
     EmberAfEndpointType endpointName = { clusterList, sizeof(clusterList) / sizeof(EmberAfCluster), 0 }

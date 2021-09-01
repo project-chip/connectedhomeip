@@ -39,10 +39,10 @@
  ******************************************************************************/
 
 #include "barrier-control-server.h"
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/attributes/Accessors.h>
-#include <app/common/gen/ids/Clusters.h>
 #include <app/util/af.h>
 
 #include <assert.h>

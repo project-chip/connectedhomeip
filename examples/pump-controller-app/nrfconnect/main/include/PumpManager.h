@@ -30,24 +30,24 @@ class PumpManager
 public:
     enum Action_t
     {
-        LOCK_ACTION = 0,
-        UNLOCK_ACTION,
+        START_ACTION = 0,
+        STOP_ACTION,
 
         INVALID_ACTION
     };
 
     enum State_t
     {
-        kState_LockingInitiated = 0,
-        kState_LockingCompleted,
-        kState_UnlockingInitiated,
-        kState_UnlockingCompleted,
+        kState_StartInitiated = 0,
+        kState_StartCompleted,
+        kState_StopInitiated,
+        kState_StopCompleted,
     };
 
     void Init();
-    bool IsUnlocked();
-    void EnableAutoRelock(bool aOn);
-    void SetAutoLockDuration(uint32_t aDurationInSecs);
+    bool IsStopped();
+    void EnableAutoRestart(bool aOn);
+    void SetAutoStartDuration(uint32_t aDurationInSecs);
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
 
@@ -62,22 +62,23 @@ private:
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
 
-    bool mAutoRelock;
-    uint32_t mAutoLockDuration;
-    bool mAutoLockTimerArmed;
+    bool mAutoRestart;
+    uint32_t mAutoStartDuration;
+    bool mAutoStartTimerArmed;
     int32_t mCurrentActor;
 
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
 
     static void TimerEventHandler(k_timer * timer);
-    static void AutoReLockTimerEventHandler(AppEvent * aEvent);
-    static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
+    static void AutoRestartTimerEventHandler(AppEvent * aEvent);
 
-    static PumpManager sLock;
+    static void PumpStartTimerEventHandler(AppEvent * aEvent);
+
+    static PumpManager sPump;
 };
 
 inline PumpManager & PumpMgr(void)
 {
-    return PumpManager::sLock;
+    return PumpManager::sPump;
 }

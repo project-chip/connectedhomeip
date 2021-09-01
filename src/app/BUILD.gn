@@ -105,7 +105,6 @@ static_library("app") {
   if (chip_ip_commissioning) {
     defines = [
       "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=1",
-      "CONFIG_RENDEZVOUS_WAIT_FOR_COMMISSIONING_COMPLETE=1",
       "CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY=1",
       "CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING=1",
     ]
@@ -115,6 +114,7 @@ static_library("app") {
     ":app_buildconfig",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]

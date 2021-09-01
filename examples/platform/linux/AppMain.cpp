@@ -65,6 +65,17 @@ using namespace chip::Transport;
 using chip::Shell::Engine;
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+/*
+ * The device shall check every kWifiStartCheckTimeUsec whether Wi-Fi management
+ * has been fully initialized. If after kWifiStartCheckAttempts Wi-Fi management
+ * still hasn't been initialized, the device configuration is reset, and device
+ * needs to be paired again.
+ */
+static constexpr useconds_t kWifiStartCheckTimeUsec = 100 * 1000; // 100 ms
+static constexpr uint8_t kWifiStartCheckAttempts    = 5;
+#endif
+
 namespace {
 void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -75,6 +86,23 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
     }
 }
 } // namespace
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+static bool EnsureWifiIsStarted()
+{
+    for (int cnt = 0; cnt < kWifiStartCheckAttempts; cnt++)
+    {
+        if (chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
+        {
+            return true;
+        }
+
+        usleep(kWifiStartCheckTimeUsec);
+    }
+
+    return chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted();
+}
+#endif
 
 int ChipLinuxAppInit(int argc, char ** argv)
 {
@@ -88,13 +116,13 @@ int ChipLinuxAppInit(int argc, char ** argv)
     err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
+    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
+    SuccessOrExit(err);
+
     err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
     err = ParseArguments(argc, argv);
-    SuccessOrExit(err);
-
-    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
     ConfigurationMgr().LogDeviceConfig();
@@ -108,18 +136,20 @@ int ChipLinuxAppInit(int argc, char ** argv)
 
     chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
-
 #if CONFIG_NETWORK_LAYER_BLE
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
     chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
-#endif
-
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
         chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+        if (!EnsureWifiIsStarted())
+        {
+            ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
+        }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 

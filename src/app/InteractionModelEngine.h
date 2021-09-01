@@ -53,7 +53,6 @@ namespace chip {
 namespace app {
 
 static constexpr size_t kMaxSecureSduLengthBytes = 1024;
-static constexpr FieldId kRootFieldId            = 0;
 
 /**
  * @class InteractionModelEngine
@@ -110,10 +109,7 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
-                               EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
-                               AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                               EventNumber aEventNumber, uint64_t aAppIdentifier = 0);
+    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
 
     /**
      *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
@@ -160,8 +156,8 @@ private:
      * Called when Interaction Model receives a Read Request message.  Errors processing
      * the Read Request are handled entirely within this function.
      */
-    CHIP_ERROR OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                             const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing

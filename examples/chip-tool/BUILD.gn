@@ -60,5 +60,10 @@ executable("chip-tool") {
 
   cflags = [ "-Wconversion" ]
 
+  include_dirs = [
+    ".",
+    "${chip_root}/zzz_generated/chip-tool",
+  ]
+
   output_dir = root_out_dir
 }

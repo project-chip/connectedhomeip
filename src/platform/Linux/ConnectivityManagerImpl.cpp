@@ -633,6 +633,11 @@ void ConnectivityManagerImpl::StartWiFiManagement()
                                                 kWpaSupplicantObjectPath, nullptr, _OnWpaProxyReady, nullptr);
 }
 
+bool ConnectivityManagerImpl::IsWiFiManagementStarted()
+{
+    return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
+}
+
 void ConnectivityManagerImpl::DriveAPState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

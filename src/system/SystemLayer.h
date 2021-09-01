@@ -30,7 +30,9 @@
 
 #include <core/CHIPCallback.h>
 
+#include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <support/ObjectLifeCycle.h>
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
@@ -52,23 +54,13 @@ namespace System {
 using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
 
 /**
- *  @enum LayerState
- *
- *  The state of a Layer object.
- */
-enum class LayerState
-{
-    kUninitialized = 0, /**< Not initialized state. */
-    kInitialized   = 1  /**< Initialized state. */
-};
-
-/**
  * This provides access to timers according to the configured event handling model.
  */
 class DLL_EXPORT Layer
 {
 public:
-    Layer();
+    Layer() = default;
+    ~Layer();
 
     CHIP_ERROR Init();
 
@@ -76,7 +68,7 @@ public:
     // to ensure that they are not used after calling Shutdown().
     CHIP_ERROR Shutdown();
 
-    LayerState State() const { return mLayerState; }
+    bool IsInitialized() const { return mLayerState.IsInitialized(); }
 
     /**
      * @brief
@@ -230,7 +222,7 @@ public:
     Clock & GetClock() { return mClock; }
 
 private:
-    LayerState mLayerState;
+    ObjectLifeCycle mLayerState;
     WatchableEventManager mWatchableEventsManager;
     Clock mClock;
 

@@ -164,6 +164,11 @@ public:
         return &mMessageDispatch;
     }
 
+    FabricIndex GetFabricIndex() const
+    {
+        return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : Transport::kUndefinedFabricIndex;
+    }
+
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
      **/
@@ -181,18 +186,17 @@ private:
     CHIP_ERROR Init(uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SendSigmaR1();
-    CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleSigmaR1(System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleSigmaR1(System::PacketBufferHandle && msg);
     CHIP_ERROR SendSigmaR2();
-    CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleSigmaR2(System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleSigmaR2(System::PacketBufferHandle && msg);
     CHIP_ERROR SendSigmaR3();
-    CHIP_ERROR HandleSigmaR3(System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR3(System::PacketBufferHandle && msg);
 
     CHIP_ERROR SendSigmaR1Resume();
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
-private:
     CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                     MutableByteSpan & salt);
     CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);

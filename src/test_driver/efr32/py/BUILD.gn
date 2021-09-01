@@ -20,8 +20,10 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 pw_python_package("nl_test_runner") {
   generate_setup = {
-    name = "nl_test_runner"
-    version = "0.0.1"
+    metadata = {
+      name = "nl_test_runner"
+      version = "0.0.1"
+    }
   }
   sources = [ "nl_test_runner/nl_test_runner.py" ]
   python_deps = [

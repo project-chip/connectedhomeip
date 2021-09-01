@@ -40,11 +40,23 @@
  *----------------------------------------------------------*/
 
 #define configUSE_PREEMPTION 1
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#define configUSE_TICKLESS_IDLE 1
+#else
 #define configUSE_TICKLESS_IDLE 0
+#endif
+
 #define configCPU_CLOCK_HZ (SystemCoreClock)
 #define configTICK_RATE_HZ ((TickType_t) 100)
 #define configMAX_PRIORITIES (8)
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#define configMINIMAL_STACK_SIZE ((unsigned short) 250)
+#else
 #define configMINIMAL_STACK_SIZE ((unsigned short) 90)
+#endif
+
 #define configMAX_TASK_NAME_LEN 20
 #define configUSE_16_BIT_TICKS 0
 #define configIDLE_SHOULD_YIELD 1
@@ -73,9 +85,12 @@
 #define configAPPLICATION_ALLOCATED_HEAP 1
 
 /* Hook function related definitions. */
-#ifndef configUSE_IDLE_HOOK
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#define configUSE_IDLE_HOOK 1
+#else
 #define configUSE_IDLE_HOOK 0
 #endif
+
 #define configUSE_TICK_HOOK 0
 #define configCHECK_FOR_STACK_OVERFLOW 0
 #ifndef configUSE_MALLOC_FAILED_HOOK
@@ -102,6 +117,15 @@
 #define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 4)
 
 /* Define to trap errors during development. */
+#if defined gLoggingActive_d && (gLoggingActive_d != 0)
+#include "dbg_logging.h"
+#define configASSERT(x)                                                                                                            \
+    if ((x) == 0)                                                                                                                  \
+    {                                                                                                                              \
+        taskDISABLE_INTERRUPTS();                                                                                                  \
+        DbgLogDump(1);                                                                                                             \
+    }
+#else
 #define configASSERT(x)                                                                                                            \
     if ((x) == 0)                                                                                                                  \
     {                                                                                                                              \
@@ -109,6 +133,7 @@
         for (;;)                                                                                                                   \
             ;                                                                                                                      \
     }
+#endif
 
 /* Optional functions - most linkers will remove unused functions anyway. */
 #define INCLUDE_vTaskPrioritySet 1

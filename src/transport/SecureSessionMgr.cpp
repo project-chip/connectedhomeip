@@ -66,10 +66,7 @@ uint32_t EncryptedPacketBufferHandle::GetMsgId() const
 
 SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 
-SecureSessionMgr::~SecureSessionMgr()
-{
-    CancelExpiryTimer();
-}
+SecureSessionMgr::~SecureSessionMgr() {}
 
 CHIP_ERROR SecureSessionMgr::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
                                   Transport::MessageCounterManagerInterface * messageCounterManager)
@@ -439,8 +436,8 @@ void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param)
 
 PeerConnectionState * SecureSessionMgr::GetPeerConnectionState(SessionHandle session)
 {
-    return mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(session.mPeerNodeId), session.mPeerKeyId.ValueOr(0),
-                                                    nullptr);
+    return mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(session.mPeerNodeId),
+                                                              session.mLocalKeyId.ValueOr(0), nullptr);
 }
 
 } // namespace chip

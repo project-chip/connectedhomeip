@@ -43,8 +43,8 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/callback.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/callback.h>
 
 using namespace chip;
 

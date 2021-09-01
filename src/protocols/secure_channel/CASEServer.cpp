@@ -102,7 +102,6 @@ void CASEServer::Cleanup()
     ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
     mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1, this);
 
-    mFabricIndex = Transport::kUndefinedFabricIndex;
     GetSession().Clear();
 }
 
@@ -116,11 +115,11 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 void CASEServer::OnSessionEstablished()
 {
     ChipLogProgress(Inet, "CASE Session established. Setting up the secure channel.");
-    mSessionMgr->ExpireAllPairings(GetSession().GetPeerNodeId(), mFabricIndex);
+    mSessionMgr->ExpireAllPairings(GetSession().GetPeerNodeId(), GetSession().GetFabricIndex());
 
-    CHIP_ERROR err =
-        mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(GetSession().GetPeerAddress()),
-                                GetSession().GetPeerNodeId(), &GetSession(), SecureSession::SessionRole::kResponder, mFabricIndex);
+    CHIP_ERROR err = mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(GetSession().GetPeerAddress()),
+                                             GetSession().GetPeerNodeId(), &GetSession(), SecureSession::SessionRole::kResponder,
+                                             GetSession().GetFabricIndex());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed in setting up secure channel: err %s", ErrorStr(err));

@@ -18,8 +18,8 @@
 
 #pragma once
 
+#include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
-#include <app/common/gen/enums.h>
 #include <lib/core/CHIPCore.h>
 #include <platform/internal/DeviceNetworkProvisioning.h>
 

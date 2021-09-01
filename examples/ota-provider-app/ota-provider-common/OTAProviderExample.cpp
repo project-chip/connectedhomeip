@@ -18,10 +18,10 @@
 
 #include <ota-provider-common/OTAProviderExample.h>
 
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
 #include <app/CommandPathParams.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <core/CHIPTLV.h>
 #include <protocols/secure_channel/PASESession.h> // For chip::kTestDeviceNodeId

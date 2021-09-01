@@ -20,14 +20,14 @@
  * @brief Implementation for the Operational Credentials Cluster
  ***************************************************************************/
 
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/attributes/Accessors.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-#include <app/common/gen/enums.h>
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
@@ -116,13 +116,13 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     uint8_t fabricIndex = 0;
     for (auto & pairing : GetGlobalFabricTable())
     {
-        NodeId nodeId               = pairing.GetNodeId();
+        NodeId nodeId               = pairing.GetPeerId().GetNodeId();
         uint64_t fabricId           = pairing.GetFabricId();
         uint16_t vendorId           = pairing.GetVendorId();
         const uint8_t * fabricLabel = pairing.GetFabricLabel();
 
         // Skip over uninitialized fabrics
-        if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
+        if (nodeId == kUndefinedNodeId)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                            "OpCreds: Skipping over uninitialized fabric with fabricId 0x" ChipLogFormatX64
@@ -155,6 +155,15 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fabrics",
                        fabricIndex);
+        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+
+    if (err == CHIP_NO_ERROR &&
+        app::Clusters::OperationalCredentials::Attributes::SetSupportedFabrics(0, CHIP_CONFIG_MAX_DEVICE_ADMINS) !=
+            EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write %" PRIu8 " in supported fabrics count attribute",
+                       CHIP_CONFIG_MAX_DEVICE_ADMINS);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
@@ -195,8 +204,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric 0x%" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
-                       fabric->GetVendorId());
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
+                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         writeFabricsIntoFabricsListAttribute();
     }
 
@@ -206,8 +215,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric %" PRIX16 " was persisted to storage. FabricId %0x" ChipLogFormatX64
                        ", NodeId %0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
-                       fabric->GetVendorId());
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
+                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         writeFabricsIntoFabricsListAttribute();
     }
 };

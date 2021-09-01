@@ -114,6 +114,8 @@ class SelectActionFragment : Fragment() {
     fun handleSensorClicked()
     /** Notifies listener of attestation command button clicked. */
     fun handleAttestationTestClicked()
+    /** Notifies listener of a click to manually input the CHIP device address.. */
+    fun onShowDeviceAddressInput()
   }
 
   companion object {

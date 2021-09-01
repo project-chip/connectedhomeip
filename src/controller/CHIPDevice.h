@@ -30,7 +30,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
-#include <controller/data_model/zap-generated/CHIPClientCallbacks.h>
+#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <credentials/CHIPOperationalCredentials.h>
@@ -107,7 +107,7 @@ public:
 
     enum class PairingWindowOption
     {
-        kOriginalSetupCode,
+        kOriginalSetupCode = 0,
         kTokenWithRandomPIN,
         kTokenWithProvidedPIN,
     };
@@ -298,13 +298,36 @@ public:
      *   The device will exit the pairing mode after a successful pairing, or after the given `timeout` time.
      *
      * @param[in] timeout         The pairing mode should terminate after this much time.
+     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+     *                            PAKE passcode verifier to be used for this commissioning.
+     * @param[in] option          The pairing window can be opened using the original setup code, or an
+     *                            onboarding token can be generated using a random setup PIN code (or with
+     *                            the PIN code provied in the setupPayload).
+     * @param[in] salt            The PAKE Salt associated with the PAKE Passcode ID and ephemeral PAKE passcode
+     *                            verifier to be used for this commissioning.
+     * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, PairingWindowOption option, const ByteSpan & salt,
+                                       SetupPayload & setupPayload);
+
+    /**
+     * @brief
+     *   Trigger a paired device to re-enter the pairing mode. If an onboarding token is provided, the device will use
+     *   the provided setup PIN code and the discriminator to advertise itself for pairing availability. If the token
+     *   is not provided, the device will use the manufacturer assigned setup PIN code and discriminator.
+     *
+     *   The device will exit the pairing mode after a successful pairing, or after the given `timeout` time.
+     *
+     * @param[in] timeout         The pairing mode should terminate after this much time.
      * @param[in] option          The pairing window can be opened using the original setup code, or an
      *                            onboarding token can be generated using a random setup PIN code (or with
      *                            the PIN code provied in the setupPayload). This argument selects one of these
      *                            methods.
      * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
      *
-     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR OpenPairingWindow(uint16_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
 

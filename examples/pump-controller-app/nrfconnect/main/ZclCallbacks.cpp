@@ -7,7 +7,7 @@
  *    You may obtain a copy of the License at
  *
  *        http://www.apache.org/licenses/LICENSE-2.0
- *BoltLockManager
+ *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,8 +20,8 @@
 #include "AppTask.h"
 #include "PumpManager.h"
 
-#include <app/common/gen/ids/Attributes.h>
-#include <app/common/gen/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
@@ -45,11 +45,11 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
 
     if (*value)
     {
-        PumpMgr().InitiateAction(0, PumpManager::LOCK_ACTION);
+        PumpMgr().InitiateAction(0, PumpManager::START_ACTION);
     }
     else
     {
-        PumpMgr().InitiateAction(0, PumpManager::UNLOCK_ACTION);
+        PumpMgr().InitiateAction(0, PumpManager::STOP_ACTION);
     }
 }
 

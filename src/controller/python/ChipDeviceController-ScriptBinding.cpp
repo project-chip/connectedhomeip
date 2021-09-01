@@ -96,6 +96,8 @@ ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Cont
 ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl,
                                                                  chip::NodeId nodeId, char * outAddress, uint64_t maxAddressLen,
                                                                  uint16_t * outPort);
+ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                     uint64_t * outFabricId);
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 
 // Rendezvous
@@ -124,6 +126,10 @@ ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTa
 
 ChipError::StorageType
 pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand(chip::Controller::DeviceCommissioner * devCtrl);
+
+ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                       chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
+                                                                       uint16_t discriminator, uint8_t option);
 
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
@@ -207,7 +213,7 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
 
-    (*outDevCtrl)->SetUdpListenPort(CHIP_PORT + 1);
+    (*outDevCtrl)->SetUdpListenPort(0);
     err = (*outDevCtrl)->Init(initParams);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
@@ -240,9 +246,17 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
     return CHIP_NO_ERROR.AsInteger();
 }
 
+ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                     uint64_t * outFabricId)
+{
+    *outFabricId = devCtrl->GetCompressedFabricId();
+    return CHIP_NO_ERROR.AsInteger();
+}
+
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId)
 {
-    return devCtrl->GetFabricId(*outFabricId).AsInteger();
+    *outFabricId = devCtrl->GetFabricId();
+    return CHIP_NO_ERROR.AsInteger();
 }
 
 const char * pychip_DeviceController_ErrorToString(ChipError::StorageType err)
@@ -358,6 +372,13 @@ pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromComma
     return devCtrl->DiscoverCommissionableNodes(filter).AsInteger();
 }
 
+ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                       chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
+                                                                       uint16_t discriminator, uint8_t option)
+{
+    return devCtrl->OpenCommissioningWindow(nodeid, timeout, iteration, discriminator, option).AsInteger();
+}
+
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl)
 {
     for (int i = 0; i < devCtrl->GetMaxCommissionableNodesSupported(); ++i)
@@ -431,7 +452,7 @@ void pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
 ChipError::StorageType pychip_Resolver_ResolveNode(uint64_t fabricid, chip::NodeId nodeid)
 {
     return Mdns::Resolver::Instance()
-        .ResolveNodeId(PeerId().SetNodeId(nodeid).SetFabricId(fabricid), Inet::kIPAddressType_Any)
+        .ResolveNodeId(PeerId().SetNodeId(nodeid).SetCompressedFabricId(fabricid), Inet::kIPAddressType_Any)
         .AsInteger();
 }
 

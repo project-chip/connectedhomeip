@@ -58,7 +58,7 @@ static void ServiceEvents(Layer & aLayer)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (aLayer.State() == LayerState::kInitialized)
+    if (aLayer.IsInitialized())
     {
         aLayer.WatchableEventsManager().HandlePlatformTimer();
     }

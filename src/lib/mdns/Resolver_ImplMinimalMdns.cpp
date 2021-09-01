@@ -15,12 +15,15 @@
  *    limitations under the License.
  */
 
+#include "MdnsCache.h"
 #include "Resolver.h"
 
 #include <limits>
 
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
+
+#include <core/CHIPConfig.h>
 
 #include <mdns/TxtFields.h>
 #include <mdns/minimal/Parser.h>
@@ -62,15 +65,17 @@ constexpr size_t kMdnsMaxPacketSize = 1024;
 constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
+using MdnsCacheType = Mdns::MdnsCache<CHIP_CONFIG_MDNS_CACHE_SIZE>;
 
 class PacketDataReporter : public ParserDelegate
 {
 public:
     PacketDataReporter(ResolverDelegate * delegate, chip::Inet::InterfaceId interfaceId, DiscoveryType discoveryType,
-                       const BytesRange & packet) :
+                       const BytesRange & packet, MdnsCacheType & mdnsCache) :
         mDelegate(delegate),
         mDiscoveryType(discoveryType), mPacketRange(packet)
     {
+        mInterfaceId           = interfaceId;
         mNodeData.mInterfaceId = interfaceId;
     }
 
@@ -88,6 +93,7 @@ private:
     DiscoveryType mDiscoveryType;
     ResolvedNodeData mNodeData;
     DiscoveredNodeData mDiscoveredNodeData;
+    chip::Inet::InterfaceId mInterfaceId;
     BytesRange mPacketRange;
 
     bool mValid       = false;
@@ -160,6 +166,7 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     {
         strncpy(mDiscoveredNodeData.instanceName, name.Value(), sizeof(DiscoveredNodeData::instanceName));
     }
+    mDiscoveredNodeData.port = srv.GetPort();
 }
 
 void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
@@ -180,7 +187,9 @@ void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress &
     {
         return;
     }
-    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs++] = addr;
+    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs]   = addr;
+    mDiscoveredNodeData.interfaceId[mDiscoveredNodeData.numIPs] = mInterfaceId;
+    mDiscoveredNodeData.numIPs++;
 }
 
 bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
@@ -351,6 +360,9 @@ private:
     }
     static constexpr int kMaxQnameSize = 100;
     char qnameStorage[kMaxQnameSize];
+    // should this be static?
+    // original version had:    static Mdns::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> sIPCache;
+    MdnsCacheType sMdnsCache;
 };
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
@@ -360,7 +372,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
         return;
     }
 
-    PacketDataReporter reporter(mDelegate, info->Interface, mDiscoveryType, data);
+    PacketDataReporter reporter(mDelegate, info->Interface, mDiscoveryType, data, sMdnsCache);
 
     if (!ParsePacket(data, &reporter))
     {

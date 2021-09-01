@@ -16,10 +16,12 @@
  */
 
 #include "Discovery_ImplPlatform.h"
+#include "MdnsCache.h"
 
 #include <inttypes.h>
 
 #include "ServiceNaming.h"
+#include "core/CHIPConfig.h"
 #include "lib/core/CHIPSafeCasts.h"
 #include "lib/mdns/TxtFields.h"
 #include "lib/mdns/platform/Mdns.h"
@@ -35,6 +37,9 @@ namespace chip {
 namespace Mdns {
 
 DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+MdnsCache<CHIP_CONFIG_MDNS_CACHE_SIZE> DiscoveryImplPlatform::sMdnsCache;
+#endif
 
 DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
 
@@ -428,6 +433,28 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
 {
     ReturnErrorOnFailure(Init());
 
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+    Inet::IPAddress addr;
+    uint16_t port;
+    Inet::InterfaceId iface;
+
+    /* see if the entry is cached and use it.... */
+
+    if (sMdnsCache.Lookup(peerId, addr, port, iface) == CHIP_NO_ERROR)
+    {
+        ResolvedNodeData nodeData;
+
+        nodeData.mInterfaceId = iface;
+        nodeData.mPort        = port;
+        nodeData.mAddress     = addr;
+        nodeData.mPeerId      = peerId;
+
+        mResolverDelegate->OnNodeIdResolved(nodeData);
+
+        return CHIP_NO_ERROR;
+    }
+#endif
+
     MdnsService service;
 
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
@@ -463,10 +490,14 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, MdnsService * resu
     DiscoveredNodeData data;
     Platform::CopyString(data.hostName, result->mHostName);
 
-    if (result->mAddress.HasValue())
+    if (result->mAddress.HasValue() && data.numIPs < DiscoveredNodeData::kMaxIPAddresses)
     {
-        data.ipAddress[data.numIPs++] = result->mAddress.Value();
+        data.ipAddress[data.numIPs]   = result->mAddress.Value();
+        data.interfaceId[data.numIPs] = result->mInterface;
+        data.numIPs++;
     }
+
+    data.port = result->mPort;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
@@ -529,6 +560,17 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
         mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), error);
         return;
     }
+
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+    // TODO --  define appropriate TTL, for now use 2000 msec (rfc default)
+    // figure out way to use TTL value from mDNS packet in  future update
+    error = mgr->sMdnsCache.Insert(nodeData.mPeerId, result->mAddress.Value(), result->mPort, result->mInterface, 2 * 1000);
+
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Discovery, "MdnsCache insert failed with %s", chip::ErrorStr(error));
+    }
+#endif
 
     Platform::CopyString(nodeData.mHostName, result->mHostName);
     nodeData.mInterfaceId = result->mInterface;

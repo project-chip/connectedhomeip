@@ -26,7 +26,7 @@
 
 #include <controller/CHIPDevice.h>
 
-#include <controller/data_model/zap-generated/CHIPClusters.h>
+#include <controller-clusters/zap-generated/CHIPClusters.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -38,6 +38,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include <app/CommandSender.h>
+#include <app/ReadPrepareParams.h>
 #include <app/util/DataModelHandler.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
@@ -356,7 +357,8 @@ void Device::OnOpenPairingWindowFailureResponse(void * context, uint8_t status)
     ChipLogError(Controller, "Failed to open pairing window on the device. Status %d", status);
 }
 
-CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
+CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, PairingWindowOption option, const ByteSpan & salt,
+                                           SetupPayload & setupPayload)
 {
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
@@ -370,9 +372,9 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption optio
     {
         bool randomSetupPIN = (option == PairingWindowOption::kTokenWithRandomPIN);
         PASEVerifier verifier;
-        ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
+
         ReturnErrorOnFailure(
-            PASESession::GeneratePASEVerifier(verifier, kPBKDFMinimumIterations, salt, randomSetupPIN, setupPayload.setUpPINCode));
+            PASESession::GeneratePASEVerifier(verifier, iteration, salt, randomSetupPIN, setupPayload.setUpPINCode));
 
         uint8_t serializedVerifier[2 * kSpake2p_WS_Length];
         VerifyOrReturnError(sizeof(serializedVerifier) == sizeof(verifier), CHIP_ERROR_INTERNAL);
@@ -380,9 +382,9 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption optio
         memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
         memcpy(&serializedVerifier[kSpake2p_WS_Length], verifier.mL, kSpake2p_WS_Length);
 
-        ReturnErrorOnFailure(cluster.OpenCommissioningWindow(
-            successCallback, failureCallback, timeout, ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
-            setupPayload.discriminator, kPBKDFMinimumIterations, salt, mPAKEVerifierID++));
+        ReturnErrorOnFailure(cluster.OpenCommissioningWindow(successCallback, failureCallback, timeout,
+                                                             ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
+                                                             setupPayload.discriminator, iteration, salt, mPAKEVerifierID++));
     }
     else
     {
@@ -393,6 +395,13 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption optio
     setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
+{
+    ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
+
+    return OpenCommissioningWindow(timeout, kPBKDFMinimumIterations, option, salt, setupPayload);
 }
 
 CHIP_ERROR Device::CloseSession()
@@ -678,6 +687,7 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeI
 CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
                                             Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter)
 {
+    chip::app::ReadPrepareParams readPrepareParams;
     bool loadedSecureSession = false;
     uint8_t seqNum           = GetNextSequenceNumber();
     aPath.mNodeId            = GetDeviceId();
@@ -690,9 +700,11 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
     }
     // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
     // use the seqNum.
-    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
-        GetDeviceId(), 0, &mSecureSession, nullptr /*event path params list*/, 0, &aPath, 1, 0 /* event number */,
-        seqNum /* application context */);
+    readPrepareParams.mSessionHandle               = mSecureSession;
+    readPrepareParams.mpAttributePathParamsList    = &aPath;
+    readPrepareParams.mAttributePathParamsListSize = 1;
+    CHIP_ERROR err =
+        chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, seqNum /* application context */);
     if (err != CHIP_NO_ERROR)
     {
         CancelResponseHandler(seqNum);

@@ -180,8 +180,8 @@ exit:
 
 CHIP_ERROR SendReadRequest()
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    chip::EventNumber number = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::ReadPrepareParams readPrepareParams;
     chip::app::EventPathParams eventPathParams[2];
     eventPathParams[0].mNodeId     = kTestNodeId;
     eventPathParams[0].mEndpointId = kTestEndpointId;
@@ -198,8 +198,13 @@ CHIP_ERROR SendReadRequest()
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
-        chip::kTestDeviceNodeId, gFabricIndex, nullptr, eventPathParams, 2, &attributePathParams, 1, number, gMessageTimeoutMsec);
+    readPrepareParams.mSessionHandle               = chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex);
+    readPrepareParams.mTimeout                     = gMessageTimeoutMsec;
+    readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 1;
+    readPrepareParams.mpEventPathParamsList        = eventPathParams;
+    readPrepareParams.mEventPathParamsListSize     = 2;
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams);
     SuccessOrExit(err);
 
 exit:
@@ -437,15 +442,19 @@ public:
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR ReportProcessed(const chip::app::ReadClient * apReadClient) override
+    CHIP_ERROR ReportProcessed(const chip::app::ReadClient * apReadClient) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ReadError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
-        HandleReadComplete();
+        printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format());
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR ReportError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
-        printf("ReportError with err %" CHIP_ERROR_FORMAT, aError.Format());
-        return CHIP_NO_ERROR;
+        if (aError == CHIP_NO_ERROR)
+        {
+            HandleReadComplete();
+        }
+        return aError;
     }
     CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * apCommandSender,
                                      const chip::Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
