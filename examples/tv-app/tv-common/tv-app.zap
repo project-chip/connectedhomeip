@@ -1312,7 +1312,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -3158,7 +3158,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "AddNOC",
@@ -3166,7 +3166,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "UpdateNOC",
