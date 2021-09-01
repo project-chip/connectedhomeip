@@ -170,6 +170,8 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
+    gLoopback.Reset();
+
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
     CASESession pairing;
@@ -203,7 +205,7 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0, context1,
                                              &delegate) == CHIP_ERROR_BAD_REQUEST);
-    gLoopback.mMessageSendError = CHIP_NO_ERROR;
+    gLoopback.Reset();
 }
 
 void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
@@ -251,7 +253,19 @@ void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
     TestCASESecurePairingDelegate delegateCommissioner;
     TestCASESessionIPK pairingCommissioner;
+    gLoopback.Reset();
     CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
+    gLoopback.Reset();
+}
+
+void CASE_SecurePairingHandshakeWithDuplicateMessagesTest(nlTestSuite * inSuite, void * inContext)
+{
+    TestCASESecurePairingDelegate delegateCommissioner;
+    TestCASESessionIPK pairingCommissioner;
+    gLoopback.Reset();
+    gLoopback.mSendDuplicateMessage = true;
+    CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
+    gLoopback.Reset();
 }
 
 class TestPersistentStorageDelegate : public PersistentStorageDelegate
@@ -342,7 +356,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    gLoopback.mSentMessageCount = 0;
+    gLoopback.Reset();
     NL_TEST_ASSERT(inSuite, pairingCommissioner->MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gPairingServer.GetSession().MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
 
@@ -375,6 +389,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     chip::Platform::Delete(pairingCommissioner);
     chip::Platform::Delete(pairingCommissioner1);
+    gLoopback.Reset();
 }
 
 void CASE_SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
@@ -400,6 +415,7 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     auto * testPairingSession1 = chip::Platform::New<TestCASESessionIPK>();
     auto * testPairingSession2 = chip::Platform::New<TestCASESessionIPK>();
 
+    gLoopback.Reset();
     CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, *testPairingSession1, delegateCommissioner);
     CASE_SecurePairingDeserialize(inSuite, inContext, *testPairingSession1, *testPairingSession2);
 
@@ -430,6 +446,7 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
 
     chip::Platform::Delete(testPairingSession1);
     chip::Platform::Delete(testPairingSession2);
+    gLoopback.Reset();
 }
 
 // Test Suite
@@ -443,6 +460,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("WaitInit",    CASE_SecurePairingWaitTest),
     NL_TEST_DEF("Start",       CASE_SecurePairingStartTest),
     NL_TEST_DEF("Handshake",   CASE_SecurePairingHandshakeTest),
+    NL_TEST_DEF("Handshake with duplicate messages",   CASE_SecurePairingHandshakeWithDuplicateMessagesTest),
     NL_TEST_DEF("ServerHandshake", CASE_SecurePairingHandshakeServerTest),
     NL_TEST_DEF("Serialize",   CASE_SecurePairingSerializeTest),
 

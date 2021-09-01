@@ -224,7 +224,8 @@ private:
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
-    Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
+    Protocols::SecureChannel::MsgType mNextExpectedMsg  = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
+    Protocols::SecureChannel::MsgType mLastProcessedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
 
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;

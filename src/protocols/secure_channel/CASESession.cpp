@@ -87,7 +87,8 @@ void CASESession::Clear()
 {
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
-    mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
+    mLastProcessedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
+    mNextExpectedMsg  = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
     mCommissioningHash.Clear();
     mPairingComplete = false;
     PairingSession::Clear();
@@ -418,6 +419,8 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle && msg)
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.GetBytes(mRemotePubKey, static_cast<uint32_t>(mRemotePubKey.Length())));
 
+    mLastProcessedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR1;
+
 exit:
 
     if (err != CHIP_NO_ERROR)
@@ -723,6 +726,8 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle && msg)
     // Validate signature
     SuccessOrExit(err = remoteCredential.ECDSA_validate_msg_signature(msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature));
 
+    mLastProcessedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR2;
+
 exit:
     if (err == CHIP_ERROR_INVALID_SIGNATURE)
     {
@@ -1010,6 +1015,8 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle && msg)
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
 
+    mLastProcessedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR3;
+
 exit:
     if (err == CHIP_ERROR_INVALID_SIGNATURE)
     {
@@ -1207,6 +1214,12 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
     }
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (payloadHeader.HasMessageType(mLastProcessedMsg))
+    {
+        return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
+    }
+
     VerifyOrReturnError(payloadHeader.HasMessageType(mNextExpectedMsg) ||
                             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_SigmaErr),
                         CHIP_ERROR_INVALID_MESSAGE_TYPE);
@@ -1218,6 +1231,10 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHead
                                           const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, msg);
+    if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
+    {
+        ExitNow(err = CHIP_NO_ERROR);
+    }
     SuccessOrExit(err);
 
     SetPeerAddress(mMessageDispatch.GetPeerAddress());

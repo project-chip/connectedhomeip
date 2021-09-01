@@ -208,6 +208,16 @@ void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
     SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
 }
 
+void SecurePairingHandshakeWithDuplicatePacketTest(nlTestSuite * inSuite, void * inContext)
+{
+    TestSecurePairingDelegate delegateCommissioner;
+    PASESession pairingCommissioner;
+    gLoopback.Reset();
+    gLoopback.mSendDuplicateMessage = true;
+    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
+    gLoopback.Reset();
+}
+
 void SecurePairingHandshakeWithPacketLossTest(nlTestSuite * inSuite, void * inContext)
 {
     TestSecurePairingDelegate delegateCommissioner;
@@ -339,6 +349,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("WaitInit",    SecurePairingWaitTest),
     NL_TEST_DEF("Start",       SecurePairingStartTest),
     NL_TEST_DEF("Handshake",   SecurePairingHandshakeTest),
+    NL_TEST_DEF("Handshake with duplicate packets",   SecurePairingHandshakeWithDuplicatePacketTest),
     NL_TEST_DEF("Handshake with packet loss", SecurePairingHandshakeWithPacketLossTest),
     NL_TEST_DEF("Failed Handshake", SecurePairingFailedHandshake),
     NL_TEST_DEF("Serialize",   SecurePairingSerializeTest),

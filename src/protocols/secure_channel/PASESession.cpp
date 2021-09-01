@@ -82,7 +82,8 @@ void PASESession::Clear()
     memset(&mPoint[0], 0, sizeof(mPoint));
     memset(&mPASEVerifier, 0, sizeof(mPASEVerifier));
     memset(&mKe[0], 0, sizeof(mKe));
-    mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
+    mNextExpectedMsg  = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
+    mLastProcessedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
 
     // Note: we don't need to explicitly clear the state of mSpake2p object.
     //       Clearing the following state takes care of it.
@@ -383,6 +384,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(const System::PacketBufferHandle
     err = mCommissioningHash.AddData(ByteSpan{ req, reqlen });
     SuccessOrExit(err);
 
+    mLastProcessedMsg = Protocols::SecureChannel::MsgType::PBKDFParamRequest;
+
     err = SendPBKDFParamResponse();
     SuccessOrExit(err);
 
@@ -476,6 +479,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(const System::PacketBufferHandl
         SuccessOrExit(err);
     }
 
+    mLastProcessedMsg = Protocols::SecureChannel::MsgType::PBKDFParamResponse;
+
     err = SendMsg1();
     SuccessOrExit(err);
 
@@ -564,7 +569,8 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const System::PacketBufferHandle
         bbuf.Put(verifier, verifier_len);
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
 
-        mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p3;
+        mLastProcessedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p1;
+        mNextExpectedMsg  = Protocols::SecureChannel::MsgType::PASE_Spake2p3;
 
         // Call delegate to send the Msg2 to peer
         err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p2, bbuf.Finalize(),
@@ -639,6 +645,8 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
         bbuf.Put(verifier, verifier_len);
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
 
+        mLastProcessedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p2;
+
         // Call delegate to send the Msg3 to peer
         err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p3, bbuf.Finalize());
         SuccessOrExit(err);
@@ -673,7 +681,8 @@ CHIP_ERROR PASESession::HandleMsg3(const System::PacketBufferHandle & msg)
 
     // We will set NextExpectedMsg to PASE_Spake2pError in all cases
     // However, when we are using IP rendezvous, we might set it to PASE_Spake2p1.
-    mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
+    mNextExpectedMsg  = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
+    mLastProcessedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p3;
 
     VerifyOrExit(hash != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(msg->DataLength() == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -776,6 +785,12 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     }
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (payloadHeader.HasMessageType(mLastProcessedMsg))
+    {
+        return CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED;
+    }
+
     VerifyOrReturnError(payloadHeader.HasMessageType(mNextExpectedMsg) ||
                             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::PASE_Spake2pError),
                         CHIP_ERROR_INVALID_MESSAGE_TYPE);
@@ -787,6 +802,10 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Pack
                                           const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = ValidateReceivedMessage(exchange, packetHeader, payloadHeader, std::move(msg));
+    if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
+    {
+        ExitNow(err = CHIP_NO_ERROR);
+    }
     SuccessOrExit(err);
 
     SetPeerAddress(mMessageDispatch.GetPeerAddress());
