@@ -104,7 +104,7 @@ public:
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             break;
         case PairingMode::OpenCommissioningWindow:
-            AddArgument("option", 0, UINT8_MAX, &mPairingWindowOption);
+            AddArgument("option", 0, UINT8_MAX, &mCommissioningWindowOption);
             AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
             AddArgument("iteration", 0, UINT16_MAX, &mIteration);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
@@ -162,7 +162,7 @@ private:
     uint16_t mIteration;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
-    uint8_t mPairingWindowOption;
+    uint8_t mCommissioningWindowOption;
     chip::ByteSpan mOperationalDataset;
     uint8_t mExtendedPanId[chip::Thread::kSizeExtendedPanId];
     chip::ByteSpan mSSID;

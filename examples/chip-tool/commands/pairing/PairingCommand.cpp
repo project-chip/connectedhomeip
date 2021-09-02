@@ -98,7 +98,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
     case PairingMode::OpenCommissioningWindow:
-        err = OpenCommissioningWindow(remoteId, mTimeout, mIteration, mDiscriminator, mPairingWindowOption);
+        err = OpenCommissioningWindow(remoteId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption);
         break;
     }
 
