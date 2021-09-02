@@ -134,26 +134,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTestCluster_Reporting_0000_BindOnOff_Test
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Binding to OnOff Cluster complete"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPBinding * bindingCluster = [[CHIPBinding alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(bindingCluster);
-    [bindingCluster bind:kDeviceId groupId:0
-              endpointId:1
-               clusterId:6
-         responseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Reporting Test Binding status : %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterTestCluster_Reporting_0001_ConfigureOnOff_Test
+- (void)testSendClusterTestCluster_Reporting_0000_ConfigureOnOff_Test
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reporting OnOff configured"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -162,6 +143,8 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     XCTAssertNotNil(onOffCluster);
     [onOffCluster configureAttributeOnOffWithMinInterval:0
                                              maxInterval:1
+                                   reportDestinationNode:kDeviceId
+                                     destinationEndpoint:1
                                          responseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"Reporting Test Configure status: %@", err);
 
@@ -172,7 +155,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTestCluster_Reporting_0002_ReportOnOff_Test
+- (void)testSendClusterTestCluster_Reporting_0001_ReportOnOff_Test
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"First report received"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -189,7 +172,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTestCluster_Reporting_0003_StopReportOnOff_Test
+- (void)testSendClusterTestCluster_Reporting_0002_StopReportOnOff_Test
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reporting OnOff cancelled"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -198,6 +181,8 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     XCTAssertNotNil(onOffCluster);
     [onOffCluster configureAttributeOnOffWithMinInterval:0
                                              maxInterval:0xffff
+                                   reportDestinationNode:kDeviceId
+                                     destinationEndpoint:1
                                          responseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"Reporting Test Cancel Reports status: %@", err);
 

@@ -3675,8 +3675,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributePresentValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                      mMaxInterval);
+        return cluster.ConfigureAttributePresentValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                      GetExecContext()->localId, 1, mMinInterval, mMaxInterval);
     }
 
 private:
@@ -3755,8 +3755,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeStatusFlags(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                     mMaxInterval);
+        return cluster.ConfigureAttributeStatusFlags(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                     GetExecContext()->localId, 1, mMinInterval, mMaxInterval);
     }
 
 private:
@@ -5541,8 +5541,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                    mMaxInterval, mChange);
+        return cluster.ConfigureAttributeCurrentHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                    GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -5623,8 +5623,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentSaturation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                           mMaxInterval, mChange);
+        return cluster.ConfigureAttributeCurrentSaturation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                           GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -5739,8 +5739,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentX(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                  mMaxInterval, mChange);
+        return cluster.ConfigureAttributeCurrentX(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                  GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -5821,8 +5821,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentY(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                  mMaxInterval, mChange);
+        return cluster.ConfigureAttributeCurrentY(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                  GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -5971,8 +5971,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeColorTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                          mMaxInterval, mChange);
+        return cluster.ConfigureAttributeColorTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                          GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -9430,8 +9430,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeLockState(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                   mMaxInterval);
+        return cluster.ConfigureAttributeLockState(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                   GetExecContext()->localId, 1, mMinInterval, mMaxInterval);
     }
 
 private:
@@ -12202,8 +12202,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                      mMaxInterval, mChange);
+        return cluster.ConfigureAttributeCurrentLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                      GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -13839,8 +13839,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeOccupancy(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                   mMaxInterval);
+        return cluster.ConfigureAttributeOccupancy(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                   GetExecContext()->localId, 1, mMinInterval, mMaxInterval);
     }
 
 private:
@@ -14263,8 +14263,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeOnOff(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                               mMaxInterval);
+        return cluster.ConfigureAttributeOnOff(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), GetExecContext()->localId,
+                                               1, mMinInterval, mMaxInterval);
     }
 
 private:
@@ -15303,8 +15303,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                       mMaxInterval, mChange);
+        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                       GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -15703,8 +15703,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCapacity(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                  mMaxInterval, mChange);
+        return cluster.ConfigureAttributeCapacity(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                  GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -15928,8 +15928,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                       mMaxInterval, mChange);
+        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                       GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -16843,8 +16843,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentPosition(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                         mMaxInterval, mChange);
+        return cluster.ConfigureAttributeCurrentPosition(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                         GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -17436,8 +17436,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                       mMaxInterval, mChange);
+        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                       GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -19553,8 +19553,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeLocalTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                          mMaxInterval, mChange);
+        return cluster.ConfigureAttributeLocalTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                          GetExecContext()->localId, 1, mMinInterval, mMaxInterval, mChange);
     }
 
 private:
@@ -23779,7 +23779,8 @@ public:
         }
 
         return cluster.ConfigureAttributeCurrentPositionLiftPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                       mMinInterval, mMaxInterval, mChange);
+                                                                       GetExecContext()->localId, 1, mMinInterval, mMaxInterval,
+                                                                       mChange);
     }
 
 private:
@@ -23861,7 +23862,8 @@ public:
         }
 
         return cluster.ConfigureAttributeCurrentPositionTiltPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                       mMinInterval, mMaxInterval, mChange);
+                                                                       GetExecContext()->localId, 1, mMinInterval, mMaxInterval,
+                                                                       mChange);
     }
 
 private:
@@ -23941,8 +23943,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeOperationalStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                           mMaxInterval);
+        return cluster.ConfigureAttributeOperationalStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                           GetExecContext()->localId, 1, mMinInterval, mMaxInterval);
     }
 
 private:
@@ -24023,7 +24025,8 @@ public:
         }
 
         return cluster.ConfigureAttributeTargetPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                         mMinInterval, mMaxInterval, mChange);
+                                                                         GetExecContext()->localId, 1, mMinInterval, mMaxInterval,
+                                                                         mChange);
     }
 
 private:
@@ -24105,7 +24108,8 @@ public:
         }
 
         return cluster.ConfigureAttributeTargetPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                         mMinInterval, mMaxInterval, mChange);
+                                                                         GetExecContext()->localId, 1, mMinInterval, mMaxInterval,
+                                                                         mChange);
     }
 
 private:
@@ -24221,7 +24225,8 @@ public:
         }
 
         return cluster.ConfigureAttributeCurrentPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                          mMinInterval, mMaxInterval, mChange);
+                                                                          GetExecContext()->localId, 1, mMinInterval, mMaxInterval,
+                                                                          mChange);
     }
 
 private:
@@ -24303,7 +24308,8 @@ public:
         }
 
         return cluster.ConfigureAttributeCurrentPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                          mMinInterval, mMaxInterval, mChange);
+                                                                          GetExecContext()->localId, 1, mMinInterval, mMaxInterval,
+                                                                          mChange);
     }
 
 private:
@@ -24586,8 +24592,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeSafetyStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                      mMaxInterval);
+        return cluster.ConfigureAttributeSafetyStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                      GetExecContext()->localId, 1, mMinInterval, mMaxInterval);
     }
 
 private:

@@ -1265,8 +1265,9 @@ CHIP_ERROR BinaryInputBasicCluster::WriteAttributePresentValue(Callback::Cancela
 }
 
 CHIP_ERROR BinaryInputBasicCluster::ConfigureAttributePresentValue(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
+                                                                   Callback::Cancelable * onFailureCallback,
+                                                                   NodeId reportDestination, EndpointId destinationEndpoint,
+                                                                   uint16_t minInterval, uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportBinaryInputBasicPresentValue", BinaryInputBasic::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -1276,7 +1277,9 @@ CHIP_ERROR BinaryInputBasicCluster::ConfigureAttributePresentValue(Callback::Can
         .Put32(BinaryInputBasic::Attributes::Ids::PresentValue)
         .Put8(16)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     COMMAND_FOOTER();
 }
 
@@ -1298,8 +1301,9 @@ CHIP_ERROR BinaryInputBasicCluster::ReadAttributeStatusFlags(Callback::Cancelabl
 }
 
 CHIP_ERROR BinaryInputBasicCluster::ConfigureAttributeStatusFlags(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
+                                                                  Callback::Cancelable * onFailureCallback,
+                                                                  NodeId reportDestination, EndpointId destinationEndpoint,
+                                                                  uint16_t minInterval, uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportBinaryInputBasicStatusFlags", BinaryInputBasic::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -1309,7 +1313,9 @@ CHIP_ERROR BinaryInputBasicCluster::ConfigureAttributeStatusFlags(Callback::Canc
         .Put32(BinaryInputBasic::Attributes::Ids::StatusFlags)
         .Put8(24)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     COMMAND_FOOTER();
 }
 
@@ -2619,7 +2625,8 @@ CHIP_ERROR ColorControlCluster::ReadAttributeCurrentHue(Callback::Cancelable * o
 }
 
 CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                             Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+                                                             EndpointId destinationEndpoint, uint16_t minInterval,
                                                              uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentHue", ColorControl::Id);
@@ -2630,7 +2637,9 @@ CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentHue(Callback::Cancelabl
         .Put32(ColorControl::Attributes::Ids::CurrentHue)
         .Put8(32)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -2653,8 +2662,9 @@ CHIP_ERROR ColorControlCluster::ReadAttributeCurrentSaturation(Callback::Cancela
 }
 
 CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval, uint8_t change)
+                                                                    Callback::Cancelable * onFailureCallback,
+                                                                    NodeId reportDestination, EndpointId destinationEndpoint,
+                                                                    uint16_t minInterval, uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentSaturation", ColorControl::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -2664,7 +2674,9 @@ CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentSaturation(Callback::Ca
         .Put32(ColorControl::Attributes::Ids::CurrentSaturation)
         .Put8(32)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -2699,7 +2711,8 @@ CHIP_ERROR ColorControlCluster::ReadAttributeCurrentX(Callback::Cancelable * onS
 }
 
 CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentX(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                           Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+                                                           EndpointId destinationEndpoint, uint16_t minInterval,
                                                            uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentX", ColorControl::Id);
@@ -2710,7 +2723,9 @@ CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentX(Callback::Cancelable 
         .Put32(ColorControl::Attributes::Ids::CurrentX)
         .Put8(33)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -2733,7 +2748,8 @@ CHIP_ERROR ColorControlCluster::ReadAttributeCurrentY(Callback::Cancelable * onS
 }
 
 CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                           Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+                                                           EndpointId destinationEndpoint, uint16_t minInterval,
                                                            uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportColorControlCurrentY", ColorControl::Id);
@@ -2744,7 +2760,9 @@ CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentY(Callback::Cancelable 
         .Put32(ColorControl::Attributes::Ids::CurrentY)
         .Put8(33)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -2791,8 +2809,9 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorTemperature(Callback::Cancelab
 }
 
 CHIP_ERROR ColorControlCluster::ConfigureAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval, uint16_t change)
+                                                                   Callback::Cancelable * onFailureCallback,
+                                                                   NodeId reportDestination, EndpointId destinationEndpoint,
+                                                                   uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportColorControlColorTemperature", ColorControl::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -2802,7 +2821,9 @@ CHIP_ERROR ColorControlCluster::ConfigureAttributeColorTemperature(Callback::Can
         .Put32(ColorControl::Attributes::Ids::ColorTemperature)
         .Put8(33)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -4841,8 +4862,8 @@ CHIP_ERROR DoorLockCluster::ReadAttributeLockState(Callback::Cancelable * onSucc
 }
 
 CHIP_ERROR DoorLockCluster::ConfigureAttributeLockState(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
+                                                        Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+                                                        EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportDoorLockLockState", DoorLock::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -4852,7 +4873,9 @@ CHIP_ERROR DoorLockCluster::ConfigureAttributeLockState(Callback::Cancelable * o
         .Put32(DoorLock::Attributes::Ids::LockState)
         .Put8(48)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     COMMAND_FOOTER();
 }
 
@@ -6408,7 +6431,8 @@ CHIP_ERROR LevelControlCluster::ReadAttributeCurrentLevel(Callback::Cancelable *
 }
 
 CHIP_ERROR LevelControlCluster::ConfigureAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                               Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+                                                               EndpointId destinationEndpoint, uint16_t minInterval,
                                                                uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportLevelControlCurrentLevel", LevelControl::Id);
@@ -6419,7 +6443,9 @@ CHIP_ERROR LevelControlCluster::ConfigureAttributeCurrentLevel(Callback::Cancela
         .Put32(LevelControl::Attributes::Ids::CurrentLevel)
         .Put8(32)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -7809,7 +7835,8 @@ CHIP_ERROR OccupancySensingCluster::ReadAttributeOccupancy(Callback::Cancelable 
 }
 
 CHIP_ERROR OccupancySensingCluster::ConfigureAttributeOccupancy(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+                                                                EndpointId destinationEndpoint, uint16_t minInterval,
                                                                 uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportOccupancySensingOccupancy", OccupancySensing::Id);
@@ -7820,7 +7847,9 @@ CHIP_ERROR OccupancySensingCluster::ConfigureAttributeOccupancy(Callback::Cancel
         .Put32(OccupancySensing::Attributes::Ids::Occupancy)
         .Put8(24)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     COMMAND_FOOTER();
 }
 
@@ -8126,7 +8155,8 @@ CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCall
 }
 
 CHIP_ERROR OnOffCluster::ConfigureAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval)
+                                                 NodeId reportDestination, EndpointId destinationEndpoint, uint16_t minInterval,
+                                                 uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportOnOffOnOff", OnOff::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -8136,7 +8166,9 @@ CHIP_ERROR OnOffCluster::ConfigureAttributeOnOff(Callback::Cancelable * onSucces
         .Put32(OnOff::Attributes::Ids::OnOff)
         .Put8(16)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     COMMAND_FOOTER();
 }
 
@@ -8712,6 +8744,7 @@ CHIP_ERROR PressureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Canc
 
 CHIP_ERROR PressureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback,
+                                                                       NodeId reportDestination, EndpointId destinationEndpoint,
                                                                        uint16_t minInterval, uint16_t maxInterval, int16_t change)
 {
     COMMAND_HEADER("ReportPressureMeasurementMeasuredValue", PressureMeasurement::Id);
@@ -8722,7 +8755,9 @@ CHIP_ERROR PressureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback:
         .Put32(PressureMeasurement::Attributes::Ids::MeasuredValue)
         .Put8(41)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -8852,6 +8887,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeCapacity(Callback::C
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ConfigureAttributeCapacity(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback,
+                                                                          NodeId reportDestination, EndpointId destinationEndpoint,
                                                                           uint16_t minInterval, uint16_t maxInterval,
                                                                           int16_t change)
 {
@@ -8863,7 +8899,9 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ConfigureAttributeCapacity(Callba
         .Put32(PumpConfigurationAndControl::Attributes::Ids::Capacity)
         .Put8(41)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -8938,8 +8976,9 @@ CHIP_ERROR RelativeHumidityMeasurementCluster::ReadAttributeMeasuredValue(Callba
 
 CHIP_ERROR RelativeHumidityMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval,
-                                                                               uint16_t change)
+                                                                               NodeId reportDestination,
+                                                                               EndpointId destinationEndpoint, uint16_t minInterval,
+                                                                               uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportRelativeHumidityMeasurementMeasuredValue", RelativeHumidityMeasurement::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -8949,7 +8988,9 @@ CHIP_ERROR RelativeHumidityMeasurementCluster::ConfigureAttributeMeasuredValue(C
         .Put32(RelativeHumidityMeasurement::Attributes::Ids::MeasuredValue)
         .Put8(33)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -9494,7 +9535,8 @@ CHIP_ERROR SwitchCluster::ReadAttributeCurrentPosition(Callback::Cancelable * on
 }
 
 CHIP_ERROR SwitchCluster::ConfigureAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                            Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+                                                            EndpointId destinationEndpoint, uint16_t minInterval,
                                                             uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportSwitchCurrentPosition", Switch::Id);
@@ -9505,7 +9547,9 @@ CHIP_ERROR SwitchCluster::ConfigureAttributeCurrentPosition(Callback::Cancelable
         .Put32(Switch::Attributes::Ids::CurrentPosition)
         .Put8(32)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -9811,6 +9855,7 @@ CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::C
 
 CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback,
+                                                                          NodeId reportDestination, EndpointId destinationEndpoint,
                                                                           uint16_t minInterval, uint16_t maxInterval,
                                                                           int16_t change)
 {
@@ -9822,7 +9867,9 @@ CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callba
         .Put32(TemperatureMeasurement::Attributes::Ids::MeasuredValue)
         .Put8(41)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -10935,7 +10982,8 @@ CHIP_ERROR ThermostatCluster::ReadAttributeLocalTemperature(Callback::Cancelable
 }
 
 CHIP_ERROR ThermostatCluster::ConfigureAttributeLocalTemperature(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                 Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+                                                                 EndpointId destinationEndpoint, uint16_t minInterval,
                                                                  uint16_t maxInterval, int16_t change)
 {
     COMMAND_HEADER("ReportThermostatLocalTemperature", Thermostat::Id);
@@ -10946,7 +10994,9 @@ CHIP_ERROR ThermostatCluster::ConfigureAttributeLocalTemperature(Callback::Cance
         .Put32(Thermostat::Attributes::Ids::LocalTemperature)
         .Put8(41)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -12699,10 +12749,9 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionLiftPercentage(Cal
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval,
-                                                                                  uint8_t change)
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionLiftPercentage(
+    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+    EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportWindowCoveringCurrentPositionLiftPercentage", WindowCovering::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -12712,7 +12761,9 @@ CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionLiftPercentag
         .Put32(WindowCovering::Attributes::Ids::CurrentPositionLiftPercentage)
         .Put8(32)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -12734,10 +12785,9 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionTiltPercentage(Cal
                                              BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval,
-                                                                                  uint8_t change)
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionTiltPercentage(
+    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+    EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportWindowCoveringCurrentPositionTiltPercentage", WindowCovering::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -12747,7 +12797,9 @@ CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionTiltPercentag
         .Put32(WindowCovering::Attributes::Ids::CurrentPositionTiltPercentage)
         .Put8(32)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -12771,6 +12823,7 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeOperationalStatus(Callback::Cance
 
 CHIP_ERROR WindowCoveringCluster::ConfigureAttributeOperationalStatus(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback,
+                                                                      NodeId reportDestination, EndpointId destinationEndpoint,
                                                                       uint16_t minInterval, uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportWindowCoveringOperationalStatus", WindowCovering::Id);
@@ -12781,7 +12834,9 @@ CHIP_ERROR WindowCoveringCluster::ConfigureAttributeOperationalStatus(Callback::
         .Put32(WindowCovering::Attributes::Ids::OperationalStatus)
         .Put8(24)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     COMMAND_FOOTER();
 }
 
@@ -12802,10 +12857,9 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeTargetPositionLiftPercent100ths(C
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                    Callback::Cancelable * onFailureCallback,
-                                                                                    uint16_t minInterval, uint16_t maxInterval,
-                                                                                    uint16_t change)
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeTargetPositionLiftPercent100ths(
+    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+    EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportWindowCoveringTargetPositionLiftPercent100ths", WindowCovering::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -12815,7 +12869,9 @@ CHIP_ERROR WindowCoveringCluster::ConfigureAttributeTargetPositionLiftPercent100
         .Put32(WindowCovering::Attributes::Ids::TargetPositionLiftPercent100ths)
         .Put8(33)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -12837,10 +12893,9 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeTargetPositionTiltPercent100ths(C
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                    Callback::Cancelable * onFailureCallback,
-                                                                                    uint16_t minInterval, uint16_t maxInterval,
-                                                                                    uint16_t change)
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeTargetPositionTiltPercent100ths(
+    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+    EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportWindowCoveringTargetPositionTiltPercent100ths", WindowCovering::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -12850,7 +12905,9 @@ CHIP_ERROR WindowCoveringCluster::ConfigureAttributeTargetPositionTiltPercent100
         .Put32(WindowCovering::Attributes::Ids::TargetPositionTiltPercent100ths)
         .Put8(33)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -12884,10 +12941,9 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionLiftPercent100ths(
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                     Callback::Cancelable * onFailureCallback,
-                                                                                     uint16_t minInterval, uint16_t maxInterval,
-                                                                                     uint16_t change)
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionLiftPercent100ths(
+    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+    EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportWindowCoveringCurrentPositionLiftPercent100ths", WindowCovering::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -12897,7 +12953,9 @@ CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionLiftPercent10
         .Put32(WindowCovering::Attributes::Ids::CurrentPositionLiftPercent100ths)
         .Put8(33)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -12919,10 +12977,9 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionTiltPercent100ths(
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                     Callback::Cancelable * onFailureCallback,
-                                                                                     uint16_t minInterval, uint16_t maxInterval,
-                                                                                     uint16_t change)
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionTiltPercent100ths(
+    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+    EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     COMMAND_HEADER("ReportWindowCoveringCurrentPositionTiltPercent100ths", WindowCovering::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -12932,7 +12989,9 @@ CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionTiltPercent10
         .Put32(WindowCovering::Attributes::Ids::CurrentPositionTiltPercent100ths)
         .Put8(33)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -13032,7 +13091,8 @@ CHIP_ERROR WindowCoveringCluster::ReadAttributeSafetyStatus(Callback::Cancelable
 }
 
 CHIP_ERROR WindowCoveringCluster::ConfigureAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                 Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+                                                                 EndpointId destinationEndpoint, uint16_t minInterval,
                                                                  uint16_t maxInterval)
 {
     COMMAND_HEADER("ReportWindowCoveringSafetyStatus", WindowCovering::Id);
@@ -13043,7 +13103,9 @@ CHIP_ERROR WindowCoveringCluster::ConfigureAttributeSafetyStatus(Callback::Cance
         .Put32(WindowCovering::Attributes::Ids::SafetyStatus)
         .Put8(25)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     COMMAND_FOOTER();
 }
 

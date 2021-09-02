@@ -47,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttribute{{asUpperCamelCase name}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{#if isReportableAttribute}}
-- (void) configureAttribute{{asUpperCamelCase name}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler;
+- (void) configureAttribute{{asUpperCamelCase name}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval reportDestinationNode:(uint64_t)reportDestinationNode destinationEndpoint:(uint16_t)destinationEndpoint{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler;
 - (void) reportAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{/chip_server_cluster_attributes}}

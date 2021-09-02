@@ -104,8 +104,9 @@ CHIP_ERROR FlowMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelab
 }
 
 CHIP_ERROR FlowMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval, int16_t change)
+                                                                   Callback::Cancelable * onFailureCallback,
+                                                                   NodeId reportDestination, EndpointId destinationEndpoint,
+                                                                   uint16_t minInterval, uint16_t maxInterval, int16_t change)
 {
     COMMAND_HEADER("ReportFlowMeasurementMeasuredValue", FlowMeasurement::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -115,7 +116,9 @@ CHIP_ERROR FlowMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Can
         .Put32(FlowMeasurement::Attributes::Ids::MeasuredValue)
         .Put8(41)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -541,7 +544,8 @@ CHIP_ERROR LevelControlCluster::ReadAttributeCurrentLevel(Callback::Cancelable *
 }
 
 CHIP_ERROR LevelControlCluster::ConfigureAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                               Callback::Cancelable * onFailureCallback, NodeId reportDestination,
+                                                               EndpointId destinationEndpoint, uint16_t minInterval,
                                                                uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportLevelControlCurrentLevel", LevelControl::Id);
@@ -552,7 +556,9 @@ CHIP_ERROR LevelControlCluster::ConfigureAttributeCurrentLevel(Callback::Cancela
         .Put32(LevelControl::Attributes::Ids::CurrentLevel)
         .Put8(32)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -744,6 +750,7 @@ CHIP_ERROR PressureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Canc
 
 CHIP_ERROR PressureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback,
+                                                                       NodeId reportDestination, EndpointId destinationEndpoint,
                                                                        uint16_t minInterval, uint16_t maxInterval, int16_t change)
 {
     COMMAND_HEADER("ReportPressureMeasurementMeasuredValue", PressureMeasurement::Id);
@@ -754,7 +761,9 @@ CHIP_ERROR PressureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback:
         .Put32(PressureMeasurement::Attributes::Ids::MeasuredValue)
         .Put8(41)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -884,6 +893,7 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeCapacity(Callback::C
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ConfigureAttributeCapacity(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback,
+                                                                          NodeId reportDestination, EndpointId destinationEndpoint,
                                                                           uint16_t minInterval, uint16_t maxInterval,
                                                                           int16_t change)
 {
@@ -895,7 +905,9 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ConfigureAttributeCapacity(Callba
         .Put32(PumpConfigurationAndControl::Attributes::Ids::Capacity)
         .Put8(41)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -970,6 +982,7 @@ CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::C
 
 CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback,
+                                                                          NodeId reportDestination, EndpointId destinationEndpoint,
                                                                           uint16_t minInterval, uint16_t maxInterval,
                                                                           int16_t change)
 {
@@ -981,7 +994,9 @@ CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callba
         .Put32(TemperatureMeasurement::Attributes::Ids::MeasuredValue)
         .Put8(41)
         .Put16(minInterval)
-        .Put16(maxInterval);
+        .Put16(maxInterval)
+        .Put64(reportDestination)
+        .Put16(destinationEndpoint);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }

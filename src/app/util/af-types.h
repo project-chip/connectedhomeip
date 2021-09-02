@@ -1065,6 +1065,10 @@ typedef struct
              *  being sent.
              */
             uint32_t reportableChange;
+            /** The node id to which the report should be sent. */
+            chip::NodeId reportDestination;
+            /** The endpoint to which the report should be sent. */
+            chip::EndpointId destinationEndpoint;
         } reported;
         struct
         {

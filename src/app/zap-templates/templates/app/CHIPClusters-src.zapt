@@ -159,7 +159,7 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::WriteAttribute{{asUpperCamel
 
 {{/if}}
 {{#if isReportableAttribute}}
-CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ConfigureAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}})
+CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ConfigureAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, NodeId reportDestination, EndpointId destinationEndpoint, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}})
 {
     COMMAND_HEADER("Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}", {{asUpperCamelCase parent.name}}::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -169,7 +169,9 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ConfigureAttribute{{asUpperC
        .Put32({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::Ids::{{asUpperCamelCase name}})
        .Put8({{atomicTypeId}})
        .Put16(minInterval)
-       .Put16(maxInterval);
+       .Put16(maxInterval)
+       .Put64(reportDestination)
+       .Put16(destinationEndpoint);
     {{#if isAnalog}}
     buf.Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>(change));
     {{/if}}

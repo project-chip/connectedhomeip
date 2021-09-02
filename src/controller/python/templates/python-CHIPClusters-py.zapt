@@ -99,12 +99,12 @@ class ChipClusters:
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
-    def ConfigureAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, minInterval: int, maxInterval: int, change: int, imEnabled):
+    def ConfigureAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, destNode: ctypes.c_uint64, destEndpoint: int, minInterval: int, maxInterval: int, change: int, imEnabled):
         func = getattr(self, "Cluster{}_ConfigureAttribute{}".format(cluster, attribute), None)
         if not func:
             raise UnknownAttribute(cluster, attribute)
         funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
-        funcCaller(lambda: func(device, endpoint, minInterval, maxInterval, change))
+        funcCaller(lambda: func(device, endpoint, destNode, destEndpoint, minInterval, maxInterval, change))
 
     def WriteAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, groupid: int, value, imEnabled):
         func = getattr(self, "Cluster{}_WriteAttribute{}".format(cluster, attribute), None)
@@ -136,8 +136,8 @@ class ChipClusters:
     def Cluster{{asUpperCamelCase parent.name}}_ReadAttribute{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(device, ZCLendpoint, ZCLgroupid)
 {{#if isReportableAttribute}}
-    def Cluster{{asUpperCamelCase parent.name}}_ConfigureAttribute{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
-        return self._chipLib.chip_ime_ConfigureAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(device, ZCLendpoint, minInterval, maxInterval, change)
+    def Cluster{{asUpperCamelCase parent.name}}_ConfigureAttribute{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLDestNode: ctypes.c_uint64, ZCLDestEndpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(device, ZCLendpoint, ZCLDestNode, ZCLDestEndpoint, minInterval, maxInterval, change)
 {{/if}}
 {{#if isWritableAttribute}}
     def Cluster{{asUpperCamelCase parent.name}}_WriteAttribute{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: {{ asPythonType chipType }}):
@@ -171,7 +171,7 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.restype = ctypes.c_uint32
 {{#if isReportableAttribute}}
         # Cluster {{asUpperCamelCase parent.name}} ConfigureAttribute {{asUpperCamelCase name}}
-        self._chipLib.chip_ime_ConfigureAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16{{#if isAnalog}}, ctypes.{{asPythonCType chipType}}{{/if}}]
+        self._chipLib.chip_ime_ConfigureAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16{{#if isAnalog}}, ctypes.{{asPythonCType chipType}}{{/if}}]
         self._chipLib.chip_ime_ConfigureAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.restype = ctypes.c_uint32
 {{/if}}
 {{#if isWritableAttribute}}

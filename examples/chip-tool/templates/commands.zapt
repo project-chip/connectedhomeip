@@ -376,7 +376,7 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval{{#if isAnalog}}, mChange{{/if}});
+        return cluster.ConfigureAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), GetExecContext()->localId, 1, mMinInterval, mMaxInterval{{#if isAnalog}}, mChange{{/if}});
     }
 
 private:

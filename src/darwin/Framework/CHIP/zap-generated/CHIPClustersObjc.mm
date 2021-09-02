@@ -5512,6 +5512,8 @@ private:
 
 - (void)configureAttributePresentValueWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
+                                reportDestinationNode:(uint64_t)reportDestinationNode
+                                  destinationEndpoint:(uint16_t)destinationEndpoint
                                       responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -5529,7 +5531,8 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ConfigureAttributePresentValue(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+        err = self.cppCluster.ConfigureAttributePresentValue(
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -5588,6 +5591,8 @@ private:
 
 - (void)configureAttributeStatusFlagsWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
+                               reportDestinationNode:(uint64_t)reportDestinationNode
+                                 destinationEndpoint:(uint16_t)destinationEndpoint
                                      responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -5605,7 +5610,8 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ConfigureAttributeStatusFlags(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+        err = self.cppCluster.ConfigureAttributeStatusFlags(
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -6861,6 +6867,8 @@ private:
 
 - (void)configureAttributeCurrentHueWithMinInterval:(uint16_t)minInterval
                                         maxInterval:(uint16_t)maxInterval
+                              reportDestinationNode:(uint64_t)reportDestinationNode
+                                destinationEndpoint:(uint16_t)destinationEndpoint
                                              change:(uint8_t)change
                                     responseHandler:(ResponseHandler)responseHandler
 {
@@ -6880,7 +6888,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeCurrentHue(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -6938,6 +6946,8 @@ private:
 
 - (void)configureAttributeCurrentSaturationWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
+                                     reportDestinationNode:(uint64_t)reportDestinationNode
+                                       destinationEndpoint:(uint16_t)destinationEndpoint
                                                     change:(uint8_t)change
                                            responseHandler:(ResponseHandler)responseHandler
 {
@@ -6957,7 +6967,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeCurrentSaturation(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -7042,6 +7052,8 @@ private:
 
 - (void)configureAttributeCurrentXWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
+                            reportDestinationNode:(uint64_t)reportDestinationNode
+                              destinationEndpoint:(uint16_t)destinationEndpoint
                                            change:(uint16_t)change
                                   responseHandler:(ResponseHandler)responseHandler
 {
@@ -7061,7 +7073,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeCurrentX(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -7119,6 +7131,8 @@ private:
 
 - (void)configureAttributeCurrentYWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
+                            reportDestinationNode:(uint64_t)reportDestinationNode
+                              destinationEndpoint:(uint16_t)destinationEndpoint
                                            change:(uint16_t)change
                                   responseHandler:(ResponseHandler)responseHandler
 {
@@ -7138,7 +7152,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeCurrentY(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -7251,6 +7265,8 @@ private:
 
 - (void)configureAttributeColorTemperatureWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
+                                    reportDestinationNode:(uint64_t)reportDestinationNode
+                                      destinationEndpoint:(uint16_t)destinationEndpoint
                                                    change:(uint16_t)change
                                           responseHandler:(ResponseHandler)responseHandler
 {
@@ -7270,7 +7286,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeColorTemperature(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -9918,6 +9934,8 @@ private:
 
 - (void)configureAttributeLockStateWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
+                             reportDestinationNode:(uint64_t)reportDestinationNode
+                               destinationEndpoint:(uint16_t)destinationEndpoint
                                    responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -9935,7 +9953,8 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ConfigureAttributeLockState(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+        err = self.cppCluster.ConfigureAttributeLockState(
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -11895,6 +11914,8 @@ private:
 
 - (void)configureAttributeCurrentLevelWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
+                                reportDestinationNode:(uint64_t)reportDestinationNode
+                                  destinationEndpoint:(uint16_t)destinationEndpoint
                                                change:(uint8_t)change
                                       responseHandler:(ResponseHandler)responseHandler
 {
@@ -11914,7 +11935,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeCurrentLevel(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -13103,6 +13124,8 @@ private:
 
 - (void)configureAttributeOccupancyWithMinInterval:(uint16_t)minInterval
                                        maxInterval:(uint16_t)maxInterval
+                             reportDestinationNode:(uint64_t)reportDestinationNode
+                               destinationEndpoint:(uint16_t)destinationEndpoint
                                    responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -13120,7 +13143,8 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ConfigureAttributeOccupancy(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+        err = self.cppCluster.ConfigureAttributeOccupancy(
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -13432,6 +13456,8 @@ private:
 
 - (void)configureAttributeOnOffWithMinInterval:(uint16_t)minInterval
                                    maxInterval:(uint16_t)maxInterval
+                         reportDestinationNode:(uint64_t)reportDestinationNode
+                           destinationEndpoint:(uint16_t)destinationEndpoint
                                responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -13449,7 +13475,8 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ConfigureAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+        err = self.cppCluster.ConfigureAttributeOnOff(
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -14207,6 +14234,8 @@ private:
 
 - (void)configureAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
+                                 reportDestinationNode:(uint64_t)reportDestinationNode
+                                   destinationEndpoint:(uint16_t)destinationEndpoint
                                                 change:(int16_t)change
                                        responseHandler:(ResponseHandler)responseHandler
 {
@@ -14226,7 +14255,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeMeasuredValue(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -14513,6 +14542,8 @@ private:
 
 - (void)configureAttributeCapacityWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
+                            reportDestinationNode:(uint64_t)reportDestinationNode
+                              destinationEndpoint:(uint16_t)destinationEndpoint
                                            change:(int16_t)change
                                   responseHandler:(ResponseHandler)responseHandler
 {
@@ -14532,7 +14563,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeCapacity(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -14684,6 +14715,8 @@ private:
 
 - (void)configureAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
+                                 reportDestinationNode:(uint64_t)reportDestinationNode
+                                   destinationEndpoint:(uint16_t)destinationEndpoint
                                                 change:(uint16_t)change
                                        responseHandler:(ResponseHandler)responseHandler
 {
@@ -14703,7 +14736,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeMeasuredValue(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -15353,6 +15386,8 @@ private:
 
 - (void)configureAttributeCurrentPositionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
+                                   reportDestinationNode:(uint64_t)reportDestinationNode
+                                     destinationEndpoint:(uint16_t)destinationEndpoint
                                                   change:(uint8_t)change
                                          responseHandler:(ResponseHandler)responseHandler
 {
@@ -15372,7 +15407,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeCurrentPosition(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -15776,6 +15811,8 @@ private:
 
 - (void)configureAttributeMeasuredValueWithMinInterval:(uint16_t)minInterval
                                            maxInterval:(uint16_t)maxInterval
+                                 reportDestinationNode:(uint64_t)reportDestinationNode
+                                   destinationEndpoint:(uint16_t)destinationEndpoint
                                                 change:(int16_t)change
                                        responseHandler:(ResponseHandler)responseHandler
 {
@@ -15795,7 +15832,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeMeasuredValue(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -17430,6 +17467,8 @@ private:
 
 - (void)configureAttributeLocalTemperatureWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
+                                    reportDestinationNode:(uint64_t)reportDestinationNode
+                                      destinationEndpoint:(uint16_t)destinationEndpoint
                                                    change:(int16_t)change
                                           responseHandler:(ResponseHandler)responseHandler
 {
@@ -17449,7 +17488,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeLocalTemperature(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -20660,6 +20699,8 @@ private:
 
 - (void)configureAttributeCurrentPositionLiftPercentageWithMinInterval:(uint16_t)minInterval
                                                            maxInterval:(uint16_t)maxInterval
+                                                 reportDestinationNode:(uint64_t)reportDestinationNode
+                                                   destinationEndpoint:(uint16_t)destinationEndpoint
                                                                 change:(uint8_t)change
                                                        responseHandler:(ResponseHandler)responseHandler
 {
@@ -20679,7 +20720,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeCurrentPositionLiftPercentage(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -20737,6 +20778,8 @@ private:
 
 - (void)configureAttributeCurrentPositionTiltPercentageWithMinInterval:(uint16_t)minInterval
                                                            maxInterval:(uint16_t)maxInterval
+                                                 reportDestinationNode:(uint64_t)reportDestinationNode
+                                                   destinationEndpoint:(uint16_t)destinationEndpoint
                                                                 change:(uint8_t)change
                                                        responseHandler:(ResponseHandler)responseHandler
 {
@@ -20756,7 +20799,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeCurrentPositionTiltPercentage(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -20814,6 +20857,8 @@ private:
 
 - (void)configureAttributeOperationalStatusWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
+                                     reportDestinationNode:(uint64_t)reportDestinationNode
+                                       destinationEndpoint:(uint16_t)destinationEndpoint
                                            responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -20832,7 +20877,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeOperationalStatus(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -20890,6 +20935,8 @@ private:
 
 - (void)configureAttributeTargetPositionLiftPercent100thsWithMinInterval:(uint16_t)minInterval
                                                              maxInterval:(uint16_t)maxInterval
+                                                   reportDestinationNode:(uint64_t)reportDestinationNode
+                                                     destinationEndpoint:(uint16_t)destinationEndpoint
                                                                   change:(uint16_t)change
                                                          responseHandler:(ResponseHandler)responseHandler
 {
@@ -20909,7 +20956,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeTargetPositionLiftPercent100ths(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -20967,6 +21014,8 @@ private:
 
 - (void)configureAttributeTargetPositionTiltPercent100thsWithMinInterval:(uint16_t)minInterval
                                                              maxInterval:(uint16_t)maxInterval
+                                                   reportDestinationNode:(uint64_t)reportDestinationNode
+                                                     destinationEndpoint:(uint16_t)destinationEndpoint
                                                                   change:(uint16_t)change
                                                          responseHandler:(ResponseHandler)responseHandler
 {
@@ -20986,7 +21035,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeTargetPositionTiltPercent100ths(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -21071,6 +21120,8 @@ private:
 
 - (void)configureAttributeCurrentPositionLiftPercent100thsWithMinInterval:(uint16_t)minInterval
                                                               maxInterval:(uint16_t)maxInterval
+                                                    reportDestinationNode:(uint64_t)reportDestinationNode
+                                                      destinationEndpoint:(uint16_t)destinationEndpoint
                                                                    change:(uint16_t)change
                                                           responseHandler:(ResponseHandler)responseHandler
 {
@@ -21090,7 +21141,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeCurrentPositionLiftPercent100ths(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -21148,6 +21199,8 @@ private:
 
 - (void)configureAttributeCurrentPositionTiltPercent100thsWithMinInterval:(uint16_t)minInterval
                                                               maxInterval:(uint16_t)maxInterval
+                                                    reportDestinationNode:(uint64_t)reportDestinationNode
+                                                      destinationEndpoint:(uint16_t)destinationEndpoint
                                                                    change:(uint16_t)change
                                                           responseHandler:(ResponseHandler)responseHandler
 {
@@ -21167,7 +21220,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ConfigureAttributeCurrentPositionTiltPercent100ths(
-            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval, change);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -21387,6 +21440,8 @@ private:
 
 - (void)configureAttributeSafetyStatusWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
+                                reportDestinationNode:(uint64_t)reportDestinationNode
+                                  destinationEndpoint:(uint16_t)destinationEndpoint
                                       responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -21404,7 +21459,8 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ConfigureAttributeSafetyStatus(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+        err = self.cppCluster.ConfigureAttributeSafetyStatus(
+            onSuccess->Cancel(), onFailure->Cancel(), reportDestinationNode, destinationEndpoint, minInterval, maxInterval);
     });
 
     if (err != CHIP_NO_ERROR) {

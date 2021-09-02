@@ -66,7 +66,13 @@ using namespace chip;
 
 #define NULL_INDEX 0xFF
 
-static void conditionallySendReport(EndpointId endpoint, ClusterId clusterId);
+/*
+ * This method sends the report to the provided destination node at destinationEndpoint.
+ * If the reportDestination is kUndefinedNodeId, the method uses binding table to identify
+ * destination nodes and endpoints
+ */
+static void conditionallySendReport(EndpointId endpoint, ClusterId clusterId, NodeId reportDestination,
+                                    EndpointId destinationEndpoint);
 static void scheduleTick(void);
 static void removeConfiguration(uint8_t index);
 static void removeConfigurationAndScheduleTick(uint8_t index);
@@ -206,6 +212,9 @@ void emberAfPluginReportingTickEventHandler(void)
     uint8_t index;
     uint16_t currentPayloadMaxLength = 0, smallestPayloadMaxLength = 0;
 
+    NodeId reportDestination       = kUndefinedNodeId;
+    EndpointId destinationEndpoint = 0;
+
     for (i = 0; i < REPORT_TABLE_SIZE; i++)
     {
         EmberAfPluginReportingEntry entry;
@@ -259,15 +268,17 @@ void emberAfPluginReportingTickEventHandler(void)
             {
                 emberAfReportingPrintln("Reporting Entry Full - creating new report");
             }
-            conditionallySendReport(apsFrame->sourceEndpoint, apsFrame->clusterId);
+            conditionallySendReport(apsFrame->sourceEndpoint, apsFrame->clusterId, reportDestination, destinationEndpoint);
             apsFrame = NULL;
         }
 
         // If we haven't made the message header, make it.
         if (apsFrame == NULL)
         {
-            apsFrame       = emberAfGetCommandApsFrame();
-            clientToServer = emberAfClusterIsClient(&entry);
+            apsFrame            = emberAfGetCommandApsFrame();
+            clientToServer      = emberAfClusterIsClient(&entry);
+            reportDestination   = entry.data.reported.reportDestination;
+            destinationEndpoint = entry.data.reported.destinationEndpoint;
             // The manufacturer-specfic version of the fill API only creates a
             // manufacturer-specfic command if the manufacturer code is set.  For
             // non-manufacturer-specfic reports, the manufacturer code is unset, so
@@ -354,17 +365,27 @@ void emberAfPluginReportingTickEventHandler(void)
 
     if (apsFrame != NULL)
     {
-        conditionallySendReport(apsFrame->sourceEndpoint, apsFrame->clusterId);
+        conditionallySendReport(apsFrame->sourceEndpoint, apsFrame->clusterId, reportDestination, destinationEndpoint);
     }
     scheduleTick();
 }
 
-static void conditionallySendReport(EndpointId endpoint, ClusterId clusterId)
+static void conditionallySendReport(EndpointId endpoint, ClusterId clusterId, NodeId reportDestination,
+                                    EndpointId destinationEndpoint)
 {
     EmberStatus status;
     if (emberAfIsDeviceEnabled(endpoint) || clusterId == ZCL_IDENTIFY_CLUSTER_ID)
     {
-        status = emberAfSendCommandUnicastToBindingsWithCallback(&retrySendReport);
+        if (reportDestination == kUndefinedNodeId)
+        {
+            status = emberAfSendCommandUnicastToBindingsWithCallback(&retrySendReport);
+        }
+        else
+        {
+            emAfCommandApsFrame->destinationEndpoint = destinationEndpoint;
+            status = emberAfSendUnicastWithCallback(MessageSendDestination::Direct(reportDestination), emAfCommandApsFrame,
+                                                    *emAfResponseLengthPtr, emAfZclBuffer, &retrySendReport);
+        }
 
         // If the callback table is full, attempt to send the message with no
         // callback.  Note that this could lead to a message failing to transmit
@@ -373,9 +394,16 @@ static void conditionallySendReport(EndpointId endpoint, ClusterId clusterId)
         // all because the system hits its callback queue limit.
         if (status == EMBER_TABLE_FULL)
         {
-            emberAfSendCommandUnicastToBindings();
+            if (reportDestination == kUndefinedNodeId)
+            {
+                emberAfSendCommandUnicastToBindings();
+            }
+            else
+            {
+                emberAfSendUnicast(MessageSendDestination::Direct(reportDestination), emAfCommandApsFrame, *emAfResponseLengthPtr,
+                                   emAfZclBuffer);
+            }
         }
-
 #ifdef EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
         emberAfSendCommandMulticastToBindings();
 #endif // EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
@@ -435,6 +463,8 @@ bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
             EmberAfAttributeType dataType;
             uint16_t minInterval, maxInterval;
             uint32_t reportableChange = 0;
+            uint64_t reportDestination;
+            uint16_t destinationEndpoint;
             EmberAfPluginReportingEntry newEntry;
 
             dataType = (EmberAfAttributeType) emberAfGetInt8u(cmd->buffer, bufIndex, cmd->bufLen);
@@ -444,7 +474,13 @@ bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
             maxInterval = emberAfGetInt16u(cmd->buffer, bufIndex, cmd->bufLen);
             bufIndex    = static_cast<uint16_t>(bufIndex + 2);
 
-            emberAfReportingPrintln("   type:%x, min:%2x, max:%2x", dataType, minInterval, maxInterval);
+            reportDestination   = emberAfGetInt64u(cmd->buffer, bufIndex, cmd->bufLen);
+            bufIndex            = static_cast<uint16_t>(bufIndex + 8);
+            destinationEndpoint = emberAfGetInt16u(cmd->buffer, bufIndex, cmd->bufLen);
+            bufIndex            = static_cast<uint16_t>(bufIndex + 2);
+
+            emberAfReportingPrintln("   type:%x, min:%2x, max:%2x, destination:" ChipLogFormatX64 ", destEP:%2x", dataType,
+                                    minInterval, maxInterval, ChipLogValueX64(reportDestination), destinationEndpoint);
             emberAfReportingFlush();
 
             if (emberAfGetAttributeAnalogOrDiscreteType(dataType) == EMBER_AF_DATA_TYPE_ANALOG)
@@ -489,7 +525,11 @@ bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
                 newEntry.data.reported.minInterval      = minInterval;
                 newEntry.data.reported.maxInterval      = maxInterval;
                 newEntry.data.reported.reportableChange = reportableChange;
-                status                                  = emberAfPluginReportingConfigureReportedAttribute(&newEntry);
+
+                newEntry.data.reported.reportDestination   = reportDestination;
+                newEntry.data.reported.destinationEndpoint = destinationEndpoint;
+
+                status = emberAfPluginReportingConfigureReportedAttribute(&newEntry);
             }
             break;
         }
@@ -882,8 +922,10 @@ EmberAfStatus emberAfPluginReportingConfigureReportedAttribute(const EmberAfPlug
     {
         emAfPluginReportingGetEntry(i, &entry);
         if (entry.direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED && entry.endpoint == newEntry->endpoint &&
-            entry.clusterId == newEntry->clusterId && entry.attributeId == newEntry->attributeId && entry.mask == newEntry->mask &&
-            entry.manufacturerCode == newEntry->manufacturerCode)
+            entry.clusterId == newEntry->clusterId && entry.attributeId == newEntry->attributeId &&
+            entry.data.reported.reportDestination == newEntry->data.reported.reportDestination &&
+            entry.data.reported.destinationEndpoint == newEntry->data.reported.destinationEndpoint &&
+            entry.mask == newEntry->mask && entry.manufacturerCode == newEntry->manufacturerCode)
         {
             initialize = false;
             index      = i;
@@ -938,6 +980,9 @@ EmberAfStatus emberAfPluginReportingConfigureReportedAttribute(const EmberAfPlug
         entry.attributeId      = newEntry->attributeId;
         entry.mask             = newEntry->mask;
         entry.manufacturerCode = newEntry->manufacturerCode;
+
+        entry.data.reported.reportDestination   = newEntry->data.reported.reportDestination;
+        entry.data.reported.destinationEndpoint = newEntry->data.reported.destinationEndpoint;
         if (index < REPORT_TABLE_SIZE)
         {
             emAfPluginReportVolatileData[index].lastReportTimeMs =
