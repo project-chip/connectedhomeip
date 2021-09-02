@@ -175,19 +175,20 @@ private:
 
     static bool MatchPeerAddress(const PeerAddress & a1, const PeerAddress & a2)
     {
-        if (a1.GetTransportType() != a2.GetTransportType()) return false;
+        if (a1.GetTransportType() != a2.GetTransportType())
+            return false;
 
         switch (a1.GetTransportType())
         {
-            case Transport::Type::kUndefined:
-                return false;
-            case Transport::Type::kUdp:
-            case Transport::Type::kTcp:
-                // Ingore interface in the address
-                return a1.GetIPAddress() == a2.GetIPAddress() && a1.GetPort() == a2.GetPort();
-            case Transport::Type::kBle:
-                // TODO: complete BLE address comparation
-                return true;
+        case Transport::Type::kUndefined:
+            return false;
+        case Transport::Type::kUdp:
+        case Transport::Type::kTcp:
+            // Ingore interface in the address
+            return a1.GetIPAddress() == a2.GetIPAddress() && a1.GetPort() == a2.GetPort();
+        case Transport::Type::kBle:
+            // TODO: complete BLE address comparation
+            return true;
         }
 
         return false;
