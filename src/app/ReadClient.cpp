@@ -64,7 +64,7 @@ void ReadClient::ShutdownInternal(CHIP_ERROR aError)
     {
         mpDelegate->ReadDone(this);
     }
-    mpDelegate = nullptr;
+    mpDelegate     = nullptr;
     mInitialReport = true;
     MoveToState(ClientState::Uninitialized);
 }
