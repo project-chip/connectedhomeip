@@ -94,12 +94,6 @@ CHIP_ERROR SecureSession::Init(const Crypto::P256Keypair & local_keypair, const 
     return InitFromSecret(ByteSpan(secret, secret.Length()), salt, infoType, role);
 }
 
-void SecureSession::Reset()
-{
-    mKeyAvailable = false;
-    memset(mKeys, 0, sizeof(mKeys));
-}
-
 CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_t len)
 {
 
