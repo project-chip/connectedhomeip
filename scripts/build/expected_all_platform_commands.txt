@@ -133,10 +133,7 @@ source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {root}/examples/lighting-app/telink'
 
 # Generating tizen-arm-light
-bash -c 'export PKG_CONFIG_SYSROOT_DIR=$TIZEN_HOME;
-export PKG_CONFIG_LIBDIR=$TIZEN_HOME/usr/lib/pkgconfig;
-export PKG_CONFIG_PATH=$TIZEN_HOME/usr/lib/pkgconfig;
-gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '"'"'--args= target_os="tizen" target_cpu="arm" tizen_sdk="TEST_TIZEN_HOME"'"'"' {out}/tizen-arm-light'
+bash -c 'gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '"'"'--args= target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"'"'"' {out}/tizen-arm-light'
 
 # Building {real_platform}-native-all_clusters
 ninja -C {out}/{real_platform}-native-all_clusters

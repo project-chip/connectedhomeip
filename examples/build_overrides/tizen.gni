@@ -15,5 +15,4 @@
 declare_args() {
   # Root directory for tizen.
   tizen_root = "//third_party/connectedhomeip/config/tizen/chip-gn/platform"
-  tizen_sdk = ""
 }

@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
-import("//build_overrides/tizen.gni")
 
+import("${build_root}/config/sysroot.gni")
 import("${build_root}/toolchain/gcc_toolchain.gni")
 
 template("tizen_toolchain") {
@@ -29,8 +29,8 @@ template("tizen_toolchain") {
 
   gcc_toolchain(target_name) {
     toolchain_args = _tizen_toolchain_args
-    ar = "$tizen_sdk/bin/arm-linux-gnueabi-ar"
-    cc = "$tizen_sdk/bin/arm-linux-gnueabi-gcc"
-    cxx = "$tizen_sdk/bin/arm-linux-gnueabi-g++"
+    ar = "$sysroot/bin/arm-linux-gnueabi-ar"
+    cc = "$sysroot/bin/arm-linux-gnueabi-gcc"
+    cxx = "$sysroot/bin/arm-linux-gnueabi-g++"
   }
 }

@@ -120,11 +120,6 @@ config("abi_default") {
 }
 
 config("target_default") {
-  if (current_os == "tizen") {
-    import("//build_overrides/tizen.gni")
-    target_cflags += [ "--sysroot=$tizen_sdk" ]
-    target_ldflags += [ "--sysroot=$tizen_sdk" ]
-  }
   if (current_toolchain == default_toolchain) {
     defines = target_defines
     cflags = target_cflags

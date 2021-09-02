@@ -69,15 +69,12 @@ class TizenBuilder(Builder):
                         "Environment TIZEN_HOME missing, cannot build tizen libraries")
 
             cmd = '''\
-export PKG_CONFIG_SYSROOT_DIR=$TIZEN_HOME;
-export PKG_CONFIG_LIBDIR=$TIZEN_HOME/usr/lib/pkgconfig;
-export PKG_CONFIG_PATH=$TIZEN_HOME/usr/lib/pkgconfig;
 gn gen --check --fail-on-unused-args --root=%s '--args=''' % self.root
 
             gn_args = {}
             gn_args['target_os'] = 'tizen'
             gn_args['target_cpu'] = self.board.TargetCpuName()
-            gn_args['tizen_sdk'] = os.environ['TIZEN_HOME']
+            gn_args['sysroot'] = os.environ['TIZEN_HOME']
 
             cmd += ' %s\' %s' % (' '.join([
                 '%s="%s"' % (key, value)
