@@ -196,8 +196,8 @@
     int maxIntervalSeconds = [_maxIntervalInSecondsTextField.text intValue];
     int deltaInCelsius = [_deltaInCelsiusTextField.text intValue];
 
-    NSLog(@"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds),
-        @(deltaInCelsius));
+    NSLog(
+        @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInCelsius));
 
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
