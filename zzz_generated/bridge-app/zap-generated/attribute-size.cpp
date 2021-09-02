@@ -255,7 +255,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         {
         case 0x0001: // fabrics list
         {
-            entryLength = 52;
+            entryLength = 120;
             if (((index - 1) * entryLength) > (am->size - entryLength))
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -264,10 +264,21 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
             // Struct _FabricDescriptor
             _FabricDescriptor * entry = reinterpret_cast<_FabricDescriptor *>(write ? src : dest);
-            copyListMember(write ? dest : (uint8_t *) &entry->FabricId, write ? (uint8_t *) &entry->FabricId : src, write,
-                           &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricIndex, write ? (uint8_t *) &entry->FabricIndex : src, write,
+                           &entryOffset, sizeof(entry->FabricIndex)); // INT8U
+            ByteSpan * RootPublicKeySpan = &entry->RootPublicKey;     // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 67, RootPublicKeySpan)
+                       : ReadByteSpan(src + entryOffset, 67, RootPublicKeySpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 67);
             copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
                            &entryOffset, sizeof(entry->VendorId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricId, write ? (uint8_t *) &entry->FabricId : src, write,
+                           &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
             copyListMember(write ? dest : (uint8_t *) &entry->NodeId, write ? (uint8_t *) &entry->NodeId : src, write, &entryOffset,
                            sizeof(entry->NodeId)); // NODE_ID
             ByteSpan * LabelSpan = &entry->Label;  // OCTET_STRING
@@ -278,6 +289,33 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
             entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            break;
+        }
+        case 0x0004: // TrustedRootCertificates
+        {
+            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, static_cast<uint16_t>(index - 1));
+            if (entryOffset == 0)
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+
+            ByteSpan * trustedRootCertificatesSpan         = reinterpret_cast<ByteSpan *>(write ? src : dest); // OCTET_STRING
+            uint16_t trustedRootCertificatesRemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, trustedRootCertificatesRemainingSpace, trustedRootCertificatesSpan)
+                       : ReadByteSpan(src + entryOffset, trustedRootCertificatesRemainingSpace, trustedRootCertificatesSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+
+            if (!CanCastTo<uint16_t>(trustedRootCertificatesSpan->size()))
+            {
+                ChipLogError(Zcl, "Span size %zu is too large", trustedRootCertificatesSpan->size());
+                return 0;
+            }
+            entryLength = static_cast<uint16_t>(trustedRootCertificatesSpan->size());
             break;
         }
         }
@@ -510,7 +548,11 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         {
         case 0x0001: // fabrics list
             // Struct _FabricDescriptor
-            entryLength = 52;
+            entryLength = 120;
+            break;
+        case 0x0004: // TrustedRootCertificates
+            // chip::ByteSpan
+            return GetByteSpanOffsetFromIndex(buffer, 402, entryCount);
             break;
         }
         break;

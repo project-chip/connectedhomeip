@@ -189,6 +189,8 @@ public:
 
     CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
 
+    const Crypto::P256PublicKey & GetRootPubkey() const { return mRootPubkey; }
+
     friend class FabricTable;
 
 private:

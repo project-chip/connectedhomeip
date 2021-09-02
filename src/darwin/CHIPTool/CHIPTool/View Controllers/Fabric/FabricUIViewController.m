@@ -196,21 +196,20 @@
 {
     NSMutableString * fabricsText = [NSMutableString new];
     if (fabricsList) {
-        int fabricIndex = 0;
         for (NSDictionary * fabricDict in fabricsList) {
+            NSNumber * fabricIndex = [fabricDict objectForKey:@"FabricIndex"];
             NSNumber * fabricId = [fabricDict objectForKey:@"FabricId"];
             NSNumber * nodeID = [fabricDict objectForKey:@"NodeId"];
             NSNumber * vendorID = [fabricDict objectForKey:@"VendorId"];
             NSData * labelData = [fabricDict objectForKey:@"Label"];
 
             NSString * label = [[NSString alloc] initWithData:labelData encoding:NSUTF8StringEncoding];
-            [fabricsText appendString:[NSString stringWithFormat:@"Fabric #%@\n", @(fabricIndex)]];
+            [fabricsText appendString:[NSString stringWithFormat:@"FabricIndex: %@\n", fabricIndex]];
             [fabricsText appendString:[NSString stringWithFormat:@"FabricId: %@\n", fabricId]];
             [fabricsText appendString:[NSString stringWithFormat:@"NodeId: %@\n", nodeID]];
             [fabricsText appendString:[NSString stringWithFormat:@"VendorId: %@\n", vendorID]];
             [fabricsText appendString:[NSString stringWithFormat:@"FabricLabel: %@\n", [label length] > 0 ? label : @"not set"]];
             [fabricsText appendString:@"------\n"];
-            fabricIndex++;
         }
     } else {
         NSLog(@"Got back error trying to read fabrics list %@", error);
