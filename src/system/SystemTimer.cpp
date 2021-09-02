@@ -81,15 +81,16 @@ ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
 
 Timer * Timer::New(System::Layer & systemLayer, uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
 {
-    Timer * timer = Timer::sPool.TryCreate(systemLayer);
+    Timer * timer = Timer::sPool.TryCreate();
     if (timer == nullptr)
     {
         ChipLogError(chipSystemLayer, "Timer pool EMPTY");
     }
     else
     {
-        timer->AppState    = appState;
-        timer->mAwakenTime = Clock::GetMonotonicMilliseconds() + static_cast<Clock::MonotonicMilliseconds>(delayMilliseconds);
+        timer->AppState     = appState;
+        timer->mSystemLayer = &systemLayer;
+        timer->mAwakenTime  = Clock::GetMonotonicMilliseconds() + static_cast<Clock::MonotonicMilliseconds>(delayMilliseconds);
         if (!__sync_bool_compare_and_swap(&timer->mOnComplete, nullptr, onComplete))
         {
             chipDie();
@@ -109,13 +110,14 @@ void Timer::Clear()
     VerifyOrReturn(__sync_bool_compare_and_swap(&mOnComplete, lOnComplete, nullptr));
 
     // Since this thread changed the state of mOnComplete, release the timer.
-    AppState = nullptr;
+    AppState     = nullptr;
+    mSystemLayer = nullptr;
 }
 
 void Timer::HandleComplete()
 {
     // Save information needed to perform the callback.
-    Layer & lLayer                          = this->SystemLayer();
+    Layer * lLayer                          = this->mSystemLayer;
     const TimerCompleteCallback lOnComplete = this->mOnComplete;
     void * lAppState                        = this->AppState;
 
@@ -125,12 +127,13 @@ void Timer::HandleComplete()
     VerifyOrReturn(__sync_bool_compare_and_swap(&this->mOnComplete, lOnComplete, nullptr), );
 
     // Since this thread changed the state of mOnComplete, release the timer.
-    AppState = nullptr;
+    AppState     = nullptr;
+    mSystemLayer = nullptr;
     this->Release();
 
     // Invoke the app's callback, if it's still valid.
     if (lOnComplete != nullptr)
-        lOnComplete(&lLayer, lAppState);
+        lOnComplete(lLayer, lAppState);
 }
 
 Timer * Timer::List::Add(Timer * add)

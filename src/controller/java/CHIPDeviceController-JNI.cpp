@@ -50,9 +50,6 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemLayerImpl.h>
 
-#include <zap-generated/CHIPClientCallbacks.h>
-#include <zap-generated/CHIPClusters.h>
-
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
 #ifndef PTHREAD_NULL
 #define PTHREAD_NULL 0
@@ -61,7 +58,6 @@
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Controller;
-using namespace chip::Thread;
 
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipDeviceController_##METHOD_NAME
@@ -86,10 +82,6 @@ static void * IOThreadMain(void * arg);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
 
 namespace {
-
-constexpr EndpointId kNodeEndpoint = 0;
-constexpr uint64_t kBreadcrumb     = 0;
-constexpr uint32_t kZclTimeoutMs   = 10000;
 
 JavaVM * sJVM;
 System::LayerImpl sSystemLayer;
@@ -278,6 +270,39 @@ JNI_METHOD(void, pairDevice)
                                       .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
                                       .SetBleLayer(&sBleLayer)
                                       .SetPeerAddress(Transport::PeerAddress::BLE());
+    if (csrNonce != nullptr)
+    {
+        JniByteArray jniCsrNonce(env, csrNonce);
+        params.SetCSRNonce(jniCsrNonce.byteSpan());
+    }
+    err = wrapper->Controller()->PairDevice(deviceId, params);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to pair the device.");
+        ThrowError(env, err);
+    }
+}
+
+JNI_METHOD(void, pairDeviceWithAddress)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jint discriminator, jint pinCode,
+ jbyteArray csrNonce)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "pairDeviceWithAddress() called");
+
+    Inet::IPAddress addr;
+    JniUtfString addrJniString(env, address);
+    VerifyOrReturn(Inet::IPAddress::FromString(addrJniString.c_str(), addr),
+                   ChipLogError(Controller, "Failed to parse IP address."), ThrowError(env, CHIP_ERROR_INVALID_ARGUMENT));
+
+    RendezvousParameters params = RendezvousParameters()
+                                      .SetDiscriminator(discriminator)
+                                      .SetSetupPINCode(pinCode)
+                                      .SetPeerAddress(Transport::PeerAddress::UDP(addr, port));
     if (csrNonce != nullptr)
     {
         JniByteArray jniCsrNonce(env, csrNonce);
@@ -512,112 +537,6 @@ JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong de
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to send CHIP command.");
-        ThrowError(env, err);
-    }
-}
-
-namespace {
-
-void OnAddNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
-void OnEnableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
-void OnNetworkCommissioningFailed(void * context, uint8_t errorCode);
-
-// Context used for processing "AddThreadNetwork" and "EnableNetwork" commands.
-struct NetworkCommissioningCtx
-{
-    static constexpr size_t kMaxNetworkIDLen = 32;
-
-    NetworkCommissioningCtx(JNIEnv * env, jlong handle, uint64_t deviceID, ByteSpan networkID) :
-        mEnv(env), mHandle(handle), mDeviceID(deviceID)
-    {
-        VerifyOrReturn(networkID.size() <= sizeof(mNetworkID), ThrowError(env, CHIP_ERROR_BUFFER_TOO_SMALL));
-        memcpy(mNetworkID, networkID.data(), networkID.size());
-        mNetworkIDLen = networkID.size();
-    }
-
-    JNIEnv * mEnv;
-    jlong mHandle;
-    uint64_t mDeviceID;
-    uint8_t mNetworkID[kMaxNetworkIDLen];
-    size_t mNetworkIDLen;
-    Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> mOnAddNetwork{ OnAddNetworkResponse, this };
-    Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback> mOnEnableNetwork{ OnEnableNetworkResponse, this };
-    Callback::Callback<DefaultFailureCallback> mOnCommissioningFailed{ OnNetworkCommissioningFailed, this };
-};
-
-void FinishCommissioning(NetworkCommissioningCtx * ctx, CHIP_ERROR err)
-{
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(ctx->mHandle);
-    wrapper->CallJavaMethod("onNetworkCommissioningComplete", static_cast<jint>(err.AsInteger()));
-    delete ctx;
-}
-
-void OnAddNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
-{
-    NetworkCommissioningCtx * ctx            = static_cast<NetworkCommissioningCtx *>(context);
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(ctx->mHandle);
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-    Device * chipDevice                      = nullptr;
-    NetworkCommissioningCluster cluster;
-
-    SuccessOrExit(err = wrapper->Controller()->GetDevice(ctx->mDeviceID, &chipDevice));
-
-    cluster.Associate(chipDevice, kNodeEndpoint);
-    err = cluster.EnableNetwork(ctx->mOnEnableNetwork.Cancel(), ctx->mOnCommissioningFailed.Cancel(),
-                                ByteSpan(ctx->mNetworkID, ctx->mNetworkIDLen), kBreadcrumb, kZclTimeoutMs);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        FinishCommissioning(ctx, err);
-    }
-}
-
-void OnEnableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
-{
-    NetworkCommissioningCtx * ctx = static_cast<NetworkCommissioningCtx *>(context);
-    FinishCommissioning(ctx, CHIP_NO_ERROR);
-}
-
-void OnNetworkCommissioningFailed(void * context, uint8_t errorCode)
-{
-    NetworkCommissioningCtx * ctx = static_cast<NetworkCommissioningCtx *>(context);
-    FinishCommissioning(ctx, CHIP_ERROR_INTERNAL);
-}
-
-} // namespace
-
-JNI_METHOD(void, enableThreadNetwork)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray operationalDataset)
-{
-    CHIP_ERROR err             = CHIP_NO_ERROR;
-    Device * chipDevice        = nullptr;
-    OperationalDataset dataset = {};
-    JniByteArray datasetAccessor(env, operationalDataset);
-    size_t datasetLength = datasetAccessor.size();
-    uint8_t datasetBytes[kSizeOperationalDataset];
-    uint8_t extPanId[kSizeExtendedPanId];
-
-    VerifyOrExit(datasetLength <= sizeof(datasetBytes), err = CHIP_ERROR_INVALID_ARGUMENT);
-    memcpy(datasetBytes, datasetAccessor.data(), datasetLength);
-    SuccessOrExit(err = dataset.Init(ByteSpan(datasetBytes, datasetLength)));
-    SuccessOrExit(err = dataset.GetExtendedPanId(extPanId));
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
-
-    {
-        auto ctx = std::make_unique<NetworkCommissioningCtx>(env, handle, deviceId, ByteSpan(extPanId, sizeof(extPanId)));
-        StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-        NetworkCommissioningCluster cluster;
-        cluster.Associate(chipDevice, kNodeEndpoint);
-        SuccessOrExit(err = cluster.AddThreadNetwork(ctx->mOnAddNetwork.Cancel(), ctx->mOnCommissioningFailed.Cancel(),
-                                                     dataset.AsByteSpan(), kBreadcrumb, kZclTimeoutMs));
-        ctx.release();
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to enable Thread network");
         ThrowError(env, err);
     }
 }

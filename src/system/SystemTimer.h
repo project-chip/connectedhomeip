@@ -227,6 +227,8 @@ private:
     Clock::MonotonicMilliseconds mAwakenTime;
     Timer * mNextTimer;
 
+    Layer * mSystemLayer;
+
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     friend class LayerImplSelect;
     dispatch_source_t mTimerSource = nullptr;

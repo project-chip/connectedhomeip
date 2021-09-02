@@ -123,7 +123,7 @@ protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 public:
     static struct netif * FindNetifFromInterfaceId(InterfaceId aInterfaceId);
-    static CHIP_ERROR PostPacketBufferEvent(chip::System::LayerLwIP & aLayer, System::Object & aTarget,
+    static CHIP_ERROR PostPacketBufferEvent(chip::System::LayerLwIP * aLayer, System::Object & aTarget,
                                             System::EventType aEventType, System::PacketBufferHandle && aBuffer);
 
 protected:

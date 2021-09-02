@@ -215,7 +215,7 @@ CHIP_ERROR RawEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, Int
     ReturnErrorOnFailure(IPEndPointBasis::Bind(addrType, addr, 0, intfId));
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = static_cast<System::LayerSocketsLoop &>(SystemLayer()).GetDispatchQueue();
+    dispatch_queue_t dispatchQueue = static_cast<System::LayerSocketsLoop *>(Layer().SystemLayer())->GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
         unsigned long fd = static_cast<unsigned long>(mSocket);
@@ -350,7 +350,7 @@ CHIP_ERROR RawEndPoint::BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & 
 
 optfail:
     res = chip::System::MapErrorPOSIX(errno);
-    static_cast<System::LayerSockets &>(SystemLayer()).StopWatchingSocket(&mWatch);
+    static_cast<System::LayerSockets *>(Layer().SystemLayer())->StopWatchingSocket(&mWatch);
     close(mSocket);
     mSocket   = INET_INVALID_SOCKET_FD;
     mAddrType = kIPAddressType_Unknown;
@@ -424,9 +424,9 @@ CHIP_ERROR RawEndPoint::Listen(IPEndPointBasis::OnMessageReceivedFunct onMessage
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Wait for ability to read on this endpoint.
-    ReturnErrorOnFailure(
-        static_cast<System::LayerSockets &>(SystemLayer()).SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
-    ReturnErrorOnFailure(static_cast<System::LayerSockets &>(SystemLayer()).RequestCallbackOnPendingRead(mWatch));
+    auto layer = static_cast<System::LayerSockets *>(Layer().SystemLayer());
+    ReturnErrorOnFailure(layer->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
+    ReturnErrorOnFailure(layer->RequestCallbackOnPendingRead(mWatch));
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return CHIP_NO_ERROR;
@@ -468,7 +468,7 @@ void RawEndPoint::Close()
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
         if (mSocket != INET_INVALID_SOCKET_FD)
         {
-            static_cast<System::LayerSockets &>(SystemLayer()).StopWatchingSocket(&mWatch);
+            static_cast<System::LayerSockets *>(Layer().SystemLayer())->StopWatchingSocket(&mWatch);
             close(mSocket);
             mSocket = INET_INVALID_SOCKET_FD;
         }
@@ -931,11 +931,10 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
 u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct pbuf * p, ip_addr_t * addr)
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
-    RawEndPoint * ep                 = static_cast<RawEndPoint *>(arg);
-    System::LayerLwIP & lSystemLayer = static_cast<System::LayerLwIP &>(ep->SystemLayer());
-    IPPacketInfo * pktInfo           = NULL;
-    uint8_t enqueue                  = 1;
-    System::PacketBufferHandle buf   = System::PacketBufferHandle::Adopt(p);
+    RawEndPoint * ep               = static_cast<RawEndPoint *>(arg);
+    IPPacketInfo * pktInfo         = NULL;
+    uint8_t enqueue                = 1;
+    System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
 
     // Filtering based on the saved ICMP6 types (the only protocol currently supported.)
     if ((ep->IPVer == kIPVersion_6) && (ep->IPProto == kIPProtocol_ICMPv6))
@@ -989,7 +988,8 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
             pktInfo->DestPort  = 0;
         }
 
-        PostPacketBufferEvent(lSystemLayer, *ep, kInetEvent_RawDataReceived, std::move(buf));
+        PostPacketBufferEvent(static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer()), *ep, kInetEvent_RawDataReceived,
+                              std::move(buf));
     }
 
     return enqueue;

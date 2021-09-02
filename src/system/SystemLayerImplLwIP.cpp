@@ -157,10 +157,6 @@ CHIP_ERROR LayerImplLwIP::PostEvent(Object & aTarget, EventType aEventType, uint
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    // Sanity check that this instance and the target layer haven't been "crossed".
-    VerifyOrDieWithMsg(aTarget.IsRetained(*this), chipSystemLayer, "wrong poster! [target %p != this %p]", &(aTarget.SystemLayer()),
-                       this);
-
     CHIP_ERROR lReturn = PlatformEventing::PostEvent(*this, aTarget, aEventType, aArgument);
     if (lReturn != CHIP_NO_ERROR)
     {
@@ -211,10 +207,6 @@ CHIP_ERROR LayerImplLwIP::DispatchEvent(Event aEvent)
 CHIP_ERROR LayerImplLwIP::HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-
-    // Sanity check that this instance and the target layer haven't been "crossed".
-    VerifyOrDieWithMsg(aTarget.IsRetained(*this), chipSystemLayer, "wrong handler! [target %p != this %p]",
-                       &(aTarget.SystemLayer()), this);
 
     // Prevent the target object from being freed while dispatching the event.
     aTarget.Retain();

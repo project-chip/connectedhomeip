@@ -126,7 +126,8 @@ CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr, gMessageTimeoutMsec);
+    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, chip::Optional<chip::SessionHandle>::Missing(),
+                                            gMessageTimeoutMsec);
     SuccessOrExit(err);
 
 exit:
@@ -163,7 +164,8 @@ CHIP_ERROR SendBadCommandRequest(chip::app::CommandSender * commandSender)
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr, gMessageTimeoutMsec);
+    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, chip::Optional<chip::SessionHandle>::Missing(),
+                                            gMessageTimeoutMsec);
     SuccessOrExit(err);
 
 exit:
@@ -181,7 +183,6 @@ exit:
 CHIP_ERROR SendReadRequest()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::app::ReadPrepareParams readPrepareParams;
     chip::app::EventPathParams eventPathParams[2];
     eventPathParams[0].mNodeId     = kTestNodeId;
     eventPathParams[0].mEndpointId = kTestEndpointId;
@@ -198,11 +199,13 @@ CHIP_ERROR SendReadRequest()
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    readPrepareParams.mSessionHandle           = chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex);
-    readPrepareParams.mTimeout                 = gMessageTimeoutMsec;
-    readPrepareParams.mpEventPathParamsList    = eventPathParams;
-    readPrepareParams.mEventPathParamsListSize = 2;
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, gMessageTimeoutMsec);
+    chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex));
+    readPrepareParams.mTimeout                     = gMessageTimeoutMsec;
+    readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 1;
+    readPrepareParams.mpEventPathParamsList        = eventPathParams;
+    readPrepareParams.mEventPathParamsListSize     = 2;
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams);
     SuccessOrExit(err);
 
 exit:
@@ -239,7 +242,8 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
 
     SuccessOrExit(err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true));
     SuccessOrExit(err = apWriteClient->FinishAttribute());
-    SuccessOrExit(err = apWriteClient.SendWriteRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr, gMessageTimeoutMsec));
+    SuccessOrExit(err = apWriteClient.SendWriteRequest(chip::kTestDeviceNodeId, gFabricIndex,
+                                                       chip::Optional<chip::SessionHandle>::Missing(), gMessageTimeoutMsec));
 
     gWriteCount++;
 

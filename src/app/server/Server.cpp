@@ -299,7 +299,12 @@ CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds,
 
     ReturnErrorOnFailure(gDeviceDiscriminatorCache.UpdateDiscriminator(discriminator));
 
-    gAdvDelegate.SetBLE(false);
+// TODO: Do not turn on BLE when opening the Enhanced Commissioning Window.
+#if CONFIG_NETWORK_LAYER_BLE
+    gAdvDelegate.SetBLE(true);
+    params.SetAdvertisementDelegate(&gAdvDelegate);
+    params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
+#endif // CONFIG_NETWORK_LAYER_BLE
     params.SetPASEVerifier(verifier).SetAdvertisementDelegate(&gAdvDelegate);
 
     ReturnErrorOnFailure(
@@ -433,8 +438,8 @@ void InitServer(AppDelegate * delegate)
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
     SuccessOrExit(err);
 
-    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalFabricTable(),
-                                                    &gSessionIDAllocator);
+    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
+                                                    &gSessions, &GetGlobalFabricTable(), &gSessionIDAllocator);
     SuccessOrExit(err);
 
 exit:
