@@ -37,5 +37,4 @@ openthread_core_config_platform_check_file =
     "openthread-core-k32w061-config-check.h"
 openthread_core_config_deps = [ "${chip_root}/examples/platform/nxp/k32w/k32w0:openthread_core_config_k32w0_chip_examples" ]
 
-openthread_external_platform =
-    "${chip_root}/third_party/openthread/platforms/nxp/k32w/k32w0:libopenthread-k32w0"
+openthread_external_platform = "${chip_root}/third_party/openthread/platforms/nxp/k32w/k32w0:libopenthread-k32w0"
