@@ -34,9 +34,6 @@
 // #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 12345678
 // #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
-// Enable log filtering.
-#define CHIP_LOG_FILTERING 1
-
 // Enable support functions for parsing command-line arguments
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
 
