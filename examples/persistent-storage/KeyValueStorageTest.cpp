@@ -21,10 +21,10 @@
 #include <cstring>
 #include <string>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
 
 using namespace chip::DeviceLayer::PersistedStorage;
 
@@ -36,8 +36,7 @@ using namespace chip::DeviceLayer::PersistedStorage;
         {                                                                                                                          \
             char error_str[255];                                                                                                   \
             chip::FormatCHIPError(error_str, sizeof(error_str), temp_test_result);                                                 \
-            ChipLogError(NotSpecified, "%s: FAILED %" PRId32 " [%s]", #test_result, temp_test_result,                              \
-                         chip::ErrorStr(temp_test_result));                                                                        \
+            ChipLogError(NotSpecified, "%s: FAILED [%s]", #test_result, chip::ErrorStr(temp_test_result));                         \
         }                                                                                                                          \
         else                                                                                                                       \
         {                                                                                                                          \

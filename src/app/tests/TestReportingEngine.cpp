@@ -24,18 +24,18 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVDebug.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
@@ -49,13 +49,12 @@ static SecureSessionMgr gSessionManager;
 static Messaging::ExchangeManager gExchangeManager;
 static TransportMgr<Transport::UDP> gTransportManager;
 static secure_channel::MessageCounterManager gMessageCounterManager;
-static const Transport::AdminId gAdminId = 0;
-constexpr ClusterId kTestClusterId       = 6;
-constexpr EndpointId kTestEndpointId     = 1;
-constexpr chip::FieldId kTestFieldId1    = 1;
-constexpr chip::FieldId kTestFieldId2    = 2;
-constexpr uint8_t kTestFieldValue1       = 1;
-constexpr uint8_t kTestFieldValue2       = 2;
+constexpr ClusterId kTestClusterId    = 6;
+constexpr EndpointId kTestEndpointId  = 1;
+constexpr chip::FieldId kTestFieldId1 = 1;
+constexpr chip::FieldId kTestFieldId2 = 2;
+constexpr uint8_t kTestFieldValue1    = 1;
+constexpr uint8_t kTestFieldValue2    = 2;
 
 namespace app {
 CHIP_ERROR ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter * apWriter, bool * apDataExists)
@@ -112,7 +111,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
 
     err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    Messaging::ExchangeContext * exchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
+    Messaging::ExchangeContext * exchangeCtx = gExchangeManager.NewContext(SessionHandle(0, 0, 0, 0), nullptr);
     TestExchangeDelegate delegate;
     exchangeCtx->SetDelegate(&delegate);
 
@@ -134,10 +133,10 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    readHandler.OnReadRequest(exchangeCtx, std::move(readRequestbuf));
+    readHandler.OnReadInitialRequest(std::move(readRequestbuf));
     reportingEngine.Init();
     err = reportingEngine.BuildAndSendSingleReportData(&readHandler);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 }
 } // namespace reporting
 } // namespace app
@@ -148,18 +147,14 @@ void InitializeChip(nlTestSuite * apSuite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(chip::gAdminId, chip::kTestDeviceNodeId);
-
-    NL_TEST_ASSERT(apSuite, adminInfo != nullptr);
+    chip::Transport::FabricTable fabrics;
 
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    chip::gSystemLayer.Init(nullptr);
+    chip::gSystemLayer.Init();
 
-    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins,
-                                     &chip::gMessageCounterManager);
+    err = chip::gSessionManager.Init(&chip::gSystemLayer, &chip::gTransportManager, &fabrics, &chip::gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = chip::gExchangeManager.Init(&chip::gSessionManager);
@@ -193,6 +188,8 @@ int TestReportingEngine()
     InitializeChip(&theSuite);
 
     nlTestRunner(&theSuite, nullptr);
+
+    chip::gSystemLayer.Shutdown();
 
     return (nlTestRunnerStats(&theSuite));
 }

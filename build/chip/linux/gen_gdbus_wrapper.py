@@ -28,8 +28,7 @@ def main(argv):
 
     parser.add_argument(
         "--output_c",
-        help=
-        "The source file to generate containing the GDBus proxy implementation"
+        help="The source file to generate containing the GDBus proxy implementation"
     )
 
     parser.add_argument(
@@ -65,7 +64,8 @@ def main(argv):
         gdbus_args = ["gdbus-codegen", "--body", "--output", options.output_c
                       ] + extra_args + [options.input_file]
         subprocess.check_call(gdbus_args)
-        sed_args = ["sed", "-i", "s/config\.h/BuildConfig.h/g", options.output_c]
+        sed_args = ["sed", "-i",
+                    "s/config\.h/BuildConfig.h/g", options.output_c]
         subprocess.check_call(sed_args)
 
     if options.output_h:

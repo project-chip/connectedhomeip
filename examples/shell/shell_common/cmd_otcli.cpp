@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 
 #include <ChipShellCollection.h>
 
@@ -164,7 +164,7 @@ static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "
 static int OnOtCliOutput(void * aContext, const char * aFormat, va_list aArguments)
 {
     int rval = vsnprintf(sTxBuffer, sTxLength, aFormat, aArguments);
-    VerifyOrExit(rval >= 0 && rval < sTxLength, rval = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(rval >= 0 && rval < sTxLength, rval = CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger());
     return streamer_write(streamer_get(), (const char *) sTxBuffer, rval);
 exit:
     return rval;

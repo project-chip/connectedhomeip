@@ -25,14 +25,14 @@
 
 #include <messaging/ReliableMessageMgr.h>
 
+#include <lib/support/BitFlags.h>
+#include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ErrorCategory.h>
 #include <messaging/ExchangeMessageDispatch.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
-#include <support/BitFlags.h>
-#include <support/CHIPFaultInjection.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Messaging {
@@ -234,7 +234,7 @@ void ReliableMessageMgr::ExpireTicks()
 #endif
 }
 
-void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState)
 {
     ReliableMessageMgr * manager = reinterpret_cast<ReliableMessageMgr *>(aAppState);
 
@@ -350,33 +350,35 @@ bool ReliableMessageMgr::CheckAndRemRetransTable(ReliableMessageContext * rc, ui
 
 CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
     ReliableMessageContext * rc = entry->rc;
-    uint32_t msgId              = 0; // Not actually used unless we reach the
-                                     // line that initializes it properly.
-
-    VerifyOrReturnError(rc != nullptr, err);
-
-    // Now that we know this is a valid entry, grab the message id from the
-    // retained buffer.  We need to do that now, because we're about to hand it
-    // over to someone else, and on failure it will no longer be available.
-    msgId = entry->retainedBuf.GetMsgId();
+    if (rc == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
 
     const ExchangeMessageDispatch * dispatcher = rc->GetExchangeContext()->GetMessageDispatch();
-    VerifyOrExit(dispatcher != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    if (dispatcher == nullptr)
+    {
+        // Using same error message for all errors to reduce code size.
+        ChipLogError(ExchangeManager, "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
+                     CHIP_ERROR_INCORRECT_STATE.Format(), entry->retainedBuf.GetMsgId(), entry->sendCount);
+        ClearRetransTable(*entry);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
-    err = dispatcher->SendPreparedMessage(rc->GetExchangeContext()->GetSecureSession(), entry->retainedBuf);
-    SuccessOrExit(err);
+    CHIP_ERROR err = dispatcher->SendPreparedMessage(rc->GetExchangeContext()->GetSecureSession(), entry->retainedBuf);
 
-    // Update the counters
-    entry->sendCount++;
-
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
+    {
+        // Update the counters
+        entry->sendCount++;
+    }
+    else
     {
         // Remove from table
-        ChipLogError(ExchangeManager, "Crit-err %ld when sending CHIP MsgId:%08" PRIX32 ", send tries: %d", long(err), msgId,
-                     entry->sendCount);
+        // Using same error message for all errors to reduce code size.
+        ChipLogError(ExchangeManager, "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
+                     err.Format(), entry->retainedBuf.GetMsgId(), entry->sendCount);
 
         ClearRetransTable(*entry);
     }
@@ -487,7 +489,8 @@ void ReliableMessageMgr::StartTimer()
             StopTimer();
             res = mSystemLayer->StartTimer((uint32_t) timerArmValue, Timeout, this);
 
-            VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager, "Cannot start ReliableMessageMgr::Timeout\n");
+            VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager,
+                               "Cannot start ReliableMessageMgr::Timeout %" CHIP_ERROR_FORMAT, res.Format());
             mCurrentTimerExpiry = timerExpiry;
 #if defined(RMP_TICKLESS_DEBUG)
         }

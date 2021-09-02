@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <mdns/minimal/records/ResourceRecord.h>
+#include <lib/mdns/minimal/records/ResourceRecord.h>
 
 namespace mdns {
 namespace Minimal {

@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include <mdns/Advertiser_ImplMinimalMdnsAllocator.h>
+#include <lib/mdns/Advertiser_ImplMinimalMdnsAllocator.h>
 
-#include <support/UnitTestRegistration.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -249,11 +249,59 @@ void TestQueryAllocatorRecordResponderTypes(nlTestSuite * inSuite, void * inCont
 #endif
 }
 
+void TestGetResponder(nlTestSuite * inSuite, void * inContext)
+{
+    TestAllocator test;
+    // Start empty.
+    test.TestAllRecordRespondersAreNull(inSuite);
+    test.TestAllQNamesAreNull(inSuite);
+
+    FullQName serviceName  = test.AllocateQName("test", "service");
+    FullQName instanceName = test.AllocateQName("test", "instance");
+    FullQName hostName     = test.AllocateQName("test", "host");
+    FullQName someTxt      = test.AllocateQName("L1=some text", "L2=some other text");
+    FullQName notAdded     = test.AllocateQName("not", "added");
+
+    NL_TEST_ASSERT(inSuite, serviceName != FullQName());
+    NL_TEST_ASSERT(inSuite, instanceName != FullQName());
+    NL_TEST_ASSERT(inSuite, hostName != FullQName());
+    NL_TEST_ASSERT(inSuite, someTxt != FullQName());
+
+    NL_TEST_ASSERT(inSuite, test.AddResponder<PtrResponder>(serviceName, instanceName).IsValid());
+    NL_TEST_ASSERT(inSuite, test.AddResponder<SrvResponder>(SrvResourceRecord(instanceName, hostName, 57)).IsValid());
+    NL_TEST_ASSERT(inSuite, test.AddResponder<TxtResponder>(TxtResourceRecord(instanceName, someTxt)).IsValid());
+    NL_TEST_ASSERT(inSuite, test.AddResponder<IPv6Responder>(hostName).IsValid());
+    NL_TEST_ASSERT(inSuite, test.AddResponder<IPv4Responder>(hostName).IsValid());
+
+    // These should all exist
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::PTR, serviceName) != nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::SRV, instanceName) != nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::TXT, instanceName) != nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::A, hostName) != nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::AAAA, hostName) != nullptr);
+
+    // incorrect types
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::SRV, notAdded) == nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::AAAA, instanceName) == nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::A, instanceName) == nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::PTR, hostName) == nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::TXT, hostName) == nullptr);
+
+    // incorrect names
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::PTR, notAdded) == nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::SRV, notAdded) == nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::TXT, notAdded) == nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::A, notAdded) == nullptr);
+    NL_TEST_ASSERT(inSuite, test.GetResponder(QType::AAAA, notAdded) == nullptr);
+    test.Clear();
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestQueryAllocatorQName", TestQueryAllocatorQName),                               //
     NL_TEST_DEF("TestQueryAllocatorQNameArray", TestQueryAllocatorQNameArray),                     //
     NL_TEST_DEF("TestQueryAllocatorRecordResponder", TestQueryAllocatorRecordResponder),           //
     NL_TEST_DEF("TestQueryAllocatorRecordResponderTypes", TestQueryAllocatorRecordResponderTypes), //
+    NL_TEST_DEF("TestGetResponder", TestGetResponder),                                             //
 
     NL_TEST_SENTINEL() //
 };

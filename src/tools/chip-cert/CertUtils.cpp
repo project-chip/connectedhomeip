@@ -28,6 +28,8 @@
 
 #include "chip-cert.h"
 
+#include <string>
+
 using namespace chip;
 using namespace chip::Credentials;
 using namespace chip::ASN1;
@@ -216,8 +218,10 @@ bool SetCertTimeField(ASN1_TIME * asn1Time, const struct tm & value)
     char timeStr[16];
 
     // Encode the time as a string in the form YYYYMMDDHHMMSSZ.
-    snprintf(timeStr, sizeof(timeStr), "%04d%02d%02d%02d%02d%02dZ", static_cast<uint16_t>(value.tm_year + 1900) % 9999,
-             static_cast<uint8_t>(value.tm_mon) % kMonthsPerYear + 1, static_cast<uint8_t>(value.tm_mday) % kMaxDaysPerMonth,
+    snprintf(timeStr, sizeof(timeStr), "%04d%02d%02d%02d%02d%02dZ",
+             (value.tm_year == kX509NoWellDefinedExpirationDateYear) ? kX509NoWellDefinedExpirationDateYear
+                                                                     : (static_cast<uint16_t>(value.tm_year + 1900) % 9999),
+             static_cast<uint8_t>(value.tm_mon) % kMonthsPerYear + 1, static_cast<uint8_t>(value.tm_mday) % (kMaxDaysPerMonth + 1),
              static_cast<uint8_t>(value.tm_hour) % kHoursPerDay, static_cast<uint8_t>(value.tm_min) % kMinutesPerHour,
              static_cast<uint8_t>(value.tm_sec) % kSecondsPerMinute);
 
@@ -250,17 +254,31 @@ bool SetValidityTime(X509 * cert, const struct tm & validFrom, uint32_t validDay
     // Note that this computation is done in local time, despite the fact that the certificate validity times are
     // UTC.  This is because the standard posix time functions do not make it easy to convert a struct tm containing
     // UTC to a time_t value without manipulating the TZ environment variable.
-    validTo = validFrom;
-    validTo.tm_mday += validDays;
-    validTo.tm_sec -= 1; // Ensure validity period is exactly a multiple of a day.
-    validTo.tm_isdst = -1;
-    validToTime      = mktime(&validTo);
-    if (validToTime == static_cast<time_t>(-1))
+    if (validDays == kCertValidDays_NoWellDefinedExpiration)
     {
-        fprintf(stderr, "mktime() failed\n");
-        ExitNow(res = false);
+        validTo.tm_year  = kX509NoWellDefinedExpirationDateYear;
+        validTo.tm_mon   = kMonthsPerYear - 1;
+        validTo.tm_mday  = kMaxDaysPerMonth;
+        validTo.tm_hour  = kHoursPerDay - 1;
+        validTo.tm_min   = kMinutesPerHour - 1;
+        validTo.tm_sec   = kSecondsPerMinute - 1;
+        validTo.tm_isdst = -1;
     }
-    localtime_r(&validToTime, &validTo);
+    else
+    {
+        validTo = validFrom;
+        validTo.tm_mday += validDays;
+        validTo.tm_sec -= 1; // Ensure validity period is exactly a multiple of a day.
+        validTo.tm_isdst = -1;
+        validToTime      = mktime(&validTo);
+
+        if (validToTime == static_cast<time_t>(-1))
+        {
+            fprintf(stderr, "mktime() failed\n");
+            ExitNow(res = false);
+        }
+        localtime_r(&validToTime, &validTo);
+    }
 
     // Set the certificate's notBefore date.
     res = SetCertTimeField(X509_get_notBefore(cert), validFrom);
@@ -379,11 +397,8 @@ bool ReadCert(const char * fileName, X509 * cert)
 
 bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
 {
-    bool res          = true;
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    const uint8_t * p = nullptr;
-    uint32_t certLen  = 0;
-    std::unique_ptr<uint8_t[]> x509CertBuf(new uint8_t[kMaxDERCertLength]);
+    bool res         = true;
+    uint32_t certLen = 0;
     std::unique_ptr<uint8_t[]> certBuf;
 
     res = ReadFileIntoMem(fileName, nullptr, certLen);
@@ -401,6 +416,18 @@ bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
         res = ReadCertPEM(fileName, cert);
         VerifyTrueOrExit(res);
     }
+    else if (certFmt == kCertFormat_X509_DER)
+    {
+        const uint8_t * outCert = certBuf.get();
+
+        VerifyOrReturnError(chip::CanCastTo<int>(certLen), false);
+
+        if (d2i_X509(&cert, &outCert, static_cast<int>(certLen)) == nullptr)
+        {
+            ReportOpenSSLErrorAndExit("d2i_X509", res = false);
+        }
+    }
+    // Otherwise, it is either CHIP TLV or CHIP TLV Base64 encoded.
     else
     {
         if (certFmt == kCertFormat_Chip_Base64)
@@ -409,23 +436,21 @@ bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
             VerifyTrueOrExit(res);
         }
 
-        if (certFmt == kCertFormat_Chip_Base64 || certFmt == kCertFormat_Chip_Raw)
-        {
-            err = ConvertChipCertToX509Cert(ByteSpan(certBuf.get(), certLen), x509CertBuf.get(), kMaxDERCertLength, certLen);
-            if (err != CHIP_NO_ERROR)
-            {
-                fprintf(stderr, "Error converting certificate: %s\n", chip::ErrorStr(err));
-                ExitNow(res = false);
-            }
+        std::unique_ptr<uint8_t[]> x509CertBuf(new uint8_t[kMaxDERCertLength]);
+        MutableByteSpan x509Cert(x509CertBuf.get(), kMaxDERCertLength);
 
-            p = x509CertBuf.get();
-        }
-        else
+        CHIP_ERROR err = ConvertChipCertToX509Cert(ByteSpan(certBuf.get(), certLen), x509Cert);
+        if (err != CHIP_NO_ERROR)
         {
-            p = certBuf.get();
+            fprintf(stderr, "Error converting certificate: %s\n", chip::ErrorStr(err));
+            ExitNow(res = false);
         }
 
-        if (d2i_X509(&cert, &p, certLen) == nullptr)
+        const uint8_t * outCert = x509Cert.data();
+
+        VerifyOrReturnError(chip::CanCastTo<int>(x509Cert.size()), false);
+
+        if (d2i_X509(&cert, &outCert, static_cast<int>(x509Cert.size())) == nullptr)
         {
             ReportOpenSSLErrorAndExit("d2i_X509", res = false);
         }
@@ -435,12 +460,12 @@ exit:
     return res;
 }
 
-bool X509ToChipCert(X509 * cert, uint8_t * certBuf, uint32_t certBufSize, uint32_t & certLen)
+bool X509ToChipCert(X509 * cert, MutableByteSpan & chipCert)
 {
     bool res = true;
     CHIP_ERROR err;
     uint8_t * derCert = nullptr;
-    int32_t derCertLen;
+    int derCertLen;
 
     derCertLen = i2d_X509(cert, &derCert);
     if (derCertLen < 0)
@@ -448,9 +473,9 @@ bool X509ToChipCert(X509 * cert, uint8_t * certBuf, uint32_t certBufSize, uint32
         ReportOpenSSLErrorAndExit("i2d_X509", res = false);
     }
 
-    VerifyOrReturnError(chip::CanCastTo<uint32_t>(derCertLen), false);
+    VerifyOrReturnError(chip::CanCastTo<size_t>(derCertLen), false);
 
-    err = ConvertX509CertToChipCert(ByteSpan(derCert, static_cast<uint32_t>(derCertLen)), certBuf, certBufSize, certLen);
+    err = ConvertX509CertToChipCert(ByteSpan(derCert, static_cast<size_t>(derCertLen)), chipCert);
     if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "ConvertX509CertToChipCert() failed\n%s\n", chip::ErrorStr(err));
@@ -461,18 +486,17 @@ exit:
     return res;
 }
 
-bool LoadChipCert(const char * fileName, bool isTrused, ChipCertificateSet & certSet, uint8_t * certBuf, uint32_t certBufSize)
+bool LoadChipCert(const char * fileName, bool isTrused, ChipCertificateSet & certSet, MutableByteSpan & chipCert)
 {
     bool res = true;
     CHIP_ERROR err;
-    uint32_t certLen;
     BitFlags<CertDecodeFlags> decodeFlags;
     std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
 
     res = ReadCert(fileName, cert.get());
     VerifyTrueOrExit(res);
 
-    res = X509ToChipCert(cert.get(), certBuf, certBufSize, certLen);
+    res = X509ToChipCert(cert.get(), chipCert);
     VerifyTrueOrExit(res);
 
     if (isTrused)
@@ -484,7 +508,7 @@ bool LoadChipCert(const char * fileName, bool isTrused, ChipCertificateSet & cer
         decodeFlags.Set(CertDecodeFlags::kGenerateTBSHash);
     }
 
-    err = certSet.LoadCert(certBuf, certLen, decodeFlags);
+    err = certSet.LoadCert(chipCert, decodeFlags);
     if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "Error reading %s\n%s\n", fileName, chip::ErrorStr(err));
@@ -522,18 +546,19 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
     else if (certFmt == kCertFormat_Chip_Raw || certFmt == kCertFormat_Chip_Base64)
     {
         uint8_t * certToWrite      = nullptr;
-        uint32_t certToWriteLen    = 0;
-        uint32_t chipCertLen       = kMaxCHIPCertLength;
-        uint32_t chipCertBase64Len = BASE64_ENCODED_LEN(chipCertLen);
-        std::unique_ptr<uint8_t[]> chipCert(new uint8_t[chipCertLen]);
+        size_t certToWriteLen      = 0;
+        uint32_t chipCertBase64Len = BASE64_ENCODED_LEN(kMaxCHIPCertLength);
         std::unique_ptr<uint8_t[]> chipCertBase64(new uint8_t[chipCertBase64Len]);
+        uint8_t chipCertBuf[kMaxCHIPCertLength];
+        MutableByteSpan chipCert(chipCertBuf);
 
-        res = X509ToChipCert(cert, chipCert.get(), chipCertLen, chipCertLen);
+        res = X509ToChipCert(cert, chipCert);
         VerifyTrueOrExit(res);
 
         if (certFmt == kCertFormat_Chip_Base64)
         {
-            res = Base64Encode(chipCert.get(), chipCertLen, chipCertBase64.get(), chipCertBase64Len, chipCertBase64Len);
+            res = Base64Encode(chipCert.data(), static_cast<uint32_t>(chipCert.size()), chipCertBase64.get(), chipCertBase64Len,
+                               chipCertBase64Len);
             VerifyTrueOrExit(res);
 
             certToWrite    = chipCertBase64.get();
@@ -541,8 +566,8 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
         }
         else
         {
-            certToWrite    = chipCert.get();
-            certToWriteLen = chipCertLen;
+            certToWrite    = chipCert.data();
+            certToWriteLen = chipCert.size();
         }
 
         if (fwrite(certToWrite, 1, certToWriteLen, file) != certToWriteLen)
@@ -558,7 +583,8 @@ exit:
 }
 
 bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
-              uint32_t validDays, const FutureExtension * futureExts, uint8_t futureExtsCount, X509 * newCert, EVP_PKEY * newKey)
+              uint32_t validDays, int pathLen, const FutureExtension * futureExts, uint8_t futureExtsCount, X509 * newCert,
+              EVP_PKEY * newKey)
 {
     bool res = true;
 
@@ -599,23 +625,42 @@ bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP
         ReportOpenSSLErrorAndExit("X509_set_issuer_name", res = false);
     }
 
+    // Add basic constraints certificate extensions.
+    {
+        std::string basicConstraintsExt;
+
+        if (certType == kCertType_Node || certType == kCertType_FirmwareSigning)
+        {
+            basicConstraintsExt = "critical,CA:FALSE";
+        }
+        else
+        {
+            basicConstraintsExt = "critical,CA:TRUE";
+        }
+
+        if (pathLen != kPathLength_NotSpecified)
+        {
+            basicConstraintsExt.append(",pathlen:" + std::to_string(pathLen));
+        }
+
+        res = AddExtension(newCert, NID_basic_constraints, basicConstraintsExt.c_str());
+        VerifyTrueOrExit(res);
+    }
+
     // Add the appropriate certificate extensions.
     if (certType == kCertType_Node)
     {
-        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:FALSE") &&
-            AddExtension(newCert, NID_key_usage, "critical,digitalSignature") &&
+        res = AddExtension(newCert, NID_key_usage, "critical,digitalSignature") &&
             AddExtension(newCert, NID_ext_key_usage, "critical,clientAuth,serverAuth");
     }
     else if (certType == kCertType_FirmwareSigning)
     {
-        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:FALSE") &&
-            AddExtension(newCert, NID_key_usage, "critical,digitalSignature") &&
+        res = AddExtension(newCert, NID_key_usage, "critical,digitalSignature") &&
             AddExtension(newCert, NID_ext_key_usage, "critical,codeSigning");
     }
     else if (certType == kCertType_ICA || certType == kCertType_Root)
     {
-        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:TRUE") &&
-            AddExtension(newCert, NID_key_usage, "critical,keyCertSign,cRLSign");
+        res = AddExtension(newCert, NID_key_usage, "critical,keyCertSign,cRLSign");
     }
     VerifyTrueOrExit(res);
 
@@ -759,10 +804,15 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
         res = AddExtension(newCert, NID_basic_constraints, "critical,CA:FALSE") &&
             AddExtension(newCert, NID_key_usage, "critical,digitalSignature");
     }
-    // otherwise, it is PAI or PAA
+    else if (attCertType == kAttCertType_PAI)
+    {
+        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:TRUE,pathlen:0") &&
+            AddExtension(newCert, NID_key_usage, "critical,keyCertSign,cRLSign");
+    }
+    // otherwise, it is PAA
     else
     {
-        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:TRUE") &&
+        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:TRUE,pathlen:1") &&
             AddExtension(newCert, NID_key_usage, "critical,keyCertSign,cRLSign");
     }
     VerifyTrueOrExit(res);

@@ -72,8 +72,9 @@ performing over-the-air Device Firmware Upgrade using Bluetooth LE.
 ### Bluetooth LE advertising
 
 To commission the device onto a CHIP network, the device must be discoverable
-over Bluetooth LE. For security reasons, you must start Bluetooth LE advertising
-manually after powering up the device by pressing **Button 4**.
+over Bluetooth LE that starts automatically upon the device startup, but only
+for a predefined period of time (15 minutes by default). If the Bluetooth LE
+advertising times out, you can re-enable it manually using **Button 4**.
 
 ### Bluetooth LE rendezvous
 
@@ -82,9 +83,9 @@ device and the CHIP controller, where the controller has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the CHIP device. The data payload is encoded within a QR code, printed to
-the UART console, and shared using an NFC tag. For security reasons, you must
-start NFC tag emulation manually after powering up the device by pressing
-**Button 4**.
+the UART console, and shared using an NFC tag. NFC tag emulation starts
+automatically when Bluetooth LE advertising is started and stays enabled until
+Bluetooth LE advertising timeout expires.
 
 #### Thread provisioning
 
@@ -218,7 +219,7 @@ opposite one.
 the test mode using the default configuration.
 
 **Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
-enables Bluetooth LE advertising for the predefined period of time.
+enables Bluetooth LE advertising for the predefined period of time (15 minutes by default).
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
@@ -383,10 +384,7 @@ To build the example with configuration that enables DFU, run the following
 command with _build-target_ replaced with the build target name of the Nordic
 Semiconductor's kit you own (for example `nrf52840dk_nrf52840`):
 
-> **_WARNING:_** Please do remember about replacing _build-target_ also in the
-> PM_STATIC_YML_FILE path.
-
-    $ west build -b build-target -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/app/overlay-dfu_support.conf -DPM_STATIC_YML_FILE="configuration/build-target/pm_static.yml"
+    $ west build -b build-target -- -DBUILD_WITH_DFU=1
 
 #### Changing bootloader configuration
 
@@ -491,3 +489,20 @@ CHIP-enabled Thread network.
 Read the
 [DFU tutorial](../../../docs/guides/nrfconnect_examples_software_update.md) to
 see how to upgrade your device firmware.
+
+## Testing using the RPC console
+
+If the flashed device has been built with the pigweed RPCs, the RPC console can
+be used to interact with the device.
+
+Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
+
+Start the console
+
+        $ python -m chip_rpc.console --device /dev/ttyUSB0
+
+From within the console you can then invoke rpcs:
+
+        rpcs.chip.rpc.Lighting.Get()
+
+        rpcs.chip.rpc.Lighting.Set(on=True)

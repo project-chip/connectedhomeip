@@ -30,7 +30,9 @@
 class ReportingCommand : public Command
 {
 public:
-    ReportingCommand(const char * commandName) : Command(commandName)
+    ReportingCommand(const char * commandName) :
+        Command(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
         AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId);
     }
@@ -43,5 +45,10 @@ public:
 
 private:
     uint8_t mEndPointId;
-    ChipDevice * mDevice;
+
+    static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
+    static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+
+    chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 };

@@ -22,8 +22,8 @@
  *          General utility functions available on all platforms.
  */
 
+#include <lib/support/CodeUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -115,18 +115,18 @@ bool FormatDeviceLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (!ChipError::IsPart(ChipError::SdkPart::kDevice, err))
+    if (!err.IsPart(ChipError::SdkPart::kDevice))
     {
         return false;
     }
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    switch (err)
+    switch (err.AsInteger())
     {
-    case CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND:
+    case CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND.AsInteger():
         desc = "Config not found";
         break;
-    case CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED:
+    case CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED.AsInteger():
         desc = "Not service provisioned";
         break;
     }

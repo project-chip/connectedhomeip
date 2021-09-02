@@ -16,9 +16,9 @@
  */
 
 #import "CHIPError.h"
+#import "CHIPError_Internal.h"
 
 #import <app/util/af-enums.h>
-#import <core/CHIPError.h>
 #import <inet/InetError.h>
 
 NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
@@ -27,31 +27,60 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
 
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
 {
-    switch (errorCode) {
-    case CHIP_ERROR_INVALID_STRING_LENGTH:
+    if (errorCode == CHIP_ERROR_INVALID_STRING_LENGTH) {
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeInvalidStringLength
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A list length is invalid.", nil) }];
-    case CHIP_ERROR_INVALID_INTEGER_VALUE:
+    }
+
+    if (errorCode == CHIP_ERROR_INVALID_INTEGER_VALUE) {
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeInvalidIntegerValue
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Unexpected integer value.", nil) }];
-    case CHIP_ERROR_INVALID_ARGUMENT:
+    }
+
+    if (errorCode == CHIP_ERROR_INVALID_ARGUMENT) {
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeInvalidArgument
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"An argument is invalid.", nil) }];
-    case CHIP_ERROR_INVALID_MESSAGE_LENGTH:
+    }
+
+    if (errorCode == CHIP_ERROR_INVALID_MESSAGE_LENGTH) {
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeInvalidMessageLength
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A message length is invalid.", nil) }];
-    case CHIP_ERROR_INCORRECT_STATE:
+    }
+
+    if (errorCode == CHIP_ERROR_INCORRECT_STATE) {
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeInvalidState
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Invalid object state.", nil) }];
-    case CHIP_ERROR_INTEGRITY_CHECK_FAILED:
+    }
+
+    if (errorCode == CHIP_ERROR_INTEGRITY_CHECK_FAILED) {
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeIntegrityCheckFailed
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Integrity check failed.", nil) }];
+    }
+
+    if (errorCode == CHIP_NO_ERROR) {
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPSuccess
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Success.", nil) }];
+    }
+
+    return [NSError errorWithDomain:CHIPErrorDomain
+                               code:CHIPErrorCodeUndefinedError
+                           userInfo:@{
+                               NSLocalizedDescriptionKey :
+                                   [NSString stringWithFormat:NSLocalizedString(@"Undefined error:%u.", nil), errorCode.AsInteger()]
+                           }];
+    ;
+}
+
++ (NSError *)errorForZCLErrorCode:(uint8_t)errorCode
+{
+    switch (errorCode) {
     case EMBER_ZCL_STATUS_DUPLICATE_EXISTS:
         return [NSError
             errorWithDomain:CHIPErrorDomain
@@ -61,18 +90,13 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeUnsupportedAttribute
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Attribute is not supported.", nil) }];
-    case CHIP_NO_ERROR:
-        return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPSuccess
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Success.", nil) }];
     default:
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeUndefinedError
                                userInfo:@{
-                                   NSLocalizedDescriptionKey :
-                                       [NSString stringWithFormat:NSLocalizedString(@"Undefined error:%d.", nil), errorCode]
+                                   NSLocalizedDescriptionKey : [NSString
+                                       stringWithFormat:NSLocalizedString(@"Undefined data model error:%u.", nil), errorCode]
                                }];
-        ;
     }
 }
 
@@ -83,10 +107,6 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
     }
 
     switch (error.code) {
-    case CHIPErrorCodeUnsupportedAttribute:
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
-    case CHIPErrorCodeDuplicateExists:
-        return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
     case CHIPErrorCodeInvalidStringLength:
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     case CHIPErrorCodeInvalidIntegerValue:

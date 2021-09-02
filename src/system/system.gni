@@ -23,9 +23,6 @@ declare_args() {
   # Use BSD/POSIX socket API.
   chip_system_config_use_sockets = current_os != "freertos"
 
-  # Socket event loop type.
-  chip_system_config_sockets_event_loop = "Select"
-
   # Mutex implementation: posix, freertos, none.
   chip_system_config_locking = ""
 
@@ -40,6 +37,15 @@ declare_args() {
   # use the dispatch library
   chip_system_config_use_dispatch = chip_system_config_use_sockets &&
                                     (current_os == "mac" || current_os == "ios")
+}
+
+declare_args() {
+  # Event loop type.
+  if (chip_system_config_use_lwip) {
+    chip_system_config_event_loop = "LwIP"
+  } else {
+    chip_system_config_event_loop = "Select"
+  }
 }
 
 if (chip_system_config_locking == "") {

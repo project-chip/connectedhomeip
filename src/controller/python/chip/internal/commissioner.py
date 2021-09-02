@@ -15,7 +15,7 @@
 #
 from chip.configuration import GetLocalNodeId
 from chip.native import NativeLibraryHandleMethodArguments, GetLibraryHandle
-from ctypes import c_uint64, c_uint32, c_uint16, c_char_p
+from ctypes import c_uint64, c_uint32, c_uint16
 from enum import Enum
 from typing import Optional
 from chip.internal.types import NetworkCredentialsRequested, OperationalCredentialsRequested, PairingComplete
@@ -23,27 +23,35 @@ import ctypes
 
 # Not using c_void_p directly is IMPORTANT. Python auto-casts c_void_p
 # to intergers and this can cause 32/64 bit issues.
+
+
 class Commissioner_p(ctypes.c_void_p):
     pass
 
+
 class ThreadBlob_p(ctypes.c_void_p):
     pass
+
 
 @NetworkCredentialsRequested
 def OnNetworkCredentialsRequested():
     GetCommissioner()._OnNetworkCredentialsRequested()
 
+
 @OperationalCredentialsRequested
 def OnOperationalCredentialsRequested(csr, csr_length):
-    GetCommissioner()._OnOperationalCredentialsRequested(ctypes.string_at(csr, csr_length))
+    GetCommissioner()._OnOperationalCredentialsRequested(
+        ctypes.string_at(csr, csr_length))
+
 
 @PairingComplete
 def OnPairingComplete(err: int):
     GetCommissioner()._OnPairingComplete(err)
 
+
 class PairingState(Enum):
     """States throughout a pairing flow. 
-    
+
     Devices generally go through:
       initialized -> pairing -> netcreds -> opcreds -> done (initialized)
 
@@ -57,12 +65,12 @@ class PairingState(Enum):
 
 class Commissioner:
     """Commissioner wraps the DeviceCommissioner native class.
-    
+
 
     The commissioner is a DeviceController that supports pairing. Since the device
     controller supports multiple devices, this class is expected to be used 
     as a singleton
-    
+
     """
 
     def __init__(self, handle: ctypes.CDLL, native: Commissioner_p):
@@ -71,23 +79,24 @@ class Commissioner:
         self.pairing_state = PairingState.INITIALIZED
         self.on_pairing_complete = None
 
-    
     def BlePair(self, remoteDeviceId: int, pinCode: int, discriminator: int):
-        result = self._handle.pychip_internal_Commissioner_BleConnectForPairing(self._native, remoteDeviceId, pinCode, discriminator)
-        if result != 0: 
+        result = self._handle.pychip_internal_Commissioner_BleConnectForPairing(
+            self._native, remoteDeviceId, pinCode, discriminator)
+        if result != 0:
             raise Exception("Failed to pair. CHIP Error code %d" % result)
 
         self.pairing_state = PairingState.PAIRING
-    
+
     def Unpair(self, remoteDeviceId: int):
-        result = self._handle.pychip_internal_Commissioner_Unpair(self._native, remoteDeviceId)
-        if result != 0: 
+        result = self._handle.pychip_internal_Commissioner_Unpair(
+            self._native, remoteDeviceId)
+        if result != 0:
             raise Exception("Failed to unpair. CHIP Error code %d" % result)
 
     def _OnPairingComplete(self, err: int):
         self.pairing_state = PairingState.INITIALIZED
         if self.on_pairing_complete:
-          self.on_pairing_complete(err)
+            self.on_pairing_complete(err)
 
 
 def _SetNativeCallSignatues(handle: ctypes.CDLL):
@@ -95,12 +104,17 @@ def _SetNativeCallSignatues(handle: ctypes.CDLL):
     setter = NativeLibraryHandleMethodArguments(handle)
 
     setter.Set('pychip_internal_Commissioner_New', Commissioner_p, [c_uint64])
-    setter.Set('pychip_internal_Commissioner_Unpair', c_uint32, [Commissioner_p, c_uint64])
-    setter.Set('pychip_internal_Commissioner_BleConnectForPairing', c_uint32, [Commissioner_p, c_uint64, c_uint32, c_uint16])
+    setter.Set('pychip_internal_Commissioner_Unpair',
+               c_uint32, [Commissioner_p, c_uint64])
+    setter.Set('pychip_internal_Commissioner_BleConnectForPairing',
+               c_uint32, [Commissioner_p, c_uint64, c_uint32, c_uint16])
 
-    setter.Set('pychip_internal_PairingDelegate_SetPairingCompleteCallback', None, [PairingComplete])
+    setter.Set('pychip_internal_PairingDelegate_SetPairingCompleteCallback', None, [
+               PairingComplete])
+
 
 commissionerSingleton: Optional[Commissioner] = None
+
 
 def GetCommissioner() -> Commissioner:
     """Gets a reference to the global commissioner singleton.
@@ -116,11 +130,11 @@ def GetCommissioner() -> Commissioner:
 
         native = handle.pychip_internal_Commissioner_New(GetLocalNodeId())
         if not native:
-            raise Exception('Failed to create commissioner object.') 
+            raise Exception('Failed to create commissioner object.')
 
-        handle.pychip_internal_PairingDelegate_SetPairingCompleteCallback(OnPairingComplete)
+        handle.pychip_internal_PairingDelegate_SetPairingCompleteCallback(
+            OnPairingComplete)
 
         commissionerSingleton = Commissioner(handle, native)
-
 
     return commissionerSingleton

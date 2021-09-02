@@ -17,10 +17,12 @@
  */
 
 #include <app/InteractionModelEngine.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVDebug.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -28,8 +30,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
@@ -41,6 +41,7 @@
 namespace {
 chip::TransportMgrBase gTransportManager;
 chip::Test::LoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
 
 using TestContext = chip::Test::MessagingContext;
 TestContext sContext;
@@ -56,7 +57,7 @@ public:
     static void TestWriteRoundtrip(nlTestSuite * apSuite, void * apContext);
 
 private:
-    static void AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient);
+    static void AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient);
     static void AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler);
     static void GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
@@ -73,7 +74,7 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
-void TestWriteInteraction::AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient)
+void TestWriteInteraction::AddAttributeDataElement(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
@@ -84,15 +85,15 @@ void TestWriteInteraction::AddAttributeDataElement(nlTestSuite * apSuite, void *
     attributePathParams.mListIndex  = 5;
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
-    err = aWriteClient.PrepareAttribute(attributePathParams);
+    err = aWriteClient->PrepareAttribute(attributePathParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    chip::TLV::TLVWriter * writer = aWriteClient.GetAttributeDataElementTLVWriter();
+    chip::TLV::TLVWriter * writer = aWriteClient->GetAttributeDataElementTLVWriter();
 
     err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = aWriteClient.FinishAttribute();
+    err = aWriteClient->FinishAttribute();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -206,16 +207,21 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     app::WriteClient writeClient;
+    app::WriteClientHandle writeClientHandle;
+    writeClientHandle.SetWriteClient(&writeClient);
 
     chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = writeClient.Init(&ctx.GetExchangeManager(), &delegate);
+    err                            = writeClient.Init(&ctx.GetExchangeManager(), &delegate, 0);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    AddAttributeDataElement(apSuite, apContext, writeClient);
+    AddAttributeDataElement(apSuite, apContext, writeClientHandle);
 
-    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
-    err                         = writeClient.SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetAdminId(), &session);
+    SessionHandle session = ctx.GetSessionLocalToPeer();
+    err                   = writeClientHandle.SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(),
+                                             Optional<SessionHandle>::Value(session));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    // The internal WriteClient should be nullptr once we SendWriteRequest.
+    NL_TEST_ASSERT(apSuite, nullptr == writeClientHandle.mpWriteClient);
 
     GenerateWriteResponse(apSuite, apContext, buf);
 
@@ -242,17 +248,10 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
     GenerateWriteRequest(apSuite, apContext, buf);
 
-    err = writeHandler.ProcessWriteRequest(std::move(buf));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    AddAttributeStatus(apSuite, apContext, writeHandler);
-
     TestExchangeDelegate delegate;
-    writeHandler.mpExchangeCtx = ctx.NewExchangeToLocal(&delegate);
-    err                        = writeHandler.SendWriteResponse();
+    Messaging::ExchangeContext * exchange = ctx.NewExchangeToLocal(&delegate);
+    err                                   = writeHandler.OnWriteRequest(exchange, std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    writeHandler.Shutdown();
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
@@ -297,17 +296,18 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    app::WriteClient * writeClient;
-    err = engine->NewWriteClient(&writeClient);
+    app::WriteClientHandle writeClient;
+    err = engine->NewWriteClient(writeClient);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    AddAttributeDataElement(apSuite, apContext, *writeClient);
+    AddAttributeDataElement(apSuite, apContext, writeClient);
 
     NL_TEST_ASSERT(apSuite, !delegate.mGotResponse);
 
-    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
-    err                         = writeClient->SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetAdminId(), &session);
+    SessionHandle session = ctx.GetSessionLocalToPeer();
+
+    err = writeClient.SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), Optional<SessionHandle>::Value(session));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, delegate.mGotResponse);
@@ -353,20 +353,13 @@ nlTestSuite sSuite =
 
 int Initialize(void * aContext)
 {
-    CHIP_ERROR err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
-
-    gTransportManager.Init(&gLoopback);
+    // Initialize System memory and resources
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gTransportManager.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
 
     auto * ctx = static_cast<TestContext *>(aContext);
-    err        = ctx->Init(&sSuite, &gTransportManager);
-    if (err != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
+    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportManager, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     gTransportManager.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
     return SUCCESS;
@@ -375,6 +368,7 @@ int Initialize(void * aContext)
 int Finalize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    gIOContext.Shutdown();
     chip::Platform::MemoryShutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }

@@ -5,12 +5,17 @@ to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested
 on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
 Raspberry Pi Desktop 20.10 (aarch64)**
 
+This example can also be cross-compiled on x64 host and run on NXP i.MX 8M Mini
+EVK, see the associated [README document](../nxp/linux-imx/imx8m/README.md) for
+details.
+
 <hr>
 
 -   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
     -   [Building](#building)
     -   [Commandline Arguments](#command-line-args)
     -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
+    -   [Running RPC console](#running-rpc-console)
 
 <hr>
 
@@ -127,16 +132,16 @@ Raspberry Pi Desktop 20.10 (aarch64)**
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
 
-## Running Pigweed RPC console
+## Running RPC Console
 
--   As part of building the example with RPCs enabled the lighting_app python
+-   As part of building the example with RPCs enabled the chip_rpc python
     interactive console is installed into your venv. The python wheel files are
-    also created in the output folder: out/debug/lighting_app_wheels. To install
-    the wheel files without rebuilding:
-    `pip3 install out/debug/lighting_app_wheels/*.whl`
+    also created in the output folder: out/debug/chip_rpc_console_wheels. To
+    install the wheel files without rebuilding:
+    `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
 
--   To use the lighting-app console after it has been installed run:
-    `python3 -m lighting_app.rpc_console -s localhost:33000 -o /<YourFolder>/pw_log.out`
+-   To use the chip-rpc console after it has been installed run:
+    `python3 -m chip_rpc.console -s localhost:33000 -o /<YourFolder>/pw_log.out`
 
 -   Then you can Get and Set the light using the RPCs:
     `rpcs.chip.rpc.Lighting.Get()`

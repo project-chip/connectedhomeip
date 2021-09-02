@@ -39,15 +39,15 @@
  ******************************************************************************/
 
 #include "door-lock-server.h"
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/callback.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
 #include <app/util/af.h>
 #include <assert.h>
 
-#include <app/Command.h>
-#include <support/CodeUtils.h>
+#include <app/CommandHandler.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 
@@ -117,7 +117,7 @@ bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoo
     return true;
 }
 
-bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj, uint16_t entryId)
+bool emberAfDoorLockClusterGetLogRecordCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint16_t entryId)
 {
     EmberStatus status;
     EmberAfPluginDoorLockServerLogEntry entry;
@@ -135,7 +135,7 @@ bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj,
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                                  ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID,
-                                                 (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                                 (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

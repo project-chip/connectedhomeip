@@ -177,8 +177,12 @@ commissioning and cluster control.
          - chip-device-ctrl > close-ble
 
 -   Resolve DNS-SD name and update address of the node in the device controller.
+    Get fabric ID using `get-fabricid` and use the decimal value of compressed
+    fabric id.
 
-         - chip-device-ctrl > resolve 0 135246
+         - chip-device-ctrl > get-fabricid
+
+         - chip-device-ctrl > resolve <Compressed Fabric ID> 135246
 
 ### Cluster control
 
@@ -199,7 +203,6 @@ commissioning and cluster control.
 
 ```
         $ export ESPPORT=/dev/tty.SLAB_USBtoUART
-        $ export ESPBAUD=${baud_value}
         $ idf.py build
         $ idf.py flashing_script
         $ python ${app_name}.flash.py

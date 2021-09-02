@@ -5,8 +5,10 @@
 
 #include <app/Command.h>
 #include <app/InteractionModelEngine.h>
-#include <app/common/gen/af-structs.h>
+#include <app-common/zap-generated/af-structs.h>
 #include <app/util/af-enums.h>
+#include <app/util/attribute-filter.h>
+#include <app/util/im-client-callbacks.h>
 #include <inttypes.h>
 #include <lib/support/FunctionTraits.h>
 #include <lib/support/Span.h>
@@ -14,63 +16,14 @@
 // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
 // instead of IM status code.
 // #6308 should handle IM error code on the application side, either modify this function or remove this.
-bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfStatus status);
-bool IMReadReportAttributesResponseCallback(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath,
-                                            chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::ProtocolCode status);
-
-// Global Response Callbacks
-typedef void (*DefaultSuccessCallback)(void * context);
-typedef void (*DefaultFailureCallback)(void * context, uint8_t status);
-typedef void (*BooleanAttributeCallback)(void * context, bool value);
-typedef void (*Int8uAttributeCallback)(void * context, uint8_t value);
-typedef void (*Int8sAttributeCallback)(void * context, int8_t value);
-typedef void (*Int16uAttributeCallback)(void * context, uint16_t value);
-typedef void (*Int16sAttributeCallback)(void * context, int16_t value);
-typedef void (*Int32uAttributeCallback)(void * context, uint32_t value);
-typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
-typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
-typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
-typedef void (*StringAttributeCallback)(void * context, const chip::ByteSpan value);
-typedef void (*AttributeResponseFilter)(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess, chip::Callback::Cancelable * onFailure);
-
-/**
- * BasicAttributeFilter accepts the actual type of onSuccess callback as template parameter.
- * It will check whether the type of the TLV data is expected by onSuccess callback.
- * If a non expected value received, onFailure callback will be called with EMBER_ZCL_STATUS_INVALID_VALUE.
- */
-template <typename CallbackType>
-void BasicAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
-                          chip::Callback::Cancelable * onFailure)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    typename chip::FunctionTraits<CallbackType>::template ArgType<1> value;
-
-    if ((err = data->Get(value)) == CHIP_NO_ERROR)
-    {
-        chip::Callback::Callback<CallbackType> * cb = chip::Callback::Callback<CallbackType>::FromCancelable(onSuccess);
-        cb->mCall(cb->mContext, value);
-    }
-    else
-    {
-        ChipLogError(Zcl, "Failed to get value from TLV data for attribute reading response: %s", chip::ErrorStr(err));
-        chip::Callback::Callback<DefaultFailureCallback> * cb =
-            chip::Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailure);
-        cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-    }
-}
-
-template <>
-void BasicAttributeFilter<StringAttributeCallback>(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
-                                                   chip::Callback::Cancelable * onFailure);
-
 typedef void (*ReadReportingConfigurationReportedCallback)(void* context, uint16_t minInterval, uint16_t maxInterval);
 typedef void (*ReadReportingConfigurationReceivedCallback)(void* context, uint16_t timeout);
 
 // Cluster Specific Response Callbacks
 {{#chip_client_clusters}}
-{{#chip_server_cluster_responses}}
-typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}});
-{{/chip_server_cluster_responses}}
+{{#chip_cluster_responses}}
+typedef void (*{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback)(void * context{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}});
+{{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 {{/if}}
 
@@ -78,8 +31,8 @@ typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name fals
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-void {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
-typedef void (*{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback)(void * context, uint16_t count, {{chipType}} * entries);
+void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
+typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback)(void * context, uint16_t count, {{chipType}} * entries);
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

@@ -49,7 +49,7 @@ run_suite() {
     if [[ -d "${log_dir}" ]]; then
         suite=${1%.a}
         suite=${suite#lib}
-        really_run_suite "$@" |& tee "$log_dir/$suite.log"
+        really_run_suite "$@" 2>&1 | tee "$log_dir/$suite.log"
     else
         really_run_suite "$@"
     fi
@@ -76,7 +76,7 @@ run_suite libCoreTests.a
 run_suite libInetLayerTests.a
 run_suite libRetransmitTests.a
 run_suite libSystemLayerTests.a
-run_suite libChipCryptoTests.a
+run_suite libChipCryptoTests.a "-lChipCertTestVectors"
 
 # TODO: Transport layer tests do not link:
 #    - getpid undefined

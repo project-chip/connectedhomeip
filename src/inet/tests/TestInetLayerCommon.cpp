@@ -35,7 +35,7 @@
 
 #include <inet/InetLayer.h>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #include "TestInetCommon.h"
 
@@ -340,10 +340,8 @@ bool HandleTCPDataReceived(const PacketBufferHandle & aBuffer, TransferStats & a
 
 // Timer Callback Handler
 
-void HandleSendTimerComplete(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void HandleSendTimerComplete(System::Layer * aSystemLayer, void * aAppState)
 {
-    INET_FAIL_ERROR(aError, "Send timer completed with error");
-
     gSendIntervalExpired = true;
 
     DriveSend();

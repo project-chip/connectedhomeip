@@ -28,16 +28,16 @@
 #include <openthread/heap.h>
 
 #include <ChipShellCollection.h>
-#include <core/CHIPError.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPError.h>
 #include <lib/shell/Engine.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
-#include <support/logging/CHIPLogging.h>
 
-#include "FreeRtosMbedtlsUtils.h"
+#include "FreeRtosHooks.h"
 #include "app_config.h"
 
 #include "radio.h"
@@ -64,6 +64,8 @@ unsigned int sleep(unsigned int seconds)
 
 extern "C" void main_task(void const * argument)
 {
+    int status = 0;
+
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;
     for (; pFunc < &__init_array_end; ++pFunc)
@@ -120,8 +122,8 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-    ret = chip::Shell::streamer_init(chip::Shell::streamer_get());
-    if (ret != 0)
+    status = chip::Shell::streamer_init(chip::Shell::streamer_get());
+    if (status != 0)
     {
         K32W_LOG("Error during streamer_init");
         goto exit;

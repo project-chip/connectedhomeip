@@ -25,8 +25,8 @@
  *
  */
 
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <transport/SecureMessageCodec.h>
 
 namespace chip {
@@ -36,8 +36,8 @@ using System::PacketBufferHandle;
 
 namespace SecureMessageCodec {
 
-CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, PayloadHeader & payloadHeader,
-                  PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf, MessageCounter & counter)
+CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+                  System::PacketBufferHandle & msgBuf, MessageCounter & counter)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -49,14 +49,8 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
                   "Addition to generate payloadLength might overflow");
 
     packetHeader
-        .SetSourceNodeId(localNodeId) //
-        .SetMessageId(msgId)          //
+        .SetMessageId(msgId) //
         .SetEncryptionKeyID(state->GetPeerKeyID());
-
-    if (state->GetPeerNodeId() != kUndefinedNodeId)
-    {
-        packetHeader.SetDestinationNodeId(state->GetPeerNodeId());
-    }
 
     packetHeader.GetFlags().Set(Header::FlagValues::kEncryptedMessage);
 

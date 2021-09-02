@@ -91,6 +91,8 @@ public:
         kState_Closed          = 8                   /**< Endpoint closed, ready for release. */
     } State;
 
+    TCPEndPoint() = default;
+
     /**
      * @brief   Bind the endpoint to an interface IP address.
      *
@@ -612,7 +614,7 @@ private:
 
     bool mUserTimeoutTimerRunning; // Indicates whether the TCP UserTimeout timer has been started.
 
-    static void TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
+    static void TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState);
 
     void StartTCPUserTimeoutTimer();
 
@@ -637,9 +639,7 @@ private:
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-    TCPEndPoint();                    // not defined
     TCPEndPoint(const TCPEndPoint &); // not defined
-    ~TCPEndPoint();                   // not defined
 
     void Init(InetLayer * inetLayer);
     CHIP_ERROR DriveSending();
@@ -649,7 +649,7 @@ private:
     CHIP_ERROR DoClose(CHIP_ERROR err, bool suppressCallback);
     static bool IsConnected(int state);
 
-    static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
+    static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState);
 
     void StartConnectTimerIfSet();
     void StopConnectTimer();
@@ -688,11 +688,11 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     CHIP_ERROR GetSocket(IPAddressType addrType);
-    void HandlePendingIO();
+    void HandlePendingIO(System::SocketEvents events);
     void ReceiveData();
     void HandleIncomingConnection();
     CHIP_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
-    static void HandlePendingIO(System::WatchableSocket & socket);
+    static void HandlePendingIO(System::SocketEvents events, intptr_t data);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_source_t mReadableSource  = nullptr;

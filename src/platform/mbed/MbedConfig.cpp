@@ -27,11 +27,11 @@
 
 #include <platform/mbed/MbedConfig.h>
 
-#include <core/CHIPEncoding.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "kvstore_global_api/kvstore_global_api.h"
 #include "platform/mbed_error.h"
@@ -282,7 +282,7 @@ CHIP_ERROR MbedConfig::ReadCounter(Key counterId, uint32_t & value)
 {
     char key[50] = { 0 };
     auto err     = ConstructCounterKey(counterId, key, sizeof(key));
-    if (err)
+    if (err != CHIP_NO_ERROR)
     {
         return err;
     }
@@ -294,7 +294,7 @@ CHIP_ERROR MbedConfig::WriteCounter(Key counterId, uint32_t value)
 {
     char key[50] = { 0 };
     auto err     = ConstructCounterKey(counterId, key, sizeof(key));
-    if (err)
+    if (err != CHIP_NO_ERROR)
     {
         return err;
     }

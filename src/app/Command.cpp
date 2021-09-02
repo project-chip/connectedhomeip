@@ -28,7 +28,7 @@
 #include "InteractionModelEngine.h"
 
 #include <app/AppBuildConfig.h>
-#include <core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVDebug.hpp>
 
 namespace chip {
 namespace app {
@@ -129,11 +129,16 @@ exit:
 void Command::Shutdown()
 {
     VerifyOrReturn(mState != CommandState::Uninitialized);
+    AbortExistingExchangeContext();
+    ShutdownInternal();
+}
+
+void Command::ShutdownInternal()
+{
     mCommandMessageWriter.Reset();
 
-    AbortExistingExchangeContext();
-
     mpExchangeMgr = nullptr;
+    mpExchangeCtx = nullptr;
     mpDelegate    = nullptr;
     ClearState();
 

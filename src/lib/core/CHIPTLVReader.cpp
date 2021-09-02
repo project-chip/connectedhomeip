@@ -24,12 +24,13 @@
 
 #include <stdlib.h>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPTLV.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace TLV {
@@ -38,13 +39,15 @@ using namespace chip::Encoding;
 
 static const uint8_t sTagSizes[] = { 0, 1, 2, 4, 2, 4, 6, 8 };
 
-void TLVReader::Init(const uint8_t * data, uint32_t dataLen)
+void TLVReader::Init(const uint8_t * data, size_t dataLen)
 {
-    mBackingStore = nullptr;
-    mReadPoint    = data;
-    mBufEnd       = data + dataLen;
-    mLenRead      = 0;
-    mMaxLen       = dataLen;
+    // TODO: Maybe we can just make mMaxLen and mLenRead size_t instead?
+    uint32_t actualDataLen = dataLen > UINT32_MAX ? UINT32_MAX : static_cast<uint32_t>(dataLen);
+    mBackingStore          = nullptr;
+    mReadPoint             = data;
+    mBufEnd                = data + actualDataLen;
+    mLenRead               = 0;
+    mMaxLen                = actualDataLen;
     ClearElementState();
     mContainerType = kTLVType_NotSpecified;
     SetContainerOpen(false);
@@ -207,28 +210,26 @@ CHIP_ERROR TLVReader::Get(uint64_t & v)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Get(double & v)
+namespace {
+float BitCastToFloat(const uint64_t elemLenOrVal)
+{
+    float f;
+    auto u32 = static_cast<uint32_t>(elemLenOrVal);
+    memcpy(&f, &u32, sizeof(f));
+    return f;
+}
+} // namespace
+
+// Note: Unlike the integer Get functions, this code avoids doing conversions
+// between float and double wherever possible, because these conversions are
+// relatively expensive on platforms that use soft-float instruction sets.
+
+CHIP_ERROR TLVReader::Get(float & v)
 {
     switch (ElementType())
     {
     case TLVElementType::FloatingPointNumber32: {
-        union
-        {
-            uint32_t u32;
-            float f;
-        } cvt;
-        cvt.u32 = static_cast<uint32_t>(mElemLenOrVal);
-        v       = cvt.f;
-        break;
-    }
-    case TLVElementType::FloatingPointNumber64: {
-        union
-        {
-            uint64_t u64;
-            double d;
-        } cvt;
-        cvt.u64 = mElemLenOrVal;
-        v       = cvt.d;
+        v = BitCastToFloat(mElemLenOrVal);
         break;
     }
     default:
@@ -237,7 +238,36 @@ CHIP_ERROR TLVReader::Get(double & v)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, uint32_t bufSize)
+CHIP_ERROR TLVReader::Get(double & v)
+{
+    switch (ElementType())
+    {
+    case TLVElementType::FloatingPointNumber32: {
+        v = BitCastToFloat(mElemLenOrVal);
+        break;
+    }
+    case TLVElementType::FloatingPointNumber64: {
+        double d;
+        memcpy(&d, &mElemLenOrVal, sizeof(d));
+        v = d;
+        break;
+    }
+    default:
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TLVReader::Get(ByteSpan & v)
+{
+    const uint8_t * val;
+    ReturnErrorOnFailure(GetDataPtr(val));
+    v = ByteSpan(val, GetLength());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, size_t bufSize)
 {
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
@@ -254,7 +284,7 @@ CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, uint32_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::GetString(char * buf, uint32_t bufSize)
+CHIP_ERROR TLVReader::GetString(char * buf, size_t bufSize)
 {
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
@@ -865,6 +895,40 @@ exit:
     ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
 
     return err;
+}
+
+CHIP_ERROR ContiguousBufferTLVReader::OpenContainer(ContiguousBufferTLVReader & containerReader)
+{
+    // We are going to initialize containerReader by calling our superclass
+    // OpenContainer method.  The superclass only knows how to initialize
+    // members the superclass knows about, so we assert that we don't have any
+    // extra members that need initializing.  If such members ever get added,
+    // they would need to be initialized in this method.
+    static_assert(sizeof(ContiguousBufferTLVReader) == sizeof(TLVReader), "We have state the superclass is not initializing?");
+    return TLVReader::OpenContainer(containerReader);
+}
+
+CHIP_ERROR ContiguousBufferTLVReader::GetStringView(Span<const char> & data)
+{
+    if (!TLVTypeIsUTF8String(ElementType()))
+    {
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+    }
+
+    const uint8_t * bytes;
+    ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
+    data = Span<const char>(Uint8::to_const_char(bytes), GetLength());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ContiguousBufferTLVReader::GetByteView(ByteSpan & data)
+{
+    if (!TLVTypeIsByteString(ElementType()))
+    {
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+    }
+
+    return Get(data);
 }
 
 } // namespace TLV

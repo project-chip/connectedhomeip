@@ -23,6 +23,7 @@ template("mbedtls_target") {
     cflags = [
       "-Wno-maybe-uninitialized",
       "-Wno-string-concatenation",
+      "-Wno-unused-but-set-parameter",
     ]
   }
 

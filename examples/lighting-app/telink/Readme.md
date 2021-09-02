@@ -5,13 +5,13 @@
 1. Pull docker image from repository:
 
     ```
-    $ docker pull alexkolosovtelinksemi/chip-build-telink:latest
+    $ docker pull connectedhomeip/chip-build-telink:latest
     ```
 
 1. Run docker container:
 
     ```
-    $ docker run -it -v ${CHIP_BASE}:/root/chip alexkolosovtelinksemi/chip-build-telink:latest
+    $ docker run -it -v ${CHIP_BASE}:/root/chip connectedhomeip/chip-build-telink:latest
     ```
 
     here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
@@ -19,7 +19,7 @@
 
 1. Run build script:
     ```
-    cd /root/chip/scripts/examples && ./telink_example.sh
+    cd /root/chip/scripts/examples && ./telink_example.sh lighting-app tlsr9518adk80d
     ```
 1. Exit docker container and collect build artifacts. Firmware binary would be
    located in
@@ -155,13 +155,13 @@ following states:
 1. Pair with device
 
     ```
-    ${CHIP_TOOL_DIR}/chip-tool pairing bypass ${IP_ADDRESS_OF_CHIP_DEVICE} 11097
+    ${CHIP_TOOL_DIR}/chip-tool pairing bypass ${IP_ADDRESS_OF_CHIP_DEVICE} 5540
     ```
 
     here:
 
     - `${IP_ADDRESS_OF_CHIP_DEVICE}` is IPv6 address of CHIP device
-    - **11097** is standart CHIP TCP port
+    - **5540** is the standard CHIP TCP port
 
 1. Switch on the light:
 

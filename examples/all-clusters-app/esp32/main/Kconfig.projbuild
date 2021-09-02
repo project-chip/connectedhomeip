@@ -46,7 +46,8 @@ menu "Demo"
 
     choice
       prompt "Rendezvous Mode"
-      default RENDEZVOUS_MODE_BLE
+      default RENDEZVOUS_MODE_BLE if BT_ENABLED
+      default RENDEZVOUS_MODE_SOFTAP
       help
           Specifies the Rendezvous mode of the peripheral.
 
@@ -56,6 +57,7 @@ menu "Demo"
           bool "Soft-AP"
       config RENDEZVOUS_MODE_BLE
           bool "BLE"
+          depends on BT_ENABLED
       config RENDEZVOUS_MODE_ON_NETWORK
           bool "On-Network"
       config RENDEZVOUS_MODE_SOFTAP_ON_NETWORK
@@ -99,5 +101,43 @@ menu "Demo"
         help
             To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
 
+
+endmenu
+
+menu "PW RPC Debug channel"
+depends on ENABLE_PW_RPC
+    config EXAMPLE_UART_PORT_NUM
+        int "UART port number"
+        range 0 2 if IDF_TARGET_ESP32
+        range 0 1 if IDF_TARGET_ESP32C3
+        default 0
+        help
+            UART communication port number for the example.
+            See UART documentation for available port numbers.
+
+    config EXAMPLE_UART_BAUD_RATE
+        int "UART communication speed"
+        range 1200 115200
+        default 115200
+        help
+            UART communication speed for Modbus example.
+
+    config EXAMPLE_UART_RXD
+        int "UART RXD pin number"
+        range 0 34 if IDF_TARGET_ESP32
+        range 0 19 if IDF_TARGET_ESP32C3
+        default 5
+        help
+            GPIO number for UART RX pin. See UART documentation for more information
+            about available pin numbers for UART.
+
+    config EXAMPLE_UART_TXD
+        int "UART TXD pin number"
+        range 0 34 if IDF_TARGET_ESP32
+        range 0 19 if IDF_TARGET_ESP32C3
+        default 4
+        help
+            GPIO number for UART TX pin. See UART documentation for more information
+            about available pin numbers for UART.
 
 endmenu

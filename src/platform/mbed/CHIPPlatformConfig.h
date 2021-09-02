@@ -37,6 +37,8 @@
 #define CHIP_CONFIG_TIME_ENABLE_CLIENT 1
 #define CHIP_CONFIG_TIME_ENABLE_SERVER 0
 
+#define CHIP_CONFIG_ERROR_CLASS 1
+
 // ==================== Security Adaptations ====================
 
 #define CHIP_CONFIG_USE_OPENSSL_ECC 0
@@ -93,7 +95,7 @@
 #endif // CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
 
 #ifndef CHIP_LOG_FILTERING
-#define CHIP_LOG_FILTERING 0
+#define CHIP_LOG_FILTERING 1
 #endif // CHIP_LOG_FILTERING
 
 #ifndef CHIP_CONFIG_MAX_INTERFACES

@@ -17,9 +17,11 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
 #include <inet/InetInterface.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
 #include <lib/mdns/Advertiser.h>
+#include <lib/mdns/MdnsCache.h>
 #include <lib/mdns/Resolver.h>
 #include <lib/mdns/platform/Mdns.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -36,8 +38,11 @@ class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 public:
     CHIP_ERROR Init();
 
+    /// Starts the service advertiser if not yet started. Otherwise, removes all existing services.
     CHIP_ERROR Start(Inet::InetLayer * inetLayer, uint16_t port) override;
-    CHIP_ERROR StartResolver(Inet::InetLayer * inetLayer, uint16_t port) override { return Start(inetLayer, port); }
+
+    /// Starts the service resolver if not yet started
+    CHIP_ERROR StartResolver(Inet::InetLayer * inetLayer, uint16_t port) override { return Init(); }
 
     /// Advertises the CHIP node as an operational node
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
@@ -94,6 +99,9 @@ private:
     ResolverDelegate * mResolverDelegate = nullptr;
 
     static DiscoveryImplPlatform sManager;
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+    static MdnsCache<CHIP_CONFIG_MDNS_CACHE_SIZE> sMdnsCache;
+#endif
 };
 
 } // namespace Mdns

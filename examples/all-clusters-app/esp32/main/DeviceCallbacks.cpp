@@ -30,14 +30,14 @@
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/Command.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
 #include <app/server/Mdns.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/mdns/Advertiser.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 static const char * TAG = "app-devicecallbacks";
 
@@ -60,6 +60,19 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     case DeviceEventType::kSessionEstablished:
         OnSessionEstablished(event);
         break;
+
+    case DeviceEventType::kCHIPoBLEConnectionEstablished:
+        ESP_LOGI(TAG, "CHIPoBLE connection established");
+        break;
+
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        ESP_LOGI(TAG, "CHIPoBLE disconnected");
+        break;
+
+    case DeviceEventType::kCommissioningComplete:
+        ESP_LOGI(TAG, "Commissioning complete");
+        break;
+
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
             (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
@@ -198,7 +211,7 @@ exit:
 }
 #endif
 
-void IdentifyTimerHandler(Layer * systemLayer, void * appState, CHIP_ERROR error)
+void IdentifyTimerHandler(Layer * systemLayer, void * appState)
 {
     statusLED1.Animate();
 

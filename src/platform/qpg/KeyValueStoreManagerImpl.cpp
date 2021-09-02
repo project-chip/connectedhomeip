@@ -22,8 +22,8 @@
  *          for Qorvo QPG platforms
  */
 
+#include <lib/support/CodeUtils.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -82,7 +82,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 
     VerifyOrExit(key != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = qvCHIP_KvsDelete(key);
+    result = qvCHIP_KvsDelete(key);
     if (result != QV_STATUS_NO_ERROR)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;

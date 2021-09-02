@@ -47,14 +47,14 @@
 #include "identify.h"
 
 // this file contains all the common includes for clusters in the util
-#include <app/Command.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 #include <app/util/common.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 
@@ -103,7 +103,7 @@ void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, A
     }
 }
 
-bool emberAfIdentifyClusterIdentifyCallback(chip::app::Command * commandObj, uint16_t time)
+bool emberAfIdentifyClusterIdentifyCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint16_t time)
 {
     EmberStatus sendStatus = EMBER_SUCCESS;
     // This Identify callback writes the new attribute, which will trigger the
@@ -120,7 +120,7 @@ bool emberAfIdentifyClusterIdentifyCallback(chip::app::Command * commandObj, uin
     return true;
 }
 
-bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::Command * commandObj)
+bool emberAfIdentifyClusterIdentifyQueryCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
     EmberAfStatus status;
     EmberStatus sendStatus = EMBER_SUCCESS;
@@ -157,8 +157,7 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::Command * commandObj
     emberAfIdentifyClusterPrintln("Identifying for %d more seconds", identifyTime);
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_IDENTIFY_CLUSTER_ID,
-                                             ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID,
-                                             (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                             ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
 
         VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

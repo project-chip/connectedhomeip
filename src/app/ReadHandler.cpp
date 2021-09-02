@@ -27,79 +27,147 @@
 #include <app/MessageDef/EventPath.h>
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
+#include <protocols/secure_channel/StatusReport.h>
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
+CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                             Messaging::ExchangeContext * apExchangeContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
-    VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeCtx              = nullptr;
-    mpDelegate                 = apDelegate;
+    VerifyOrReturnError(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    mpExchangeMgr              = apExchangeMgr;
+    mpExchangeCtx              = apExchangeContext;
     mSuppressResponse          = true;
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
+    mInitialReport             = true;
     MoveToState(HandlerState::Initialized);
+    mpDelegate = apDelegate;
+    if (apExchangeContext != nullptr)
+    {
+        apExchangeContext->SetDelegate(this);
+    }
 
-exit:
-    ChipLogFunctError(err);
     return err;
 }
 
-void ReadHandler::Shutdown()
+void ReadHandler::Shutdown(ShutdownOptions aOptions)
 {
+    if (aOptions == ShutdownOptions::AbortCurrentExchange)
+    {
+        if (mpExchangeCtx != nullptr)
+        {
+            mpExchangeCtx->Abort();
+            mpExchangeCtx = nullptr;
+        }
+    }
+
+    if (IsReporting())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
-    AbortExistingExchangeContext();
+    mpExchangeCtx = nullptr;
     MoveToState(HandlerState::Uninitialized);
-    mpDelegate                 = nullptr;
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
+    mInitialReport             = false;
+    mpDelegate                 = nullptr;
 }
 
-CHIP_ERROR ReadHandler::AbortExistingExchangeContext()
-{
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ReadHandler::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
 
-    mpExchangeCtx = apExchangeContext;
-    err           = ProcessReadRequest(std::move(aPayload));
-
+    err = ProcessReadRequest(std::move(aPayload));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogFunctError(err);
-        // Keep Shutdown() from double-closing our exchange.
-        mpExchangeCtx = nullptr;
         Shutdown();
     }
 
     return err;
 }
 
-CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnStatusReport(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload));
+    Protocols::SecureChannel::StatusReport statusReport;
+    err = statusReport.Parse(std::move(aPayload));
+    SuccessOrExit(err);
+    ChipLogProgress(DataManagement, "in state %s, receive status report, protocol id is %" PRIu32 ", protocol code is %" PRIu16,
+                    GetStateStr(), statusReport.GetProtocolId(), statusReport.GetProtocolCode());
+    VerifyOrExit((statusReport.GetProtocolId() == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm()) &&
+                     (statusReport.GetProtocolCode() == to_underlying(Protocols::InteractionModel::ProtocolCode::Success)),
+                 err = CHIP_ERROR_INVALID_ARGUMENT);
+    switch (mState)
+    {
+    case HandlerState::Reporting:
+        Shutdown();
+        break;
+    case HandlerState::Reportable:
+    case HandlerState::Initialized:
+    case HandlerState::Uninitialized:
+    default:
+        err = CHIP_ERROR_INCORRECT_STATE;
+        break;
+    }
 exit:
-    ChipLogFunctError(err);
-    Shutdown();
+    if (err != CHIP_NO_ERROR)
+    {
+        Shutdown();
+    }
     return err;
+}
+
+CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
+{
+    VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
+    if (IsInitialReport())
+    {
+        VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    }
+    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    MoveToState(HandlerState::Reporting);
+    return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
+                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+}
+
+CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (aPayloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+    {
+        err = OnStatusReport(apExchangeContext, std::move(aPayload));
+    }
+    else
+    {
+        err = OnUnknownMsgType(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+    }
+    return err;
+}
+
+CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                         const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+{
+    ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
+    Shutdown();
+    return CHIP_ERROR_INVALID_MESSAGE_TYPE;
+}
+
+void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
+{
+    ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: %d",
+                    apExchangeContext->GetExchangeId());
+    Shutdown();
 }
 
 CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayload)
@@ -215,9 +283,17 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         }
         SuccessOrExit(err);
 
-        err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
-        SuccessOrExit(err);
-        mpAttributeClusterInfoList->SetDirty();
+        if (MergeOverlappedAttributePath(clusterInfo))
+        {
+            continue;
+        }
+        else
+        {
+            err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
+            SuccessOrExit(err);
+            mpAttributeClusterInfoList->SetDirty();
+            SetInitialReport();
+        }
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -228,6 +304,31 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
 exit:
     ChipLogFunctError(err);
     return err;
+}
+
+bool ReadHandler::MergeOverlappedAttributePath(ClusterInfo & aAttributePath)
+{
+    ClusterInfo * runner = mpAttributeClusterInfoList;
+    while (runner != nullptr)
+    {
+        // If overlapped, we would skip this target path,
+        // --If targetPath is part of previous path, return true
+        // --If previous path is part of target path, update filedid and listindex and mflags with target path, return true
+        if (runner->IsAttributePathSupersetOf(aAttributePath))
+        {
+            return true;
+        }
+        if (aAttributePath.IsAttributePathSupersetOf(*runner))
+        {
+            runner->mListIndex = aAttributePath.mListIndex;
+            runner->mFieldId   = aAttributePath.mFieldId;
+            runner->mFlags     = aAttributePath.mFlags;
+            runner->SetDirty();
+            return true;
+        }
+        runner = runner->mpNext;
+    }
+    return false;
 }
 
 CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathListParser)
@@ -288,6 +389,9 @@ const char * ReadHandler::GetStateStr() const
 
     case HandlerState::Reportable:
         return "Reportable";
+
+    case HandlerState::Reporting:
+        return "Reporting";
     }
 #endif // CHIP_DETAIL_LOGGING
     return "N/A";
@@ -303,15 +407,16 @@ bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
 {
     if (mCurrentPriority == PriorityLevel::Invalid)
     {
-        // Upload is not in middle, previous mLastScheduledEventNumber is not valid, Check for new events, and set a checkpoint
-        for (size_t index = 0; index < ArraySize(mSelfProcessedEvents); index++)
+        // Upload is not in middle, previous mLastScheduledEventNumber is not valid, Check for new events from Critical high
+        // priority to Debug low priority, and set a checkpoint when there is dirty events
+        for (int index = ArraySize(mSelfProcessedEvents) - 1; index >= 0; index--)
         {
             EventNumber lastEventNumber = aEventManager.GetLastEventNumber(static_cast<PriorityLevel>(index));
             if ((lastEventNumber != 0) && (lastEventNumber >= mSelfProcessedEvents[index]))
             {
                 // We have more events. snapshot last event IDs
                 aEventManager.SetScheduledEventEndpoint(&(mLastScheduledEventNumber[0]));
-                // initialize the next priority level to transfer
+                // initialize the next dirty priority level to transfer
                 MoveToNextScheduledDirtyPriority();
                 return false;
             }
@@ -329,7 +434,7 @@ bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
 
 void ReadHandler::MoveToNextScheduledDirtyPriority()
 {
-    for (uint8_t i = 0; i < ArraySize(mSelfProcessedEvents); i++)
+    for (int i = ArraySize(mSelfProcessedEvents) - 1; i >= 0; i--)
     {
         if ((mLastScheduledEventNumber[i] != 0) && mSelfProcessedEvents[i] <= mLastScheduledEventNumber[i])
         {

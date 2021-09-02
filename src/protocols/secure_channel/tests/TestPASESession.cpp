@@ -24,14 +24,15 @@
 #include <errno.h>
 #include <nlunit-test.h>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/UnitTestUtils.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <stdarg.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 using namespace chip;
@@ -42,18 +43,6 @@ using namespace chip::Protocols;
 
 using TestContext = chip::Test::MessagingContext;
 
-static void test_os_sleep_ms(uint64_t millisecs)
-{
-    struct timespec sleep_time;
-    uint64_t s = millisecs / 1000;
-
-    millisecs -= s * 1000;
-    sleep_time.tv_sec  = static_cast<time_t>(s);
-    sleep_time.tv_nsec = static_cast<long>(millisecs * 1000000);
-
-    nanosleep(&sleep_time, nullptr);
-}
-
 class PASETestLoopbackTransport : public Test::LoopbackTransport
 {
     void MessageDropped() override
@@ -61,9 +50,9 @@ class PASETestLoopbackTransport : public Test::LoopbackTransport
         // Trigger a retransmit.
         if (mContext != nullptr)
         {
-            test_os_sleep_ms(65);
+            chip::test_utils::SleepMillis(65);
             ReliableMessageMgr * rm = mContext->GetExchangeManager().GetReliableMessageMgr();
-            ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm, CHIP_NO_ERROR);
+            ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm);
         }
     }
 
@@ -81,6 +70,7 @@ public:
 
 TransportMgrBase gTransportMgr;
 PASETestLoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
 
 class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
@@ -113,10 +103,12 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 
     gLoopback.Reset();
 
-    NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, nullptr, 0, 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, ByteSpan(nullptr, 0), 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(1234, 500, (const uint8_t *) "saltSalt", 8, 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, pairing.WaitForPairing(1234, 500, (const uint8_t *) "saltSalt", 8, 0, &delegate) == CHIP_NO_ERROR);
+                   pairing.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSalt", 8), 0, nullptr) ==
+                       CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite,
+                   pairing.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSalt", 8), 0, &delegate) == CHIP_NO_ERROR);
 }
 
 void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
@@ -192,7 +184,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
                        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "saltSALT", 8, 0, &delegateAccessory) ==
+                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALT", 8), 0, &delegateAccessory) ==
                        CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, contextCommissioner,
@@ -263,7 +255,7 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
                        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &pairingAccessory) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "saltSALT", 8, 0, &delegateAccessory) ==
+                   pairingAccessory.WaitForPairing(1234, 500, ByteSpan((const uint8_t *) "saltSALT", 8), 0, &delegateAccessory) ==
                        CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 4321, 0, contextCommissioner,
@@ -360,7 +352,7 @@ int TestSecurePairing_Teardown(void * inContext);
 // clang-format off
 static nlTestSuite sSuite =
 {
-    "Test-CHIP-SecurePairing",
+    "Test-CHIP-SecurePairing-PASE",
     &sTests[0],
     TestSecurePairing_Setup,
     TestSecurePairing_Teardown,
@@ -376,23 +368,19 @@ static TestContext sContext;
  */
 int TestSecurePairing_Setup(void * inContext)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    // Initialize System memory and resources
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gTransportMgr.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
 
-    CHIP_ERROR err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-        return FAILURE;
+    auto & ctx = *static_cast<TestContext *>(inContext);
+    VerifyOrReturnError(ctx.Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
-    gTransportMgr.Init(&gLoopback);
-
-    err = ctx.Init(&sSuite, &gTransportMgr);
-    if (err != CHIP_NO_ERROR)
-        return FAILURE;
-
-    ctx.SetSourceNodeId(kAnyNodeId);
-    ctx.SetDestinationNodeId(kAnyNodeId);
+    ctx.SetSourceNodeId(kPlaceholderNodeId);
+    ctx.SetDestinationNodeId(kPlaceholderNodeId);
     ctx.SetLocalKeyId(0);
     ctx.SetPeerKeyId(0);
-    ctx.SetAdminId(kUndefinedAdminId);
+    ctx.SetFabricIndex(kUndefinedFabricIndex);
 
     gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
 
@@ -405,6 +393,7 @@ int TestSecurePairing_Setup(void * inContext)
 int TestSecurePairing_Teardown(void * inContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(inContext)->Shutdown();
+    gIOContext.Shutdown();
     chip::Platform::MemoryShutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }

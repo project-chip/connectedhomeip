@@ -27,13 +27,7 @@ jobs:
         name: Build Android
         timeout-minutes: 60
 
-        strategy:
-            matrix:
-                type: [arm, arm64, x64]
-
         env:
-            BUILD_TYPE: android_${{ matrix.type }}
-            TARGET_CPU: ${{ matrix.type }}
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
 
         runs-on: ubuntu-latest
@@ -60,13 +54,7 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build libs
-              timeout-minutes: 2
+            - name: Build android examples
               run: |
-                  ./scripts/examples/android_app.sh
-            - name: Build App
-              timeout-minutes: 5
-              run: |
-                  yes | "$ANDROID_HOME"/tools/bin/sdkmanager --licenses
-                  cd src/android/CHIPTool
-                  ./gradlew build
+                ./scripts/run_in_build_env.sh \
+                  "./scripts/build/build_examples.py --no-log-timestamps --platform android build"

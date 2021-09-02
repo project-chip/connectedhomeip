@@ -14,13 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <mdns/minimal/responders/Ptr.h>
+#include <lib/mdns/minimal/responders/Ptr.h>
 
 #include <vector>
 
-#include <mdns/minimal/Parser.h>
-#include <mdns/minimal/RecordData.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/mdns/minimal/Parser.h>
+#include <lib/mdns/minimal/RecordData.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -81,6 +81,7 @@ private:
     nlTestSuite * mSuite;
 };
 
+#if INET_CONFIG_ENABLE_IPV4
 void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
 {
     IPAddress ipAddress;
@@ -103,9 +104,12 @@ void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
 
     responder.AddAllResponses(&packetInfo, &acc);
 }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 const nlTest sTests[] = {
+#if INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("TestPtrResponse", TestPtrResponse), //
+#endif                                               // INET_CONFIG_ENABLE_IPV4
     NL_TEST_SENTINEL()                               //
 };
 

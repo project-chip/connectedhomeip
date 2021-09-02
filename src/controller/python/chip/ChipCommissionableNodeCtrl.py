@@ -25,13 +25,12 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-import time
-from threading import Thread
 from ctypes import *
 from .ChipStack import *
 from .exceptions import *
 
 __all__ = ["ChipCommissionableNodeController"]
+
 
 def _singleton(cls):
     instance = [None]
@@ -42,6 +41,7 @@ def _singleton(cls):
         return instance[0]
 
     return wrapper
+
 
 @_singleton
 class ChipCommissionableNodeController(object):
@@ -69,12 +69,14 @@ class ChipCommissionableNodeController(object):
 
     def PrintDiscoveredCommissioners(self):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_CommissionableNodeController_PrintDiscoveredCommissioners(self.commissionableNodeCtrl)
+            lambda: self._dmLib.pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
+                self.commissionableNodeCtrl)
         )
 
     def DiscoverCommissioners(self):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_CommissionableNodeController_DiscoverCommissioners(self.commissionableNodeCtrl)
+            lambda: self._dmLib.pychip_CommissionableNodeController_DiscoverCommissioners(
+                self.commissionableNodeCtrl)
         )
 
     # ----- Private Members -----
@@ -90,7 +92,9 @@ class ChipCommissionableNodeController(object):
                 c_void_p]
             self._dmLib.pychip_CommissionableNodeController_DeleteController.restype = c_uint32
 
-            self._dmLib.pychip_CommissionableNodeController_DiscoverCommissioners.argtypes = [c_void_p]
+            self._dmLib.pychip_CommissionableNodeController_DiscoverCommissioners.argtypes = [
+                c_void_p]
             self._dmLib.pychip_CommissionableNodeController_DiscoverCommissioners.restype = c_uint32
 
-            self._dmLib.pychip_CommissionableNodeController_PrintDiscoveredCommissioners.argtypes = [c_void_p]
+            self._dmLib.pychip_CommissionableNodeController_PrintDiscoveredCommissioners.argtypes = [
+                c_void_p]

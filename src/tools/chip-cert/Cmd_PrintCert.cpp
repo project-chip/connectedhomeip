@@ -28,6 +28,7 @@
 
 namespace {
 
+using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
 using namespace chip::ASN1;
@@ -209,8 +210,8 @@ bool PrintCert(const char * fileName, X509 * cert)
     ChipCertificateSet certSet;
     const ChipCertificateData * certData;
     chip::BitFlags<CertDecodeFlags> decodeFlags;
-    std::unique_ptr<uint8_t[]> certBuf(new uint8_t[kMaxCHIPCertLength]);
-    uint32_t certLen;
+    uint8_t chipCertBuf[kMaxCHIPCertLength];
+    MutableByteSpan chipCert(chipCertBuf);
     int indent = 4;
 
     VerifyOrExit(cert != nullptr, res = false);
@@ -218,17 +219,17 @@ bool PrintCert(const char * fileName, X509 * cert)
     res = OpenFile(fileName, file, true);
     VerifyTrueOrExit(res);
 
-    res = X509ToChipCert(cert, certBuf.get(), kMaxCHIPCertLength, certLen);
+    res = X509ToChipCert(cert, chipCert);
     VerifyTrueOrExit(res);
 
-    err = certSet.Init(1, kMaxCHIPCertDecodeBufLength);
+    err = certSet.Init(1);
     if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "Failed to initialize certificate set: %s\n", chip::ErrorStr(err));
         ExitNow(res = false);
     }
 
-    err = certSet.LoadCert(certBuf.get(), certLen, decodeFlags);
+    err = certSet.LoadCert(chipCert, decodeFlags);
     if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "Error reading %s: %s\n", fileName, chip::ErrorStr(err));

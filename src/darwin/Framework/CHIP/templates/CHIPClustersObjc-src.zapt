@@ -5,10 +5,10 @@
 
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
-#import "CHIPError.h"
-#import "gen/CHIPClusters.h"
-#import "gen/CHIPClustersObjc.h"
-#import "gen/CHIPClientCallbacks.h"
+#import "CHIPError_Internal.h"
+#import <zap-generated/CHIPClusters.h>
+#import <zap-generated/CHIPClustersObjc.h>
+#import <zap-generated/CHIPClientCallbacks.h>
 #import "app/util/af.h"
 
 #include <lib/support/Span.h>
@@ -16,424 +16,37 @@
 
 using namespace ::chip;
 
-class CHIPDefaultSuccessCallbackBridge : public Callback::Callback<DefaultSuccessCallback> {
-public:
-    CHIPDefaultSuccessCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DefaultSuccessCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPDefaultSuccessCallbackBridge() {};
-
-    static void CallbackFn(void * context)
-    {
-        CHIPDefaultSuccessCallbackBridge * callback = reinterpret_cast<CHIPDefaultSuccessCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, nil);
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPDefaultFailureCallbackBridge : public Callback::Callback<DefaultFailureCallback> {
-public:
-    CHIPDefaultFailureCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DefaultFailureCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPDefaultFailureCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint8_t status)
-    {
-        CHIPDefaultFailureCallbackBridge * callback = reinterpret_cast<CHIPDefaultFailureCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                NSError * error = [CHIPError errorForCHIPErrorCode:status];
-                callback->mHandler(error, nil);
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPStringAttributeCallbackBridge : public Callback::Callback<StringAttributeCallback> {
-public:
-    CHIPStringAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool octetString, bool keepAlive = false)
-        : Callback::Callback<StringAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-        , mOctetString(octetString)
-        , mKeepAlive(keepAlive)
-    {
-    }
-
-    ~CHIPStringAttributeCallbackBridge() {};
-
-    static void CallbackFn(void * context, chip::ByteSpan value)
-    {
-        NSData * data = [NSData dataWithBytes: value.data() length: value.size()];
-
-        CHIPStringAttributeCallbackBridge * callback = reinterpret_cast<CHIPStringAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                if (callback->mOctetString)
-                {
-                    callback->mHandler(nil, @{ @"value": data });
-                }
-                else
-                {
-                    NSString * str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-                    callback->mHandler(nil, @{ @"value": str });
-                }
-
-                if (!callback->mKeepAlive)
-                {
-                    callback->Cancel();
-                    delete callback;
-                }
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-    bool mOctetString;
-    bool mKeepAlive;
-};
-
-class CHIPBooleanAttributeCallbackBridge : public Callback::Callback<BooleanAttributeCallback> {
-public:
-    CHIPBooleanAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
-        : Callback::Callback<BooleanAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-        , mKeepAlive(keepAlive)
-    {
-    }
-
-    ~CHIPBooleanAttributeCallbackBridge() {};
-
-    static void CallbackFn(void * context, bool value)
-    {
-        CHIPBooleanAttributeCallbackBridge * callback = reinterpret_cast<CHIPBooleanAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithBool:value] });
-                if (!callback->mKeepAlive)
-                {
-                    callback->Cancel();
-                    delete callback;
-                }
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-    bool mKeepAlive;
-};
-
-class CHIPInt8uAttributeCallbackBridge : public Callback::Callback<Int8uAttributeCallback> {
-public:
-    CHIPInt8uAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
-        : Callback::Callback<Int8uAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-        , mKeepAlive(keepAlive)
-    {
-    }
-
-    ~CHIPInt8uAttributeCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint8_t value)
-    {
-        CHIPInt8uAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt8uAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithUnsignedChar:value] });
-                if (!callback->mKeepAlive)
-                {
-                    callback->Cancel();
-                    delete callback;
-                }
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-    bool mKeepAlive;
-};
-
-class CHIPInt8sAttributeCallbackBridge : public Callback::Callback<Int8sAttributeCallback> {
-public:
-    CHIPInt8sAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
-        : Callback::Callback<Int8sAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-        , mKeepAlive(keepAlive)
-    {
-    }
-
-    ~CHIPInt8sAttributeCallbackBridge() {};
-
-    static void CallbackFn(void * context, int8_t value)
-    {
-        CHIPInt8sAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt8sAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithChar:value] });
-                if (!callback->mKeepAlive)
-                {
-                    callback->Cancel();
-                    delete callback;
-                }
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-    bool mKeepAlive;
-};
-
-class CHIPInt16uAttributeCallbackBridge : public Callback::Callback<Int16uAttributeCallback> {
-public:
-    CHIPInt16uAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
-        : Callback::Callback<Int16uAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-        , mKeepAlive(keepAlive)
-    {
-    }
-
-    ~CHIPInt16uAttributeCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint16_t value)
-    {
-        CHIPInt16uAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt16uAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithUnsignedShort:value] });
-                if (!callback->mKeepAlive)
-                {
-                    callback->Cancel();
-                    delete callback;
-                }
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-    bool mKeepAlive;
-};
-
-class CHIPInt16sAttributeCallbackBridge : public Callback::Callback<Int16sAttributeCallback> {
-public:
-    CHIPInt16sAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
-        : Callback::Callback<Int16sAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-        , mKeepAlive(keepAlive)
-    {
-    }
-
-    ~CHIPInt16sAttributeCallbackBridge() {};
-
-    static void CallbackFn(void * context, int16_t value)
-    {
-        CHIPInt16sAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt16sAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithShort:value] });
-                if (!callback->mKeepAlive)
-                {
-                    callback->Cancel();
-                    delete callback;
-                }
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-    bool mKeepAlive;
-};
-
-class CHIPInt32uAttributeCallbackBridge : public Callback::Callback<Int32uAttributeCallback> {
-public:
-    CHIPInt32uAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
-        : Callback::Callback<Int32uAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-        , mKeepAlive(keepAlive)
-    {
-    }
-
-    ~CHIPInt32uAttributeCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint32_t value)
-    {
-        CHIPInt32uAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt32uAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithUnsignedLong:value] });
-                if (!callback->mKeepAlive)
-                {
-                    callback->Cancel();
-                    delete callback;
-                }
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-    bool mKeepAlive;
-};
-
-class CHIPInt32sAttributeCallbackBridge : public Callback::Callback<Int32sAttributeCallback> {
-public:
-    CHIPInt32sAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
-        : Callback::Callback<Int32sAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-        , mKeepAlive(keepAlive)
-    {
-    }
-
-    ~CHIPInt32sAttributeCallbackBridge() {};
-
-    static void CallbackFn(void * context, int32_t value)
-    {
-        CHIPInt32sAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt32sAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithLong:value] });
-                if (!callback->mKeepAlive)
-                {
-                    callback->Cancel();
-                    delete callback;
-                }
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-    bool mKeepAlive;
-};
-
-class CHIPInt64uAttributeCallbackBridge : public Callback::Callback<Int64uAttributeCallback> {
-public:
-    CHIPInt64uAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
-        : Callback::Callback<Int64uAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-        , mKeepAlive(keepAlive)
-    {
-    }
-
-    ~CHIPInt64uAttributeCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint64_t value)
-    {
-        CHIPInt64uAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt64uAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithUnsignedLongLong:value] });
-                if (!callback->mKeepAlive)
-                {
-                    callback->Cancel();
-                    delete callback;
-                }
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-    bool mKeepAlive;
-};
-
-class CHIPInt64sAttributeCallbackBridge : public Callback::Callback<Int64sAttributeCallback> {
-public:
-    CHIPInt64sAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
-        : Callback::Callback<Int64sAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-        , mKeepAlive(keepAlive)
-    {
-    }
-
-    ~CHIPInt64sAttributeCallbackBridge() {};
-
-    static void CallbackFn(void * context, int64_t value)
-    {
-        CHIPInt64sAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt64sAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWithLongLong:value] });
-                if (!callback->mKeepAlive)
-                {
-                    callback->Cancel();
-                    delete callback;
-                }
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-    bool mKeepAlive;
-};
+{{>CHIPCallbackBridge name="DefaultSuccess"       type=""            }}
+{{>CHIPCallbackBridge name="DefaultFailure"       type="Int8u"       }}
+{{>CHIPCallbackBridge name="OctetStringAttribute" type="Octet_String"}}
+{{>CHIPCallbackBridge name="CharStringAttribute"  type="Char_String" }}
+{{>CHIPCallbackBridge name="BooleanAttribute"     type="Boolean"     }}
+{{>CHIPCallbackBridge name="Int8uAttribute"       type="Int8u"       }}
+{{>CHIPCallbackBridge name="Int8sAttribute"       type="Int8s"       }}
+{{>CHIPCallbackBridge name="Int16uAttribute"      type="Int16u"      }}
+{{>CHIPCallbackBridge name="Int16sAttribute"      type="Int16s"      }}
+{{>CHIPCallbackBridge name="Int32uAttribute"      type="Int32u"      }}
+{{>CHIPCallbackBridge name="Int32sAttribute"      type="Int32s"      }}
+{{>CHIPCallbackBridge name="Int64uAttribute"      type="Int64u"      }}
+{{>CHIPCallbackBridge name="Int64sAttribute"      type="Int64s"      }}
 
 {{#chip_client_clusters}}
-{{#chip_server_cluster_responses}}
-class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge : public Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback>
+{{#chip_cluster_responses}}
+class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge : public Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback>
 {
 public:
-    CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
-    ~CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge() {};
+    ~CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge() {};
 
-    static void CallbackFn(void * context{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}})
+    static void CallbackFn(void * context{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}})
     {
-        CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge * callback = reinterpret_cast<CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge *>(context);
+        CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge * callback = reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge *>(context);
         if (callback && callback->mQueue)
         {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @{
-                  {{#chip_server_cluster_response_arguments}}
-                  {{#unless (isStrEqual label "status")}}
+                  {{#chip_cluster_response_arguments}}
                   {{#if isArray}}
                   // {{asSymbol label}}: {{asUnderlyingZclType type}}
                   // Conversion from this type to Objc is not properly implemented yet
@@ -444,8 +57,7 @@ public:
                   {{else}}
                   @"{{asSymbol label}}": [NSNumber numberWith{{asObjectiveCNumberType label type false}}:{{asSymbol label}}],
                   {{/if}}
-                  {{/unless}}
-                  {{/chip_server_cluster_response_arguments}}
+                  {{/chip_cluster_response_arguments}}
                 });
                 callback->Cancel();
                 delete callback;
@@ -458,22 +70,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-{{/chip_server_cluster_responses}}
+{{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-class CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge : public Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>
+class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge : public Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>
 {
 public:
-    CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
-    ~CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge() {};
+    ~CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t count, {{chipType}} * entries)
     {
-        CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge * callback = reinterpret_cast<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge *>(context);
+        CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge * callback = reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge *>(context);
         if (callback && callback->mQueue)
         {
             id values[count];
@@ -571,26 +183,26 @@ private:
 
 {{#chip_client_clusters}}
 
-@interface CHIP{{asCamelCased name false}} ()
-@property (readonly) Controller::{{asCamelCased name false}}Cluster cppCluster;
+@interface CHIP{{asUpperCamelCase name}} ()
+@property (readonly) Controller::{{asUpperCamelCase name}}Cluster cppCluster;
 @end
 
-@implementation CHIP{{asCamelCased name false}}
+@implementation CHIP{{asUpperCamelCase name}}
 
 - (Controller::ClusterBase *)getCluster
 {
     return &_cppCluster;
 }
 
-{{#chip_server_cluster_commands}}
+{{#chip_cluster_commands}}
 {{#if (zcl_command_arguments_count this.id)}}
-- (void){{asCamelCased name}}:{{#chip_server_cluster_command_arguments}}{{#if index includeZero=false}}{{asCamelCased label}}:{{/if}}({{asObjectiveCBasicType type}}){{asCamelCased label}} {{/chip_server_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler
+- (void){{asLowerCamelCase name}}:{{#chip_cluster_command_arguments}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler
 {{else}}
-- (void){{asCamelCased name}}:(ResponseHandler)responseHandler
+- (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler
 {{/if}}
 {
 {{#if hasSpecificResponse}}
-    CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}CallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}CallbackBridge(responseHandler, [self callbackQueue]);
+    CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}CallbackBridge * onSuccess = new CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}CallbackBridge(responseHandler, [self callbackQueue]);
 {{else}}
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
 {{/if}}
@@ -608,7 +220,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*){{asCamelCased label}}.bytes, {{asCamelCased label}}.length){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*)[{{asCamelCased label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asCamelCased label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
+        err = self.cppCluster.{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*){{asLowerCamelCase label}}.bytes, {{asLowerCamelCase label}}.length){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*)[{{asLowerCamelCase label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asLowerCamelCase label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments}});
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -617,15 +229,15 @@ private:
         responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-{{/chip_server_cluster_commands}}
+{{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-- (void)readAttribute{{asCamelCased name false}}WithResponseHandler:(ResponseHandler)responseHandler
+- (void)readAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)responseHandler
 {
 {{#if isList}}
-    CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge * onSuccess = new CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge(responseHandler, [self callbackQueue]);
 {{else}}
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onSuccess = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(responseHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}});
+    CHIP{{chipCallback.name}}AttributeCallbackBridge * onSuccess = new CHIP{{chipCallback.name}}AttributeCallbackBridge(responseHandler, [self callbackQueue]);
 {{/if}}
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
@@ -641,7 +253,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ReadAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel());
+        err = self.cppCluster.ReadAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel());
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -651,8 +263,8 @@ private:
     }
 }
 
-{{#if (isWritableAttribute)}}
-- (void)writeAttribute{{asCamelCased name false}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler
+{{#if isWritableAttribute}}
+- (void)writeAttribute{{asUpperCamelCase name}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -670,12 +282,12 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         {{#if (isOctetString type)}}
-        err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)value.bytes, value.length));
+        err = self.cppCluster.WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)value.bytes, value.length));
         {{else if (isCharString type)}}
         NSData * data = [value dataUsingEncoding:NSUTF8StringEncoding];
-        err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)data.bytes, data.length));
+        err = self.cppCluster.WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)data.bytes, data.length));
         {{else}}
-        err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), value);
+        err = self.cppCluster.WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), value);
         {{/if}}
     });
 
@@ -687,8 +299,8 @@ private:
 }
 
 {{/if}}
-{{#if (isReportableAttribute)}}
-- (void) configureAttribute{{asCamelCased name false}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler
+{{#if isReportableAttribute}}
+- (void) configureAttribute{{asUpperCamelCase name}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -706,7 +318,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ConfigureAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval{{#if isAnalog}}, change{{/if}});
+        err = self.cppCluster.ConfigureAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval{{#if isAnalog}}, change{{/if}});
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -716,9 +328,9 @@ private:
     }
 }
 
-- (void) reportAttribute{{asCamelCased name false}}WithResponseHandler:(ResponseHandler)reportHandler
+- (void) reportAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)reportHandler
 {
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onReport = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(reportHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}, true);
+    CHIP{{chipCallback.name}}AttributeCallbackBridge * onReport = new CHIP{{chipCallback.name}}AttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
         reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -726,7 +338,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ReportAttribute{{asCamelCased name false}}(onReport->Cancel());
+        err = self.cppCluster.ReportAttribute{{asUpperCamelCase name}}(onReport->Cancel());
     });
 
     if (err != CHIP_NO_ERROR) {

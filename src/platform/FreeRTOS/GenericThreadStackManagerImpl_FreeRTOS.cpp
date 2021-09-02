@@ -26,12 +26,12 @@
 #ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_FREERTOS_IPP
 #define GENERIC_THREAD_STACK_MANAGER_IMPL_FREERTOS_IPP
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

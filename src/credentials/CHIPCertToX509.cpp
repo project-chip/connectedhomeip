@@ -31,16 +31,16 @@
 #include <inttypes.h>
 #include <stddef.h>
 
-#include <asn1/ASN1.h>
-#include <asn1/ASN1Macros.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
-#include <core/CHIPTLV.h>
 #include <credentials/CHIPCert.h>
+#include <lib/asn1/ASN1.h>
+#include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/SafeInt.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/SafeInt.h>
 
 namespace chip {
 namespace Credentials {
@@ -119,7 +119,7 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
                     }
                     else
                     {
-                        VerifyOrExit(chipAttr <= UINT32_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+                        VerifyOrExit(CanCastTo<uint32_t>(chipAttr), err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
                         // For CHIP 32-bit attribute the string representation is 8 uppercase hex characters.
                         snprintf(reinterpret_cast<char *>(chipAttrStr), sizeof(chipAttrStr), "%08" PRIX32,
@@ -181,6 +181,8 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
             }
             ASN1_END_SET;
         }
+        err = reader.VerifyEndOfContainer();
+        SuccessOrExit(err);
     }
     ASN1_END_SEQUENCE;
 
@@ -208,7 +210,7 @@ static CHIP_ERROR DecodeConvertValidity(TLVReader & reader, ASN1Writer & writer,
         err = reader.Get(chipEpochTime);
         SuccessOrExit(err);
 
-        VerifyOrExit(chipEpochTime <= UINT32_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+        VerifyOrExit(CanCastTo<uint32_t>(chipEpochTime), err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
         certData.mNotBeforeTime = static_cast<uint32_t>(chipEpochTime);
 
         err = ChipEpochToASN1Time(static_cast<uint32_t>(chipEpochTime), asn1Time);
@@ -222,7 +224,7 @@ static CHIP_ERROR DecodeConvertValidity(TLVReader & reader, ASN1Writer & writer,
         err = reader.Get(chipEpochTime);
         SuccessOrExit(err);
 
-        VerifyOrExit(chipEpochTime <= UINT32_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+        VerifyOrExit(CanCastTo<uint32_t>(chipEpochTime), err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
         certData.mNotAfterTime = static_cast<uint32_t>(chipEpochTime);
 
         err = ChipEpochToASN1Time(static_cast<uint32_t>(chipEpochTime), asn1Time);
@@ -246,7 +248,7 @@ static CHIP_ERROR DecodeConvertSubjectPublicKeyInfo(TLVReader & reader, ASN1Writ
     SuccessOrExit(err);
     err = reader.Get(pubKeyAlgoId);
     SuccessOrExit(err);
-    VerifyOrExit(pubKeyAlgoId <= UINT8_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+    VerifyOrExit(CanCastTo<uint8_t>(pubKeyAlgoId), err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
     pubKeyAlgoOID           = GetOID(kOIDCategory_PubKeyAlgo, static_cast<uint8_t>(pubKeyAlgoId));
     certData.mPubKeyAlgoOID = pubKeyAlgoOID;
@@ -257,7 +259,7 @@ static CHIP_ERROR DecodeConvertSubjectPublicKeyInfo(TLVReader & reader, ASN1Writ
     SuccessOrExit(err);
     err = reader.Get(pubKeyCurveId);
     SuccessOrExit(err);
-    VerifyOrExit(pubKeyCurveId <= UINT8_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+    VerifyOrExit(CanCastTo<uint8_t>(pubKeyCurveId), err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
     certData.mPubKeyCurveOID = GetOID(kOIDCategory_EllipticCurve, static_cast<uint8_t>(pubKeyCurveId));
 
@@ -372,7 +374,7 @@ static CHIP_ERROR DecodeConvertKeyUsageExtension(TLVReader & reader, ASN1Writer 
     err = reader.Get(keyUsageBits);
     SuccessOrExit(err);
 
-    VerifyOrExit(keyUsageBits <= UINT16_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+    VerifyOrExit(CanCastTo<uint16_t>(keyUsageBits), err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
     {
         BitFlags<KeyUsageFlags> keyUsageFlags(static_cast<uint16_t>(keyUsageBits));
@@ -437,7 +439,7 @@ static CHIP_ERROR DecodeConvertBasicConstraintsExtension(TLVReader & reader, ASN
             err = reader.Get(pathLenConstraint);
             SuccessOrExit(err);
 
-            VerifyOrExit(pathLenConstraint <= UINT8_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+            VerifyOrExit(CanCastTo<uint8_t>(pathLenConstraint), err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
             ASN1_ENCODE_INTEGER(static_cast<int64_t>(pathLenConstraint));
 
@@ -445,7 +447,8 @@ static CHIP_ERROR DecodeConvertBasicConstraintsExtension(TLVReader & reader, ASN
 
             certData.mCertFlags.Set(CertFlags::kPathLenConstraintPresent);
 
-            reader.Next();
+            nextRes = reader.Next();
+            VerifyOrExit(nextRes == CHIP_END_OF_TLV, err = nextRes);
         }
 
         err = reader.VerifyEndOfContainer();
@@ -462,7 +465,7 @@ exit:
 
 static CHIP_ERROR DecodeConvertExtendedKeyUsageExtension(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
-    CHIP_ERROR err, nextRes;
+    CHIP_ERROR err;
     TLVType outerContainer;
 
     certData.mCertFlags.Set(CertFlags::kExtPresent_ExtendedKeyUsage);
@@ -476,7 +479,7 @@ static CHIP_ERROR DecodeConvertExtendedKeyUsageExtension(TLVReader & reader, ASN
         err = reader.EnterContainer(outerContainer);
         SuccessOrExit(err);
 
-        while ((nextRes = reader.Next(kTLVType_UnsignedInteger, AnonymousTag)) == CHIP_NO_ERROR)
+        while ((err = reader.Next(kTLVType_UnsignedInteger, AnonymousTag)) == CHIP_NO_ERROR)
         {
             uint64_t keyPurposeId;
             OID keyPurposeOID;
@@ -484,7 +487,7 @@ static CHIP_ERROR DecodeConvertExtendedKeyUsageExtension(TLVReader & reader, ASN
             err = reader.Get(keyPurposeId);
             SuccessOrExit(err);
 
-            VerifyOrExit(keyPurposeId <= UINT8_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+            VerifyOrExit(CanCastTo<uint8_t>(keyPurposeId), err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
             keyPurposeOID = GetOID(kOIDCategory_KeyPurpose, static_cast<uint8_t>(keyPurposeId));
 
@@ -493,8 +496,8 @@ static CHIP_ERROR DecodeConvertExtendedKeyUsageExtension(TLVReader & reader, ASN
 
             certData.mKeyPurposeFlags.Set(static_cast<KeyPurposeFlags>(0x01 << (keyPurposeId - 1)));
         }
-
-        VerifyOrExit(nextRes == CHIP_END_OF_TLV, err = nextRes);
+        err = reader.VerifyEndOfContainer();
+        SuccessOrExit(err);
 
         err = reader.ExitContainer(outerContainer);
         SuccessOrExit(err);
@@ -548,7 +551,7 @@ static CHIP_ERROR DecodeConvertFutureExtension(TLVReader & tlvReader, ASN1Writer
     }
     ASN1_EXIT_SEQUENCE;
 
-    VerifyOrExit(extensionSequenceLen <= UINT16_MAX, err = ASN1_ERROR_INVALID_ENCODING);
+    VerifyOrExit(CanCastTo<uint16_t>(extensionSequenceLen), err = ASN1_ERROR_INVALID_ENCODING);
 
     // FutureExtension SEQUENCE
     err = writer.PutConstructedType(extensionSequence, static_cast<uint16_t>(extensionSequenceLen));
@@ -650,6 +653,8 @@ static CHIP_ERROR DecodeConvertExtensions(TLVReader & reader, ASN1Writer & write
                 err = DecodeConvertExtension(reader, writer, certData);
                 SuccessOrExit(err);
             }
+            err = reader.VerifyEndOfContainer();
+            SuccessOrExit(err);
         }
         ASN1_END_SEQUENCE;
     }
@@ -743,7 +748,7 @@ CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCer
             err = reader.Get(sigAlgoId);
             SuccessOrExit(err);
 
-            VerifyOrExit(sigAlgoId <= UINT8_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+            VerifyOrExit(CanCastTo<uint8_t>(sigAlgoId), err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
             sigAlgoOID = GetOID(kOIDCategory_SigAlgo, static_cast<uint8_t>(sigAlgoId));
             ASN1_ENCODE_OBJECT_ID(sigAlgoOID);
@@ -829,34 +834,30 @@ exit:
     return err;
 }
 
-DLL_EXPORT CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, uint8_t * x509CertBuf, uint32_t x509CertBufSize,
-                                                uint32_t & x509CertLen)
+DLL_EXPORT CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, MutableByteSpan & x509Cert)
 {
     TLVReader reader;
     ASN1Writer writer;
     ChipCertificateData certData;
 
-    VerifyOrReturnError(!chipCert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(CanCastTo<uint32_t>(chipCert.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    reader.Init(chipCert);
 
-    reader.Init(chipCert.data(), static_cast<uint32_t>(chipCert.size()));
-
-    writer.Init(x509CertBuf, x509CertBufSize);
+    writer.Init(x509Cert.data(), static_cast<uint32_t>(x509Cert.size()));
 
     certData.Clear();
 
     ReturnErrorOnFailure(DecodeConvertCert(reader, writer, certData));
 
-    x509CertLen = writer.GetLengthWritten();
+    x509Cert.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeChipCert(const uint8_t * chipCert, uint32_t chipCertLen, ChipCertificateData & certData)
+CHIP_ERROR DecodeChipCert(const ByteSpan chipCert, ChipCertificateData & certData)
 {
     TLVReader reader;
 
-    reader.Init(chipCert, chipCertLen);
+    reader.Init(chipCert);
 
     return DecodeChipCert(reader, certData);
 }

@@ -38,16 +38,15 @@ namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Map an OpenThread error into the OpenChip error space.
+ * Map an OpenThread error into the CHIP error space.
  */
 CHIP_ERROR MapOpenThreadError(otError otErr)
 {
-    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR
-                                    : ChipError::Encapsulate(ChipError::Range::kOpenThread, static_cast<unsigned int>(otErr));
+    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kOpenThread, static_cast<unsigned int>(otErr));
 }
 
 /**
- * Given an OpenChip error value that represents an OpenThread error, returns a
+ * Given an CHIP error value that represents an OpenThread error, returns a
  * human-readable NULL-terminated C string describing the error.
  *
  * @param[in] buf                   Buffer into which the error string will be placed.
@@ -60,7 +59,7 @@ CHIP_ERROR MapOpenThreadError(otError otErr)
  */
 bool FormatOpenThreadError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
-    if (!ChipError::IsRange(ChipError::Range::kOpenThread, err))
+    if (!err.IsRange(ChipError::Range::kOpenThread))
     {
         return false;
     }
@@ -68,7 +67,7 @@ bool FormatOpenThreadError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 #if CHIP_CONFIG_SHORT_ERROR_STR
     const char * desc = NULL;
 #else  // CHIP_CONFIG_SHORT_ERROR_STR
-    otError otErr     = (otError) ChipError::GetValue(err);
+    otError otErr     = (otError) err.GetValue();
     const char * desc = otThreadErrorToString(otErr);
 #endif // CHIP_CONFIG_SHORT_ERROR_STR
 

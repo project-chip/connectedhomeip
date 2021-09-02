@@ -106,6 +106,7 @@ public:
      */
     typedef void (*OnReceiveErrorFunct)(IPEndPointBasis * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo);
 
+    IPEndPointBasis() = default;
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback);
     CHIP_ERROR JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
     CHIP_ERROR LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
@@ -122,7 +123,7 @@ protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 public:
     static struct netif * FindNetifFromInterfaceId(InterfaceId aInterfaceId);
-    static CHIP_ERROR PostPacketBufferEvent(chip::System::Layer & aLayer, System::Object & aTarget, System::EventType aEventType,
+    static CHIP_ERROR PostPacketBufferEvent(chip::System::Layer * aLayer, System::Object & aTarget, System::EventType aEventType,
                                             System::PacketBufferHandle && aBuffer);
 
 protected:
@@ -178,9 +179,7 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
 private:
-    IPEndPointBasis()                        = delete;
     IPEndPointBasis(const IPEndPointBasis &) = delete;
-    ~IPEndPointBasis()                       = delete;
 };
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

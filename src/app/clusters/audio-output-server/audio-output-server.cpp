@@ -22,13 +22,16 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
+
+using namespace chip;
 
 bool audioOutputClusterSelectOutput(uint8_t index);
 bool audioOutputClusterRenameOutput(uint8_t index, uint8_t * name);
 
-bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * command, uint8_t index, uint8_t * name)
+bool emberAfAudioOutputClusterRenameOutputCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t index,
+                                                   uint8_t * name)
 {
     bool success         = audioOutputClusterRenameOutput(index, name);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -36,7 +39,7 @@ bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * command,
     return true;
 }
 
-bool emberAfAudioOutputClusterSelectOutputCallback(chip::app::Command * command, uint8_t index)
+bool emberAfAudioOutputClusterSelectOutputCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t index)
 {
     bool success         = audioOutputClusterSelectOutput(index);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;

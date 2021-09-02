@@ -17,31 +17,16 @@
  *    limitations under the License.
  */
 
-#include <bsp.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
-
+#include <AppConfig.h>
 #include <FreeRTOS.h>
+#include <WindowApp.h>
+#include <app/server/Server.h>
+#include <init_efrPlatform.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 #include <mbedtls/threading.h>
-
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
-
-#include <AppTask.h>
-
-#include "AppConfig.h"
-#include "init_efrPlatform.h"
-#include <app/server/Server.h>
-
-#if DISPLAY_ENABLED
-#include "lcd.h"
-#endif
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <mbedtls/platform.h>
@@ -58,26 +43,10 @@
 #endif // CHIP_ENABLE_OPENTHREAD
 
 #if PW_RPC_ENABLED
-#include "Rpc.h"
+#include <Rpc.h>
 #endif
 
-using namespace ::chip;
-using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
-
-#define UNUSED_PARAMETER(a) (a = a)
-
-volatile int apperror_cnt;
-// ================================================================================
-// App Error
-//=================================================================================
-void appError(int err)
-{
-    EFR32_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
-    portDISABLE_INTERRUPTS();
-    while (1)
-        ;
-}
 
 // ================================================================================
 // FreeRTOS Callbacks
@@ -91,10 +60,25 @@ extern "C" void vApplicationIdleHook(void)
 }
 
 // ================================================================================
+// App Error
+//=================================================================================
+
+void appError(CHIP_ERROR err)
+{
+    // appError(static_cast<int>(err.AsInteger()));
+    EFR32_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
+    portDISABLE_INTERRUPTS();
+    while (1)
+        ;
+}
+
+// ================================================================================
 // Main Code
 // ================================================================================
 int main(void)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     init_efrPlatform();
 
 #if PW_RPC_ENABLED
@@ -102,9 +86,6 @@ int main(void)
 #endif
 
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
-
-    // Initialize mbedtls threading support on EFR32
-    THREADING_setup();
 
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-window-cover-example starting");
@@ -116,63 +97,66 @@ int main(void)
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
-    CHIP_ERROR ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
+    err = PlatformMgr().InitChipStack();
+    if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("PlatformMgr().InitChipStack() failed");
-        appError(ret);
+        appError(err);
     }
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_WINDOW");
 
     EFR32_LOG("Starting Platform Manager Event Loop");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
+    err = PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
-        appError(ret);
+        appError(err);
     }
 
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Initializing OpenThread stack");
-    ret = ThreadStackMgr().InitThreadStack();
-    if (ret != CHIP_NO_ERROR)
+    err = ThreadStackMgr().InitThreadStack();
+    if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("ThreadStackMgr().InitThreadStack() failed");
-        appError(ret);
+        appError(err);
     }
 
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-    if (ret != CHIP_NO_ERROR)
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
-        appError(ret);
+        appError(err);
     }
 
     EFR32_LOG("Starting OpenThread task");
 
     // Start OpenThread task
-    ret = ThreadStackMgrImpl().StartThreadTask();
-    if (ret != CHIP_NO_ERROR)
+    err = ThreadStackMgrImpl().StartThreadTask();
+    if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("ThreadStackMgr().StartThreadTask() failed");
-        appError(ret);
+        appError(err);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
-    EFR32_LOG("Starting App Task");
-    ret = AppTask::Instance().Start();
-    if (ret != CHIP_NO_ERROR)
+    WindowApp & app = WindowApp::Instance();
+
+    EFR32_LOG("Starting App");
+    err = app.Init();
+    if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("GetAppTask().Init() failed");
-        appError(ret);
+        EFR32_LOG("App Init failed");
+        appError(err);
     }
 
-    EFR32_LOG("Starting FreeRTOS scheduler");
-    vTaskStartScheduler();
+    err = app.Start();
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("App Start failed");
+        appError(err);
+    }
 
-    chip::Platform::MemoryShutdown();
-
-    // Should never get here.
-    EFR32_LOG("vTaskStartScheduler() failed");
-    appError(ret);
+    app.Finish();
+    return err.AsInteger();
 }

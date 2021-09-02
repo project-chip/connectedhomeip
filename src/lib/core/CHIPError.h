@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,34 +28,61 @@
 
 #pragma once
 
-#include <core/CHIPConfig.h>
-#include <support/TypeTraits.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/TypeTraits.h>
 
 #include <inttypes.h>
+#include <limits>
 #include <stdint.h>
 #include <type_traits>
 
 namespace chip {
 
 /**
- * This is a helper class for managing `CHIP_ERROR` numbers.
+ * This class represents CHIP errors.
  *
- * At the top level, an error belongs to a `Range` and has an integral Value whose meaning depends on the `Range`.
- * One, `Range::kSDK`, is used for the CHIP SDK's own errors; others encapsulate error codes from external sources
- * (e.g. libraries, OS) into a `CHIP_ERROR`.
+ * At the top level, an error belongs to a Range and has an integral Value whose meaning depends on the Range.
+ * One, Range::kSDK, is used for the CHIP SDK's own errors; others encapsulate error codes from external sources
+ * (e.g. libraries, OS) into a CHIP_ERROR.
  *
- * CHIP SDK errors inside `Range::kSDK` consist of a component identifier given by `SdkPart` and an arbitrary small
+ * CHIP SDK errors inside Range::kSDK consist of a component identifier given by SdkPart and an arbitrary small
  * integer Code.
  */
 class ChipError
 {
 public:
-    using BaseType = uint32_t;
+    /// Internal representation of an error.
+    using StorageType = uint32_t;
 
-    /// `printf` format for error numbers. This is a C macro in order to allow for string literal concatenation.
-#define CHIP_ERROR_FORMAT PRIx32
+    /// Type for encapsulated error values.
+    using ValueType = StorageType;
 
-    /// Top-level error classification.
+    /// Integer `printf` format for errors. This is a C macro in order to allow for string literal concatenation.
+#define CHIP_ERROR_INTEGER_FORMAT PRIx32
+
+#if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+
+    /// Type returned by Format().
+    using FormatType = const char *;
+    /// `printf` format for Format(). This is a C macro in order to allow for string literal concatenation.
+#define CHIP_ERROR_FORMAT "s"
+
+#else // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+
+    /// Type returned by Format().
+    using FormatType = StorageType;
+    /// `printf` format for Format(). This is a C macro in order to allow for string literal concatenation.
+#define CHIP_ERROR_FORMAT CHIP_ERROR_INTEGER_FORMAT
+
+#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+
+    /**
+     * Top-level error classification.
+     *
+     * Every error belongs to a Range and has an integral Value whose meaning depends on the Range.
+     * All native CHIP SDK errors belong to the kSDK range. Other ranges are used to encapsulate error
+     * codes from other subsystems (e.g. platform or library) used by the CHIP SDK.
+     */
     enum class Range : uint8_t
     {
         kSDK        = 0x0, ///< CHIP SDK errors.
@@ -64,9 +91,12 @@ public:
         kLwIP       = 0x3, ///< Encapsulated LwIP errors.
         kOpenThread = 0x4, ///< Encapsulated OpenThread errors.
         kPlatform   = 0x5, ///< Platform-defined encapsulation.
+        kLastRange  = kPlatform
     };
 
-    /// Secondary classification of errors in `Range::kSDK`.
+    /**
+     * Secondary classification of CHIP SDK errors (Range::kSDK).
+     */
     enum class SdkPart : uint8_t
     {
         kCore        = 0, ///< SDK core errors.
@@ -74,36 +104,189 @@ public:
         kDevice      = 2, ///< Device layer errors; see <platform/CHIPDeviceError.h>.
         kASN1        = 3, ///< ASN1 errors; see <asn1/ASN1Error.h>.
         kBLE         = 4, ///< BLE layer errors; see <ble/BleError.h>.
-        kApplication = 7, ///< Application-defined errors.
+        kApplication = 7, ///< Application-defined errors; see CHIP_APPLICATION_ERROR
     };
 
-    /// Test whether @a error belongs to @a range.
-    static constexpr bool IsRange(Range range, BaseType error)
+    ChipError() = default;
+
+    // Helper for declaring constructors without too much repetition.
+#if CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_INITIALIZE_ERROR_SOURCE(f, l) , mFile((f)), mLine((l))
+#else // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_INITIALIZE_ERROR_SOURCE(f, l)
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
+    /**
+     * Construct a CHIP_ERROR encapsulating @a value inside the Range @a range.
+     *
+     * @note
+     *  The result is valid only if CanEncapsulate() is true.
+     */
+    constexpr ChipError(Range range, ValueType value) :
+        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0)
+    {}
+    constexpr ChipError(Range range, ValueType value, const char * file, unsigned int line) :
+        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(file, line)
+    {}
+
+    /**
+     * Construct a CHIP_ERROR for SdkPart @a part with @a code.
+     *
+     * @note
+     *  The macro version CHIP_SDK_ERROR checks that the numeric value is constant and well-formed.
+     */
+    constexpr ChipError(SdkPart part, uint8_t code) : mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0) {}
+    constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line) :
+        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line)
+    {}
+
+    /**
+     * Construct a CHIP_ERROR constant for SdkPart @a part with @a code at the current source line.
+     * This checks that the numeric value is constant and well-formed.
+     * (In C++20 this could be replaced by a consteval constructor.)
+     */
+#if CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(chip::ChipError::SdkErrorConstant<(part), (code)>::value, __FILE__, __LINE__))
+#else // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(chip::ChipError::SdkErrorConstant<(part), (code)>::value))
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
+    /**
+     * Construct a CHIP_ERROR from the underlying storage type.
+     *
+     * @note
+     *  This is intended to be used only in foreign function interfaces.
+     */
+    explicit constexpr ChipError(StorageType error) : mError(error) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0) {}
+    explicit constexpr ChipError(StorageType error, const char * file, unsigned int line) :
+        mError(error) CHIP_INITIALIZE_ERROR_SOURCE(file, line)
+    {}
+
+#undef CHIP_INITIALIZE_ERROR_SOURCE
+
+    /**
+     * Compare errors for equality.
+     *
+     * @note
+     *  This only compares the error code. Under the CHIP_CONFIG_ERROR_SOURCE configuration, errors compare equal
+     *  if they have the same error code, even if they have different source locations.
+     */
+    bool operator==(const ChipError & other) const { return mError == other.mError; }
+    bool operator!=(const ChipError & other) const { return mError != other.mError; }
+
+    /**
+     * Return an integer code for the error.
+     */
+    constexpr StorageType AsInteger() const { return mError; }
+
+    /*
+     * IsSuccess() is intended to support macros that can take either a ChipError or an integer error code.
+     * The latter follows the C convention that a non-zero integer indicates an error.
+     *
+     * @note
+     *  Normal code should use `status == CHIP_NO_ERROR` rather than `IsSuccess(status)`.
+     */
+    static constexpr bool IsSuccess(ChipError error) { return error.mError == 0; }
+    static constexpr bool IsSuccess(StorageType error) { return error == 0; }
+
+    /**
+     * Format an @a error for printing.
+     *
+     * Normally, this is used with the `printf()`-style macro CHIP_ERROR_FORMAT.
+     * For example,
+     *  @code
+     *      ChipLogError(subsystem, "A bad thing happened! %" CHIP_ERROR_FORMAT, status.Format());
+     *  @endcode
+     */
+#if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+    FormatType Format() const { return AsString(); }
+#else  // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+    FormatType Format() const { return mError; }
+#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+
+    /**
+     * Format an @a error as a string for printing.
+     *
+     * @note
+     *  Normally, prefer to use Format()
+     */
+    const char * AsString() const
     {
-        return (error & MakeMask(kRangeStart, kRangeLength)) == MakeField(kRangeStart, static_cast<BaseType>(range));
+        extern const char * ErrorStr(ChipError);
+        return ErrorStr(*this);
     }
 
-    static constexpr Range GetRange(BaseType error) { return static_cast<Range>(GetField(kRangeStart, kRangeLength, error)); }
-    static BaseType GetValue(BaseType error) { return GetField(kValueStart, kValueLength, error); }
-
-    /// Test whether if @a value can be losslessly encapsulated in a `CHIP_ERROR`.
-    static constexpr bool CanEncapsulate(BaseType value) { return FitsInField(kValueLength, value); }
-
-    /// Construct a `CHIP_ERROR` encapsulating @a value inside the @a range.
-    static BaseType Encapsulate(Range range, BaseType value) { return MakeInteger(range, (value & MakeMask(0, kValueLength))); }
-
-    /// Test whether @a error is an SDK error belonging to @a part.
-    static constexpr bool IsPart(SdkPart part, BaseType error)
+    /**
+     * Test whether @a error belongs to the Range @a range.
+     */
+    constexpr bool IsRange(Range range) const
     {
-        return (error & (MakeMask(kRangeStart, kRangeLength) | MakeMask(kSdkPartStart, kSdkPartLength))) ==
-            (MakeField(kRangeStart, static_cast<BaseType>(Range::kSDK)) | MakeField(kSdkPartStart, static_cast<BaseType>(part)));
+        return (mError & MakeMask(kRangeStart, kRangeLength)) == MakeField(kRangeStart, static_cast<StorageType>(range));
     }
+
+    /**
+     * Get the Range to which the @a error belongs.
+     */
+    constexpr Range GetRange() const { return static_cast<Range>(GetField(kRangeStart, kRangeLength, mError)); }
+
+    /**
+     * Get the encapsulated value of an @a error.
+     */
+    constexpr ValueType GetValue() const { return GetField(kValueStart, kValueLength, mError); }
+
+    /**
+     * Test whether type @a T can always be losslessly encapsulated in a CHIP_ERROR.
+     */
+    template <typename T>
+    static constexpr bool CanEncapsulate()
+    {
+        return std::numeric_limits<typename std::make_unsigned_t<T>>::digits <= kValueLength;
+    }
+
+    /**
+     * Test whether if @a value can be losslessly encapsulated in a CHIP_ERROR.
+     */
+    template <typename T>
+    static constexpr bool CanEncapsulate(T value)
+    {
+        return CanEncapsulate<T>() || FitsInField(kValueLength, static_cast<ValueType>(value));
+    }
+
+    /**
+     * Test whether @a error is an SDK error belonging to the SdkPart @a part.
+     */
+    constexpr bool IsPart(SdkPart part) const
+    {
+        return (mError & (MakeMask(kRangeStart, kRangeLength) | MakeMask(kSdkPartStart, kSdkPartLength))) ==
+            (MakeField(kRangeStart, static_cast<StorageType>(Range::kSDK)) |
+             MakeField(kSdkPartStart, static_cast<StorageType>(part)));
+    }
+
+#if CHIP_CONFIG_ERROR_SOURCE
+
+    /**
+     * Get the source file name of the point where the error occurred.
+     *
+     * @note
+     *  This will be `nullptr` if the error was not created with a file name.
+     */
+    const char * GetFile() const { return mFile; }
+
+    /**
+     * Get the source line number of the point where the error occurred.
+     *
+     * @note
+     *  This will be 0 if the error was not created with a file name.
+     */
+    unsigned int GetLine() const { return mLine; }
+
+#endif // CHIP_CONFIG_ERROR_SOURCE
 
 private:
     /*
      * The representation of a CHIP_ERROR is structured so that SDK error code constants are small, in order to improve code
      * density on embedded builds. Arm 32, Xtensa, and RISC-V can all handle 11-bit values in a move-immediate instruction.
-     * Further, `SdkPart::kCore` is 0 so that the most common errors fit in 8 bits for additional density on some processors.
+     * Further, SdkPart::kCore is 0 so that the most common errors fit in 8 bits for additional density on some processors.
      *
      *  31    28      24      20      16      12       8       4       0    Bit
      *  |       |       |       |       |       |       |       |       |
@@ -121,39 +304,63 @@ private:
     static constexpr int kSdkCodeStart  = 0;
     static constexpr int kSdkCodeLength = 8;
 
-    static constexpr BaseType GetField(unsigned int start, unsigned int length, BaseType value)
+    static constexpr StorageType GetField(unsigned int start, unsigned int length, StorageType value)
     {
         return (value >> start) & ((1u << length) - 1);
     }
-    static constexpr BaseType MakeMask(unsigned int start, unsigned int length) { return ((1u << length) - 1) << start; }
-    static constexpr BaseType MakeField(unsigned int start, BaseType value) { return value << start; }
-    static constexpr bool FitsInField(unsigned int length, BaseType value) { return value < (1u << length); }
+    static constexpr StorageType MakeMask(unsigned int start, unsigned int length) { return ((1u << length) - 1) << start; }
+    static constexpr StorageType MakeField(unsigned int start, StorageType value) { return value << start; }
+    static constexpr bool FitsInField(unsigned int length, StorageType value) { return value < (1u << length); }
 
-    static constexpr BaseType MakeInteger(Range range, BaseType value)
+    static constexpr StorageType MakeInteger(Range range, StorageType value)
     {
         return MakeField(kRangeStart, to_underlying(range)) | MakeField(kValueStart, value);
     }
-    static constexpr BaseType MakeInteger(SdkPart part, BaseType code)
+    static constexpr StorageType MakeInteger(SdkPart part, uint8_t code)
     {
         return MakeInteger(Range::kSDK, MakeField(kSdkPartStart, to_underlying(part)) | MakeField(kSdkCodeStart, code));
     }
+    template <unsigned int START, unsigned int LENGTH>
+    struct MaskConstant
+    {
+        static constexpr StorageType value = ((1u << LENGTH) - 1) << START;
+    };
+
+    // Assert that Range and Value fields fit in StorageType and don't overlap.
+    static_assert(kRangeStart + kRangeLength <= std::numeric_limits<StorageType>::digits, "Range does not fit in StorageType");
+    static_assert(kValueStart + kValueLength <= std::numeric_limits<StorageType>::digits, "Value does not fit in StorageType");
+    static_assert((MaskConstant<kRangeStart, kRangeLength>::value & MaskConstant<kValueStart, kValueLength>::value) == 0,
+                  "Range and Value overlap");
+
+    // Assert that SDK Part and Code fields fit in SdkCode field and don't overlap.
+    static_assert(kSdkPartStart + kSdkPartLength <= kValueLength, "SdkPart does not fit in Value");
+    static_assert(kSdkCodeStart + kSdkCodeLength <= kValueLength, "SdkCode does not fit in Value");
+    static_assert((MaskConstant<kSdkPartStart, kSdkPartLength>::value & MaskConstant<kSdkCodeStart, kSdkCodeLength>::value) == 0,
+                  "SdkPart and SdkCode overlap");
+
+    // Assert that Value fits in ValueType.
+    static_assert(kValueStart + kValueLength <= std::numeric_limits<ValueType>::digits, "Value does not fit in ValueType");
+
+    StorageType mError;
+
+#if CHIP_CONFIG_ERROR_SOURCE
+    const char * mFile;
+    unsigned int mLine;
+#endif // CHIP_CONFIG_ERROR_SOURCE
 
 public:
-    /*
-     * Wrapper for constructing error constants. This is a C macro so that it can easily be augmented to track
-     * error source line information on large platforms without touching users.
+    /**
+     * Helper for constructing error constants.
      *
-     * The underlying template ensures that the numeric value is constant and well-formed.
-     * (In C++20 this could be replaced by a consteval function.)
+     * This template ensures that the numeric value is constant and well-formed.
      */
-#define CHIP_SDK_ERROR(part, code) (::chip::ChipError::MakeSdkErrorConstant<(part), (code)>::value)
-    template <SdkPart part, BaseType code>
-    struct MakeSdkErrorConstant
+    template <SdkPart PART, StorageType CODE>
+    struct SdkErrorConstant
     {
-        static_assert(FitsInField(kSdkPartLength, to_underlying(part)), "part is too large");
-        static_assert(FitsInField(kSdkCodeLength, code), "code is too large");
-        static_assert(MakeInteger(part, code) != 0, "value is zero");
-        static constexpr BaseType value = MakeInteger(part, code);
+        static_assert(FitsInField(kSdkPartLength, to_underlying(PART)), "part is too large");
+        static_assert(FitsInField(kSdkCodeLength, CODE), "code is too large");
+        static_assert(MakeInteger(PART, CODE) != 0, "value is zero");
+        static constexpr StorageType value = MakeInteger(PART, CODE);
     };
 };
 
@@ -162,10 +369,12 @@ public:
 /**
  *  The basic type for all CHIP errors.
  */
-using CHIP_ERROR = ::chip::ChipError::BaseType;
+using CHIP_ERROR = ::chip::ChipError;
 
 /**
- * Applications using the CHIP SDK can use this to define error codes in the `CHIP_ERROR` space for their own purposes.
+ * Applications using the CHIP SDK can use this to define error codes in the CHIP_ERROR space for their own purposes.
+ * This is suitable for a small fixed set of errors, similar to `CHIP_ERROR_…` constants. For embedding arbitrary or
+ * larger values, use a custom Range offset from Range::kLastRange.
  */
 #define CHIP_APPLICATION_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kApplication, (e))
 
@@ -186,7 +395,11 @@ using CHIP_ERROR = ::chip::ChipError::BaseType;
  *    This defines the CHIP error code for success or no error.
  *
  */
-#define CHIP_NO_ERROR                                          (0)
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+#define CHIP_NO_ERROR                                          CHIP_ERROR(0, __FILE__, __LINE__)
+#else // CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+#define CHIP_NO_ERROR                                          CHIP_ERROR(0)
+#endif // CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 
 /**
  *  @def CHIP_ERROR_SENDING_BLOCKED
@@ -1942,6 +2155,22 @@ using CHIP_ERROR = ::chip::ChipError::BaseType;
  *   The received message is a duplicate of a previously received message.
  */
 #define CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED                  CHIP_CORE_ERROR(0xc4)
+
+/**
+ * @def CHIP_ERROR_INVALID_PUBLIC_KEY
+ *
+ * @brief
+ *   The received public key doesn't match locally generated key.
+ */
+#define CHIP_ERROR_INVALID_PUBLIC_KEY                          CHIP_CORE_ERROR(0xc5)
+
+/**
+ * @def CHIP_ERROR_FABRIC_MISMATCH_ON_ICA
+ *
+ * @brief
+ *   The fabric ID in ICA certificate doesn't match the one in NOC.
+ */
+#define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                          CHIP_CORE_ERROR(0xc6)
 
 /**
  *  @}

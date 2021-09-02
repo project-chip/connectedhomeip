@@ -17,15 +17,13 @@
 
 #include "temperature-measurement-server.h"
 
-#include <app/util/af.h>
-
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/af-event.h>
+#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
-
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 
@@ -33,37 +31,37 @@ using namespace chip;
 #define emberAfTemperatureMeasurementClusterPrintln(...) ChipLogProgress(Zcl, __VA_ARGS__);
 #endif
 
-EmberAfStatus emberAfTemperatureMeasurementClusterGetMeasuredValue(chip::EndpointId endpoint, int16_t * measuredValue)
+EmberAfStatus emberAfTemperatureMeasurementClusterGetMeasuredValue(EndpointId endpoint, int16_t * measuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID,
                                       (uint8_t *) measuredValue, sizeof(*measuredValue));
 }
 
-EmberAfStatus emberAfTemperatureMeasurementClusterGetMinMeasuredValue(chip::EndpointId endpoint, int16_t * minMeasuredValue)
+EmberAfStatus emberAfTemperatureMeasurementClusterGetMinMeasuredValue(EndpointId endpoint, int16_t * minMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID,
                                       (uint8_t *) minMeasuredValue, sizeof(*minMeasuredValue));
 }
 
-EmberAfStatus emberAfTemperatureMeasurementClusterGetMaxMeasuredValue(chip::EndpointId endpoint, int16_t * maxMeasuredValue)
+EmberAfStatus emberAfTemperatureMeasurementClusterGetMaxMeasuredValue(EndpointId endpoint, int16_t * maxMeasuredValue)
 {
     return emberAfReadServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID,
                                       (uint8_t *) maxMeasuredValue, sizeof(*maxMeasuredValue));
 }
 
-EmberAfStatus emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, int16_t measuredValue)
+EmberAfStatus emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(EndpointId endpoint, int16_t measuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID,
                                        (uint8_t *) &measuredValue, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus emberAfTemperatureMeasurementClusterSetMinMeasuredValueCallback(chip::EndpointId endpoint, int16_t minMeasuredValue)
+EmberAfStatus emberAfTemperatureMeasurementClusterSetMinMeasuredValueCallback(EndpointId endpoint, int16_t minMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MIN_MEASURED_VALUE_ATTRIBUTE_ID,
                                        (uint8_t *) &minMeasuredValue, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus emberAfTemperatureMeasurementClusterSetMaxMeasuredValueCallback(chip::EndpointId endpoint, int16_t maxMeasuredValue)
+EmberAfStatus emberAfTemperatureMeasurementClusterSetMaxMeasuredValueCallback(EndpointId endpoint, int16_t maxMeasuredValue)
 {
     return emberAfWriteServerAttribute(endpoint, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_TEMP_MAX_MEASURED_VALUE_ATTRIBUTE_ID,
                                        (uint8_t *) &maxMeasuredValue, ZCL_INT16S_ATTRIBUTE_TYPE);

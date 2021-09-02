@@ -34,7 +34,8 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 
-CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * secureSession)
+CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
+                                             uint32_t timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle commandPacket;
@@ -49,18 +50,9 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     AbortExistingExchangeContext();
 
     // Create a new exchange context.
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
-    if (secureSession == nullptr)
-    {
-        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
-    }
-    else
-    {
-        mpExchangeCtx = mpExchangeMgr->NewContext(*secureSession, this);
-    }
+    mpExchangeCtx = mpExchangeMgr->NewContext(secureSession.ValueOr(SessionHandle(aNodeId, 0, 0, aFabricIndex)), this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
+    mpExchangeCtx->SetResponseTimeout(timeout);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(commandPacket),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
@@ -92,10 +84,6 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
 exit:
     ChipLogFunctError(err);
 
-    // Null out mpExchangeCtx, so our Shutdown() call below won't try to abort
-    // it and fail to send an ack for the message we just received.
-    mpExchangeCtx = nullptr;
-
     if (mpDelegate != nullptr)
     {
         if (err != CHIP_NO_ERROR)
@@ -108,7 +96,7 @@ exit:
         }
     }
 
-    Shutdown();
+    ShutdownInternal();
     return err;
 }
 
@@ -122,7 +110,7 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
         mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
     }
 
-    Shutdown();
+    ShutdownInternal();
 }
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
@@ -167,7 +155,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         err = aCommandElement.GetData(&commandDataReader);
         SuccessOrExit(err);
         // TODO(#4503): Should call callbacks of cluster that sends the command.
-        DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
+        DispatchSingleClusterResponseCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
 
 exit:

@@ -15,9 +15,10 @@
  *    limitations under the License.
  */
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <platform/ESP32/ESP32Utils.h>
 
 #include <algorithm>
 
@@ -31,7 +32,6 @@ CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
 {
     ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t wifiConfig;
 
     // Set the wifi configuration
@@ -42,16 +42,15 @@ CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
     wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
 
     // Configure the ESP WiFi interface.
-    err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+    esp_err_t err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", esp_err_to_name(err));
+        return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
     }
-    SuccessOrExit(err);
 
     ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled);
     ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }

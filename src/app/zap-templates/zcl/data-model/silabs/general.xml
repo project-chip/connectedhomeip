@@ -162,10 +162,6 @@ limitations under the License.
       <arg name="discoveryComplete" type="INT8U"/>
       <arg name="extendedDiscoverAttributesInfoRecords" type="ExtendedDiscoverAttributesInfoRecord" array="true"/>
     </command>
-    <attribute side="client" code="0xFFFD" define="CLUSTER_REVISION_CLIENT" type="INT16U" min="0x0001" max="0xFFFE" writable="false" default="0x0001" optional="false" introducedIn="zcl-6.0-15-02017-001">cluster revision</attribute>
-    <attribute side="client" code="0xFFFC" define="FEATURE_MAP_CLIENT" type="INT32U" writable="false" default="0x0000" optional="true">feature map</attribute>
-    <attribute side="server" code="0xFFFD" define="CLUSTER_REVISION_SERVER" type="INT16U" min="0x0001" max="0xFFFE" writable="false" default="0x0001" optional="false" introducedIn="zcl-6.0-15-02017-001">cluster revision</attribute>
-    <attribute side="server" code="0xFFFC" define="FEATURE_MAP_SERVER" type="INT32U" writable="false" default="0x0000" optional="true">feature map</attribute>
   </global>
   <cluster singleton="true">
     <name>Power Configuration</name>
@@ -492,33 +488,6 @@ limitations under the License.
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneCount" type="INT8U" arrayLength="true" presentIf="status==0"/>
       <arg name="sceneList" type="INT8U" array="true" presentIf="status==0"/>
-    </command>
-  </cluster>
-  <cluster>
-    <name>On/off</name>
-    <domain>General</domain>
-    <description>Attributes and commands for switching devices between 'On' and 'Off' states.</description>
-    <code>0x0006</code>
-    <define>ON_OFF_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="ON_OFF" type="BOOLEAN" min="0x00" max="0x01" writable="false" reportable="true" default="0x00" optional="false">on/off</attribute>
-    <attribute side="server" code="0x4003" define="START_UP_ON_OFF" type="ENUM8" min="0x00" max="0xFF" writable="true" optional="true" introducedIn="l&amp;o-1.0-15-0014-04">start up on off</attribute>
-    <command source="client" code="0x00" name="Off" optional="false" cli="zcl on-off off">
-      <description>
-        Command description for Off
-      </description>
-    </command>
-    <command source="client" code="0x01" name="On" optional="false" cli="zcl on-off on">
-      <description>
-        Command description for On
-      </description>
-    </command>
-    <command source="client" code="0x02" name="Toggle" optional="false" cli="zcl on-off toggle">
-      <description>
-        Command description for Toggle
-      </description>
     </command>
   </cluster>
   <cluster>

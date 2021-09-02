@@ -29,11 +29,11 @@
 #include <type_traits>
 
 #include <app/util/basic-types.h>
-#include <core/CHIPCallback.h>
-#include <core/CHIPConfig.h>
-#include <core/CHIPError.h>
-#include <core/CHIPTLV.h>
-#include <support/DLLUtil.h>
+#include <lib/core/CHIPCallback.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 namespace app {
@@ -95,7 +95,7 @@ private:
 
     struct TLVFilterItem
     {
-        ResponseCallbackInfo info = { kAnyNodeId, 0 };
+        ResponseCallbackInfo info = { kPlaceholderNodeId, 0 };
         TLVDataFilter filter      = nullptr;
     };
 

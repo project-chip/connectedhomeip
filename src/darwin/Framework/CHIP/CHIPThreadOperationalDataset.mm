@@ -18,8 +18,8 @@
 #import "CHIPThreadOperationalDataset.h"
 
 #include "CHIPLogging.h"
-#include <support/Span.h>
-#include <support/ThreadOperationalDataset.h>
+#include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
 
 size_t const CHIPSizeThreadNetworkName = chip::Thread::kSizeNetworkName;
 size_t const CHIPSizeThreadExtendedPanId = chip::Thread::kSizeExtendedPanId;
@@ -96,7 +96,8 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
     if (valuePtr == nullptr) {
         return NO;
     }
-    _cppThreadOperationalDataset.SetPanId(*valuePtr);
+    // The underlying CPP class assumes Big Endianness for the panID
+    _cppThreadOperationalDataset.SetPanId(CFSwapInt16HostToBig(*valuePtr));
 
     return YES;
 }
@@ -108,6 +109,38 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
         return NO;
     }
     return YES;
+}
+
+- (nullable instancetype)initWithData:(NSData *)data
+{
+    chip::ByteSpan span = chip::ByteSpan((uint8_t *) data.bytes, data.length);
+    auto dataset = chip::Thread::OperationalDataset();
+    CHIP_ERROR error = dataset.Init(span);
+    if (error != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Failed to parse data, cannot construct Operational Dataset. %s", chip::ErrorStr(error));
+        return nil;
+    }
+    // len+1 for null termination
+    char networkName[CHIPSizeThreadNetworkName + 1];
+    uint8_t pskc[CHIPSizeThreadPSKc];
+    uint8_t extendedPANID[CHIPSizeThreadExtendedPanId];
+    uint8_t masterKey[CHIPSizeThreadMasterKey];
+    uint16_t panID;
+    uint16_t channel;
+    dataset.GetNetworkName(networkName);
+    dataset.GetExtendedPanId(extendedPANID);
+    dataset.GetMasterKey(masterKey);
+    dataset.GetPSKc(pskc);
+    dataset.GetPanId(panID);
+    dataset.GetChannel(channel);
+    panID = CFSwapInt16BigToHost(panID);
+
+    return [self initWithNetworkName:[NSString stringWithUTF8String:networkName]
+                       extendedPANID:[NSData dataWithBytes:extendedPANID length:CHIPSizeThreadExtendedPanId]
+                           masterKey:[NSData dataWithBytes:masterKey length:CHIPSizeThreadMasterKey]
+                                PSKc:[NSData dataWithBytes:pskc length:CHIPSizeThreadPSKc]
+                             channel:channel
+                               panID:[NSData dataWithBytes:&panID length:sizeof(uint16_t)]];
 }
 
 - (NSData *)asData

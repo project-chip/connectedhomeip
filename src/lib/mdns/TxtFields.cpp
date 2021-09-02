@@ -19,15 +19,18 @@
 
 #include <algorithm>
 #include <cctype>
+#include <climits>
 #include <cstdio>
 #include <inttypes.h>
 #include <limits>
 #include <stdlib.h>
 #include <string.h>
 
-#include <mdns/Resolver.h>
-#include <support/BytesToHex.h>
-#include <support/CHIPMemString.h>
+#include <lib/mdns/Advertiser.h>
+#include <lib/mdns/Resolver.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace Mdns {
@@ -56,34 +59,47 @@ bool IsKey(const ByteSpan & key, const char * desired)
     return true;
 }
 
+uint32_t MakeU32FromAsciiDecimal(const ByteSpan & val, uint32_t defaultValue = 0)
+{
+    // +1 because `digits10` means the number of decimal digits that fit in `uint32_t`,
+    // not how many digits are enough to represent any `uint32_t`
+    // +1 for null-terminator
+    char nullTerminatedValue[std::numeric_limits<uint32_t>::digits10 + 2];
+
+    // value is too long to store `uint32_t`
+    if (val.size() >= sizeof(nullTerminatedValue))
+        return defaultValue;
+
+    // value contains leading zeros
+    if (val.size() > 1 && *val.data() == static_cast<uint8_t>('0'))
+        return defaultValue;
+
+    Platform::CopyString(nullTerminatedValue, sizeof(nullTerminatedValue), val);
+
+    char * endPtr;
+    unsigned long num = strtoul(nullTerminatedValue, &endPtr, 10);
+
+    if (endPtr > nullTerminatedValue && *endPtr == '\0' && num != ULONG_MAX && CanCastTo<uint32_t>(num))
+        return static_cast<uint32_t>(num);
+
+    return defaultValue;
+}
+
 uint16_t MakeU16FromAsciiDecimal(const ByteSpan & val)
 {
-    // Largest u16 number if 65536, so 5 chars.
-    constexpr size_t kMaxUint16StrLen = 5;
-    // Add a space for null
-    char temp[kMaxUint16StrLen + 1];
-    if (val.size() > kMaxUint16StrLen)
-    {
-        return 0;
-    }
-    Platform::CopyString(temp, sizeof(temp), val);
-    char * end;
-    unsigned long num = strtoul(temp, &end, 10);
-    if (num > std::numeric_limits<uint16_t>::max())
-    {
-        return 0;
-    }
-    return static_cast<uint16_t>(num);
+    const uint32_t num = MakeU32FromAsciiDecimal(val);
+    return CanCastTo<uint16_t>(num) ? static_cast<uint16_t>(num) : 0;
 }
 
 uint8_t MakeU8FromAsciiDecimal(const ByteSpan & val)
 {
-    uint16_t u16 = MakeU16FromAsciiDecimal(val);
-    if (u16 > std::numeric_limits<uint8_t>::max())
-    {
-        return 0x0;
-    }
-    return static_cast<uint8_t>(u16);
+    const uint32_t num = MakeU32FromAsciiDecimal(val);
+    return CanCastTo<uint8_t>(num) ? static_cast<uint8_t>(num) : 0;
+}
+
+bool MakeBoolFromAsciiDecimal(const ByteSpan & val)
+{
+    return val.size() == 1 && static_cast<char>(*val.data()) == '1';
 }
 
 size_t GetPlusSignIdx(const ByteSpan & value)
@@ -119,7 +135,7 @@ uint16_t GetVendor(const ByteSpan & value)
     return MakeU16FromAsciiDecimal(ByteSpan(value.data(), plussign));
 }
 
-uint16_t GetLongDisriminator(const ByteSpan & value)
+uint16_t GetLongDiscriminator(const ByteSpan & value)
 {
     return MakeU16FromAsciiDecimal(value);
 }
@@ -160,6 +176,16 @@ void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction)
     Platform::CopyString(pairingInstruction, kMaxPairingInstructionLen + 1, value);
 }
 
+uint32_t GetRetryInterval(const ByteSpan & value)
+{
+    const auto retryInterval = MakeU32FromAsciiDecimal(value, kUndefinedRetryInterval);
+
+    if (retryInterval != kUndefinedRetryInterval && retryInterval <= kMaxRetryInterval)
+        return retryInterval;
+
+    return kUndefinedRetryInterval;
+}
+
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 {
     if (IsKey(key, "D"))
@@ -198,6 +224,18 @@ TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
     {
         return TxtFieldKey::kPairingHint;
     }
+    else if (IsKey(key, "CRI"))
+    {
+        return TxtFieldKey::kMrpRetryIntervalIdle;
+    }
+    else if (IsKey(key, "CRA"))
+    {
+        return TxtFieldKey::kMrpRetryIntervalActive;
+    }
+    else if (IsKey(key, "T"))
+    {
+        return TxtFieldKey::kTcpSupport;
+    }
     else
     {
         return TxtFieldKey::kUnknown;
@@ -206,40 +244,67 @@ TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 
 } // namespace Internal
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredNodeData * nodeData)
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredNodeData & nodeData)
 {
     Internal::TxtFieldKey keyType = Internal::GetTxtFieldKey(key);
     switch (keyType)
     {
     case Internal::TxtFieldKey::kLongDiscriminator:
-        nodeData->longDiscriminator = Internal::GetLongDisriminator(val);
+        nodeData.longDiscriminator = Internal::GetLongDiscriminator(val);
         break;
     case Internal::TxtFieldKey::kVendorProduct:
-        nodeData->vendorId  = Internal::GetVendor(val);
-        nodeData->productId = Internal::GetProduct(val);
+        nodeData.vendorId  = Internal::GetVendor(val);
+        nodeData.productId = Internal::GetProduct(val);
         break;
     case Internal::TxtFieldKey::kAdditionalPairing:
-        nodeData->additionalPairing = Internal::GetAdditionalPairing(val);
+        nodeData.additionalPairing = Internal::GetAdditionalPairing(val);
         break;
     case Internal::TxtFieldKey::kCommissioningMode:
-        nodeData->commissioningMode = Internal::GetCommissioningMode(val);
+        nodeData.commissioningMode = Internal::GetCommissioningMode(val);
         break;
     case Internal::TxtFieldKey::kDeviceType:
-        nodeData->deviceType = Internal::GetDeviceType(val);
+        nodeData.deviceType = Internal::GetDeviceType(val);
         break;
     case Internal::TxtFieldKey::kDeviceName:
-        Internal::GetDeviceName(val, nodeData->deviceName);
+        Internal::GetDeviceName(val, nodeData.deviceName);
         break;
     case Internal::TxtFieldKey::kRotatingDeviceId:
-        Internal::GetRotatingDeviceId(val, nodeData->rotatingId, &nodeData->rotatingIdLen);
+        Internal::GetRotatingDeviceId(val, nodeData.rotatingId, &nodeData.rotatingIdLen);
         break;
     case Internal::TxtFieldKey::kPairingInstruction:
-        Internal::GetPairingInstruction(val, nodeData->pairingInstruction);
+        Internal::GetPairingInstruction(val, nodeData.pairingInstruction);
         break;
     case Internal::TxtFieldKey::kPairingHint:
-        nodeData->pairingHint = Internal::GetPairingHint(val);
+        nodeData.pairingHint = Internal::GetPairingHint(val);
         break;
-    case Internal::TxtFieldKey::kUnknown:
+    case Internal::TxtFieldKey::kMrpRetryIntervalIdle:
+        nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(val);
+        break;
+    case Internal::TxtFieldKey::kMrpRetryIntervalActive:
+        nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(val);
+        break;
+    case Internal::TxtFieldKey::kTcpSupport:
+        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(val);
+        break;
+    default:
+        break;
+    }
+}
+
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedNodeData & nodeData)
+{
+    switch (Internal::GetTxtFieldKey(key))
+    {
+    case Internal::TxtFieldKey::kMrpRetryIntervalIdle:
+        nodeData.mMrpRetryIntervalIdle = Internal::GetRetryInterval(value);
+        break;
+    case Internal::TxtFieldKey::kMrpRetryIntervalActive:
+        nodeData.mMrpRetryIntervalActive = Internal::GetRetryInterval(value);
+        break;
+    case Internal::TxtFieldKey::kTcpSupport:
+        nodeData.mSupportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+        break;
+    default:
         break;
     }
 }

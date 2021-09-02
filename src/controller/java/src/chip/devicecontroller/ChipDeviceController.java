@@ -20,6 +20,9 @@ package chip.devicecontroller;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.util.Log;
+import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
+import chip.devicecontroller.mdns.ChipMdnsCallback;
+import chip.devicecontroller.mdns.ServiceResolver;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -30,8 +33,9 @@ public class ChipDeviceController {
   private BluetoothGatt bleGatt;
   private CompletionListener completionListener;
 
-  public ChipDeviceController() {
-    deviceControllerPtr = newDeviceController();
+  public ChipDeviceController(
+      KeyValueStoreManager manager, ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback) {
+    deviceControllerPtr = newDeviceController(manager, resolver, chipMdnsCallback);
   }
 
   public void setCompletionListener(CompletionListener listener) {
@@ -82,6 +86,12 @@ public class ChipDeviceController {
     }
   }
 
+  public void pairDeviceWithAddress(
+      long deviceId, String address, int port, int discriminator, long pinCode, byte[] csrNonce) {
+    pairDeviceWithAddress(
+        deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce);
+  }
+
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
   }
@@ -90,8 +100,21 @@ public class ChipDeviceController {
     pairTestDeviceWithoutSecurity(deviceControllerPtr, ipAddress);
   }
 
-  public long getDevicePointer(long deviceId) {
-    return getDevicePointer(deviceControllerPtr, deviceId);
+  /**
+   * Returns a pointer to a device with the specified nodeId. The device is not guaranteed to be
+   * connected.
+   *
+   * <p>TODO(#8443): This method and getConnectedDevicePointer() could benefit from ChipDevice
+   * abstraction to hide the pointer passing.
+   */
+  public long getDevicePointer(long nodeId) {
+    return getDevicePointer(deviceControllerPtr, nodeId);
+  }
+
+  /** Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error. */
+  public void getConnectedDevicePointer(long nodeId, GetConnectedDeviceCallback callback) {
+    GetConnectedDeviceCallbackJni jniCallback = new GetConnectedDeviceCallbackJni(callback);
+    getConnectedDevicePointer(deviceControllerPtr, nodeId, jniCallback.getCallbackHandle());
   }
 
   public boolean disconnectDevice(long deviceId) {
@@ -118,21 +141,21 @@ public class ChipDeviceController {
     }
   }
 
-  public void onOpCSRGenerationComplete(byte[] errorCode) {
+  public void onCommissioningComplete(long nodeId, int errorCode) {
     if (completionListener != null) {
-      completionListener.onOpCSRGenerationComplete(errorCode);
+      completionListener.onCommissioningComplete(nodeId, errorCode);
+    }
+  }
+
+  public void onOpCSRGenerationComplete(byte[] csr) {
+    if (completionListener != null) {
+      completionListener.onOpCSRGenerationComplete(csr);
     }
   }
 
   public void onPairingDeleted(int errorCode) {
     if (completionListener != null) {
       completionListener.onPairingDeleted(errorCode);
-    }
-  }
-
-  public void onNetworkCommissioningComplete(int errorCode) {
-    if (completionListener != null) {
-      completionListener.onNetworkCommissioningComplete(errorCode);
     }
   }
 
@@ -184,8 +207,8 @@ public class ChipDeviceController {
     return getIpAddress(deviceControllerPtr, deviceId);
   }
 
-  public void updateAddress(long deviceId, String address, int port) {
-    updateAddress(deviceControllerPtr, deviceId, address, port);
+  public void updateDevice(long fabricId, long deviceId) {
+    updateDevice(deviceControllerPtr, fabricId, deviceId);
   }
 
   public void sendMessage(long deviceId, String message) {
@@ -196,10 +219,6 @@ public class ChipDeviceController {
     sendCommand(deviceControllerPtr, deviceId, command, value);
   }
 
-  public void enableThreadNetwork(long deviceId, byte[] operationalDataset) {
-    enableThreadNetwork(deviceControllerPtr, deviceId, operationalDataset);
-  }
-
   public boolean openPairingWindow(long deviceId, int duration) {
     return openPairingWindow(deviceControllerPtr, deviceId, duration);
   }
@@ -208,14 +227,27 @@ public class ChipDeviceController {
     return isActive(deviceControllerPtr, deviceId);
   }
 
-  private native long newDeviceController();
+  private native long newDeviceController(
+      KeyValueStoreManager manager, ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
 
   private native void pairDevice(
       long deviceControllerPtr, long deviceId, int connectionId, long pinCode, byte[] csrNonce);
 
+  private native void pairDeviceWithAddress(
+      long deviceControllerPtr,
+      long deviceId,
+      String address,
+      int port,
+      int discriminator,
+      long pinCode,
+      byte[] csrNonce);
+
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 
   private native long getDevicePointer(long deviceControllerPtr, long deviceId);
+
+  private native void getConnectedDevicePointer(
+      long deviceControllerPtr, long deviceId, long callbackHandle);
 
   private native void pairTestDeviceWithoutSecurity(long deviceControllerPtr, String ipAddress);
 
@@ -225,22 +257,16 @@ public class ChipDeviceController {
 
   private native String getIpAddress(long deviceControllerPtr, long deviceId);
 
-  private native void updateAddress(
-      long deviceControllerPtr, long deviceId, String address, int port);
+  private native void updateDevice(long deviceControllerPtr, long fabricId, long deviceId);
 
   private native void sendMessage(long deviceControllerPtr, long deviceId, String message);
 
   private native void sendCommand(
       long deviceControllerPtr, long deviceId, ChipCommandType command, int value);
 
-  private native void enableThreadNetwork(
-      long deviceControllerPtr, long deviceId, byte[] operationalDataset);
-
   private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
-
-  public static native void setKeyValueStoreManager(KeyValueStoreManager manager);
 
   static {
     System.loadLibrary("CHIPController");
@@ -274,8 +300,8 @@ public class ChipDeviceController {
     /** Notifies the deletion of pairing session. */
     void onPairingDeleted(int errorCode);
 
-    /** Notifies the completion of network commissioning */
-    void onNetworkCommissioningComplete(int errorCode);
+    /** Notifies the completion of commissioning. */
+    void onCommissioningComplete(long nodeId, int errorCode);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();
@@ -287,6 +313,6 @@ public class ChipDeviceController {
     void onError(Throwable error);
 
     /** Notifies the Commissioner when the OpCSR for the Comissionee is generated. */
-    void onOpCSRGenerationComplete(byte[] errorCode);
+    void onOpCSRGenerationComplete(byte[] csr);
   }
 }

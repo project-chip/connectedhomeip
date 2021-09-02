@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ name: Build example - Mbed OS
 on:
     push:
     pull_request:
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -24,25 +25,21 @@ concurrency:
 
 jobs:
     mbedos:
-        strategy:
-            fail-fast: False
-            matrix:
-                EXAMPLE_APP:    [lock-app, lighting-app]
-                EXAMPLE_TARGET: [CY8CPROTO_062_4343W]
-        
-        name: "${{matrix.EXAMPLE_APP}}: ${{matrix.EXAMPLE_TARGET}}"
+        name: Mbed OS examples building
+        timeout-minutes: 60
         
         env:
             BUILD_TYPE: mbedos
-            EXAMPLE_PROFILE: release
+            APP_PROFILE: release
+            APP_TARGET: CY8CPROTO_062_4343W
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: connectedhomeip/chip-build-mbed-os:latest
             volumes:
                 - "/tmp/output_binaries:/tmp/output_binaries"
-            
 
         steps:
             - name: Checkout
@@ -50,16 +47,36 @@ jobs:
               with:
                   submodules: true
 
-            - name: Build example
-              run: scripts/examples/mbed_example.sh -a=${{matrix.EXAMPLE_APP}} -b=${{matrix.EXAMPLE_TARGET}} -p=$EXAMPLE_PROFILE
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
+
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }}
+              with:
+                  name: bootstrap-logs
+                  path: |
+                   .environment/gn_out/.ninja_log
+                   .environment/pigweed-venv/*.log
+
+            - name: Build lock-app example
+              timeout-minutes: 10
+              run: scripts/examples/mbed_example.sh -a=lock-app -b=$APP_TARGET -p=$APP_PROFILE
+
+            - name: Build lighting-app example
+              timeout-minutes: 10
+              run: scripts/examples/mbed_example.sh -a=lighting-app -b=$APP_TARGET -p=$APP_PROFILE
 
             - name: Copy aside build products
               run: |
-                  mkdir -p example_binaries/$BUILD_TYPE-build/
-                  cp examples/${{matrix.EXAMPLE_APP}}/mbed/build-${{matrix.EXAMPLE_TARGET}}/$EXAMPLE_PROFILE/chip-mbed-${{matrix.EXAMPLE_APP}}-example.hex \
-                     example_binaries/$BUILD_TYPE-build/${{matrix.EXAMPLE_APP}}_${{matrix.EXAMPLE_TARGET}}_$EXAMPLE_PROFILE.hex
+                  mkdir -p /tmp/output_binaries/$BUILD_TYPE-build
+                  cp examples/lock-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-lock-app-example.hex \
+                     /tmp/output_binaries/$BUILD_TYPE-build/lock-app-$APP_TARGET-$APP_PROFILE.hex
+                  cp examples/lighting-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-lighting-app-example.hex \
+                     /tmp/output_binaries/$BUILD_TYPE-build/lighting-app-$APP_TARGET-$APP_PROFILE.hex
 
-            - name: Binary artifact suffix
+            - name: Binary artifacts suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
               with:
@@ -67,14 +84,10 @@ jobs:
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
 
-            - name: Copy aside binaries
-              run: |
-                  cp -r example_binaries/$BUILD_TYPE-build/ /tmp/output_binaries/
-
-            - name: Uploading Binaries
+            - name: Uploading binaries as artifacts
               uses: actions/upload-artifact@v1
               with:
                   name:
-                      ${{ env.BUILD_TYPE }}-${{matrix.EXAMPLE_APP}}-example-${{matrix.EXAMPLE_TARGET}}-${{ env.EXAMPLE_PROFILE}}-build-${{
+                      ${{ env.BUILD_TYPE }}-binaries-${{env.APP_TARGET}}-${{ env.APP_PROFILE}}-build-${{
                       steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build/${{matrix.EXAMPLE_APP}}_${{matrix.EXAMPLE_TARGET}}_${{ env.EXAMPLE_PROFILE }}.hex
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build

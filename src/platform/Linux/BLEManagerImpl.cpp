@@ -24,10 +24,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <new>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
 
 #include <cassert>
 #include <type_traits>
@@ -54,7 +54,7 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x12 } };
 
-void HandleConnectTimeout(chip::System::Layer *, void * apEndpoint, CHIP_ERROR)
+void HandleConnectTimeout(chip::System::Layer *, void * apEndpoint)
 {
     assert(apEndpoint != nullptr);
 

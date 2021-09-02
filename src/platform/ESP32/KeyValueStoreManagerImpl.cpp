@@ -21,6 +21,7 @@
  *          Platform-specific key value storage implementation for ESP32
  */
 
+#include <platform/ESP32/ScopedNvsHandle.h>
 #include <platform/KeyValueStoreManager.h>
 
 #include <algorithm>
@@ -28,7 +29,7 @@
 
 #include "nvs.h"
 #include "nvs_flash.h"
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -39,94 +40,51 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    nvs_handle handle;
-    bool needClose = false;
+    VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (!value)
-    {
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    if (offset_bytes > 0)
-    {
-        // Offset and partial reads are not supported in nvs, for now just return NOT_IMPLEMENTED. Support can be added in the
-        // future if this is needed.
-        ExitNow(err = CHIP_ERROR_NOT_IMPLEMENTED);
-    }
+    // Offset and partial reads are not supported in nvs, for now just return NOT_IMPLEMENTED. Support can be added in the
+    // future if this is needed.
+    VerifyOrReturnError(offset_bytes == 0, CHIP_ERROR_NOT_IMPLEMENTED);
 
-    err = nvs_open(kNamespace, NVS_READONLY, &handle);
-    SuccessOrExit(err);
-    needClose = true;
+    Internal::ScopedNvsHandle handle;
+    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READONLY));
+    ReturnMappedErrorOnFailure(nvs_get_blob(handle, key, value, &value_size));
 
-    err = nvs_get_blob(handle, key, value, &value_size);
-    SuccessOrExit(err);
     if (read_bytes_size)
     {
         *read_bytes_size = value_size;
     }
 
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    nvs_handle handle;
-    bool needClose = false;
+    VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (!value)
-    {
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    err = nvs_open(kNamespace, NVS_READWRITE, &handle);
-    SuccessOrExit(err);
-    needClose = true;
+    Internal::ScopedNvsHandle handle;
+    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE));
 
-    err = nvs_set_blob(handle, key, value, value_size);
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(nvs_set_blob(handle, key, value, value_size));
 
     // Commit the value to the persistent store.
-    err = nvs_commit(handle);
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(nvs_commit(handle));
 
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    nvs_handle handle;
-    bool needClose = false;
+    Internal::ScopedNvsHandle handle;
 
-    err = nvs_open(kNamespace, NVS_READWRITE, &handle);
-    SuccessOrExit(err);
-    needClose = true;
+    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE));
 
-    err = nvs_erase_key(handle, key);
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(nvs_erase_key(handle, key));
 
     // Commit the value to the persistent store.
-    err = nvs_commit(handle);
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(nvs_commit(handle));
 
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace PersistedStorage

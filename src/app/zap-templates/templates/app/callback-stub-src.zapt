@@ -1,7 +1,7 @@
 {{> header}}
 
-#include <app/common/gen/callback.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <lib/support/Span.h>
 
 using namespace chip;
@@ -13,7 +13,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     {
     {{#all_user_clusters_names}}
      case ZCL_{{asDelimitedMacro define}}_ID :
-        emberAf{{asCamelCased name false}}ClusterInitCallback(endpoint);
+        emberAf{{asUpperCamelCase name}}ClusterInitCallback(endpoint);
         break;
     {{/all_user_clusters_names}}
     default:
@@ -23,7 +23,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 }
 
 {{#all_user_clusters_names}}
-void __attribute__((weak)) emberAf{{asCamelCased name false}}ClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAf{{asUpperCamelCase name}}ClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -419,23 +419,6 @@ EmberAfStatus __attribute__((weak)) emberAfExternalAttributeReadCallback(
                                                    uint8_t * buffer, uint16_t maxReadLength, int32_t index)
 {
     return EMBER_ZCL_STATUS_FAILURE;
-}
-
-/** @brief Write Attributes Response
- *
- * This function is called by the application framework when a Write Attributes
- * Response command is received from an external device.  The application should
- * return true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of write attribute status records.
- * Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool __attribute__((weak)) emberAfWriteAttributesResponseCallback(
-    ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
 }
 
 /** @brief External Attribute Write

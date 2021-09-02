@@ -16,8 +16,8 @@
  */
 
 #import "CHIPDevice_Internal.h"
+#import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
-#import <CHIP/CHIPError.h>
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
 
@@ -57,8 +57,8 @@
 
     chip::SetupPayload setupPayload;
 
-    if (duration > UINT32_MAX) {
-        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT32_MAX);
+    if (duration > UINT16_MAX) {
+        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -67,11 +67,11 @@
 
     [self.lock lock];
     err = self.cppDevice->OpenPairingWindow(
-        (uint32_t) duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
+        (uint16_t) duration, chip::Controller::Device::CommissioningWindowOption::kOriginalSetupCode, setupPayload);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, Open Pairing Window failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
@@ -90,8 +90,8 @@
 
     chip::SetupPayload setupPayload;
 
-    if (duration > UINT32_MAX) {
-        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT32_MAX);
+    if (duration > UINT16_MAX) {
+        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -113,11 +113,11 @@
 
     [self.lock lock];
     err = self.cppDevice->OpenPairingWindow(
-        (uint32_t) duration, chip::Controller::Device::PairingWindowOption::kTokenWithProvidedPIN, setupPayload);
+        (uint16_t) duration, chip::Controller::Device::CommissioningWindowOption::kTokenWithProvidedPIN, setupPayload);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, Open Pairing Window failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }

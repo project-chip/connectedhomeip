@@ -18,8 +18,8 @@
 
 #include "AppTask.h"
 
+#include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
 
 #include <kernel.h>
 
@@ -31,49 +31,49 @@ using namespace ::chip::DeviceLayer;
 
 int main(void)
 {
-    int ret = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ret = chip::Platform::MemoryInit();
-    if (ret != CHIP_NO_ERROR)
+    err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("Platform::MemoryInit() failed");
         goto exit;
     }
 
     LOG_INF("Init CHIP stack");
-    ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
+    err = PlatformMgr().InitChipStack();
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("PlatformMgr().InitChipStack() failed");
         goto exit;
     }
 
     LOG_INF("Starting CHIP task");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
+    err = PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
         goto exit;
     }
 
     LOG_INF("Init Thread stack");
-    ret = ThreadStackMgr().InitThreadStack();
-    if (ret != CHIP_NO_ERROR)
+    err = ThreadStackMgr().InitThreadStack();
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("ThreadStackMgr().InitThreadStack() failed");
         goto exit;
     }
 
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-    if (ret != CHIP_NO_ERROR)
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
         goto exit;
     }
 
-    ret = GetAppTask().StartApp();
+    err = GetAppTask().StartApp();
 
 exit:
-    LOG_ERR("Exited with code %d", ret);
-    return ret;
+    LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
+    return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

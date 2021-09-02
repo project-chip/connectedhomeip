@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/src/platform/device.gni")
 
 source_set("platform_header") {
@@ -28,6 +29,7 @@ static_library("mdns") {
 
   sources = [
     "Advertiser.h",
+    "MdnsCache.h",
     "Resolver.h",
     "ServiceNaming.cpp",
     "ServiceNaming.h",

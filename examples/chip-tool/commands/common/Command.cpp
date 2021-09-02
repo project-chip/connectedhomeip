@@ -25,12 +25,12 @@
 #include <sys/types.h>
 
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/BytesToHex.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 bool Command::InitArguments(int argc, char ** argv)
 {
@@ -157,6 +157,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
+    case ArgumentType::Boolean:
     case ArgumentType::Number_uint8: {
         uint8_t * value = reinterpret_cast<uint8_t *>(arg.value);
 
@@ -413,7 +414,7 @@ void Command::WaitForResponse(uint16_t seconds)
 
 #else // CONFIG_USE_SEPARATE_EVENTLOOP
 
-static void OnResponseTimeout(chip::System::Layer *, void *, CHIP_ERROR)
+static void OnResponseTimeout(chip::System::Layer *, void *)
 {
     ChipLogError(chipTool, "No response from device");
 
@@ -422,16 +423,10 @@ static void OnResponseTimeout(chip::System::Layer *, void *, CHIP_ERROR)
 
 CHIP_ERROR Command::ScheduleWaitForResponse(uint16_t seconds)
 {
-    chip::System::Timer * timer = nullptr;
-
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer.NewTimer(timer);
-    if (err == CHIP_NO_ERROR)
+    CHIP_ERROR err = chip::DeviceLayer::SystemLayer.StartTimer(seconds * 1000, OnResponseTimeout, this);
+    if (err != CHIP_NO_ERROR)
     {
-        timer->Start(seconds * 1000, OnResponseTimeout, this);
-    }
-    else
-    {
-        ChipLogError(chipTool, "Failed to allocate timer");
+        ChipLogError(chipTool, "Failed to allocate timer %" CHIP_ERROR_FORMAT, err.Format());
     }
     return err;
 }

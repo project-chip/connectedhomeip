@@ -30,10 +30,11 @@
 #pragma once
 
 #include <controller/OperationalCredentialsDelegate.h>
-#include <core/CHIPError.h>
-#include <core/CHIPPersistentStorageDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace Controller {
@@ -43,12 +44,17 @@ class DLL_EXPORT ExampleOperationalCredentialsIssuer : public OperationalCredent
 public:
     virtual ~ExampleOperationalCredentialsIssuer() {}
 
-    CHIP_ERROR GenerateNodeOperationalCertificate(const Optional<NodeId> & nodeId, FabricId fabricId, const ByteSpan & csr,
-                                                  const ByteSpan & DAC, Callback::Callback<NOCGenerated> * onNOCGenerated) override;
+    CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
+                                const ByteSpan & PAI, const ByteSpan & PAA,
+                                Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
-    CHIP_ERROR GetIntermediateCACertificate(FabricId fabricId, MutableByteSpan & outCert) override;
+    void SetNodeIdForNextNOCRequest(NodeId nodeId) override
+    {
+        mNextRequestedNodeId = nodeId;
+        mNodeIdRequested     = true;
+    }
 
-    CHIP_ERROR GetRootCACertificate(FabricId fabricId, MutableByteSpan & outCert) override;
+    void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
 
     /**
      * @brief Initialize the issuer with the keypair in the storage.
@@ -69,6 +75,23 @@ public:
 
     void SetCertificateValidityPeriod(uint32_t validity) { mValidity = validity; }
 
+    /**
+     * Generate a random operational node id.
+     *
+     * @param[out] aNodeId where to place the generated id.
+     *
+     * On error no guarantees are made about the state of aNodeId.
+     */
+    static CHIP_ERROR GetRandomOperationalNodeId(NodeId * aNodeId);
+
+    /**
+     * This is a utility method that generates a operational certificate chain for the given public key.
+     * This method is expected to be called once all the checks (e.g. device attestation, CSR verification etc)
+     * have been completed, or not required (e.g. for self trusted devices such as commissioner apps).
+     */
+    CHIP_ERROR GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId, const Crypto::P256PublicKey & ephemeralKey,
+                                               MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc);
+
 private:
     Crypto::P256Keypair mIssuer;
     Crypto::P256Keypair mIntermediateIssuer;
@@ -80,7 +103,12 @@ private:
     // By default, let's set validity to 10 years
     uint32_t mValidity = 365 * 24 * 60 * 60 * 10;
 
-    NodeId mNextAvailableNodeId = 1;
+    NodeId mNextAvailableNodeId          = 1;
+    PersistentStorageDelegate * mStorage = nullptr;
+
+    NodeId mNextRequestedNodeId = 1;
+    FabricId mNextFabricId      = 0;
+    bool mNodeIdRequested       = false;
 };
 
 } // namespace Controller

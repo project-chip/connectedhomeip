@@ -23,8 +23,8 @@
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+#include <lib/support/logging/CHIPLogging.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 
@@ -106,7 +106,7 @@ public:
     const PASEVerifier & GetPASEVerifier() const { return mPASEVerifier; }
     RendezvousParameters & SetPASEVerifier(PASEVerifier & verifier)
     {
-        memmove(mPASEVerifier, verifier, sizeof(verifier));
+        memmove(&mPASEVerifier, &verifier, sizeof(verifier));
         mHasPASEVerifier = true;
         return *this;
     }

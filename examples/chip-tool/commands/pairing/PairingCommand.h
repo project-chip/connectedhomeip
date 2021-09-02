@@ -20,13 +20,13 @@
 
 #include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
-#include "gen/CHIPClientCallbacks.h"
-#include "gen/CHIPClusters.h"
+#include <zap-generated/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClusters.h>
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/Span.h>
 
 enum class PairingMode
 {
@@ -38,6 +38,7 @@ enum class PairingMode
     SoftAP,
     Ethernet,
     OnNetwork,
+    OpenCommissioningWindow,
 };
 
 enum class PairingNetworkType
@@ -102,6 +103,12 @@ public:
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             break;
+        case PairingMode::OpenCommissioningWindow:
+            AddArgument("option", 0, UINT8_MAX, &mCommissioningWindowOption);
+            AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+            AddArgument("iteration", 0, UINT16_MAX, &mIteration);
+            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            break;
         }
     }
 
@@ -132,6 +139,8 @@ private:
     CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
     CHIP_ERROR PairWithoutSecurity(NodeId remoteId, PeerAddress address);
     CHIP_ERROR Unpair(NodeId remoteId);
+    CHIP_ERROR OpenCommissioningWindow(NodeId remoteId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+                                       uint8_t option);
 
     void InitCallbacks();
     CHIP_ERROR SetupNetwork();
@@ -149,8 +158,11 @@ private:
     NodeId mRemoteId;
     uint16_t mRemotePort;
     uint64_t mFabricId;
+    uint16_t mTimeout;
+    uint16_t mIteration;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
+    uint8_t mCommissioningWindowOption;
     chip::ByteSpan mOperationalDataset;
     uint8_t mExtendedPanId[chip::Thread::kSizeExtendedPanId];
     chip::ByteSpan mSSID;

@@ -27,18 +27,18 @@
 
 #include <utility>
 
-#include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
 #include <protocols/secure_channel/Constants.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/PairingSession.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>
-#include <transport/SecureSessionHandle.h>
+#include <transport/SessionHandle.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
@@ -141,8 +141,8 @@ public:
      * @param isDuplicate   The message is a duplicate of previously received message
      * @param msgBuf        The received message
      */
-    virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   SecureSessionHandle session, const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
+    virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SessionHandle session,
+                                   const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                                    System::PacketBufferHandle && msgBuf)
     {}
 
@@ -161,7 +161,7 @@ public:
      *
      * @param session The handle to the secure session
      */
-    virtual void OnNewConnection(SecureSessionHandle session) {}
+    virtual void OnNewConnection(SessionHandle session) {}
 
     /**
      * @brief
@@ -169,7 +169,7 @@ public:
      *
      * @param session The handle to the secure session
      */
-    virtual void OnConnectionExpired(SecureSessionHandle session) {}
+    virtual void OnConnectionExpired(SessionHandle session) {}
 
     virtual ~SecureSessionMgrDelegate() {}
 };
@@ -191,16 +191,16 @@ public:
      *    3. Encode the packet header and prepend it to message.
      *   Returns a encrypted message in encryptedMessage.
      */
-    CHIP_ERROR BuildEncryptedMessagePayload(SecureSessionHandle session, PayloadHeader & payloadHeader,
+    CHIP_ERROR BuildEncryptedMessagePayload(SessionHandle session, PayloadHeader & payloadHeader,
                                             System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle & encryptedMessage);
 
     /**
      * @brief
      *   Send a prepared message to a currently connected peer.
      */
-    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage);
+    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage);
 
-    Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
+    Transport::PeerConnectionState * GetPeerConnectionState(SessionHandle session);
 
     /**
      * @brief
@@ -221,10 +221,10 @@ public:
      *   peer node.
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
-                          SecureSession::SessionRole direction, Transport::AdminId admin);
+                          SecureSession::SessionRole direction, FabricIndex fabric);
 
-    void ExpirePairing(SecureSessionHandle session);
-    void ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin);
+    void ExpirePairing(SessionHandle session);
+    void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
 
     /**
      * @brief
@@ -236,14 +236,13 @@ public:
      * @brief
      *   Initialize a Secure Session Manager
      *
-     * @param localNodeId           Node id for the current node
      * @param systemLayer           System, layer to use
      * @param transportMgr          Transport to use
-     * @param admins                A table of device administrators
+     * @param fabrics                A table of device administrators
      * @param messageCounterManager The message counter manager
      */
-    CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                    Transport::AdminPairingTable * admins, Transport::MessageCounterManagerInterface * messageCounterManager);
+    CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
+                    Transport::MessageCounterManagerInterface * messageCounterManager);
 
     /**
      * @brief
@@ -251,16 +250,6 @@ public:
      *  of the object and reset it's state.
      */
     void Shutdown();
-
-    /**
-     * @brief
-     *   Set local node ID
-     *
-     * @param nodeId    Node id for the current node
-     */
-    void SetLocalNodeId(NodeId nodeId) { mLocalNodeId = nodeId; }
-
-    NodeId GetLocalNodeId() { return mLocalNodeId; }
 
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 
@@ -290,13 +279,12 @@ private:
     };
 
     System::Layer * mSystemLayer = nullptr;
-    NodeId mLocalNodeId;                                                                // < Id of the current node
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 
     SecureSessionMgrDelegate * mCB                                     = nullptr;
     TransportMgrBase * mTransportMgr                                   = nullptr;
-    Transport::AdminPairingTable * mAdmins                             = nullptr;
+    Transport::FabricTable * mFabrics                                  = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
@@ -316,7 +304,7 @@ private:
     /**
      * Callback for timer expiry check
      */
-    static void ExpiryTimerCallback(System::Layer * layer, void * param, CHIP_ERROR error);
+    static void ExpiryTimerCallback(System::Layer * layer, void * param);
 
     void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                System::PacketBufferHandle && msg);

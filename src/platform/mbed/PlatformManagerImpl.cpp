@@ -46,8 +46,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         mQueue.~EventQueue();
         new (&mQueue) events::EventQueue(event_size * CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
 
-        mQueue.background(
-            [&](int t) { MbedEventTimeout::AttachTimeout([&] { SystemLayer.WakeIOThread(); }, std::chrono::milliseconds{ t }); });
+        mQueue.background([&](int t) {
+            MbedEventTimeout::AttachTimeout([&] { SystemLayer.WatchableEventsManager().Signal(); }, std::chrono::milliseconds{ t });
+        });
 
         // Reinitialize the Mutexes
         mThisStateMutex.~Mutex();
@@ -147,7 +148,7 @@ void PlatformManagerImpl::_RunEventLoop()
     LockChipStack();
 
     ChipLogProgress(DeviceLayer, "CHIP Run event loop");
-    System::WatchableEventManager & watchState = SystemLayer.WatchableEvents();
+    System::WatchableEventManager & watchState = SystemLayer.WatchableEventsManager();
     watchState.EventLoopBegins();
     while (true)
     {
@@ -211,7 +212,7 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 
     // Wake from select so it unblocks processing
     LockChipStack();
-    SystemLayer.WakeIOThread();
+    SystemLayer.WatchableEventsManager().Signal();
     UnlockChipStack();
 
     osStatus err = osOK;

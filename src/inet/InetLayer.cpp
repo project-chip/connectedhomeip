@@ -32,7 +32,7 @@
  *        * Raw network transport
  *
  *      For BSD/POSIX Sockets (CHIP_SYSTEM_CONFIG_USE_SOCKETS), event readiness
- *      notification is handled via file descriptors, using System::WatchableSocket.
+ *      notification is handled via file descriptors, using a System::Layer API.
  *
  *      For LwIP (CHIP_SYSTEM_CONFIG_USE_LWIP), event readiness notification is handled
  *      via events / messages and platform- and system-specific hooks for the event
@@ -49,10 +49,8 @@
 
 #include <platform/LockTracker.h>
 
-#include <system/SystemTimer.h>
-
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <errno.h>
 #include <stddef.h>
@@ -319,14 +317,13 @@ CHIP_ERROR InetLayer::Shutdown()
     {
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
         // Cancel all DNS resolution requests owned by this instance.
-        for (size_t i = 0; i < DNSResolver::sPool.Size(); i++)
-        {
-            DNSResolver * lResolver = DNSResolver::sPool.Get(*mSystemLayer, i);
+        DNSResolver::sPool.ForEachActiveObject([&](DNSResolver * lResolver) {
             if ((lResolver != nullptr) && lResolver->IsCreatedByInetLayer(*this))
             {
                 lResolver->Cancel();
             }
-        }
+            return true;
+        });
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
@@ -337,38 +334,35 @@ CHIP_ERROR InetLayer::Shutdown()
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
         // Close all raw endpoints owned by this Inet layer instance.
-        for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
-        {
-            RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
+        RawEndPoint::sPool.ForEachActiveObject([&](RawEndPoint * lEndPoint) {
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->Close();
             }
-        }
+            return true;
+        });
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         // Abort all TCP endpoints owned by this instance.
-        for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
-        {
-            TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
+        TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->Abort();
             }
-        }
+            return true;
+        });
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         // Close all UDP endpoints owned by this instance.
-        for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
-        {
-            UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
+        UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->Close();
             }
-        }
+            return true;
+        });
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
     }
 
@@ -410,17 +404,15 @@ bool InetLayer::IsIdleTimerRunning()
 {
     bool timerRunning = false;
 
-    // see if there are any TCP connections with the idle timer check in use.
-    for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
-    {
-        TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-
+    // See if there are any TCP connections with the idle timer check in use.
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
         if ((lEndPoint != nullptr) && (lEndPoint->mIdleTimeout != 0))
         {
             timerRunning = true;
-            break;
+            return false;
         }
-    }
+        return true;
+    });
 
     return timerRunning;
 }
@@ -540,7 +532,7 @@ CHIP_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEnd
 
     VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = RawEndPoint::sPool.TryCreate(*mSystemLayer);
+    *retEndPoint = RawEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "Raw");
@@ -580,7 +572,7 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = TCPEndPoint::sPool.TryCreate(*mSystemLayer);
+    *retEndPoint = TCPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "TCP");
@@ -620,7 +612,7 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = UDPEndPoint::sPool.TryCreate(*mSystemLayer);
+    *retEndPoint = UDPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "UDP");
@@ -795,7 +787,7 @@ CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
     VerifyOrExit(hostNameLen <= NL_DNS_HOSTNAME_MAX_LEN, err = INET_ERROR_HOST_NAME_TOO_LONG);
     VerifyOrExit(maxAddrs > 0, err = CHIP_ERROR_NO_MEMORY);
 
-    resolver = DNSResolver::sPool.TryCreate(*mSystemLayer);
+    resolver = DNSResolver::sPool.TryCreate();
     if (resolver != nullptr)
     {
         resolver->InitInetLayerBasis(*this);
@@ -879,40 +871,32 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
     if (State != kState_Initialized)
         return;
 
-    for (size_t i = 0; i < DNSResolver::sPool.Size(); i++)
-    {
-        DNSResolver * lResolver = DNSResolver::sPool.Get(*mSystemLayer, i);
-
-        if (lResolver == nullptr)
-        {
-            continue;
-        }
-
+    DNSResolver::sPool.ForEachActiveObject([&](DNSResolver * lResolver) {
         if (!lResolver->IsCreatedByInetLayer(*this))
         {
-            continue;
+            return true;
         }
 
         if (lResolver->OnComplete != onComplete)
         {
-            continue;
+            return true;
         }
 
         if (lResolver->AppState != appState)
         {
-            continue;
+            return true;
         }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
         if (lResolver->mState == DNSResolver::kState_Canceled)
         {
-            continue;
+            return true;
         }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
         lResolver->Cancel();
-        break;
-    }
+        return false;
+    });
 }
 
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
@@ -986,23 +970,18 @@ bool InetLayer::MatchLocalIPv6Subnet(const IPAddress & addr)
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState)
 {
     InetLayer & lInetLayer = *reinterpret_cast<InetLayer *>(aAppState);
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();
 
-    for (size_t i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
-    {
-        TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*aSystemLayer, i);
-
-        if (lEndPoint == nullptr)
-            continue;
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
         if (!lEndPoint->IsCreatedByInetLayer(lInetLayer))
-            continue;
+            return true;
         if (!lEndPoint->IsConnected())
-            continue;
+            return true;
         if (lEndPoint->mIdleTimeout == 0)
-            continue;
+            return true;
 
         if (lEndPoint->mRemainingIdleTime == 0)
         {
@@ -1012,7 +991,9 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
         {
             --lEndPoint->mRemainingIdleTime;
         }
-    }
+
+        return true;
+    });
 
     if (lTimerRequired)
     {

@@ -25,10 +25,10 @@
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 #include "esp_event.h"
 #include "esp_netif.h"
@@ -53,6 +53,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::TLV;
+using chip::DeviceLayer::Internal::ESP32Utils;
 
 namespace chip {
 namespace DeviceLayer {
@@ -353,7 +354,7 @@ static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
 
 CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
 {
-    CHIP_ERROR err;
+    esp_err_t err;
     wifi_config_t wifiConfig;
     uint8_t primaryChannel;
     wifi_second_chan_t secondChannel;
@@ -363,16 +364,16 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
     err = esp_wifi_get_config(WIFI_IF_STA, &wifiConfig);
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_get_config() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_get_config() failed: %s", esp_err_to_name(err));
+        return ESP32Utils::MapError(err);
     }
-    SuccessOrExit(err);
 
     err = esp_wifi_get_channel(&primaryChannel, &secondChannel);
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_get_channel() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_get_channel() failed: %s", esp_err_to_name(err));
+        return ESP32Utils::MapError(err);
     }
-    SuccessOrExit(err);
 
     freq = MapFrequency(WIFI_BAND_2_4GHZ, primaryChannel);
     static_assert(std::is_same<std::remove_reference<decltype(wifiConfig.sta.bssid[5])>::type, uint8_t>::value,
@@ -383,7 +384,6 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
                     "BSSID: %x\n"
                     "freq: %d\n",
                     bssid, freq);
-exit:
     return CHIP_NO_ERROR;
 }
 
@@ -391,8 +391,6 @@ exit:
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
-    CHIP_ERROR err;
-
     mLastStationConnectFailTime     = 0;
     mLastAPDemandTime               = 0;
     mWiFiStationMode                = kWiFiStationMode_Disabled;
@@ -406,8 +404,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     // TODO Initialize the Chip Addressing and Routing Module.
 
     // Ensure that ESP station mode is enabled.
-    err = Internal::ESP32Utils::EnableStationMode();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::ESP32Utils::EnableStationMode());
 
     // If there is no persistent station provision...
     if (!IsWiFiStationProvisioned())
@@ -424,38 +421,31 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
             memcpy(wifiConfig.sta.password, CONFIG_DEFAULT_WIFI_PASSWORD, strlen(CONFIG_DEFAULT_WIFI_PASSWORD) + 1);
             wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
             wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
-            err                        = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+            esp_err_t err              = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
             if (err != ESP_OK)
             {
-                ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", chip::ErrorStr(err));
+                ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", esp_err_to_name(err));
             }
-            err = CHIP_NO_ERROR;
 
             // Enable WiFi station mode.
-            err = SetWiFiStationMode(kWiFiStationMode_Enabled);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(SetWiFiStationMode(kWiFiStationMode_Enabled));
         }
 
         // Otherwise, ensure WiFi station mode is disabled.
         else
         {
-            err = SetWiFiStationMode(kWiFiStationMode_Disabled);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(SetWiFiStationMode(kWiFiStationMode_Disabled));
         }
     }
 
     // Force AP mode off for now.
-    err = Internal::ESP32Utils::SetAPMode(false);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::ESP32Utils::SetAPMode(false));
 
     // Queue work items to bootstrap the AP and station state machines once the Chip event loop is running.
-    err = SystemLayer.ScheduleWork(DriveStationState, NULL);
-    SuccessOrExit(err);
-    err = SystemLayer.ScheduleWork(DriveAPState, NULL);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(SystemLayer.ScheduleWork(DriveStationState, NULL));
+    ReturnErrorOnFailure(SystemLayer.ScheduleWork(DriveAPState, NULL));
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -550,7 +540,6 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 
 void ConnectivityManagerImpl::DriveStationState()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     bool stationConnected;
 
     // Refresh the current station mode.  Specifically, this reads the ESP auto_connect flag,
@@ -562,17 +551,14 @@ void ConnectivityManagerImpl::DriveStationState()
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
         // Ensure that the ESP WiFi layer is started.
-        err = Internal::ESP32Utils::StartWiFiLayer();
-        SuccessOrExit(err);
+        ReturnOnFailure(Internal::ESP32Utils::StartWiFiLayer());
 
         // Ensure that station mode is enabled in the ESP WiFi layer.
-        err = Internal::ESP32Utils::EnableStationMode();
-        SuccessOrExit(err);
+        ReturnOnFailure(Internal::ESP32Utils::EnableStationMode());
     }
 
     // Determine if the ESP WiFi layer thinks the station interface is currently connected.
-    err = Internal::ESP32Utils::IsStationConnected(stationConnected);
-    SuccessOrExit(err);
+    ReturnOnFailure(Internal::ESP32Utils::IsStationConnected(stationConnected));
 
     // If the station interface is currently connected ...
     if (stationConnected)
@@ -594,12 +580,12 @@ void ConnectivityManagerImpl::DriveStationState()
             (mWiFiStationMode != kWiFiStationMode_Enabled || !IsWiFiStationProvisioned()))
         {
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
-            err = esp_wifi_disconnect();
+            esp_err_t err = esp_wifi_disconnect();
             if (err != ESP_OK)
             {
-                ChipLogError(DeviceLayer, "esp_wifi_disconnect() failed: %s", chip::ErrorStr(err));
+                ChipLogError(DeviceLayer, "esp_wifi_disconnect() failed: %s", esp_err_to_name(err));
+                return;
             }
-            SuccessOrExit(err);
 
             ChangeWiFiStationState(kWiFiStationState_Disconnecting);
         }
@@ -639,12 +625,12 @@ void ConnectivityManagerImpl::DriveStationState()
             if (mLastStationConnectFailTime == 0 || now >= mLastStationConnectFailTime + mWiFiStationReconnectIntervalMS)
             {
                 ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
-                err = esp_wifi_connect();
+                esp_err_t err = esp_wifi_connect();
                 if (err != ESP_OK)
                 {
-                    ChipLogError(DeviceLayer, "esp_wifi_connect() failed: %s", chip::ErrorStr(err));
+                    ChipLogError(DeviceLayer, "esp_wifi_connect() failed: %s", esp_err_to_name(err));
+                    return;
                 }
-                SuccessOrExit(err);
 
                 ChangeWiFiStationState(kWiFiStationState_Connecting);
             }
@@ -656,13 +642,10 @@ void ConnectivityManagerImpl::DriveStationState()
 
                 ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRIu32 " ms", timeToNextConnect);
 
-                err = SystemLayer.StartTimer(timeToNextConnect, DriveStationState, NULL);
-                SuccessOrExit(err);
+                ReturnOnFailure(SystemLayer.StartTimer(timeToNextConnect, DriveStationState, NULL));
             }
         }
     }
-
-exit:
 
     ChipLogProgress(DeviceLayer, "Done driving station state, nothing else to do...");
     // Kick-off any pending network scan that might have been deferred due to the activity
@@ -671,13 +654,11 @@ exit:
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
-    CHIP_ERROR err;
-
     // Assign an IPv6 link local address to the station interface.
-    err = esp_netif_create_ip6_linklocal(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
+    esp_err_t err = esp_netif_create_ip6_linklocal(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_netif_create_ip6_linklocal() failed for WIFI_STA_DEF interface: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_netif_create_ip6_linklocal() failed for WIFI_STA_DEF interface: %s", esp_err_to_name(err));
     }
 
     // TODO Invoke WARM to perform actions that occur when the WiFi station interface comes up.
@@ -714,7 +695,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
     }
 }
 
-void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError)
+void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState)
 {
     sInstance.DriveStationState();
 }
@@ -842,12 +823,13 @@ void ConnectivityManagerImpl::DriveAPState()
     if (mWiFiAPState == kWiFiAPState_Active && Internal::ESP32Utils::IsInterfaceUp("WIFI_AP_DEF") &&
         !Internal::ESP32Utils::HasIPv6LinkLocalAddress("WIFI_AP_DEF"))
     {
-        err = esp_netif_create_ip6_linklocal(esp_netif_get_handle_from_ifkey("WIFI_AP_DEF"));
-        if (err != ESP_OK)
+        esp_err_t error = esp_netif_create_ip6_linklocal(esp_netif_get_handle_from_ifkey("WIFI_AP_DEF"));
+        if (error != ESP_OK)
         {
-            ChipLogError(DeviceLayer, "esp_netif_create_ip6_linklocal() failed for WIFI_AP_DEF interface: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_netif_create_ip6_linklocal() failed for WIFI_AP_DEF interface: %s",
+                         esp_err_to_name(error));
+            goto exit;
         }
-        SuccessOrExit(err);
     }
 
 exit:
@@ -860,13 +842,12 @@ exit:
 
 CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t wifiConfig;
 
     memset(&wifiConfig, 0, sizeof(wifiConfig));
 
     uint16_t discriminator;
-    SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+    ReturnErrorOnFailure(ConfigurationMgr().GetSetupDiscriminator(discriminator));
     snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%03X-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
              discriminator, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
     wifiConfig.ap.channel         = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
@@ -874,15 +855,14 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     wifiConfig.ap.max_connection  = CHIP_DEVICE_CONFIG_WIFI_AP_MAX_STATIONS;
     wifiConfig.ap.beacon_interval = CHIP_DEVICE_CONFIG_WIFI_AP_BEACON_INTERVAL;
     ChipLogProgress(DeviceLayer, "Configuring WiFi AP: SSID %s, channel %u", wifiConfig.ap.ssid, wifiConfig.ap.channel);
-    err = esp_wifi_set_config(WIFI_IF_AP, &wifiConfig);
+    esp_err_t err = esp_wifi_set_config(WIFI_IF_AP, &wifiConfig);
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_set_config(WIFI_IF_AP) failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_set_config(WIFI_IF_AP) failed: %s", esp_err_to_name(err));
+        return ESP32Utils::MapError(err);
     }
-    SuccessOrExit(err);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
@@ -894,7 +874,7 @@ void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
     }
 }
 
-void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError)
+void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void * aAppState)
 {
     sInstance.DriveAPState();
 }

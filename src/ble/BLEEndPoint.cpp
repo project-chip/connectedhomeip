@@ -34,12 +34,12 @@
 #include <ble/BleConfig.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
-#include <support/BitFlags.h>
-#include <support/CHIPFaultInjection.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <ble/BLEEndPoint.h>
 #include <ble/BleLayer.h>
@@ -1428,7 +1428,7 @@ bool BLEEndPoint::SendIndication(PacketBufferHandle && buf)
 CHIP_ERROR BLEEndPoint::StartConnectTimer()
 {
     const CHIP_ERROR timerErr = mBle->mSystemLayer->StartTimer(BLE_CONNECT_TIMEOUT_MS, HandleConnectTimeout, this);
-    VerifyOrReturnError(timerErr == CHIP_NO_ERROR, BLE_ERROR_START_TIMER_FAILED);
+    ReturnErrorOnFailure(timerErr);
     mTimerStateFlags.Set(TimerStateFlag::kConnectTimerRunning);
 
     return CHIP_NO_ERROR;
@@ -1437,7 +1437,7 @@ CHIP_ERROR BLEEndPoint::StartConnectTimer()
 CHIP_ERROR BLEEndPoint::StartReceiveConnectionTimer()
 {
     const CHIP_ERROR timerErr = mBle->mSystemLayer->StartTimer(BLE_CONNECT_TIMEOUT_MS, HandleReceiveConnectionTimeout, this);
-    VerifyOrReturnError(timerErr == CHIP_NO_ERROR, BLE_ERROR_START_TIMER_FAILED);
+    ReturnErrorOnFailure(timerErr);
     mTimerStateFlags.Set(TimerStateFlag::kReceiveConnectionTimerRunning);
 
     return CHIP_NO_ERROR;
@@ -1448,7 +1448,7 @@ CHIP_ERROR BLEEndPoint::StartAckReceivedTimer()
     if (!mTimerStateFlags.Has(TimerStateFlag::kAckReceivedTimerRunning))
     {
         const CHIP_ERROR timerErr = mBle->mSystemLayer->StartTimer(BTP_ACK_RECEIVED_TIMEOUT_MS, HandleAckReceivedTimeout, this);
-        VerifyOrReturnError(timerErr == CHIP_NO_ERROR, BLE_ERROR_START_TIMER_FAILED);
+        ReturnErrorOnFailure(timerErr);
 
         mTimerStateFlags.Set(TimerStateFlag::kAckReceivedTimerRunning);
     }
@@ -1473,7 +1473,7 @@ CHIP_ERROR BLEEndPoint::StartSendAckTimer()
     {
         ChipLogDebugBleEndPoint(Ble, "starting new SendAckTimer");
         const CHIP_ERROR timerErr = mBle->mSystemLayer->StartTimer(BTP_ACK_SEND_TIMEOUT_MS, HandleSendAckTimeout, this);
-        VerifyOrReturnError(timerErr == CHIP_NO_ERROR, BLE_ERROR_START_TIMER_FAILED);
+        ReturnErrorOnFailure(timerErr);
 
         mTimerStateFlags.Set(TimerStateFlag::kSendAckTimerRunning);
     }
@@ -1484,7 +1484,7 @@ CHIP_ERROR BLEEndPoint::StartSendAckTimer()
 CHIP_ERROR BLEEndPoint::StartUnsubscribeTimer()
 {
     const CHIP_ERROR timerErr = mBle->mSystemLayer->StartTimer(BLE_UNSUBSCRIBE_TIMEOUT_MS, HandleUnsubscribeTimeout, this);
-    VerifyOrReturnError(timerErr == CHIP_NO_ERROR, BLE_ERROR_START_TIMER_FAILED);
+    ReturnErrorOnFailure(timerErr);
     mTimerStateFlags.Set(TimerStateFlag::kUnsubscribeTimerRunning);
 
     return CHIP_NO_ERROR;
@@ -1525,7 +1525,7 @@ void BLEEndPoint::StopUnsubscribeTimer()
     mTimerStateFlags.Clear(TimerStateFlag::kUnsubscribeTimerRunning);
 }
 
-void BLEEndPoint::HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR err)
+void BLEEndPoint::HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState)
 {
     BLEEndPoint * ep = static_cast<BLEEndPoint *>(appState);
 
@@ -1538,7 +1538,7 @@ void BLEEndPoint::HandleConnectTimeout(chip::System::Layer * systemLayer, void *
     }
 }
 
-void BLEEndPoint::HandleReceiveConnectionTimeout(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR err)
+void BLEEndPoint::HandleReceiveConnectionTimeout(chip::System::Layer * systemLayer, void * appState)
 {
     BLEEndPoint * ep = static_cast<BLEEndPoint *>(appState);
 
@@ -1551,7 +1551,7 @@ void BLEEndPoint::HandleReceiveConnectionTimeout(chip::System::Layer * systemLay
     }
 }
 
-void BLEEndPoint::HandleAckReceivedTimeout(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR err)
+void BLEEndPoint::HandleAckReceivedTimeout(chip::System::Layer * systemLayer, void * appState)
 {
     BLEEndPoint * ep = static_cast<BLEEndPoint *>(appState);
 
@@ -1565,7 +1565,7 @@ void BLEEndPoint::HandleAckReceivedTimeout(chip::System::Layer * systemLayer, vo
     }
 }
 
-void BLEEndPoint::HandleSendAckTimeout(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR err)
+void BLEEndPoint::HandleSendAckTimeout(chip::System::Layer * systemLayer, void * appState)
 {
     BLEEndPoint * ep = static_cast<BLEEndPoint *>(appState);
 
@@ -1587,7 +1587,7 @@ void BLEEndPoint::HandleSendAckTimeout(chip::System::Layer * systemLayer, void *
     }
 }
 
-void BLEEndPoint::HandleUnsubscribeTimeout(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR err)
+void BLEEndPoint::HandleUnsubscribeTimeout(chip::System::Layer * systemLayer, void * appState)
 {
     BLEEndPoint * ep = static_cast<BLEEndPoint *>(appState);
 

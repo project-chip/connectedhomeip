@@ -24,6 +24,10 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef CONFIG_MCUMGR_SMP_BT
+#include "DFUOverSMP.h"
+#endif
+
 struct k_timer;
 
 class AppTask
@@ -53,12 +57,14 @@ private:
     static void LockActionEventHandler(AppEvent * aEvent);
     static void StartBLEAdvertisementHandler(AppEvent * aEvent);
 
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static void ButtonEventHandler(uint32_t buttons_state, uint32_t has_changed);
     static void TimerEventHandler(k_timer * timer);
 
-    static int SoftwareUpdateConfirmationHandler(uint32_t offset, uint32_t size, void * arg);
+#ifdef CONFIG_MCUMGR_SMP_BT
+    static void RequestSMPAdvertisingStart(void);
+#endif
 
     void StartTimer(uint32_t aTimeoutInMs);
 
@@ -71,9 +77,8 @@ private:
         kFunction_Invalid
     };
 
-    Function_t mFunction        = kFunction_NoneSelected;
-    bool mFunctionTimerActive   = false;
-    bool mSoftwareUpdateEnabled = false;
+    Function_t mFunction      = kFunction_NoneSelected;
+    bool mFunctionTimerActive = false;
     static AppTask sAppTask;
 };
 

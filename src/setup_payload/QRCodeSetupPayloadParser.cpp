@@ -22,22 +22,22 @@
  */
 
 #include "QRCodeSetupPayloadParser.h"
-#include "Base38.h"
+#include "Base38Decode.h"
 
 #include <math.h>
 #include <memory>
 #include <string.h>
 #include <vector>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPError.h>
-#include <core/CHIPTLVData.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLVData.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
 
 namespace chip {
 
@@ -65,7 +65,8 @@ static CHIP_ERROR readBits(std::vector<uint8_t> buf, size_t & index, uint64_t & 
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR openTLVContainer(TLV::TLVReader & reader, TLV::TLVType type, uint64_t tag, TLV::TLVReader & containerReader)
+static CHIP_ERROR openTLVContainer(TLV::ContiguousBufferTLVReader & reader, TLV::TLVType type, uint64_t tag,
+                                   TLV::ContiguousBufferTLVReader & containerReader)
 {
     VerifyOrReturnError(reader.GetType() == type, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(reader.GetTag() == tag, CHIP_ERROR_INVALID_ARGUMENT);
@@ -77,17 +78,13 @@ static CHIP_ERROR openTLVContainer(TLV::TLVReader & reader, TLV::TLVType type, u
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR retrieveOptionalInfoString(TLV::TLVReader & reader, OptionalQRCodeInfo & info)
+static CHIP_ERROR retrieveOptionalInfoString(TLV::ContiguousBufferTLVReader & reader, OptionalQRCodeInfo & info)
 {
-    const uint32_t valLength = reader.GetLength();
-    chip::Platform::ScopedMemoryBuffer<char> value;
-    value.Alloc(valLength + 1);
-    VerifyOrReturnError(value, CHIP_ERROR_NO_MEMORY);
-
-    ReturnErrorOnFailure(reader.GetString(value.Get(), valLength + 1));
+    Span<const char> data;
+    ReturnErrorOnFailure(reader.GetStringView(data));
 
     info.type = optionalQRCodeInfoTypeString;
-    info.data = std::string(value.Get());
+    info.data = std::string(data.data(), data.size());
 
     return CHIP_NO_ERROR;
 }
@@ -136,7 +133,8 @@ static CHIP_ERROR retrieveOptionalInfoUInt64(TLV::TLVReader & reader, OptionalQR
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR retrieveOptionalInfo(TLV::TLVReader & reader, OptionalQRCodeInfo & info, optionalQRCodeInfoType type)
+static CHIP_ERROR retrieveOptionalInfo(TLV::ContiguousBufferTLVReader & reader, OptionalQRCodeInfo & info,
+                                       optionalQRCodeInfoType type)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -156,7 +154,8 @@ static CHIP_ERROR retrieveOptionalInfo(TLV::TLVReader & reader, OptionalQRCodeIn
     return err;
 }
 
-static CHIP_ERROR retrieveOptionalInfo(TLV::TLVReader & reader, OptionalQRCodeInfoExtension & info, optionalQRCodeInfoType type)
+static CHIP_ERROR retrieveOptionalInfo(TLV::ContiguousBufferTLVReader & reader, OptionalQRCodeInfoExtension & info,
+                                       optionalQRCodeInfoType type)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -184,7 +183,7 @@ static CHIP_ERROR retrieveOptionalInfo(TLV::TLVReader & reader, OptionalQRCodeIn
     return err;
 }
 
-CHIP_ERROR QRCodeSetupPayloadParser::retrieveOptionalInfos(SetupPayload & outPayload, TLV::TLVReader & reader)
+CHIP_ERROR QRCodeSetupPayloadParser::retrieveOptionalInfos(SetupPayload & outPayload, TLV::ContiguousBufferTLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     while (err == CHIP_NO_ERROR)
@@ -242,8 +241,8 @@ CHIP_ERROR QRCodeSetupPayloadParser::parseTLVFields(SetupPayload & outPayload, u
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    TLV::TLVReader rootReader;
-    rootReader.Init(tlvDataStart, static_cast<uint32_t>(tlvDataLengthInBytes));
+    TLV::ContiguousBufferTLVReader rootReader;
+    rootReader.Init(tlvDataStart, tlvDataLengthInBytes);
     ReturnErrorOnFailure(rootReader.Next());
 
     if (rootReader.GetType() != TLV::kTLVType_Structure)
@@ -251,7 +250,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::parseTLVFields(SetupPayload & outPayload, u
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    TLV::TLVReader innerStructureReader;
+    TLV::ContiguousBufferTLVReader innerStructureReader;
     ReturnErrorOnFailure(openTLVContainer(rootReader, TLV::kTLVType_Structure, TLV::AnonymousTag, innerStructureReader));
     ReturnErrorOnFailure(innerStructureReader.Next());
     err = retrieveOptionalInfos(outPayload, innerStructureReader);

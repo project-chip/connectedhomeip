@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
 
 namespace mdns {
 namespace Minimal {
@@ -76,8 +76,9 @@ private:
     }
 
     // Mask to limit values to what RFC 6762 consideres useful
-    // 1111 1010 0000 0000 = FA0F
-    static constexpr uint16_t kMdnsNonIgnoredMask = 0x8A08;
+    // 1111 1110 0000 0000 = FE0F
+    // TODO(cecille): need to better document this value. Why is the comment different than the value?
+    static constexpr uint16_t kMdnsNonIgnoredMask = 0x8E08;
 
     static constexpr uint16_t kIsResponseMask = 0x8000;
     static constexpr uint16_t kOpcodeMask     = 0x7000;
@@ -130,6 +131,7 @@ class HeaderRef : public ConstHeaderRef
 {
 public:
     HeaderRef(uint8_t * buffer) : ConstHeaderRef(buffer) {}
+    HeaderRef(const HeaderRef & other) = default;
     HeaderRef & operator=(const HeaderRef & other) = default;
 
     HeaderRef & Clear()

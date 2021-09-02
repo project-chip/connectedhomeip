@@ -26,10 +26,9 @@
 
 #pragma once
 
-#include <asn1/ASN1OID.h>
-#include <core/CHIPConfig.h>
-#include <support/BitFlags.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace TestCerts {
@@ -70,7 +69,7 @@ enum class TestCertLoadFlags : uint8_t
 
 extern CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert);
 extern const char * GetTestCertName(uint8_t certType);
-extern CHIP_ERROR GetTestCertPubkey(uint8_t certType, const uint8_t *& certPubkey, uint32_t & certPubkeyLen);
+extern CHIP_ERROR GetTestCertPubkey(uint8_t certType, const uint8_t ** certPubkey, uint32_t & certPubkeyLen);
 extern CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags,
                                BitFlags<CertDecodeFlags> decodeFlags);
 

@@ -24,12 +24,12 @@
 #include <errno.h>
 #include <nlunit-test.h>
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <transport/SecureSession.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <stdarg.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
 
 using namespace chip;
 using namespace Crypto;
@@ -170,7 +170,7 @@ static const nlTest sTests[] =
 // clang-format off
 static nlTestSuite sSuite =
 {
-    "Test-CHIP-SecureChannel",
+    "Test-CHIP-SecureSession",
     &sTests[0],
     nullptr,
     nullptr

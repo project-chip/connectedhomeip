@@ -19,9 +19,9 @@
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
 
-#include <support/BufferReader.h>
-#include <support/CodeUtils.h>
-#include <support/TypeTraits.h>
+#include <lib/support/BufferReader.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 
 #include <type_traits>
 

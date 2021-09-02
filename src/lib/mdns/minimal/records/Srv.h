@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <mdns/minimal/records/ResourceRecord.h>
+#include <lib/mdns/minimal/records/ResourceRecord.h>
 
 namespace mdns {
 namespace Minimal {
@@ -28,6 +28,7 @@ public:
     SrvResourceRecord(const FullQName & qName, const FullQName & serverName, uint16_t port) :
         ResourceRecord(QType::SRV, qName), mServerName(serverName), mPort(port)
     {}
+    SrvResourceRecord(const SrvResourceRecord & other) = default;
     SrvResourceRecord & operator=(const SrvResourceRecord & other) = default;
 
     FullQName GetServerName() const { return mServerName; }

@@ -79,7 +79,8 @@ class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDel
 {
 public:
     ChannelContext(ExchangeManager * exchangeManager, ChannelManager * channelManager) :
-        mState(ChannelState::kNone), mExchangeManager(exchangeManager), mChannelManager(channelManager)
+        mState(ChannelState::kNone), mExchangeManager(exchangeManager), mChannelManager(channelManager), mFabricsTable(nullptr),
+        mFabricIndex(Transport::kUndefinedFabricIndex)
     {}
 
     void Start(const ChannelBuilder & builder);
@@ -102,14 +103,14 @@ public:
     bool IsCasePairing();
 
     bool MatchesBuilder(const ChannelBuilder & builder);
-    bool MatchesSession(SecureSessionHandle session, SecureSessionMgr * ssm);
+    bool MatchesSession(SessionHandle session, SecureSessionMgr * ssm);
 
     // events of ResolveDelegate, propagated from ExchangeManager
     void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const Mdns::MdnsService & address);
 
     // events of SecureSessionManager, propagated from ExchangeManager
-    void OnNewConnection(SecureSessionHandle session);
-    void OnConnectionExpired(SecureSessionHandle session);
+    void OnNewConnection(SessionHandle session);
+    void OnConnectionExpired(SessionHandle session);
 
     // Pairing callbacks
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -122,6 +123,8 @@ private:
     ChannelState mState;
     ExchangeManager * mExchangeManager;
     ChannelManager * mChannelManager;
+    Transport::FabricTable * mFabricsTable;
+    FabricIndex mFabricIndex;
 
     enum class PrepareState
     {
@@ -133,7 +136,6 @@ private:
     // mPreparing is pretty big, consider move it outside
     struct PrepareVars
     {
-        static constexpr const size_t VariantId = 1;
         PrepareState mState;
         Inet::IPAddressType mAddressType;
         Inet::IPAddress mAddress;
@@ -143,9 +145,8 @@ private:
 
     struct ReadyVars
     {
-        static constexpr const size_t VariantId = 2;
-        ReadyVars(SecureSessionHandle session) : mSession(session) {}
-        const SecureSessionHandle mSession;
+        ReadyVars(SessionHandle session) : mSession(session) {}
+        const SessionHandle mSession;
     };
 
     Variant<PrepareVars, ReadyVars> mStateVars;
@@ -157,7 +158,7 @@ private:
     void EnterPreparingState(const ChannelBuilder & builder);
     void ExitPreparingState();
 
-    void EnterReadyState(SecureSessionHandle session);
+    void EnterReadyState(SessionHandle session);
     void ExitReadyState();
 
     void EnterFailedState(CHIP_ERROR error);
@@ -165,7 +166,7 @@ private:
 
     // Preparing sub-states
     void EnterAddressResolve();
-    static void AddressResolveTimeout(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError);
+    static void AddressResolveTimeout(System::Layer * aLayer, void * aAppState);
     void AddressResolveTimeout();
     void ExitAddressResolve() {}
 

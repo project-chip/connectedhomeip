@@ -22,27 +22,32 @@
 #include <app/InteractionModelEngine.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
-#include <app/server/StorablePeerConnection.h>
 #include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
-#include <core/CHIPPersistentStorageDelegate.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/mdns/ServiceNaming.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
+#include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT || CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT || CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <app/server/Mdns.h>
@@ -100,107 +105,6 @@ class ServerStorageDelegate : public PersistentStorageDelegate
 ServerStorageDelegate gServerStorage;
 SessionIDAllocator gSessionIDAllocator;
 
-CHIP_ERROR PersistAdminPairingToKVS(AdminPairingInfo * admin, AdminId nextAvailableId)
-{
-    ReturnErrorCodeIf(admin == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogProgress(AppServer, "Persisting admin ID %d, next available %d", admin->GetAdminId(), nextAvailableId);
-
-    ReturnErrorOnFailure(GetGlobalAdminPairingTable().Store(admin->GetAdminId()));
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kAdminTableCountKey, &nextAvailableId, sizeof(nextAvailableId)));
-
-    ChipLogProgress(AppServer, "Persisting admin ID successfully");
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, AdminId & nextAvailableId)
-{
-    // It's not an error if the key doesn't exist. Just return right away.
-    VerifyOrReturnError(PersistedStorage::KeyValueStoreMgr().Get(kAdminTableCountKey, &nextAvailableId) == CHIP_NO_ERROR,
-                        CHIP_NO_ERROR);
-    ChipLogProgress(AppServer, "Next available admin ID is %d", nextAvailableId);
-
-    // TODO: The admin ID space allocation should be re-evaluated. With the current approach, the space could be
-    //       exhausted while IDs are still available (e.g. if the admin IDs are allocated and freed over a period of time).
-    //       Also, the current approach can make ID lookup slower as more IDs are allocated and freed.
-    for (AdminId id = 0; id < nextAvailableId; id++)
-    {
-        // Recreate the binding if one exists in persistent storage. Else skip to the next ID
-        if (adminPairings.LoadFromStorage(id) == CHIP_NO_ERROR)
-        {
-            AdminPairingInfo * admin = adminPairings.FindAdminWithId(id);
-            if (admin != nullptr)
-            {
-                ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x" ChipLogFormatX64, admin->GetAdminId(),
-                                ChipLogValueX64(admin->GetNodeId()));
-            }
-        }
-    }
-    ChipLogProgress(AppServer, "Restored all admin pairings from KVS.");
-
-    return CHIP_NO_ERROR;
-}
-
-void EraseAllAdminPairingsUpTo(AdminId nextAvailableId)
-{
-    PersistedStorage::KeyValueStoreMgr().Delete(kAdminTableCountKey);
-
-    for (AdminId id = 0; id < nextAvailableId; id++)
-    {
-        GetGlobalAdminPairingTable().Delete(id);
-    }
-}
-
-static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr)
-{
-    uint16_t nextSessionKeyId = 0;
-    // It's not an error if the key doesn't exist. Just return right away.
-    VerifyOrReturnError(PersistedStorage::KeyValueStoreMgr().Get(kStorablePeerConnectionCountKey, &nextSessionKeyId) ==
-                            CHIP_NO_ERROR,
-                        CHIP_NO_ERROR);
-    ChipLogProgress(AppServer, "Found %d stored connections", nextSessionKeyId);
-
-    PASESession * session = chip::Platform::New<PASESession>();
-    VerifyOrReturnError(session != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
-    {
-        StorablePeerConnection connection;
-        if (CHIP_NO_ERROR == connection.FetchFromKVS(gServerStorage, keyId))
-        {
-            connection.GetPASESession(session);
-
-            ChipLogProgress(AppServer, "Fetched the session information: from 0x" ChipLogFormatX64,
-                            ChipLogValueX64(session->PeerConnection().GetPeerNodeId()));
-            if (gSessionIDAllocator.Reserve(keyId) == CHIP_NO_ERROR)
-            {
-                sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
-                                      session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
-                                      connection.GetAdminId());
-            }
-            else
-            {
-                ChipLogProgress(AppServer, "Session Key ID  %" PRIu16 " cannot be used. Skipping over this session", keyId);
-            }
-            session->Clear();
-        }
-    }
-
-    chip::Platform::Delete(session);
-
-    return CHIP_NO_ERROR;
-}
-
-void EraseAllSessionsUpTo(uint16_t nextSessionKeyId)
-{
-    PersistedStorage::KeyValueStoreMgr().Delete(kStorablePeerConnectionCountKey);
-
-    for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
-    {
-        gSessionIDAllocator.Free(keyId);
-        StorablePeerConnection::DeleteFromKVS(gServerStorage, keyId);
-    }
-}
-
 // TODO: The following class is setting the discriminator in Persistent Storage. This is
 //       is needed since BLE reads the discriminator using ConfigurationMgr APIs. The
 //       better solution will be to pass the discriminator to BLE without changing it
@@ -239,8 +143,8 @@ private:
 };
 
 DeviceDiscriminatorCache gDeviceDiscriminatorCache;
-AdminPairingTable gAdminPairings;
-AdminId gNextAvailableAdminId = 0;
+FabricTable gFabrics;
+bool gPairingWindowOpen = false;
 
 class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
 {
@@ -255,11 +159,14 @@ public:
         {
             mDelegate->OnPairingWindowOpened();
         }
+        gPairingWindowOpen = true;
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR StopAdvertisement() const override
     {
         gDeviceDiscriminatorCache.RestoreDiscriminator();
+
+        gPairingWindowOpen = false;
 
         if (isBLE)
         {
@@ -271,22 +178,16 @@ public:
             mDelegate->OnPairingWindowClosed();
         }
 
-        AdminPairingInfo * admin = gAdminPairings.FindAdminWithId(mAdmin);
-        if (admin != nullptr)
-        {
-            ReturnErrorOnFailure(PersistAdminPairingToKVS(admin, gNextAvailableAdminId));
-        }
-
         return CHIP_NO_ERROR;
     }
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
     void SetBLE(bool ble) { isBLE = ble; }
-    void SetAdminId(AdminId id) { mAdmin = id; }
+    void SetFabricIndex(FabricIndex id) { mFabric = id; }
 
 private:
     AppDelegate * mDelegate = nullptr;
-    AdminId mAdmin;
+    FabricIndex mFabric;
     bool isBLE = true;
 };
 
@@ -297,29 +198,6 @@ CASEServer gCASEServer;
 Messaging::ExchangeManager gExchangeMgr;
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
-static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVerifier & verifier)
-{
-    RendezvousParameters params;
-
-    ReturnErrorOnFailure(gDeviceDiscriminatorCache.UpdateDiscriminator(discriminator));
-
-#if CONFIG_NETWORK_LAYER_BLE
-    params.SetPASEVerifier(verifier)
-        .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
-        .SetPeerAddress(Transport::PeerAddress::BLE())
-        .SetAdvertisementDelegate(&gAdvDelegate);
-#else
-    params.SetPASEVerifier(verifier);
-#endif // CONFIG_NETWORK_LAYER_BLE
-
-    AdminId admin                = gNextAvailableAdminId;
-    AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(admin);
-    VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
-    gNextAvailableAdminId++;
-
-    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
-}
-
 class ServerCallback : public ExchangeDelegate
 {
 public:
@@ -329,62 +207,8 @@ public:
         CHIP_ERROR err = CHIP_NO_ERROR;
         // as soon as a client connects, assume it is connected
         VerifyOrExit(!buffer.IsNull(), ChipLogError(AppServer, "Received data but couldn't process it..."));
-        VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), ChipLogError(AppServer, "Unknown source for received message"));
-
         VerifyOrExit(mSessionMgr != nullptr, ChipLogError(AppServer, "SecureSessionMgr is not initilized yet"));
-
-        VerifyOrExit(packetHeader.GetSourceNodeId().Value() != kUndefinedNodeId,
-                     ChipLogError(AppServer, "Unknown source for received message"));
-
-        ChipLogProgress(AppServer, "Packet received from Node 0x" ChipLogFormatX64 ": %u bytes",
-                        ChipLogValueX64(packetHeader.GetSourceNodeId().Value()), buffer->DataLength());
-
-        // TODO: This code is temporary, and must be updated to use the Cluster API.
-        // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
-        if (payloadHeader.HasProtocol(chip::Protocols::ServiceProvisioning::Id))
-        {
-            uint32_t timeout;
-            uint16_t discriminator;
-            PASEVerifier verifier;
-
-            ChipLogProgress(AppServer, "Received service provisioning message. Treating it as OpenPairingWindow request");
-            chip::System::PacketBufferTLVReader reader;
-            reader.Init(std::move(buffer));
-            reader.ImplicitProfileId = chip::Protocols::ServiceProvisioning::Id.ToTLVProfileId();
-
-            SuccessOrExit(reader.Next(kTLVType_UnsignedInteger, TLV::ProfileTag(reader.ImplicitProfileId, 1)));
-            SuccessOrExit(reader.Get(timeout));
-
-            err = reader.Next(kTLVType_UnsignedInteger, TLV::ProfileTag(reader.ImplicitProfileId, 2));
-            if (err == CHIP_NO_ERROR)
-            {
-                SuccessOrExit(reader.Get(discriminator));
-
-                err = reader.Next(kTLVType_ByteString, TLV::ProfileTag(reader.ImplicitProfileId, 3));
-                if (err == CHIP_NO_ERROR)
-                {
-                    SuccessOrExit(reader.GetBytes(reinterpret_cast<uint8_t *>(verifier), sizeof(verifier)));
-                }
-            }
-
-            ChipLogProgress(AppServer, "Pairing Window timeout %" PRIu32 " seconds", timeout);
-
-            if (err != CHIP_NO_ERROR)
-            {
-                SuccessOrExit(err = OpenDefaultPairingWindow(ResetAdmins::kNo));
-            }
-            else
-            {
-                ChipLogProgress(AppServer, "Pairing Window discriminator %d", discriminator);
-                err = OpenPairingWindowUsingVerifier(discriminator, verifier);
-                SuccessOrExit(err);
-            }
-            ChipLogProgress(AppServer, "Opened the pairing window");
-        }
-        else
-        {
-            HandleDataModelMessage(exchangeContext, std::move(buffer));
-        }
+        HandleDataModelMessage(exchangeContext, std::move(buffer));
 
     exit:
         return err;
@@ -411,9 +235,21 @@ secure_channel::MessageCounterManager gMessageCounterManager;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+void HandlePairingWindowTimeout(System::Layer * aSystemLayer, void * aAppState)
+{
+    ClosePairingWindow();
+}
+
 } // namespace
 
-CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindowAdvertisement advertisementMode)
+CHIP_ERROR OpenBasicCommissioningWindow(ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds,
+                                        chip::PairingWindowAdvertisement advertisementMode)
 {
     // TODO(cecille): If this is re-called when the window is already open, what should happen?
     gDeviceDiscriminatorCache.RestoreDiscriminator();
@@ -433,22 +269,77 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    if (resetAdmins == ResetAdmins::kYes)
+    if (resetFabrics == ResetFabrics::kYes)
     {
-        EraseAllAdminPairingsUpTo(gNextAvailableAdminId);
-        EraseAllSessionsUpTo(gSessionIDAllocator.Peek());
-        // Only resetting gNextAvailableAdminId at reboot otherwise previously paired device with adminID 0
-        // can continue sending messages to accessory as next available admin will also be 0.
+        gFabrics.DeleteAllFabrics();
+        // Only resetting gNextAvailableFabricIndex at reboot otherwise previously paired device with fabricID 0
+        // can continue sending messages to accessory as next available fabric will also be 0.
         // This logic is not up to spec, will be implemented up to spec once AddOptCert is implemented.
-        gAdminPairings.Reset();
+        gFabrics.Reset();
     }
 
-    AdminId admin                = gNextAvailableAdminId;
-    AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(admin);
-    VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
-    gNextAvailableAdminId++;
+    ReturnErrorOnFailure(gRendezvousServer.WaitForPairing(
+        std::move(params), kSpake2p_Iteration_Count,
+        ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), 0, &gExchangeMgr,
+        &gTransports, &gSessions));
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
+    if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
+    {
+        ReturnErrorOnFailure(
+            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator, PASEVerifier & verifier,
+                                           uint32_t iterations, ByteSpan salt, uint16_t passcodeID)
+{
+    RendezvousParameters params;
+
+    ReturnErrorOnFailure(gDeviceDiscriminatorCache.UpdateDiscriminator(discriminator));
+
+// TODO: Do not turn on BLE when opening the Enhanced Commissioning Window.
+#if CONFIG_NETWORK_LAYER_BLE
+    gAdvDelegate.SetBLE(true);
+    params.SetAdvertisementDelegate(&gAdvDelegate);
+    params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
+#endif // CONFIG_NETWORK_LAYER_BLE
+    params.SetPASEVerifier(verifier).SetAdvertisementDelegate(&gAdvDelegate);
+
+    ReturnErrorOnFailure(
+        gRendezvousServer.WaitForPairing(std::move(params), iterations, salt, passcodeID, &gExchangeMgr, &gTransports, &gSessions));
+
+    if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
+    {
+        ReturnErrorOnFailure(
+            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ClosePairingWindow()
+{
+    if (gPairingWindowOpen)
+    {
+        ChipLogProgress(AppServer, "Closing pairing window");
+        gRendezvousServer.Cleanup();
+    }
+}
+
+bool IsPairingWindowOpen()
+{
+    return gPairingWindowOpen;
+}
+
+uint16_t gSecuredServicePort   = CHIP_PORT;
+uint16_t gUnsecuredServicePort = CHIP_UDC_PORT;
+
+void SetServerConfig(ServerConfigParams params)
+{
+    gSecuredServicePort   = params.securedServicePort;
+    gUnsecuredServicePort = params.unsecuredServicePort;
 }
 
 // The function will initialize datamodel handler and then start the server
@@ -466,34 +357,34 @@ void InitServer(AppDelegate * delegate)
     err = PersistedStorage::KeyValueStoreMgrImpl().Init("chip.store");
     SuccessOrExit(err);
 #elif CHIP_DEVICE_LAYER_TARGET_LINUX
-    PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_server_kvs");
+    PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 #endif
 
-    err = gRendezvousServer.Init(delegate, &gServerStorage, &gSessionIDAllocator);
+    err = gRendezvousServer.Init(delegate, &gSessionIDAllocator);
     SuccessOrExit(err);
 
     gAdvDelegate.SetDelegate(delegate);
 
-    err = gAdminPairings.Init(&gServerStorage);
+    err = gFabrics.Init(&gServerStorage);
     SuccessOrExit(err);
 
     // Init transport before operations with secure session mgr.
-    err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6)
+    err = gTransports.Init(
+        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(gSecuredServicePort)
 
 #if INET_CONFIG_ENABLE_IPV4
-                               ,
-                           UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4)
+            ,
+        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(gSecuredServicePort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                               ,
-                           BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
+            ,
+        BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
 #endif
     );
 
     SuccessOrExit(err);
 
-    err =
-        gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings, &gMessageCounterManager);
+    err = gSessions.Init(&DeviceLayer::SystemLayer, &gTransports, &gFabrics, &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeMgr.Init(&gSessions);
@@ -512,30 +403,28 @@ void InitServer(AppDelegate * delegate)
     if (useTestPairing())
     {
         ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
-        SuccessOrExit(err = AddTestPairing());
+        SuccessOrExit(err = AddTestCommissioning());
     }
     else if (DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         // If the network is already provisioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Network already provisioned. Disabling BLE advertisement");
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
-
-        // Restore any previous admin pairings
-        VerifyOrExit(CHIP_NO_ERROR == RestoreAllAdminPairingsFromKVS(gAdminPairings, gNextAvailableAdminId),
-                     ChipLogError(AppServer, "Could not restore admin table"));
-
-        VerifyOrExit(CHIP_NO_ERROR == RestoreAllSessionsFromKVS(gSessions),
-                     ChipLogError(AppServer, "Could not restore previous sessions"));
     }
     else
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
-        SuccessOrExit(err = OpenDefaultPairingWindow(ResetAdmins::kYes));
+        SuccessOrExit(err = OpenBasicCommissioningWindow(ResetFabrics::kYes));
 #endif
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    app::Mdns::SetSecuredPort(gSecuredServicePort);
+    app::Mdns::SetUnsecuredPort(gUnsecuredServicePort);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED
+    // StartServer only enables commissioning mode if device has not been commissioned
     app::Mdns::StartServer();
 #endif
 
@@ -543,14 +432,14 @@ void InitServer(AppDelegate * delegate)
 
     // Register to receive unsolicited legacy ZCL messages from the exchange manager.
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, &gCallbacks);
-    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
+    SuccessOrExit(err);
 
     // Register to receive unsolicited Service Provisioning messages from the exchange manager.
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
-    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
+    SuccessOrExit(err);
 
-    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalAdminPairingTable(),
-                                                    &gSessionIDAllocator);
+    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
+                                                    &gSessions, &GetGlobalFabricTable(), &gSessionIDAllocator);
     SuccessOrExit(err);
 
 exit:
@@ -564,28 +453,58 @@ exit:
     }
 }
 
-CHIP_ERROR AddTestPairing()
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+// NOTE: UDC client is located in Server.cpp because it really only makes sense
+// to send UDC from a Matter device. The UDC message payload needs to include the device's
+// randomly generated service name.
+
+CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner)
 {
-    CHIP_ERROR err               = CHIP_NO_ERROR;
-    AdminPairingInfo * adminInfo = nullptr;
-    PASESession * testSession    = nullptr;
+    ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
+
+    CHIP_ERROR err;
+    char nameBuffer[chip::Mdns::kMaxInstanceNameSize + 1];
+    err = app::Mdns::GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to get mdns instance name error: %s", ErrorStr(err));
+        return err;
+    }
+    ChipLogDetail(AppServer, "instanceName=%s", nameBuffer);
+
+    chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
+    if (payloadBuf.IsNull())
+    {
+        ChipLogError(AppServer, "Unable to allocate packet buffer\n");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    err = gUDCClient.SendUDCMessage(&gTransports, std::move(payloadBuf), commissioner);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "Send UDC request success");
+    }
+    else
+    {
+        ChipLogError(AppServer, "Send UDC request failed, err: %s\n", chip::ErrorStr(err));
+    }
+    return err;
+}
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+CHIP_ERROR AddTestCommissioning()
+{
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    PASESession * testSession = nullptr;
     PASESessionSerializable serializedTestSession;
 
-    for (const AdminPairingInfo & admin : gAdminPairings)
-        if (admin.IsInitialized() && admin.GetNodeId() == chip::kTestDeviceNodeId)
-            ExitNow();
-
-    adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
-    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    adminInfo->SetNodeId(chip::kTestDeviceNodeId);
     gTestPairing.ToSerializable(serializedTestSession);
 
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
     SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, SecureSession::SessionRole::kResponder, gNextAvailableAdminId));
-    ++gNextAvailableAdminId;
+                                             testSession, SecureSession::SessionRole::kResponder, kMinValidFabricIndex));
 
 exit:
     if (testSession)
@@ -594,13 +513,12 @@ exit:
         chip::Platform::Delete(testSession);
     }
 
-    if (err != CHIP_NO_ERROR && adminInfo != nullptr)
-        gAdminPairings.ReleaseAdminId(gNextAvailableAdminId);
-
+    if (err != CHIP_NO_ERROR)
+        gFabrics.ReleaseFabricIndex(kMinValidFabricIndex);
     return err;
 }
 
-AdminPairingTable & GetGlobalAdminPairingTable()
+FabricTable & GetGlobalFabricTable()
 {
-    return gAdminPairings;
+    return gFabrics;
 }

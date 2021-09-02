@@ -19,9 +19,10 @@
 #pragma once
 
 #include "DiscoverCommand.h"
+#include "DiscoverCommissionablesCommand.h"
 #include "DiscoverCommissionersCommand.h"
 #include <controller/DeviceAddressUpdateDelegate.h>
-#include <mdns/Resolver.h>
+#include <lib/mdns/Resolver.h>
 
 constexpr uint16_t kMdnsPort = 5353;
 
@@ -37,7 +38,7 @@ public:
         ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().SetResolverDelegate(nullptr));
         ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().SetResolverDelegate(this));
         ChipLogProgress(chipTool, "Mdns: Searching for NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
-        return chip::Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(remoteId).SetFabricId(fabricId),
+        return chip::Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(remoteId).SetCompressedFabricId(fabricId),
                                                               chip::Inet::kIPAddressType_Any);
     }
 
@@ -47,6 +48,19 @@ public:
         nodeData.mAddress.ToString(addrBuffer);
         ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Address: %s, Port: %" PRIu16, nodeData.mPeerId.GetNodeId(),
                         addrBuffer, nodeData.mPort);
+        ChipLogProgress(chipTool, "    Hostname: %s", nodeData.mHostName);
+
+        auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
+
+        if (retryInterval.HasValue())
+            ChipLogProgress(chipTool, "   MRP retry interval (idle): %" PRIu32 "ms", retryInterval.Value());
+
+        retryInterval = nodeData.GetMrpRetryIntervalActive();
+
+        if (retryInterval.HasValue())
+            ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms", retryInterval.Value());
+
+        ChipLogProgress(chipTool, "   Supports TCP: %s", nodeData.mSupportsTcp ? "yes" : "no");
         SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
@@ -66,8 +80,9 @@ public:
     /////////// DiscoverCommand Interface /////////
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
-        ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
-        return GetExecContext()->commissioner->UpdateDevice(remoteId, fabricId);
+        ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " Compressed FabricId: %" PRIx64 " ...", remoteId,
+                        GetExecContext()->commissioner->GetCompressedFabricId());
+        return GetExecContext()->commissioner->UpdateDevice(remoteId);
     }
 
     /////////// DeviceAddressUpdateDelegate Interface /////////
@@ -93,6 +108,7 @@ void registerCommandsDiscover(Commands & commands)
     commands_list clusterCommands = {
         make_unique<Resolve>(),
         make_unique<Update>(),
+        make_unique<DiscoverCommissionablesCommand>(),
         make_unique<DiscoverCommissionersCommand>(),
     };
 

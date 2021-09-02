@@ -32,10 +32,10 @@
 #include <inet/InetInterface.h>
 #include <inet/InetLayerEvents.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <system/SystemSockets.h>
+#include <system/SocketEvents.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -97,8 +97,9 @@ protected:
 #endif
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    System::WatchableSocket mSocket; /**< Encapsulated socket descriptor. */
+    int mSocket;                     /**< Encapsulated socket descriptor. */
     IPAddressType mAddrType;         /**< Protocol family, i.e. IPv4 or IPv6. */
+    System::SocketWatchToken mWatch; /**< Socket event watcher */
 #endif                               // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -145,7 +146,7 @@ inline bool EndPointBasis::IsNetworkFrameworkEndPoint(void) const
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 inline bool EndPointBasis::IsSocketsEndPoint() const
 {
-    return mSocket.HasFD();
+    return mSocket != INET_INVALID_SOCKET_FD;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -174,20 +175,6 @@ inline bool EndPointBasis::IsOpenEndPoint() const
 
     return lResult;
 }
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-inline void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic)
-{
-    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
-    {
-        DeferredRelease(aTactic);
-    }
-    else
-    {
-        Release();
-    }
-}
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace Inet
 } // namespace chip

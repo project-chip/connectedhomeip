@@ -1,8 +1,5 @@
 package com.google.chip.chiptool.clusterclient
 
-import android.content.Context
-import android.net.nsd.NsdManager
-import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,12 +23,20 @@ import kotlinx.android.synthetic.main.on_off_client_fragment.levelBar
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.levelBar
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.offBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.onBtn
+import kotlinx.android.synthetic.main.on_off_client_fragment.view.readBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.toggleBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.updateAddressBtn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class OnOffClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
-    get() = ChipClient.getDeviceController()
+    get() = ChipClient.getDeviceController(requireContext())
+
+  private val scope = CoroutineScope(Dispatchers.Main + Job())
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -42,9 +47,10 @@ class OnOffClientFragment : Fragment() {
       deviceController.setCompletionListener(ChipControllerCallback())
 
       updateAddressBtn.setOnClickListener { updateAddressClick() }
-      onBtn.setOnClickListener { sendOnCommandClick() }
-      offBtn.setOnClickListener { sendOffCommandClick() }
-      toggleBtn.setOnClickListener { sendToggleCommandClick() }
+      onBtn.setOnClickListener { scope.launch { sendOnCommandClick() } }
+      offBtn.setOnClickListener { scope.launch { sendOffCommandClick() } }
+      toggleBtn.setOnClickListener { scope.launch { sendToggleCommandClick() } }
+      readBtn.setOnClickListener { scope.launch { sendReadOnOffClick() } }
 
       levelBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
@@ -60,10 +66,23 @@ class OnOffClientFragment : Fragment() {
             "Level is: " + levelBar.progress,
             Toast.LENGTH_SHORT
           ).show()
-          sendLevelCommandClick()
+          scope.launch { sendLevelCommandClick() }
         }
       })
     }
+  }
+
+  private suspend fun sendReadOnOffClick() {
+    getOnOffClusterForDevice().readOnOffAttribute(object : ChipClusters.BooleanAttributeCallback {
+      override fun onSuccess(on: Boolean) {
+        Log.v(TAG, "On/Off attribute value: $on")
+        showMessage("On/Off attribute value: $on")
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "Error reading onOff attribute", ex)
+      }
+    })
   }
 
   override fun onStart() {
@@ -76,6 +95,10 @@ class OnOffClientFragment : Fragment() {
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
     override fun onConnectDeviceComplete() {}
+
+    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+      Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
+    }
 
     override fun onSendMessageComplete(message: String?) {
       commandStatusTv.text = requireContext().getString(R.string.echo_status_response, message)
@@ -94,47 +117,26 @@ class OnOffClientFragment : Fragment() {
     }
   }
 
+  override fun onStop() {
+    super.onStop()
+    scope.cancel()
+  }
+
   private fun updateAddressClick() {
-    val serviceInfo = NsdServiceInfo().apply {
-      serviceName = "%016X-%016X".format(
-        fabricIdEd.text.toString().toLong(),
-        deviceIdEd.text.toString().toLong()
+    try{
+      deviceController.updateDevice(
+          fabricIdEd.text.toString().toULong().toLong(),
+          deviceIdEd.text.toString().toULong().toLong()
       )
-      serviceType = "_matter._tcp"
-    }
-
-    // TODO: implement the common CHIP mDNS interface for Android and make CHIP stack call the resolver
-    val resolverListener = object : NsdManager.ResolveListener {
-      override fun onResolveFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
-        showMessage("Address resolution failed: $errorCode")
-      }
-
-      override fun onServiceResolved(serviceInfo: NsdServiceInfo?) {
-        val hostAddress = serviceInfo?.host?.hostAddress ?: ""
-        val port = serviceInfo?.port ?: 0
-
-        showMessage("Address: ${hostAddress}:${port}")
-
-        if (hostAddress == "" || port == 0)
-          return
-
-        try {
-          deviceController.updateAddress(deviceIdEd.text.toString().toLong(), hostAddress, port)
-        } catch (e: ChipDeviceControllerException) {
-          showMessage(e.toString())
-        }
-      }
-    }
-
-    (requireContext().getSystemService(Context.NSD_SERVICE) as NsdManager).apply {
-      resolveService(serviceInfo, resolverListener)
+      showMessage("Address update started")
+    } catch (ex: Exception) {
+      showMessage("Address update failed: $ex")
     }
   }
 
-  private fun sendLevelCommandClick() {
+  private suspend fun sendLevelCommandClick() {
     val cluster = ChipClusters.LevelControlCluster(
-      ChipClient.getDeviceController()
-        .getDevicePointer(deviceIdEd.text.toString().toLong()), 1
+      ChipClient.getConnectedDevicePointer(requireContext(), deviceIdEd.text.toString().toLong()), 1
     )
     cluster.moveToLevel(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
@@ -149,7 +151,7 @@ class OnOffClientFragment : Fragment() {
     }, levelBar.progress, 0, 0, 0)
   }
 
-  private fun sendOnCommandClick() {
+  private suspend fun sendOnCommandClick() {
     getOnOffClusterForDevice().on(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
         showMessage("ON command success")
@@ -163,7 +165,7 @@ class OnOffClientFragment : Fragment() {
     })
   }
 
-  private fun sendOffCommandClick() {
+  private suspend fun sendOffCommandClick() {
     getOnOffClusterForDevice().off(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
         showMessage("OFF command success")
@@ -176,7 +178,7 @@ class OnOffClientFragment : Fragment() {
     })
   }
 
-  private fun sendToggleCommandClick() {
+  private suspend fun sendToggleCommandClick() {
     getOnOffClusterForDevice().toggle(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
         showMessage("TOGGLE command success")
@@ -189,10 +191,9 @@ class OnOffClientFragment : Fragment() {
     })
   }
 
-  private fun getOnOffClusterForDevice(): OnOffCluster {
+  private suspend fun getOnOffClusterForDevice(): OnOffCluster {
     return OnOffCluster(
-      ChipClient.getDeviceController()
-        .getDevicePointer(deviceIdEd.text.toString().toLong()), 1
+      ChipClient.getConnectedDevicePointer(requireContext(), deviceIdEd.text.toString().toLong()), 1
     )
   }
 

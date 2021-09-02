@@ -14,6 +14,13 @@
 
 import("//build_overrides/chip.gni")
 
+config("config") {
+  # TODO: this should be a dependency on src/controller/data_model however this is circular:
+  #    zzz_generated/controller-clusters depend on src/controller
+  #    src/controller neeeds zzz_generated/controller-cluster for includes
+  include_dirs = [ "${chip_root}/zzz_generated/" ]
+}
+
 static_library("controller") {
   output_name = "libChipController"
 
@@ -22,6 +29,7 @@ static_library("controller") {
     "CHIPCluster.cpp",
     "CHIPCluster.h",
     "CHIPCommissionableNodeController.cpp",
+    "CHIPCommissionableNodeController.h",
     "CHIPDevice.cpp",
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",
@@ -30,7 +38,6 @@ static_library("controller") {
     "EmptyDataModelHandler.cpp",
     "ExampleOperationalCredentialsIssuer.cpp",
     "ExampleOperationalCredentialsIssuer.h",
-    "data_model/gen/chip-zcl-zpro-codec-api.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -47,6 +54,8 @@ static_library("controller") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
+
+  public_configs = [ ":config" ]
 
   defines = []
 }

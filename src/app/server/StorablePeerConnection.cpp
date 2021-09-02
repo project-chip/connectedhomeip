@@ -16,18 +16,19 @@
  */
 
 #include <app/server/StorablePeerConnection.h>
-#include <core/CHIPEncoding.h>
-#include <support/SafeInt.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 
-StorablePeerConnection::StorablePeerConnection(PASESession & session, Transport::AdminId admin)
+StorablePeerConnection::StorablePeerConnection(PASESession & session, FabricIndex fabric)
 {
     session.ToSerializable(mSession.mOpCreds);
-    mSession.mAdmin = Encoding::LittleEndian::HostSwap16(admin);
-    mKeyId          = session.GetLocalKeyId();
+    mSession.mFabric = fabric;
+    mKeyId           = session.GetLocalKeyId();
 }
 
+#pragma GCC diagnostic ignored "-Wstack-usage="
 CHIP_ERROR StorablePeerConnection::StoreIntoKVS(PersistentStorageDelegate & kvs)
 {
     char key[KeySize()];

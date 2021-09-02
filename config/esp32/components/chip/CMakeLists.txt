@@ -59,6 +59,12 @@ chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                is_debug)
 
+if(CONFIG_BT_ENABLED)
+chip_gn_arg_append("chip_config_network_layer_ble"           "true")
+else()
+chip_gn_arg_append("chip_config_network_layer_ble"           "false")
+endif()
+
 if(CONFIG_ENABLE_PW_RPC)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]")

@@ -24,15 +24,15 @@
 #pragma once
 
 #include <lib/core/ReferenceCounted.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/ReferenceCountedHandle.h>
+#include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeACL.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 #include <protocols/Protocols.h>
-#include <support/BitFlags.h>
-#include <support/DLLUtil.h>
-#include <support/TypeTraits.h>
-#include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -42,6 +42,7 @@ namespace Messaging {
 class ExchangeManager;
 class ExchangeContext;
 class ExchangeMessageDispatch;
+using ExchangeHandle = ReferenceCountedHandle<ExchangeContext>;
 
 class ExchangeContextDeletor
 {
@@ -63,8 +64,7 @@ class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public Referen
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
-    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                    ExchangeDelegate * delegate);
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator, ExchangeDelegate * delegate);
 
     ~ExchangeContext();
 
@@ -77,6 +77,12 @@ public:
 
     /**
      *  Send a CHIP message on this exchange.
+     *
+     *  If SendMessage returns success and the message was not expecting a
+     *  response, the exchange will close itself before returning, unless the
+     *  message being sent is a standalone ack.  If SendMessage returns failure,
+     *  the caller is responsible for deciding what to do (e.g. closing the
+     *  exchange, trying to re-establish a secure session, etc).
      *
      *  @param[in]    protocolId    The protocol identifier of the CHIP message to be sent.
      *
@@ -146,21 +152,21 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
+    ExchangeACL * GetExchangeACL(Transport::FabricTable & table)
     {
         if (mExchangeACL == nullptr)
         {
-            Transport::AdminPairingInfo * admin = table.FindAdminWithId(mSecureSession.GetAdminId());
-            if (admin != nullptr)
+            Transport::FabricInfo * fabric = table.FindFabricWithIndex(mSecureSession.Value().GetFabricIndex());
+            if (fabric != nullptr)
             {
-                mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);
+                mExchangeACL = chip::Platform::New<CASEExchangeACL>(fabric);
             }
         }
 
         return mExchangeACL;
     }
 
-    SecureSessionHandle GetSecureSession() { return mSecureSession; }
+    SessionHandle GetSecureSession() { return mSecureSession.Value(); }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -175,15 +181,15 @@ public:
     void SetResponseTimeout(Timeout timeout);
 
 private:
-    Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
+    Timeout mResponseTimeout       = 0; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
     ExchangeACL * mExchangeACL     = nullptr;
 
     ExchangeMessageDispatch * mDispatch = nullptr;
 
-    SecureSessionHandle mSecureSession; // The connection state
-    uint16_t mExchangeId;               // Assigned exchange ID.
+    Optional<SessionHandle> mSecureSession; // The connection state
+    uint16_t mExchangeId;                   // Assigned exchange ID.
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over
@@ -193,6 +199,13 @@ private:
      *  @return Returns 'true' if response expected, else 'false'.
      */
     bool IsResponseExpected() const;
+
+    /**
+     * Determine whether we are expecting our consumer to send a message on
+     * this exchange (i.e. WillSendMessage was called and the message has not
+     * yet been sent).
+     */
+    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
     /**
      *  Track whether we are now expecting a response to a message sent via this exchange (because that
@@ -216,7 +229,7 @@ private:
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
      */
-    bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchExchange(SessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     /**
      * Notify the exchange that its connection has expired.
@@ -232,9 +245,15 @@ private:
     CHIP_ERROR StartResponseTimer();
 
     void CancelResponseTimer();
-    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
+    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState);
 
     void DoClose(bool clearRetransTable);
+
+    /**
+     * We have handled an application-level message in some way and should
+     * re-evaluate out state to see whether we should still be open.
+     */
+    void MessageHandled();
 };
 
 } // namespace Messaging

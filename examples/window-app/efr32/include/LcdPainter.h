@@ -18,12 +18,14 @@
 
 #pragma once
 
-#include <WindowCover.h>
+#include <app-common/zap-generated/enums.h>
 #include <stdint.h>
 
 enum class LcdIcon
 {
     None = 0,
+    One,
+    Two,
     Lift,
     Tilt
 };
@@ -98,8 +100,8 @@ private:
 class LcdPainter
 {
 public:
-    static void Paint(WindowCover::CoverType type, uint8_t lift, uint8_t tilt, LcdIcon icon);
+    static void Paint(EmberAfWcType type, uint8_t lift, uint8_t tilt, LcdIcon icon);
 
 private:
-    static PixelPainter * GetCoverPainter(WindowCover::CoverType type, uint8_t lift, uint8_t tilt);
+    static PixelPainter * GetCoverPainter(EmberAfWcType type, uint8_t lift, uint8_t tilt);
 };

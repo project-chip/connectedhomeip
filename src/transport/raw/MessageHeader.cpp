@@ -29,9 +29,9 @@
 
 #include <type_traits>
 
-#include <core/CHIPError.h>
-#include <support/BufferReader.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BufferReader.h>
+#include <lib/support/CodeUtils.h>
 
 /**********************************************
  * Header format (little endian):
@@ -144,6 +144,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     CHIP_ERROR err = CHIP_NO_ERROR;
     LittleEndian::Reader reader(data, size);
     int version;
+    // TODO: De-uint16-ify everything related to this library
     uint16_t octets_read;
 
     uint16_t header;
@@ -185,7 +186,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     err = reader.Read16(&mEncryptionKeyID).StatusCode();
     SuccessOrExit(err);
 
-    octets_read = reader.OctetsRead();
+    octets_read = static_cast<uint16_t>(reader.OctetsRead());
     VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
     *decode_len = octets_read;
 
@@ -245,7 +246,7 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
         mAckId.ClearValue();
     }
 
-    octets_read = reader.OctetsRead();
+    octets_read = static_cast<uint16_t>(reader.OctetsRead());
     VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
     *decode_len = octets_read;
 

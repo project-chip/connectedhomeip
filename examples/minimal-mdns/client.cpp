@@ -22,14 +22,13 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-#include <mdns/minimal/QueryBuilder.h>
-#include <mdns/minimal/Server.h>
-#include <mdns/minimal/core/QName.h>
+#include <lib/mdns/minimal/QueryBuilder.h>
+#include <lib/mdns/minimal/Server.h>
+#include <lib/mdns/minimal/core/QName.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/SystemTimer.h>
 
 #include "AllInterfaceListener.h"
 #include "PacketReporter.h"
@@ -327,22 +326,16 @@ int main(int argc, char ** args)
 
     BroadcastPacket(&mdnsServer);
 
-    System::Timer * timer = nullptr;
-
-    if (DeviceLayer::SystemLayer.NewTimer(timer) == CHIP_NO_ERROR)
+    CHIP_ERROR err = DeviceLayer::SystemLayer.StartTimer(
+        gOptions.runtimeMs,
+        [](System::Layer *, void *, CHIP_ERROR err) {
+            DeviceLayer::PlatformMgr().StopEventLoopTask();
+            DeviceLayer::PlatformMgr().Shutdown();
+        },
+        nullptr);
+    if (err != CHIP_NO_ERROR)
     {
-        timer->Start(
-            gOptions.runtimeMs,
-            [](System::Layer *, void *, CHIP_ERROR err) {
-                DeviceLayer::PlatformMgr().StopEventLoopTask();
-                DeviceLayer::PlatformMgr().Shutdown();
-            },
-            nullptr);
-    }
-    else
-    {
-
-        printf("Failed to create the shutdown timer. Kill with ^C.\n");
+        printf("Failed to create the shutdown timer. Kill with ^C. %" CHIP_ERROR_FORMAT "\n", err.Format());
     }
 
     DeviceLayer::PlatformMgr().RunEventLoop();

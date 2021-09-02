@@ -40,7 +40,7 @@
 #include <sys/time.h>
 
 #include <inet/InetLayer.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <system/SystemLayer.h>
 
 #define CHIP_TOOL_COPYRIGHT "Copyright (c) 2020 Project CHIP Authors\nAll rights reserved.\n"
@@ -63,12 +63,12 @@ void ShutdownSystemLayer();
 void InetFailError(CHIP_ERROR err, const char * msg);
 
 void InitNetwork();
-void ServiceEvents(struct ::timeval & aSleepTime);
+void ServiceEvents(uint32_t aSleepTimeMilliseconds);
 void ShutdownNetwork();
 void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix, uint32_t rowWidth);
 void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix);
 
-inline static void ServiceNetwork(struct ::timeval & aSleepTime)
+inline static void ServiceNetwork(uint32_t aSleepTimeMilliseconds)
 {
-    ServiceEvents(aSleepTime);
+    ServiceEvents(aSleepTimeMilliseconds);
 }

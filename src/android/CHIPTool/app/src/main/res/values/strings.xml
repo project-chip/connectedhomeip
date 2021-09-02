@@ -18,6 +18,7 @@
     <string name="camera_unavailable_alert_title">Camera unavailable</string>
     <string name="camera_unavailable_alert_subtitle">Error launching camera to scan the QR code.</string>
     <string name="camera_unavailable_alert_exit">Exit</string>
+    <string name="input_address_btn_text">Input device address</string>
 
     <string name="send_echo_btn_text">Send echo</string>
     <string name="echo_status_connecting">Connecting…</string>
@@ -31,12 +32,22 @@
     <string name="enter_ip_address_hint_text">Enter IP Address (eg. 192.168.10.2)</string>
     <string name="enter_fabric_id_hint_text">Enter Fabric ID</string>
     <string name="enter_device_id_hint_text">Enter Device ID</string>
+    <string name="enter_endpoint_id_hint_text">Enter Endpoint ID</string>
     <string name="echo_input_hint_text">Enter message for device</string>
     <string name="update_device_address_btn_text">Update address</string>
+
+    <string name="address_commissioning_title_text">Commission with IP address</string>
+    <string name="default_discriminator">3840</string>
+    <string name="default_pincode">20202021</string>
+    <string name="enter_device_address_label_text">Device address</string>
+    <string name="enter_discriminator_label_text">Discriminator</string>
+    <string name="enter_pincode_label_text">Pincode</string>
+    <string name="commission_btn_text">Commission</string>
 
     <string name="send_command_on_btn_text">On</string>
     <string name="send_command_off_btn_text">Off</string>
     <string name="send_command_toggle_btn_text">Toggle</string>
+    <string name="read_on_off_attribute_btn_text">Read On/Off</string>
     <string name="send_command_type_label_text">%s/%d command sent!</string>
     <string name="rendezvous_over_ble_btn_text">Rendezvous over BLE</string>
     <string name="rendezvous_over_soft_ap_btn_text">Rendezvous over Soft AP</string>
@@ -48,6 +59,7 @@
     <string name="rendezvous_over_ble_pairing_failure_text">Pairing failed</string>
     <string name="rendezvous_over_ble_commissioning_success_text">Network commissioning completed</string>
     <string name="rendezvous_over_ble_commissioning_failure_text">Network commissioning failed</string>
+    <string name="commissioning_completed">Commissioning completed with result: %1$d</string>
 
     <string name="attestation_test_btn_text">Attestation Test</string>
     <string name="attestation_fetching_status">Fetching…</string>
@@ -73,5 +85,11 @@
     <string name="nfc_tag_action_show">Show device information</string>
     <string name="nfc_tag_action_wifi">Provision into Wi-Fi network</string>
     <string name="nfc_tag_action_thread">Provision into Thread network</string>
+
+    <string name="sensor_client_btn_text">Sensor clusters</string>
+    <string name="sensor_client_read_btn_text">Read</string>
+    <string name="sensor_client_watch_btn_text">Watch</string>
+    <string name="sensor_client_last_value_text">Last value: %1$.2f %2$s</string>
+    <string name="sensor_client_read_error_text">Failed to read the sensor: %1$s</string>
 
 </resources>

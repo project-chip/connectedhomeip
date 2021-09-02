@@ -18,17 +18,23 @@
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/CHIPCert.h>
-#include <support/CHIPMem.h>
-#include <support/ScopedBuffer.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/PersistentStorageMacros.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
 
 namespace chip {
 namespace Controller {
 
 constexpr const char kOperationalCredentialsIssuerKeypairStorage[]             = "ExampleOpCredsCAKey";
 constexpr const char kOperationalCredentialsIntermediateIssuerKeypairStorage[] = "ExampleOpCredsICAKey";
+constexpr const char kOperationalCredentialsRootCertificateStorage[]           = "ExampleCARootCert";
 
 using namespace Credentials;
 using namespace Crypto;
+using namespace TLV;
 
 CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDelegate & storage)
 {
@@ -78,68 +84,124 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ReturnErrorOnFailure(mIntermediateIssuer.Deserialize(serializedKey));
     }
 
+    mStorage     = &storage;
     mInitialized = true;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR
-ExampleOperationalCredentialsIssuer::GenerateNodeOperationalCertificate(const Optional<NodeId> & nodeId, FabricId fabricId,
-                                                                        const ByteSpan & csr, const ByteSpan & DAC,
-                                                                        Callback::Callback<NOCGenerated> * onNOCGenerated)
+CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId,
+                                                                                const Crypto::P256PublicKey & pubkey,
+                                                                                MutableByteSpan & rcac, MutableByteSpan & icac,
+                                                                                MutableByteSpan & noc)
+{
+    ChipLogProgress(Controller, "Generating NOC");
+    X509CertRequestParams noc_request = { 1, mIntermediateIssuerId, mNow, mNow + mValidity, true, fabricId, true, nodeId };
+    ReturnErrorOnFailure(
+        NewNodeOperationalX509Cert(noc_request, CertificateIssuerLevel::kIssuerIsIntermediateCA, pubkey, mIntermediateIssuer, noc));
+
+    ChipLogProgress(Controller, "Generating ICAC");
+    X509CertRequestParams icac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+    ReturnErrorOnFailure(NewICAX509Cert(icac_request, mIntermediateIssuerId, mIntermediateIssuer.Pubkey(), mIssuer, icac));
+
+    uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+                      err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
+    if (err == CHIP_NO_ERROR)
+    {
+        // Found root certificate in the storage.
+        rcac.reduce_size(rcacBufLen);
+        return CHIP_NO_ERROR;
+    }
+
+    ChipLogProgress(Controller, "Generating RCAC");
+    X509CertRequestParams rcac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac));
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
+    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+                      err = mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size())));
+
+    return err;
+}
+
+CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements,
+                                                                 const ByteSpan & attestationSignature, const ByteSpan & DAC,
+                                                                 const ByteSpan & PAI, const ByteSpan & PAA,
+                                                                 Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     NodeId assignedId;
-    if (nodeId.HasValue())
+    if (mNodeIdRequested)
     {
-        assignedId = nodeId.Value();
+        assignedId       = mNextRequestedNodeId;
+        mNodeIdRequested = false;
     }
     else
     {
         assignedId = mNextAvailableNodeId++;
     }
 
-    X509CertRequestParams request = { 1, mIntermediateIssuerId, mNow, mNow + mValidity, true, fabricId, true, assignedId };
+    ChipLogProgress(Controller, "Verifying Certificate Signing Request");
+    TLVReader reader;
+    reader.Init(csrElements);
+
+    if (reader.GetType() == kTLVType_NotSpecified)
+    {
+        ReturnErrorOnFailure(reader.Next());
+    }
+
+    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(reader.GetTag() == AnonymousTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+    TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+    ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
+
+    ByteSpan csr(reader.GetReadPoint(), reader.GetLength());
+    reader.ExitContainer(containerType);
 
     P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    uint32_t nocLen = 0;
+    MutableByteSpan nocSpan(noc.Get(), kMaxCHIPDERCertLength);
 
-    ReturnErrorOnFailure(NewNodeOperationalX509Cert(request, CertificateIssuerLevel::kIssuerIsIntermediateCA, pubkey,
-                                                    mIntermediateIssuer, noc.Get(), kMaxCHIPDERCertLength, nocLen));
+    chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
+    ReturnErrorCodeIf(!icac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan icacSpan(icac.Get(), kMaxCHIPDERCertLength);
 
-    onNOCGenerated->mCall(onNOCGenerated->mContext, ByteSpan(noc.Get(), nocLen));
+    chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
+    ReturnErrorCodeIf(!rcac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan rcacSpan(rcac.Get(), kMaxCHIPDERCertLength);
 
+    ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcacSpan, icacSpan, nocSpan));
+
+    ChipLogProgress(Controller, "Providing certificate chain to the commissioner");
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, icacSpan, rcacSpan);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleOperationalCredentialsIssuer::GetIntermediateCACertificate(FabricId fabricId, MutableByteSpan & outCert)
+CHIP_ERROR ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(NodeId * aNodeId)
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+    for (int i = 0; i < 10; ++i)
+    {
+        CHIP_ERROR err = DRBG_get_bytes(reinterpret_cast<uint8_t *>(aNodeId), sizeof(*aNodeId));
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
 
-    size_t outCertSize  = (outCert.size() > UINT32_MAX) ? UINT32_MAX : outCert.size();
-    uint32_t outCertLen = 0;
-    ReturnErrorOnFailure(NewICAX509Cert(request, mIntermediateIssuerId, mIntermediateIssuer.Pubkey(), mIssuer, outCert.data(),
-                                        static_cast<uint32_t>(outCertSize), outCertLen));
-    outCert.reduce_size(outCertLen);
+        if (IsOperationalNodeId(*aNodeId))
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ExampleOperationalCredentialsIssuer::GetRootCACertificate(FabricId fabricId, MutableByteSpan & outCert)
-{
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
-
-    size_t outCertSize  = (outCert.size() > UINT32_MAX) ? UINT32_MAX : outCert.size();
-    uint32_t outCertLen = 0;
-    ReturnErrorOnFailure(NewRootX509Cert(request, mIssuer, outCert.data(), static_cast<uint32_t>(outCertSize), outCertLen));
-    outCert.reduce_size(outCertLen);
-
-    return CHIP_NO_ERROR;
+    // Terrible, universe-ending luck (chances are 1 in 2^280 or so here, if our
+    // DRBG is good).
+    return CHIP_ERROR_INTERNAL;
 }
 
 } // namespace Controller

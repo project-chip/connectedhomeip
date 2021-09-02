@@ -22,8 +22,8 @@
  *
  */
 
-#include <support/SafeString.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/SafeString.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -41,11 +41,18 @@ static void TestMaxStringLength(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, MaxStringLength("") == 0);
 }
 
+static void TestTotalStringLength(nlTestSuite * inSuite, void * inContext)
+{
+    NL_TEST_ASSERT(inSuite, TotalStringLength("") == 0);
+    NL_TEST_ASSERT(inSuite, TotalStringLength("a") == 1);
+    NL_TEST_ASSERT(inSuite, TotalStringLength("def", "bc", "a") == 6);
+}
+
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestMaxStringLength), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestMaxStringLength), NL_TEST_DEF_FN(TestTotalStringLength), NL_TEST_SENTINEL() };
 
 int TestSafeString(void)
 {

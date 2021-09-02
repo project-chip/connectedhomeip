@@ -27,15 +27,15 @@
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelDelegate.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -47,43 +47,45 @@ namespace app {
  *         for the relevant data, and sending a reply.
  *
  */
-class ReadHandler
+class ReadHandler : public Messaging::ExchangeDelegate
 {
 public:
+    enum class ShutdownOptions
+    {
+        KeepCurrentExchange,
+        AbortCurrentExchange,
+    };
+
     /**
      *  Initialize the ReadHandler. Within the lifetime
      *  of this instance, this method is invoked once after object
      *  construction until a call to Shutdown is made to terminate the
      *  instance.
      *
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
-     *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                    Messaging::ExchangeContext * apExchangeContext);
 
     /**
      *  Shut down the ReadHandler. This terminates this instance
      *  of the object and releases all held resources.
      *
      */
-    void Shutdown();
+    void Shutdown(ShutdownOptions aOptions = ShutdownOptions::KeepCurrentExchange);
     /**
      *  Process a read request.  Parts of the processing may end up being asynchronous, but the ReadHandler
-     *  guarantees that it will call Shutdown on itself when processing is done (including if OnReadRequest
+     *  guarantees that it will call Shutdown on itself when processing is done (including if OnReadInitialRequest
      *  returns an error).
-     *
-     *  @param[in]    apExchangeContext    A pointer to the ExchangeContext.
-     *  @param[in]    aPayload             A payload that has read request data
      *
      *  @retval #Others If fails to process read request
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR OnReadRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnReadInitialRequest(System::PacketBufferHandle && aPayload);
 
     /**
      *  Send ReportData to initiator
@@ -98,7 +100,7 @@ public:
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
     bool IsReportable() const { return mState == HandlerState::Reportable; }
-
+    bool IsReporting() const { return mState == HandlerState::Reporting; }
     virtual ~ReadHandler() = default;
 
     ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
@@ -111,8 +113,12 @@ public:
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
     bool CheckEventClean(EventManagement & aEventManager);
 
-    // Move to the next dirty priority where last schedule event number is larger than current self vended event number
+    // Move to the next dirty priority from critical high priority to debug low priority, where last schedule event number
+    // is larger than current self vended event number
     void MoveToNextScheduledDirtyPriority();
+
+    bool IsInitialReport() { return mInitialReport; }
+    void ClearInitialReport() { mInitialReport = false; }
 
 private:
     enum class HandlerState
@@ -120,18 +126,27 @@ private:
         Uninitialized = 0, ///< The handler has not been initialized
         Initialized,       ///< The handler has been initialized and is ready
         Reportable,        ///< The handler has received read request and is waiting for the data to send to be available
+        Reporting,         ///< The handler is reporting
     };
 
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser);
     CHIP_ERROR ProcessEventPathList(EventPathList::Parser & aEventPathListParser);
+    CHIP_ERROR OnStatusReport(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
+    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    void SetInitialReport() { mInitialReport = true; }
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
-    CHIP_ERROR AbortExistingExchangeContext();
+
+    // Merges aAttributePath inside the existing internal mpAttributeClusterInfoList
+    bool MergeOverlappedAttributePath(ClusterInfo & aAttributePath);
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
 
     // Don't need the response for report data if true
     bool mSuppressResponse = false;
@@ -148,6 +163,9 @@ private:
 
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
+    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
+    InteractionModelDelegate * mpDelegate      = nullptr;
+    bool mInitialReport                        = false;
 };
 } // namespace app
 } // namespace chip

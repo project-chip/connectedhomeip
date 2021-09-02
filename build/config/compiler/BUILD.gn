@@ -53,53 +53,67 @@ config("abi_default") {
     ]
   } else if (current_os == "ios") {
     # iOS ABI currently set by chip_xcode_build_connector.sh
-  } else if (current_cpu == "arm" || current_cpu == "arm64") {
-    if (arm_arch != "") {
-      cflags += [ "-march=${arm_arch}" ]
-    }
-    if (arm_cpu != "") {
-      cflags += [ "-mcpu=${arm_cpu}" ]
-    }
-    if (arm_tune != "") {
-      cflags += [ "-mtune=${arm_tune}" ]
-    }
-    if (arm_abi != "") {
-      cflags += [ "-mabi=${arm_abi}" ]
-    }
-    if (arm_fpu != "") {
-      cflags += [ "-mfpu=${arm_fpu}" ]
-    }
-    if (arm_float_abi != "") {
-      cflags += [ "-mfloat-abi=${arm_float_abi}" ]
-    }
-    if (arm_use_thumb) {
-      cflags += [ "-mthumb" ]
-    }
-  } else if (current_cpu == "x86" || current_cpu == "x86_64") {
-    if (x86_arch != "") {
-      cflags += [ "-march=${x86_arch}" ]
-    }
-    if (x86_cpu != "") {
-      cflags += [ "-mcpu=${x86_cpu}" ]
-    }
-    if (x86_tune != "") {
-      cflags += [ "-mtune=${x86_tune}" ]
-    }
+  }
 
-    if (current_cpu == "x86_64") {
-      cflags += [
-        "-msse4.2",
-        "-mpopcnt",
-        "-m64",
-      ]
-    } else if (current_cpu == "x86") {
-      cflags += [
-        "-mssse3",
-        "-mfpmath=sse",
-        "-m32",
-      ]
+  if (current_os != "mac" && current_os != "ios") {
+    if (current_cpu == "arm" || current_cpu == "arm64") {
+      if (current_os == "linux" && is_clang) {
+        if (current_cpu == "arm") {
+          cflags += [ "--target=armv7-linux-gnueabihf" ]
+        } else if (current_cpu == "arm64") {
+          cflags += [ "--target=aarch64-linux-gnu" ]
+        }
+      }
+
+      if (arm_arch != "") {
+        cflags += [ "-march=${arm_arch}" ]
+      }
+      if (arm_cpu != "") {
+        cflags += [ "-mcpu=${arm_cpu}" ]
+      }
+      if (arm_tune != "") {
+        cflags += [ "-mtune=${arm_tune}" ]
+      }
+      if (arm_abi != "") {
+        cflags += [ "-mabi=${arm_abi}" ]
+      }
+      if (arm_fpu != "") {
+        cflags += [ "-mfpu=${arm_fpu}" ]
+      }
+      if (arm_float_abi != "") {
+        cflags += [ "-mfloat-abi=${arm_float_abi}" ]
+      }
+      if (arm_use_thumb) {
+        cflags += [ "-mthumb" ]
+      }
+    }
+    if (current_cpu == "x86" || current_cpu == "x86_64") {
+      if (x86_arch != "") {
+        cflags += [ "-march=${x86_arch}" ]
+      }
+      if (x86_cpu != "") {
+        cflags += [ "-mcpu=${x86_cpu}" ]
+      }
+      if (x86_tune != "") {
+        cflags += [ "-mtune=${x86_tune}" ]
+      }
+
+      if (current_cpu == "x86_64") {
+        cflags += [
+          "-msse4.2",
+          "-mpopcnt",
+          "-m64",
+        ]
+      } else if (current_cpu == "x86") {
+        cflags += [
+          "-mssse3",
+          "-mfpmath=sse",
+          "-m32",
+        ]
+      }
     }
   }
+
   asmflags = cflags
   ldflags = cflags
 }
@@ -146,6 +160,7 @@ config("disabled_warnings") {
   cflags = [
     "-Wno-deprecated-declarations",
     "-Wno-unknown-warning-option",
+    "-Wno-maybe-uninitialized",
     "-Wno-missing-field-initializers",
     "-Wno-unused-parameter",
   ]
@@ -356,6 +371,11 @@ config("sanitize_default") {
 config("fuzzing_default") {
 }
 
+declare_args() {
+  # Enable Runtime Type Information (RTTI)
+  enable_rtti = false
+}
+
 config("no_rtti") {
   cflags_cc = [ "-fno-rtti" ]
 }
@@ -365,7 +385,11 @@ config("rtti") {
 }
 
 config("rtti_default") {
-  configs = [ ":no_rtti" ]
+  if (enable_rtti) {
+    configs = [ ":rtti" ]
+  } else {
+    configs = [ ":no_rtti" ]
+  }
 }
 
 config("no_exceptions") {

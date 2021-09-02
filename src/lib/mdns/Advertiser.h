@@ -20,12 +20,13 @@
 #include <algorithm>
 #include <cstdint>
 
-#include <core/CHIPError.h>
-#include <core/Optional.h>
-#include <core/PeerId.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/core/PeerId.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeString.h>
 #include <lib/support/Span.h>
-#include <support/CHIPMemString.h>
 
 namespace chip {
 namespace Mdns {
@@ -34,22 +35,33 @@ static constexpr uint16_t kMdnsPort = 5353;
 // Need 8 bytes to fit a thread mac.
 static constexpr size_t kMaxMacSize = 8;
 
-static constexpr size_t kKeyDiscriminatorMaxLength      = 5;
-static constexpr size_t kKeyVendorProductMaxLength      = 11;
-static constexpr size_t kKeyAdditionalPairingMaxLength  = 1;
-static constexpr size_t kKeyCommissioningModeMaxLength  = 1;
-static constexpr size_t kKeyDeviceTypeMaxLength         = 5;
-static constexpr size_t kKeyDeviceNameMaxLength         = 32;
-static constexpr size_t kKeyRotatingIdMaxLength         = 100;
-static constexpr size_t kKeyPairingInstructionMaxLength = 128;
-static constexpr size_t kKeyPairingHintMaxLength        = 10;
+// Operational node TXT entries
+static constexpr size_t kTxtRetryIntervalIdleMaxLength   = 7; // [CRI] 0-3600000
+static constexpr size_t kTxtRetryIntervalActiveMaxLength = 7; // [CRA] 0-3600000
+static constexpr size_t kMaxRetryInterval                = 3600000;
 
-static constexpr size_t kSubTypeShortDiscriminatorMaxLength = 3;
-static constexpr size_t kSubTypeLongDiscriminatorMaxLength  = 4;
-static constexpr size_t kSubTypeVendorMaxLength             = 5;
-static constexpr size_t kSubTypeDeviceTypeMaxLength         = 5;
-static constexpr size_t kSubTypeCommissioningModeMaxLength  = 1;
-static constexpr size_t kSubTypeAdditionalPairingMaxLength  = 1;
+// Commissionable/commissioner node TXT entries
+static constexpr size_t kKeyDiscriminatorMaxLength           = 5;
+static constexpr size_t kKeyVendorProductMaxLength           = 11;
+static constexpr size_t kKeyAdditionalCommissioningMaxLength = 1;
+static constexpr size_t kKeyCommissioningModeMaxLength       = 1;
+static constexpr size_t kKeyDeviceTypeMaxLength              = 5;
+static constexpr size_t kKeyDeviceNameMaxLength              = 32;
+static constexpr size_t kKeyRotatingIdMaxLength              = 100;
+static constexpr size_t kKeyPairingInstructionMaxLength      = 128;
+static constexpr size_t kKeyPairingHintMaxLength             = 10;
+
+// Commissionable/commissioner node subtypes
+static constexpr size_t kSubTypeShortDiscriminatorMaxLength      = 4; // _S<dd>
+static constexpr size_t kSubTypeLongDiscriminatorMaxLength       = 6; // _L<dddd>
+static constexpr size_t kSubTypeVendorMaxLength                  = 7; // _V<ddddd>
+static constexpr size_t kSubTypeDeviceTypeMaxLength              = 5; // _T<ddd>
+static constexpr size_t kSubTypeCommissioningModeMaxLength       = 3; // _C<d>
+static constexpr size_t kSubTypeAdditionalCommissioningMaxLength = 3; // _A<d>
+static constexpr size_t kSubTypeMaxNumber                        = 6;
+static constexpr size_t kSubTypeTotalLength = kSubTypeShortDiscriminatorMaxLength + kSubTypeLongDiscriminatorMaxLength +
+    kSubTypeVendorMaxLength + kSubTypeDeviceTypeMaxLength + kSubTypeCommissioningModeMaxLength +
+    kSubTypeAdditionalCommissioningMaxLength;
 
 enum class CommssionAdvertiseMode : uint8_t
 {
@@ -94,10 +106,11 @@ private:
 class OperationalAdvertisingParameters : public BaseAdvertisingParams<OperationalAdvertisingParameters>
 {
 public:
-    // Amount of mDNS text entries required for this advertising type
-    static constexpr uint8_t kNumAdvertisingTxtEntries = 2;
-    static constexpr uint8_t kTxtMaxKeySize            = 3 + 1; // "CRI"/"CRA" as possible keys
-    static constexpr uint8_t kTxtMaxValueSize          = 7 + 1; // Max for text representation of the 32-bit MRP intervals
+    static constexpr uint8_t kTxtMaxNumber     = 2;
+    static constexpr uint8_t kTxtMaxKeySize    = MaxStringLength("CRI", "CRA"); // possible keys
+    static constexpr uint8_t kTxtMaxValueSize  = std::max({ kTxtRetryIntervalIdleMaxLength, kTxtRetryIntervalActiveMaxLength });
+    static constexpr size_t kTxtTotalKeySize   = TotalStringLength("CRI", "CRA"); // possible keys
+    static constexpr size_t kTxtTotalValueSize = kTxtRetryIntervalIdleMaxLength + kTxtRetryIntervalActiveMaxLength;
 
     OperationalAdvertisingParameters & SetPeerId(const PeerId & peerId)
     {
@@ -127,10 +140,17 @@ private:
 class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionAdvertisingParameters>
 {
 public:
-    // Amount of mDNS text entries required for this advertising type
-    static constexpr uint8_t kNumAdvertisingTxtEntries = 8;     // Min 1 - Max 8
-    static constexpr uint8_t kTxtMaxKeySize            = 2 + 1; // "D"/"VP"/"CM"/"DT"/"DN"/"RI"/"PI"/"PH" as possible keys
-    static constexpr uint8_t kTxtMaxValueSize          = 128;   // Max from PI - Pairing Instruction
+    static constexpr uint8_t kTxtMaxNumber  = 9;
+    static constexpr uint8_t kTxtMaxKeySize = MaxStringLength("D", "VP", "CM", "AP", "DT", "DN", "RI", "PI", "PH"); // possible keys
+    static constexpr uint8_t kTxtMaxValueSize =
+        std::max({ kKeyDiscriminatorMaxLength, kKeyVendorProductMaxLength, kKeyAdditionalCommissioningMaxLength,
+                   kKeyCommissioningModeMaxLength, kKeyDeviceTypeMaxLength, kKeyDeviceNameMaxLength, kKeyRotatingIdMaxLength,
+                   kKeyPairingInstructionMaxLength, kKeyPairingHintMaxLength });
+    static constexpr size_t kTxtTotalKeySize =
+        TotalStringLength("D", "VP", "CM", "AP", "DT", "DN", "RI", "PI", "PH"); // possible keys
+    static constexpr size_t kTxtTotalValueSize = kKeyDiscriminatorMaxLength + kKeyVendorProductMaxLength +
+        kKeyAdditionalCommissioningMaxLength + kKeyCommissioningModeMaxLength + kKeyDeviceTypeMaxLength + kKeyDeviceNameMaxLength +
+        kKeyRotatingIdMaxLength + kKeyPairingInstructionMaxLength + kKeyPairingHintMaxLength;
 
     CommissionAdvertisingParameters & SetShortDiscriminator(uint8_t discriminator)
     {
@@ -139,7 +159,7 @@ public:
     }
     uint8_t GetShortDiscriminator() const { return mShortDiscriminator; }
 
-    CommissionAdvertisingParameters & SetLongDiscrimininator(uint16_t discriminator)
+    CommissionAdvertisingParameters & SetLongDiscriminator(uint16_t discriminator)
     {
         mLongDiscriminator = discriminator;
         return *this;
@@ -160,14 +180,19 @@ public:
     }
     Optional<uint16_t> GetProductId() const { return mProductId; }
 
-    CommissionAdvertisingParameters & SetCommissioningMode(bool modeEnabled, bool openWindow)
+    CommissionAdvertisingParameters & SetCommissioningMode(bool modeEnabled)
     {
-        mCommissioningModeEnabled    = modeEnabled;
-        mOpenWindowCommissioningMode = openWindow;
+        mCommissioningModeEnabled = modeEnabled;
         return *this;
     }
     bool GetCommissioningMode() const { return mCommissioningModeEnabled; }
-    bool GetOpenWindowCommissioningMode() const { return mOpenWindowCommissioningMode; }
+
+    CommissionAdvertisingParameters & SetAdditionalCommissioning(bool additionalCommissioningEnabled)
+    {
+        mAdditionalCommissioningEnabled = additionalCommissioningEnabled;
+        return *this;
+    }
+    bool GetAdditionalCommissioning() const { return mAdditionalCommissioningEnabled; }
 
     CommissionAdvertisingParameters & SetDeviceType(Optional<uint16_t> deviceType)
     {
@@ -180,7 +205,7 @@ public:
     {
         if (deviceName.HasValue())
         {
-            chip::Platform::CopyString(mDeviceName, sizeof(mDeviceName), deviceName.Value());
+            Platform::CopyString(mDeviceName, sizeof(mDeviceName), deviceName.Value());
             mDeviceNameHasValue = true;
         }
         else
@@ -198,7 +223,7 @@ public:
     {
         if (rotatingId.HasValue())
         {
-            chip::Platform::CopyString(mRotatingId, sizeof(mRotatingId), rotatingId.Value());
+            Platform::CopyString(mRotatingId, sizeof(mRotatingId), rotatingId.Value());
             mRotatingIdHasValue = true;
         }
         else
@@ -216,7 +241,7 @@ public:
     {
         if (pairingInstr.HasValue())
         {
-            chip::Platform::CopyString(mPairingInstr, sizeof(mPairingInstr), pairingInstr.Value());
+            Platform::CopyString(mPairingInstr, sizeof(mPairingInstr), pairingInstr.Value());
             mPairingInstrHasValue = true;
         }
         else
@@ -245,11 +270,11 @@ public:
     CommssionAdvertiseMode GetCommissionAdvertiseMode() const { return mMode; }
 
 private:
-    uint8_t mShortDiscriminator       = 0;
-    uint16_t mLongDiscriminator       = 0; // 12-bit according to spec
-    CommssionAdvertiseMode mMode      = CommssionAdvertiseMode::kCommissionableNode;
-    bool mCommissioningModeEnabled    = false;
-    bool mOpenWindowCommissioningMode = false;
+    uint8_t mShortDiscriminator          = 0;
+    uint16_t mLongDiscriminator          = 0; // 12-bit according to spec
+    CommssionAdvertiseMode mMode         = CommssionAdvertiseMode::kCommissionableNode;
+    bool mCommissioningModeEnabled       = false;
+    bool mAdditionalCommissioningEnabled = false;
     chip::Optional<uint16_t> mVendorId;
     chip::Optional<uint16_t> mProductId;
     chip::Optional<uint16_t> mDeviceType;

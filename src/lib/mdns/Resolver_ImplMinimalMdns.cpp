@@ -15,20 +15,21 @@
  *    limitations under the License.
  */
 
+#include "MdnsCache.h"
 #include "Resolver.h"
 
 #include <limits>
 
-#include "MinimalMdnsServer.h"
-#include "ServiceNaming.h"
-
-#include <mdns/TxtFields.h>
-#include <mdns/minimal/Parser.h>
-#include <mdns/minimal/QueryBuilder.h>
-#include <mdns/minimal/RecordData.h>
-#include <mdns/minimal/core/FlatAllocatedQName.h>
-
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/mdns/MinimalMdnsServer.h>
+#include <lib/mdns/ServiceNaming.h>
+#include <lib/mdns/TxtFields.h>
+#include <lib/mdns/minimal/Parser.h>
+#include <lib/mdns/minimal/QueryBuilder.h>
+#include <lib/mdns/minimal/RecordData.h>
+#include <lib/mdns/minimal/core/FlatAllocatedQName.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 // MDNS servers will receive all broadcast packets over the network.
 // Disable 'invalid packet' messages because the are expected and common
@@ -39,45 +40,40 @@ namespace chip {
 namespace Mdns {
 namespace {
 
-class TxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
-{
-public:
-    TxtRecordDelegateImpl(DiscoveredNodeData * nodeData) : mNodeData(nodeData) {}
-    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value);
-
-private:
-    DiscoveredNodeData * mNodeData;
-};
-
 const ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
 {
     return ByteSpan(range.Start(), range.Size());
 }
 
-void TxtRecordDelegateImpl::OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)
+template <class NodeData>
+class TxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
 {
-    if (mNodeData == nullptr)
+public:
+    explicit TxtRecordDelegateImpl(NodeData & nodeData) : mNodeData(nodeData) {}
+    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override
     {
-        return;
+        FillNodeDataFromTxt(GetSpan(name), GetSpan(value), mNodeData);
     }
-    ByteSpan key = GetSpan(name);
-    ByteSpan val = GetSpan(value);
-    FillNodeDataFromTxt(key, val, mNodeData);
-}
+
+private:
+    NodeData & mNodeData;
+};
 
 constexpr size_t kMdnsMaxPacketSize = 1024;
 constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
+using MdnsCacheType = Mdns::MdnsCache<CHIP_CONFIG_MDNS_CACHE_SIZE>;
 
 class PacketDataReporter : public ParserDelegate
 {
 public:
     PacketDataReporter(ResolverDelegate * delegate, chip::Inet::InterfaceId interfaceId, DiscoveryType discoveryType,
-                       const BytesRange & packet) :
+                       const BytesRange & packet, MdnsCacheType & mdnsCache) :
         mDelegate(delegate),
         mDiscoveryType(discoveryType), mPacketRange(packet)
     {
+        mInterfaceId           = interfaceId;
         mNodeData.mInterfaceId = interfaceId;
     }
 
@@ -95,6 +91,7 @@ private:
     DiscoveryType mDiscoveryType;
     ResolvedNodeData mNodeData;
     DiscoveredNodeData mDiscoveredNodeData;
+    chip::Inet::InterfaceId mInterfaceId;
     BytesRange mPacketRange;
 
     bool mValid       = false;
@@ -129,6 +126,12 @@ void PacketDataReporter::OnHeader(ConstHeaderRef & header)
 
 void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
 {
+    mdns::Minimal::SerializedQNameIterator it = srv.GetName();
+    if (it.Next())
+    {
+        Platform::CopyString(mNodeData.mHostName, it.Value());
+    }
+
     if (!name.Next())
     {
 #ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
@@ -155,12 +158,13 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
     if (it.Next())
     {
-        strncpy(mDiscoveredNodeData.hostName, it.Value(), sizeof(DiscoveredNodeData::hostName));
+        Platform::CopyString(mDiscoveredNodeData.hostName, it.Value());
     }
     if (name.Next())
     {
         strncpy(mDiscoveredNodeData.instanceName, name.Value(), sizeof(DiscoveredNodeData::instanceName));
     }
+    mDiscoveredNodeData.port = srv.GetPort();
 }
 
 void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
@@ -181,7 +185,9 @@ void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress &
     {
         return;
     }
-    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs++] = addr;
+    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs]   = addr;
+    mDiscoveredNodeData.interfaceId[mDiscoveredNodeData.numIPs] = mInterfaceId;
+    mDiscoveredNodeData.numIPs++;
 }
 
 bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
@@ -220,24 +226,18 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         else if (mDiscoveryType == DiscoveryType::kOperational)
         {
             // Ensure this is our record.
+            // TODO: Fix this comparison which is too loose.
             if (HasQNamePart(data.GetName(), kOperationalServiceName))
             {
                 OnOperationalSrvRecord(data.GetName(), srv);
             }
-            else
-            {
-                mValid = false;
-            }
         }
         else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
+            // TODO: Fix this comparison which is too loose.
             if (HasQNamePart(data.GetName(), kCommissionableServiceName) || HasQNamePart(data.GetName(), kCommissionerServiceName))
             {
                 OnCommissionableNodeSrvRecord(data.GetName(), srv);
-            }
-            else
-            {
-                mValid = false;
             }
         }
         break;
@@ -257,7 +257,12 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
     case QType::TXT:
         if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
-            TxtRecordDelegateImpl textRecordDelegate(&mDiscoveredNodeData);
+            TxtRecordDelegateImpl<DiscoveredNodeData> textRecordDelegate(mDiscoveredNodeData);
+            ParseTxtRecord(data.GetData(), &textRecordDelegate);
+        }
+        else if (mDiscoveryType == DiscoveryType::kOperational)
+        {
+            TxtRecordDelegateImpl<ResolvedNodeData> textRecordDelegate(mNodeData);
             ParseTxtRecord(data.GetData(), &textRecordDelegate);
         }
         break;
@@ -353,6 +358,9 @@ private:
     }
     static constexpr int kMaxQnameSize = 100;
     char qnameStorage[kMaxQnameSize];
+    // should this be static?
+    // original version had:    static Mdns::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> sIPCache;
+    MdnsCacheType sMdnsCache;
 };
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
@@ -362,7 +370,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
         return;
     }
 
-    PacketDataReporter reporter(mDelegate, info->Interface, mDiscoveryType, data);
+    PacketDataReporter reporter(mDelegate, info->Interface, mDiscoveryType, data, sMdnsCache);
 
     if (!ParsePacket(data, &reporter))
     {

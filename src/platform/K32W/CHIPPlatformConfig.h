@@ -41,6 +41,8 @@
 #define CHIP_CONFIG_TIME_ENABLE_CLIENT 1
 #define CHIP_CONFIG_TIME_ENABLE_SERVER 0
 
+#define CHIP_CONFIG_ERROR_CLASS 1
+
 // ==================== Security Adaptations ====================
 
 #define CHIP_CONFIG_USE_OPENSSL_ECC 0
@@ -137,3 +139,11 @@
 #ifndef WDM_PUBLISHER_MAX_NOTIFIES_IN_FLIGHT
 #define WDM_PUBLISHER_MAX_NOTIFIES_IN_FLIGHT 2
 #endif // WDM_PUBLISHER_MAX_NOTIFIES_IN_FLIGHT
+
+/* TODO:
+ * https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/2534
+ * https://app.slack.com/client/TUK3ZT5EX/G014G30SVV0/thread/G014G30SVV0-1626166816.177800
+ */
+#ifndef CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS
+#define CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS 30000
+#endif

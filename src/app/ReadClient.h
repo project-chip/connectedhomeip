@@ -28,15 +28,16 @@
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequest.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLVDebug.hpp>
+#include <app/ReadPrepareParams.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -56,26 +57,30 @@ public:
      *  all held resources.  The object must not be used after Shutdown() is called.
      *
      *  SDK consumer can choose when to shut down the ReadClient.
-     *  The ReadClient will never shut itself down, unless the overall InteractionModelEngine is shut down.
+     *  The ReadClient will automatically shut itself down when it receives a
+     *  response or the response times out.  So manual shutdown is only needed
+     *  to shut down a ReadClient before one of those two things has happened,
+     *  (e.g. if SendReadRequest returned failure).
      */
     void Shutdown();
 
     /**
      *  Send a Read Request.  There can be one Read Request outstanding on a given ReadClient.
      *  If SendReadRequest returns success, no more Read Requests can be sent on this ReadClient
-     *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReportError
+     *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReadError
      *  call happens with guarantee.
+     *
+     *  Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
+     *  Default timeout value will be used otherwise.
      *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * aSecureSession,
-                               EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
-                               AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                               EventNumber aEventNumber);
+    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
 
-    intptr_t GetAppIdentifier() const { return mAppIdentifier; }
+    uint64_t GetAppIdentifier() const { return mAppIdentifier; }
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+    CHIP_ERROR SendStatusReport(CHIP_ERROR aError);
 
 private:
     friend class TestReadInteraction;
@@ -83,9 +88,9 @@ private:
 
     enum class ClientState
     {
-        Uninitialized = 0, ///< The client has not been initialized
-        Initialized,       ///< The client has been initialized and is ready for a SendReadRequest
-        AwaitingResponse,  ///< The client has sent out the read request message
+        Uninitialized = 0,     ///< The client has not been initialized
+        Initialized,           ///< The client has been initialized and is ready for a SendReadRequest
+        AwaitingInitialReport, ///< The client is waiting for initial report
     };
 
     /**
@@ -96,13 +101,12 @@ private:
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.
-     *  @param[in]    aAppState        Application defined object to distinguish different read requests.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, intptr_t aAppIdentifier);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, uint64_t aAppIdentifier);
 
     virtual ~ReadClient() = default;
 
@@ -114,24 +118,35 @@ private:
      *  Check if current read client is being used
      *
      */
-    bool IsFree() const { return mState == ClientState::Uninitialized; };
-
-    CHIP_ERROR GenerateEventPathList(ReadRequest::Builder & aRequest, EventPathParams * apEventPathParamsList,
-                                     size_t aEventPathParamsListSize, EventNumber & aEventNumber);
-    CHIP_ERROR GenerateAttributePathList(ReadRequest::Builder & aRequest, AttributePathParams * apAttributePathParamsList,
-                                         size_t aAttributePathParamsListSize);
+    bool IsFree() const { return mState == ClientState::Uninitialized; }
+    bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
+    CHIP_ERROR GenerateEventPathList(EventPathList::Builder & aEventPathListBuilder, EventPathParams * apEventPathParamsList,
+                                     size_t aEventPathParamsListSize);
+    CHIP_ERROR GenerateAttributePathList(AttributePathList::Builder & aAttributeathListBuilder,
+                                         AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
+
+    void SetExchangeContext(Messaging::ExchangeContext * apExchangeContext) { mpExchangeCtx = apExchangeContext; }
+    void ClearExchangeContext() { mpExchangeCtx = nullptr; }
 
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;
 
+    /**
+     * Internal shutdown method that we use when we know what's going on with
+     * our exchange and don't need to manually close it.
+     */
+    void ShutdownInternal(CHIP_ERROR aError);
+    void ClearInitialReport() { mInitialReport = false; }
+    bool IsInitialReport() { return mInitialReport; }
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
-    intptr_t mAppIdentifier                    = 0;
+    uint64_t mAppIdentifier                    = 0;
+    bool mInitialReport                        = true;
 };
 
 }; // namespace app

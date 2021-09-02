@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -19,15 +19,28 @@
 
 #include "LightingManager.h"
 #include "qvCHIP.h"
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+// initialization values for Blue in XY color space
+constexpr XyColor_t kBlueXY = { 9830, 3932 };
+
+// initialization values for Blue in HSV color space
+constexpr HsvColor_t kBlueHSV = { 240, 100, 255 };
+
+// default initialization value for the light level after start
+constexpr uint8_t kDefaultLevel = 64;
 
 LightingManager LightingManager::sLight;
 
-int LightingManager::Init()
+CHIP_ERROR LightingManager::Init()
 {
     mState = kState_Off;
-    mLevel = 64;
-    return 0;
+    mLevel = kDefaultLevel;
+    mXY    = kBlueXY;
+    mHSV   = kBlueHSV;
+    mRGB   = XYToRgb(mLevel, mXY.x, mXY.y);
+
+    return CHIP_NO_ERROR;
 }
 
 bool LightingManager::IsTurnedOn()
@@ -51,6 +64,8 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
     // TODO: this function is called InitiateAction because we want to implement some features such as ramping up here.
     bool action_initiated = false;
     State_t new_state;
+    XyColor_t xy;
+    HsvColor_t hsv;
 
     switch (aAction)
     {
@@ -62,6 +77,14 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
         break;
     case LEVEL_ACTION:
         ChipLogProgress(NotSpecified, "LightMgr:LEVEL: lev:%u->%u", mLevel, *value);
+        break;
+    case COLOR_ACTION_XY:
+        xy = *reinterpret_cast<XyColor_t *>(value);
+        ChipLogProgress(NotSpecified, "LightMgr:COLOR: xy:%u|%u->%u|%u", mXY.x, mXY.y, xy.x, xy.y);
+        break;
+    case COLOR_ACTION_HSV:
+        hsv = *reinterpret_cast<HsvColor_t *>(value);
+        ChipLogProgress(NotSpecified, "LightMgr:COLOR: hsv:%u|%u->%u|%u", mHSV.h, mHSV.s, hsv.h, hsv.s);
         break;
     default:
         ChipLogProgress(NotSpecified, "LightMgr:Unknown");
@@ -91,6 +114,30 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
             new_state = kState_On;
         }
     }
+    else if (aAction == COLOR_ACTION_XY)
+    {
+        action_initiated = true;
+        if (xy.x == 0 && xy.y == 0)
+        {
+            new_state = kState_Off;
+        }
+        else
+        {
+            new_state = kState_On;
+        }
+    }
+    else if (aAction == COLOR_ACTION_HSV)
+    {
+        action_initiated = true;
+        if (hsv.h == 0 && hsv.s == 0)
+        {
+            new_state = kState_Off;
+        }
+        else
+        {
+            new_state = kState_On;
+        }
+    }
 
     if (action_initiated)
     {
@@ -101,6 +148,14 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
         if (aAction == LEVEL_ACTION)
         {
             SetLevel(*value);
+        }
+        else if (aAction == COLOR_ACTION_XY)
+        {
+            SetColor(xy.x, xy.y);
+        }
+        else if (aAction == COLOR_ACTION_HSV)
+        {
+            SetColor(hsv.h, hsv.s);
         }
         else
         {
@@ -119,6 +174,24 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
 void LightingManager::SetLevel(uint8_t aLevel)
 {
     mLevel = aLevel;
+    mRGB   = XYToRgb(mLevel, mXY.x, mXY.y);
+    UpdateLight();
+}
+
+void LightingManager::SetColor(uint16_t x, uint16_t y)
+{
+    mXY.x = x;
+    mXY.y = y;
+    mRGB  = XYToRgb(mLevel, mXY.x, mXY.y);
+    UpdateLight();
+}
+
+void LightingManager::SetColor(uint8_t hue, uint8_t saturation)
+{
+    mHSV.h = hue;
+    mHSV.s = saturation;
+    mHSV.v = mLevel; // use level from Level Cluster as Vibrance parameter
+    mRGB   = HsvToRgb(mHSV);
     UpdateLight();
 }
 
@@ -137,7 +210,7 @@ void LightingManager::Set(bool aOn)
 
 void LightingManager::UpdateLight()
 {
-    ChipLogProgress(NotSpecified, "UpdateLight: %d %d", mState, mLevel);
-    qvCHIP_PWMSetColor(mLevel, mLevel, mLevel);
+    ChipLogProgress(NotSpecified, "UpdateLight: %d L:%d R:%d G:%d B:%d", mState, mLevel, mRGB.r, mRGB.g, mRGB.b);
+    qvCHIP_PWMSetColor(mRGB.r, mRGB.g, mRGB.b);
     qvCHIP_PWMColorOnOff(mState == kState_On);
 }

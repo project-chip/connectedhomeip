@@ -27,13 +27,13 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
-#include <core/CHIPTLVTags.h>
-#include <core/CHIPTLVTypes.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLVTags.h>
+#include <lib/core/CHIPTLVTypes.h>
 
-#include <support/DLLUtil.h>
-#include <support/Span.h>
-#include <support/TypeTraits.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -114,7 +114,29 @@ public:
      * @param[in]   dataLen The length of the TLV data to be parsed.
      *
      */
-    void Init(const uint8_t * data, uint32_t dataLen);
+    void Init(const uint8_t * data, size_t dataLen);
+
+    /**
+     * Initializes a TLVReader object to read from a single input buffer
+     * represented as a span.
+     *
+     * @param[in]   data    A byte span to read from
+     *
+     */
+    void Init(const ByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Initializes a TLVReader object to read from a single input buffer
+     * represented as byte array.
+     *
+     * @param[in]   data    A byte buffer to read from
+     *
+     */
+    template <size_t N>
+    void Init(const uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
 
     /**
      * Initializes a TLVReader object to read from a TLVBackingStore.
@@ -406,6 +428,18 @@ public:
     CHIP_ERROR Get(float & v);
 
     /**
+     * Get the value of the current element as a chip::ByteSpan
+     *
+     * @param[out]  v                       Receives the value associated with current TLV element.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV bytes array, or
+     *                                      the reader is not positioned on an element.
+     *
+     */
+    CHIP_ERROR Get(chip::ByteSpan & v);
+
+    /**
      * Get the value of the current byte or UTF8 string element.
      *
      * To determine the required input buffer size, call the GetLength() method before calling GetBytes().
@@ -426,7 +460,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize);
+    CHIP_ERROR GetBytes(uint8_t * buf, size_t bufSize);
 
     /**
      * Allocates and returns a buffer containing the value of the current byte or UTF8 string.
@@ -475,7 +509,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetString(char * buf, uint32_t bufSize);
+    CHIP_ERROR GetString(char * buf, size_t bufSize);
 
     /**
      * Allocates and returns a buffer containing the null-terminated value of the current byte or UTF8
@@ -811,6 +845,75 @@ protected:
 };
 
 /**
+ * A TLVReader that is guaranteed to be backed by a single contiguous buffer.
+ * This allows it to expose some additional methods that allow consumers to
+ * directly access the data in that buffer in a safe way that is guaranteed to
+ * work as long as the reader object stays in scope.
+ */
+class ContiguousBufferTLVReader : public TLVReader
+{
+public:
+    ContiguousBufferTLVReader() : TLVReader() {}
+
+    /**
+     * Init with input buffer as ptr + length pair.
+     */
+    void Init(const uint8_t * data, size_t dataLen) { TLVReader::Init(data, dataLen); }
+
+    /**
+     * Init with input buffer as ByteSpan.
+     */
+    void Init(const ByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Init with input buffer as byte array.
+     */
+    template <size_t N>
+    void Init(const uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
+
+    /**
+     * Allow opening a container, with a new ContiguousBufferTLVReader reading
+     * that container.  See TLVReader::OpenContainer for details.
+     */
+    CHIP_ERROR OpenContainer(ContiguousBufferTLVReader & containerReader);
+
+    /**
+     * Get the value of the current UTF8 string as a Span<const char> pointing
+     * into the TLV data.  Consumers may need to copy the data elsewhere as
+     * needed (e.g. before releasing the reader and its backing buffer if they
+     * plan to use the data after that point).
+     *
+     * @param[out] data                     A Span<const char> representing the string data.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV UTF8 string, or
+     *                                      the reader is not positioned on an element.
+     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely (i.e. the string length was "too big").
+     *
+     */
+    CHIP_ERROR GetStringView(Span<const char> & data);
+
+    /**
+     * Get the value of the current octet string as a ByteSpan pointing into the
+     * TLV data.  Consumers may need to copy the data elsewhere as needed
+     * (e.g. before releasing the reader and its backing buffer if they plan to
+     * use the data after that point).
+     *
+     * @param[out] data                     A ByteSpan representing the string data.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV octet string, or
+     *                                      the reader is not positioned on an element.
+     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely (i.e. the string length was "too big").
+     *
+     */
+    CHIP_ERROR GetByteView(ByteSpan & data);
+};
+
+/**
  * Provides a memory efficient encoder for writing data in CHIP TLV format.
  *
  * TLVWriter implements a forward-only, stream-style encoder for CHIP TLV data.  Applications
@@ -837,7 +940,27 @@ public:
      * @param[in]   maxLen  The maximum number of bytes that should be written to the output buffer.
      *
      */
-    void Init(uint8_t * buf, uint32_t maxLen);
+    void Init(uint8_t * buf, size_t maxLen);
+
+    /**
+     * Initializes a TLVWriter object to write into a single output buffer
+     * represented by a MutableSpan.  See documentation for the two-arg Init()
+     * form for details.
+     *
+     */
+    void Init(const MutableByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Initializes a TLVWriter object to write into a single output buffer
+     * represented by a fixed-size byte array.  See documentation for the
+     * two-arg Init() form for details.
+     *
+     */
+    template <size_t N>
+    void Init(uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
 
     /**
      * Initializes a TLVWriter object to write into memory provided by a TLVBackingStore.
@@ -1113,7 +1236,7 @@ public:
     /**
      * static_cast to enumerations' underlying type when data is an enumeration.
      */
-    template <typename T>
+    template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
     CHIP_ERROR Put(uint64_t tag, T data)
     {
         return Put(tag, to_underlying(data));
@@ -1146,6 +1269,18 @@ public:
      *
      */
     CHIP_ERROR PutBoolean(uint64_t tag, bool v);
+
+    /**
+     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, bool v)
+     */
+    CHIP_ERROR Put(uint64_t tag, bool v)
+    {
+        /*
+         * In TLV, boolean values are encoded as standalone tags without actual values, so we have a seperate
+         * PutBoolean method.
+         */
+        return PutBoolean(tag, v);
+    }
 
     /**
      * Encodes a TLV byte string value.
@@ -2185,6 +2320,7 @@ public:
     CHIP_ERROR Get(uint64_t & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(float & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(double & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(chip::ByteSpan & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize) { return mUpdaterReader.GetBytes(buf, bufSize); }
     CHIP_ERROR DupBytes(uint8_t *& buf, uint32_t & dataLen) { return mUpdaterReader.DupBytes(buf, dataLen); }
     CHIP_ERROR GetString(char * buf, uint32_t bufSize) { return mUpdaterReader.GetString(buf, bufSize); }

@@ -15,8 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <mdns/minimal/records/IP.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/mdns/minimal/records/IP.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -29,6 +29,7 @@ using namespace chip::Encoding::BigEndian;
 
 const QNamePart kNames[] = { "some", "test", "local" };
 
+#if INET_CONFIG_ENABLE_IPV4
 void WriteIPv4(nlTestSuite * inSuite, void * inContext)
 {
     IPAddress ipAddress;
@@ -126,6 +127,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
     }
 }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 void WriteIPv6(nlTestSuite * inSuite, void * inContext)
 {
@@ -169,7 +171,9 @@ void WriteIPv6(nlTestSuite * inSuite, void * inContext)
 }
 
 const nlTest sTests[] = {
+#if INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("IPV4", WriteIPv4), //
+#endif                              // INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("IPV6", WriteIPv6), //
     NL_TEST_SENTINEL()              //
 };

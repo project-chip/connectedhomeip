@@ -15,26 +15,31 @@
  *    limitations under the License.
  */
 
-#include "Discovery_ImplPlatform.h"
+#include <lib/mdns/Discovery_ImplPlatform.h>
 
 #include <inttypes.h>
 
-#include "ServiceNaming.h"
-#include "lib/core/CHIPSafeCasts.h"
-#include "lib/mdns/TxtFields.h"
-#include "lib/mdns/platform/Mdns.h"
-#include "lib/support/logging/CHIPLogging.h"
-#include "platform/CHIPDeviceConfig.h"
-#include "platform/CHIPDeviceLayer.h"
-#include "support/CHIPMemString.h"
-#include "support/CodeUtils.h"
-#include "support/ErrorStr.h"
-#include "support/RandUtils.h"
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/mdns/MdnsCache.h>
+#include <lib/mdns/ServiceNaming.h>
+#include <lib/mdns/TxtFields.h>
+#include <lib/mdns/platform/Mdns.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace Mdns {
 
 DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+MdnsCache<CHIP_CONFIG_MDNS_CACHE_SIZE> DiscoveryImplPlatform::sMdnsCache;
+#endif
 
 DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
 
@@ -126,24 +131,24 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char discriminatorBuf[kKeyDiscriminatorMaxLength + 1];
     char vendorProductBuf[kKeyVendorProductMaxLength + 1];
     char commissioningModeBuf[kKeyCommissioningModeMaxLength + 1];
-    char additionalPairingBuf[kKeyAdditionalPairingMaxLength + 1];
+    char additionalCommissioningingBuf[kKeyAdditionalCommissioningMaxLength + 1];
     char deviceTypeBuf[kKeyDeviceTypeMaxLength + 1];
     char deviceNameBuf[kKeyDeviceNameMaxLength + 1];
     char rotatingIdBuf[kKeyRotatingIdMaxLength + 1];
     char pairingHintBuf[kKeyPairingHintMaxLength + 1];
     char pairingInstrBuf[kKeyPairingInstructionMaxLength + 1];
     // size of textEntries array should be count of Bufs above
-    TextEntry textEntries[9];
+    TextEntry textEntries[CommissionAdvertisingParameters::kTxtMaxNumber];
     size_t textEntrySize = 0;
-    // add underscore, character and newline to lengths for sub types (ex. _S<ddd>)
-    char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 3];
-    char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 4];
-    char vendorSubType[kSubTypeVendorMaxLength + 3];
-    char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 3];
-    char openWindowSubType[kSubTypeAdditionalPairingMaxLength + 3];
-    char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 3];
+    // add null-character to the subtypes
+    char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 1];
+    char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 1];
+    char vendorSubType[kSubTypeVendorMaxLength + 1];
+    char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 1];
+    char additionalCommissioningSubType[kSubTypeAdditionalCommissioningMaxLength + 1];
+    char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 1];
     // size of subTypes array should be count of SubTypes above
-    const char * subTypes[6];
+    const char * subTypes[kSubTypeMaxNumber];
     size_t subTypeSize = 0;
 
     if (!mMdnsInitialized)
@@ -202,7 +207,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     // Following fields are for nodes and not for commissioners
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
-        snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%04u", params.GetLongDiscriminator());
+        snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%u", params.GetLongDiscriminator());
         textEntries[textEntrySize++] = { "D", reinterpret_cast<const uint8_t *>(discriminatorBuf),
                                          strnlen(discriminatorBuf, sizeof(discriminatorBuf)) };
 
@@ -210,11 +215,11 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         textEntries[textEntrySize++] = { "CM", reinterpret_cast<const uint8_t *>(commissioningModeBuf),
                                          strnlen(commissioningModeBuf, sizeof(commissioningModeBuf)) };
 
-        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        if (params.GetCommissioningMode() && params.GetAdditionalCommissioning())
         {
-            snprintf(additionalPairingBuf, sizeof(additionalPairingBuf), "1");
-            textEntries[textEntrySize++] = { "AP", reinterpret_cast<const uint8_t *>(additionalPairingBuf),
-                                             strnlen(additionalPairingBuf, sizeof(additionalPairingBuf)) };
+            snprintf(additionalCommissioningingBuf, sizeof(additionalCommissioningingBuf), "1");
+            textEntries[textEntrySize++] = { "AP", reinterpret_cast<const uint8_t *>(additionalCommissioningingBuf),
+                                             strnlen(additionalCommissioningingBuf, sizeof(additionalCommissioningingBuf)) };
         }
 
         if (params.GetRotatingId().HasValue())
@@ -254,12 +259,12 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         {
             subTypes[subTypeSize++] = commissioningModeSubType;
         }
-        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        if (params.GetCommissioningMode() && params.GetAdditionalCommissioning())
         {
-            if (MakeServiceSubtype(openWindowSubType, sizeof(openWindowSubType),
+            if (MakeServiceSubtype(additionalCommissioningSubType, sizeof(additionalCommissioningSubType),
                                    DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1)) == CHIP_NO_ERROR)
             {
-                subTypes[subTypeSize++] = openWindowSubType;
+                subTypes[subTypeSize++] = additionalCommissioningSubType;
             }
         }
     }
@@ -283,7 +288,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
     service.mTextEntries   = textEntries;
     service.mTextEntrySize = textEntrySize;
-    service.mPort          = CHIP_PORT;
+    service.mPort          = params.GetPort();
     service.mInterface     = INET_NULL_INTERFACEID;
     service.mSubTypes      = subTypes;
     service.mSubTypeSize   = subTypeSize;
@@ -345,7 +350,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     constexpr uint8_t kMaxMRPRetryBufferSize = 7 + 1;
     char mrpRetryIntervalIdleBuf[kMaxMRPRetryBufferSize];
     char mrpRetryIntervalActiveBuf[kMaxMRPRetryBufferSize];
-    TextEntry mrpRetryIntervalEntries[OperationalAdvertisingParameters::kNumAdvertisingTxtEntries];
+    TextEntry mrpRetryIntervalEntries[OperationalAdvertisingParameters::kTxtMaxNumber];
     size_t textEntrySize = 0;
     uint32_t mrpRetryIntervalIdle, mrpRetryIntervalActive;
     int writtenCharactersNumber;
@@ -398,7 +403,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetPeerId()));
     strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
-    service.mPort          = CHIP_PORT;
+    service.mPort          = params.GetPort();
     service.mTextEntries   = mrpRetryIntervalEntries;
     service.mTextEntrySize = textEntrySize;
     service.mInterface     = INET_NULL_INTERFACEID;
@@ -437,6 +442,28 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
 {
     ReturnErrorOnFailure(Init());
 
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+    Inet::IPAddress addr;
+    uint16_t port;
+    Inet::InterfaceId iface;
+
+    /* see if the entry is cached and use it.... */
+
+    if (sMdnsCache.Lookup(peerId, addr, port, iface) == CHIP_NO_ERROR)
+    {
+        ResolvedNodeData nodeData;
+
+        nodeData.mInterfaceId = iface;
+        nodeData.mPort        = port;
+        nodeData.mAddress     = addr;
+        nodeData.mPeerId      = peerId;
+
+        mResolverDelegate->OnNodeIdResolved(nodeData);
+
+        return CHIP_NO_ERROR;
+    }
+#endif
+
     MdnsService service;
 
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
@@ -472,16 +499,20 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, MdnsService * resu
     DiscoveredNodeData data;
     Platform::CopyString(data.hostName, result->mHostName);
 
-    if (result->mAddress.HasValue())
+    if (result->mAddress.HasValue() && data.numIPs < DiscoveredNodeData::kMaxIPAddresses)
     {
-        data.ipAddress[data.numIPs++] = result->mAddress.Value();
+        data.ipAddress[data.numIPs]   = result->mAddress.Value();
+        data.interfaceId[data.numIPs] = result->mInterface;
+        data.numIPs++;
     }
+
+    data.port = result->mPort;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
         ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
         ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, &data);
+        FillNodeDataFromTxt(key, val, data);
     }
     mgr->mResolverDelegate->OnNodeDiscoveryComplete(data);
 }
@@ -539,9 +570,28 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
         return;
     }
 
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+    // TODO --  define appropriate TTL, for now use 2000 msec (rfc default)
+    // figure out way to use TTL value from mDNS packet in  future update
+    error = mgr->sMdnsCache.Insert(nodeData.mPeerId, result->mAddress.Value(), result->mPort, result->mInterface, 2 * 1000);
+
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Discovery, "MdnsCache insert failed with %s", chip::ErrorStr(error));
+    }
+#endif
+
+    Platform::CopyString(nodeData.mHostName, result->mHostName);
     nodeData.mInterfaceId = result->mInterface;
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
+
+    for (size_t i = 0; i < result->mTextEntrySize; ++i)
+    {
+        ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
+        ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
+        FillNodeDataFromTxt(key, val, nodeData);
+    }
 
     nodeData.LogNodeIdResolved();
     mgr->mResolverDelegate->OnNodeIdResolved(nodeData);

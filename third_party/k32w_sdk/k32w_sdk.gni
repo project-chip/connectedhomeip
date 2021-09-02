@@ -23,6 +23,7 @@ declare_args() {
   k32w_sdk_root = getenv("K32W_SDK_ROOT")
   chip_with_OM15082 = 0
   chip_with_ot_cli = 0
+  chip_with_low_power = 0
 }
 
 assert(k32w_sdk_root != "", "k32w_sdk_root must be specified")
@@ -38,6 +39,11 @@ template("k32w_sdk") {
   }
 
   assert(k32w_sdk_root != "", "k32w_sdk_root must be specified")
+  assert(
+      chip_with_low_power == 0 ||
+          (chip_with_low_power == 1 && chip_with_OM15082 == 0 &&
+               chip_with_ot_cli == 0 && chip_with_se05x == 0),
+      "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
   sdk_target_name = target_name
 
@@ -53,6 +59,7 @@ template("k32w_sdk") {
     _sdk_include_dirs = [
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm",
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement",
+      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common",
       "${chip_root}/src/platform/K32W",
       "${k32w_sdk_root}/CMSIS/Include",
       "${k32w_sdk_root}/components/serial_manager",
@@ -78,6 +85,7 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/middleware/wireless/framework/Flash/Internal",
       "${k32w_sdk_root}/middleware/wireless/framework/FunctionLib",
       "${k32w_sdk_root}/middleware/wireless/framework/GPIO",
+      "${k32w_sdk_root}/middleware/wireless/framework/Logging/Interface",
       "${k32w_sdk_root}/middleware/wireless/framework/Keyboard/Interface",
       "${k32w_sdk_root}/middleware/wireless/framework/LED/Interface",
       "${k32w_sdk_root}/middleware/wireless/framework/Lists",
@@ -114,13 +122,14 @@ template("k32w_sdk") {
     ]
 
     defines = [
+      "gPWR_CpuClk_48MHz=1",
       "gMainThreadPriority_c=6",
       "CPU_K32W061HN",
       "CPU_JN518X",
       "CPU_JN518X_REV=2",
       "JENNIC_CHIP_FAMILY_NAME=_JN518x",
       "gPWR_LDOMEM_0_9V_PD=0",
-      "SDK_DEBUGCONSOLE=0",
+      "SDK_DEBUGCONSOLE=1",
       "NO_SYSCORECLK_UPD=0",
       "USE_RTOS=1",
       "USE_SDK_OSA=0",
@@ -128,11 +137,12 @@ template("k32w_sdk") {
       "FSL_RTOS_FREE_RTOS=1",
       "gTotalHeapSize_c=0xF000",
       "gUartDebugConsole_d=1",
+      "DEBUG_SERIAL_INTERFACE_INSTANCE=0",
+      "APP_SERIAL_INTERFACE_INSTANCE=1",
       "gUsePdm_d=1",
       "PDM_EXT_FLASH=1",
       "gEepromType_d=gEepromDevice_MX25R8035F_c",
       "gOTA_externalFlash_d=1",
-      "gLEDSupported_d",
       "gKeyBoardSupported_d",
       "gPdmNbSegments=63",
       "configFRTOS_MEMORY_SCHEME=4",
@@ -155,6 +165,10 @@ template("k32w_sdk") {
       "SUPPORT_FOR_BLE=1",
       "gEnableBleInactivityTimeNotify=1",
       "DUAL_MODE_APP=1",
+      "gMainThreadStackSize_c=3096",
+      "HEAP_SIZE=0xF000",
+      "gLoggingActive_d=0",
+      "gLogRingPlacementOffset_c=0xF000",
 
       #TODO: move OT defines in an OT specific GN file
       "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
@@ -174,11 +188,10 @@ template("k32w_sdk") {
     if (chip_with_se05x == 1) {
       defines += [
         "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
-        "gMainThreadStackSize_c=14048",
+        "CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE=9216",
       ]
-    } else {
-      defines += [ "gMainThreadStackSize_c=6024" ]
     }
+
     if (chip_with_OM15082 == 1) {
       defines += [
         "gKBD_KeysCount_c=4",
@@ -190,6 +203,27 @@ template("k32w_sdk") {
 
     if (chip_with_ot_cli == 1) {
       defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
+    }
+
+    if (chip_with_low_power == 1) {
+      defines += [
+        "cPWR_UsePowerDownMode=1",
+        "cPWR_FullPowerDownMode=1",
+        "DBG_PostStepTickAssess=0",
+        "gApp_SystemClockCalibration=1",
+        "gPWR_FreqScalingWFI=0",
+        "mAppUseTickLessMode_c=1",
+        "App_SuppressTickInStopMode=0",
+        "cPWR_DiscardRunningTimerForPowerDown=1",
+      ]
+    } else {
+      defines += [
+        "gLEDSupported_d",
+        "gLED_InvertedMode_d=1",
+        "gLEDsOnTargetBoardCnt_c=2",
+        "cPWR_UsePowerDownMode=0",
+        "cPWR_FullPowerDownMode=0",
+      ]
     }
 
     if (defined(invoker.defines)) {
@@ -236,6 +270,7 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_ctimer.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_flash.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_flexcomm.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_fmeas.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_gpio.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_i2c.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_i2c_freertos.c",
@@ -245,6 +280,7 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_power.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_reset.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_rng.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_rtc.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_sha.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_spifi.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_usart.c",
@@ -268,7 +304,10 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/middleware/wireless/framework/Keyboard/Source/Keyboard.c",
       "${k32w_sdk_root}/middleware/wireless/framework/LED/Source/LED.c",
       "${k32w_sdk_root}/middleware/wireless/framework/Lists/GenericList.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/Logging/Source/dbg_logging.c",
       "${k32w_sdk_root}/middleware/wireless/framework/LowPower/Source/k32w061dk6/PWR.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/LowPower/Source/k32w061dk6/PWRLib.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/LowPower/Source/k32w061dk6/PWR_setjmp.S",
       "${k32w_sdk_root}/middleware/wireless/framework/MemManager/Source/MemManager.c",
       "${k32w_sdk_root}/middleware/wireless/framework/Messaging/Source/Messaging.c",
       "${k32w_sdk_root}/middleware/wireless/framework/OSAbstraction/Source/fsl_os_abstraction_free_rtos.c",
@@ -301,6 +340,10 @@ template("k32w_sdk") {
         "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/clock_config.c",
         "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/pin_mux.c",
       ]
+    }
+
+    if (chip_with_low_power == 1) {
+      sources += [ "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common/app_dual_mode_low_power.c" ]
     }
 
     if (!defined(public_deps)) {

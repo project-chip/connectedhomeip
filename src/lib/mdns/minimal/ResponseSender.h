@@ -21,7 +21,7 @@
 #include "ResponseBuilder.h"
 #include "Server.h"
 
-#include <mdns/minimal/responders/QueryResponder.h>
+#include <lib/mdns/minimal/responders/QueryResponder.h>
 
 #include <inet/InetLayer.h>
 #include <system/SystemPacketBuffer.h>
@@ -100,6 +100,8 @@ public:
 
     // Implementation of ResponderDelegate
     void AddResponse(const ResourceRecord & record) override;
+
+    void SetServer(ServerBase * server) { mServer = server; }
 
 private:
     CHIP_ERROR FlushReply();

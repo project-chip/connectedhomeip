@@ -67,7 +67,6 @@ efr32_sdk("sdk") {
   defines = [
     "BOARD_ID=${efr32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
-    "SL_HEAP_SIZE=(16 * 1024)",
   ]
 
   if (chip_enable_pw_rpc) {
@@ -83,7 +82,7 @@ efr32_executable("lighting_app") {
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
-    "${examples_plat_dir}/Service.cpp",
+    "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
     "src/AppTask.cpp",
@@ -174,8 +173,8 @@ group("efr32") {
   deps = [ ":lighting_app" ]
   if (chip_enable_pw_rpc) {
     deps += [
-      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app.install",
-      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app_wheel",
+      "${chip_root}/examples/common/pigweed/rpc_console/py:chip_rpc.install",
+      "${chip_root}/examples/common/pigweed/rpc_console/py:chip_rpc_wheel",
     ]
   }
 }

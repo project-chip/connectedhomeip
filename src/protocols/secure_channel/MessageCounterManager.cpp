@@ -21,18 +21,18 @@
  *
  */
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPKeyIds.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPKeyIds.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace secure_channel {
@@ -53,11 +53,12 @@ void MessageCounterManager::Shutdown()
     if (mExchangeMgr != nullptr)
     {
         mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq);
+        mExchangeMgr->CloseAllContextsForDelegate(this);
         mExchangeMgr = nullptr;
     }
 }
 
-CHIP_ERROR MessageCounterManager::StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state)
+CHIP_ERROR MessageCounterManager::StartSync(SessionHandle session, Transport::PeerConnectionState * state)
 {
     // Initiate message counter synchronization if no message counter synchronization is in progress.
     Transport::PeerMessageCounter & counter = state->GetSessionMessageCounter().GetPeerMessageCounter();
@@ -69,7 +70,7 @@ CHIP_ERROR MessageCounterManager::StartSync(SecureSessionHandle session, Transpo
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, SecureSessionHandle session,
+CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, SessionHandle session,
                                                                    Transport::PeerConnectionState * state,
                                                                    const Transport::PeerAddress & peerAddress,
                                                                    System::PacketBufferHandle && msgBuf)
@@ -112,8 +113,6 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
     {
         ChipLogError(SecureChannel, "Timed out! Failed to clear message counter synchronization status.");
     }
-
-    exchangeContext->Close();
 }
 
 CHIP_ERROR MessageCounterManager::AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
@@ -175,7 +174,7 @@ void MessageCounterManager::ProcessPendingMessages(NodeId peerNodeId)
     }
 }
 
-CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle session, Transport::PeerConnectionState * state)
+CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SessionHandle session, Transport::PeerConnectionState * state)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -209,6 +208,10 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle sess
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        if (exchangeContext != nullptr)
+        {
+            exchangeContext->Close();
+        }
         state->GetSessionMessageCounter().GetPeerMessageCounter().SyncFailed();
         ChipLogError(SecureChannel, "Failed to send message counter synchronization request with error:%s", ErrorStr(err));
     }

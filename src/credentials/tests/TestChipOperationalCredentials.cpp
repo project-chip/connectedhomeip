@@ -15,17 +15,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      Unit tests for CHIP Operational Credential Set functionality.
- *
- */
-
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
-#include <support/CHIPMem.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -114,15 +107,16 @@ static void TestChipOperationalCredentials_CertValidation(nlTestSuite * inSuite,
                                                                          { TestCerts::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
     };
     // clang-format on
-    static const size_t sNumValidationTestCases = sizeof(sValidationTestCases) / sizeof(sValidationTestCases[0]);
+    static const size_t sNumValidationTestCases = ArraySize(sValidationTestCases);
 
     for (unsigned i = 0; i < sNumValidationTestCases; i++)
     {
-        ChipCertificateData * resultCert    = nullptr;
-        const ValidationTestCase & testCase = sValidationTestCases[i];
+        const ChipCertificateData * resultCert = nullptr;
+        const ValidationTestCase & testCase    = sValidationTestCases[i];
 
-        // Initialize the certificate set and load the specified test certificates.
-        certSet.Init(kMaxCertsPerTestCase, kMaxCHIPCertDecodeBufLength);
+        err = certSet.Init(kMaxCertsPerTestCase);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
         for (size_t i2 = 0; i2 < kMaxCertsPerTestCase; i2++)
         {
             if (testCase.InputCerts[i2].Type != TestCerts::kNone)
@@ -159,7 +153,7 @@ static void TestChipOperationalCredentials_CertValidation(nlTestSuite * inSuite,
         const CertificateKeyId & trustedRootId = certSet.GetCertSet()[testCase.mExpectedTrustAnchorIndex].mAuthKeyId;
 
         // Invoke the FindValidCert() method (the method being tested).
-        err = opCredSet.FindValidCert(trustedRootId, subjectDN, subjectKeyId, validContext, resultCert);
+        err = opCredSet.FindValidCert(trustedRootId, subjectDN, subjectKeyId, validContext, &resultCert);
         NL_TEST_ASSERT(inSuite, err == testCase.mExpectedResult);
 
         // If the test case is expected to be successful...
@@ -193,7 +187,8 @@ static void TestChipOperationalCredentials_Serialization(nlTestSuite * inSuite, 
     };
 
     // Initialize the certificate set and load the specified test certificates.
-    certSet.Init(kMaxCerts, kMaxCHIPCertDecodeBufLength);
+    err = certSet.Init(kMaxCerts);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = LoadTestCert(certSet, TestCerts::kRoot01, sNullLoadFlag, sTrustAnchorFlag);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = LoadTestCert(certSet, TestCerts::kICA01, sNullLoadFlag, sGenTBSHashFlag);

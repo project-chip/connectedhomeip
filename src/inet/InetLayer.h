@@ -84,7 +84,7 @@
 #include <system/SystemLayer.h>
 #include <system/SystemStats.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #if INET_CONFIG_MAX_DROPPABLE_EVENTS
 
@@ -285,7 +285,7 @@ public:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-    static void HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
+    static void HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
 
 private:

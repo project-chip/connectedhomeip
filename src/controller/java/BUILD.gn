@@ -28,17 +28,23 @@ shared_library("jni") {
     "AndroidBleConnectionDelegate.h",
     "AndroidBlePlatformDelegate.cpp",
     "AndroidBlePlatformDelegate.h",
+    "AndroidCallbacks-JNI.cpp",
+    "AndroidCallbacks.cpp",
+    "AndroidCallbacks.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
     "AndroidKeyValueStoreManagerImpl.cpp",
     "AndroidKeyValueStoreManagerImpl.h",
     "CHIPDeviceController-JNI.cpp",
     "CHIPJNIError.h",
+    "CHIPMdnsCallbackImpl-JNI.cpp",
     "JniReferences.cpp",
     "JniReferences.h",
     "JniTypeWrappers.h",
+    "MdnsImpl.cpp",
+    "MdnsImpl.h",
     "StackLock.h",
-    "gen/CHIPClusters-JNI.cpp",
+    "zap-generated/CHIPClusters-JNI.cpp",
   ]
 
   deps = [
@@ -60,14 +66,19 @@ android_library("java") {
   ]
 
   sources = [
-    "gen/ChipClusters.java",
     "src/chip/devicecontroller/AndroidChipStack.java",
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
+    "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/KeyValueStoreManager.java",
     "src/chip/devicecontroller/PreferencesKeyValueStoreManager.java",
+    "src/chip/devicecontroller/mdns/ChipMdnsCallback.java",
+    "src/chip/devicecontroller/mdns/ChipMdnsCallbackImpl.java",
+    "src/chip/devicecontroller/mdns/NsdManagerServiceResolver.java",
+    "src/chip/devicecontroller/mdns/ServiceResolver.java",
+    "zap-generated/chip/devicecontroller/ChipClusters.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

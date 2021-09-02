@@ -31,7 +31,7 @@
 // Include module header
 #include <system/SystemStats.h>
 
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 #include <string.h>
 
@@ -87,8 +87,10 @@ void UpdateSnapshot(Snapshot & aSnapshot)
     memcpy(&aSnapshot.mResourcesInUse, &sResourcesInUse, sizeof(aSnapshot.mResourcesInUse));
     memcpy(&aSnapshot.mHighWatermarks, &sHighWatermarks, sizeof(aSnapshot.mHighWatermarks));
 
+#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
     chip::System::Timer::GetStatistics(aSnapshot.mResourcesInUse[kSystemLayer_NumTimers],
                                        aSnapshot.mHighWatermarks[kSystemLayer_NumTimers]);
+#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 }

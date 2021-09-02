@@ -32,10 +32,9 @@
 #if CONFIG_BT_BLUEDROID_ENABLED
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
-#include <system/SystemTimer.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"
@@ -126,10 +125,6 @@ const uint16_t CHIPoBLEGATTAttrCount = sizeof(CHIPoBLEGATTAttrs) / sizeof(CHIPoB
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-BLEManagerImpl::BLEManagerImpl() :
-    mAdvertiseTimerCallback(HandleAdvertisementTimer, this), mFastAdvertiseTimerCallback(HandleFastAdvertisementTimer, this)
-{}
-
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
@@ -181,8 +176,8 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (val)
     {
         mAdvertiseStartTime = System::Clock::GetMonotonicMilliseconds();
-        SystemLayer.StartTimer(kAdvertiseTimeout, &mAdvertiseTimerCallback);
-        SystemLayer.StartTimer(kFastAdvertiseTimeout, &mFastAdvertiseTimerCallback);
+        ReturnErrorOnFailure(SystemLayer.StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
+        ReturnErrorOnFailure(SystemLayer.StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
     mFlags.Set(Flags::kFastAdvertisingEnabled, val);
     mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
@@ -192,7 +187,7 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleAdvertisementTimer(void * context)
+void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context)
 {
     static_cast<BLEManagerImpl *>(context)->HandleAdvertisementTimer();
 }
@@ -208,7 +203,7 @@ void BLEManagerImpl::HandleAdvertisementTimer()
     }
 }
 
-void BLEManagerImpl::HandleFastAdvertisementTimer(void * context)
+void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context)
 {
     static_cast<BLEManagerImpl *>(context)->HandleFastAdvertisementTimer();
 }
@@ -443,7 +438,7 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
     case ESP_ERR_NO_MEM:
         return CHIP_ERROR_NO_MEMORY;
     default:
-        return ChipError::Encapsulate(ChipError::Range::kPlatform, CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + bleErr);
+        return CHIP_ERROR(ChipError::Range::kPlatform, CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + bleErr);
     }
 }
 
@@ -813,7 +808,7 @@ void BLEManagerImpl::HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt
             if (param->reg.status != ESP_GATT_OK)
             {
                 ChipLogError(DeviceLayer, "ESP_GATTS_REG_EVT error: %d", (int) param->reg.status);
-                ExitNow(err = ESP_ERR_INVALID_RESPONSE);
+                ExitNow(err = CHIP_ERROR_INTERNAL);
             }
 
             // Save the 'interface type' assigned to the CHIPoBLE application by the ESP BLE layer.
@@ -831,7 +826,7 @@ void BLEManagerImpl::HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt
         if (param->add_attr_tab.status != ESP_GATT_OK)
         {
             ChipLogError(DeviceLayer, "ESP_GATTS_CREAT_ATTR_TAB_EVT error: %d", (int) param->add_attr_tab.status);
-            ExitNow(err = ESP_ERR_INVALID_RESPONSE);
+            ExitNow(err = CHIP_ERROR_INTERNAL);
         }
 
         // Save the attribute handles assigned by the ESP BLE layer to the CHIPoBLE attributes.
@@ -850,7 +845,7 @@ void BLEManagerImpl::HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt
         if (param->start.status != ESP_GATT_OK)
         {
             ChipLogError(DeviceLayer, "ESP_GATTS_START_EVT error: %d", (int) param->start.status);
-            ExitNow(err = ESP_ERR_INVALID_RESPONSE);
+            ExitNow(err = CHIP_ERROR_INTERNAL);
         }
 
         ChipLogProgress(DeviceLayer, "CHIPoBLE GATT service started");
@@ -865,7 +860,7 @@ void BLEManagerImpl::HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt
         if (param->stop.status != ESP_GATT_OK)
         {
             ChipLogError(DeviceLayer, "ESP_GATTS_STOP_EVT error: %d", (int) param->stop.status);
-            ExitNow(err = ESP_ERR_INVALID_RESPONSE);
+            ExitNow(err = CHIP_ERROR_INTERNAL);
         }
 
         ChipLogProgress(DeviceLayer, "CHIPoBLE GATT service stopped");
@@ -1175,6 +1170,10 @@ void BLEManagerImpl::HandleDisconnect(esp_ble_gatts_cb_param_t * param)
         }
         PlatformMgr().PostEvent(&event);
 
+        ChipDeviceEvent disconnectEvent;
+        disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
+        PlatformMgr().PostEvent(&disconnectEvent);
+
         // Force a refresh of the advertising state.
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);
         mFlags.Clear(Flags::kAdvertisingConfigured);
@@ -1275,7 +1274,7 @@ void BLEManagerImpl::HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb
         if (param->adv_data_cmpl.status != ESP_BT_STATUS_SUCCESS)
         {
             ChipLogError(DeviceLayer, "ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT error: %d", (int) param->adv_data_cmpl.status);
-            ExitNow(err = ESP_ERR_INVALID_RESPONSE);
+            ExitNow(err = CHIP_ERROR_INTERNAL);
         }
 
         sInstance.mFlags.Set(Flags::kAdvertisingConfigured);
@@ -1288,7 +1287,7 @@ void BLEManagerImpl::HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb
         if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS)
         {
             ChipLogError(DeviceLayer, "ESP_GAP_BLE_ADV_START_COMPLETE_EVT error: %d", (int) param->adv_start_cmpl.status);
-            ExitNow(err = ESP_ERR_INVALID_RESPONSE);
+            ExitNow(err = CHIP_ERROR_INTERNAL);
         }
 
         sInstance.mFlags.Clear(Flags::kControlOpInProgress);
@@ -1317,7 +1316,7 @@ void BLEManagerImpl::HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb
         if (param->adv_stop_cmpl.status != ESP_BT_STATUS_SUCCESS)
         {
             ChipLogError(DeviceLayer, "ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT error: %d", (int) param->adv_stop_cmpl.status);
-            ExitNow(err = ESP_ERR_INVALID_RESPONSE);
+            ExitNow(err = CHIP_ERROR_INTERNAL);
         }
 
         sInstance.mFlags.Clear(Flags::kControlOpInProgress);

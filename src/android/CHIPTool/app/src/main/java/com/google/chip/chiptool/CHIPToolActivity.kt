@@ -26,19 +26,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import chip.devicecontroller.ChipDeviceController
+import chip.setuppayload.SetupPayload
+import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.attestation.AttestationTestFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
+import com.google.chip.chiptool.clusterclient.SensorClientFragment
 import com.google.chip.chiptool.echoclient.EchoClientFragment
+import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
-import chip.devicecontroller.PreferencesKeyValueStoreManager
-import chip.setuppayload.SetupPayload
-import chip.setuppayload.SetupPayloadParser
 
 class CHIPToolActivity :
     AppCompatActivity(),
@@ -53,7 +53,6 @@ class CHIPToolActivity :
     setContentView(R.layout.top_activity)
 
     if (savedInstanceState == null) {
-      ChipDeviceController.setKeyValueStoreManager(PreferencesKeyValueStoreManager(this))
       val fragment = SelectActionFragment.newInstance()
       supportFragmentManager
           .beginTransaction()
@@ -83,11 +82,14 @@ class CHIPToolActivity :
   }
 
   override fun onCommissioningComplete(code: Int) {
-    if (code == 0) {
-      showFragment(OnOffClientFragment.newInstance(), false)
-    } else {
-      showFragment(SelectActionFragment.newInstance(), false)
+    runOnUiThread {
+      Toast.makeText(
+          this,
+          getString(R.string.commissioning_completed, code),
+          Toast.LENGTH_SHORT).show()
     }
+    ChipClient.getDeviceController(this).close()
+    showFragment(SelectActionFragment.newInstance(), false)
   }
 
   override fun handleScanQrCodeClicked() {
@@ -104,12 +106,20 @@ class CHIPToolActivity :
     showFragment(BarcodeFragment.newInstance(), false)
   }
 
+  override fun onShowDeviceAddressInput() {
+    showFragment(AddressCommissioningFragment.newInstance(), false)
+  }
+
   override fun handleEchoClientClicked() {
     showFragment(EchoClientFragment.newInstance())
   }
 
   override fun handleOnOffClicked() {
     showFragment(OnOffClientFragment.newInstance())
+  }
+
+  override fun handleSensorClicked() {
+    showFragment(SensorClientFragment.newInstance())
   }
 
   override fun handleAttestationTestClicked() {
@@ -182,6 +192,7 @@ class CHIPToolActivity :
 
   companion object {
     private const val TAG = "CHIPToolActivity"
+    private const val ADDRESS_COMMISSIONING_FRAGMENT_TAG = "address_commissioning_fragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
 
     var REQUEST_CODE_COMMISSIONING = 0xB003

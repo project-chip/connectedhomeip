@@ -14,9 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <mdns/minimal/records/Txt.h>
+#include <lib/mdns/minimal/records/Txt.h>
 
-#include <support/UnitTestRegistration.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -26,7 +26,7 @@ using namespace chip;
 using namespace chip::Encoding;
 using namespace mdns::Minimal;
 
-void TestSrv(nlTestSuite * inSuite, void * inContext)
+void TestTxt(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[128];
@@ -40,6 +40,7 @@ void TestSrv(nlTestSuite * inSuite, void * inContext)
 
     TxtResourceRecord record(kName, kData);
     record.SetTtl(128);
+    NL_TEST_ASSERT(inSuite, record.GetNumEntries() == 3);
 
     header.Clear();
 
@@ -67,17 +68,17 @@ void TestSrv(nlTestSuite * inSuite, void * inContext)
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestSrv", TestSrv), //
+    NL_TEST_DEF("TestTxt", TestTxt), //
     NL_TEST_SENTINEL()               //
 };
 
 } // namespace
 
-int TestSrv(void)
+int TestTxt(void)
 {
-    nlTestSuite theSuite = { "Srv", sTests, nullptr, nullptr };
+    nlTestSuite theSuite = { "Txt", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestSrv)
+CHIP_REGISTER_TEST_SUITE(TestTxt)

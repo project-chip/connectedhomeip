@@ -27,10 +27,19 @@
 
 #include <stdint.h>
 
-#include <core/CHIPError.h>
-#include <support/DLLUtil.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
+
+/**
+ *  @def CHIP_NO_ERROR_STRING
+ *
+ *  @brief
+ *    This defines the CHIP error string for success or no error.
+ *
+ */
+#define CHIP_NO_ERROR_STRING "Success"
 
 struct ErrorFormatter
 {

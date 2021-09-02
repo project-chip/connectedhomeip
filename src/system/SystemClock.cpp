@@ -22,47 +22,47 @@
  *      for POSIX and LwIP platforms.
  */
 
-// __STDC_LIMIT_MACROS must be defined for UINT8_MAX to be defined for pre-C++11 clib
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif // __STDC_LIMIT_MACROS
-
-// __STDC_CONSTANT_MACROS must be defined for INT64_C and UINT64_C to be defined for pre-C++11 clib
-#ifndef __STDC_CONSTANT_MACROS
-#define __STDC_CONSTANT_MACROS
-#endif // __STDC_CONSTANT_MACROS
-
-// config
-#include <system/SystemConfig.h>
-
-#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
-
-// module header
 #include <system/SystemClock.h>
+
 // common private
 #include "SystemLayerPrivate.h"
 
-#include <support/CodeUtils.h>
-#include <support/TimeUtils.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/TimeUtils.h>
 #include <system/SystemError.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
-#include <time.h>
-#if !(HAVE_CLOCK_GETTIME)
-#include <sys/time.h>
-#endif
+#include <stdint.h>
+#include <stdlib.h>
+
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <errno.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
+#include <time.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/sys.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#include <stdint.h>
-#include <stdlib.h>
+#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
 namespace chip {
 namespace System {
+
+bool Clock::IsEarlier(const Clock::MonotonicMilliseconds & inFirst, const Clock::MonotonicMilliseconds & inSecond)
+{
+    static const Clock::MonotonicMilliseconds kMaxTime_2 = static_cast<Clock::MonotonicMilliseconds>(
+        (static_cast<Clock::MonotonicMilliseconds>(0) - static_cast<Clock::MonotonicMilliseconds>(1)) / 2);
+
+    // account for timer wrap with the assumption that no two input times will "naturally"
+    // be more than half the timer range apart.
+    return (((inFirst < inSecond) && (inSecond - inFirst < kMaxTime_2)) ||
+            ((inFirst > inSecond) && (inFirst - inSecond > kMaxTime_2)));
+}
+
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+
 namespace Platform {
 namespace Clock {
 
@@ -239,7 +239,24 @@ CHIP_ERROR SetUnixTimeMicroseconds(uint64_t newCurTime)
 
 } // namespace Clock
 } // namespace Platform
-} // namespace System
-} // namespace chip
 
 #endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+Clock::MonotonicMilliseconds TimevalToMilliseconds(const timeval & in)
+{
+    return static_cast<Clock::MonotonicMilliseconds>(in.tv_sec) * 1000 +
+        static_cast<Clock::MonotonicMilliseconds>(in.tv_usec / 1000);
+}
+
+void MillisecondsToTimeval(Clock::MonotonicMilliseconds in, timeval & out)
+{
+    out.tv_sec  = static_cast<time_t>(in / 1000);
+    out.tv_usec = static_cast<suseconds_t>((in % 1000) * 1000);
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+} // namespace System
+} // namespace chip

@@ -227,7 +227,7 @@ ESP32_OPTIONS = {
         },
         'bootloader_offset': {
             'help': 'Bootloader offset',
-            'default': None,
+            'default': '0x1000',
             'argparse': {
                 'metavar': 'OFFSET'
             },
@@ -446,13 +446,16 @@ class Flasher(firmware_utils.Flasher):
 
         return self
 
-### Mobly integration
-class ESP32Platform:
-  def __init__(self, flasher_args):
-      self.flasher = Flasher(**flasher_args)
+# Mobly integration
 
-  def flash(self):
-      self.flasher.flash_command([os.getcwd()])
+
+class ESP32Platform:
+    def __init__(self, flasher_args):
+        self.flasher = Flasher(**flasher_args)
+
+    def flash(self):
+        self.flasher.flash_command([os.getcwd()])
+
 
 def verify_platform_args(platform_args):
     required_args = [
@@ -475,11 +478,13 @@ def verify_platform_args(platform_args):
     if difference:
         raise ValueError("Required arguments missing: %s" % difference)
 
+
 def create_platform(platform_args):
     verify_platform_args(platform_args[0])
     return ESP32Platform(platform_args[0])
 
-### End of Mobly integration
+# End of Mobly integration
+
 
 if __name__ == '__main__':
     sys.exit(Flasher().flash_command(sys.argv))

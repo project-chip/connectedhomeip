@@ -31,7 +31,7 @@
 #include "pw_log/log.h"
 #include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 const char * TAG = "RPC";
 
@@ -55,7 +55,7 @@ public:
 
     pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LockingState & response)
     {
-        response.locked = BoltLockMgr().IsUnlocked();
+        response.locked = !BoltLockMgr().IsUnlocked();
         return pw::OkStatus();
     }
 };

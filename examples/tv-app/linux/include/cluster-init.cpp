@@ -26,8 +26,8 @@
 #include "tv-channel/TvChannelManager.h"
 #include "wake-on-lan/WakeOnLanManager.h"
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 
 using namespace chip;
 
@@ -72,7 +72,7 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
     err                           = wolManager.Init();
     if (CHIP_NO_ERROR == err)
     {
-        char macAddress[17] = "";
+        char macAddress[32] = "";
         wolManager.setMacAddress(endpoint, macAddress);
         wolManager.store(endpoint, macAddress);
     }

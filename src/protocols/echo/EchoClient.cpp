@@ -29,14 +29,17 @@ namespace chip {
 namespace Protocols {
 namespace Echo {
 
-CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session)
+// The Echo message timeout value in milliseconds.
+constexpr uint32_t kEchoMessageTimeoutMsec = 800;
+
+CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SessionHandle session)
 {
     // Error if already initialized.
     if (mExchangeMgr != nullptr)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    mExchangeMgr           = exchangeMgr;
-    mSecureSession         = session;
+    mExchangeMgr = exchangeMgr;
+    mSecureSession.SetValue(session);
     OnEchoResponseReceived = nullptr;
     mExchangeCtx           = nullptr;
 
@@ -55,7 +58,7 @@ void EchoClient::Shutdown()
     mExchangeMgr           = nullptr;
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, const Messaging::SendFlags & sendFlags)
+CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, Messaging::SendFlags sendFlags)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -68,14 +71,17 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, co
     }
 
     // Create a new exchange context.
-    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession, this);
+    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession.Value(), this);
     if (mExchangeCtx == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
 
+    mExchangeCtx->SetResponseTimeout(kEchoMessageTimeoutMsec);
+
     // Send an Echo Request message.  Discard the exchange context if the send fails.
-    err = mExchangeCtx->SendMessage(MsgType::EchoRequest, std::move(payload), sendFlags);
+    err = mExchangeCtx->SendMessage(MsgType::EchoRequest, std::move(payload),
+                                    sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -113,6 +119,7 @@ CHIP_ERROR EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const 
 
 void EchoClient::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
+    mExchangeCtx = nullptr;
     ChipLogProgress(Echo, "Time out! failed to receive echo response from Exchange: %p", ec);
 }
 

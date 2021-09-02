@@ -32,7 +32,7 @@
 class AppTask
 {
 public:
-    int StartAppTask();
+    CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
     void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
@@ -43,7 +43,7 @@ public:
 private:
     friend AppTask & GetAppTask(void);
 
-    int Init();
+    CHIP_ERROR Init();
 
     static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(BoltLockManager::Action_t aAction);
@@ -52,14 +52,14 @@ private:
 
     void DispatchEvent(AppEvent * event);
 
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void FunctionTimerEventHandler(void * aGenericEvent);
     static void KBD_Callback(uint8_t events);
     static void HandleKeyboard(void);
-    static void JoinHandler(AppEvent * aEvent);
-    static void BleHandler(AppEvent * aEvent);
-    static void LockActionEventHandler(AppEvent * aEvent);
-    static void ResetActionEventHandler(AppEvent * aEvent);
-    static void InstallEventHandler(AppEvent * aEvent);
+    static void JoinHandler(void * aGenericEvent);
+    static void BleHandler(void * aGenericEvent);
+    static void LockActionEventHandler(void * aGenericEvent);
+    static void ResetActionEventHandler(void * aGenericEvent);
+    static void InstallEventHandler(void * aGenericEvent);
 
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);
@@ -79,8 +79,9 @@ private:
         kFunction_Invalid
     } Function;
 
-    Function_t mFunction;
-    bool mResetTimerActive;
+    Function_t mFunction            = kFunction_NoneSelected;
+    bool mResetTimerActive          = false;
+    bool mSyncClusterToButtonAction = false;
 
     static AppTask sAppTask;
 };

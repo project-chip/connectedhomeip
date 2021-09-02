@@ -29,7 +29,9 @@ chip_test_suite("tests") {
     "TestCHIPArgParser.cpp",
     "TestCHIPCounter.cpp",
     "TestCHIPMem.cpp",
+    "TestDefer.cpp",
     "TestErrorStr.cpp",
+    "TestFixedBufferAllocator.cpp",
     "TestOwnerOf.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
@@ -42,6 +44,7 @@ chip_test_suite("tests") {
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
     "TestVariant.cpp",
+    "TestZclString.cpp",
   ]
   sources = []
 

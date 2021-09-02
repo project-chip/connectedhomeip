@@ -25,11 +25,11 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <core/CHIPKeyIds.h>
+#include <lib/core/CHIPKeyIds.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
-#include <support/CodeUtils.h>
 
 #include "esp_wifi.h"
 #include "nvs.h"
@@ -169,10 +169,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     }
 
     // Restore WiFi persistent settings to default values.
-    err = esp_wifi_restore();
-    if (err != ESP_OK)
+    esp_err_t error = esp_wifi_restore();
+    if (error != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", esp_err_to_name(error));
     }
 
     // Restart the system.

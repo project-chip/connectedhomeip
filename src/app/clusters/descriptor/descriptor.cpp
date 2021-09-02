@@ -20,16 +20,17 @@
  * @brief Implementation for the Descriptor Server Cluster
  ***************************************************************************/
 
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 
 constexpr const char * kErrorStr = "Descriptor cluster (0x%02x) Error setting '%s' attribute: 0x%02x";
 
@@ -37,7 +38,7 @@ EmberAfStatus writeAttribute(EndpointId endpoint, AttributeId attributeId, uint8
 {
     EmberAfAttributeSearchRecord record;
     record.endpoint         = endpoint;
-    record.clusterId        = ZCL_DESCRIPTOR_CLUSTER_ID;
+    record.clusterId        = Descriptor::Id;
     record.clusterMask      = CLUSTER_MASK_SERVER;
     record.manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE;
     record.attributeId      = attributeId;
@@ -56,7 +57,7 @@ EmberAfStatus writeAttribute(EndpointId endpoint, AttributeId attributeId, uint8
 EmberAfStatus writeClientServerAttribute(EndpointId endpoint, bool server)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
-    AttributeId attributeId = server ? ZCL_SERVER_LIST_ATTRIBUTE_ID : ZCL_CLIENT_LIST_ATTRIBUTE_ID;
+    AttributeId attributeId = server ? Descriptor::Attributes::Ids::ServerList : Descriptor::Attributes::Ids::ClientList;
 
     uint16_t clusterCount = emberAfClusterCount(endpoint, server);
 
@@ -84,7 +85,7 @@ EmberAfStatus writeClientAttribute(EndpointId endpoint)
 EmberAfStatus writeDeviceAttribute(EndpointId endpoint, uint16_t index)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
-    AttributeId attributeId = ZCL_DEVICE_LIST_ATTRIBUTE_ID;
+    AttributeId attributeId = Descriptor::Attributes::Ids::DeviceList;
 
     uint16_t deviceTypeCount  = 1;
     DeviceTypeId deviceTypeId = emberAfDeviceIdFromIndex(index);
@@ -103,7 +104,7 @@ EmberAfStatus writeDeviceAttribute(EndpointId endpoint, uint16_t index)
 EmberAfStatus writePartsAttribute(EndpointId endpoint)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
-    AttributeId attributeId = ZCL_PARTS_LIST_ATTRIBUTE_ID;
+    AttributeId attributeId = Descriptor::Attributes::Ids::PartsList;
 
     uint16_t partsCount = 0;
 
@@ -131,7 +132,7 @@ void emberAfPluginDescriptorServerInitCallback(void)
     for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
     {
         EndpointId endpoint = emberAfEndpointFromIndex(index);
-        if (!emberAfContainsCluster(endpoint, ZCL_DESCRIPTOR_CLUSTER_ID))
+        if (!emberAfContainsCluster(endpoint, Descriptor::Id))
         {
             continue;
         }

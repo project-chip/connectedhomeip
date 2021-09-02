@@ -26,8 +26,9 @@ using namespace ::chip;
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
-    ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
-                  aCommandId, aEndPointId);
+    ChipLogDetail(Controller,
+                  "Received Cluster Command: Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " Endpoint=%" PRIx16,
+                  ChipLogValueMEI(aClusterId), ChipLogValueMEI(aCommandId), aEndPointId);
     ChipLogError(
         Controller,
         "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
@@ -40,9 +41,9 @@ CHIP_ERROR ModelCommand::Run()
     auto * ctx = GetExecContext();
 
     err = ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-    VerifyOrExit(
-        err == CHIP_NO_ERROR,
-        ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %d", ctx->remoteId, err));
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %" CHIP_ERROR_FORMAT,
+                              ctx->remoteId, err.Format()));
 
 exit:
     return err;
@@ -59,7 +60,7 @@ void ModelCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device 
 void ModelCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
 {
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %d", deviceId, error);
+    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %" CHIP_ERROR_FORMAT, deviceId, error.Format());
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "ModelCommand context is null"));
     command->SetCommandExitStatus(error);
 }

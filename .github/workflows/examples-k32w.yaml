@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-k32w:0.4.23
+            image: connectedhomeip/chip-build-k32w:0.5.1
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -43,11 +43,6 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-#            - name: Initialize CodeQL
-#              uses: github/codeql-action/init@v1
-#              with:
-#                  languages: "cpp"
-#                  queries: +security-and-quality
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -87,8 +82,3 @@ jobs:
                   path: |
                       out/lock_app_debug/chip-k32w061-lock-example.out
                       out/lock_app_debug/chip-k32w061-lock-example.out.map
-            - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
-#            - name: Perform CodeQL Analysis
-#              if: ${{ github.event_name == 'push' }}
-#              uses: github/codeql-action/analyze@v1

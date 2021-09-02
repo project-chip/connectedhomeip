@@ -17,7 +17,9 @@
 
 #include "ServiceNaming.h"
 
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CodeUtils.h>
 
 #include <cstdio>
 #include <inttypes.h>
@@ -25,36 +27,13 @@
 
 namespace chip {
 namespace Mdns {
-namespace {
-
-uint8_t HexToInt(char c)
-{
-    if ('0' <= c && c <= '9')
-    {
-        return static_cast<uint8_t>(c - '0');
-    }
-    else if ('a' <= c && c <= 'f')
-    {
-        return static_cast<uint8_t>(0x0a + c - 'a');
-    }
-    else if ('A' <= c && c <= 'F')
-    {
-        return static_cast<uint8_t>(0x0a + c - 'A');
-    }
-
-    return UINT8_MAX;
-}
-
-} // namespace
 
 CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peerId)
 {
-    constexpr size_t kServiceNameLen = 16 + 1 + 16; // 2 * 64-bit value in HEX + hyphen
+    ReturnErrorCodeIf(bufferLen <= kOperationalServiceNamePrefix, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorCodeIf(bufferLen <= kServiceNameLen, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    NodeId nodeId     = peerId.GetNodeId();
-    FabricId fabricId = peerId.GetFabricId();
+    NodeId nodeId               = peerId.GetNodeId();
+    CompressedFabricId fabricId = peerId.GetCompressedFabricId();
 
     snprintf(buffer, bufferLen, "%08" PRIX32 "%08" PRIX32 "-%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(fabricId >> 32),
              static_cast<uint32_t>(fabricId), static_cast<uint32_t>(nodeId >> 32), static_cast<uint32_t>(nodeId));
@@ -67,43 +46,36 @@ CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
     ReturnErrorCodeIf(name == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(peerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    peerId->SetNodeId(0);
-    peerId->SetFabricId(0);
+    // Make sure the string is long enough.
+    static constexpr size_t fabricIdByteLength   = 8;
+    static constexpr size_t fabricIdStringLength = fabricIdByteLength * 2;
+    static constexpr size_t nodeIdByteLength     = 8;
+    static constexpr size_t nodeIdStringLength   = nodeIdByteLength * 2;
+    static constexpr size_t totalLength          = fabricIdStringLength + nodeIdStringLength + 1; // +1 for '-'
 
-    bool deliminatorFound = false;
-    bool hasFabricPart    = false;
-    bool hasNodePart      = false;
+    // Ensure we have at least totalLength chars.
+    size_t len = strnlen(name, totalLength);
+    ReturnErrorCodeIf(len < totalLength, CHIP_ERROR_INVALID_ARGUMENT);
 
-    for (; *name != '\0'; name++)
-    {
-        if (*name == '.')
-        {
-            break;
-        }
-        else if (*name == '-')
-        {
-            deliminatorFound = true;
-            continue;
-        }
+    // Check that we have a proper terminator.
+    ReturnErrorCodeIf(name[totalLength] != '\0' && name[totalLength] != '.', CHIP_ERROR_WRONG_NODE_ID);
 
-        uint8_t val = HexToInt(*name);
-        ReturnErrorCodeIf(val == UINT8_MAX, CHIP_ERROR_WRONG_NODE_ID);
+    // Check what we have a separator where we expect.
+    ReturnErrorCodeIf(name[fabricIdStringLength] != '-', CHIP_ERROR_WRONG_NODE_ID);
 
-        if (deliminatorFound)
-        {
-            hasNodePart = true;
-            peerId->SetNodeId(peerId->GetNodeId() * 16 + val);
-        }
-        else
-        {
-            hasFabricPart = true;
-            peerId->SetFabricId(peerId->GetFabricId() * 16 + val);
-        }
-    }
+    static constexpr size_t bufferSize = max(fabricIdByteLength, nodeIdByteLength);
+    uint8_t buf[bufferSize];
 
-    ReturnErrorCodeIf(!deliminatorFound, CHIP_ERROR_WRONG_NODE_ID);
-    ReturnErrorCodeIf(!hasNodePart, CHIP_ERROR_WRONG_NODE_ID);
-    ReturnErrorCodeIf(!hasFabricPart, CHIP_ERROR_WRONG_NODE_ID);
+    ReturnErrorCodeIf(Encoding::HexToBytes(name, fabricIdStringLength, buf, bufferSize) == 0, CHIP_ERROR_WRONG_NODE_ID);
+    // Buf now stores the fabric id, as big-endian bytes.
+    static_assert(fabricIdByteLength == sizeof(uint64_t), "Wrong number of bytes");
+    peerId->SetCompressedFabricId(Encoding::BigEndian::Get64(buf));
+
+    ReturnErrorCodeIf(Encoding::HexToBytes(name + fabricIdStringLength + 1, nodeIdStringLength, buf, bufferSize) == 0,
+                      CHIP_ERROR_WRONG_NODE_ID);
+    // Buf now stores the node id id, as big-endian bytes.
+    static_assert(nodeIdByteLength == sizeof(uint64_t), "Wrong number of bytes");
+    peerId->SetNodeId(Encoding::BigEndian::Get64(buf));
 
     return CHIP_NO_ERROR;
 }
@@ -126,8 +98,8 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
     switch (subtype.type)
     {
     case DiscoveryFilterType::kShort:
-        // 8-bit number
-        if (subtype.code >= 1 << 8)
+        // 4-bit number
+        if (subtype.code >= 1 << 4)
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }

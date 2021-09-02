@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
@@ -52,7 +52,7 @@ public:
 
         // Additional metadata (optional, TLV format)
         const uint8_t * Metadata = nullptr;
-        uint16_t MetadataLength  = 0;
+        size_t MetadataLength    = 0;
     };
 
     struct TransferAcceptData
@@ -65,7 +65,7 @@ public:
 
         // Additional metadata (optional, TLV format)
         const uint8_t * Metadata = nullptr;
-        uint16_t MetadataLength  = 0;
+        size_t MetadataLength    = 0;
     };
 
     struct StatusReportData
@@ -76,16 +76,28 @@ public:
     struct BlockData
     {
         const uint8_t * Data = nullptr;
-        uint16_t Length      = 0;
+        size_t Length        = 0;
         bool IsEof           = false;
+    };
+
+    struct MessageTypeData
+    {
+        Protocols::Id ProtocolId; // Should only ever be SecureChannel or BDX
+        uint8_t MessageType;
+
+        MessageTypeData() : ProtocolId(Protocols::NotSpecified), MessageType(0) {}
     };
 
     /**
      * @brief
      *   All output data processed by the TransferSession object will be passed to the caller using this struct via PollOutput().
      *
-     *   NOTE: Some sub-structs may contain pointers to data in a PacketBuffer. In this case, the MsgData field MUST be populated
-     *         with a PacketBufferHandle that encapsulates the respective PacketBuffer, in order to ensure valid memory access.
+     *   NOTE: Some sub-structs may contain pointers to data in a PacketBuffer (see Blockdata). In this case, the MsgData field MUST
+     *   be populated with a PacketBufferHandle that encapsulates the respective PacketBuffer, in order to ensure valid memory
+     *   access.
+     *
+     *   NOTE: MsgData can contain messages that have been received or messages that should be sent by the caller. The underlying
+     *   buffer will always start at the data, never at the payload header. Outgoing messages do not have a header prepended.
      */
     struct OutputEvent
     {
@@ -97,6 +109,7 @@ public:
             TransferAcceptData transferAcceptData;
             BlockData blockdata;
             StatusReportData statusData;
+            MessageTypeData msgTypeData;
         };
 
         OutputEvent() : EventType(OutputEventType::kNone) { statusData = { StatusCode::kNone }; }
@@ -107,6 +120,7 @@ public:
         static OutputEvent TransferAcceptEvent(TransferAcceptData data, System::PacketBufferHandle msg);
         static OutputEvent BlockDataEvent(BlockData data, System::PacketBufferHandle msg);
         static OutputEvent StatusReportEvent(OutputEventType type, StatusReportData data);
+        static OutputEvent MsgToSendEvent(MessageTypeData typeData, System::PacketBufferHandle msg);
     };
 
     /**
@@ -119,8 +133,8 @@ public:
      *   It is possible that consecutive calls to this method may emit different outputs depending on the state of the
      *   TransferSession object.
      *
-     *   Note that if the type outputted is kMsgToSend, it is assumed that the message will be send immediately, and the
-     *   session timeout timer will begin at curTimeMs.
+     *   Note that if the type outputted is kMsgToSend, the caller is expected to send the message immediately, and the session
+     *   timeout timer will begin at curTimeMs.
      *
      *   See OutputEventType for all possible output event types.
      *
@@ -236,13 +250,15 @@ public:
      * @brief
      *   Process a message intended for this TransferSession object.
      *
-     * @param msg       A PacketBufferHandle pointing to the message buffer to process. May be BDX or StatusReport protocol.
-     * @param curTimeMs Current time indicated by the number of milliseconds since some epoch defined by the platform
+     * @param payloadHeader A PayloadHeader containing the Protocol type and Message Type
+     * @param msg           A PacketBufferHandle pointing to the message buffer to process. May be BDX or StatusReport protocol.
+     *                      Buffer is expected to start at data (not header).
+     * @param curTimeMs     Current time indicated by the number of milliseconds since some epoch defined by the platform
      *
      * @return CHIP_ERROR Indicates any problems in decoding the message, or if the message is not of the BDX or StatusReport
      *                    protocols.
      */
-    CHIP_ERROR HandleMessageReceived(System::PacketBufferHandle msg, uint64_t curTimeMs);
+    CHIP_ERROR HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg, uint64_t curTimeMs);
 
     TransferControlFlags GetControlMode() const { return mControlMode; }
     uint64_t GetStartOffset() const { return mStartOffset; }
@@ -266,8 +282,8 @@ private:
     };
 
     // Incoming message handlers
-    CHIP_ERROR HandleBdxMessage(PayloadHeader & header, System::PacketBufferHandle msg);
-    CHIP_ERROR HandleStatusReportMessage(PayloadHeader & header, System::PacketBufferHandle msg);
+    CHIP_ERROR HandleBdxMessage(const PayloadHeader & header, System::PacketBufferHandle msg);
+    CHIP_ERROR HandleStatusReportMessage(const PayloadHeader & header, System::PacketBufferHandle msg);
     void HandleTransferInit(MessageType msgType, System::PacketBufferHandle msgData);
     void HandleReceiveAccept(System::PacketBufferHandle msgData);
     void HandleSendAccept(System::PacketBufferHandle msgData);
@@ -308,13 +324,15 @@ private:
     uint64_t mTransferLength       = 0; ///< 0 represents indefinite length
     uint16_t mTransferMaxBlockSize = 0;
 
+    // Used to store event data before it is emitted via PollOutput()
     System::PacketBufferHandle mPendingMsgHandle;
     StatusReportData mStatusReportData;
     TransferInitData mTransferRequestData;
     TransferAcceptData mTransferAcceptData;
     BlockData mBlockEventData;
+    MessageTypeData mMsgTypeData;
 
-    uint32_t mNumBytesProcessed = 0;
+    size_t mNumBytesProcessed = 0;
 
     uint32_t mLastBlockNum = 0;
     uint32_t mNextBlockNum = 0;

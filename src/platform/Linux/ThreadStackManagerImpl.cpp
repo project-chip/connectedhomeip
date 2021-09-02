@@ -18,10 +18,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -398,7 +398,7 @@ bool ThreadStackManagerImpl::_HaveMeshConnectivity()
     // This API is Weave legacy and should be removed.
 
     ChipLogError(DeviceLayer, "HaveMeshConnectivity has confusing behavior and shouldn't be called");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return false;
 }
 
 void ThreadStackManagerImpl::_OnMessageLayerActivityChanged(bool messageLayerIsActive)

@@ -26,13 +26,13 @@
 
 #include <array>
 
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Pool.h>
+#include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
-#include <support/DLLUtil.h>
-#include <support/Pool.h>
-#include <support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
@@ -100,7 +100,7 @@ public:
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(SecureSessionHandle session, ExchangeDelegate * delegate);
+    ExchangeContext * NewContext(SessionHandle session, ExchangeDelegate * delegate);
 
     void ReleaseContext(ExchangeContext * ec) { mContextPool.ReleaseObject(ec); }
 
@@ -190,7 +190,7 @@ public:
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
-    Transport::AdminId GetAdminId() { return mAdminId; }
+    FabricIndex GetFabricIndex() { return mFabricIndex; }
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
 
@@ -232,7 +232,7 @@ private:
 
     ApplicationExchangeDispatch mDefaultExchangeDispatch;
 
-    Transport::AdminId mAdminId = 0;
+    FabricIndex mFabricIndex = 0;
 
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
 
@@ -243,15 +243,15 @@ private:
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source) override;
 
-    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SessionHandle session,
                            const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                            System::PacketBufferHandle && msgBuf) override;
 
-    void OnNewConnection(SecureSessionHandle session) override;
+    void OnNewConnection(SessionHandle session) override;
 #if CHIP_CONFIG_TEST
 public: // Allow OnConnectionExpired to be called directly from tests.
 #endif  // CHIP_CONFIG_TEST
-    void OnConnectionExpired(SecureSessionHandle session) override;
+    void OnConnectionExpired(SessionHandle session) override;
 };
 
 } // namespace Messaging

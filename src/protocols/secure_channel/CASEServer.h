@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <ble/BleLayer.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/CASESession.h>
@@ -34,13 +35,11 @@ public:
         {
             mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1);
         }
-
-        mCredentials.Release();
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             SecureSessionMgr * sessionMgr, Transport::AdminPairingTable * admins,
-                                             SessionIDAllocator * idAllocator);
+                                             Ble::BleLayer * bleLayer, SecureSessionMgr * sessionMgr,
+                                             Transport::FabricTable * fabrics, SessionIDAllocator * idAllocator);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -53,10 +52,10 @@ public:
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * reliableMessageManager,
                                                             SecureSessionMgr * sessionMgr) override
     {
-        return mPairingSession.GetMessageDispatch(reliableMessageManager, sessionMgr);
+        return GetSession().GetMessageDispatch(reliableMessageManager, sessionMgr);
     }
 
-    CASESession & GetSession() { return mPairingSession; }
+    virtual CASESession & GetSession() { return mPairingSession; }
 
 private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
@@ -64,13 +63,9 @@ private:
     CASESession mPairingSession;
     uint16_t mSessionKeyId         = 0;
     SecureSessionMgr * mSessionMgr = nullptr;
+    Ble::BleLayer * mBleLayer      = nullptr;
 
-    Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
-
-    Transport::AdminPairingTable * mAdmins = nullptr;
-    Credentials::ChipCertificateSet mCertificates;
-    Credentials::OperationalCredentialSet mCredentials;
-    Credentials::CertificateKeyId mRootKeyId;
+    Transport::FabricTable * mFabrics = nullptr;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
 

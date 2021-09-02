@@ -27,12 +27,13 @@
 
 #include <platform/ESP32/ESP32Config.h>
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/ESP32/ESP32Utils.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <platform/ESP32/ScopedNvsHandle.h>
 
 #include "nvs.h"
 #include "nvs_flash.h"
@@ -81,66 +82,44 @@ const char ESP32Config::kGroupKeyNamePrefix[] = "gk-";
 
 CHIP_ERROR ESP32Config::ReadConfigValue(Key key, bool & val)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
     uint32_t intVal;
 
-    err = nvs_open(key.Namespace, NVS_READONLY, &handle);
-    SuccessOrExit(err);
-    needClose = true;
+    ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READONLY));
 
-    err = nvs_get_u32(handle, key.Name, &intVal);
+    esp_err_t err = nvs_get_u32(handle, key.Name, &intVal);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(err);
 
     val = (intVal != 0);
 
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Config::ReadConfigValue(Key key, uint32_t & val)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
-    err = nvs_open(key.Namespace, NVS_READONLY, &handle);
-    SuccessOrExit(err);
-    needClose = true;
+    ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READONLY));
 
-    err = nvs_get_u32(handle, key.Name, &val);
+    esp_err_t err = nvs_get_u32(handle, key.Name, &val);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(err);
 
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Config::ReadConfigValue(Key key, uint64_t & val)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
-    err = nvs_open(key.Namespace, NVS_READONLY, &handle);
-    SuccessOrExit(err);
-    needClose = true;
+    ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READONLY));
 
     // Special case the MfrDeviceId value, optionally allowing it to be read as a blob containing
     // a 64-bit big-endian integer, instead of a u64 value.
@@ -154,312 +133,192 @@ CHIP_ERROR ESP32Config::ReadConfigValue(Key key, uint64_t & val)
     {
         uint8_t deviceIdBytes[sizeof(uint64_t)];
         size_t deviceIdLen = sizeof(deviceIdBytes);
-        err                = nvs_get_blob(handle, key.Name, deviceIdBytes, &deviceIdLen);
+        esp_err_t err      = nvs_get_blob(handle, key.Name, deviceIdBytes, &deviceIdLen);
         if (err == ESP_OK)
         {
-            VerifyOrExit(deviceIdLen == sizeof(deviceIdBytes), err = ESP_ERR_NVS_INVALID_LENGTH);
+            VerifyOrReturnError(deviceIdLen == sizeof(deviceIdBytes), ESP32Utils::MapError(ESP_ERR_NVS_INVALID_LENGTH));
             val = Encoding::BigEndian::Get64(deviceIdBytes);
-            ExitNow();
+            return CHIP_NO_ERROR;
         }
     }
 
-    err = nvs_get_u64(handle, key.Name, &val);
+    esp_err_t err = nvs_get_u64(handle, key.Name, &val);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(err);
 
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
-    err = nvs_open(key.Namespace, NVS_READONLY, &handle);
-    SuccessOrExit(err);
-    needClose = true;
+    ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READONLY));
 
-    outLen = bufSize;
-    err    = nvs_get_str(handle, key.Name, buf, &outLen);
+    outLen        = bufSize;
+    esp_err_t err = nvs_get_str(handle, key.Name, buf, &outLen);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
         outLen = 0;
-        err    = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    else if (err == ESP_ERR_NVS_INVALID_LENGTH)
+    if (err == ESP_ERR_NVS_INVALID_LENGTH && buf != NULL)
     {
-        err = (buf == NULL) ? CHIP_NO_ERROR : CHIP_ERROR_BUFFER_TOO_SMALL;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(err);
 
     outLen -= 1; // Don't count trailing nul.
 
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
-    err = nvs_open(key.Namespace, NVS_READONLY, &handle);
-    SuccessOrExit(err);
-    needClose = true;
+    ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READONLY));
 
-    outLen = bufSize;
-    err    = nvs_get_blob(handle, key.Name, buf, &outLen);
+    outLen        = bufSize;
+    esp_err_t err = nvs_get_blob(handle, key.Name, buf, &outLen);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
         outLen = 0;
-        err    = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    else if (err == ESP_ERR_NVS_INVALID_LENGTH)
+    else if (err == ESP_ERR_NVS_INVALID_LENGTH && buf != NULL)
     {
-        err = (buf == NULL) ? CHIP_NO_ERROR : CHIP_ERROR_BUFFER_TOO_SMALL;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(err);
 
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Config::WriteConfigValue(Key key, bool val)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
-    err = nvs_open(key.Namespace, NVS_READWRITE, &handle);
-    SuccessOrExit(err);
-    needClose = true;
-
-    err = nvs_set_u32(handle, key.Name, val ? 1 : 0);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READWRITE));
+    ReturnMappedErrorOnFailure(nvs_set_u32(handle, key.Name, val ? 1 : 0));
 
     // Commit the value to the persistent store.
-    err = nvs_commit(handle);
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(nvs_commit(handle));
 
     ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %s", key.Namespace, key.Name, val ? "true" : "false");
-
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Config::WriteConfigValue(Key key, uint32_t val)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
-    err = nvs_open(key.Namespace, NVS_READWRITE, &handle);
-    SuccessOrExit(err);
-    needClose = true;
-
-    err = nvs_set_u32(handle, key.Name, val);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READWRITE));
+    ReturnMappedErrorOnFailure(nvs_set_u32(handle, key.Name, val));
 
     // Commit the value to the persistent store.
-    err = nvs_commit(handle);
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(nvs_commit(handle));
 
     ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu32 " (0x%" PRIX32 ")", key.Namespace, key.Name, val, val);
-
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Config::WriteConfigValue(Key key, uint64_t val)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
-    err = nvs_open(key.Namespace, NVS_READWRITE, &handle);
-    SuccessOrExit(err);
-    needClose = true;
-
-    err = nvs_set_u64(handle, key.Name, val);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READWRITE));
+    ReturnMappedErrorOnFailure(nvs_set_u64(handle, key.Name, val));
 
     // Commit the value to the persistent store.
-    err = nvs_commit(handle);
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(nvs_commit(handle));
 
     ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu64 " (0x%" PRIX64 ")", key.Namespace, key.Name, val, val);
-
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
-
     if (str != NULL)
     {
-        err = nvs_open(key.Namespace, NVS_READWRITE, &handle);
-        SuccessOrExit(err);
-        needClose = true;
+        ScopedNvsHandle handle;
 
-        err = nvs_set_str(handle, key.Name, str);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READWRITE));
+        ReturnMappedErrorOnFailure(nvs_set_str(handle, key.Name, str));
 
         // Commit the value to the persistent store.
-        err = nvs_commit(handle);
-        SuccessOrExit(err);
+        ReturnMappedErrorOnFailure(nvs_commit(handle));
 
         ChipLogProgress(DeviceLayer, "NVS set: %s/%s = \"%s\"", key.Namespace, key.Name, str);
+        return CHIP_NO_ERROR;
     }
 
-    else
-    {
-        err = ClearConfigValue(key);
-        SuccessOrExit(err);
-    }
-
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-
-    return err;
+    return ClearConfigValue(key);
 }
 
 CHIP_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    CHIP_ERROR err;
     chip::Platform::ScopedMemoryBuffer<char> strCopy;
 
     if (str != NULL)
     {
         strCopy.Calloc(strLen + 1);
-        VerifyOrExit(strCopy, err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(strCopy, CHIP_ERROR_NO_MEMORY);
         strncpy(strCopy.Get(), str, strLen);
     }
-    err = ESP32Config::WriteConfigValueStr(key, strCopy.Get());
-
-exit:
-    return err;
+    return ESP32Config::WriteConfigValueStr(key, strCopy.Get());
 }
 
 CHIP_ERROR ESP32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
     if (data != NULL)
     {
-        err = nvs_open(key.Namespace, NVS_READWRITE, &handle);
-        SuccessOrExit(err);
-        needClose = true;
-
-        err = nvs_set_blob(handle, key.Name, data, dataLen);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READWRITE));
+        ReturnMappedErrorOnFailure(nvs_set_blob(handle, key.Name, data, dataLen));
 
         // Commit the value to the persistent store.
-        err = nvs_commit(handle);
-        SuccessOrExit(err);
+        ReturnMappedErrorOnFailure(nvs_commit(handle));
 
         ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %" PRId32 ")", key.Namespace, key.Name, dataLen);
+        return CHIP_NO_ERROR;
     }
 
-    else
-    {
-        err = ClearConfigValue(key);
-        SuccessOrExit(err);
-    }
-
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-
-    return err;
+    return ClearConfigValue(key);
 }
 
 CHIP_ERROR ESP32Config::ClearConfigValue(Key key)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
-    err = nvs_open(key.Namespace, NVS_READWRITE, &handle);
-    SuccessOrExit(err);
-    needClose = true;
+    ReturnErrorOnFailure(handle.Open(key.Namespace, NVS_READWRITE));
 
-    err = nvs_erase_key(handle, key.Name);
+    esp_err_t err = nvs_erase_key(handle, key.Name);
     if (err == ESP_ERR_NVS_NOT_FOUND)
     {
-        ExitNow(err = CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
     }
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(err);
 
     // Commit the value to the persistent store.
-    err = nvs_commit(handle);
-    SuccessOrExit(err);
+    ReturnMappedErrorOnFailure(nvs_commit(handle));
 
     ChipLogProgress(DeviceLayer, "NVS erase: %s/%s", key.Namespace, key.Name);
-
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 bool ESP32Config::ConfigValueExists(Key key)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
-    err = nvs_open(key.Namespace, NVS_READONLY, &handle);
-    SuccessOrExit(err);
-    needClose = true;
+    if (handle.Open(key.Namespace, NVS_READONLY) != CHIP_NO_ERROR)
+    {
+        return false;
+    }
 
     // This code is a rather unfortunate consequence of the limitations
     // in the ESP NVS API.  As defined, there is no API for determining
@@ -471,6 +330,7 @@ bool ESP32Config::ConfigValueExists(Key key)
     //
     // Thus the solution is to exhaustively check for the key using
     // each possible value type.
+    esp_err_t err;
     {
         uint8_t v;
         err = nvs_get_u8(handle, key.Name, &v);
@@ -528,63 +388,35 @@ bool ESP32Config::ConfigValueExists(Key key)
         err = ESP_OK;
     }
 
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
     return err == ESP_OK;
 }
 
 CHIP_ERROR ESP32Config::EnsureNamespace(const char * ns)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
-    err = nvs_open(ns, NVS_READONLY, &handle);
-    if (err == ESP_ERR_NVS_NOT_FOUND)
+    CHIP_ERROR err = handle.Open(ns, NVS_READONLY);
+    if (err == CHIP_NO_ERROR)
     {
-        err = nvs_open(ns, NVS_READWRITE, &handle);
-        SuccessOrExit(err);
-        needClose = true;
-
-        err = nvs_commit(handle);
-        SuccessOrExit(err);
+        return CHIP_NO_ERROR;
     }
-    SuccessOrExit(err);
-    needClose = true;
-
-exit:
-    if (needClose)
+    if (err == ESP32Utils::MapError(ESP_ERR_NVS_NOT_FOUND))
     {
-        nvs_close(handle);
+        ReturnErrorOnFailure(handle.Open(ns, NVS_READWRITE));
+        ReturnMappedErrorOnFailure(nvs_commit(handle));
+        return CHIP_NO_ERROR;
     }
     return err;
 }
 
 CHIP_ERROR ESP32Config::ClearNamespace(const char * ns)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
-    err = nvs_open(ns, NVS_READWRITE, &handle);
-    SuccessOrExit(err);
-    needClose = true;
-
-    err = nvs_erase_all(handle);
-    SuccessOrExit(err);
-
-    err = nvs_commit(handle);
-    SuccessOrExit(err);
-
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-    return err;
+    ReturnErrorOnFailure(handle.Open(ns, NVS_READWRITE));
+    ReturnMappedErrorOnFailure(nvs_erase_all(handle));
+    ReturnMappedErrorOnFailure(nvs_commit(handle));
+    return CHIP_NO_ERROR;
 }
 
 void ESP32Config::RunConfigUnitTest() {}

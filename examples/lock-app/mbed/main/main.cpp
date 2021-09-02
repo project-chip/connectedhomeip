@@ -20,30 +20,22 @@
 #include "AppTask.h"
 
 #include "mbedtls/platform.h"
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
-
-#ifdef MBED_CONF_MBED_TRACE_ENABLE
-#include "mbed-trace/mbed_trace.h"
-#endif
+#include <platform/mbed/Logging.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Logging::Platform;
 
 int main()
 {
-    int ret = 0;
+    int ret        = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-#ifdef MBED_CONF_MBED_TRACE_ENABLE
-    mbed_trace_init();
-    mbed_trace_include_filters_set("BSDS,NETS");
-    mbed_trace_config_set(TRACE_ACTIVE_LEVEL_ALL | TRACE_MODE_COLOR);
-#endif
-
-    // note: Make sure to turn the filtering on with CHIP_LOG_FILTERING=1
-    chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_Progress);
+    mbed_logging_init();
 
     ret = mbedtls_platform_setup(NULL);
     if (ret)
@@ -52,25 +44,29 @@ int main()
         goto exit;
     }
 
-    ret = chip::Platform::MemoryInit();
-    if (ret != CHIP_NO_ERROR)
+    err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Platform::MemoryInit() failed");
+        ret = EXIT_FAILURE;
         goto exit;
     }
 
     ChipLogProgress(NotSpecified, "Init CHIP Stack\r\n");
-    ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
+    err = PlatformMgr().InitChipStack();
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed");
+        ret = EXIT_FAILURE;
+        goto exit;
     }
 
     ChipLogProgress(NotSpecified, "Starting CHIP task");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
+    err = PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "PlatformMgr().StartEventLoopTask() failed");
+        ret = EXIT_FAILURE;
         goto exit;
     }
 

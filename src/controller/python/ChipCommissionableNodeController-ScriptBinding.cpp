@@ -25,35 +25,37 @@
 
 #include <controller/CHIPCommissionableNodeController.h>
 #include <inet/IPAddress.h>
-#include <support/BytesToHex.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+#include <type_traits>
 
 using namespace chip;
 using namespace chip::Controller;
 
+static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
+
 extern "C" {
-CHIP_ERROR
+ChipError::StorageType
 pychip_CommissionableNodeController_NewController(chip::Controller::CommissionableNodeController ** outCommissionableNodeCtrl);
-CHIP_ERROR
+ChipError::StorageType
 pychip_CommissionableNodeController_DeleteController(chip::Controller::CommissionableNodeController * commissionableNodeCtrl);
 
-CHIP_ERROR
+ChipError::StorageType
 pychip_CommissionableNodeController_DiscoverCommissioners(chip::Controller::CommissionableNodeController * commissionableNodeCtrl);
 void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
     chip::Controller::CommissionableNodeController * commissionableNodeCtrl);
 }
 
-CHIP_ERROR
+ChipError::StorageType
 pychip_CommissionableNodeController_NewController(chip::Controller::CommissionableNodeController ** outCommissionableNodeCtrl)
 {
-    CHIP_ERROR err             = CHIP_NO_ERROR;
     *outCommissionableNodeCtrl = new chip::Controller::CommissionableNodeController();
-    VerifyOrExit(*outCommissionableNodeCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
-exit:
-    return err;
+    VerifyOrReturnError(*outCommissionableNodeCtrl != NULL, CHIP_ERROR_NO_MEMORY.AsInteger());
+    return CHIP_NO_ERROR.AsInteger();
 }
 
-CHIP_ERROR
+ChipError::StorageType
 pychip_CommissionableNodeController_DeleteController(chip::Controller::CommissionableNodeController * commissionableNodeCtrl)
 {
     if (commissionableNodeCtrl != NULL)
@@ -61,13 +63,13 @@ pychip_CommissionableNodeController_DeleteController(chip::Controller::Commissio
         delete commissionableNodeCtrl;
     }
 
-    return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR.AsInteger();
 }
 
-CHIP_ERROR
+ChipError::StorageType
 pychip_CommissionableNodeController_DiscoverCommissioners(chip::Controller::CommissionableNodeController * commissionableNodeCtrl)
 {
-    return commissionableNodeCtrl->DiscoverCommissioners();
+    return commissionableNodeCtrl->DiscoverCommissioners().AsInteger();
 }
 
 void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(

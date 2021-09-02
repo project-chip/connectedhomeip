@@ -29,7 +29,7 @@
 #include <cstdint>
 #include <type_traits>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 
 namespace chip {

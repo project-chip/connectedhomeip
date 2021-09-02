@@ -27,10 +27,10 @@
 #include "Builder.h"
 #include "Parser.h"
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -71,7 +71,7 @@ public:
     /**
      *  @brief Get GetSuppressResponse Next() must be called before accessing them.
      *
-     *  @param [in] apGetSuppressResponse    A pointer to apGetSuppressResponse
+     *  @param [in] apSuppressResponse    A pointer to apSuppressResponse
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
@@ -81,7 +81,7 @@ public:
     /**
      *  @brief Get a TLVReader for the AttributePathList. Next() must be called before accessing them.
      *
-     *  @param [in] apAttributePath    A pointer to apAttributePath
+     *  @param [in] apAttributeDataList    A pointer to apAttributeDataList
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element

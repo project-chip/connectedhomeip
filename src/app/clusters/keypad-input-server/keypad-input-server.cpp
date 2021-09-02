@@ -21,35 +21,37 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
+
+using namespace chip;
 
 EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode);
 
-static void sendResponse(chip::app::Command * command, EmberAfKeypadInputStatus keypadInputStatus)
+static void sendResponse(app::CommandHandler * command, EmberAfKeypadInputStatus keypadInputStatus)
 {
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
-    chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_KEYPAD_INPUT_CLUSTER_ID,
-                                               ZCL_SEND_KEY_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
-    chip::TLV::TLVWriter * writer          = nullptr;
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_KEYPAD_INPUT_CLUSTER_ID,
+                                         ZCL_SEND_KEY_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    TLV::TLVWriter * writer          = nullptr;
 
     VerifyOrExit(command != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
     VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = writer->Put(chip::TLV::ContextTag(0), keypadInputStatus));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), keypadInputStatus));
     SuccessOrExit(err = command->FinishCommand());
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to encode KeypadInputResponse command. Error:%s", chip::ErrorStr(err));
+        ChipLogError(Zcl, "Failed to encode KeypadInputResponse command. Error:%s", ErrorStr(err));
     }
 }
 
-bool emberAfKeypadInputClusterSendKeyCallback(chip::app::Command * command, uint8_t keyCode)
+bool emberAfKeypadInputClusterSendKeyCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t keyCode)
 {
     EmberAfKeypadInputStatus status = keypadInputClusterSendKey(static_cast<EmberAfKeypadInputCecKeyCode>(keyCode));
     sendResponse(command, status);

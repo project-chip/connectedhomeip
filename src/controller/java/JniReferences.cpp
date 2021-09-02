@@ -19,7 +19,7 @@
 
 #include "CHIPJNIError.h"
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace Controller {
@@ -134,7 +134,7 @@ void JniReferences::CallVoidInt(JNIEnv * env, jobject object, const char * metho
     err = JniReferences::FindMethod(env, object, methodName, "(I)V", &method);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Error finding Java method: %d", err);
+        ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     env->ExceptionClear();

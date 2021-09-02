@@ -31,9 +31,9 @@
 #include <app/ClusterInfo.h>
 #include <app/MessageDef/EventDataElement.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCircularTLVBuffer.h>
+#include <lib/core/CHIPCircularTLVBuffer.h>
+#include <lib/support/PersistedCounter.h>
 #include <messaging/ExchangeMgr.h>
-#include <support/PersistedCounter.h>
 #include <system/SystemMutex.h>
 
 #define CHIP_CONFIG_EVENT_GLOBAL_PRIORITY PriorityLevel::Debug
@@ -381,6 +381,7 @@ public:
      *                         completion, the event number of the last event
      *                         fetched.
      *
+     * @param[out] aEventCount The number of fetched event
      * @retval #CHIP_END_OF_TLV             The function has reached the end of the
      *                                       available log entries at the specified
      *                                       priority level
@@ -395,7 +396,7 @@ public:
      *
      */
     CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, PriorityLevel aPriority,
-                                EventNumber & aEventNumber);
+                                EventNumber & aEventNumber, size_t & aEventCount);
 
     /**
      * @brief

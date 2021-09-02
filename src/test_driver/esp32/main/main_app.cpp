@@ -29,9 +29,9 @@
 #include <stdio.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
@@ -66,65 +66,58 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
              (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
-    CHIP_ERROR err; // A quick note about errors: CHIP adopts the error type and numbering
-                    // convention of the environment into which it is ported.  Thus esp_err_t
-                    // and CHIP_ERROR are in fact the same type, and both ESP-IDF errors
-                    // and CHIO-specific errors can be stored in the same value without
-                    // ambiguity.  For convenience, ESP_OK and CHIP_NO_ERROR are mapped
-                    // to the same value.
-
     // Initialize the ESP NVS layer.
-    err = nvs_flash_init();
-    if (err != CHIP_NO_ERROR)
+    esp_err_t err = nvs_flash_init();
+    if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         exit(err);
     }
 
     // Initialize the LwIP core lock.  This must be done before the ESP
     // tcpip_adapter layer is initialized.
-    err = PlatformMgrImpl().InitLwIPCoreLock();
-    if (err != CHIP_NO_ERROR)
+    CHIP_ERROR error = PlatformMgrImpl().InitLwIPCoreLock();
+    if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "PlatformMgr().InitLocks() failed: %s", ErrorStr(err));
-        exit(err);
+        ESP_LOGE(TAG, "PlatformMgr().InitLocks() failed: %s", ErrorStr(error));
+        exit(1);
     }
 
     err = esp_netif_init();
-    if (err != CHIP_NO_ERROR)
+    if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "esp_netif_init() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "esp_netif_init() failed: %s", esp_err_to_name(err));
         exit(err);
     }
 
     // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
     err = esp_event_loop_create_default();
-    if (err != CHIP_NO_ERROR)
+    if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", esp_err_to_name(err));
         exit(err);
     }
     esp_netif_create_default_wifi_ap();
     esp_netif_create_default_wifi_sta();
 
     err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    if (err != CHIP_NO_ERROR)
+    if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "esp_event_handler_register() failed for WIFI_EVENT: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "esp_event_handler_register() failed for WIFI_EVENT: %s", esp_err_to_name(err));
         exit(err);
     }
     err = esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    if (err != CHIP_NO_ERROR)
+    if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "esp_event_handler_register() failed for IP_EVENT: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "esp_event_handler_register() failed for IP_EVENT: %s", esp_err_to_name(err));
         exit(err);
     }
 
-    err = Crypto::add_entropy_source(app_entropy_source, NULL, 16);
-    if (err != CHIP_NO_ERROR)
+    error = Crypto::add_entropy_source(app_entropy_source, NULL, 16);
+    if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "add_entropy_source() failed: %s", ErrorStr(err));
-        exit(err);
+        ESP_LOGE(TAG, "add_entropy_source() failed: %s", ErrorStr(error));
+        exit(error.AsInteger());
     }
 
     xTaskCreate(tester_task, "tester", 12288, (void *) NULL, tskIDLE_PRIORITY + 10, NULL);

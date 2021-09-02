@@ -28,10 +28,14 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <support/DLLUtil.h>
-#include <support/TimeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/TimeUtils.h>
 
 #include <system/SystemError.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#include <sys/time.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 namespace chip {
 namespace System {
@@ -51,7 +55,7 @@ namespace Clock {
  *
  * @note
  *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetMonotonicMicroseconds().
+ *   Layer should call System::Clock::GetMonotonicMicroseconds().
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
  */
@@ -69,7 +73,7 @@ extern uint64_t GetMonotonicMicroseconds();
  *
  * @note
  *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetMonotonicMilliseconds().
+ *   Layer should call System::Clock::GetMonotonicMilliseconds().
  *
  * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
  */
@@ -94,7 +98,7 @@ extern uint64_t GetMonotonicMilliseconds();
  *
  * @note
  *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetUnixTimeMicroseconds().
+ *   Layer should call System::Clock::GetUnixTimeMicroseconds().
  *
  * @param[out] curTime                  The current time, expressed as Unix time scaled to microseconds.
  *
@@ -146,6 +150,7 @@ extern CHIP_ERROR SetUnixTimeMicroseconds(uint64_t newCurTime);
 class Clock
 {
 public:
+    // Note: these provide documentation, not type safety.
     using MonotonicMicroseconds = uint64_t;
     using MonotonicMilliseconds = uint64_t;
     using UnixTimeMicroseconds  = uint64_t;
@@ -251,7 +256,27 @@ public:
         // Current implementation is a simple pass-through to the platform.
         return Platform::Clock::SetUnixTimeMicroseconds(newCurTime);
     }
+
+    /**
+     *  Compares two Clock::MonotonicMilliseconds values and returns true if the first value is earlier than the second value.
+     *
+     *  @brief
+     *      A static API that gets called to compare 2 time values.  This API attempts to account for timer wrap by assuming that
+     * the difference between the 2 input values will only be more than half the timestamp scalar range if a timer wrap has occurred
+     *      between the 2 samples.
+     *
+     *  @note
+     *      This implementation assumes that Clock::MonotonicMilliseconds is an unsigned scalar type.
+     *
+     *  @return true if the first param is earlier than the second, false otherwise.
+     */
+    static bool IsEarlier(const Clock::MonotonicMilliseconds & first, const Clock::MonotonicMilliseconds & second);
 };
+
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
+Clock::MonotonicMilliseconds TimevalToMilliseconds(const timeval & in);
+void MillisecondsToTimeval(Clock::MonotonicMilliseconds in, timeval & out);
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace System
 } // namespace chip

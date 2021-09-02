@@ -25,7 +25,7 @@ concurrency:
 jobs:
     qemu:
         name: ESP32
-        timeout-minutes: 60
+        timeout-minutes: 70
 
         env:
             BUILD_TYPE: esp32-qemu
@@ -58,7 +58,7 @@ jobs:
               timeout-minutes: 25
               run: scripts/examples/esp_example.sh all-clusters-app
             - name: Build ESP32 QEMU and Run Tests
-              timeout-minutes: 25
+              timeout-minutes: 35
               run: scripts/tests/esp32_qemu_tests.sh /tmp/test_logs
             - name: Uploading Logs
               uses: actions/upload-artifact@v1

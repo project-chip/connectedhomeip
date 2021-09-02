@@ -16,17 +16,17 @@
  */
 #include <inttypes.h>
 
-#include <core/CHIPError.h>
-#include <mdns/minimal/core/FlatAllocatedQName.h>
-#include <mdns/minimal/core/QName.h>
-#include <mdns/minimal/responders/IP.h>
-#include <mdns/minimal/responders/Ptr.h>
-#include <mdns/minimal/responders/QueryResponder.h>
-#include <mdns/minimal/responders/RecordResponder.h>
-#include <mdns/minimal/responders/Srv.h>
-#include <mdns/minimal/responders/Txt.h>
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPError.h>
+#include <lib/mdns/minimal/core/FlatAllocatedQName.h>
+#include <lib/mdns/minimal/core/QName.h>
+#include <lib/mdns/minimal/responders/IP.h>
+#include <lib/mdns/minimal/responders/Ptr.h>
+#include <lib/mdns/minimal/responders/QueryResponder.h>
+#include <lib/mdns/minimal/responders/RecordResponder.h>
+#include <lib/mdns/minimal/responders/Srv.h>
+#include <lib/mdns/minimal/responders/Txt.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Mdns {
@@ -37,13 +37,13 @@ class QueryResponderAllocator
 public:
     QueryResponderAllocator()
     {
-        for (size_t i = 0; i < kMaxRecords; i++)
+        for (auto & responder : mAllocatedResponders)
         {
-            mAllocatedResponders[i] = nullptr;
+            responder = nullptr;
         }
-        for (size_t i = 0; i < kMaxAllocatedQNameData; i++)
+        for (auto & name : mAllocatedQNameParts)
         {
-            mAllocatedQNameParts[i] = nullptr;
+            name = nullptr;
         }
     }
     ~QueryResponderAllocator() { Clear(); }
@@ -84,25 +84,55 @@ public:
         mQueryResponder.Init();
 
         // Free all allocated data
-        for (size_t i = 0; i < kMaxRecords; i++)
+        for (auto & responder : mAllocatedResponders)
         {
-            if (mAllocatedResponders[i] != nullptr)
+            if (responder != nullptr)
             {
-                chip::Platform::Delete(mAllocatedResponders[i]);
-                mAllocatedResponders[i] = nullptr;
+                chip::Platform::Delete(responder);
+                responder = nullptr;
             }
         }
 
-        for (size_t i = 0; i < kMaxAllocatedQNameData; i++)
+        for (auto & name : mAllocatedQNameParts)
         {
-            if (mAllocatedQNameParts[i] != nullptr)
+            if (name != nullptr)
             {
-                chip::Platform::MemoryFree(mAllocatedQNameParts[i]);
-                mAllocatedQNameParts[i] = nullptr;
+                chip::Platform::MemoryFree(name);
+                name = nullptr;
             }
         }
     }
     mdns::Minimal::QueryResponder<kMaxRecords + 1> * GetQueryResponder() { return &mQueryResponder; }
+    const mdns::Minimal::RecordResponder * GetResponder(const mdns::Minimal::QType & qtype,
+                                                        const mdns::Minimal::FullQName & qname) const
+    {
+        for (auto & responder : mAllocatedResponders)
+        {
+            if (responder != nullptr && responder->GetQType() == qtype && responder->GetQName() == qname)
+            {
+                return responder;
+            }
+        }
+        return nullptr;
+    }
+    bool IsEmpty() const
+    {
+        for (auto & responder : mAllocatedResponders)
+        {
+            if (responder != nullptr)
+            {
+                return false;
+            }
+        }
+        for (auto & name : mAllocatedQNameParts)
+        {
+            if (name != nullptr)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
 protected:
     // For testing.
@@ -118,45 +148,45 @@ private:
     // The QueryResponder needs 1 extra space to hold the record for itself.
     mdns::Minimal::QueryResponder<kMaxRecords + 1> mQueryResponder;
 
-    mdns::Minimal::QueryResponderSettings AddAllocatedResponder(mdns::Minimal::RecordResponder * responder)
+    mdns::Minimal::QueryResponderSettings AddAllocatedResponder(mdns::Minimal::RecordResponder * newResponder)
     {
-        if (responder == nullptr)
+        if (newResponder == nullptr)
         {
             ChipLogError(Discovery, "Responder memory allocation failed");
             return mdns::Minimal::QueryResponderSettings(); // failed
         }
 
-        for (size_t i = 0; i < kMaxRecords; i++)
+        for (auto & responder : mAllocatedResponders)
         {
-            if (mAllocatedResponders[i] != nullptr)
+            if (responder != nullptr)
             {
                 continue;
             }
 
-            mAllocatedResponders[i] = responder;
-            return mQueryResponder.AddResponder(mAllocatedResponders[i]);
+            responder = newResponder;
+            return mQueryResponder.AddResponder(responder);
         }
 
-        Platform::Delete(responder);
+        Platform::Delete(newResponder);
         ChipLogError(Discovery, "Failed to find free slot for adding a responder");
         return mdns::Minimal::QueryResponderSettings();
     }
 
     void * AllocateQNameSpace(size_t size)
     {
-        for (size_t i = 0; i < kMaxAllocatedQNameData; i++)
+        for (auto & name : mAllocatedQNameParts)
         {
-            if (mAllocatedQNameParts[i] != nullptr)
+            if (name != nullptr)
             {
                 continue;
             }
 
-            mAllocatedQNameParts[i] = chip::Platform::MemoryAlloc(size);
-            if (mAllocatedQNameParts[i] == nullptr)
+            name = chip::Platform::MemoryAlloc(size);
+            if (name == nullptr)
             {
                 ChipLogError(Discovery, "QName memory allocation failed");
             }
-            return mAllocatedQNameParts[i];
+            return name;
         }
         ChipLogError(Discovery, "Failed to find free slot for adding a qname");
         return nullptr;

@@ -1,9 +1,9 @@
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <vector>
 
@@ -11,10 +11,8 @@
 
 using namespace chip;
 
-#define SETUP_PAYLOAD_PARSER_JNI_ERROR_MIN 10000
-#define SETUP_PAYLOAD_PARSER_JNI_ERROR_MAX 10999
-
-#define _SETUP_PAYLOAD_PARSER_JNI_ERROR(e) (SETUP_PAYLOAD_PARSER_JNI_ERROR_MIN + (e))
+#define SETUP_PAYLOAD_PARSER_JNI_ERROR_MIN 10 // avoiding collision with CHIPJNIError.h
+#define _SETUP_PAYLOAD_PARSER_JNI_ERROR(e) CHIP_APPLICATION_ERROR(SETUP_PAYLOAD_PARSER_JNI_ERROR_MIN + (e))
 
 #define SETUP_PAYLOAD_PARSER_JNI_ERROR_EXCEPTION_THROWN _SETUP_PAYLOAD_PARSER_JNI_ERROR(0)
 #define SETUP_PAYLOAD_PARSER_JNI_ERROR_TYPE_NOT_FOUND _SETUP_PAYLOAD_PARSER_JNI_ERROR(1)
@@ -51,7 +49,7 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
         err = ThrowUnrecognizedQRCodeException(env, qrCodeObj);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(SetupPayload, "Error throwing UnrecognizedQRCodeException: %d", err);
+            ChipLogError(SetupPayload, "Error throwing UnrecognizedQRCodeException: %" CHIP_ERROR_FORMAT, err.Format());
         }
         return nullptr;
     }
@@ -75,7 +73,7 @@ JNI_METHOD(jobject, fetchPayloadFromManualEntryCode)(JNIEnv * env, jobject self,
         err = ThrowInvalidEntryCodeFormatException(env, entryCode);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(SetupPayload, "Error throwing InvalidEntryCodeFormatException: %d", err);
+            ChipLogError(SetupPayload, "Error throwing InvalidEntryCodeFormatException: %" CHIP_ERROR_FORMAT, err.Format());
         }
         return nullptr;
     }

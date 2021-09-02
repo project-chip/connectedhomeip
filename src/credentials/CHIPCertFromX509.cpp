@@ -30,16 +30,16 @@
 
 #include <stddef.h>
 
-#include <asn1/ASN1.h>
-#include <asn1/ASN1Macros.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
-#include <core/CHIPTLV.h>
-#include <core/Optional.h>
 #include <credentials/CHIPCert.h>
+#include <lib/asn1/ASN1.h>
+#include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
 
 namespace chip {
 namespace Credentials {
@@ -350,7 +350,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 ASN1_PARSE_ENTER_SEQUENCE
                 {
                     err = reader.Next();
-                    VerifyOrExit(err == CHIP_NO_ERROR, err = ASN1_ERROR_INVALID_ENCODING);
+                    SuccessOrExit(err);
 
                     // keyIdentifier [0] IMPLICIT KeyIdentifier,
                     // KeyIdentifier ::= OCTET STRING
@@ -393,7 +393,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 uint32_t keyUsageBits;
                 err = reader.GetBitString(keyUsageBits);
                 SuccessOrExit(err);
-                VerifyOrExit(keyUsageBits <= UINT16_MAX, err = ASN1_ERROR_INVALID_ENCODING);
+                VerifyOrExit(CanCastTo<uint16_t>(keyUsageBits), err = ASN1_ERROR_INVALID_ENCODING);
 
                 // Check that only supported flags are set.
                 BitFlags<KeyUsageFlags> keyUsageFlags(static_cast<uint16_t>(keyUsageBits));
@@ -435,8 +435,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                     {
                         ASN1_GET_INTEGER(pathLenConstraint);
 
-                        VerifyOrExit(pathLenConstraint <= UINT8_MAX, err = ASN1_ERROR_INVALID_ENCODING);
-                        VerifyOrExit(pathLenConstraint >= 0, err = ASN1_ERROR_INVALID_ENCODING);
+                        VerifyOrExit(CanCastTo<uint8_t>(pathLenConstraint), err = ASN1_ERROR_INVALID_ENCODING);
 
                         // pathLenConstraint is present only when cA is TRUE
                         VerifyOrExit(isCA, err = ASN1_ERROR_INVALID_ENCODING);
@@ -701,8 +700,7 @@ exit:
     return err;
 }
 
-DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, uint8_t * chipCertBuf, uint32_t chipCertBufSize,
-                                                uint32_t & chipCertLen)
+CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & chipCert)
 {
     ASN1Reader reader;
     TLVWriter writer;
@@ -715,13 +713,13 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, uint8_t
 
     reader.Init(x509Cert.data(), static_cast<uint32_t>(x509Cert.size()));
 
-    writer.Init(chipCertBuf, chipCertBufSize);
+    writer.Init(chipCert);
 
     ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, issuer, subject, fabric));
 
     ReturnErrorOnFailure(writer.Finalize());
 
-    chipCertLen = writer.GetLengthWritten();
+    chipCert.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
 }
@@ -733,10 +731,7 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
 
     TLVWriter writer;
 
-    // We can still generate the certificate if the output chip cert buffer is bigger than UINT32_MAX,
-    // since generated cert needs less space than UINT32_MAX.
-    uint32_t chipCertBufLen = (chipCertArray.size() > UINT32_MAX) ? UINT32_MAX : static_cast<uint32_t>(chipCertArray.size());
-    writer.Init(chipCertArray.data(), chipCertBufLen);
+    writer.Init(chipCertArray);
 
     TLVType outerContainer;
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Array, outerContainer));
@@ -768,7 +763,9 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
     ReturnErrorOnFailure(writer.EndContainer(outerContainer));
     ReturnErrorOnFailure(writer.Finalize());
 
-    ReturnErrorCodeIf(writer.GetLengthWritten() > chipCertBufLen, CHIP_ERROR_INTERNAL);
+    // This error return is a bit weird... if we already overran our buffer,
+    // then fail???
+    ReturnErrorCodeIf(writer.GetLengthWritten() > chipCertArray.size(), CHIP_ERROR_INTERNAL);
     chipCertArray.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
@@ -778,7 +775,7 @@ CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & no
 {
     TLVType outerContainerType;
     TLVReader reader;
-    reader.Init(opCertArray.data(), static_cast<uint32_t>(opCertArray.size()));
+    reader.Init(opCertArray);
 
     if (reader.GetType() == kTLVType_NotSpecified)
     {

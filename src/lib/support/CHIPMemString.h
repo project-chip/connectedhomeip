@@ -27,8 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <support/ScopedBuffer.h>
-#include <support/Span.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace Platform {
@@ -88,6 +88,15 @@ inline void CopyString(char * dest, size_t destLength, ByteSpan source)
         memcpy(dest, source.data(), maxChars);
         dest[maxChars] = '\0';
     }
+}
+
+/**
+ * Convenience method for CopyString to auto-detect destination size.
+ */
+template <size_t N>
+inline void CopyString(char (&dest)[N], ByteSpan source)
+{
+    CopyString(dest, N, source);
 }
 
 /**

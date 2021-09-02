@@ -25,21 +25,13 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+#include <system/SystemLayer.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <system/LwIPEventSupport.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
-namespace System {
-namespace Platform {
-namespace Layer {
-
-CHIP_ERROR PostEvent(System::Layer & aLayer, void * aContext, System::Object & aTarget, System::EventType aType,
-                     uintptr_t aArgument);
-CHIP_ERROR DispatchEvents(System::Layer & aLayer, void * aContext);
-CHIP_ERROR DispatchEvent(System::Layer & aLayer, void * aContext, System::Event aEvent);
-CHIP_ERROR StartTimer(System::Layer & aLayer, void * aContext, uint32_t aMilliseconds);
-
-} // namespace Layer
-} // namespace Platform
-} // namespace System
 
 namespace DeviceLayer {
 
@@ -49,6 +41,7 @@ class ConfigurationManagerImpl;
 class TraitManager;
 class ThreadStackManagerImpl;
 class TimeSyncManager;
+
 namespace Internal {
 class DeviceControlServer;
 class FabricProvisioningServer;
@@ -99,6 +92,11 @@ public:
      * that happen before either StartEventLoopTask or RunEventLoop will queue
      * the work up but that work will NOT run until one of those functions is
      * called.
+     *
+     * ScheduleWork can be called safely on any thread without locking the
+     * stack.  When called from a thread that is not doing the stack work item
+     * processing, the callback function may be called (on the work item
+     * processing thread) before ScheduleWork returns.
      */
     void ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
     /**
@@ -182,16 +180,16 @@ private:
     friend class Internal::GenericThreadStackManagerImpl_OpenThread_LwIP;
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
-    // Parentheses used to fix clang parsing issue with these declarations
-    friend ::CHIP_ERROR(::chip::System::Platform::Layer::PostEvent)(::chip::System::Layer & aLayer, void * aContext,
-                                                                    ::chip::System::Object & aTarget,
-                                                                    ::chip::System::EventType aType, uintptr_t aArgument);
-    friend ::CHIP_ERROR(::chip::System::Platform::Layer::DispatchEvents)(::chip::System::Layer & aLayer, void * aContext);
-    friend ::CHIP_ERROR(::chip::System::Platform::Layer::DispatchEvent)(::chip::System::Layer & aLayer, void * aContext,
-                                                                        ::chip::System::Event aEvent);
-    friend ::CHIP_ERROR(::chip::System::Platform::Layer::StartTimer)(::chip::System::Layer & aLayer, void * aContext,
-                                                                     uint32_t aMilliseconds);
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    friend class System::PlatformEventing;
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+    /*
+     * PostEvent can be called safely on any thread without locking the stack.
+     * When called from a thread that is not doing the stack work item
+     * processing, the event might get dispatched (on the work item processing
+     * thread) before PostEvent returns.
+     */
     void PostEvent(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
     CHIP_ERROR StartChipTimer(uint32_t durationMS);

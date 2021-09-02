@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 
 namespace chip {
 namespace Protocols {
@@ -41,6 +41,8 @@ public:
     {
         return mVendorId == aOther.mVendorId && mProtocolId == aOther.mProtocolId;
     }
+
+    constexpr bool operator!=(const Id & aOther) const { return !(*this == aOther); }
 
     // Convert the Protocols::Id to a TLV profile id.
     // NOTE: We may want to change the TLV reader/writer to take Protocols::Id

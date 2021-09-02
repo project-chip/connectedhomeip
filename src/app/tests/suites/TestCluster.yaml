@@ -34,6 +34,30 @@ tests:
               - name: "returnValue"
                 value: 7
 
+    - label: "Send Test Add Arguments Command"
+      command: "testAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 3
+              - name: "arg2"
+                value: 17
+      response:
+          values:
+              - name: "returnValue"
+                value: 20
+
+    - label: "Send failing Test Add Arguments Command"
+      command: "testAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 250
+              - name: "arg2"
+                value: 6
+      response:
+          error: 1
+
     # Tests for Boolean attribute
 
     - label: "Read attribute BOOLEAN Default Value"
@@ -587,6 +611,8 @@ tests:
       attribute: "octet_string"
       arguments:
           value: "TestValueLongerThan10"
+      response:
+          error: true
 
     - label: "Read attribute OCTET_STRING"
       command: "readAttribute"
@@ -623,6 +649,74 @@ tests:
     - label: "Write attribute LONG_OCTET_STRING"
       command: "writeAttribute"
       attribute: "long_octet_string"
+      arguments:
+          value: ""
+
+    # Tests for Char String attribute
+
+    - label: "Read attribute CHAR_STRING Default Value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: ""
+
+    - label: "Write attribute CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "☉T☉"
+
+    - label: "Read attribute CHAR_STRING"
+      command: "readAttribute"
+      attribute: "char_string"
+      disabled: true
+      response:
+          value: "☉T☉"
+
+    - label: "Write attribute CHAR_STRING - Value too long"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "☉TestValueLongerThan10☉"
+      response:
+          error: true
+
+    - label: "Read attribute CHAR_STRING"
+      command: "readAttribute"
+      attribute: "char_string"
+      disabled: true
+      response:
+          value: "☉TestVal"
+
+    - label: "Write attribute CHAR_STRING - Empty"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: ""
+
+    # Tests for Long Char String attribute
+
+    - label: "Read attribute LONG_CHAR_STRING Default Value"
+      command: "readAttribute"
+      attribute: "long_char_string"
+      response:
+          value: ""
+
+    - label: "Write attribute LONG_CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "long_char_string"
+      arguments:
+          value: "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+
+    - label: "Read attribute LONG_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "long_char_string"
+      response:
+          value: "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+
+    - label: "Write attribute LONG_CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "long_char_string"
       arguments:
           value: ""
 

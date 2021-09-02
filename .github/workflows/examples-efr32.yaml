@@ -44,10 +44,6 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-#             - name: Initialize CodeQL
-#               uses: github/codeql-action/init@v1
-#               with:
-#                   languages: "cpp, python"
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -60,23 +56,23 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Build example EFR32 Lock App for BRD4161A
-              timeout-minutes: 5
+              timeout-minutes: 10
               run:
                   scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
                   out/lock_app_debug BRD4161A
             - name: Build example EFR32 Lighting App for BRD4161A
-              timeout-minutes: 5
+              timeout-minutes: 10
               run:
                   scripts/examples/gn_efr32_example.sh
                   examples/lighting-app/efr32/ out/lighting_app_debug BRD4161A
             - name: Build example EFR32 Lighting App for BRD4161A with RPCs
-              timeout-minutes: 5
+              timeout-minutes: 10
               run:
                   scripts/examples/gn_efr32_example.sh
                   examples/lighting-app/efr32/ out/lighting_app_debug_rpc BRD4161A
                   -args='import("//with_pw_rpc.gni")'
             - name: Build example EFR32 Window Covering for BRD4161A
-              timeout-minutes: 5
+              timeout-minutes: 10
               run:
                   scripts/examples/gn_efr32_example.sh examples/window-app/efr32/
                   out/window_app_debug BRD4161A
@@ -98,10 +94,3 @@ jobs:
                       out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out.map
                       out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out
                       out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out.map
-            - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
-            - name: Remove SiliconLabs binaries for CodeQL Analysis
-              run: find out -type d -name "SiliconLabs" -exec rm -rf {} +
-#             - name: Perform CodeQL Analysis
-#               if: ${{ github.event_name == 'push' }}
-#               uses: github/codeql-action/analyze@v1

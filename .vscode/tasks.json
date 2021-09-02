@@ -2,6 +2,42 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Build examples for platform",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --platform ${input:examplePlatform} build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Build specific example (all compatible platforms)",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --app ${input:exampleApp} build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Build single example (specific board/example)",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --board ${input:exampleBoard} --app ${input:exampleApp} build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
             "label": "Main Build",
             "type": "shell",
             "command": "scripts/build/default.sh",
@@ -89,19 +125,6 @@
             }
         },
         {
-            "label": "Build Chip Tool",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/chip-tool out/chip_tool",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/chip_tool/"
-                ]
-            }
-        },
-        {
             "label": "Build Lighting App (Linux)",
             "type": "shell",
             "command": "scripts/examples/gn_build_example.sh examples/lighting-app/linux out/lighting-app",
@@ -111,45 +134,6 @@
                 "fileLocation": [
                     "relative",
                     "${workspaceFolder}/out/lighting-app/"
-                ]
-            }
-        },
-        {
-            "label": "Build QPG6100 Lock Example",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lock-app/qpg out/qpg6100_lock_app qpg6100",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/qpg6100_lock_app/"
-                ]
-            }
-        },
-        {
-            "label": "Build EFR32 Lock Example",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lock-app/efr32 out/efr32_lock_app",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/efr32_lock_app/"
-                ]
-            }
-        },
-        {
-            "label": "Build EFR32 Light Example",
-            "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/lighting-app/efr32 out/efr32_lighting_app",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/efr32_lighting/"
                 ]
             }
         },
@@ -167,63 +151,10 @@
             }
         },
         {
-            "label": "Build ESP32 all-clusters-app Example",
-            "type": "shell",
-            "command": "scripts/examples/build-all-clusters-app.py",
-            "group": "build",
-            "problemMatcher": ["$gcc"]
-        },
-        {
             "label": "QEMU: run esp32-qemu unit tests",
             "type": "shell",
             "command": "scripts/tests/esp32_qemu_tests.sh /tmp/test_logs",
             "problemMatcher": []
-        },
-        {
-            "label": "Build Android App",
-            "type": "shell",
-            "command": "TARGET_CPU=arm64 scripts/examples/android_app.sh",
-            "group": "build",
-            "problemMatcher": ["$gcc"]
-        },
-        {
-            "label": "Build nRF Connect Lock Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/lock-app/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
-        },
-        {
-            "label": "Build nRF Connect Lighting Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/lighting-app/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
-        },
-        {
-            "label": "Build nRF Connect Shell Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/shell/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
         },
         {
             "label": "Build nRF Connect Pigweed Example (nRF52840)",
@@ -235,45 +166,6 @@
                 "fileLocation": [
                     "relative",
                     "${workspaceFolder}/examples/pigweed-app/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
-        },
-        {
-            "label": "Build nRF Connect Lock Example (nRF5340)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app nrf5340dk_nrf5340_cpuapp",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/lock-app/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
-                ]
-            }
-        },
-        {
-            "label": "Build nRF Connect Lighting Example (nRF5340)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app nrf5340dk_nrf5340_cpuapp",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/lighting-app/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
-                ]
-            }
-        },
-        {
-            "label": "Build nRF Connect Shell Example (nRF5340)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell nrf5340dk_nrf5340_cpuapp",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/shell/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
                 ]
             }
         },
@@ -356,6 +248,76 @@
             "description": "What mbed profile do you want to use?",
             "options": ["develop", "release", "debug"],
             "default": "develop"
+        },
+        {
+            "id": "efr32_board",
+            "type": "pickString",
+            "description": "What's the type of your EFR32 board?",
+            "options": [
+                "BRD4304A",
+                "BRD4161A",
+                "BRD4163A",
+                "BRD4164A",
+                "BRD4166A",
+                "BRD4170A",
+                "BRD4180A"
+            ],
+            "default": "BRD4166A"
+        },
+        {
+            "type": "pickString",
+            "id": "examplePlatform",
+            "description": "Which platform would you like to build",
+            "options": [
+                "all",
+                "android",
+                "efr32",
+                "esp32",
+                "host",
+                "nrf",
+                "qpg",
+                "infineon"
+            ],
+            "default": "build"
+        },
+        {
+            "type": "pickString",
+            "id": "exampleApp",
+            "description": "Which example application would you like to build",
+            "options": [
+                "all-clusters",
+                "bridge",
+                "chip-tool",
+                "light",
+                "lock",
+                "shell",
+                "temperature-measurement",
+                "thermostat",
+                "window-covering",
+                "pump",
+                "pump-controller"
+            ],
+            "default": "build"
+        },
+        {
+            "type": "pickString",
+            "id": "exampleBoard",
+            "description": "Which example board to build for",
+            "options": [
+                "arm",
+                "arm64",
+                "brd4161a",
+                "c3devkit",
+                "devkitc",
+                "m5stack",
+                "native",
+                "nrf52840",
+                "nrf5340",
+                "qpg6100",
+                "x64",
+                "p6board"
+            ],
+            "default": "build"
         }
     ]
 }

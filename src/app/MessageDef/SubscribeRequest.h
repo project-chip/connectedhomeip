@@ -24,10 +24,10 @@
 #include "Parser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -38,8 +38,8 @@ enum
     kCsTag_EventPathList             = 1,
     kCsTag_AttributeDataVersionList  = 2,
     kCsTag_EventNumber               = 3,
-    kCsTag_MinIntervalMs             = 4,
-    kCsTag_MaxIntervalMs             = 5,
+    kCsTag_MinIntervalSeconds        = 4,
+    kCsTag_MaxIntervalSeconds        = 5,
     kCsTag_KeepExistingSubscriptions = 6,
     kCsTag_IsProxy                   = 7,
 };
@@ -99,19 +99,19 @@ public:
     CHIP_ERROR GetEventNumber(uint64_t * const apEventNumber) const;
 
     /**
-     *  @brief Get Min Interval. Next() must be called before accessing them.
+     *  @brief Get MinIntervalSeconds. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetMinIntervalMs(uint16_t * const apMinIntervalMs) const;
+    CHIP_ERROR GetMinIntervalSeconds(uint16_t * const apMinIntervalSeconds) const;
 
     /**
-     *  @brief Get Max Interval. Next() must be called before accessing them.
+     *  @brief Get MaxIntervalSeconds. Next() must be called before accessing them.
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetMaxIntervalMs(uint16_t * const apMaxIntervalMs) const;
+    CHIP_ERROR GetMaxIntervalSeconds(uint16_t * const apMaxIntervalSeconds) const;
 
     /**
      *  @brief Check if subscription is kept. Next() must be called before accessing them.
@@ -151,9 +151,9 @@ public:
      */
     SubscribeRequest::Builder & EventNumber(const uint64_t aEventNumber);
 
-    SubscribeRequest::Builder & MinIntervalMs(const uint16_t aMinIntervalMs);
+    SubscribeRequest::Builder & MinIntervalSeconds(const uint16_t aMinIntervalSeconds);
 
-    SubscribeRequest::Builder & MaxIntervalMs(const uint16_t aMinIntervalMs);
+    SubscribeRequest::Builder & MaxIntervalSeconds(const uint16_t aMinIntervalSeconds);
 
     /**
      *  @brief This is set to 'true' by the subscriber to indicate preservation of previous subscriptions. If omitted, it implies

@@ -25,9 +25,9 @@
 
 #include "CHIPLogging.h"
 
-#include <core/CHIPCore.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -91,6 +91,7 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "SPL"   // SetupPayload
                                   "SVR"   // AppServer
                                   "DIS"   // Discovery
+                                  "IM"    // InteractionModel
     ;
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chip::Logging::kMaxModuleNameLen)

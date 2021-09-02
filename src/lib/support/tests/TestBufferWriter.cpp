@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <support/BufferWriter.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -76,6 +76,29 @@ public:
 };
 
 using namespace chip::Encoding;
+
+void TestSpanVersusRegular(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t buf_regular[5]    = { 0, 0, 0, 0, 0 };
+    uint8_t buf_span[5]       = { 0, 0, 0, 0, 0 };
+    uint8_t all_zeroes[5]     = { 0, 0, 0, 0, 0 };
+    uint8_t final_expected[5] = { 1, 2, 3, 4, 0 };
+
+    BufferWriter regular_writer(buf_regular, sizeof(buf_regular));
+    BufferWriter span_writer(chip::MutableByteSpan{ buf_span });
+
+    NL_TEST_ASSERT(inSuite, regular_writer.Available() == sizeof(buf_regular));
+    NL_TEST_ASSERT(inSuite, span_writer.Available() == sizeof(buf_span));
+
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(buf_regular, all_zeroes, sizeof(all_zeroes)));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(buf_span, all_zeroes, sizeof(all_zeroes)));
+
+    NL_TEST_ASSERT(inSuite, regular_writer.Put(1).Put(2).Put(3).Put(4).Fit());
+    NL_TEST_ASSERT(inSuite, span_writer.Put(1).Put(2).Put(3).Put(4).Fit());
+
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(buf_regular, final_expected, sizeof(final_expected)));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(buf_span, final_expected, sizeof(final_expected)));
+}
 
 void TestStringWrite(nlTestSuite * inSuite, void * inContext)
 {
@@ -203,11 +226,12 @@ void TestPutBigEndian(nlTestSuite * inSuite, void * inContext)
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestStringWrite", TestStringWrite),         //
-    NL_TEST_DEF("TestBufferWrite", TestBufferWrite),         //
-    NL_TEST_DEF("TestPutLittleEndian", TestPutLittleEndian), //
-    NL_TEST_DEF("TestPutBigEndian", TestPutBigEndian),       //
-    NL_TEST_SENTINEL()                                       //
+    NL_TEST_DEF("TestSpanVersusRegular", TestSpanVersusRegular), //
+    NL_TEST_DEF("TestStringWrite", TestStringWrite),             //
+    NL_TEST_DEF("TestBufferWrite", TestBufferWrite),             //
+    NL_TEST_DEF("TestPutLittleEndian", TestPutLittleEndian),     //
+    NL_TEST_DEF("TestPutBigEndian", TestPutBigEndian),           //
+    NL_TEST_SENTINEL()                                           //
 };
 
 } // namespace

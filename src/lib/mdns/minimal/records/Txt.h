@@ -19,7 +19,7 @@
 
 #include <string.h>
 
-#include <mdns/minimal/records/ResourceRecord.h>
+#include <lib/mdns/minimal/records/ResourceRecord.h>
 
 namespace mdns {
 namespace Minimal {
@@ -48,6 +48,8 @@ public:
     {
         SetTtl(kDefaultTtl);
     }
+    size_t GetNumEntries() const { return mEntryCount; }
+    const char * const * GetEntries() const { return mEntries; }
 
 protected:
     bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const override

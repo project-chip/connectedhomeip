@@ -121,7 +121,7 @@ bool ChannelContext::IsCasePairing()
     return mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kCasePairing;
 }
 
-bool ChannelContext::MatchesSession(SecureSessionHandle session, SecureSessionMgr * ssm)
+bool ChannelContext::MatchesSession(SessionHandle session, SecureSessionMgr * ssm)
 {
     switch (mState)
     {
@@ -187,7 +187,7 @@ void ChannelContext::EnterAddressResolve()
     }
 }
 
-void ChannelContext::AddressResolveTimeout(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
+void ChannelContext::AddressResolveTimeout(System::Layer * aLayer, void * aAppState)
 {
     ChannelContext * me = static_cast<ChannelContext *>(aAppState);
     me->AddressResolveTimeout();
@@ -258,14 +258,16 @@ void ChannelContext::EnterCasePairingState()
     auto & prepare              = GetPrepareVars();
     prepare.mCasePairingSession = Platform::New<CASESession>();
 
-    ExchangeContext * ctxt = mExchangeManager->NewContext(SecureSessionHandle(), prepare.mCasePairingSession);
+    ExchangeContext * ctxt =
+        mExchangeManager->NewContext(SessionHandle::TemporaryUnauthenticatedSession(), prepare.mCasePairingSession);
     VerifyOrReturn(ctxt != nullptr);
 
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
     addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(prepare.mAddress);
-    CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(addr, &prepare.mBuilder.GetOperationalCredentialSet(),
-                                                                   prepare.mBuilder.GetPeerNodeId(),
+    Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    VerifyOrReturn(fabric != nullptr);
+    CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(addr, fabric, prepare.mBuilder.GetPeerNodeId(),
                                                                    mExchangeManager->GetNextKeyId(), ctxt, this);
     if (err != CHIP_NO_ERROR)
     {
@@ -312,7 +314,7 @@ void ChannelContext::OnSessionEstablished()
     }
 }
 
-void ChannelContext::OnNewConnection(SecureSessionHandle session)
+void ChannelContext::OnNewConnection(SessionHandle session)
 {
     if (mState != ChannelState::kPreparing)
         return;
@@ -323,14 +325,14 @@ void ChannelContext::OnNewConnection(SecureSessionHandle session)
     EnterReadyState(session);
 }
 
-void ChannelContext::EnterReadyState(SecureSessionHandle session)
+void ChannelContext::EnterReadyState(SessionHandle session)
 {
     mState = ChannelState::kReady;
     mStateVars.Set<ReadyVars>(session);
     mChannelManager->NotifyChannelEvent(this, [](ChannelDelegate * delegate) { delegate->OnEstablished(); });
 }
 
-void ChannelContext::OnConnectionExpired(SecureSessionHandle session)
+void ChannelContext::OnConnectionExpired(SessionHandle session)
 {
     if (mState != ChannelState::kReady)
         return;

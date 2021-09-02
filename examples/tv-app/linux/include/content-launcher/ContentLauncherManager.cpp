@@ -18,16 +18,17 @@
 
 #include "ContentLauncherManager.h"
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
 
 #include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #include <map>
 
@@ -98,11 +99,12 @@ static void sendResponse(const char * responseName, ContentLaunchResponse launch
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)
     {
-        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, chip::ErrorStr(status));
+        ChipLogError(Zcl, "Failed to send %s. Error:%d", responseName, static_cast<int>(status));
     }
 }
 
-bool emberAfContentLauncherClusterLaunchContentCallback(chip::app::Command * command, unsigned char autoplay, unsigned char * data)
+bool emberAfContentLauncherClusterLaunchContentCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
+                                                        bool autoplay, unsigned char * data)
 {
 
     string dataString(reinterpret_cast<char *>(data));
@@ -112,8 +114,8 @@ bool emberAfContentLauncherClusterLaunchContentCallback(chip::app::Command * com
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLCallback(chip::app::Command * command, unsigned char * contentUrl,
-                                                    unsigned char * displayString)
+bool emberAfContentLauncherClusterLaunchURLCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
+                                                    unsigned char * contentUrl, unsigned char * displayString)
 {
     string contentUrlString(reinterpret_cast<char *>(contentUrl));
     string displayStringString(reinterpret_cast<char *>(displayString));

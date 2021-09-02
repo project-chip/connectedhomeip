@@ -28,14 +28,18 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/BLEEndPoint.h>
+#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
+
+// Application-defined error codes in the CHIP_ERROR space.
+#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x01)
 
 #define APP_NAME "Lock-app"
 class AppTask
 {
 
 public:
-    int StartAppTask();
+    CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
     void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
@@ -47,7 +51,7 @@ public:
 private:
     friend AppTask & GetAppTask(void);
 
-    int Init();
+    CHIP_ERROR Init();
 
     static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(BoltLockManager::Action_t aAction);
@@ -59,7 +63,7 @@ private:
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void LockActionEventHandler(AppEvent * aEvent);
-    static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState, CHIP_ERROR aError);
+    static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
 
     void StartTimer(uint32_t aTimeoutMs);
 

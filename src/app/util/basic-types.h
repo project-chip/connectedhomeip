@@ -26,10 +26,10 @@
 #include <stdint.h>
 
 // Pull in NodeId
-#include <transport/raw/MessageHeader.h>
+#include <lib/core/NodeId.h>
 
 // Pull in VendorId
-#include <core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 
 namespace chip {
 typedef uint8_t ActionId;
@@ -48,4 +48,6 @@ typedef uint16_t GroupId;
 typedef uint16_t ListIndex;
 typedef uint32_t TransactionId;
 typedef uint32_t StatusCode;
+typedef uint8_t Percent;
+typedef uint16_t Percent100ths;
 } // namespace chip

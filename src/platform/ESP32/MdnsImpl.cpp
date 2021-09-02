@@ -23,9 +23,9 @@
 #include <mdns.h>
 
 #include "platform/CHIPDeviceLayer.h"
-#include "support/CHIPMem.h"
-#include "support/CodeUtils.h"
-#include "support/logging/CHIPLogging.h"
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace {
 
@@ -53,6 +53,11 @@ exit:
     initCallback(context, error);
 
     return error;
+}
+
+CHIP_ERROR ChipMdnsShutdown()
+{
+    return CHIP_NO_ERROR;
 }
 
 static const char * GetProtocolString(MdnsServiceProtocol protocol)

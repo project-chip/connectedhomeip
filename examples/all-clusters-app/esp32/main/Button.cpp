@@ -29,26 +29,23 @@
 #include "esp_system.h"
 
 #include "Button.h"
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CodeUtils.h>
 
 extern const char * TAG;
 
 esp_err_t Button::Init(gpio_num_t gpioNum, uint16_t debouncePeriod)
 {
-    esp_err_t err;
-
     mGPIONum         = gpioNum;
     mDebouncePeriod  = debouncePeriod / portTICK_PERIOD_MS;
     mState           = false;
     mLastPolledState = false;
 
-    err = gpio_set_direction(gpioNum, GPIO_MODE_INPUT);
-    SuccessOrExit(err);
-
-    Poll();
-
-exit:
+    esp_err_t err = gpio_set_direction(gpioNum, GPIO_MODE_INPUT);
+    if (err == ESP_OK)
+    {
+        Poll();
+    }
     return err;
 }
 

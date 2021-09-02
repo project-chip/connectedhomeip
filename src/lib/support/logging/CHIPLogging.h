@@ -34,11 +34,11 @@
 
 #pragma once
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 #include <platform/logging/LogV.h>
 
-#include <support/logging/Constants.h>
+#include <lib/support/logging/Constants.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -113,7 +113,7 @@ void SetLogFilter(uint8_t category);
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Error, MSG, ##__VA_ARGS__)
 #endif
 #else
-#define ChipLogError(MOD, MSG, ...)
+#define ChipLogError(MOD, MSG, ...) ((void) 0)
 #endif
 
 #ifndef CHIP_PROGRESS_LOGGING
@@ -134,7 +134,7 @@ void SetLogFilter(uint8_t category);
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Progress, MSG, ##__VA_ARGS__)
 #endif
 #else
-#define ChipLogProgress(MOD, MSG, ...)
+#define ChipLogProgress(MOD, MSG, ...) ((void) 0)
 #endif
 
 #ifndef CHIP_DETAIL_LOGGING
@@ -155,7 +155,7 @@ void SetLogFilter(uint8_t category);
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Detail, MSG, ##__VA_ARGS__)
 #endif
 #else
-#define ChipLogDetail(MOD, MSG, ...)
+#define ChipLogDetail(MOD, MSG, ...) ((void) 0)
 #endif
 
 #if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING
@@ -344,6 +344,41 @@ bool IsCategoryEnabled(uint8_t category);
  *  @param[in]  aValue    64-bit value that will be split in 32-bit MSB/LSB part
  */
 #define ChipLogValueX64(aValue) static_cast<uint32_t>(aValue >> 32), static_cast<uint32_t>(aValue)
+
+/*
+ *  @brief
+ *      Macro for use in a string formatter for a MEI hex print.
+ *      Will split into 2x 16-bit prints to display both the MEI prefix/suffix
+ *
+ *  Example Usage:
+ *
+ *  @code
+ *  void foo() {
+ *      chip::CommandId value = 0x12340001;
+ *      ChipLogProgress(Foo, "A MEI value: " ChipLogFormatMEI, ChipLogValueMEI(value));
+ *  }
+ *  @endcode
+ *
+ */
+#define ChipLogFormatMEI "0x%04" PRIX16 "_%04" PRIX16
+
+/*
+ *  @brief
+ *      Macro for use in a printf parameter list for MEI value.
+ *      Will split into MSB/LSB 16-bit values to separate prefix/suffix.
+ *
+ *  Example Usage:
+ *
+ *  @code
+ *  void foo() {
+ *      chip::CommandId value = 0x12340001;
+ *      ChipLogProgress(Foo, "A MEI value: " ChipLogFormatMEI, ChipLogValueMEI(value));
+ *  }
+ *  @endcode
+ *
+ *  @param[in]  aValue    "32-bit value that will be split in 16-bit MSB/LSB part
+ */
+#define ChipLogValueMEI(aValue) static_cast<uint16_t>(aValue >> 16), static_cast<uint16_t>(aValue)
 
 } // namespace Logging
 } // namespace chip

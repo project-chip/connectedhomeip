@@ -31,7 +31,7 @@
 
 #include "ASN1Config.h"
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 #define CHIP_ASN1_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kASN1, (e))
 
@@ -161,7 +161,7 @@ namespace ASN1 {
 
 // clang-format on
 
-bool FormatASN1Error(char * buf, uint16_t bufSize, int32_t err);
+bool FormatASN1Error(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
 } // namespace ASN1
 } // namespace chip

@@ -24,8 +24,8 @@
 #include "Types.h"
 
 #include <errno.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <pthread.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -143,7 +143,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(unsigned timeoutMs)
     return CHIP_NO_ERROR;
 }
 
-void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void * appState, CHIP_ERROR error)
+void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void * appState)
 {
     static_cast<ChipDeviceScanner *>(appState)->StopScan();
 }

@@ -28,11 +28,11 @@
 #include <algorithm>
 #include <stdint.h>
 
-#include "core/CHIPError.h"
-#include "inet/IPAddress.h"
-#include "inet/InetInterface.h"
-#include "lib/core/Optional.h"
-#include "lib/mdns/ServiceNaming.h"
+#include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/mdns/ServiceNaming.h>
 
 namespace chip {
 namespace Mdns {
@@ -43,8 +43,9 @@ static constexpr uint8_t kMdnsHostNameMaxSize     = 16; // 64-bits in hex.
 static constexpr size_t kMdnsProtocolTextMaxSize  = std::max(sizeof(kOperationalProtocol), sizeof(kCommissionProtocol)) - 1;
 static constexpr size_t kMdnsTypeMaxSize =
     std::max({ sizeof(kCommissionableServiceName), sizeof(kOperationalServiceName), sizeof(kCommissionerServiceName) }) - 1;
-static constexpr uint8_t kMdnsTypeAndProtocolMaxSize = kMdnsTypeMaxSize + kMdnsProtocolTextMaxSize + 1; // <type>.<protocol>
-static constexpr uint16_t kMdnsTextMaxSize           = 64;
+static constexpr uint8_t kMdnsTypeAndProtocolMaxSize     = kMdnsTypeMaxSize + kMdnsProtocolTextMaxSize + 1; // <type>.<protocol>
+static constexpr uint16_t kMdnsTextMaxSize               = 64;
+static constexpr uint8_t kMdnsFullTypeAndProtocolMaxSize = kMaxSubtypeDescSize + /* '.' */ 1 + kMdnsTypeAndProtocolMaxSize;
 
 enum class MdnsServiceProtocol : uint8_t
 {
@@ -106,7 +107,7 @@ using MdnsBrowseCallback = void (*)(void * context, MdnsService * services, size
 using MdnsAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
 
 /**
- * This function intializes the mdns module
+ * This function initializes the mdns module
  *
  * @param[in] initCallback    The callback for notifying the initialization result.
  * @param[in] errorCallback   The callback for notifying internal errors.
@@ -117,6 +118,15 @@ using MdnsAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
  *
  */
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context);
+
+/**
+ * This function shuts down the mdns module
+ *
+ * @retval CHIP_NO_ERROR  The shutdown succeeds.
+ * @retval Error code     The shutdown fails
+ *
+ */
+CHIP_ERROR ChipMdnsShutdown();
 
 /**
  * This function publishes an service via mDNS.

@@ -22,39 +22,40 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
+#include <app/CommandHandler.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-#include <app/common/gen/enums.h>
 #include <app/util/af.h>
+
+using namespace chip;
 
 ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data);
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * commandObj, uint8_t *, uint8_t *)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t *, uint8_t *)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-void sendResponse(chip::app::Command * command, ApplicationLauncherResponse response)
+void sendResponse(app::CommandHandler * command, ApplicationLauncherResponse response)
 {
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
-    chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_APPLICATION_LAUNCHER_CLUSTER_ID,
-                                               ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID,
-                                               (chip::app::CommandPathFlags::kEndpointIdValid) };
-    chip::TLV::TLVWriter * writer          = nullptr;
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_APPLICATION_LAUNCHER_CLUSTER_ID,
+                                         ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    TLV::TLVWriter * writer          = nullptr;
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
     VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = writer->Put(chip::TLV::ContextTag(0), response.status));
-    SuccessOrExit(err = writer->PutString(chip::TLV::ContextTag(1), reinterpret_cast<const char *>(response.data)));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), response.status));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(1), reinterpret_cast<const char *>(response.data)));
     SuccessOrExit(err = command->FinishCommand());
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to send LaunchAppResponse. Error:%s", chip::ErrorStr(err));
+        ChipLogError(Zcl, "Failed to send LaunchAppResponse. Error:%s", ErrorStr(err));
     }
 }
 
@@ -66,7 +67,7 @@ EmberAfApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId
     return application;
 }
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * command, uint8_t * requestData,
+bool emberAfApplicationLauncherClusterLaunchAppCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t * requestData,
                                                         uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId)
 {
     EmberAfApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);

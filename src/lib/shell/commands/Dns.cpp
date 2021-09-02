@@ -15,120 +15,241 @@
  *    limitations under the License.
  */
 
-#include <core/CHIPCore.h>
-#include <core/PeerId.h>
 #include <inet/IPAddress.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/PeerId.h>
 #include <lib/mdns/Advertiser.h>
 #include <lib/mdns/Resolver.h>
 #include <lib/mdns/platform/Mdns.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace Shell {
 
-static chip::Shell::Engine sShellDnsSubcommands;
-static bool isResolverStarted;
+namespace {
 
-class DnsShellResolverDelegate : public chip::Mdns::ResolverDelegate
+Shell::Engine sShellDnsBrowseSubcommands;
+Shell::Engine sShellDnsSubcommands;
+
+class DnsShellResolverDelegate : public Mdns::ResolverDelegate
 {
 public:
-    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override
+    void OnNodeIdResolved(const Mdns::ResolvedNodeData & nodeData) override
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\n",
-                        ChipLogValueX64(nodeData.mPeerId.GetFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
+                        ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
+        streamer_printf(streamer_get(), "   Hostname: %s\n", nodeData.mHostName);
         streamer_printf(streamer_get(), "   IP address: %s\n", nodeData.mAddress.ToString(ipAddressBuf));
-        streamer_printf(streamer_get(), "   Port: %d\n", nodeData.mPort);
+        streamer_printf(streamer_get(), "   Port: %" PRIu16 "\n", nodeData.mPort);
+
+        auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
+
+        if (retryInterval.HasValue())
+            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\n", retryInterval.Value());
+
+        retryInterval = nodeData.GetMrpRetryIntervalActive();
+
+        if (retryInterval.HasValue())
+            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\n", retryInterval.Value());
+
+        streamer_printf(streamer_get(), "   Supports TCP: %s\n", nodeData.mSupportsTcp ? "yes" : "no");
     }
 
     void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}
 
-    void OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData) override
+    void OnNodeDiscoveryComplete(const Mdns::DiscoveredNodeData & nodeData) override
     {
         if (!nodeData.IsValid())
         {
             streamer_printf(streamer_get(), "DNS browse failed - not found valid services \n");
             return;
         }
+
+        char rotatingId[Mdns::kMaxRotatingIdLen * 2 + 1];
+        Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
+
         streamer_printf(streamer_get(), "DNS browse succeeded: \n");
         streamer_printf(streamer_get(), "   Hostname: %s\n", nodeData.hostName);
-        streamer_printf(streamer_get(), "   Vendor ID: %d\n", nodeData.vendorId);
-        streamer_printf(streamer_get(), "   Product ID: %d\n", nodeData.productId);
-        streamer_printf(streamer_get(), "   Long discriminator: %d\n", nodeData.longDiscriminator);
-        streamer_printf(streamer_get(), "   Device type: %d\n", nodeData.deviceType);
+        streamer_printf(streamer_get(), "   Vendor ID: %" PRIu16 "\n", nodeData.vendorId);
+        streamer_printf(streamer_get(), "   Product ID: %" PRIu16 "\n", nodeData.productId);
+        streamer_printf(streamer_get(), "   Long discriminator: %" PRIu16 "\n", nodeData.longDiscriminator);
+        streamer_printf(streamer_get(), "   Device type: %" PRIu16 "\n", nodeData.deviceType);
         streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.deviceName);
-        streamer_printf(streamer_get(), "   Commissioning mode: %d\n", nodeData.commissioningMode);
+        streamer_printf(streamer_get(), "   Commissioning mode: %d\n", static_cast<int>(nodeData.commissioningMode));
+        streamer_printf(streamer_get(), "   Additional pairing: %d\n", static_cast<int>(nodeData.additionalPairing));
+        streamer_printf(streamer_get(), "   Pairing hint: %" PRIu16 "\n", nodeData.pairingHint);
+        streamer_printf(streamer_get(), "   Pairing instruction: %s\n", nodeData.pairingInstruction);
+        streamer_printf(streamer_get(), "   Rotating ID %s\n", rotatingId);
+
+        auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
+
+        if (retryInterval.HasValue())
+            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\n", retryInterval.Value());
+
+        retryInterval = nodeData.GetMrpRetryIntervalActive();
+
+        if (retryInterval.HasValue())
+            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\n", retryInterval.Value());
+
+        streamer_printf(streamer_get(), "   Supports TCP: %s\n", nodeData.supportsTcp ? "yes" : "no");
         streamer_printf(streamer_get(), "   IP addresses:\n");
         for (uint8_t i = 0; i < nodeData.kMaxIPAddresses; i++)
         {
-            if (nodeData.ipAddress[i] != chip::Inet::IPAddress::Any)
+            if (nodeData.ipAddress[i] != Inet::IPAddress::Any)
                 streamer_printf(streamer_get(), "      %s\n", nodeData.ipAddress[i].ToString(ipAddressBuf));
         }
     }
 
 private:
-    char ipAddressBuf[chip::Inet::kMaxIPAddressStringLength];
+    char ipAddressBuf[Inet::kMaxIPAddressStringLength];
 };
 
-static DnsShellResolverDelegate sDnsShellResolverDelegate;
+DnsShellResolverDelegate sDnsShellResolverDelegate;
 
-CHIP_ERROR DnsHelpHandler(int argc, char ** argv)
+CHIP_ERROR ResolveHandler(int argc, char ** argv)
 {
-    sShellDnsSubcommands.ForEachCommand(PrintCommandHelp, nullptr);
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR ResolveHandler(int argc, char ** argv)
-{
-    streamer_printf(streamer_get(), "Resolving ...\r\n");
-
     VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
 
+    streamer_printf(streamer_get(), "Resolving ...\n");
+
     PeerId peerId;
-    peerId.SetFabricId(strtoull(argv[0], NULL, 10));
+    peerId.SetCompressedFabricId(strtoull(argv[0], NULL, 10));
     peerId.SetNodeId(strtoull(argv[1], NULL, 10));
 
-    return chip::Mdns::Resolver::Instance().ResolveNodeId(peerId, Inet::kIPAddressType_Any);
+    return Mdns::Resolver::Instance().ResolveNodeId(peerId, Inet::kIPAddressType_Any);
 }
 
-static CHIP_ERROR BrowseHandler(int argc, char ** argv)
+bool ParseSubType(int argc, char ** argv, Mdns::DiscoveryFilter & filter)
 {
-    streamer_printf(streamer_get(), "Browsing ...\r\n");
-
-    return chip::Mdns::Resolver::Instance().FindCommissionableNodes();
-}
-
-static CHIP_ERROR DnsHandler(int argc, char ** argv)
-{
-    if (!isResolverStarted)
-    {
-        chip::Mdns::Resolver::Instance().StartResolver(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
-        chip::Mdns::Resolver::Instance().SetResolverDelegate(&sDnsShellResolverDelegate);
-
-        isResolverStarted = true;
-    }
-
     if (argc == 0)
     {
-        DnsHelpHandler(argc, argv);
+        // No filtering by subtype.
+        return true;
+    }
+
+    VerifyOrReturnError(argc == 1, false);
+
+    const char * subtype = argv[0];
+    // All supported subtypes are:_<S><dd...>, where the number of digits is greater than 0.
+    VerifyOrReturnError(strlen(subtype) >= 3, false);
+    VerifyOrReturnError(subtype[0] == '_', false);
+
+    auto filterType = Mdns::DiscoveryFilterType::kNone;
+
+    switch (subtype[1])
+    {
+    case 'S':
+        filterType = Mdns::DiscoveryFilterType::kShort;
+        break;
+    case 'L':
+        filterType = Mdns::DiscoveryFilterType::kLong;
+        break;
+    case 'V':
+        filterType = Mdns::DiscoveryFilterType::kVendor;
+        break;
+    case 'T':
+        filterType = Mdns::DiscoveryFilterType::kDeviceType;
+        break;
+    case 'C':
+        filterType = Mdns::DiscoveryFilterType::kCommissioningMode;
+        break;
+    case 'A':
+        filterType = Mdns::DiscoveryFilterType::kCommissioningModeFromCommand;
+        break;
+    default:
+        return false;
+    }
+
+    uint16_t code;
+    VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code), false);
+
+    filter = Mdns::DiscoveryFilter(filterType, code);
+    return true;
+}
+
+CHIP_ERROR BrowseCommissionableHandler(int argc, char ** argv)
+{
+    Mdns::DiscoveryFilter filter;
+
+    if (!ParseSubType(argc, argv, filter))
+    {
+        streamer_printf(streamer_get(), "Invalid argument\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    streamer_printf(streamer_get(), "Browsing commissionable nodes...\n");
+
+    return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
+}
+
+CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
+{
+    Mdns::DiscoveryFilter filter;
+
+    if (!ParseSubType(argc, argv, filter))
+    {
+        streamer_printf(streamer_get(), "Invalid argument\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    streamer_printf(streamer_get(), "Browsing commissioners...\n");
+
+    return Mdns::Resolver::Instance().FindCommissioners(filter);
+}
+
+CHIP_ERROR BrowseHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        sShellDnsBrowseSubcommands.ForEachCommand(PrintCommandHelp, nullptr);
         return CHIP_NO_ERROR;
     }
+
+    return sShellDnsBrowseSubcommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR DnsHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        sShellDnsSubcommands.ForEachCommand(PrintCommandHelp, nullptr);
+        return CHIP_NO_ERROR;
+    }
+
+    Mdns::Resolver::Instance().StartResolver(&DeviceLayer::InetLayer, Mdns::kMdnsPort);
+    Mdns::Resolver::Instance().SetResolverDelegate(&sDnsShellResolverDelegate);
+
     return sShellDnsSubcommands.ExecCommand(argc, argv);
 }
 
+} // namespace
+
 void RegisterDnsCommands()
 {
+    static const shell_command_t sDnsBrowseSubCommands[] = {
+        { &BrowseCommissionableHandler, "commissionable",
+          "Browse Matter commissionable nodes. Usage: dns browse commissionable [subtype]" },
+        { &BrowseCommissionerHandler, "commissioner",
+          "Browse Matter commissioner nodes. Usage: dns browse commissioner [subtype]" },
+    };
+
     static const shell_command_t sDnsSubCommands[] = {
         { &ResolveHandler, "resolve",
           "Resolve the DNS service. Usage: dns resolve <fabric-id> <node-id> (e.g. dns resolve 5544332211 1)" },
-        { &BrowseHandler, "browse", "Browse the services published by mdns. Usage: dns browse" },
+        { &BrowseHandler, "browse",
+          "Browse DNS services published by Matter nodes. Usage: dns browse <commissionable|commissioner>" },
     };
 
     static const shell_command_t sDnsCommand = { &DnsHandler, "dns", "Dns client commands" };
+
+    // Register `dns browse` subcommands
+    sShellDnsBrowseSubcommands.RegisterCommands(sDnsBrowseSubCommands, ArraySize(sDnsBrowseSubCommands));
 
     // Register `dns` subcommands with the local shell dispatcher.
     sShellDnsSubcommands.RegisterCommands(sDnsSubCommands, ArraySize(sDnsSubCommands));

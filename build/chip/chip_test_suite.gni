@@ -80,7 +80,12 @@ template("chip_test_suite") {
     invoker.sources += invoker.test_sources
   }
 
-  static_library("${_suite_name}_lib") {
+  if (chip_build_test_static_libraries) {
+    _target_type = "static_library"
+  } else {
+    _target_type = "source_set"
+  }
+  target(_target_type, "${_suite_name}_lib") {
     forward_variables_from(invoker, "*", [ "tests" ])
 
     output_dir = "${root_out_dir}/lib"

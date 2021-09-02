@@ -19,10 +19,15 @@ declare_args() {
   # Device platform layer: cc13x2_26x2, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w, qpg, none.
   chip_device_platform = "auto"
   chip_platform_target = ""
+
+  # Substitue fake platform when building with chip_device_platform=auto.
+  chip_fake_platform = false
 }
 
 if (chip_device_platform == "auto") {
-  if (current_os == "mac" || current_os == "ios") {
+  if (chip_fake_platform) {
+    chip_device_platform = "fake"
+  } else if (current_os == "mac" || current_os == "ios") {
     chip_device_platform = "darwin"
   } else if (current_os == "linux") {
     chip_device_platform = "linux"
@@ -43,17 +48,22 @@ declare_args() {
       chip_device_platform == "mbed"
 
   # Enable ble support.
-  chip_enable_ble = chip_config_network_layer_ble
+  if (chip_device_platform == "fake") {
+    chip_enable_ble = false
+  } else {
+    chip_enable_ble = chip_config_network_layer_ble
+  }
 
   # Enable NFC support
   chip_enable_nfc = false
 
   # Select DNS-SD implementation
   if (chip_device_platform == "linux" || chip_device_platform == "esp32" ||
-      chip_device_platform == "mbed") {
+      chip_device_platform == "mbed" || chip_device_platform == "p6") {
     chip_mdns = "minimal"
   } else if (chip_device_platform == "darwin" ||
-             chip_device_platform == "cc13x2_26x2") {
+             chip_device_platform == "cc13x2_26x2" || current_os == "android" ||
+             chip_device_platform == "fake") {
     chip_mdns = "platform"
   } else {
     chip_mdns = "none"
@@ -84,6 +94,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "telink"
 } else if (chip_device_platform == "mbed") {
   _chip_device_layer = "mbed"
+} else if (chip_device_platform == "p6") {
+  _chip_device_layer = "P6"
 }
 
 if (chip_device_platform != "external") {
@@ -117,11 +129,13 @@ if (_chip_device_layer != "none" && chip_device_platform != "external") {
 
 assert(
     (current_os != "freertos" && chip_device_platform == "none") ||
+        chip_device_platform == "fake" ||
         chip_device_platform == "cc13x2_26x2" ||
         chip_device_platform == "darwin" || chip_device_platform == "efr32" ||
         chip_device_platform == "esp32" || chip_device_platform == "external" ||
         chip_device_platform == "linux" ||
         chip_device_platform == "nrfconnect" ||
         chip_device_platform == "k32w" || chip_device_platform == "qpg" ||
-        chip_device_platform == "telink" || chip_device_platform == "mbed",
+        chip_device_platform == "telink" || chip_device_platform == "mbed" ||
+        chip_device_platform == "p6",
     "Please select a valid value for chip_device_platform")

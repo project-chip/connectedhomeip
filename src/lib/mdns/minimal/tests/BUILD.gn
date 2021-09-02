@@ -27,11 +27,15 @@ chip_test_suite("tests") {
     "TestRecordData.cpp",
     "TestResponseSender.cpp",
   ]
+  if (chip_mdns == "minimal") {
+    test_sources += [ "TestAdvertiser.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/mdns",
     "${chip_root}/src/lib/mdns/minimal",
     "${nlunit_test_root}:nlunit-test",
   ]

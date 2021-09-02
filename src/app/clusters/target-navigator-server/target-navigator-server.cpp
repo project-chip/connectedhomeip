@@ -22,36 +22,38 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
+#include <app/CommandHandler.h>
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-#include <app/common/gen/enums.h>
 #include <app/util/af.h>
+
+using namespace chip;
 
 TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data);
 
-void sendResponse(chip::app::Command * command, TargetNavigatorResponse response)
+void sendResponse(app::CommandHandler * command, TargetNavigatorResponse response)
 {
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
-    chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TARGET_NAVIGATOR_CLUSTER_ID,
-                                               ZCL_NAVIGATE_TARGET_RESPONSE_COMMAND_ID,
-                                               (chip::app::CommandPathFlags::kEndpointIdValid) };
-    chip::TLV::TLVWriter * writer          = nullptr;
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TARGET_NAVIGATOR_CLUSTER_ID,
+                                         ZCL_NAVIGATE_TARGET_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    TLV::TLVWriter * writer          = nullptr;
     SuccessOrExit(err = command->PrepareCommand(cmdParams));
     VerifyOrExit((writer = command->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = writer->Put(chip::TLV::ContextTag(0), response.status));
-    SuccessOrExit(err = writer->PutString(chip::TLV::ContextTag(1), reinterpret_cast<const char *>(response.data)));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), response.status));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(1), reinterpret_cast<const char *>(response.data)));
     SuccessOrExit(err = command->FinishCommand());
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to send NavigateTargetResponse. Error:%s", chip::ErrorStr(err));
+        ChipLogError(Zcl, "Failed to send NavigateTargetResponse. Error:%s", ErrorStr(err));
     }
 }
 
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::Command * command, uint8_t target, uint8_t * data)
+bool emberAfTargetNavigatorClusterNavigateTargetCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t target,
+                                                         uint8_t * data)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string dataString(reinterpret_cast<char *>(data));

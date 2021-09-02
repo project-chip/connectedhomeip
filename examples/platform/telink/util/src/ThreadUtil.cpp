@@ -18,9 +18,9 @@
 
 #include "ThreadUtil.h"
 
+#include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <support/ThreadOperationalDataset.h>
 
 #include <zephyr.h>
 

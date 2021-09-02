@@ -1,0 +1,26 @@
+# NOTE: /workspace/ is the persistent directory across steps for
+steps:
+    - name: "connectedhomeip/chip-build-vscode:latest"
+      id: "CompileAll"
+      entrypoint: "./scripts/run_in_build_env.sh"
+      args:
+          [
+              "./scripts/build/build_examples.py --platform all
+              --enable-flashbundle build --create-archives /workspace/artifacts/",
+          ]
+      timeout: 7200s
+
+logsBucket: matter-build-automation-build-logs
+
+# Global timeout for all steps
+timeout: 7200s
+
+artifacts:
+    objects:
+        location: "gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/"
+        paths: ["/workspace/artifacts/*.tar.gz"]
+
+# Using higher CPU machines generally speeds up builds by > 4x (faster as we spend more time
+# building instead of docker download/checkout/bootstrap)
+options:
+    machineType: "E2_HIGHCPU_8"

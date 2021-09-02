@@ -2,32 +2,6 @@
 
 #pragma once
 
-#include "TestCommand.h"
+#include <commands/tests/TestCommand.h>
 
-{{>test_cluster tests="TV_TargetNavigatorCluster, TV_AudioOutputCluster, TV_ApplicationLauncherCluster, TV_KeypadInputCluster, TV_AccountLoginCluster, TV_ApplicationBasicCluster, TV_MediaPlaybackCluster, TV_TvChannelCluster, TV_LowPowerCluster, TV_MediaInputCluster, TestCluster, Test_TC_OO_1_1, Test_TC_OO_2_1, Test_TC_OO_2_2, Test_TC_DM_1_1, Test_TC_DM_3_1"}}
-
-void registerCommandsTests(Commands & commands)
-{
-    const char * clusterName = "Tests";
-
-    commands_list clusterCommands = {
-        make_unique<TV_TargetNavigatorCluster>(),
-        make_unique<TV_AudioOutputCluster>(),
-        make_unique<TV_ApplicationLauncherCluster>(),
-        make_unique<TV_KeypadInputCluster>(),
-        make_unique<TV_AccountLoginCluster>(),
-        make_unique<TV_ApplicationBasicCluster>(),
-        make_unique<TV_MediaPlaybackCluster>(),
-        make_unique<TV_TvChannelCluster>(),
-        make_unique<TV_LowPowerCluster>(),
-        make_unique<TV_MediaInputCluster>(),
-        make_unique<TestCluster>(),
-        make_unique<Test_TC_OO_1_1>(),
-        make_unique<Test_TC_OO_2_1>(),
-        make_unique<Test_TC_OO_2_2>(),
-        make_unique<Test_TC_DM_1_1>(),
-        make_unique<Test_TC_DM_3_1>(),
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}
+{{>test_cluster tests="TV_TargetNavigatorCluster, TV_AudioOutputCluster, TV_ApplicationLauncherCluster, TV_KeypadInputCluster, TV_AccountLoginCluster, TV_WakeOnLanCluster, TV_ApplicationBasicCluster, TV_MediaPlaybackCluster, TV_TvChannelCluster, TV_LowPowerCluster, TV_MediaInputCluster, TestCluster, Test_TC_OO_1_1, Test_TC_OO_2_1, Test_TC_OO_2_2, Test_TC_DM_1_1, Test_TC_DM_3_1, Test_TC_CC_3_4, Test_TC_CC_5, Test_TC_CC_6, Test_TC_CC_7, Test_TC_CC_8, Test_TC_WNCV_1_1, Test_TC_WNCV_2_1, Test_TC_BI_1_1, Test_TC_FLW_1_1, Test_TC_TM_1_1, Test_TC_OCC_1_1, OperationalCredentialsCluster"}}

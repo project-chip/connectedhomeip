@@ -38,13 +38,7 @@ while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
   {
 {{#zcl_command_arguments}}
     case {{index}}:
-{{#if (isOctetString type)}}
-    {
-        const uint8_t * data = nullptr;
-        TLVUnpackError = aDataTlv.GetDataPtr(data);
-        {{asSymbol label}} = {{asUnderlyingZclType type}}(data, aDataTlv.GetLength());
-    }
-{{else if (isString type)}}
+{{#if (isCharString type)}}
       // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
       TLVUnpackError = aDataTlv.GetDataPtr({{asSymbol label}});
 {{else if isArray}}
@@ -77,8 +71,7 @@ if (CHIP_END_OF_TLV == TLVError)
 if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && {{zcl_command_arguments_count this.id}} == validArgumentCount)
 {
 {{/if}}
-// TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(apCommandObj{{#zcl_command_arguments}}, {{#if (isCharString type)}}const_cast<uint8_t*>({{asSymbol label}}){{else}}{{asSymbol label}}{{/if}}{{/zcl_command_arguments}});
+wasHandled = emberAf{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(aEndpointId, apCommandObj{{#zcl_command_arguments}}, {{#if (isCharString type)}}const_cast<uint8_t*>({{asSymbol label}}){{else}}{{asSymbol label}}{{/if}}{{/zcl_command_arguments}});
 {{#if (zcl_command_arguments_count this.id)}}
 }
 {{/if}}

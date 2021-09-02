@@ -21,8 +21,8 @@
 #include "controller/ExampleOperationalCredentialsIssuer.h"
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
-#include <support/Span.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <atomic>
 #include <condition_variable>
@@ -59,6 +59,7 @@ enum ArgumentType
     Number_int32,
     Number_int64,
     CharString,
+    Boolean,
     OctetString,
     Attribute,
     Address
@@ -108,7 +109,7 @@ public:
     Command(const char * commandName) : mName(commandName) {}
     virtual ~Command() {}
 
-    void SetExecutionContext(ExecutionContext & execContext) { mExecContext = &execContext; }
+    void SetExecutionContext(ExecutionContext & execContext) { mExecContext = execContext; }
 
     const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;
@@ -131,6 +132,10 @@ public:
      */
     size_t AddArgument(const char * name, chip::ByteSpan * value);
     size_t AddArgument(const char * name, AddressWithInterface * out);
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, bool * out)
+    {
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Boolean);
+    }
     size_t AddArgument(const char * name, int64_t min, uint64_t max, int8_t * out)
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int8);
@@ -201,8 +206,7 @@ public:
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
 protected:
-    ExecutionContext * GetExecContext() { return mExecContext; }
-    ExecutionContext * mExecContext;
+    ExecutionContext * GetExecContext() { return &mExecContext; }
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);
@@ -212,6 +216,8 @@ private:
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
     const char * mName            = nullptr;
     std::vector<Argument> mArgs;
+
+    ExecutionContext mExecContext;
 
 #if CONFIG_USE_SEPARATE_EVENTLOOP
     std::condition_variable cvWaitingForResponse;

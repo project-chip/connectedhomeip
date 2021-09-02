@@ -49,8 +49,6 @@ executable("chip-lighting-app") {
 
   include_dirs = [ "include" ]
 
-  cflags = [ "-Wconversion" ]
-
   if (chip_enable_pw_rpc) {
     defines = [ "PW_RPC_ENABLED" ]
 
@@ -76,6 +74,10 @@ executable("chip-lighting-app") {
     ]
 
     deps += pw_build_LINK_DEPS
+  } else {
+    # The system_rpc_server.cc file is in pigweed and doesn't compile with
+    # -Wconversion, remove check for RPC build only.
+    cflags = [ "-Wconversion" ]
   }
 
   output_dir = root_out_dir
@@ -86,8 +88,8 @@ group("linux") {
 
   if (chip_enable_pw_rpc) {
     deps += [
-      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app.install",
-      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app_wheel",
+      "${chip_root}/examples/common/pigweed/rpc_console/py:chip_rpc.install",
+      "${chip_root}/examples/common/pigweed/rpc_console/py:chip_rpc_wheel",
     ]
   }
 }

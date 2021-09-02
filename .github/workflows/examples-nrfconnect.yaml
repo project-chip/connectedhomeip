@@ -56,40 +56,40 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Update nRF Connect SDK revision to the currently recommended.
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow"
-            # https://github.com/project-chip/connectedhomeip/issues/3100
-            # - name: Initialize CodeQL
-            #   uses: github/codeql-action/init@v1
-            #   with:
-            #       languages: "cpp, python"
-            #       queries: +security-and-quality
             - name: Build example nRF Connect SDK Lock App on nRF52840 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840
             - name: Build example nRF Connect SDK Lighting App on nRF52840 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840
             - name: Build example nRF Connect SDK Lighting App on nRF52840 DK with RPC
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840 -DOVERLAY_CONFIG=rpc.overlay
             - name: Build example nRF Connect SDK Shell on nRF52840 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh shell nrf52840dk_nrf52840
             - name: Build example nRF Connect SDK Pigweed on nRF52840 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh pigweed-app nrf52840dk_nrf52840
             - name: Build example nRF Connect SDK Lock App on nRF5340 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh lock-app nrf5340dk_nrf5340_cpuapp
             - name: Build example nRF Connect SDK Lighting App on nRF5340 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh lighting-app nrf5340dk_nrf5340_cpuapp
             - name: Build example nRF Connect SDK Shell on nRF5340 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh shell nrf5340dk_nrf5340_cpuapp
-            - name: Run unit tests for Zephyr native_posix_64 platform
+            - name: Build example nRF Connect SDK Pump App on nRF52840 DK
               timeout-minutes: 5
+              run: scripts/examples/nrfconnect_example.sh pump-app nrf52840dk_nrf52840
+            - name: Build example nRF Connect SDK Pump Controller App on nRF52840 DK
+              timeout-minutes: 5
+              run: scripts/examples/nrfconnect_example.sh pump-controller-app nrf52840dk_nrf52840
+            - name: Run unit tests for Zephyr native_posix_64 platform
+              timeout-minutes: 10
               run:
                   scripts/run_in_build_env.sh "scripts/tests/nrfconnect_native_posix_tests.sh native_posix_64"
             - name: Copy aside build products
@@ -113,20 +113,3 @@ jobs:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-            # https://github.com/project-chip/connectedhomeip/issues/3100
-            # - name: Remove third_party binaries for CodeQL Analysis
-            #   run: find examples -type d -name "third_party" -exec rm -rf {} +
-            # - name: Remove nrfxlib binaries for CodeQL Analysis
-            #   run: find examples -type d -name "nrfxlib" -exec rm -rf {} +
-            # - name: Remove zephyr binaries for CodeQL Analysis
-            #   run: find examples -type d -name "zephyr" -exec rm -rf {} +
-            # - name: Remove nrf binaries for CodeQL Analysis
-            #   run: find examples -type d -name "nrf" -exec rm -rf {} +
-            # - name: Remove modules binaries for CodeQL Analysis
-            #   run: find examples -type d -name "modules" -exec rm -rf {} +
-            # - name: Perform CodeQL Analysis
-            #   if: ${{ github.event_name == 'push' }}
-            #   uses: github/codeql-action/analyze@v1
-            # - name: Perform CodeQL Analysis
-            #   if: ${{ github.event_name == 'push' }}
-            #   uses: github/codeql-action/analyze@v1

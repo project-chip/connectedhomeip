@@ -385,7 +385,7 @@ menu "CHIP Device Layer"
         config DEFAULT_DEVICE_PRODUCT_REVISION
             int "Default Device Product Revision"
             range 0 65535
-            default 1
+            default 0
             help
                 The default device product revision.
 
@@ -488,7 +488,7 @@ menu "CHIP Device Layer"
 
         config WIFI_AP_IDLE_TIMEOUT
             int "WiFi AP Idle Timeout (ms)"
-            range 0 65535
+            range 0 600000
             default 120000
             help
                 The amount of time (in milliseconds) after which the CHIP platform will deactivate the soft-AP
@@ -497,10 +497,12 @@ menu "CHIP Device Layer"
     endmenu
 
     menu "BLE Options"
+        visible if BT_ENABLED
 
         config ENABLE_CHIPOBLE
             bool "Enable CHIP-over-BLE (CHIPoBLE) Support"
             default y
+            depends on BT_ENABLED
             help
                 Enables support for sending and receiving CHIP messages over a BLE connection.
 
@@ -731,7 +733,7 @@ menu "CHIP Device Layer"
             help
                 The IP address and port of the server to which the device should establish a service tunnel.
                 The supplied address must be a dot-notation IP address--not a host name.  The port number is
-                optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:11097).
+                optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:5540).
 
         config LOG_PROVISIONING_HASH
             bool "Enable Provisioning Hash Logging"

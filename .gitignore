@@ -44,6 +44,7 @@ TAGS
 # Python bytecodes
 __pycache__
 *.pyc
+*.egg-info
 
 # Doxygen outputs
 docs/html

@@ -26,13 +26,14 @@ import kotlinx.android.parcel.Parcelize
 /** Class to hold the CHIP device information. */
 @Parcelize
 data class CHIPDeviceInfo(
-  val version: Int,
-  val vendorId: Int,
-  val productId: Int,
-  val discriminator: Int,
-  val setupPinCode: Long,
-  val optionalQrCodeInfoMap: Map<Int, QrCodeInfo>,
-  val discoveryCapabilities: Set<DiscoveryCapability>
+  val version: Int = 0,
+  val vendorId: Int = 0,
+  val productId: Int = 0,
+  val discriminator: Int = 0,
+  val setupPinCode: Long = 0L,
+  val optionalQrCodeInfoMap: Map<Int, QrCodeInfo> = mapOf(),
+  val discoveryCapabilities: Set<DiscoveryCapability> = setOf(),
+  val ipAddress: String? = null,
 ) : Parcelable {
 
   companion object {

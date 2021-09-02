@@ -1337,8 +1337,19 @@
  *
  */
 #ifndef CHIP_PORT
-#define CHIP_PORT 11097
+#define CHIP_PORT 5540
 #endif // CHIP_PORT
+
+/**
+ *  @def CHIP_UDC_PORT
+ *
+ *  @brief
+ *    chip TCP/UDP port for unsecured user-directed-commissioning traffic.
+ *
+ */
+#ifndef CHIP_UDC_PORT
+#define CHIP_UDC_PORT CHIP_PORT + 10
+#endif // CHIP_UDC_PORT
 
 /**
  *  @def CHIP_UNSECURED_PORT
@@ -1452,17 +1463,6 @@
 #endif // CHIP_CONFIG_DEBUG_CERT_VALIDATION
 
 /**
- *  @def CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
- *
- *  @brief
- *    EC curve to be used to generate chip operational device certificate.
- *
- */
-#ifndef CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
-#define CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime256v1)
-#endif // CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
-
-/**
  *  @def CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_BEFORE
  *
  *  @brief
@@ -1563,42 +1563,6 @@
 #ifndef CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER "GlobalMCTR"
 #endif // CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
-
-/**
- *  @def CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
- *
- *  @brief
- *    Default ECDH curve to be used when initiating a CASE session, if not overridden by the application.
- *
- */
-#ifndef CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
-#if CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_secp224r1)
-#elif CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime256v1)
-#elif CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime192v1)
-#else
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_secp160r1)
-#endif
-#endif // CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
-
-/**
- *  @def CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
- *
- *  @brief
- *    Default set of ECDH curves allowed to be used in a CASE session (initiating or responding), if not overridden by the
- * application.
- *
- */
-#ifndef CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
-#if CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1 || CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES                                                                                    \
-    (chip::Profiles::Security::kChipCurveSet_secp224r1 | chip::Profiles::Security::kChipCurveSet_prime256v1)
-#else
-#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES (chip::Profiles::Security::kChipCurveSet_All)
-#endif
-#endif // CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
 
 /**
  * @def CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE
@@ -1925,6 +1889,37 @@
 #ifndef CHIP_CONFIG_TEST
 #define CHIP_CONFIG_TEST 0
 #endif // CHIP_CONFIG_TEST
+
+/**
+ *  @def CHIP_CONFIG_ERROR_SOURCE
+ *
+ *  If asserted (1), then CHIP_ERROR constants will include the source location of their expansion.
+ */
+#ifndef CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_CONFIG_ERROR_SOURCE 0
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
+/**
+ *  @def CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+ *
+ *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then instances of CHIP_NO_ERROR will also include
+ *  the source location of their expansion. Otherwise, CHIP_NO_ERROR is excluded from source tracking.
+ */
+#ifndef CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 1
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
+/**
+ *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+ *
+ *  If 0, then ChipError::Format() returns an integer (ChipError::StorageType).
+ *  If 1, then ChipError::Format() returns a const char *, from chip::ErrorStr().
+ *  In either case, the macro CHIP_ERROR_FORMAT expands to a suitable printf format.
+ */
+
+#ifndef CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+#define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 0
+#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
 
 /**
  *  @def CHIP_CONFIG_SHORT_ERROR_STR
@@ -2362,3 +2357,109 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_COMMISSIONING_HINT_INDEX_PRESS_RESET_SECONDS_WITH_POWER 10
 #define CHIP_COMMISSIONING_HINT_INDEX_PRESS_RESET_UNTIL_BLINK_WITH_POWER 11
 #endif
+
+/**
+ * @def CHIP_CONFIG_MDNS_CACHE_SIZE
+ *
+ * @brief
+ *      Define the size of the MDNS cache
+ *
+ *      If CHIP_CONFIG_MDNS_CACHE_SIZE is 0, the builtin cache is not used.
+ *
+ */
+#ifndef CHIP_CONFIG_MDNS_CACHE_SIZE
+#define CHIP_CONFIG_MDNS_CACHE_SIZE 20
+#endif
+/**
+ *  @name Interaction Model object pool configuration.
+ *
+ *  @brief
+ *    The following definitions sets the maximum number of corresponding interaction model object pool size.
+ *
+ *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *      * #CHIP_IM_MAX_NUM_COMMAND_SENDER
+ *      * #CHIP_IM_MAX_NUM_READ_HANDLER
+ *      * #CHIP_IM_MAX_NUM_READ_CLIENT
+ *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
+ *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *      * #CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *
+ *  @{
+ */
+
+/**
+ * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *
+ * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
+ */
+#ifndef CHIP_IM_MAX_NUM_COMMAND_HANDLER
+#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_COMMAND_SENDER
+ *
+ * @brief Defines the maximum number of CommandSender, limits the number of active command transactions on client.
+ */
+#ifndef CHIP_IM_MAX_NUM_COMMAND_SENDER
+#define CHIP_IM_MAX_NUM_COMMAND_SENDER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_READ_HANDLER
+ *
+ * @brief Defines the maximum number of ReadHandler, limits the number of active read transactions on server.
+ */
+#ifndef CHIP_IM_MAX_NUM_READ_HANDLER
+#define CHIP_IM_MAX_NUM_READ_HANDLER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_READ_CLIENT
+ *
+ * @brief Defines the maximum number of ReadClient, limits the number of active read transactions on client.
+ */
+#ifndef CHIP_IM_MAX_NUM_READ_CLIENT
+#define CHIP_IM_MAX_NUM_READ_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_REPORTS_IN_FLIGHT
+ *
+ * @brief Defines the maximum number of Reports, limits the traffic of read and subscription transactions.
+ */
+#ifndef CHIP_IM_MAX_REPORTS_IN_FLIGHT
+#define CHIP_IM_MAX_REPORTS_IN_FLIGHT 4
+#endif
+
+/**
+ * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ *
+ * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
+ */
+#ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *
+ * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
+ */
+#ifndef CHIP_IM_MAX_NUM_WRITE_HANDLER
+#define CHIP_IM_MAX_NUM_WRITE_HANDLER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *
+ * @brief Defines the maximum number of WriteClient, limits the number of active write transactions on client.
+ */
+#ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
+#define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @}
+ */

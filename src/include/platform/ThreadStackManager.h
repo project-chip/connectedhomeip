@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <support/Span.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 
@@ -93,9 +93,9 @@ public:
     CHIP_ERROR SetThreadEnabled(bool val);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    CHIP_ERROR
-    AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
-                  size_t aTxtEntiresSize, uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
+    CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
+                             const Span<const char * const> & aSubTypes, const Span<const Mdns::TextEntry> & aTxtEntries,
+                             uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR RemoveAllSrpServices();
     CHIP_ERROR SetupSrpHost(const char * aHostName);
@@ -241,10 +241,11 @@ inline CHIP_ERROR ThreadStackManager::SetThreadEnabled(bool val)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 inline CHIP_ERROR ThreadStackManager::AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
-                                                    chip::Mdns::TextEntry * aTxtEntries, size_t aTxtEntiresSize,
-                                                    uint32_t aLeaseInterval = 0, uint32_t aKeyLeaseInterval = 0)
+                                                    const Span<const char * const> & aSubTypes,
+                                                    const Span<const Mdns::TextEntry> & aTxtEntries, uint32_t aLeaseInterval = 0,
+                                                    uint32_t aKeyLeaseInterval = 0)
 {
-    return static_cast<ImplClass *>(this)->_AddSrpService(aInstanceName, aName, aPort, aTxtEntries, aTxtEntiresSize, aLeaseInterval,
+    return static_cast<ImplClass *>(this)->_AddSrpService(aInstanceName, aName, aPort, aSubTypes, aTxtEntries, aLeaseInterval,
                                                           aKeyLeaseInterval);
 }
 

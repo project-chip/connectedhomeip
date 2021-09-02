@@ -32,7 +32,7 @@ import time
 import glob
 import platform
 import logging
-from threading import Lock, Event
+from threading import Lock, Event, Condition
 from ctypes import *
 from .ChipUtility import ChipUtility
 from .exceptions import *
@@ -121,9 +121,40 @@ class ChipLogFormatter(logging.Formatter):
         return timestampStr
 
 
+class AsyncCallableHandle:
+    def __init__(self, callback):
+        self._callback = callback
+        self._res = None
+        self._exc = None
+        self._finish = False
+        self._cv_lock = Lock()
+        self._cv = Condition(self._cv_lock)
+
+    def __call__(self):
+        with self._cv_lock:
+            try:
+                self._res = self._callback()
+            except Exception as ex:
+                self._exc = ex
+            self._finish = True
+            self._cv.notify_all()
+        pythonapi.Py_DecRef(py_object(self))
+
+    def Wait(self):
+        with self._cv:
+            while self._finish is False:
+                self._cv.wait()
+            if self._exc is not None:
+                raise self._exc
+            return self._res
+
+
 _CompleteFunct = CFUNCTYPE(None, c_void_p, c_void_p)
-_ErrorFunct = CFUNCTYPE(None, c_void_p, c_void_p, c_ulong, POINTER(DeviceStatusStruct))
-_LogMessageFunct = CFUNCTYPE(None, c_int64, c_int64, c_char_p, c_uint8, c_char_p)
+_ErrorFunct = CFUNCTYPE(None, c_void_p, c_void_p,
+                        c_ulong, POINTER(DeviceStatusStruct))
+_LogMessageFunct = CFUNCTYPE(
+    None, c_int64, c_int64, c_char_p, c_uint8, c_char_p)
+_ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
 
 @_singleton
@@ -193,16 +224,23 @@ class ChipStack(object):
             self.callbackRes = self.ErrorToException(err, devStatusPtr)
             self.completeEvent.set()
 
+        @_ChipThreadTaskRunnerFunct
+        def HandleChipThreadRun(callback):
+            callback()
+
+        self.cbHandleChipThreadRun = HandleChipThreadRun
         self.cbHandleComplete = _CompleteFunct(HandleComplete)
         self.cbHandleError = _ErrorFunct(HandleError)
-        self.blockingCB = None  # set by other modules(BLE) that require service by thread while thread blocks.
+        # set by other modules(BLE) that require service by thread while thread blocks.
+        self.blockingCB = None
 
         # Initialize the chip library
         res = self._ChipStackLib.pychip_Stack_Init()
         if res != 0:
             raise self.ErrorToException(res)
 
-        res = self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle(bluetoothAdapter)
+        res = self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle(
+            bluetoothAdapter)
         if res != 0:
             raise self.ErrorToException(res)
 
@@ -258,22 +296,30 @@ class ChipStack(object):
         self.callbackRes = None
 
     def Call(self, callFunct):
+        '''Run a Python function on CHIP stack, and wait for the response.
+        This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
+        Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
+        '''
         # throw error if op in progress
         self.callbackRes = None
         self.completeEvent.clear()
         with self.networkLock:
-            res = callFunct()
+            res = self.PostTaskOnChipThread(callFunct).Wait()
         self.completeEvent.set()
         if res == 0 and self.callbackRes != None:
             return self.callbackRes
         return res
 
     def CallAsync(self, callFunct):
+        '''Run a Python function on CHIP stack, and wait for the application specific response.
+        This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
+        Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
+        '''
         # throw error if op in progress
         self.callbackRes = None
         self.completeEvent.clear()
         with self.networkLock:
-            res = callFunct()
+            res = self.PostTaskOnChipThread(callFunct).Wait()
 
         if res != 0:
             self.completeEvent.set()
@@ -287,8 +333,22 @@ class ChipStack(object):
             raise self.callbackRes
         return self.callbackRes
 
+    def PostTaskOnChipThread(self, callFunct) -> AsyncCallableHandle:
+        '''Run a Python function on CHIP stack, and wait for the response.
+        This function will post a task on CHIP mainloop, and return an object with Wait() method for getting the result.
+        Calling Wait inside main loop will cause deadlock.
+        '''
+        callObj = AsyncCallableHandle(callFunct)
+        pythonapi.Py_IncRef(py_object(callObj))
+        res = self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread(
+            self.cbHandleChipThreadRun, py_object(callObj))
+        if res != 0:
+            pythonapi.Py_DecRef(py_object(callObj))
+            raise self.ErrorToException(res)
+        return callObj
+
     def ErrorToException(self, err, devStatusPtr=None):
-        if err == 4044 and devStatusPtr:
+        if err == 0x2C and devStatusPtr:
             devStatus = devStatusPtr.contents
             msg = ChipUtility.CStringToString(
                 (
@@ -298,7 +358,8 @@ class ChipStack(object):
                 )
             )
             sysErrorCode = (
-                devStatus.SysErrorCode if (devStatus.SysErrorCode != 0) else None
+                devStatus.SysErrorCode if (
+                    devStatus.SysErrorCode != 0) else None
             )
             if sysErrorCode != None:
                 msg = msg + " (system err %d)" % (sysErrorCode)
@@ -331,7 +392,8 @@ class ChipStack(object):
         # running script looking for an CHIP build directory containing the Chip Device
         # Manager DLL. This makes it possible to import and use the ChipDeviceMgr module
         # directly from a built copy of the CHIP source tree.
-        buildMachineGlob = "%s-*-%s*" % (platform.machine(), platform.system().lower())
+        buildMachineGlob = "%s-*-%s*" % (platform.machine(),
+                                         platform.system().lower())
         relDMDLLPathGlob = os.path.join(
             "build",
             buildMachineGlob,
@@ -374,8 +436,14 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_StatusReportToString.restype = c_char_p
             self._ChipStackLib.pychip_Stack_ErrorToString.argtypes = [c_uint32]
             self._ChipStackLib.pychip_Stack_ErrorToString.restype = c_char_p
-            self._ChipStackLib.pychip_Stack_SetLogFunct.argtypes = [_LogMessageFunct]
+            self._ChipStackLib.pychip_Stack_SetLogFunct.argtypes = [
+                _LogMessageFunct]
             self._ChipStackLib.pychip_Stack_SetLogFunct.restype = c_uint32
 
-            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.argtypes = [c_uint32]
+            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.argtypes = [
+                c_uint32]
             self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.restype = c_uint32
+
+            self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread.argtypes = [
+                _ChipThreadTaskRunnerFunct, py_object]
+            self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread.restype = c_uint32

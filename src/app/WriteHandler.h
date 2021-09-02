@@ -20,15 +20,15 @@
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/WriteResponse.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -54,11 +54,6 @@ public:
     CHIP_ERROR Init(InteractionModelDelegate * apDelegate);
 
     /**
-     *  Shut down the ReadHandler. This terminates this instance
-     *  of the object and releases all held resources.
-     */
-    void Shutdown();
-    /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
      *  guarantees that it will call Shutdown on itself when processing is done (including if OnWriteRequest
      *  returns an error).
@@ -83,7 +78,6 @@ public:
                                       const Protocols::InteractionModel::ProtocolCode aProtocolCode);
 
 private:
-    friend class TestWriteInteraction;
     enum class State
     {
         Uninitialized = 0,      // The handler has not been initialized
@@ -100,10 +94,12 @@ private:
     void MoveToState(const State aTargetState);
     void ClearState();
     const char * GetStateStr() const;
-    void ClearExistingExchangeContext();
+    /**
+     *  Clean up state when we are done sending the write response.
+     */
+    void Shutdown();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
     WriteResponse::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;
     State mState = State::Uninitialized;

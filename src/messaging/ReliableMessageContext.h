@@ -28,10 +28,10 @@
 
 #include <messaging/ReliableMessageProtocolConfig.h>
 
-#include <core/CHIPError.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/ReferenceCounted.h>
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -218,7 +218,8 @@ private:
     void RetainContext();
     void ReleaseContext();
     CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
-    CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> Flags);
+    CHIP_ERROR HandleNeedsAck(uint32_t messageId, BitFlags<MessageFlagValues> messageFlags);
+    CHIP_ERROR HandleNeedsAckInner(uint32_t messageId, BitFlags<MessageFlagValues> messageFlags);
     ExchangeContext * GetExchangeContext();
 
     /**

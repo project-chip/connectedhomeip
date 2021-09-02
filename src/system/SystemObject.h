@@ -34,9 +34,17 @@
 // Include dependent headers
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 #include <unistd.h>
 
-#include <support/DLLUtil.h>
+#include <utility>
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+#include <memory>
+#include <mutex>
+#include <vector>
+#endif
+
+#include <lib/support/DLLUtil.h>
 
 #include <system/SystemError.h>
 #include <system/SystemStats.h>
@@ -75,8 +83,18 @@ class DLL_EXPORT Object
     friend class ObjectPool;
 
 public:
-    /** Test whether this object is retained by \c aLayer. Concurrency safe. */
-    bool IsRetained(const Layer & aLayer) const;
+    Object() : mRefCount(0)
+    {
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        mNext = nullptr;
+        mPrev = nullptr;
+#endif
+    }
+
+    virtual ~Object() {}
+
+    /** Test whether this object is retained. Concurrency safe. */
+    bool IsRetained() const;
 
     void Retain();
     void Release();
@@ -92,20 +110,45 @@ protected:
         kReleaseDeferralErrorTactic_Die,     /**< Die with message. */
     };
 
-    void DeferredRelease(ReleaseDeferralErrorTactic aTactic);
+    void DeferredRelease(Layer * aSystemLayer, ReleaseDeferralErrorTactic aTactic);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:
-    Object();
-    ~Object();
     Object(const Object &) = delete;
     Object & operator=(const Object &) = delete;
 
-    Layer * volatile mSystemLayer; /**< Pointer to the layer object that owns this object. */
-    unsigned int mRefCount;        /**< Count of remaining calls to Release before object is dead. */
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    Object * mNext;
+    Object * mPrev;
+    std::mutex * mMutexRef;
+#endif
 
-    /** If not already retained, attempt initial retention of this object for \c aLayer and zero up to \c aOctets. */
-    bool TryCreate(Layer & aLayer, size_t aOctets);
+    unsigned int mRefCount; /**< Count of remaining calls to Release before object is dead. */
+
+    /**
+     *  @brief
+     *      Attempts to perform an initial retention of this object, in a THREAD-SAFE manner.
+     *
+     *  @note
+     *      If reference count is non-zero, tryCreate will fail and return false.
+     *      If reference count is zero, then:
+     *         - reference count will be set to  1
+     *         - The size of the created object (assumed to be derived from SystemObject) is aOctects.
+     *           the method will memset to 0 the bytes following sizeof(SystemObject).
+     *
+     *       Typical usage is like:
+     *           class Foo: public SystemObject {...}
+     *           ....
+     *           Foo foo;
+     *           foo.TryCreate(sizeof(foo));
+     *
+     *       IMPORTANT inheritance precondition:
+     *           0 memset assumes that SystemObject is the top of the inheritance. This will NOT work properly:
+     *           class Bar: public Baz, SystemObject {...}
+     *           Bar bar;
+     *           bar.TryCreate(sizeof(bar)); /// NOT safe: this will clear sizeof(Baz) extra bytes in unallocated space.
+     */
+    bool TryCreate(size_t aOctets);
 
 public:
     void * AppState; /**< Generic pointer to app-specific data associated with the object. */
@@ -113,16 +156,16 @@ public:
 
 /**
  *  @brief
- *      Tests whether this object is retained by \c aLayer.
+ *      Tests whether this object is retained.
  *
  *  @note
  *      No memory barrier is applied. If this returns \c false in one thread context, then it does not imply that another thread
- *      cannot have previously retained the object for \c aLayer. If it returns \c true, then the logic using \c aLayer is
+ *      cannot have previously retained the object for \c aLayer. If it returns \c true, then the logic using \c mRefCount is
  *      responsible for ensuring concurrency safety for this object.
  */
-inline bool Object::IsRetained(const Layer & aLayer) const
+inline bool Object::IsRetained() const
 {
-    return this->mSystemLayer == &aLayer;
+    return this->mRefCount > 0;
 }
 
 /**
@@ -133,22 +176,6 @@ inline void Object::Retain()
 {
     __sync_fetch_and_add(&this->mRefCount, 1);
 }
-
-/**
- *  @brief
- *      Returns a reference to the CHIP System Layer object provided when the object was initially retained from its corresponding
- *      object pool instance. The object is assumed to be live.
- */
-inline Layer & Object::SystemLayer() const
-{
-    return *this->mSystemLayer;
-}
-
-/** Deleted. */
-inline Object::Object() {}
-
-/** Deleted. */
-inline Object::~Object() {}
 
 /**
  *  @brief
@@ -175,15 +202,54 @@ template <class T, unsigned int N>
 class ObjectPool
 {
 public:
-    static size_t Size();
+    void Reset();
 
-    T * Get(const Layer & aLayer, size_t aIndex);
-    T * TryCreate(Layer & aLayer);
+    T * TryCreate();
     void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
+
+    /**
+     * @brief
+     *   Run a functor for each active object in the pool
+     *
+     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
+     *  @return    bool     Returns false if broke during iteration
+     */
+    template <typename Function>
+    bool ForEachActiveObject(Function && function)
+    {
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        std::lock_guard<std::mutex> lock(mMutex);
+        Object * p = mDummyHead.mNext;
+        while (p)
+        {
+            if (!function(static_cast<T *>(p)))
+            {
+                return false;
+            }
+            p = p->mNext;
+        }
+#else
+        for (unsigned int i = 0; i < N; ++i)
+        {
+            T & lObject = reinterpret_cast<T *>(mArena.uMemory)[i];
+
+            if (lObject.IsRetained())
+            {
+                if (!function(&lObject))
+                    return false;
+            }
+        }
+#endif
+        return true;
+    }
 
 private:
     friend class TestObject;
 
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    std::mutex mMutex;
+    Object mDummyHead;
+#else
     ObjectArena<void *, N * sizeof(T)> mArena;
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
@@ -191,53 +257,73 @@ private:
     void UpdateHighWatermark(const unsigned int & aCandidate);
     volatile unsigned int mHighWatermark;
 #endif
+#endif
 };
 
-/**
- *  @brief
- *      Returns the number of objects that can be simultaneously retained from a pool.
- */
 template <class T, unsigned int N>
-inline size_t ObjectPool<T, N>::Size()
+inline void ObjectPool<T, N>::Reset()
 {
-    return N;
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    std::lock_guard<std::mutex> lock(mMutex);
+    Object * p = mDummyHead.mNext;
+
+    while (p)
+    {
+        Object * del = p;
+        p            = p->mNext;
+        delete del;
+    }
+
+    mDummyHead.mNext = nullptr;
+#else
+    memset(mArena.uMemory, 0, N * sizeof(T));
+
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    mHighWatermark = 0;
+#endif
+#endif
 }
 
 /**
  *  @brief
- *      Returns a pointer the object at \c aIndex or \c NULL if the object is not retained by \c aLayer.
+ *      Tries to initially retain the first object in the pool that is not retained.
  */
 template <class T, unsigned int N>
-inline T * ObjectPool<T, N>::Get(const Layer & aLayer, size_t aIndex)
+inline T * ObjectPool<T, N>::TryCreate()
 {
     T * lReturn = nullptr;
-
-    if (aIndex < N)
-        lReturn = &reinterpret_cast<T *>(mArena.uMemory)[aIndex];
 
     (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
 
-    return (lReturn != nullptr) && lReturn->IsRetained(aLayer) ? lReturn : nullptr;
-}
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    T * newNode = new T();
 
-/**
- *  @brief
- *      Tries to initially retain the first object in the pool that is not retained by any layer.
- */
-template <class T, unsigned int N>
-inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
-{
-    T * lReturn = nullptr;
-    unsigned int lIndex;
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    unsigned int lNumInUse = 0;
-#endif
+    if (newNode->TryCreate(sizeof(T)))
+    {
+        std::lock_guard<std::mutex> lock(mMutex);
+        Object * p = &mDummyHead;
+        if (p->mNext)
+        {
+            p->mNext->mPrev = newNode;
+        }
+        newNode->mNext     = p->mNext;
+        p->mNext           = newNode;
+        newNode->mPrev     = p;
+        newNode->mMutexRef = &mMutex;
+        lReturn            = newNode;
+    }
+    else
+    {
+        delete newNode;
+    }
+#else // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    unsigned int lIndex = 0;
 
     for (lIndex = 0; lIndex < N; ++lIndex)
     {
         T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
 
-        if (lObject.TryCreate(aLayer, sizeof(T)))
+        if (lObject.TryCreate(sizeof(T)))
         {
             lReturn = &lObject;
             break;
@@ -245,6 +331,8 @@ inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
     }
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    unsigned int lNumInUse = 0;
+
     if (lReturn != nullptr)
     {
         lIndex++;
@@ -258,11 +346,12 @@ inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
 
     UpdateHighWatermark(lNumInUse);
 #endif
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
     return lReturn;
 }
 
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 template <class T, unsigned int N>
 inline void ObjectPool<T, N>::UpdateHighWatermark(const unsigned int & aCandidate)
 {
@@ -292,7 +381,7 @@ inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsig
     {
         T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
 
-        if (lObject.mSystemLayer != nullptr)
+        if (lObject.IsRetained())
         {
             count++;
         }
@@ -305,12 +394,12 @@ inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsig
 
     aNumInUse += count;
 }
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 template <class T, unsigned int N>
 inline void ObjectPool<T, N>::GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
 {
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     unsigned int lNumInUse;
     unsigned int lHighWatermark;
 

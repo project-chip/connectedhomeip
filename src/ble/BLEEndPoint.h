@@ -214,11 +214,11 @@ private:
     void StopUnsubscribeTimer();       // Stop unsubscribe timer.
 
     // Timer expired callbacks:
-    static void HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR err);
-    static void HandleReceiveConnectionTimeout(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR err);
-    static void HandleAckReceivedTimeout(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR err);
-    static void HandleSendAckTimeout(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR err);
-    static void HandleUnsubscribeTimeout(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR err);
+    static void HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState);
+    static void HandleReceiveConnectionTimeout(chip::System::Layer * systemLayer, void * appState);
+    static void HandleAckReceivedTimeout(chip::System::Layer * systemLayer, void * appState);
+    static void HandleSendAckTimeout(chip::System::Layer * systemLayer, void * appState);
+    static void HandleUnsubscribeTimeout(chip::System::Layer * systemLayer, void * appState);
 
     // Close functions:
     void DoCloseCallback(uint8_t state, uint8_t flags, CHIP_ERROR err);

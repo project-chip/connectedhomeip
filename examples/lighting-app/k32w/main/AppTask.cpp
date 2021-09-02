@@ -18,17 +18,19 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "support/ErrorStr.h"
 #include <app/server/Server.h>
+#include <lib/support/ErrorStr.h>
 
 #include <app/server/OnboardingCodesUtil.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <support/ThreadOperationalDataset.h>
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
 #include "Keyboard.h"
@@ -61,13 +63,14 @@ static uint32_t eventMask = 0;
 extern "C" void K32WUartProcess(void);
 #endif
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
-int AppTask::StartAppTask()
+CHIP_ERROR AppTask::StartAppTask()
 {
-    int err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
@@ -80,12 +83,15 @@ int AppTask::StartAppTask()
     return err;
 }
 
-int AppTask::Init()
+CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -100,6 +106,7 @@ int AppTask::Init()
 
     sLightLED.Init(LIGHT_STATE_LED);
     sLightLED.Set(LightingMgr().IsTurnedOff());
+    UpdateClusterState();
 
     /* intialize the Keyboard and button press calback */
     KBD_Init(KBD_Callback);
@@ -118,11 +125,11 @@ int AppTask::Init()
         assert(err == CHIP_NO_ERROR);
     }
 
-    err = LightingMgr().Init();
-    if (err != CHIP_NO_ERROR)
+    int status = LightingMgr().Init();
+    if (status != 0)
     {
         K32W_LOG("LightingMgr().Init() failed");
-        assert(err == CHIP_NO_ERROR);
+        assert(status == 0);
     }
 
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
@@ -147,10 +154,9 @@ int AppTask::Init()
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
-    int err;
     AppEvent event;
 
-    err = sAppTask.Init();
+    CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("AppTask.Init() failed");
@@ -381,7 +387,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
 void AppTask::LightActionEventHandler(AppEvent * aEvent)
 {
     LightingManager::Action_t action;
-    int err        = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t actor  = 0;
     bool initiated = false;
 
@@ -409,7 +415,8 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        err = APP_ERROR_UNHANDLED_EVENT;
+        err    = APP_ERROR_UNHANDLED_EVENT;
+        action = LightingManager::INVALID_ACTION;
     }
 
     if (err == CHIP_NO_ERROR)
@@ -482,13 +489,13 @@ void AppTask::BleHandler(AppEvent * aEvent)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
-        if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+        if (OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
         {
             K32W_LOG("Started BLE Advertising!");
         }
         else
         {
-            K32W_LOG("OpenDefaultPairingWindow() failed");
+            K32W_LOG("OpenBasicCommissioningWindow() failed");
         }
     }
 }
@@ -565,6 +572,11 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
         K32W_LOG("Turn off Action has been initiated")
     }
 
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        sAppTask.mSyncClusterToButtonAction = true;
+    }
+
     sAppTask.mFunction = kFunctionTurnOnTurnOff;
 }
 
@@ -581,6 +593,12 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     {
         K32W_LOG("Turn off action has been completed")
         sLightLED.Set(false);
+    }
+
+    if (sAppTask.mSyncClusterToButtonAction)
+    {
+        sAppTask.UpdateClusterState();
+        sAppTask.mSyncClusterToButtonAction = false;
     }
 
     sAppTask.mFunction = kFunction_NoneSelected;

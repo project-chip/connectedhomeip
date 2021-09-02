@@ -37,6 +37,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&
         (host_cpu == "x64" || host_cpu == "arm64")
+    enable_pylib = false
   }
 
   # Python packages for supporting specific targets.
@@ -112,6 +113,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         deps += [ "${chip_root}/src/tools/chip-cert" ]
       }
       if (chip_enable_python_modules) {
+        if (enable_pylib) {
+          deps += [ "${chip_root}/src/pybindings/pycontroller" ]
+        }
         deps += [ "${chip_root}/src/controller/python" ]
       }
     }
@@ -129,6 +133,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       data_deps = [ "${chip_root}/examples/chip-tool" ]
 
       if (chip_enable_python_modules) {
+        if (enable_pylib) {
+          data_deps += [ "${chip_root}/src/pybindings/pycontroller" ]
+        }
         data_deps += [ "${chip_root}/src/controller/python" ]
       }
 
@@ -136,9 +143,19 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
+  group("fake_platform_tests") {
+    if (chip_link_tests) {
+      deps = [ "//src:fake_platform_tests_run" ]
+    }
+  }
+
   group("check") {
     if (chip_link_tests) {
-      deps = [ "//src:tests_run" ]
+      deps = [
+        "//:fake_platform_tests",
+        "//scripts/build:build_examples.tests",
+        "//src:tests_run",
+      ]
     }
   }
 
@@ -165,6 +182,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Set this to true to enable efr32 builds by default.
     enable_efr32_builds = false
+
+    # Set this to true to enable p6 builds by default.
+    enable_p6_builds = false
 
     # Set this to true to enable Qorvo qpg builds by default.
     enable_qpg_builds = false
@@ -206,6 +226,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_linux_tv_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux tv casting app example.
+    enable_linux_tv_casting_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # Build the Linux bridge app example.
     enable_linux_bridge_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
@@ -214,11 +238,18 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_linux_lighting_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux thermostat app example.
+    enable_linux_thermostat_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # Build the cc13x2x7_26x2x7 lock app example.
     enable_cc13x2x7_26x2x7_lock_app_build = enable_ti_simplelink_builds
 
     # Build the efr32 lock app example.
     enable_efr32_lock_app_build = enable_efr32_builds
+
+    # Build the p6 lock app example.
+    enable_p6_lock_app_build = enable_p6_builds
 
     # Build the qpgxxxx lock app example.
     enable_qpg_lock_app_build = enable_qpg_builds && !is_debug
@@ -237,6 +268,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the k32w shell app example.
     enable_k32w_shell_app_build = enable_k32w_builds
+
+    enable_fake_tests = enable_default_builds && host_os == "linux"
   }
 
   if (enable_host_clang_build) {
@@ -272,6 +305,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     chip_build("android_x86") {
       toolchain = "${build_root}/toolchain/android:android_x86"
+    }
+  }
+
+  if (enable_fake_tests) {
+    chip_build("fake_platform") {
+      toolchain = "${build_root}/toolchain/host:fake_${host_cpu}_gcc"
     }
   }
 
@@ -318,9 +357,24 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
+  if (enable_linux_thermostat_app_build) {
+    group("linux_thermostat_app") {
+      deps =
+          [ "${chip_root}/examples/thermostat/linux(${standalone_toolchain})" ]
+    }
+  }
+
   if (enable_linux_tv_app_build) {
     group("linux_tv_app") {
       deps = [ "${chip_root}/examples/tv-app/linux(${standalone_toolchain})" ]
+    }
+  }
+
+  if (enable_linux_tv_casting_app_build) {
+    group("linux_tv_casting_app") {
+      deps = [
+        "${chip_root}/examples/tv-casting-app/linux(${standalone_toolchain})",
+      ]
     }
   }
 
@@ -342,6 +396,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   if (enable_efr32_lock_app_build) {
     group("efr32_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lock_app)" ]
+    }
+  }
+
+  if (enable_p6_lock_app_build) {
+    group("p6_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/p6(${chip_root}/config/p6/toolchain:p6_lock_app)" ]
     }
   }
 
@@ -415,8 +475,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     if (enable_linux_all_clusters_app_build) {
       deps += [ ":linux_all_clusters_app" ]
     }
+    if (enable_linux_thermostat_app_build) {
+      deps += [ ":linux_thermostat_app" ]
+    }
     if (enable_linux_tv_app_build) {
       deps += [ ":linux_tv_app" ]
+    }
+    if (enable_linux_tv_casting_app_build) {
+      deps += [ ":linux_tv_casting_app" ]
     }
     if (enable_linux_bridge_app_build) {
       deps += [ ":linux_bridge_app" ]
@@ -432,6 +498,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
     if (enable_efr32_window_app_build) {
       deps += [ ":efr32_window_app" ]
+    }
+    if (enable_p6_lock_app_build) {
+      deps += [ ":p6_lock_app" ]
     }
     if (enable_k32w_lighting_app_build) {
       deps += [ ":k32w_lighting_app" ]
@@ -460,6 +529,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
     if (enable_host_gcc_mbedtls_build) {
       deps += [ ":check_host_gcc_mbedtls" ]
+    }
+    if (enable_fake_tests) {
+      deps += [ ":check_fake_platform" ]
     }
   }
 }

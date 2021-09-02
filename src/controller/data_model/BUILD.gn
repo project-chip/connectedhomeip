@@ -19,7 +19,8 @@ import("${chip_root}/src/app/chip_data_model.gni")
 chip_data_model("data_model") {
   zap_file = "controller-clusters.zap"
 
-  zap_pregenerated_dir = "gen"
+  zap_pregenerated_dir =
+      "${chip_root}/zzz_generated/controller-clusters/zap-generated"
 
   use_default_client_callbacks = true
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]

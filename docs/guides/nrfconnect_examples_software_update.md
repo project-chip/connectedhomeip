@@ -1,10 +1,7 @@
 # Performing Device Firmware Upgrade in the nRF Connect examples
 
-The following examples for the development kits from Nordic Semiconductor
-support over-the-air Device Firmware Upgrade:
-
--   [CHIP nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md)
--   [CHIP nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
+Some examples for the development kits from Nordic Semiconductor support
+over-the-air Device Firmware Upgrade.
 
 Currently, the Bluetooth LE is the only available transport for performing the
 DFU operation and it uses nRF Connect SDK's
@@ -22,8 +19,13 @@ following steps:
     - [nRF Connect for Mobile](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Connect-for-mobile)
     - [nRF Toolbox](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Toolbox)
 
-2. Push **Button 1** on the device to enable the software update functionality.
-3. Push **Button 4** on the device to start the Bluetooth LE advertising.
+2. Push the appropriate button on the device to enable the software update
+   functionality (if it is not enabled by default) and start the Bluetooth LE
+   advertising of SMP service. See the user interface section in the example
+   documentation to check the button number.
+3. Push the appropriate button on the device to start the Bluetooth LE
+   advertising. See the user interface section in the example documentation to
+   check the button number.
 4. Follow the instructions about downloading the new image to a device on the
    [FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf52.html#fota-upgrades)
    page in the nRF Connect SDK documentation.
@@ -34,22 +36,36 @@ To upgrade your device firmware over Bluetooth LE, you can use the PC command
 line tool provided by the [mcumgr](https://github.com/zephyrproject-rtos/mcumgr)
 project.
 
-> **_WARNING:_** mcumgr tool using Bluetooth LE is available only for Linux and
-> macOS systems. On Windows, there is no support for Device Firmware Upgrade
-> over Bluetooth LE yet.
+> **_WARNING:_**
+>
+> -   The mcumgr tool using Bluetooth LE is available only for Linux and macOS
+>     systems. On Windows, there is no support for Device Firmware Upgrade over
+>     Bluetooth LE yet.
+> -   It might not be possible to connect to the nRF device when using the
+>     mcumgr on Linux with the built-in Bluetooth LE adapter. In such cases, you
+>     can use Zephyr's Bluetooth HCI USB sample and program it to a Nordic
+>     Semiconductor's development kit to form an external Bluetooth LE adapter.
+>     For example, to build the sample for the nRF52840 DK, use the following
+>     command:
+>
+>         cd zephyr/samples/bluetooth/hci_usb && west build -b nrf52840dk_nrf52840 -- -DCONFIG_BT_LL_SW_SPLIT=y
 
 Complete the following steps to perform DFU using mcumgr:
-
-1. Install the tool by following the
-   [mcumgr command line tool installation instructions](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#command-line-tool).
-2. Push **Button 1** on the device to enable software update functionality.
-3. Push **Button 4** on the device to start the Bluetooth LE advertising.
 
 > **_NOTE:_** In all of the commands listed in the following steps, replace
 > `ble-hci-number` with the Bluetooth hci integer value (for example, `0`) and
 > `ble-device-name` with the CHIP device name advertised over Bluetooth LE (for
 > example, `MatterLock`).
 
+1.  Install the tool by following the
+    [mcumgr command line tool installation instructions](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#command-line-tool).
+2.  Push the appropriate button on the device to enable the software update
+    functionality (if it is not enabled by default) and start the Bluetooth LE
+    advertising of SMP service. See the user interface section in the example
+    documentation to check the button number.
+3.  Observe that the LED on the device is flashing (short flash on), which means
+    that the Bluetooth LE advertising has started. See the user interface
+    section in the example documentation to check the LED number.
 4.  Upload the firmware image to the device by running the following command in
     your example directory:
 

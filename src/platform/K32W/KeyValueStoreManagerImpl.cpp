@@ -23,7 +23,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include "support/CHIPMem.h"
+#include <lib/support/CHIPMem.h>
 #include <platform/K32W/K32WConfig.h>
 #include <platform/KeyValueStoreManager.h>
 #include <string>

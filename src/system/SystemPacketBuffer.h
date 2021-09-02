@@ -29,9 +29,9 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
 #include <system/SystemAlignSize.h>
 #include <system/SystemError.h>
 
@@ -129,6 +129,21 @@ struct pbuf
  *
  *          @ref chip::chipTLVReader
  *          @ref chip::chipTLVWriter
+ *
+ * ### PacketBuffer format
+ *
+ * <pre>
+ *           ┌────────────────────────────────────┐
+ *           │       ┌────────────────────┐       │
+ *           │       │                    │◁──────┴───────▷│
+ *  ┏━━━━━━━━┿━━━━━━━┿━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┓
+ *  ┃ pbuf len payload ┃ reserve          ┃ data           ┃ unused                  ┃
+ *  ┗━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ *  │                  │← ReservedSize() →│← DataLength() →│← AvailableDataLength() →│
+ *  │                  │                  │← MaxDataLength() → · · · · · · · · · · ·→│
+ *  │                  │                  Start()                                    │
+ *  │← kStructureSize →│← AllocSize() → · · · · · · · · · · · · · · · · · · · · · · →│
+ * </pre>
  *
  */
 class DLL_EXPORT PacketBuffer : private pbuf

@@ -39,15 +39,15 @@
 #include <errno.h>
 #include <getopt.h>
 #include <inttypes.h>
+#include <lib/support/SafeInt.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
 #include <strings.h>
-#include <support/SafeInt.h>
 
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 
 /*
  * TODO: Revisit these if and when fabric ID and node ID support has
@@ -56,10 +56,6 @@
 #ifndef CHIP_ARG_PARSER_PARSE_FABRIC_ID
 #define CHIP_ARG_PARSER_PARSE_FABRIC_ID 0
 #endif // CHIP_ARG_PARSER_PARSE_FABRIC_ID
-
-#ifndef CHIP_ARG_PARSER_PARSE_NODE_ID
-#define CHIP_ARG_PARSER_PARSE_NODE_ID 0
-#endif // CHIP_ARG_PARSER_PARSE_NODE_ID
 
 namespace chip {
 namespace ArgParser {
@@ -891,38 +887,6 @@ bool ParseInt(const char * str, uint8_t & output)
 
     return false;
 }
-
-#if CHIP_ARG_PARSER_PARSE_NODE_ID
-/**
- * Parse a CHIP node id in text form.
- *
- * @param[in]  str    A pointer to a NULL-terminated C string containing
- *                    the node id to parse.
- * @param[out] output A reference to an uint64_t lvalue in which the parsed
- *                    value will be stored on success.
- *
- * @return true if the value was successfully parsed; false if not.
- *
- * @details
- * The ParseNodeId() function accepts either a 64-bit node id given in hex
- * format (with or without a leading '0x'), or the words 'any' or 'all' which
- * are interpreted as meaning the Any node id (0xFFFFFFFFFFFFFFFF).
- */
-bool ParseNodeId(const char * str, uint64_t & nodeId)
-{
-    char * parseEnd;
-
-    if (strcasecmp(str, "any") == 0 || strcasecmp(str, "all") == 0)
-    {
-        nodeId = kAnyNodeId;
-        return true;
-    }
-
-    errno  = 0;
-    nodeId = strtoull(str, &parseEnd, 16);
-    return parseEnd > str && *parseEnd == 0 && (nodeId != ULLONG_MAX || errno == 0);
-}
-#endif // CHIP_ARG_PARSER_PARSE_NODE_ID
 
 #if CHIP_ARG_PARSER_PARSE_FABRIC_ID
 /**

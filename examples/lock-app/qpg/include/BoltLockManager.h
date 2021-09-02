@@ -27,6 +27,8 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 
+#include <lib/core/CHIPError.h>
+
 class BoltLockManager
 {
 public:
@@ -46,7 +48,7 @@ public:
         kState_UnlockingCompleted,
     } State;
 
-    int Init();
+    CHIP_ERROR Init();
     bool IsUnlocked();
     void EnableAutoRelock(bool aOn);
     void SetAutoLockDuration(uint32_t aDurationInSecs);

@@ -34,12 +34,13 @@
 #include <avahi-common/watch.h>
 
 #include "lib/mdns/platform/Mdns.h"
-#include "system/SystemSockets.h"
 
 struct AvahiWatch
 {
-    chip::System::WatchableSocket mSocket;
+    int mSocket;
+    chip::System::SocketWatchToken mSocketWatch;
     AvahiWatchCallback mCallback; ///< The function to be called when interested events happened on mFd.
+    AvahiWatchEvent mPendingIO;   ///< The pending events from the currently active or most recent callback.
     void * mContext;              ///< A pointer to application-specific context.
     void * mPoller;               ///< The poller created this watch.
 };
@@ -100,6 +101,7 @@ public:
     MdnsAvahi & operator=(const MdnsAvahi &) = delete;
 
     CHIP_ERROR Init(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context);
+    CHIP_ERROR Shutdown();
     CHIP_ERROR SetHostname(const char * hostname);
     CHIP_ERROR PublishService(const MdnsService & service);
     CHIP_ERROR StopPublish();
@@ -111,8 +113,6 @@ public:
     Poller & GetPoller() { return mPoller; }
 
     static MdnsAvahi & GetInstance() { return sInstance; }
-
-    ~MdnsAvahi();
 
 private:
     struct BrowseContext

@@ -26,6 +26,8 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 
+#include <lib/core/CHIPError.h>
+
 class LightingManager
 {
 public:
@@ -45,7 +47,7 @@ public:
         kState_OnCompleted,
     } State;
 
-    int Init();
+    CHIP_ERROR Init();
     bool IsLightOn();
     void EnableAutoTurnOff(bool aOn);
     void SetAutoTurnOffDuration(uint32_t aDurationInSecs);

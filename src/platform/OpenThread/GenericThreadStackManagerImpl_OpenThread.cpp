@@ -26,6 +26,8 @@
 #ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_IPP
 #define GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_IPP
 
+#include <cassert>
+
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
 #include <openthread/joiner.h>
@@ -43,14 +45,17 @@
 #include <openthread/srp_client.h>
 #endif
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/FixedBufferAllocator.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/CodeUtils.h>
-#include <support/ThreadOperationalDataset.h>
-#include <support/logging/CHIPLogging.h>
+
+#include <limits>
 
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
@@ -586,7 +591,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyMinimul failed: %" CHIP_ERROR_FORMAT, err);
+        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyMinimul failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
@@ -827,7 +832,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     // state change occurs.  Note that we reference the OnOpenThreadStateChange method
     // on the concrete implementation class so that that class can override the default
     // method implementation if it chooses to.
-    otErr = otSetStateChangedCallback(otInst, ImplClass::OnOpenThreadStateChange, this);
+    otErr = otSetStateChangedCallback(otInst, ImplClass::OnOpenThreadStateChange, mOTInst);
     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
     // Enable automatic assignment of Thread advertised addresses.
@@ -1074,36 +1079,42 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientStateChange
 }
 
 template <class ImplClass>
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::SrpClient::Service::Matches(const char * aInstanceName,
+                                                                                      const char * aName) const
+{
+    return IsUsed() && (strcmp(mService.mInstanceName, aInstanceName) == 0) && (strcmp(mService.mName, aName) == 0);
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(const char * aInstanceName, const char * aName,
-                                                                               uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
-                                                                               size_t aTxtEntriesSize, uint32_t aLeaseInterval,
-                                                                               uint32_t aKeyLeaseInterval)
+                                                                               uint16_t aPort,
+                                                                               const Span<const char * const> & aSubTypes,
+                                                                               const Span<const Mdns::TextEntry> & aTxtEntries,
+                                                                               uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval)
 {
     CHIP_ERROR error                         = CHIP_NO_ERROR;
     typename SrpClient::Service * srpService = nullptr;
+    size_t entryId                           = 0;
+    FixedBufferAllocator alloc;
 
     Impl()->LockThreadStack();
 
     VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aInstanceName) <= SrpClient::kMaxInstanceNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
     VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aName) <= SrpClient::kMaxNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
 
     // Try to find an empty slot in array for the new service and
     // remove the possible existing entry from anywhere in the list
     for (typename SrpClient::Service & service : mSrpClient.mServices)
     {
         // Remove possible existing entry
-        if ((strcmp(service.mInstanceName, aInstanceName) == 0) && (strcmp(service.mName, aName) == 0))
+        if (service.Matches(aInstanceName, aName))
         {
-            VerifyOrExit(MapOpenThreadError(otSrpClientClearService(mOTInst, &(service.mService))) == CHIP_NO_ERROR,
-                         error = MapOpenThreadError(OT_ERROR_FAILED));
-
+            SuccessOrExit(error = MapOpenThreadError(otSrpClientClearService(mOTInst, &service.mService)));
             // Clear memory immediately, as OnSrpClientNotification will not be called.
             memset(&service, 0, sizeof(service));
         }
 
-        if ((srpService == nullptr) && (strcmp(service.mInstanceName, "") == 0))
+        if ((srpService == nullptr) && !service.IsUsed())
         {
             // Assign first empty slot found in array for a new service.
             srpService = &service;
@@ -1113,48 +1124,64 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     }
 
     // Verify there is a slot found for the new service.
-    VerifyOrExit(srpService, error = MapOpenThreadError(OT_ERROR_NO_BUFS));
+    VerifyOrExit(srpService != nullptr, error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    alloc.Init(srpService->mServiceBuffer);
 
     otSrpClientSetLeaseInterval(mOTInst, aLeaseInterval);
     otSrpClientSetKeyLeaseInterval(mOTInst, aKeyLeaseInterval);
 
-    memcpy(srpService->mInstanceName, aInstanceName, strlen(aInstanceName) + 1);
-    srpService->mService.mInstanceName = srpService->mInstanceName;
+    srpService->mService.mInstanceName = alloc.Clone(aInstanceName);
+    srpService->mService.mName         = alloc.Clone(aName);
+    srpService->mService.mPort         = aPort;
 
-    memcpy(srpService->mName, aName, strlen(aName) + 1);
-    srpService->mService.mName = srpService->mName;
+#if OPENTHREAD_API_VERSION >= 132
+    VerifyOrExit(aSubTypes.size() < ArraySize(srpService->mSubTypes), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    entryId = 0;
 
-    srpService->mService.mPort = aPort;
-
-    // Check if there are some optional text entries to add.
-    if (aTxtEntries && aTxtEntriesSize != 0)
+    for (const char * subType : aSubTypes)
     {
-        VerifyOrExit(aTxtEntriesSize <= SrpClient::kMaxTxtEntriesNumber, error = CHIP_ERROR_INVALID_LIST_LENGTH);
-
-        srpService->mService.mNumTxtEntries = static_cast<uint8_t>(aTxtEntriesSize);
-
-        for (uint8_t entryId = 0; entryId < aTxtEntriesSize; entryId++)
-        {
-            VerifyOrExit(aTxtEntries[entryId].mDataSize <= SrpClient::kMaxTxtValueSize, error = CHIP_ERROR_BUFFER_TOO_SMALL);
-            VerifyOrExit((strlen(aTxtEntries[entryId].mKey) + 1) <= SrpClient::kMaxTxtKeySize, error = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-            srpService->mTxtEntries[entryId].mValueLength = static_cast<uint8_t>(aTxtEntries[entryId].mDataSize);
-            memcpy(&(srpService->mTxtValueBuffers[entryId][0]), aTxtEntries[entryId].mData, aTxtEntries[entryId].mDataSize);
-            srpService->mTxtEntries[entryId].mValue = &(srpService->mTxtValueBuffers[entryId][0]);
-
-            memcpy(&(srpService->mTxtKeyBuffers[entryId][0]), aTxtEntries[entryId].mKey, strlen(aTxtEntries[entryId].mKey) + 1);
-            srpService->mTxtEntries[entryId].mKey = &(srpService->mTxtKeyBuffers[entryId][0]);
-        }
-
-        srpService->mService.mTxtEntries = srpService->mTxtEntries;
+        srpService->mSubTypes[entryId++] = alloc.Clone(subType);
     }
+
+    srpService->mSubTypes[entryId]      = nullptr;
+    srpService->mService.mSubTypeLabels = srpService->mSubTypes;
+#endif
+
+    // Initialize TXT entries
+    VerifyOrExit(aTxtEntries.size() <= ArraySize(srpService->mTxtEntries), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    entryId = 0;
+
+    for (const chip::Mdns::TextEntry & entry : aTxtEntries)
+    {
+        using OtTxtValueLength = decltype(srpService->mTxtEntries[entryId].mValueLength);
+        static_assert(SrpClient::kServiceBufferSize <= std::numeric_limits<OtTxtValueLength>::max(),
+                      "DNS TXT value length may not fit in otDnsTxtEntry structure");
+
+        // TXT entry keys are constants, so they don't need to be cloned
+        srpService->mTxtEntries[entryId].mKey         = entry.mKey;
+        srpService->mTxtEntries[entryId].mValue       = alloc.Clone(entry.mData, entry.mDataSize);
+        srpService->mTxtEntries[entryId].mValueLength = static_cast<OtTxtValueLength>(entry.mDataSize);
+        ++entryId;
+    }
+
+    using OtNumTxtEntries = decltype(srpService->mService.mNumTxtEntries);
+    static_assert(ArraySize(srpService->mTxtEntries) <= std::numeric_limits<OtNumTxtEntries>::max(),
+                  "Number of DNS TXT entries may not fit in otSrpClientService structure");
+    srpService->mService.mNumTxtEntries = static_cast<OtNumTxtEntries>(aTxtEntries.size());
+    srpService->mService.mTxtEntries    = srpService->mTxtEntries;
+
+    VerifyOrExit(!alloc.AnyAllocFailed(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     ChipLogProgress(DeviceLayer, "advertising srp service: %s.%s", srpService->mService.mInstanceName, srpService->mService.mName);
     error = MapOpenThreadError(otSrpClientAddService(mOTInst, &(srpService->mService)));
 
 exit:
-    Impl()->UnlockThreadStack();
+    if (srpService != nullptr && error != CHIP_NO_ERROR)
+    {
+        memset(srpService, 0, sizeof(*srpService));
+    }
 
+    Impl()->UnlockThreadStack();
     return error;
 }
 
@@ -1167,14 +1194,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
     Impl()->LockThreadStack();
 
     VerifyOrExit(aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aInstanceName) <= SrpClient::kMaxInstanceNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
     VerifyOrExit(aName, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(strlen(aName) <= SrpClient::kMaxNameSize, error = CHIP_ERROR_INVALID_STRING_LENGTH);
 
     // Check if service to remove exists.
     for (typename SrpClient::Service & service : mSrpClient.mServices)
     {
-        if ((strcmp(service.mInstanceName, aInstanceName) == 0) && (strcmp(service.mName, aName) == 0))
+        if (service.Matches(aInstanceName, aName))
         {
             srpService = &service;
             break;
@@ -1195,15 +1220,18 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveAllSrpServices()
 {
-    CHIP_ERROR error;
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
     Impl()->LockThreadStack();
-    const otSrpClientService * services = otSrpClientGetServices(mOTInst);
 
-    // In case of empty list just return with no error
-    VerifyOrExit(services != nullptr, error = CHIP_NO_ERROR);
+    for (typename SrpClient::Service & service : mSrpClient.mServices)
+    {
+        if (!service.IsUsed())
+            continue;
 
-    error = MapOpenThreadError(otSrpClientRemoveHostAndServices(mOTInst, false));
+        error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
+        SuccessOrExit(error);
+    }
 
 exit:
     Impl()->UnlockThreadStack();
@@ -1302,21 +1330,21 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     otDnsInitTxtEntryIterator(&iterator, serviceInfo.mTxtData, serviceInfo.mTxtDataSize);
 
     otDnsTxtEntry txtEntry;
+    FixedBufferAllocator alloc(serviceTxtEntries.mBuffer);
 
     uint8_t entryIndex = 0;
     while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < kMaxDnsServiceTxtEntriesNumber)
     {
-        if (txtEntry.mKey && strlen(txtEntry.mKey) < kMaxDnsServiceTxtKeySize && txtEntry.mValue &&
-            txtEntry.mValueLength <= kMaxDnsServiceTxtValueSize)
-        {
-            strcpy(serviceTxtEntries.mTxtKeyBuffers[entryIndex], txtEntry.mKey);
-            serviceTxtEntries.mTxtEntries[entryIndex].mKey      = serviceTxtEntries.mTxtKeyBuffers[entryIndex];
-            serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
-            memcpy(serviceTxtEntries.mTxtValueBuffers[entryIndex], txtEntry.mValue, txtEntry.mValueLength);
-            serviceTxtEntries.mTxtEntries[entryIndex].mData = serviceTxtEntries.mTxtValueBuffers[entryIndex];
-            entryIndex++;
-        }
+        if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
+            continue;
+
+        serviceTxtEntries.mTxtEntries[entryIndex].mKey      = alloc.Clone(txtEntry.mKey);
+        serviceTxtEntries.mTxtEntries[entryIndex].mData     = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
+        serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
+        entryIndex++;
     }
+
+    ReturnErrorCodeIf(alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
     mdnsService.mTextEntrySize = entryIndex;
@@ -1334,12 +1362,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
     char type[chip::Mdns::kMdnsTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
     // hostname buffer size is kMdnsHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
     char hostname[chip::Mdns::kMdnsHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
-
-    uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber *
-                      (kMaxDnsServiceTxtKeySize + kMaxDnsServiceTxtValueSize + sizeof(chip::Mdns::TextEntry))];
+    // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
+    // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
+    uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
     otDnsServiceInfo serviceInfo;
-    uint16_t index = 0;
-    bool wasAnythingBrowsed;
+    uint16_t index          = 0;
+    bool wasAnythingBrowsed = false;
 
     if (ThreadStackMgrImpl().mDnsBrowseCallback == nullptr)
     {
@@ -1395,18 +1423,17 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsBrowse(const
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     Impl()->LockThreadStack();
-    const otDnsQueryConfig * defaultConfig = otDnsClientGetDefaultConfig(mOTInst);
 
     VerifyOrExit(aServiceName, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     mDnsBrowseCallback = aCallback;
 
     // Append default SRP domain name to the service name.
-    // fullServiceName buffer size is kMdnsTypeAndProtocolMaxSize + . separator + kDefaultDomainNameSize + termination character.
-    char fullServiceName[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
+    // fullServiceName buffer size is kMdnsFullTypeAndProtocolMaxSize + . + kDefaultDomainNameSize + null-terminator.
+    char fullServiceName[Mdns::kMdnsFullTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
     snprintf(fullServiceName, sizeof(fullServiceName), "%s.%s", aServiceName, SrpClient::kDefaultDomainName);
 
-    error = otDnsClientBrowse(mOTInst, fullServiceName, OnDnsBrowseResult, aContext, defaultConfig);
+    error = MapOpenThreadError(otDnsClientBrowse(mOTInst, fullServiceName, OnDnsBrowseResult, aContext, /* config */ nullptr));
 
 exit:
 
@@ -1425,8 +1452,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
     char type[chip::Mdns::kMdnsTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
     // hostname buffer size is kMdnsHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
     char hostname[chip::Mdns::kMdnsHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
-    uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber *
-                      (kMaxDnsServiceTxtKeySize + kMaxDnsServiceTxtValueSize + sizeof(chip::Mdns::TextEntry))];
+    // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
+    // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
+    uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
     otDnsServiceInfo serviceInfo;
 
     if (ThreadStackMgrImpl().mDnsResolveCallback == nullptr)
@@ -1479,7 +1507,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsResolve(cons
     char fullServiceName[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
     snprintf(fullServiceName, sizeof(fullServiceName), "%s.%s", aServiceName, SrpClient::kDefaultDomainName);
 
-    error = otDnsClientResolveService(mOTInst, aInstanceName, fullServiceName, OnDnsResolveResult, aContext, defaultConfig);
+    error = MapOpenThreadError(
+        otDnsClientResolveService(mOTInst, aInstanceName, fullServiceName, OnDnsResolveResult, aContext, defaultConfig));
 
 exit:
 

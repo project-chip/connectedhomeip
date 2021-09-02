@@ -1,0 +1,257 @@
+# Generating {real_platform}-native-all_clusters
+gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux {out}/{real_platform}-native-all_clusters
+
+# Generating {real_platform}-native-chip_tool
+gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool {out}/{real_platform}-native-chip_tool
+
+# Generating {real_platform}-native-thermostat
+gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux {out}/{real_platform}-native-thermostat
+
+# Generating qpg-qpg6100-lock
+gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
+
+# Generating esp32-m5stack-all_clusters
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_m5stack.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all_clusters reconfigure'
+cd -
+
+# Generating esp32-devkitc-all_clusters
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all_clusters reconfigure'
+cd -
+
+# Generating esp32-devkitc-lock
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock reconfigure'
+cd -
+
+# Generating esp32-devkitc-shell
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/shell/esp32 -B {out}/esp32-devkitc-shell reconfigure'
+cd -
+
+# Generating esp32-devkitc-bridge
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge reconfigure'
+cd -
+
+# Generating esp32-devkitc-temperature_measurement
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature_measurement reconfigure'
+cd -
+
+# Generating esp32-c3devkit-all_clusters
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_c3devkit.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-c3devkit-all_clusters reconfigure'
+cd -
+
+# Generating efr32-brd4161a-light
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light
+
+# Generating efr32-brd4161a-lock
+gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-lock
+
+# Generating efr32-brd4161a-window_covering
+gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window_covering
+
+# Generating nrf-nrf52840-light
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-light -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect'
+
+# Generating nrf-nrf52840-lock
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
+
+# Generating nrf-nrf52840-shell
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
+
+# Generating nrf-nrf52840-pump
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d /OUTPUT/DIR/nrf-nrf52840-pump -b nrf52840dk_nrf52840 /TEST/BUILD/ROOT/examples/pump-app/nrfconnect'
+
+# Generating nrf-nrf52840-pump_controller
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d /OUTPUT/DIR/nrf-nrf52840-pump_controller -b nrf52840dk_nrf52840 /TEST/BUILD/ROOT/examples/pump-controller-app/nrfconnect'
+
+# Generating nrf-nrf5340-light
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
+
+# Generating nrf-nrf5340-lock
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-lock -b nrf5340dk_nrf5340_cpuapp {root}/examples/lock-app/nrfconnect'
+
+# Generating nrf-nrf5340-shell
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
+
+# Generating nrf-nrf5340-pump
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d /OUTPUT/DIR/nrf-nrf5340-pump -b nrf5340dk_nrf5340_cpuapp /TEST/BUILD/ROOT/examples/pump-app/nrfconnect'
+
+# Generating nrf-nrf5340-pump_controller
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d /OUTPUT/DIR/nrf-nrf5340-pump_controller -b nrf5340dk_nrf5340_cpuapp /TEST/BUILD/ROOT/examples/pump-controller-app/nrfconnect'
+
+# Generating android-arm-chip_tool
+gn gen --check --fail-on-unused-args {out}/android-arm-chip_tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating android-arm64-chip_tool
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip_tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating android-x64-chip_tool
+gn gen --check --fail-on-unused-args {out}/android-x64-chip_tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating infineon-p6board-lock
+gn gen --check --fail-on-unused-args --root=/TEST/BUILD/ROOT/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' /OUTPUT/DIR/infineon-p6board-lock
+
+# Generating telink-tlsr9518adk80d-light
+bash -c 'source "$TELINK_ZEPHYR_BASE/zephyr-env.sh";
+export ZEPHYR_TOOLCHAIN_VARIANT=cross-compile;
+export CROSS_COMPILE=$TELINK_TOOLCHAIN_PATH/riscv32-elf-;
+west build -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {root}/examples/lighting-app/telink'
+
+# Building {real_platform}-native-all_clusters
+ninja -C {out}/{real_platform}-native-all_clusters
+
+# Building {real_platform}-native-chip_tool
+ninja -C {out}/{real_platform}-native-chip_tool
+
+# Building {real_platform}-native-thermostat
+ninja -C {out}/{real_platform}-native-thermostat
+
+# Building qpg-qpg6100-lock
+ninja -C {out}/qpg-qpg6100-lock
+
+# Building esp32-m5stack-all_clusters
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-m5stack-all_clusters'"'"''
+
+# Building esp32-devkitc-all_clusters
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-all_clusters'"'"''
+
+# Building esp32-devkitc-lock
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-lock'"'"''
+
+# Building esp32-devkitc-shell
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-shell'"'"''
+
+# Building esp32-devkitc-bridge
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-bridge'"'"''
+
+# Building esp32-devkitc-temperature_measurement
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-temperature_measurement'"'"''
+
+# Building esp32-c3devkit-all_clusters
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-c3devkit-all_clusters'"'"''
+
+# Building efr32-brd4161a-light
+ninja -C {out}/efr32-brd4161a-light
+
+# Building efr32-brd4161a-lock
+ninja -C {out}/efr32-brd4161a-lock
+
+# Building efr32-brd4161a-window_covering
+ninja -C {out}/efr32-brd4161a-window_covering
+
+# Building nrf-nrf52840-light
+ninja -C {out}/nrf-nrf52840-light
+
+# Building nrf-nrf52840-lock
+ninja -C {out}/nrf-nrf52840-lock
+
+# Building nrf-nrf52840-shell
+ninja -C {out}/nrf-nrf52840-shell
+
+# Building nrf-nrf52840-pump
+ninja -C /OUTPUT/DIR/nrf-nrf52840-pump
+
+# Building nrf-nrf52840-pump_controller
+ninja -C /OUTPUT/DIR/nrf-nrf52840-pump_controller
+
+# Building nrf-nrf5340-light
+ninja -C {out}/nrf-nrf5340-light
+
+# Building nrf-nrf5340-lock
+ninja -C {out}/nrf-nrf5340-lock
+
+# Building nrf-nrf5340-shell
+ninja -C {out}/nrf-nrf5340-shell
+
+# Building nrf-nrf5340-pump
+ninja -C /OUTPUT/DIR/nrf-nrf5340-pump
+
+# Building nrf-nrf5340-pump_controller
+ninja -C /OUTPUT/DIR/nrf-nrf5340-pump_controller
+
+# Building JNI android-arm-chip_tool
+ninja -C {out}/android-arm-chip_tool
+
+# Prepare Native libs android-arm-chip_tool
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a
+
+cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libSetupPayloadParser.so
+
+cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libCHIPController.so
+
+cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
+
+# Building APP android-arm-chip_tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm-chip_tool/lib -PbuildDir={out}/android-arm-chip_tool build
+
+# Building JNI android-arm64-chip_tool
+ninja -C {out}/android-arm64-chip_tool
+
+# Prepare Native libs android-arm64-chip_tool
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a
+
+cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
+
+cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libCHIPController.so
+
+cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libc++_shared.so
+
+# Building APP android-arm64-chip_tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm64-chip_tool/lib -PbuildDir={out}/android-arm64-chip_tool build
+
+# Building JNI android-x64-chip_tool
+ninja -C {out}/android-x64-chip_tool
+
+# Prepare Native libs android-x64-chip_tool
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64
+
+cp {out}/android-x64-chip_tool/lib/jni/x86_64/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libSetupPayloadParser.so
+
+cp {out}/android-x64-chip_tool/lib/jni/x86_64/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libCHIPController.so
+
+cp {out}/android-x64-chip_tool/lib/jni/x86_64/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libc++_shared.so
+
+# Building APP android-x64-chip_tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-x64-chip_tool/lib -PbuildDir={out}/android-x64-chip_tool build
+
+# Building infineon-p6board-lock
+ninja -C /OUTPUT/DIR/infineon-p6board-lock
+
+# Building telink-tlsr9518adk80d-light
+ninja -C {out}/telink-tlsr9518adk80d-light
+
+

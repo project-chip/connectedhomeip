@@ -1,17 +1,17 @@
 {{> header}}
 {{#if (chip_has_client_clusters)}}
 
-#include "gen/CHIPClusters.h"
-#include "gen/CHIPClientCallbacks.h"
+#include <zap-generated/CHIPClusters.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 
 #include <controller/java/CHIPJNIError.h>
 #include <controller/java/JniReferences.h>
 #include <controller/java/JniTypeWrappers.h>
 #include <controller/java/StackLock.h>
-#include <core/CHIPSafeCasts.h>
-#include <lib/support/Span.h>
 #include <jni.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
@@ -21,6 +21,7 @@ using namespace chip::Controller;
 
 static CHIP_ERROR CreateChipClusterException(JNIEnv * env, jint errorCode, jthrowable & outEx);
 static CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], jint errorCode, jthrowable & outEx);
+static void ReturnIllegalStateException(JNIEnv * env, jobject callback, const char message[], jint errorCode);
 
 CHIP_ERROR CreateChipClusterException(JNIEnv * env, jint errorCode, jthrowable & outEx) {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -29,6 +30,7 @@ CHIP_ERROR CreateChipClusterException(JNIEnv * env, jint errorCode, jthrowable &
 
     err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipClusterException", clusterExceptionCls);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    JniClass clusterExceptionJniCls(clusterExceptionCls);
     
     exceptionConstructor = env->GetMethodID(clusterExceptionCls, "<init>", "(I)V");
     VerifyOrReturnError(exceptionConstructor != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
@@ -46,20 +48,40 @@ CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], jint 
     jstring errStr;
 
     err = JniReferences::GetInstance().GetClassRef(env, "java/lang/IllegalStateException", exceptionClass);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    JniClass exceptionJniClass(exceptionClass);
     
     exceptionConstructor = env->GetMethodID(exceptionClass, "<init>", "(Ljava/lang/String;)V");
-    VerifyOrExit(exceptionConstructor != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    VerifyOrReturnError(exceptionConstructor != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
     
     char buf[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     snprintf(buf, sizeof(buf), "%s: %d", message, errorCode);
     errStr = env->NewStringUTF(buf);
 
     outEx = (jthrowable) env->NewObject(exceptionClass, exceptionConstructor, errStr);
-    VerifyOrExit(outEx != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-exit:
-    env->DeleteGlobalRef(exceptionClass);
+    VerifyOrReturnError(outEx != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+
     return err;
+}
+
+void ReturnIllegalStateException(JNIEnv * env, jobject callback, const char message[], jint errorCode) {
+    VerifyOrReturn(callback == nullptr, ChipLogDetail(Zcl, "Callback is null in ReturnIllegalStateException(), exiting early"));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    jmethodID method;
+    err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(Zcl, "Error throwing IllegalStateException %d", errorCode);
+        return;
+    }
+
+    jthrowable exception;
+    err = CreateIllegalStateException(env, message, errorCode, exception);
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(Zcl, "Error throwing IllegalStateException %d", errorCode);
+        return;
+    }
+    env->CallVoidMethod(callback, method, exception);
 }
 
 class CHIPDefaultSuccessCallback : public Callback::Callback<DefaultSuccessCallback> {
@@ -113,7 +135,7 @@ class CHIPDefaultSuccessCallback : public Callback::Callback<DefaultSuccessCallb
 
         exit:
             if (err != CHIP_NO_ERROR) {
-                ChipLogError(Zcl, "Error invoking Java callback: %d", err);
+                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
             }
             if (cppCallback != nullptr) {
                 cppCallback->Cancel();
@@ -179,7 +201,7 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
             env->CallVoidMethod(javaCallbackRef, javaMethod, exception);
         exit:
             if (err != CHIP_NO_ERROR) {
-                ChipLogError(Zcl, "Error invoking Java callback: %d", err);
+                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
             }
             if (cppCallback != nullptr) {
                 cppCallback->Cancel();
@@ -191,14 +213,86 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
         jobject javaCallbackRef;
 };
 
-// TODO(#7376): add attribute callbacks.
+{{#chip_server_global_responses}}
+
+class CHIP{{chipCallback.name}}AttributeCallback : public Callback::Callback<{{chipCallback.name}}AttributeCallback> {
+    public:
+        CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback, bool keepAlive = false): Callback::Callback<{{chipCallback.name}}AttributeCallback>(CallbackFn, this)
+        , keepAlive(keepAlive)
+        {
+            JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+            if (env == nullptr) {
+                ChipLogError(Zcl, "Could not create global reference for Java callback");
+                return;
+            }
+            javaCallbackRef = env->NewGlobalRef(javaCallback);
+            if (javaCallbackRef == nullptr) {
+                ChipLogError(Zcl, "Could not create global reference for Java callback");
+            }
+        }
+
+        static void maybeDestroy(CHIP{{chipCallback.name}}AttributeCallback * callback) {
+            if (!callback->keepAlive) {
+                callback->Cancel();
+                delete callback;
+            }
+        }
+
+        static void CallbackFn(void * context, {{chipCallback.type}} value)
+        {
+            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            CHIP_ERROR err = CHIP_NO_ERROR;
+
+            JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+            VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+            std::unique_ptr<CHIP{{chipCallback.name}}AttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIP{{chipCallback.name}}AttributeCallback *>(context), maybeDestroy);
+
+            // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+            jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+            VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
+
+            jmethodID javaMethod;
+            {{#unless (isStrEqual chipCallback.name "OctetString")}}
+            {{#unless (isStrEqual chipCallback.name "CharString")}}
+            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{convertCTypeToJniSignature chipCallback.type}})V", &javaMethod);
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+            env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<{{convertBasicCTypeToJniType chipCallback.type}}>(value));
+            {{/unless}}
+            {{/unless}}
+
+            {{#if (isStrEqual chipCallback.name "OctetString")}}
+            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+
+            jbyteArray valueArr = env->NewByteArray(value.size());
+            env->ExceptionClear();
+            env->SetByteArrayRegion(valueArr, 0, value.size(), reinterpret_cast<const jbyte *>(value.data()));
+
+            env->CallVoidMethod(javaCallbackRef, javaMethod, valueArr);
+            {{/if}}
+
+            {{#if (isStrEqual chipCallback.name "CharString")}}
+            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+
+            UtfString valueStr(env, value);
+            env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
+            {{/if}}
+        }
+
+    private:
+        jobject javaCallbackRef;
+        bool keepAlive;
+};
+{{/chip_server_global_responses}}
 
 {{#chip_client_clusters}}
-{{#chip_server_cluster_responses}}
-class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback : public Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback>
+{{#chip_cluster_responses}}
+class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback : public Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback>
 {
     public:
-        CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(jobject javaCallback): Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback>(CallbackFn, this)
+        CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(jobject javaCallback): Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback>(CallbackFn, this)
         {
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
             if (env == nullptr) {
@@ -211,7 +305,7 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
                 ChipLogError(Zcl, "Could not create global reference for Java callback");
             }
         }
-        ~CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback()
+        ~CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback()
         {
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
             if (env == nullptr) {
@@ -221,38 +315,35 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             env->DeleteGlobalRef(javaCallbackRef);
         };
 
-        static void CallbackFn(void * context{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}})
+        static void CallbackFn(void * context{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}})
         {
             StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
             CHIP_ERROR err = CHIP_NO_ERROR;
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
             jobject javaCallbackRef;
             jmethodID javaMethod;
-            CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback * cppCallback = nullptr;
-            {{#chip_server_cluster_response_arguments}}
-            {{#unless (isStrEqual label "status")}}
+            CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback * cppCallback = nullptr;
+            {{#chip_cluster_response_arguments}}
             {{#if (isOctetString type)}}
             jbyteArray {{asSymbol label}}Arr;
             {{else if (isShortString type)}}
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString {{asSymbol label}}Str(env, "");
             {{/if}}
-            {{/unless}}
-            {{/chip_server_cluster_response_arguments}}
+            {{/chip_cluster_response_arguments}}
 
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
-            cppCallback = reinterpret_cast<CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback *>(context);
+            cppCallback = reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback *>(context);
             VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
 
             javaCallbackRef = cppCallback->javaCallbackRef;
             VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}{{#if isArray}}{{else if (isOctetString type)}}[B{{else if (isShortString type)}}Ljava/lang/String;{{else}}{{asJniSignature label type}}{{/if}}{{/unless}}{{/chip_server_cluster_response_arguments}})V", &javaMethod);
+            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#chip_cluster_response_arguments}}{{#if isArray}}{{else if (isOctetString type)}}[B{{else if (isShortString type)}}Ljava/lang/String;{{else}}{{asJniSignature type}}{{/if}}{{/chip_cluster_response_arguments}})V", &javaMethod);
             SuccessOrExit(err);
 
-            {{#chip_server_cluster_response_arguments}}
-            {{#unless (isStrEqual label "status")}}
+            {{#chip_cluster_response_arguments}}
             {{#if (isOctetString type)}}
             {{asSymbol label}}Arr = env->NewByteArray({{asSymbol label}}.size());
             VerifyOrExit({{asSymbol label}}Arr != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -260,12 +351,10 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             env->SetByteArrayRegion({{asSymbol label}}Arr, 0, {{asSymbol label}}.size(), reinterpret_cast<const jbyte *>({{asSymbol label}}.data()));
             VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
             {{/if}}
-            {{/unless}}
-            {{/chip_server_cluster_response_arguments}}
+            {{/chip_cluster_response_arguments}}
 
             env->CallVoidMethod(javaCallbackRef, javaMethod
-                {{#chip_server_cluster_response_arguments}}
-                {{#unless (isStrEqual label "status")}}
+                {{#chip_cluster_response_arguments}}
                 {{#if isArray}}
                 // {{asSymbol label}}: {{asUnderlyingZclType type}}
                 // Conversion from this type to Java is not properly implemented yet
@@ -276,21 +365,18 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
                 {{else}}
                 , static_cast<{{asJniBasicTypeForZclType type}}>({{asSymbol label}})
                 {{/if}}
-                {{/unless}}
-                {{/chip_server_cluster_response_arguments}}
+                {{/chip_cluster_response_arguments}}
             );
 
-            {{#chip_server_cluster_response_arguments}}
-            {{#unless (isStrEqual label "status")}}
+            {{#chip_cluster_response_arguments}}
             {{#if (isOctetString type)}}
             env->DeleteLocalRef({{asSymbol label}}Arr);
             {{/if}}
-            {{/unless}}
-            {{/chip_server_cluster_response_arguments}}
+            {{/chip_cluster_response_arguments}}
 
         exit:
             if (err != CHIP_NO_ERROR) {
-                ChipLogError(Zcl, "Error invoking Java callback: %d", err);
+                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
             }
             if (cppCallback != nullptr) {
                 cppCallback->Cancel();
@@ -302,8 +388,118 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
         jobject javaCallbackRef;
 };
 
-{{/chip_server_cluster_responses}}
+{{/chip_cluster_responses}}
 {{/chip_client_clusters}}
+
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if isList}}
+class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback : public Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>
+{
+    public:
+        CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback): Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>(CallbackFn, this)
+        {
+            JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+            if (env == nullptr) {
+                ChipLogError(Zcl, "Could not create global reference for Java callback");
+                return;
+            }
+
+            javaCallbackRef = env->NewGlobalRef(javaCallback);
+            if (javaCallbackRef == nullptr) {
+                ChipLogError(Zcl, "Could not create global reference for Java callback");
+            }
+        }
+
+        static void CallbackFn(void * context, uint16_t count, {{chipType}} * entries)
+        {
+            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+            jobject javaCallbackRef;
+
+            VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+            std::unique_ptr<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback> cppCallback(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context));
+
+            // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+            javaCallbackRef = cppCallback.get()->javaCallbackRef;
+            VerifyOrReturn(javaCallbackRef != nullptr, ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+            jclass arrayListClass;
+            err = JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
+            JniClass arrayListJniClass(arrayListClass);
+            jmethodID arrayListCtor = env->GetMethodID(arrayListClass, "<init>", "()V");
+            jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+            VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr, ChipLogError(Zcl, "Error finding Java ArrayList methods"));
+            jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
+            VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+
+            jmethodID javaMethod;
+            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+            {{#if isStruct}}
+            jclass attributeClass;
+            err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipClusters${{asUpperCamelCase parent.name}}Cluster${{asUpperCamelCase name}}Attribute", attributeClass);
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters${{asUpperCamelCase parent.name}}Cluster${{asUpperCamelCase name}}Attribute"));
+            JniClass attributeJniClass(attributeClass);
+            jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>"
+                , "({{#chip_attribute_list_entryTypes}}{{#if (isString type)}}{{#if (isOctetString type)}}[B{{else}}Ljava/lang/String;{{/if}}{{else}}{{asJniSignature type}}{{/if}}{{/chip_attribute_list_entryTypes}})V");
+            VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find {{asUpperCamelCase name}}Attribute constructor"));
+            {{/if}}
+
+            for (uint16_t i = 0; i < count; i++)
+            {
+                {{#if isStruct}}
+                {{#chip_attribute_list_entryTypes}}
+                {{#if (isOctetString type)}}
+                jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entries[i].{{name}}.size());
+                env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entries[i].{{name}}.size(), reinterpret_cast<const jbyte *>(entries[i].{{name}}.data()));
+                {{else if (isCharString type)}}
+                // Implement after ByteSpan is emitted instead of uint8_t *.
+                {{else}}
+                {{asJniBasicType type}} {{asLowerCamelCase name}} = entries[i].{{name}};
+                {{/if}}
+                {{/chip_attribute_list_entryTypes}}
+
+                jobject attributeObj = env->NewObject(attributeClass, attributeCtor,
+                    {{#chip_attribute_list_entryTypes}}
+                    {{asLowerCamelCase name}}{{#not_last}}, {{/not_last}}
+                    {{/chip_attribute_list_entryTypes}}
+                );
+                VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create {{asUpperCamelCase name}}Attribute object"));
+
+                env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+                {{else}}
+                {{#if (isOctetString type)}}
+                jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entries[i].size());
+                env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entries[i].size(), reinterpret_cast<const jbyte *>(entries[i].data()));
+                {{else if (isCharString type)}}
+                // Implement after ByteSpan is emitted instead of uint8_t *
+                {{else}}
+                jclass entryTypeCls;
+                JniReferences::GetInstance().GetClassRef(env, "java/lang/{{asJavaBasicTypeForZclType type true}}", entryTypeCls);
+                jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "({{asJniSignature type}})V");
+                jobject {{asLowerCamelCase name}} = env->NewObject(entryTypeCls, entryTypeCtor, entries[i]);
+                {{/if}}
+                env->CallBooleanMethod(arrayListObj, arrayListAddMethod, {{asLowerCamelCase name}});
+                {{/if}}
+            }
+
+            env->ExceptionClear();
+            env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+        }
+            
+    private:
+        jobject javaCallbackRef;
+};
+
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
 JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlong clusterPtr)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -314,45 +510,45 @@ JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlo
 }
 
 {{#chip_client_clusters}}
-JNI_METHOD(jlong, {{asCamelCased name false}}Cluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+JNI_METHOD(jlong, {{asUpperCamelCase name}}Cluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    {{asCamelCased name false}}Cluster * cppCluster = new {{asCamelCased name false}}Cluster();
+    {{asUpperCamelCase name}}Cluster * cppCluster = new {{asUpperCamelCase name}}Cluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-{{#chip_server_cluster_commands}}
+{{#chip_cluster_commands}}
 {{#if (zcl_command_arguments_count this.id)}}
-JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, {{asCamelCased name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{#chip_server_cluster_command_arguments}}{{asJniBasicType type}} {{asCamelCased label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/chip_server_cluster_command_arguments}})
+JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{#chip_cluster_command_arguments}}{{asJniBasicType type}} {{asLowerCamelCase label}}{{#not_last}}, {{/not_last}}{{/chip_cluster_command_arguments}})
 {{else}}
-JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, {{asCamelCased name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {{/if}}
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
-    {{asCamelCased ../name false}}Cluster * cppCluster;
+    {{asUpperCamelCase ../name}}Cluster * cppCluster;
     
-    {{#chip_server_cluster_command_arguments}}
+    {{#chip_cluster_command_arguments}}
     {{#if (isOctetString type)}}
-    JniByteArray {{asCamelCased label}}Arr(env, {{asCamelCased label}});
+    JniByteArray {{asLowerCamelCase label}}Arr(env, {{asLowerCamelCase label}});
     {{else if (isCharString type)}}
-    JniUtfString {{asCamelCased label}}Str(env, {{asCamelCased label}});
+    JniUtfString {{asLowerCamelCase label}}Str(env, {{asLowerCamelCase label}});
     {{/if}}
-    {{/chip_server_cluster_command_arguments}}
+    {{/chip_cluster_command_arguments}}
     {{#if hasSpecificResponse}}
-    CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}Callback * onSuccess;
+    CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}Callback * onSuccess;
     {{else}}
     CHIPDefaultSuccessCallback * onSuccess;
     {{/if}}
     CHIPDefaultFailureCallback * onFailure;
 
-    cppCluster = reinterpret_cast<{{asCamelCased ../name false}}Cluster *>(clusterPtr);
+    cppCluster = reinterpret_cast<{{asUpperCamelCase ../name}}Cluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     {{#if hasSpecificResponse}}
-    onSuccess = new CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}Callback(callback);
+    onSuccess = new CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}Callback(callback);
     {{else}}
     onSuccess = new CHIPDefaultSuccessCallback(callback);
     {{/if}}
@@ -360,7 +556,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, {{asCamelCased name}})(J
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asCamelCased label}}Arr.data(), {{asCamelCased label}}Arr.size()){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*) {{asCamelCased label}}, strlen({{asCamelCased label}}Str.c_str())){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
+    err = cppCluster->{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*) {{asLowerCamelCase label}}Arr.data(), {{asLowerCamelCase label}}Arr.size()){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*) {{asLowerCamelCase label}}, strlen({{asLowerCamelCase label}}Str.c_str())){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments}});
     SuccessOrExit(err);
 
 exit: 
@@ -373,18 +569,100 @@ exit:
 
         err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR) {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
 
-        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        err = CreateIllegalStateException(env, "Error invoking cluster", err.Format(), exception);
         if (err != CHIP_NO_ERROR) {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
         env->CallVoidMethod(callback, method, exception);
     }
 }
-{{/chip_server_cluster_commands}}
+{{/chip_cluster_commands}}
+{{#chip_server_cluster_attributes}}
+
+JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, read{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+{{#if isList}}
+    CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback * onSuccess = new CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(callback);
+{{else}}
+    CHIP{{chipCallback.name}}AttributeCallback * onSuccess = new CHIP{{chipCallback.name}}AttributeCallback(callback);
+{{/if}}
+    if (!onSuccess) {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure) {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    {{asUpperCamelCase ../name}}Cluster * cppCluster = reinterpret_cast<{{asUpperCamelCase ../name}}Cluster *>(clusterPtr);
+    if (cppCluster == nullptr) {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+{{#if isWritableAttribute}}
+
+JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{asJniBasicType type}} value)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
+    if (!onSuccess) {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure) {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    {{asUpperCamelCase ../name}}Cluster * cppCluster = reinterpret_cast<{{asUpperCamelCase ../name}}Cluster *>(clusterPtr);
+    if (cppCluster == nullptr) {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    {{#if (isOctetString type)}}
+    JniByteArray jniArr(env, value);
+    err = cppCluster->WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) jniArr.data(), jniArr.size()));
+    {{else if (isCharString type)}}
+    JniUtfString valueStr(env, value);
+    err = cppCluster->WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*) valueStr.c_str(), strlen(valueStr.c_str())));
+    {{else}}
+    err = cppCluster->WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), static_cast<{{chipCallback.type}}>(value));
+    {{/if}}
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
+    }
+}
+{{/if}}
+{{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 {{/if}}

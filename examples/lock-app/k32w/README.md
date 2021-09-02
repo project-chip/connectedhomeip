@@ -127,12 +127,12 @@ bolt is extended (i.e. door locked); when not lit, the bolt is retracted (door
 unlocked). The LED will flash whenever the simulated bolt is in motion from one
 position to another.
 
-**Button SW2** can be used to reset the device to a default state. Pressing and
-holding Button SW2 for 6 seconds initiates a factory reset. After an initial
-period of 3 seconds, LED2 D2 and D3 will flash in unison to signal the pending
-reset. Holding the button past 6 seconds will cause the device to reset its
-persistent configuration and initiate a reboot. The reset action can be
-cancelled by releasing the button at any point before the 6 second limit.
+**Button SW2** can be used to reset the device to a default state. A short Press
+Button SW2 initiates a factory reset. After an initial period of 3 seconds, LED2
+D2 and D3 will flash in unison to signal the pending reset. After 6 seconds will
+cause the device to reset its persistent configuration and initiate a reboot.
+The reset action can be cancelled by press SW2 button at any point before the 6
+second limit.
 
 **Button SW3** can be used to change the state of the simulated bolt. This can
 be used to mimic a user manually operating the lock. The button behaves as a
@@ -142,7 +142,7 @@ toggle, swapping the state every time it is pressed.
 a Border Router. Default parameters for a Thread network are hard-coded and are
 being used if this button is pressed.
 
-The remaining two LEDs (D1/D2) and button (SW1) are unused.
+The remaining two LEDs (D1/D4) and button (SW1) are unused.
 
 Directly on the development board, **Button USERINTERFACE** can be used for
 enabling Bluetooth LE advertising for a predefined period of time. Also, pushing
@@ -165,10 +165,10 @@ will be initiated.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [K32W061 SDK 2.6.3 for Project CHIP](https://mcuxpresso.nxp.com/).
+-   Download [K32W061 SDK 2.6.4 for Project CHIP](https://mcuxpresso.nxp.com/).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
-    SDK_2.6.3_K32W061DK6. The SDK Builder UI selection should be similar with
+    SDK_2_6_4_K32W061DK6. The SDK Builder UI selection should be similar with
     the one from the image below.
     ![MCUXpresso SDK Download](../../platform/k32w/doc/images/mcux-sdk-download.JPG)
 
@@ -177,7 +177,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
     -   with Secure Element
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.3_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2_6_4_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/k32w/
@@ -190,7 +190,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ $K32W061_SDK_R
         Exactly the same steps as above but set chip_with_se05x=0 in the gn command
 
 Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
-2.6.3.
+2.6.4.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
@@ -228,10 +228,42 @@ used or with _out/debug/chip-k32w061-lock-example_ if MCUXpresso is used.
 
 <a name="knownissues"></a>
 
+## Low power
+
+The example also offers the possibility to run in low power mode. This means
+that the board will go in a deep power down mode most of the time and the power
+consumption will be very low.
+
+In order build with low power support, the _chip_with_low_power=1_ must be
+provided to the build system. In this case, please note that the GN build
+arguments chip*with_OM15082 and \_chip_with_ot_cli* must be set to 0.
+
+In order to maintain a low power consumption, the LEDs showing the state of the
+elock and the internal state are disabled. Console logs can be used instead.
+Also, please note that once the board is flashed with MCUXpresso the debugger
+disconnects because the board enters low power.
+
+Power Measurement Tool can be used inside MCUXpresso for checking the power
+consumption pattern: Window -> Show View -> Other -> Power Measurement Tool. The
+configuration for this tool is the next one:
+
+![POWER_CONF](../../platform/k32w/doc/images/power_conf.JPG)
+
+Also, please make sure that the J14 jumper is set to the _ENABLED_ position and
+no expansion board is attached to the DK6. A view from this tool is illustrated
+below:
+
+![POWER_VIEW](../../platform/k32w/doc/images/power_view.JPG)
+
+Please note that that the Power Measurement Tool is not very accurate and
+professional tools must be used if exact power consumption needs to be kwnown.
+
 ## Known issues
 
 -   When cross-compiling on Linux - Log messages from the Plug&Trust middleware
-    stack may not echo to the console.
+    stack may not echo to the console;
+-   Power Measurement Tool may not work correctly in MCUXpresso versions greater
+    that 11.0.1.
 
 ## Testing the example
 

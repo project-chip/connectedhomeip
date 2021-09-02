@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <mdns/minimal/core/QName.h>
-#include <mdns/minimal/records/ResourceRecord.h>
+#include <lib/mdns/minimal/core/QName.h>
+#include <lib/mdns/minimal/records/ResourceRecord.h>
 
 #include <inet/InetLayer.h>
 

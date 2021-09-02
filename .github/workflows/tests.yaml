@@ -70,10 +70,15 @@ jobs:
               timeout-minutes: 5
               run: |
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
+            - name: Build TV app
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/tv-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
             - name: Build chip-tool
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
+                  # config_pair_with_random_id=false so CI runs faster.
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP} config_pair_with_random_id=false
             - name: Copy objdir
               run: |
                   # The idea is to not upload our objdir unless builds have
@@ -82,8 +87,11 @@ jobs:
             - name: Run Tests
               timeout-minutes: 10
               run: |
-                  ifconfig -a
                   scripts/tests/test_suites.sh
+            - name: Run TV Tests
+              timeout-minutes: 10
+              run: |
+                  scripts/tests/test_suites.sh  -a tv
             - name: Uploading core files
               uses: actions/upload-artifact@v2
               if: ${{ failure() }}
@@ -148,20 +156,21 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Run Build Test Server
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
             - name: Build chip-tool
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
+                  # config_pair_with_random_id=false so CI runs faster.
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP} config_pair_with_random_id=false
             - name: Copy objdir
               run: |
                   # The idea is to not upload our objdir unless builds have
                   # actually succeeded, because that just wastes space.
                   rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Test Suites
-              timeout-minutes: 25
+              timeout-minutes: 35
               run: |
                   scripts/tests/test_suites.sh
             - name: Uploading core files

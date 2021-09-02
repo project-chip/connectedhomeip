@@ -18,8 +18,8 @@
  */
 
 #include "AppConfig.h"
+#include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPPlatformMemory.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,7 +48,6 @@ extern "C" {
 
 #if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
 #include "openthread/heap.h"
-#include "sl_malloc.h"
 #endif // OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
 #endif // CHIP_ENABLE_OPENTHREAD
 

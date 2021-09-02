@@ -161,22 +161,22 @@ Instructions about how to build Project Connected Home over IP can be found
 
 The Connected Home over IP repository is structured as follows:
 
-| File / Folder                        | Contents                                                                                 |
-| ------------------------------------ | ---------------------------------------------------------------------------------------- |
-| `build/`                             | Build system support content and build output directories                                |
-| [BUILDING.md](./docs/BUILDING.md)    | More detailed information on configuring and building Project CHIP for different targets |
-| `CODE_OF_CONDUCT.md`                 | Code of Conduct for Project CHIP, and contributions to it                                |
-| [CONTRIBUTING.md](./CONTRIBUTING.md) | Guidelines for contributing to Project CHIP                                              |
-| `docs/`                              | Documentation                                                                            |
-| `examples/`                          | Example firmware applications that demonstrate use of Project CHIP technology            |
-| `integrations/`                      | Third party integrations related to this project                                         |
-| `integrations/docker/`               | Docker scripts and Dockerfiles                                                           |
-| `LICENSE`                            | Project CHIP [License file](./LICENSE) (Apache 2.0)                                      |
-| `BUILD.gn`                           | Top level GN build file                                                                  |
-| `README.md`                          | This file                                                                                |
-| `src/`                               | Implementation of Project CHIP                                                           |
-| `third_party/`                       | Third-party code used by Project CHIP                                                    |
-| `scripts/`                           | Scripts needed to work with the Project CHIP repo                                        |
+| File / Folder                          | Contents                                                                                 |
+| -------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `build/`                               | Build system support content and build output directories                                |
+| [BUILDING.md](docs/guides/BUILDING.md) | More detailed information on configuring and building Project CHIP for different targets |
+| `CODE_OF_CONDUCT.md`                   | Code of Conduct for Project CHIP, and contributions to it                                |
+| [CONTRIBUTING.md](./CONTRIBUTING.md)   | Guidelines for contributing to Project CHIP                                              |
+| `docs/`                                | Documentation, including [guides](./docs/guides)                                         |
+| `examples/`                            | Example firmware applications that demonstrate use of Project CHIP technology            |
+| `integrations/`                        | Third party integrations related to this project                                         |
+| `integrations/docker/`                 | Docker scripts and Dockerfiles                                                           |
+| `LICENSE`                              | Project CHIP [License file](./LICENSE) (Apache 2.0)                                      |
+| `BUILD.gn`                             | Top level GN build file                                                                  |
+| `README.md`                            | This file                                                                                |
+| `src/`                                 | Implementation of Project CHIP                                                           |
+| `third_party/`                         | Third-party code used by Project CHIP                                                    |
+| `scripts/`                             | Scripts needed to work with the Project CHIP repo                                        |
 
 # License
 

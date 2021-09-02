@@ -18,13 +18,12 @@
 
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <core/CHIPEventLoggingConfig.h>
-#include <core/CHIPTLVUtilities.hpp>
 #include <inttypes.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
-#include <system/SystemTimer.h>
+#include <lib/core/CHIPEventLoggingConfig.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::TLV;
 
@@ -404,7 +403,7 @@ EventNumber CircularEventBuffer::VendEventNumber()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(EventLogging, "%s Advance() for priority %u failed with %" CHIP_ERROR_FORMAT, __FUNCTION__,
-                     static_cast<unsigned>(mPriority), err);
+                     static_cast<unsigned>(mPriority), err.Format());
     }
 
     return mLastEventNumber;
@@ -569,10 +568,11 @@ exit:
 
 #if CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
         ChipLogDetail(EventLogging,
-                      "LogEvent event number: 0x" ChipLogFormatX64 " schema priority: %u cluster id: 0x%" PRIx32
+                      "LogEvent event number: 0x" ChipLogFormatX64 " schema priority: %u cluster id: " ChipLogFormatMEI
                       " event id: 0x%" PRIx32 " sys timestamp: 0x" ChipLogFormatX64,
                       ChipLogValueX64(aEventNumber), static_cast<unsigned>(opts.mpEventSchema->mPriority),
-                      opts.mpEventSchema->mClusterId, opts.mpEventSchema->mEventId, ChipLogValueX64(opts.mTimestamp.mValue));
+                      ChipLogValueMEI(opts.mpEventSchema->mClusterId), opts.mpEventSchema->mEventId,
+                      ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
         ScheduleFlushIfNeeded(opts.mUrgent);
@@ -690,13 +690,14 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
 
         loadOutContext->mPreviousSystemTime.mValue = loadOutContext->mCurrentSystemTime.mValue;
         loadOutContext->mFirst                     = false;
+        loadOutContext->mEventCount++;
     }
 
     return err;
 }
 
 CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * apClusterInfolist, PriorityLevel aPriority,
-                                             EventNumber & aEventNumber)
+                                             EventNumber & aEventNumber, size_t & aEventCount)
 {
     // TODO: Add particular set of event Paths in FetchEventsSince so that we can filter the interested paths
     CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -729,7 +730,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
 
 exit:
     aEventNumber = context.mCurrentEventNumber;
-
+    aEventCount += context.mEventCount;
     return err;
 }
 

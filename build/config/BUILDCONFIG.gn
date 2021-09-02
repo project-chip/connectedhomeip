@@ -59,10 +59,18 @@ if (host_toolchain == "") {
 
 if (_chip_defaults.custom_toolchain != "") {
   _default_toolchain = _chip_defaults.custom_toolchain
-} else if (target_os == host_os) {
-  _default_toolchain = host_toolchain
 } else if (target_os == "all") {
   _default_toolchain = "${_pigweed_overrides.dir_pw_toolchain}/default"
+} else if (target_os == "linux") {
+  if (_chip_defaults.is_clang) {
+    _target_compiler = "clang"
+  } else {
+    _target_compiler = "gcc"
+  }
+
+  _default_toolchain = "${_build_overrides.build_root}/toolchain/linux:linux_${target_cpu}_${_target_compiler}"
+} else if (target_os == host_os && target_cpu == host_cpu) {
+  _default_toolchain = host_toolchain
 } else if (target_os == "freertos") {
   if (target_cpu == "arm") {
     _default_toolchain = "${_build_overrides.build_root}/toolchain/arm_gcc"

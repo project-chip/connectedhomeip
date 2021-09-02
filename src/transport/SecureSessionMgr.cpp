@@ -30,13 +30,13 @@
 #include <string.h>
 
 #include <app/util/basic-types.h>
-#include <core/CHIPKeyIds.h>
+#include <lib/core/CHIPKeyIds.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/Constants.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
 
@@ -66,28 +66,21 @@ uint32_t EncryptedPacketBufferHandle::GetMsgId() const
 
 SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 
-SecureSessionMgr::~SecureSessionMgr()
-{
-    CancelExpiryTimer();
-}
+SecureSessionMgr::~SecureSessionMgr() {}
 
-CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                                  Transport::AdminPairingTable * admins,
+CHIP_ERROR SecureSessionMgr::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
                                   Transport::MessageCounterManagerInterface * messageCounterManager)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mState                 = State::kInitialized;
-    mLocalNodeId           = localNodeId;
     mSystemLayer           = systemLayer;
     mTransportMgr          = transportMgr;
-    mAdmins                = admins;
+    mFabrics               = fabrics;
     mMessageCounterManager = messageCounterManager;
 
     mGlobalEncryptedMessageCounter.Init();
-
-    ChipLogProgress(Inet, "local node id is 0x" ChipLogFormatX64, ChipLogValueX64(mLocalNodeId));
 
     ScheduleExpiryTimer();
 
@@ -103,14 +96,13 @@ void SecureSessionMgr::Shutdown()
     mMessageCounterManager = nullptr;
 
     mState        = State::kNotReady;
-    mLocalNodeId  = kUndefinedNodeId;
     mSystemLayer  = nullptr;
     mTransportMgr = nullptr;
-    mAdmins       = nullptr;
+    mFabrics      = nullptr;
     mCB           = nullptr;
 }
 
-CHIP_ERROR SecureSessionMgr::BuildEncryptedMessagePayload(SecureSessionHandle session, PayloadHeader & payloadHeader,
+CHIP_ERROR SecureSessionMgr::BuildEncryptedMessagePayload(SessionHandle session, PayloadHeader & payloadHeader,
                                                           System::PacketBufferHandle && msgBuf,
                                                           EncryptedPacketBufferHandle & encryptedMessage)
 {
@@ -126,30 +118,20 @@ CHIP_ERROR SecureSessionMgr::BuildEncryptedMessagePayload(SecureSessionHandle se
         return CHIP_ERROR_NOT_CONNECTED;
     }
 
-    Transport::AdminPairingInfo * admin = mAdmins->FindAdminWithId(state->GetAdminId());
-    if (admin == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    NodeId localNodeId       = admin->GetNodeId();
     MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *state);
-    ReturnErrorOnFailure(SecureMessageCodec::Encode(localNodeId, state, payloadHeader, packetHeader, msgBuf, counter));
+    ReturnErrorOnFailure(SecureMessageCodec::Encode(state, payloadHeader, packetHeader, msgBuf, counter));
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msgBuf));
 
     encryptedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(msgBuf));
-    ChipLogProgress(Inet,
-                    "Encrypted message %p from 0x" ChipLogFormatX64 " to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
-                    " on exchange %d.",
-                    &encryptedMessage, ChipLogValueX64(localNodeId), ChipLogValueX64(state->GetPeerNodeId()),
-                    payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(),
-                    payloadHeader.GetExchangeID());
+    ChipLogProgress(Inet, "Encrypted message %p to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32 " on exchange %d.",
+                    &encryptedMessage, ChipLogValueX64(state->GetPeerNodeId()), payloadHeader.GetMessageType(),
+                    payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), payloadHeader.GetExchangeID());
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage)
+CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = nullptr;
@@ -197,7 +179,7 @@ exit:
     return err;
 }
 
-void SecureSessionMgr::ExpirePairing(SecureSessionHandle session)
+void SecureSessionMgr::ExpirePairing(SessionHandle session)
 {
     PeerConnectionState * state = GetPeerConnectionState(session);
     if (state != nullptr)
@@ -207,12 +189,12 @@ void SecureSessionMgr::ExpirePairing(SecureSessionHandle session)
     }
 }
 
-void SecureSessionMgr::ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin)
+void SecureSessionMgr::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
 {
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
     while (state != nullptr)
     {
-        if (admin == state->GetAdminId())
+        if (fabric == state->GetFabricIndex())
         {
             mPeerConnections.MarkConnectionExpired(
                 state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
@@ -226,14 +208,15 @@ void SecureSessionMgr::ExpireAllPairings(NodeId peerNodeId, Transport::AdminId a
 }
 
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
-                                        PairingSession * pairing, SecureSession::SessionRole direction, Transport::AdminId admin)
+                                        PairingSession * pairing, SecureSession::SessionRole direction, FabricIndex fabric)
 {
-    uint16_t peerKeyId          = pairing->GetPeerKeyId();
-    uint16_t localKeyId         = pairing->GetLocalKeyId();
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, nullptr);
+    uint16_t peerKeyId  = pairing->GetPeerKeyId();
+    uint16_t localKeyId = pairing->GetLocalKeyId();
+    PeerConnectionState * state =
+        mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(peerNodeId), localKeyId, nullptr);
 
-    // Find any existing connection with the same node and key ID
-    if (state && (state->GetAdminId() == Transport::kUndefinedAdminId || state->GetAdminId() == admin))
+    // Find any existing connection with the same local key ID
+    if (state)
     {
         mPeerConnections.MarkConnectionExpired(
             state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
@@ -246,7 +229,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
         mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, localKeyId, &state));
     ReturnErrorCodeIf(state == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    state->SetAdminId(admin);
+    state->SetFabricIndex(fabric);
 
     if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
     {
@@ -268,7 +251,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     if (mCB != nullptr)
     {
         state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(pairing->GetPeerCounter());
-        mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin });
+        mCB->OnNewConnection(SessionHandle(state->GetPeerNodeId(), state->GetLocalKeyID(), state->GetPeerKeyID(), fabric));
     }
 
     return CHIP_NO_ERROR;
@@ -313,7 +296,7 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
     {
         PayloadHeader payloadHeader;
         ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
-        mCB->OnMessageReceived(packetHeader, payloadHeader, SecureSessionHandle(), peerAddress,
+        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle::TemporaryUnauthenticatedSession(), peerAddress,
                                SecureSessionMgrDelegate::DuplicateMessage::No, std::move(msg));
     }
 }
@@ -326,12 +309,6 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetEncryptionKeyID(), nullptr);
 
     PayloadHeader payloadHeader;
-
-    Transport::AdminPairingInfo * admin = nullptr;
-
-    bool modifiedAdmin = false;
-    NodeId localNodeId;
-    FabricId fabricId;
 
     SecureSessionMgrDelegate::DuplicateMessage isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::No;
 
@@ -354,15 +331,16 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         {
             // Queue and start message sync procedure
             err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
-                packetHeader, { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, peerAddress,
-                std::move(msg));
+                packetHeader,
+                SessionHandle(state->GetPeerNodeId(), state->GetLocalKeyID(), state->GetPeerKeyID(), state->GetFabricIndex()),
+                state, peerAddress, std::move(msg));
 
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Inet,
                              "Message counter synchronization for received message, failed to "
                              "QueueReceivedMessageAndStartSync, err = %" CHIP_ERROR_FORMAT,
-                             err);
+                             err.Format());
             }
             else
             {
@@ -381,35 +359,9 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err);
+            ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err.Format());
         }
         SuccessOrExit(err);
-    }
-
-    admin = mAdmins->FindAdminWithId(state->GetAdminId());
-    VerifyOrExit(admin != nullptr,
-                 ChipLogError(Inet, "Secure transport received packet for unknown admin (%p, %d) pairing, discarding", state,
-                              state->GetAdminId()));
-    if (packetHeader.GetDestinationNodeId().HasValue() && admin->GetNodeId() != kUndefinedNodeId)
-    {
-        VerifyOrExit(admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
-                     ChipLogError(Inet,
-                                  "Secure transport received message, but destination node ID (0x" ChipLogFormatX64
-                                  ") doesn't match our node ID (0x" ChipLogFormatX64 "), discarding",
-                                  ChipLogValueX64(packetHeader.GetDestinationNodeId().Value()),
-                                  ChipLogValueX64(admin->GetNodeId())));
-    }
-
-    if (packetHeader.GetDestinationNodeId().HasValue())
-    {
-        ChipLogProgress(Inet, "Secure transport received message destined to fabric %d, node 0x" ChipLogFormatX64 ". Key ID %d",
-                        static_cast<int>(state->GetAdminId()), ChipLogValueX64(packetHeader.GetDestinationNodeId().Value()),
-                        packetHeader.GetEncryptionKeyID());
-    }
-    else
-    {
-        ChipLogProgress(Inet, "Secure transport received message for fabric %d without node ID. Key ID %d",
-                        static_cast<int>(state->GetAdminId()), packetHeader.GetEncryptionKeyID());
     }
 
     mPeerConnections.MarkConnectionActive(state);
@@ -434,49 +386,6 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         state->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageId());
     }
 
-    // See operational-credentials-server.cpp for explanation as to why fabricId is being set to commissioner node id
-    // This is temporary code until AddOptCert is implemented through which an admin will be correctly added with the correct
-    // fields.
-    // TODO: Remove temporary code once AddOptCert is implemented
-    if (packetHeader.GetSourceNodeId().HasValue())
-    {
-        if (state->GetPeerNodeId() == kUndefinedNodeId)
-        {
-            state->SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
-        }
-    }
-
-    // TODO: Remove temporary code once AddOptCert is implemented
-    if (packetHeader.GetDestinationNodeId().HasValue())
-    {
-        localNodeId = packetHeader.GetDestinationNodeId().Value();
-        if (localNodeId != kUndefinedNodeId && admin->GetNodeId() != localNodeId)
-        {
-            admin->SetNodeId(localNodeId);
-            ChipLogProgress(Inet, "Setting nodeID %" PRIX64 " on admin.", admin->GetNodeId());
-            modifiedAdmin = true;
-        }
-    }
-
-    // TODO: Remove temporary code once AddOptCert is implemented
-    if (packetHeader.GetSourceNodeId().HasValue())
-    {
-        fabricId = packetHeader.GetSourceNodeId().Value();
-        if (fabricId != kUndefinedFabricId && admin->GetFabricId() != fabricId)
-        {
-            admin->SetFabricId(packetHeader.GetSourceNodeId().Value());
-            ChipLogProgress(Inet, "Setting fabricID %" PRIX64 " on admin.", admin->GetFabricId());
-            modifiedAdmin = true;
-        }
-    }
-
-    // TODO: Remove temporary code once AddOptCert is implemented
-    if (modifiedAdmin)
-    {
-        ChipLogProgress(Inet, "Since admin was modified, persisting changes to KVS");
-        mAdmins->Store(admin->GetAdminId());
-    }
-
     // TODO: once mDNS address resolution is available reconsider if this is required
     // This updates the peer address once a packet is received from a new address
     // and serves as a way to auto-detect peer changing IPs.
@@ -487,7 +396,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
 
     if (mCB != nullptr)
     {
-        SecureSessionHandle session(state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId());
+        SessionHandle session(state->GetPeerNodeId(), state->GetLocalKeyID(), state->GetPeerKeyID(), state->GetFabricIndex());
         mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, isDuplicate, std::move(msg));
     }
 
@@ -505,13 +414,14 @@ void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionSt
 
     if (mCB != nullptr)
     {
-        mCB->OnConnectionExpired({ state.GetPeerNodeId(), state.GetPeerKeyID(), state.GetAdminId() });
+        mCB->OnConnectionExpired(
+            SessionHandle(state.GetPeerNodeId(), state.GetLocalKeyID(), state.GetPeerKeyID(), state.GetFabricIndex()));
     }
 
     mTransportMgr->Disconnect(state.GetPeerAddress());
 }
 
-void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, CHIP_ERROR error)
+void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param)
 {
     SecureSessionMgr * mgr = reinterpret_cast<SecureSessionMgr *>(param);
 #if CHIP_CONFIG_SESSION_REKEYING
@@ -524,9 +434,10 @@ void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, 
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
 
-PeerConnectionState * SecureSessionMgr::GetPeerConnectionState(SecureSessionHandle session)
+PeerConnectionState * SecureSessionMgr::GetPeerConnectionState(SessionHandle session)
 {
-    return mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(session.mPeerNodeId), session.mPeerKeyId, nullptr);
+    return mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(session.mPeerNodeId),
+                                                              session.mLocalKeyId.ValueOr(0), nullptr);
 }
 
 } // namespace chip

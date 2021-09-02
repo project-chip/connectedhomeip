@@ -7,7 +7,7 @@
  *    You may obtain a copy of the License at
  *
  *        http://www.apache.org/licenses/LICENSE-2.0
- *BoltLockManager
+ *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,32 +15,29 @@
  *    limitations under the License.
  */
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-#include "AppConfig.h"
+#include "AppTask.h"
 #include "PumpManager.h"
 
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af-types.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
+#include <app/util/af.h>
 
 using namespace ::chip;
+using namespace ::chip::app::Clusters;
 
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
-    ChipLogProgress(Zcl, "%s: %" PRIx16 " %" PRIx32 " %" PRIx32 " %d", __FUNCTION__, endpoint, clusterId, attributeId, *value);
-    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
+    if (clusterId != OnOff::Id)
     {
         ChipLogProgress(Zcl, "Unknown cluster ID: %" PRIx32, clusterId);
         return;
     }
 
-    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
+    if (attributeId != OnOff::Attributes::Ids::OnOff)
     {
         ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
         return;
@@ -48,11 +45,11 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
 
     if (*value)
     {
-        PumpMgr().InitiateAction(0, PumpManager::LOCK_ACTION);
+        PumpMgr().InitiateAction(0, PumpManager::START_ACTION);
     }
     else
     {
-        PumpMgr().InitiateAction(0, PumpManager::UNLOCK_ACTION);
+        PumpMgr().InitiateAction(0, PumpManager::STOP_ACTION);
     }
 }
 
@@ -73,267 +70,5 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    // TODO: implement any additional Cluster Server init actions
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
-}
-
-bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex,
-                                    EmberAfEndpointInfoStruct * returnEndpointInfo)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
-
-    /**returnNetworkIndex = 0;
-
-    returnEndpointInfo->deviceId = 45;
-    returnEndpointInfo->endpoint = endpoint;
-    returnEndpointInfo->clusterCount = 2;
-    returnEndpointInfo->clusters[0].clusterId = 0x0006;
-    returnEndpointInfo->clusters[0].server = true;
-    returnEndpointInfo->clusters[1].clusterId = 0x0200;
-    returnEndpointInfo->clusters[1].server = true;    */
-    return false;
-}
-
-bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberStatus * status)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, status);
-    return false;
-}
-
-void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
-
-bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
-                                        chip::AttributeId attributeId)
-{
-    ChipLogProgress(Zcl, "%s: %d %" PRIx32 " %" PRIx32 " %d", __FUNCTION__, endpoint, clusterId, manufacturerCode, attributeId);
-    return true;
-}
-
-EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                    uint8_t * buffer)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
-    return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
-}
-
-bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
-                                         chip::AttributeId attributeId)
-{
-    ChipLogProgress(Zcl, "%s: %d %" PRIx32 " %" PRIx32 " %d", __FUNCTION__, endpoint, clusterId, manufacturerCode, attributeId);
-    return true;
-}
-
-EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                   uint8_t * buffer, uint16_t maxReadLength)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
-    return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
-}
-
-void emberAfGroupsClusterServerInitCallback(chip::EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
-}
-
-void emberAfScenesClusterServerInitCallback(chip::EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
-}
-
-void emberAfIdentifyClusterServerInitCallback(chip::EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
-}
-
-void emberAfIdentifyClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
-}
-
-EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
-                                                uint8_t * value)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
-    return EMBER_ZCL_STATUS_SUCCESS; // EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
-}
-
-EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                          chip::AttributeId attributeId, uint8_t mask,
-                                                                          uint16_t manufacturerCode, uint8_t * value, uint8_t type)
-
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
-    return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_READ_ONLY;
-}
-
-bool emberAfReadAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
-    return false;
-}
-
-bool emberAfWriteAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
-    return false;
-}
-
-bool emberAfConfigureReportingResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
-    return false;
-}
-
-bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
-    return false;
-}
-
-bool emberAfReportAttributesCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
-    return false;
-}
-
-bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId commandId, EmberAfStatus status)
-{
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
-    return false;
-}
-
-bool emberAfDiscoverAttributesResponseCallback(chip::ClusterId clusterId, bool discoveryComplete, uint8_t * buffer, uint16_t bufLen,
-                                               bool extended)
-{
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
-    return false;
-}
-
-bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand * cmd)
-{
-    return false;
-}
-
-EmberStatus emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, uint16_t messageLength, uint8_t * message)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, 0);
-    return 0;
-}
-
-uint8_t emberAfGetSourceRouteOverheadCallback(chip::NodeId destination)
-{
-    return 0;
-}
-
-bool emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupName)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
-    return false;
-}
-
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t * groupName)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
-    return false;
-}
-
-bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount,
-                                                    /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupCount);
-    return false;
-}
-
-bool emberAfGroupsClusterRemoveAllGroupsCallback()
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, 0);
-    return false;
-}
-
-bool emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
-    return false;
-}
-
-bool emberAfGroupsClusterViewGroupCallback(uint16_t groupId)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
-    return false;
-}
-
-bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, timeout);
-    return false;
-}
-
-bool emberAfIdentifyClusterIdentifyQueryCallback()
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, 0);
-    return false;
-}
-
-bool emberAfIdentifyClusterIdentifyCallback(uint16_t identifyTime)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, identifyTime);
-    return false;
-}
-
-bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                          /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
-    return false;
-}
-
-bool emberAfScenesClusterGetSceneMembershipCallback(uint16_t groupId)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
-    return false;
-}
-
-bool emberAfScenesClusterRecallSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
-    return false;
-}
-
-bool emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
-    return false;
-}
-
-bool emberAfScenesClusterRemoveSceneCallback(uint16_t groupId, uint8_t sceneId)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
-    return false;
-}
-
-bool emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
-    return false;
-}
-
-bool emberAfScenesClusterViewSceneCallback(uint16_t groupId, uint8_t sceneId)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
-    return false;
-}
-
-bool emberAfScenesClusterMakeInvalidCallback(unsigned char par)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, par);
-    return false;
-}
-
-bool emberAfGroupsClusterEndpointInGroupCallback(unsigned char par, unsigned short)
-{
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, par);
-    return false;
+    GetAppTask().UpdateClusterState();
 }

@@ -17,12 +17,12 @@
  */
 
 #include "AccountLoginManager.h"
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/Command.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-#include <app/common/gen/enums.h>
 #include <app/util/af.h>
 
 using namespace std;
@@ -43,15 +43,13 @@ bool AccountLoginManager::isUserLoggedIn(string requestTempAccountIdentifier, st
         bool found = accounts[requestTempAccountIdentifier] == requestSetupPin;
         if (!found)
         {
-            ChipLogError(Zcl, "User is not logged in, failed to match request setup pin. Error:%s",
-                         chip::ErrorStr(EMBER_ZCL_STATUS_NOT_AUTHORIZED));
+            ChipLogError(Zcl, "User is not logged in, failed to match request setup pin.");
         }
         return found;
     }
     else
     {
-        ChipLogError(Zcl, "User is not logged in, failed to find temp account identifier. Error:%s",
-                     chip::ErrorStr(EMBER_ZCL_STATUS_NOT_AUTHORIZED));
+        ChipLogError(Zcl, "User is not logged in, failed to find temp account identifier.");
         return false;
     }
 }

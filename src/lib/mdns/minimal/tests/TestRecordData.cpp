@@ -14,12 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <mdns/minimal/RecordData.h>
+#include <lib/mdns/minimal/RecordData.h>
 
 #include <string>
 #include <vector>
 
-#include <support/UnitTestRegistration.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -106,6 +106,7 @@ void SrvWithPtrRecord(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+#if INET_CONFIG_ENABLE_IPV4
 void ARecordParsing(nlTestSuite * inSuite, void * inContext)
 {
     const uint8_t record[] = {
@@ -122,6 +123,7 @@ void ARecordParsing(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("10.11.12.13", expected));
     NL_TEST_ASSERT(inSuite, addr == expected);
 }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 void AAAARecordParsing(nlTestSuite * inSuite, void * inContext)
 {
@@ -238,9 +240,11 @@ void TxtRecord(nlTestSuite * inSuite, void * inContext)
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing),   //
-    NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),               //
+    NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing), //
+    NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),             //
+#if INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("ARecordParsing", ARecordParsing),                   //
+#endif                                                               // INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("AAAARecordParsing", AAAARecordParsing),             //
     NL_TEST_DEF("PtrRecordSimpleParsing", PtrRecordSimpleParsing),   //
     NL_TEST_DEF("PtrRecordComplexParsing", PtrRecordComplexParsing), //

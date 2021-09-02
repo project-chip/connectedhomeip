@@ -18,16 +18,23 @@
 #pragma once
 
 #include <cstdint>
+#include <limits>
 
 #include "lib/support/logging/CHIPLogging.h"
-#include <core/CHIPError.h>
-#include <core/PeerId.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/core/PeerId.h>
+#include <lib/support/BytesToHex.h>
 
 namespace chip {
 namespace Mdns {
+
+// Largest host name is 64-bits in hex.
+static constexpr int kMaxHostNameSize      = 16;
+constexpr uint32_t kUndefinedRetryInterval = std::numeric_limits<uint32_t>::max();
 
 struct ResolvedNodeData
 {
@@ -43,18 +50,32 @@ struct ResolvedNodeData
 #endif // CHIP_PROGRESS_LOGGING
     }
 
+    Optional<uint32_t> GetMrpRetryIntervalIdle() const
+    {
+        return mMrpRetryIntervalIdle != kUndefinedRetryInterval ? Optional<uint32_t>{ mMrpRetryIntervalIdle }
+                                                                : Optional<uint32_t>{};
+    }
+
+    Optional<uint32_t> GetMrpRetryIntervalActive() const
+    {
+        return mMrpRetryIntervalActive != kUndefinedRetryInterval ? Optional<uint32_t>{ mMrpRetryIntervalActive }
+                                                                  : Optional<uint32_t>{};
+    }
+
     PeerId mPeerId;
-    Inet::InterfaceId mInterfaceId;
-    Inet::IPAddress mAddress;
-    uint16_t mPort;
+    Inet::IPAddress mAddress             = Inet::IPAddress::Any;
+    Inet::InterfaceId mInterfaceId       = INET_NULL_INTERFACEID;
+    uint16_t mPort                       = 0;
+    char mHostName[kMaxHostNameSize + 1] = {};
+    bool mSupportsTcp                    = false;
+    uint32_t mMrpRetryIntervalIdle       = kUndefinedRetryInterval;
+    uint32_t mMrpRetryIntervalActive     = kUndefinedRetryInterval;
 };
 
 constexpr size_t kMaxDeviceNameLen         = 32;
 constexpr size_t kMaxRotatingIdLen         = 50;
 constexpr size_t kMaxPairingInstructionLen = 128;
 
-// Largest host name is 64-bits in hex.
-static constexpr int kMaxHostNameSize     = 16;
 static constexpr int kMaxInstanceNameSize = 16;
 struct DiscoveredNodeData
 {
@@ -72,10 +93,16 @@ struct DiscoveredNodeData
     char deviceName[kMaxDeviceNameLen + 1];
     uint8_t rotatingId[kMaxRotatingIdLen];
     size_t rotatingIdLen;
-    char pairingInstruction[kMaxPairingInstructionLen + 1];
     uint16_t pairingHint;
+    char pairingInstruction[kMaxPairingInstructionLen + 1];
+    bool supportsTcp;
+    uint32_t mrpRetryIntervalIdle;
+    uint32_t mrpRetryIntervalActive;
+    uint16_t port;
     int numIPs;
+    Inet::InterfaceId interfaceId[kMaxIPAddresses];
     Inet::IPAddress ipAddress[kMaxIPAddresses];
+
     void Reset()
     {
         memset(hostName, 0, sizeof(hostName));
@@ -90,8 +117,11 @@ struct DiscoveredNodeData
         memset(rotatingId, 0, sizeof(rotatingId));
         rotatingIdLen = 0;
         memset(pairingInstruction, 0, sizeof(pairingInstruction));
-        pairingHint = 0;
-        numIPs      = 0;
+        pairingHint            = 0;
+        supportsTcp            = false;
+        mrpRetryIntervalIdle   = kUndefinedRetryInterval;
+        mrpRetryIntervalActive = kUndefinedRetryInterval;
+        numIPs                 = 0;
         for (int i = 0; i < kMaxIPAddresses; ++i)
         {
             ipAddress[i] = chip::Inet::IPAddress::Any;
@@ -100,6 +130,79 @@ struct DiscoveredNodeData
     DiscoveredNodeData() { Reset(); }
     bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
+
+    Optional<uint32_t> GetMrpRetryIntervalIdle() const
+    {
+        return mrpRetryIntervalIdle != kUndefinedRetryInterval ? Optional<uint32_t>{ mrpRetryIntervalIdle } : Optional<uint32_t>{};
+    }
+
+    Optional<uint32_t> GetMrpRetryIntervalActive() const
+    {
+        return mrpRetryIntervalActive != kUndefinedRetryInterval ? Optional<uint32_t>{ mrpRetryIntervalActive }
+                                                                 : Optional<uint32_t>{};
+    }
+
+    void LogDetail() const
+    {
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+        if (rotatingIdLen > 0)
+        {
+            char rotatingIdString[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
+            Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
+            ChipLogDetail(Discovery, "Rotating ID: %s", rotatingIdString);
+        }
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
+        if (strlen(deviceName) != 0)
+        {
+            ChipLogDetail(Discovery, "Device Name: %s", deviceName);
+        }
+        if (vendorId > 0)
+        {
+            ChipLogDetail(Discovery, "Vendor ID: %u", vendorId);
+        }
+        if (productId > 0)
+        {
+            ChipLogDetail(Discovery, "Product ID: %u", productId);
+        }
+        if (deviceType > 0)
+        {
+            ChipLogDetail(Discovery, "Device Type: %u", deviceType);
+        }
+        if (longDiscriminator > 0)
+        {
+            ChipLogDetail(Discovery, "Long Discriminator: %u", longDiscriminator);
+        }
+        if (additionalPairing > 0)
+        {
+            ChipLogDetail(Discovery, "Additional Pairing: %u", additionalPairing);
+        }
+        if (strlen(pairingInstruction) != 0)
+        {
+            ChipLogDetail(Discovery, "Pairing Instruction: %s", pairingInstruction);
+        }
+        if (pairingHint > 0)
+        {
+            ChipLogDetail(Discovery, "Pairing Hint: 0x%x", pairingHint);
+        }
+        if (!IsHost(""))
+        {
+            ChipLogDetail(Discovery, "Hostname: %s", hostName);
+        }
+        for (int j = 0; j < numIPs; j++)
+        {
+#if CHIP_DETAIL_LOGGING
+            char buf[Inet::kMaxIPAddressStringLength];
+            char * ipAddressOut = ipAddress[j].ToString(buf);
+            ChipLogDetail(Discovery, "IP Address #%d: %s", j + 1, ipAddressOut);
+            (void) ipAddressOut;
+#endif // CHIP_DETAIL_LOGGING
+        }
+        if (port > 0)
+        {
+            ChipLogDetail(Discovery, "Port: %u", port);
+        }
+        ChipLogDetail(Discovery, "Commissioning Mode: %u", commissioningMode);
+    }
 };
 
 enum class DiscoveryFilterType : uint8_t
@@ -118,10 +221,10 @@ struct DiscoveryFilter
 {
     DiscoveryFilterType type;
     uint16_t code;
-    char * instanceName;
+    const char * instanceName;
     DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
     DiscoveryFilter(DiscoveryFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
-    DiscoveryFilter(DiscoveryFilterType newType, char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
+    DiscoveryFilter(DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
 };
 enum class DiscoveryType
 {

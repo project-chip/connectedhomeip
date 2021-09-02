@@ -39,9 +39,23 @@ void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    mSocket.Init(aInetLayer.SystemLayer()->WatchableEvents());
+    mSocket = INET_INVALID_SOCKET_FD;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic)
+{
+    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
+    {
+        DeferredRelease(Layer().SystemLayer(), aTactic);
+    }
+    else
+    {
+        Release();
+    }
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace Inet
 } // namespace chip

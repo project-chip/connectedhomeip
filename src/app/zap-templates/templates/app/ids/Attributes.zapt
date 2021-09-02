@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -11,7 +13,7 @@ namespace Attributes {
 namespace Ids {
 {{#zcl_attributes_server}}
 {{#unless clusterRef}}
-static constexpr AttributeId {{asUpperCamelCase label}} = {{asHex code 4}};
+static constexpr AttributeId {{asUpperCamelCase label}} = {{asMEI manufacturerCode code}};
 {{/unless}}
 {{/zcl_attributes_server}}
 } // namespace Ids
@@ -28,7 +30,7 @@ namespace Attributes {
 namespace Ids {
 {{/first}}
 {{#if clusterRef}}
-static constexpr AttributeId {{asUpperCamelCase label}} = {{asHex code 4}};
+static constexpr AttributeId {{asUpperCamelCase label}} = {{asMEI manufacturerCode code}};
 {{/if}}
 {{#last}}
 } // namespace Ids

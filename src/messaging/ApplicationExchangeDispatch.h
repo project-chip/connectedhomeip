@@ -24,8 +24,8 @@
 
 #pragma once
 
+#include <lib/support/CodeUtils.h>
 #include <messaging/ExchangeMessageDispatch.h>
-#include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -45,9 +45,9 @@ public:
         return ExchangeMessageDispatch::Init();
     }
 
-    CHIP_ERROR PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
+    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
                               EncryptedPacketBufferHandle & preparedMessage) override;
-    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & message) const override;
+    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & message) const override;
 
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 

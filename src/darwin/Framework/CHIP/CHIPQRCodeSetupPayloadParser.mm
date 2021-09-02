@@ -16,13 +16,13 @@
  */
 
 #import "CHIPQRCodeSetupPayloadParser.h"
-#import "CHIPError.h"
+#import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
 #import "CHIPSetupPayload_Internal.h"
 
+#import <lib/support/CHIPMem.h>
 #import <setup_payload/QRCodeSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>
-#import <support/CHIPMem.h>
 
 @implementation CHIPQRCodeSetupPayloadParser {
     NSString * _base38Representation;
@@ -50,7 +50,7 @@
     if (_chipQRCodeSetupPayloadParser) {
         CHIP_ERROR chipError = _chipQRCodeSetupPayloadParser->populatePayload(cPlusPluspayload);
 
-        if (chipError == 0) {
+        if (chipError == CHIP_NO_ERROR) {
             payload = [[CHIPSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
         } else if (error) {
             *error = [CHIPError errorForCHIPErrorCode:chipError];

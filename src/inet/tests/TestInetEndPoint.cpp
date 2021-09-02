@@ -38,13 +38,12 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <system/SystemError.h>
-#include <system/SystemTimer.h>
 
 #include <nlunit-test.h>
 
@@ -73,7 +72,7 @@ void HandleDNSResolveComplete(void * appState, CHIP_ERROR err, uint8_t addrCount
         printf("    DNS name resolution return no addresses\n");
 }
 
-void HandleTimer(Layer * aLayer, void * aAppState, CHIP_ERROR aError)
+void HandleTimer(Layer * aLayer, void * aAppState)
 {
     printf("    timer handler\n");
 }
@@ -95,6 +94,13 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     IPAddress testDestAddr = IPAddress::Any;
     char testHostName[20]  = "www.nest.com";
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
+
+    // Deinit system layer and network
+    ShutdownNetwork();
+    if (gSystemLayer.IsInitialized())
+    {
+        ShutdownSystemLayer();
+    }
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP);
@@ -132,12 +138,9 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     char testHostName2[20] = "127.0.0.1";
     char testHostName3[20] = "";
     char testHostName4[260];
-    struct timeval sleepTime;
     IPAddress testDestAddr[1] = { IPAddress::Any };
     CHIP_ERROR err;
-
-    sleepTime.tv_sec  = 0;
-    sleepTime.tv_usec = 10000;
+    constexpr uint32_t kSleepTimeMilliseconds = 10;
 
     memset(testHostName4, 'w', sizeof(testHostName4));
     testHostName4[259] = '\0';
@@ -150,7 +153,7 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     {
         while (!callbackHandlerCalled)
         {
-            ServiceNetwork(sleepTime);
+            ServiceNetwork(kSleepTimeMilliseconds);
         }
     }
 
@@ -162,7 +165,7 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     {
         while (!callbackHandlerCalled)
         {
-            ServiceNetwork(sleepTime);
+            ServiceNetwork(kSleepTimeMilliseconds);
         }
     }
 
@@ -174,7 +177,7 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     {
         while (!callbackHandlerCalled)
         {
-            ServiceNetwork(sleepTime);
+            ServiceNetwork(kSleepTimeMilliseconds);
         }
     }
 
@@ -217,7 +220,7 @@ static void TestInetError(nlTestSuite * inSuite, void * inContext)
 
     err = MapErrorPOSIX(EPERM);
     NL_TEST_ASSERT(inSuite, DescribeErrorPOSIX(err));
-    NL_TEST_ASSERT(inSuite, ChipError::IsRange(ChipError::Range::kPOSIX, err));
+    NL_TEST_ASSERT(inSuite, err.IsRange(ChipError::Range::kPOSIX));
 }
 
 static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
@@ -315,10 +318,12 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     InterfaceId intId;
 
     // EndPoint
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
     RawEndPoint * testRaw6EP = nullptr;
 #if INET_CONFIG_ENABLE_IPV4
     RawEndPoint * testRaw4EP = nullptr;
 #endif // INET_CONFIG_ENABLE_IPV4
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
     UDPEndPoint * testUDPEP  = nullptr;
     TCPEndPoint * testTCPEP1 = nullptr;
     PacketBufferHandle buf   = PacketBufferHandle::New(PacketBuffer::kMaxSize);
@@ -326,6 +331,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     bool didListen           = false;
 
     // init all the EndPoints
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
     err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRaw6EP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -333,6 +339,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = gInet.NewRawEndPoint(kIPVersion_4, kIPProtocol_ICMPv4, &testRaw4EP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 #endif // INET_CONFIG_ENABLE_IPV4
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
     err = gInet.NewUDPEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -352,6 +359,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 #endif // INET_CONFIG_ENABLE_IPV4
 
     // error bind cases
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
     err = testRaw6EP->Bind(kIPAddressType_Unknown, addr_any);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 #if INET_CONFIG_ENABLE_IPV4
@@ -410,6 +418,8 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
     testRaw4EP->Free();
 #endif // INET_CONFIG_ENABLE_IPV4
+    testRaw6EP->Free();
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
     // UdpEndPoint special cases to cover the error branch
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
@@ -482,28 +492,34 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    testTCPEP1->Shutdown();
+    testTCPEP1->Free();
 }
 
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 // Test the InetLayer resource limitation
 static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
-    RawEndPoint * testRawEP = nullptr;
-    UDPEndPoint * testUDPEP = nullptr;
-    TCPEndPoint * testTCPEP = nullptr;
-    CHIP_ERROR err;
-    char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
+    RawEndPoint * testRawEP[INET_CONFIG_NUM_RAW_ENDPOINTS + 1] = { nullptr };
+#endif //
 
+    UDPEndPoint * testUDPEP[INET_CONFIG_NUM_UDP_ENDPOINTS + 1] = { nullptr };
+    TCPEndPoint * testTCPEP[INET_CONFIG_NUM_TCP_ENDPOINTS + 1] = { nullptr };
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
     for (int i = 0; i < INET_CONFIG_NUM_RAW_ENDPOINTS + 1; i++)
-        err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP);
+        err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
     for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS + 1; i++)
-        err = gInet.NewUDPEndPoint(&testUDPEP);
+        err = gInet.NewUDPEndPoint(&testUDPEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
 
     for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS + 1; i++)
-        err = gInet.NewTCPEndPoint(&testTCPEP);
+        err = gInet.NewTCPEndPoint(&testTCPEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
 
     // Verify same aComplete and aAppState args do not exhaust timer pool
@@ -513,13 +529,33 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
+    char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
         err = gSystemLayer.StartTimer(10, HandleTimer, &numTimersTest[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
+#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
     ShutdownNetwork();
     ShutdownSystemLayer();
+
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
+    // Release RAW endpoints
+    for (int i = 0; i < INET_CONFIG_NUM_RAW_ENDPOINTS; i++)
+        testRawEP[i]->Free();
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+
+    // Release UDP endpoints
+    for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS; i++)
+        testUDPEP[i]->Free();
+
+    // Release TCP endpoints
+    for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
+    {
+        testTCPEP[i]->Free();
+    }
 }
+#endif
 
 // Test Suite
 
@@ -534,7 +570,9 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
                                  NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
                                  NL_TEST_DEF("InetEndPoint::TestEndPointLimit", TestInetEndPointLimit),
+#endif
                                  NL_TEST_SENTINEL() };
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -554,6 +592,8 @@ static int TestSetup(void * inContext)
  */
 static int TestTeardown(void * inContext)
 {
+    ShutdownNetwork();
+    ShutdownSystemLayer();
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }

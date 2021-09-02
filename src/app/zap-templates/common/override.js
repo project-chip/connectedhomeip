@@ -18,6 +18,8 @@
 function atomicType(arg)
 {
   switch (arg.name) {
+  case 'boolean':
+    return 'bool';
   case 'action_id':
   case 'cluster_id':
   case 'command_id':
@@ -48,6 +50,10 @@ function atomicType(arg)
     return 'chip::ByteSpan';
   case 'eui64':
     return 'chip::node_id';
+  case 'percent':
+    return 'chip::Percent';
+  case 'percent100ths':
+    return 'chip::Percent100ths';
   default:
     throw 'not overriding';
   }

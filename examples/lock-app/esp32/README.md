@@ -11,6 +11,7 @@ This example demonstrates the mapping of OnOff cluster to lock/unlock logic.
         -   [Commissioning over BLE](#commissioning-over-ble)
         -   [Cluster control](#cluster-control)
     -   [Example Demo](#example-demo)
+    -   [Using the RPC Console](#using-the-rpc-console)
 
 ---
 
@@ -176,8 +177,12 @@ commissioning and cluster control.
          - chip-device-ctrl > close-ble
 
 -   Resolve DNS-SD name and update address of the node in the device controller.
+    Get fabric ID using `get-fabricid` and use the decimal value of compressed
+    fabric id.
 
-         - chip-device-ctrl > resolve 0 135246
+         - chip-device-ctrl > get-fabricid
+
+         - chip-device-ctrl > resolve <Compressed Fabric ID> 135246
 
 ### Cluster control
 
@@ -195,3 +200,27 @@ endpoint and lock/unlock status of door using LED's. For `ESP32-DevKitC`, a GPIO
 through the on/off/toggle commands from the `python-controller`. If you wish to
 see the actual effect of the commands on `ESP32-DevKitC`, you will have to
 connect an external LED to GPIO.
+
+## Using the RPC console
+
+Enable RPCs in the build using menuconfig:
+
+    $ idf.py menuconfig
+
+Enable the RPC library:
+
+    Component config → CHIP Core → General Options → Enable Pigweed PRC library
+
+After flashing a build with RPCs enabled you can use the rpc console to send
+commands to the device.
+
+Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
+
+Start the console
+
+    python -m chip_rpc.console --device /dev/ttyUSB0
+
+From within the console you can then invoke rpcs:
+
+    rpcs.chip.rpc.Locking.Get()
+    rpcs.chip.rpc.Locking.Set(locked=True)

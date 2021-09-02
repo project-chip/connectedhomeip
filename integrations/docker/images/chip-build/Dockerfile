@@ -50,10 +50,9 @@ RUN set -x \
     ninja-build \
     openjdk-8-jdk \
     pkg-config \
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-venv \
+    python3.9 \
+    python3.9-dev \
+    python3.9-venv \
     rsync \
     shellcheck \
     strace \
@@ -74,20 +73,20 @@ RUN set -x \
     && exec bash \
     && : # last line
 
-# Python 2 and PIP
+# Python 3.9 and PIP
 RUN set -x \
-    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive  apt-get update \
+    && DEBIAN_FRONTEND=noninteractive  apt-get install -y libgirepository1.0-dev \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
     && add-apt-repository universe \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y python python2 \
-    && curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py \
-    && python2 get-pip.py \
+    && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
+    && python3.9 get-pip.py \
+    && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 RUN set -x \
-    && pip3 install circleci attrs coloredlogs PyGithub pygit future \
-    portpicker mobly                                                 \
+    && pip3 install attrs coloredlogs PyGithub pygit future portpicker mobly click \
     && : # last line
 
 # build and install gn

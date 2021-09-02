@@ -32,14 +32,16 @@ namespace Shell {
 
 static int chip_command_handler(int argc, char ** argv)
 {
+    CHIP_ERROR err;
     if (argc > 0)
     {
-        return Engine::Root().ExecCommand(argc - 1, argv + 1);
+        err = Engine::Root().ExecCommand(argc - 1, argv + 1);
     }
     else
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        err = CHIP_ERROR_INVALID_ARGUMENT;
     }
+    return static_cast<int>(err.AsInteger());
 }
 
 int streamer_esp32_init(streamer_t * streamer)

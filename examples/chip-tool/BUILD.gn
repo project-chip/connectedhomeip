@@ -22,6 +22,11 @@ assert(chip_build_tools)
 declare_args() {
   # Use a separate eventloop for CHIP tasks
   config_use_separate_eventloop = true
+
+  # Generate a new node id on every pairing.  This significantly slows
+  # down running a lot of pairings (because of all the disk traffic for
+  # saving the config file), so we disable it in some configurations.
+  config_pair_with_random_id = true
 }
 
 executable("chip-tool") {
@@ -30,6 +35,7 @@ executable("chip-tool") {
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
     "commands/discover/DiscoverCommand.cpp",
+    "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
@@ -40,7 +46,10 @@ executable("chip-tool") {
     "main.cpp",
   ]
 
-  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
+  defines = [
+    "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}",
+    "CONFIG_PAIR_WITH_RANDOM_ID=${config_pair_with_random_id}",
+  ]
 
   deps = [
     "${chip_root}/src/controller/data_model",
@@ -50,6 +59,11 @@ executable("chip-tool") {
   ]
 
   cflags = [ "-Wconversion" ]
+
+  include_dirs = [
+    ".",
+    "${chip_root}/zzz_generated/chip-tool",
+  ]
 
   output_dir = root_out_dir
 }

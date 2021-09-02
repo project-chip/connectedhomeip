@@ -28,15 +28,14 @@
 #endif
 
 #include <credentials/CHIPOperationalCredentials.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace Credentials {
 
-static constexpr size_t kOperationalCertificatesMax          = 3;
-static constexpr size_t kOperationalCertificateDecodeBufSize = 1024;
+static constexpr size_t kOperationalCertificatesMax = 3;
 
 using namespace chip::Crypto;
 
@@ -192,14 +191,14 @@ CHIP_ERROR OperationalCredentialSet::ValidateCert(const CertificateKeyId & trust
 
 CHIP_ERROR OperationalCredentialSet::FindValidCert(const CertificateKeyId & trustedRootId, const ChipDN & subjectDN,
                                                    const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                                                   ChipCertificateData *& cert)
+                                                   const ChipCertificateData ** certData)
 {
     ChipCertificateSet * chipCertificateSet;
 
     chipCertificateSet = FindCertSet(trustedRootId);
     VerifyOrReturnError(chipCertificateSet != nullptr, CHIP_ERROR_CERT_NOT_FOUND);
 
-    return chipCertificateSet->FindValidCert(subjectDN, subjectKeyId, context, cert);
+    return chipCertificateSet->FindValidCert(subjectDN, subjectKeyId, context, certData);
 }
 
 CHIP_ERROR OperationalCredentialSet::SignMsg(const CertificateKeyId & trustedRootId, const uint8_t * msg, const size_t msg_length,
@@ -306,9 +305,9 @@ CHIP_ERROR OperationalCredentialSet::FromSerializable(const OperationalCredentia
     ChipCertificateSet certificateSet;
     CertificateKeyId trustedRootId;
 
-    SuccessOrExit(err = certificateSet.Init(kOperationalCertificatesMax, kOperationalCertificateDecodeBufSize));
+    SuccessOrExit(err = certificateSet.Init(kOperationalCertificatesMax));
 
-    err = certificateSet.LoadCert(serializable.mRootCertificate, serializable.mRootCertificateLen,
+    err = certificateSet.LoadCert(ByteSpan(serializable.mRootCertificate, serializable.mRootCertificateLen),
                                   BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
     SuccessOrExit(err);
 
@@ -316,7 +315,7 @@ CHIP_ERROR OperationalCredentialSet::FromSerializable(const OperationalCredentia
 
     if (serializable.mCACertificateLen != 0)
     {
-        err = certificateSet.LoadCert(serializable.mCACertificate, serializable.mCACertificateLen,
+        err = certificateSet.LoadCert(ByteSpan(serializable.mCACertificate, serializable.mCACertificateLen),
                                       BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
         SuccessOrExit(err);
     }
@@ -358,6 +357,25 @@ P256Keypair * OperationalCredentialSet::GetNodeKeypairAt(const CertificateKeyId 
         if (trustedRootId.data_equal(mDeviceOpCredKeypair[i].trustedRootId))
         {
             return &mDeviceOpCredKeypair[i].keypair;
+        }
+    }
+
+    return nullptr;
+}
+
+const ChipCertificateData * OperationalCredentialSet::GetRootCertificate(const CertificateKeyId & trustedRootId) const
+{
+    for (size_t certChainIdx = 0; certChainIdx < mOpCredCount; certChainIdx++)
+    {
+        ChipCertificateSet * certSet = &mOpCreds[certChainIdx];
+
+        for (size_t ipkIdx = 0; ipkIdx < certSet->GetCertCount(); ipkIdx++)
+        {
+            const ChipCertificateData * cert = &certSet->GetCertSet()[ipkIdx];
+            if (cert->mCertFlags.Has(CertFlags::kIsTrustAnchor) && cert->mAuthKeyId.data_equal(trustedRootId))
+            {
+                return cert;
+            }
         }
     }
 

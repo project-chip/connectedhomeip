@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <transport/SecureSession.h>
 
 namespace chip {
@@ -35,6 +35,41 @@ class DLL_EXPORT PairingSession
 public:
     PairingSession() {}
     virtual ~PairingSession() {}
+
+    // TODO: the session should know which peer we are trying to connect to at start
+    // mPeerNodeId should be const and assigned at the construction, such that GetPeerNodeId will never return kUndefinedNodeId, and
+    // SetPeerNodeId is not necessary.
+    NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
+
+    // TODO: the local key id should be allocateed at start
+    // mLocalKeyId should be const and assigned at the construction, such that GetLocalKeyId will always return a valid key id , and
+    // SetLocalKeyId is not necessary.
+    uint16_t GetLocalKeyId() const { return mLocalKeyId; }
+    void SetLocalKeyId(uint16_t id) { mLocalKeyId = id; }
+    bool IsValidLocalKeyId() const { return mLocalKeyId != kInvalidKeyId; }
+
+    uint16_t GetPeerKeyId() const
+    {
+        VerifyOrDie(mPeerKeyId.HasValue());
+        return mPeerKeyId.Value();
+    }
+    void SetPeerKeyId(uint16_t id) { mPeerKeyId.SetValue(id); }
+    bool IsValidPeerKeyId() const { return mPeerKeyId.HasValue(); }
+
+    // TODO: decouple peer address into transport, such that pairing session do not need to handle peer address
+    const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
+    Transport::PeerAddress & GetPeerAddress() { return mPeerAddress; }
+    void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
+
+    // TODO: remove Clear, we should create a new instance instead reset the old instance.
+    void Clear()
+    {
+        mPeerNodeId  = kUndefinedNodeId;
+        mPeerAddress = Transport::PeerAddress::Uninitialized();
+        mPeerKeyId.ClearValue();
+        mLocalKeyId = kInvalidKeyId;
+    }
 
     /**
      * @brief
@@ -50,22 +85,6 @@ public:
 
     /**
      * @brief
-     *  Return the associated peer key id
-     *
-     * @return uint16_t The associated peer key id
-     */
-    virtual uint16_t GetPeerKeyId() = 0;
-
-    /**
-     * @brief
-     *  Return the associated local key id
-     *
-     * @return uint16_t The associated local key id
-     */
-    virtual uint16_t GetLocalKeyId() = 0;
-
-    /**
-     * @brief
      *   Get the value of peer session counter which is synced during session establishment
      */
     virtual uint32_t GetPeerCounter()
@@ -77,6 +96,19 @@ public:
     virtual const char * GetI2RSessionInfo() const = 0;
 
     virtual const char * GetR2ISessionInfo() const = 0;
+
+private:
+    NodeId mPeerNodeId = kUndefinedNodeId;
+
+    // TODO: the local key id should be allocateed at start
+    // then we can remove kInvalidKeyId
+    static constexpr uint16_t kInvalidKeyId = UINT16_MAX;
+    uint16_t mLocalKeyId                    = kInvalidKeyId;
+
+    // TODO: decouple peer address into transport, such that pairing session do not need to handle peer address
+    Transport::PeerAddress mPeerAddress = Transport::PeerAddress::Uninitialized();
+
+    Optional<uint16_t> mPeerKeyId;
 };
 
 } // namespace chip

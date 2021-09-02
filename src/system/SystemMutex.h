@@ -30,9 +30,7 @@
 // Include dependent headers
 #include <system/SystemError.h>
 
-#include <support/DLLUtil.h>
-
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+#include <lib/support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
@@ -79,6 +77,10 @@ public:
     void Lock();   /**< Acquire the mutual exclusion lock, blocking the current thread indefinitely if necessary. */
     void Unlock(); /**< Release the mutual exclusion lock (can block on some systems until scheduler completes). */
 
+    // Synonyms for compatibility with std::lock_guard.
+    void lock() { Lock(); }
+    void unlock() { Unlock(); }
+
 private:
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     pthread_mutex_t mPOSIXMutex;
@@ -101,8 +103,16 @@ private:
 };
 
 inline Mutex::Mutex() {}
-
 inline Mutex::~Mutex() {}
+
+#if CHIP_SYSTEM_CONFIG_NO_LOCKING
+inline CHIP_ERROR Init(Mutex & aMutex)
+{
+    return CHIP_NO_ERROR;
+}
+inline void Mutex::Lock() {}
+inline void Mutex::Unlock() {}
+#endif // CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 inline void Mutex::Lock()
@@ -144,5 +154,3 @@ inline void Mutex::Unlock(void)
 
 } // namespace System
 } // namespace chip
-
-#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING

@@ -41,8 +41,7 @@
 
 #include <inet/IPAddress.h>
 #include <inet/InetArgParser.h>
-#include <support/CHIPArgParser.hpp>
-#include <system/SystemTimer.h>
+#include <lib/support/CHIPArgParser.hpp>
 
 #include "TestInetCommon.h"
 #include "TestInetCommonOptions.h"
@@ -318,14 +317,11 @@ int main(int argc, char * argv[])
 
     while (Common::IsTesting(sTestState.mStatus))
     {
-        struct timeval sleepTime;
         bool lSucceeded = true;
         bool lFailed    = false;
 
-        sleepTime.tv_sec  = 0;
-        sleepTime.tv_usec = 10000;
-
-        ServiceNetwork(sleepTime);
+        constexpr uint32_t kSleepTimeMilliseconds = 10;
+        ServiceNetwork(kSleepTimeMilliseconds);
 
         CheckSucceededOrFailed(sTestState, lSucceeded, lFailed);
 

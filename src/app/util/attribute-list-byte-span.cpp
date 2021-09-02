@@ -17,9 +17,9 @@
 
 #include "attribute-list-byte-span.h"
 
-#include <support/BufferReader.h>
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
+#include <lib/support/BufferReader.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
@@ -83,7 +83,7 @@ uint16_t GetByteSpanOffsetFromIndex(const uint8_t * buffer, uint16_t bufferLen, 
         reader.Skip(entrySize);
     }
 
-    return reader.OctetsRead();
+    return static_cast<uint16_t>(reader.OctetsRead());
 }
 
 } // namespace List

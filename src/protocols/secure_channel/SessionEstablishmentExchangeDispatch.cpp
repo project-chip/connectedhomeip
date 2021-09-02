@@ -20,7 +20,7 @@
  *      This file provides implementation of Application Channel class.
  */
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 
@@ -28,7 +28,7 @@ namespace chip {
 
 using namespace Messaging;
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
+CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader,
                                                                 System::PacketBufferHandle && message,
                                                                 EncryptedPacketBufferHandle & preparedMessage)
 {
@@ -40,20 +40,22 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SecureSessionHan
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SecureSessionHandle session,
+CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SessionHandle session,
                                                                      const EncryptedPacketBufferHandle & preparedMessage) const
 {
     ReturnErrorCodeIf(mTransportMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mTransportMgr->SendMessage(mPeerAddress, preparedMessage.CastToWritable());
 }
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
+CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const Header::Flags & headerFlags,
+                                                                   const PayloadHeader & payloadHeader, uint32_t messageId,
                                                                    const Transport::PeerAddress & peerAddress,
                                                                    Messaging::MessageFlags msgFlags,
                                                                    ReliableMessageContext * reliableMessageContext)
 {
     mPeerAddress = peerAddress;
-    return ExchangeMessageDispatch::OnMessageReceived(payloadHeader, messageId, peerAddress, msgFlags, reliableMessageContext);
+    return ExchangeMessageDispatch::OnMessageReceived(headerFlags, payloadHeader, messageId, peerAddress, msgFlags,
+                                                      reliableMessageContext);
 }
 
 bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)

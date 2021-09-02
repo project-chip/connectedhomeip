@@ -35,6 +35,9 @@ buildconfig_header("chip_buildconfig") {
   chip_config_memory_management_platform =
       chip_config_memory_management == "platform"
 
+  chip_config_short_error_str =
+      chip_config_short_error_str || chip_target_style_embedded
+
   # TODO - Move CHIP_PROJECT_CONFIG_INCLUDE, CHIP_PLATFORM_CONFIG_INCLUDE here.
   # Currently those are also used from src/system.
   defines = [
@@ -66,10 +69,7 @@ source_set("chip_config_header") {
     "CHIPTimeConfig.h",
   ]
 
-  public_configs = [
-    "${chip_root}/src:includes",
-    "${chip_root}/src/lib:includes",
-  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 
   public_deps = [
     ":chip_buildconfig",
@@ -101,6 +101,7 @@ static_library("core") {
     "CHIPTLVUpdater.cpp",
     "CHIPTLVUtilities.cpp",
     "CHIPTLVWriter.cpp",
+    "NodeId.h",
     "PeerId.h",
   ]
 

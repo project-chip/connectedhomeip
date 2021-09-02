@@ -31,16 +31,16 @@
 #include <inttypes.h>
 #include <memory>
 
+#include <lib/support/CodeUtils.h>
 #include <messaging/ExchangeMessageDispatch.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/secure_channel/Constants.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace Messaging {
 
-CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
+CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t exchangeId, bool isInitiator,
                                                 ReliableMessageContext * reliableMessageContext, bool isReliableTransmission,
                                                 Protocols::Id protocol, uint8_t type, System::PacketBufferHandle && message)
 {
@@ -94,10 +94,15 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
-                                                      const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
-                                                      ReliableMessageContext * reliableMessageContext)
+CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(const Header::Flags & headerFlags, const PayloadHeader & payloadHeader,
+                                                      uint32_t messageId, const Transport::PeerAddress & peerAddress,
+                                                      MessageFlags msgFlags, ReliableMessageContext * reliableMessageContext)
 {
+    if (IsEncryptionRequired())
+    {
+        VerifyOrReturnError(headerFlags.Has(Header::FlagValues::kEncryptedMessage), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
     ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
                       CHIP_ERROR_INVALID_ARGUMENT);
 

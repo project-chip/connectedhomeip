@@ -17,7 +17,9 @@
  */
 #include "PersistentStorage.h"
 
-#include <support/Base64.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/Base64.h>
+#include <protocols/secure_channel/PASESession.h>
 
 #include <fstream>
 #include <memory>
@@ -34,6 +36,8 @@ constexpr const char kFilename[]           = "/tmp/chip_tool_config.ini";
 constexpr const char kDefaultSectionName[] = "Default";
 constexpr const char kPortKey[]            = "ListenPort";
 constexpr const char kLoggingKey[]         = "LoggingLevel";
+constexpr const char kLocalNodeIdKey[]     = "LocalNodeId";
+constexpr const char kRemoteNodeIdKey[]    = "RemoteNodeId";
 constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Detail;
 
 namespace {
@@ -203,4 +207,45 @@ LogCategory PersistentStorage::GetLoggingLevel()
     }
 
     return chipLogLevel;
+}
+
+NodeId PersistentStorage::GetNodeId(const char * key, NodeId defaultVal)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    uint64_t nodeId;
+    uint16_t size = static_cast<uint16_t>(sizeof(nodeId));
+    err           = SyncGetKeyValue(key, &nodeId, size);
+    if (err == CHIP_NO_ERROR)
+    {
+        return static_cast<NodeId>(Encoding::LittleEndian::HostSwap64(nodeId));
+    }
+
+    return defaultVal;
+}
+
+NodeId PersistentStorage::GetLocalNodeId()
+{
+    return GetNodeId(kLocalNodeIdKey, kTestControllerNodeId);
+}
+
+NodeId PersistentStorage::GetRemoteNodeId()
+{
+    return GetNodeId(kRemoteNodeIdKey, kTestDeviceNodeId);
+}
+
+CHIP_ERROR PersistentStorage::SetNodeId(const char * key, NodeId value)
+{
+    uint64_t nodeId = Encoding::LittleEndian::HostSwap64(value);
+    return SyncSetKeyValue(key, &nodeId, sizeof(nodeId));
+}
+
+CHIP_ERROR PersistentStorage::SetLocalNodeId(NodeId nodeId)
+{
+    return SetNodeId(kLocalNodeIdKey, nodeId);
+}
+
+CHIP_ERROR PersistentStorage::SetRemoteNodeId(NodeId nodeId)
+{
+    return SetNodeId(kRemoteNodeIdKey, nodeId);
 }

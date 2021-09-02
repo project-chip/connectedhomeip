@@ -39,6 +39,7 @@ static_library("framework") {
     "CHIPDevice_Internal.h",
     "CHIPError.h",
     "CHIPError.mm",
+    "CHIPError_Internal.h",
     "CHIPLogging.h",
     "CHIPManualSetupPayloadParser.h",
     "CHIPManualSetupPayloadParser.mm",
@@ -51,8 +52,8 @@ static_library("framework") {
     "CHIPQRCodeSetupPayloadParser.mm",
     "CHIPSetupPayload.h",
     "CHIPSetupPayload.mm",
-    "gen/CHIPClustersObjc.h",
-    "gen/CHIPClustersObjc.mm",
+    "zap-generated/CHIPClustersObjc.h",
+    "zap-generated/CHIPClustersObjc.mm",
   ]
 
   public_deps = [

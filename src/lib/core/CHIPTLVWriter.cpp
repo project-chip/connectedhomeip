@@ -25,14 +25,14 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPTLV.h>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
 
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -48,13 +48,15 @@ namespace TLV {
 
 using namespace chip::Encoding;
 
-NO_INLINE void TLVWriter::Init(uint8_t * buf, uint32_t maxLen)
+NO_INLINE void TLVWriter::Init(uint8_t * buf, size_t maxLen)
 {
-    mBackingStore = nullptr;
+    // TODO: Maybe we can just make mMaxLen, mLenWritten, mRemainingLen size_t instead?
+    uint32_t actualMaxLen = maxLen > UINT32_MAX ? UINT32_MAX : static_cast<uint32_t>(maxLen);
+    mBackingStore         = nullptr;
     mBufStart = mWritePoint = buf;
-    mRemainingLen           = maxLen;
+    mRemainingLen           = actualMaxLen;
     mLenWritten             = 0;
-    mMaxLen                 = maxLen;
+    mMaxLen                 = actualMaxLen;
     mContainerType          = kTLVType_NotSpecified;
     SetContainerOpen(false);
     SetCloseContainerReserved(true);
@@ -211,26 +213,18 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v, bool preserveSize)
     return Put(tag, v);
 }
 
-CHIP_ERROR TLVWriter::Put(uint64_t tag, float v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, const float v)
 {
-    union
-    {
-        float f;
-        uint32_t u32;
-    } cvt;
-    cvt.f = v;
-    return WriteElementHead(TLVElementType::FloatingPointNumber32, tag, cvt.u32);
+    uint32_t u32;
+    memcpy(&u32, &v, sizeof(u32));
+    return WriteElementHead(TLVElementType::FloatingPointNumber32, tag, u32);
 }
 
-CHIP_ERROR TLVWriter::Put(uint64_t tag, double v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, const double v)
 {
-    union
-    {
-        double d;
-        uint64_t u64;
-    } cvt;
-    cvt.d = v;
-    return WriteElementHead(TLVElementType::FloatingPointNumber64, tag, cvt.u64);
+    uint64_t u64;
+    memcpy(&u64, &v, sizeof(u64));
+    return WriteElementHead(TLVElementType::FloatingPointNumber64, tag, u64);
 }
 
 CHIP_ERROR TLVWriter::Put(uint64_t tag, ByteSpan data)

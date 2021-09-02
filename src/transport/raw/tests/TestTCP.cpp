@@ -23,11 +23,11 @@
 
 #include "NetworkTestHelpers.h"
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <system/SystemLayer.h>
 #include <system/SystemObject.h>
 #include <transport/TransportMgr.h>
@@ -203,12 +203,14 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     gMockTransportMgrDelegate.FinalizeMessageTest(tcp, addr);
 }
 
+#if INET_CONFIG_ENABLE_IPV4
 void CheckMessageTest4(nlTestSuite * inSuite, void * inContext)
 {
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
     CheckMessageTest(inSuite, inContext, addr);
 }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
 {

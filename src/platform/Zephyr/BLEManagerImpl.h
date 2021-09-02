@@ -29,7 +29,7 @@
 #include <bluetooth/conn.h>
 #include <bluetooth/gatt.h>
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -91,6 +91,7 @@ private:
         kAdvertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
         kAdvertisingRefreshNeeded =
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
+        kChipoBleGattServiceRegister = 0x0020, /**< The system has currently CHIPoBLE GATT service registered. */
     };
 
     struct ServiceData;
@@ -122,8 +123,8 @@ private:
     static void HandleTXCompleted(bt_conn * conn, void * param);
     static void HandleConnect(bt_conn * conn, uint8_t err);
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
-    static void HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, CHIP_ERROR error);
-    static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param, CHIP_ERROR error);
+    static void HandleBLEAdvertisementTimeout(System::Layer * layer, void * param);
+    static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param);
 
     // ===== Members for internal use by the following friends.
 

@@ -41,12 +41,12 @@
 
 #include <app/util/af.h>
 
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
 #include <app/clusters/ias-zone-client/ias-zone-client.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/callback.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
 #include <app/reporting/reporting.h>
 #include <app/util/common.h>
 
@@ -54,7 +54,7 @@
 #include "app/framework/plugin/comms-hub-function-sub-ghz/comms-hub-function-sub-ghz.h"
 #endif
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 
@@ -99,7 +99,6 @@ static void printDiscoverCommandsResponse(bool generated, ClusterId clusterId, b
 
 bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 {
-    AttributeId attrId;
     uint8_t frameControl;
     // This is a little clumsy but easier to read and port
     // from earlier implementation.
@@ -112,9 +111,12 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
     // If we are disabled then we can only respond to read or write commands
     // or identify cluster (see device enabled attr of basic cluster)
-    if (!emberAfIsDeviceEnabled(cmd->apsFrame->destinationEndpoint) && zclCmd != ZCL_READ_ATTRIBUTES_COMMAND_ID &&
+    // Since read and write is handled by interaction model, we only need to handle identify command.
+    if (!emberAfIsDeviceEnabled(cmd->apsFrame->destinationEndpoint) &&
+        /* zclCmd != ZCL_READ_ATTRIBUTES_COMMAND_ID &&
         zclCmd != ZCL_WRITE_ATTRIBUTES_COMMAND_ID && zclCmd != ZCL_WRITE_ATTRIBUTES_UNDIVIDED_COMMAND_ID &&
-        zclCmd != ZCL_WRITE_ATTRIBUTES_NO_RESPONSE_COMMAND_ID && clusterId != ZCL_IDENTIFY_CLUSTER_ID)
+        zclCmd != ZCL_WRITE_ATTRIBUTES_NO_RESPONSE_COMMAND_ID && */
+        clusterId != ZCL_IDENTIFY_CLUSTER_ID)
     {
         emberAfCorePrintln("disabled");
         emberAfDebugPrintln("%pd, dropping global cmd:%x", "disable", zclCmd);
@@ -154,203 +156,8 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
     switch (zclCmd)
     {
-    // Write undivided means all attributes must be written in order to write
-    // any of them. So first do a check. If the check fails, send back a fail
-    // response. If it works, fall through to the normal write attr code.
-    // write attr responses are the same for undivided and normal writes.
-    case ZCL_WRITE_ATTRIBUTES_UNDIVIDED_COMMAND_ID: {
-        uint8_t numFailures = 0;
-        uint8_t dataType;
-        uint16_t dataSize;
-        EmberAfStatus status;
-
-        emberAfPutInt32uInResp(ZCL_WRITE_ATTRIBUTES_RESPONSE_COMMAND_ID);
-
-        // Go through the message until there are no more attrID/type/data
-        while (msgIndex < msgLen - 5)
-        {
-            attrId   = emberAfGetInt32u(message, msgIndex, msgLen);
-            dataType = emberAfGetInt8u(message, msgIndex + 4, msgLen);
-
-            dataSize = emberAfAttributeValueSize(clusterId, attrId, dataType, message + msgIndex + 5);
-
-            // Check to see if there are dataSize bytes left in the message if it is a string
-            if (emberAfIsThisDataTypeAStringType(dataType) && (dataSize < msgLen - (msgIndex + 5)))
-            {
-                // This command is malformed
-                status = EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            else
-            {
-                status = emberAfVerifyAttributeWrite(cmd->apsFrame->destinationEndpoint, clusterId, attrId, clientServerMask,
-                                                     cmd->mfgCode, &(message[msgIndex + 5]), dataType);
-            }
-
-            if (status != EMBER_ZCL_STATUS_SUCCESS)
-            {
-                numFailures++;
-                // Write to the response buffer - status and then attrID
-                emberAfPutStatusInResp(status);
-                emberAfPutInt32uInResp(attrId);
-
-                emberAfAttributesPrintln("WRITE: clus %2x attr %2x ", clusterId, attrId);
-                emberAfAttributesPrintln("FAIL %x", status);
-                emberAfCoreFlush();
-                if (status == EMBER_ZCL_STATUS_MALFORMED_COMMAND)
-                {
-                    // this attribute is malformed, terminate attribute processing.
-                    break;
-                }
-            }
-
-            // Increment past the attribute id (four bytes), the type (one byte), and
-            // the data (N bytes, including the length byte for strings).
-            msgIndex = static_cast<uint16_t>(msgIndex + 5 + dataSize);
-        }
-        // If there are any failures, send the response and exit
-        if (numFailures > 0)
-        {
-            emberAfSendResponse();
-            return true;
-        }
-    }
-        // Reset message back to start
-        msgIndex          = cmd->payloadStartIndex;
-        appResponseLength = (cmd->mfgSpecific ? 4 : 2);
-        FALLTHROUGH;
-        /* fall through */
-    // DO NOT BREAK from this case
-
-    // the format of the write attributes cmd is:
-    // ([attr ID:4] [data type:1] [data:N]) * N
-    // the format of the write attributes response is:
-    // ([status 1] [attr ID 2]) * n
-    // ONLY errors are reported unless all are successful then a single success
-    // is sent. write attr no response is handled by just executing the same
-    // code but not setting the flag that sends the response at the end.
-    case ZCL_WRITE_ATTRIBUTES_NO_RESPONSE_COMMAND_ID:
-    case ZCL_WRITE_ATTRIBUTES_COMMAND_ID: {
-        uint8_t numFailures = 0;
-        uint8_t numSuccess  = 0;
-        uint8_t dataType;
-        uint16_t dataSize;
-#if (BIGENDIAN_CPU)
-        uint8_t writeData[ATTRIBUTE_LARGEST];
-#endif //(BIGENDIAN_CPU)
-        EmberAfStatus status;
-
-        // set the cmd byte - this is byte 3 index 2, but since we have
-        // already incremented past the 3 byte ZCL header (our index is at 3),
-        // this gets written to "-1" since 3 - 1 = 2.
-        emberAfPutInt32uInResp(ZCL_WRITE_ATTRIBUTES_RESPONSE_COMMAND_ID);
-
-        // go through the message until there are no more attrID/type/data
-        while (msgLen > msgIndex + 5)
-        {
-            attrId   = emberAfGetInt32u(message, msgIndex, msgLen);
-            dataType = emberAfGetInt8u(message, msgIndex + 4, msgLen);
-
-            dataSize = emberAfAttributeValueSize(clusterId, attrId, dataType, message + msgIndex + 5);
-
-            // the data is sent little endian over-the-air, it needs to be
-            // inserted into the table big endian for the EM250 and little
-            // endian for the EZSP hosts. This means for the EM250 the data
-            // needs to be reversed before sending to writeAttributes
-#if (BIGENDIAN_CPU)
-            if (dataSize <= msgLen - (msgIndex + 5) && dataSize <= ATTRIBUTE_LARGEST)
-            {
-                // strings go over the air as length byte and then in human
-                // readable format. These should not be flipped.
-                if (emberAfIsThisDataTypeAStringType(dataType))
-                {
-                    memmove(writeData, message + msgIndex + 5, dataSize);
-                }
-                else
-                {
-                    // the data is sent little endian over-the-air, it needs to be
-                    // inserted into the table big endian
-                    uint16_t i;
-                    for (i = 0; i < dataSize; i++)
-                    {
-                        writeData[i] = message[msgIndex + 5 + dataSize - i - 1];
-                    }
-                }
-#else  //(BIGENDIAN_CPU)
-            if (dataSize <= msgLen - (msgIndex + 5))
-            {
-#endif //(BIGENDIAN_CPU)
-
-                status = emberAfWriteAttributeExternal(cmd->apsFrame->destinationEndpoint, clusterId, attrId, clientServerMask,
-                                                       cmd->mfgCode,
-#if (BIGENDIAN_CPU)
-                                                       writeData,
-#else  //(BIGENDIAN_CPU)
-                                                       &(message[msgIndex + 5]),
-#endif //(BIGENDIAN_CPU)
-                                                       dataType);
-                emberAfAttributesPrint("WRITE: clus %2x attr %2x ", clusterId, attrId);
-                if (status == EMBER_ZCL_STATUS_SUCCESS)
-                {
-                    numSuccess++;
-                    emberAfAttributesPrintln("OK");
-                }
-                else
-                {
-                    numFailures++;
-                    // write to the response buffer - status and then attrID
-                    emberAfPutStatusInResp(status);
-                    emberAfPutInt32uInResp(attrId);
-                    emberAfAttributesPrintln("FAIL %x", status);
-                }
-                emberAfCoreFlush();
-
-                // Increment past the attribute id (four bytes), the type (one byte), and
-                // the data (N bytes, including the length byte for strings).
-                msgIndex = static_cast<uint16_t>(msgIndex + 5 + dataSize);
-            }
-            else
-            {
-                numFailures++;
-                status = EMBER_ZCL_STATUS_INVALID_VALUE;
-                // write to the response buffer - status and then attrID
-                emberAfPutStatusInResp(status);
-                emberAfPutInt32uInResp(attrId);
-                emberAfAttributesPrintln("FAIL %x", status);
-                // size exceeds buffer, terminate loop
-                break;
-            }
-        }
-
-        // always send a response unless the cmd requested no response
-        if (zclCmd == ZCL_WRITE_ATTRIBUTES_NO_RESPONSE_COMMAND_ID)
-        {
-            return true;
-        }
-
-        if (numFailures == 0)
-        {
-            // if no failures and no success this means the packet was too short
-            // print an error message but still return true as we consumed the
-            // message
-            if (numSuccess == 0)
-            {
-                emberAfAttributesPrintln("WRITE: too short");
-                emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_MALFORMED_COMMAND);
-                return true;
-            }
-            // if no failures and at least one success, write a success status
-            // that means everything worked
-            else
-            {
-                emberAfPutInt8uInResp(EMBER_ZCL_STATUS_SUCCESS);
-            }
-        }
-        emberAfSendResponse();
-        return true;
-    }
-
-    // the format of discover is: [start attr ID:4] [max attr IDs:1]
-    // the format of the response is: [done:1] ([attrID:4] [type:1]) * N
+    // the format of discover is: [start attr ID:2] [max attr IDs:1]
+    // the format of the response is: [done:1] ([attrID:2] [type:1]) * N
     case ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID:
     case ZCL_DISCOVER_ATTRIBUTES_EXTENDED_COMMAND_ID: {
         AttributeId startingAttributeId;
@@ -413,87 +220,6 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         }
         break;
 
-    // ([attribute id:4] [status:1] [type:0/1] [value:0/V])+
-    case ZCL_READ_ATTRIBUTES_RESPONSE_COMMAND_ID:
-        // The "timesync" command in the CLI sends a Read Attributes command for the
-        // Time attribute on another device and then sets a flag.  If that flag is
-        // set and a Read Attributes Response command for the time comes in, we set
-        // the time to the value in the message.
-        if (clusterId == ZCL_TIME_CLUSTER_ID)
-        {
-            if (emAfSyncingTime && !cmd->mfgSpecific && msgLen - msgIndex == 10 // attr:4 status:1 type:1 data:4
-                && (emberAfGetInt32u(message, msgIndex, msgLen) == ZCL_TIME_ATTRIBUTE_ID) &&
-                (emberAfGetInt8u(message, msgIndex + 4, msgLen) == EMBER_ZCL_STATUS_SUCCESS) &&
-                (emberAfGetInt8u(message, msgIndex + 5, msgLen) == ZCL_UTC_ATTRIBUTE_TYPE))
-            {
-                // emberAfSetTime(emberAfGetInt32u(message, msgIndex + 4, msgLen));
-                // emberAfDebugPrintln("time sync ok, time: %4x", emberAfGetCurrentTime());
-                emAfSyncingTime = false;
-            }
-#ifdef EMBER_AF_PLUGIN_SMART_ENERGY_REGISTRATION_TIME_SOURCE_REQUIRED
-            emAfPluginSmartEnergyRegistrationReadAttributesResponseCallback(message + msgIndex, msgLen - msgIndex);
-#endif // EMBER_AF_PLUGIN_SMART_ENERGY_REGISTRATION_TIME_SOURCE_REQUIRED
-#ifdef EMBER_AF_PLUGIN_WWAH_SERVER_SILABS
-            emAfPluginSlWwahReadAttributesResponseCallback(clusterId, message, msgLen);
-#endif
-        }
-
-#ifdef EMBER_AF_PLUGIN_TRUST_CENTER_KEEPALIVE
-        if (clusterId == ZCL_KEEPALIVE_CLUSTER_ID && !cmd->mfgSpecific)
-        {
-            emAfPluginTrustCenterKeepaliveReadAttributesResponseCallback(message + msgIndex, msgLen - msgIndex);
-        }
-#endif // EMBER_AF_PLUGIN_TRUST_CENTER_KEEPALIVE
-
-#if defined(EMBER_AF_PLUGIN_KEY_ESTABLISHMENT)
-        if (clusterId == ZCL_KEY_ESTABLISHMENT_CLUSTER_ID && !cmd->mfgSpecific &&
-            msgLen - msgIndex == 8 // attr:4 status:1 type:1 data:2
-            && (emberAfGetInt32u(message, msgIndex, msgLen) == ZCL_KEY_ESTABLISHMENT_SUITE_CLIENT_ATTRIBUTE_ID) &&
-            (emberAfGetInt8u(message, msgIndex + 4, msgLen) == EMBER_ZCL_STATUS_SUCCESS) &&
-            ((emberAfGetInt8u(message, msgIndex + 5, msgLen) == ZCL_ENUM16_ATTRIBUTE_TYPE) ||
-             (emberAfGetInt8u(message, msgIndex + 5, msgLen) == ZCL_BITMAP16_ATTRIBUTE_TYPE)))
-        {
-            uint16_t suite = emberAfGetInt16u(message, msgIndex + 6, msgLen);
-            emberAfPluginKeyEstablishmentReadAttributesCallback(suite);
-        }
-#endif
-
-#if defined(EMBER_AF_PLUGIN_TEST_HARNESS)
-        emberAfPluginTestHarnessReadAttributesResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex);
-#endif
-
-#if defined(EMBER_AF_PLUGIN_IAS_ZONE_CLIENT)
-        emberAfPluginIasZoneClientReadAttributesResponseCallback(clusterId, message + msgIndex,
-                                                                 static_cast<uint16_t>(msgLen - msgIndex));
-#endif
-
-#if defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER)
-        emberAfPluginSimpleMeteringClusterReadAttributesResponseCallback(clusterId, message + msgIndex,
-                                                                         static_cast<uint16_t>(msgLen - msgIndex));
-#endif
-
-        return true;
-
-    // ([status:1] [attribute id:4])+
-    case ZCL_WRITE_ATTRIBUTES_RESPONSE_COMMAND_ID:
-
-#if defined(EMBER_AF_PLUGIN_TEST_HARNESS)
-        emberAfPluginTestHarnessWriteAttributesResponseCallback(clusterId, message + msgIndex,
-                                                                static_cast<uint16_t>(msgLen - msgIndex));
-#endif
-
-#if defined(EMBER_AF_PLUGIN_IAS_ZONE_CLIENT)
-        emberAfPluginIasZoneClientWriteAttributesResponseCallback(clusterId, message + msgIndex,
-                                                                  static_cast<uint16_t>(msgLen - msgIndex));
-#endif
-
-        if (!emberAfWriteAttributesResponseCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
-        {
-            emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
-        }
-        return true;
-
-    // ([status:1] [direction:1] [attribute id:4])+
     case ZCL_CONFIGURE_REPORTING_RESPONSE_COMMAND_ID:
         if (!emberAfConfigureReportingResponseCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
         {

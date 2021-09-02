@@ -43,21 +43,22 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 // clang-format off
 OptionDef gCmdOptionDefs[] =
 {
-    { "type",             kArgumentRequired, 't' },
-    { "subject-chip-id",  kArgumentRequired, 'i' },
-    { "subject-fab-id",   kArgumentRequired, 'f' },
-    { "subject-at",       kArgumentRequired, 'a' },
-    { "subject-cn-u",     kArgumentRequired, 'c' },
-    { "future-ext-sub",   kArgumentRequired, 'x' },
-    { "future-ext-info",  kArgumentRequired, '2' },
-    { "key",              kArgumentRequired, 'k' },
-    { "ca-cert",          kArgumentRequired, 'C' },
-    { "ca-key",           kArgumentRequired, 'K' },
-    { "out",              kArgumentRequired, 'o' },
-    { "out-key",          kArgumentRequired, 'O' },
-    { "out-format",       kArgumentRequired, 'F' },
-    { "valid-from",       kArgumentRequired, 'V' },
-    { "lifetime",         kArgumentRequired, 'l' },
+    { "type",                kArgumentRequired, 't' },
+    { "subject-chip-id",     kArgumentRequired, 'i' },
+    { "subject-fab-id",      kArgumentRequired, 'f' },
+    { "subject-at",          kArgumentRequired, 'a' },
+    { "subject-cn-u",        kArgumentRequired, 'c' },
+    { "path-len-constraint", kArgumentRequired, 'p' },
+    { "future-ext-sub",      kArgumentRequired, 'x' },
+    { "future-ext-info",     kArgumentRequired, '2' },
+    { "key",                 kArgumentRequired, 'k' },
+    { "ca-cert",             kArgumentRequired, 'C' },
+    { "ca-key",              kArgumentRequired, 'K' },
+    { "out",                 kArgumentRequired, 'o' },
+    { "out-key",             kArgumentRequired, 'O' },
+    { "out-format",          kArgumentRequired, 'F' },
+    { "valid-from",          kArgumentRequired, 'V' },
+    { "lifetime",            kArgumentRequired, 'l' },
     { }
 };
 
@@ -89,6 +90,11 @@ const char * const gCmdOptionHelp =
     "   -c, --subject-cn-u <string>\n"
     "\n"
     "       Subject DN Common Name attribute encoded as UTF8String.\n"
+    "\n"
+    "   -p, --path-len-constraint <int>\n"
+    "\n"
+    "       Path length constraint to be included in the basic constraint extension.\n"
+    "       If not specified, the path length constraint is not included in the extension.\n"
     "\n"
     "   -x, --future-ext-sub <string>\n"
     "\n"
@@ -137,7 +143,9 @@ const char * const gCmdOptionHelp =
     "\n"
     "   -l, --lifetime <days>\n"
     "\n"
-    "       The lifetime for the new certificate, in whole days.\n"
+    "       The lifetime for the new certificate, in whole days. Use special value\n"
+    "       4294967295 to indicate that certificate doesn't have well defined\n"
+    "       expiration date\n"
     "\n"
     ;
 
@@ -166,6 +174,7 @@ OptionSet *gCmdOptionSets[] =
 
 ToolChipDN gSubjectDN;
 uint8_t gCertType                    = kCertType_NotSpecified;
+int gPathLengthConstraint            = kPathLength_NotSpecified;
 bool gSelfSign                       = false;
 const char * gCACertFileName         = nullptr;
 const char * gCAKeyFileName          = nullptr;
@@ -174,7 +183,7 @@ const char * gOutCertFileName        = nullptr;
 const char * gOutKeyFileName         = nullptr;
 CertFormat gOutCertFormat            = kCertFormat_Chip_Base64;
 KeyFormat gOutKeyFormat              = kKeyFormat_Chip_Base64;
-uint32_t gValidDays                  = 0;
+uint32_t gValidDays                  = kCertValidDays_Undefined;
 FutureExtension gFutureExtensions[3] = { { 0, nullptr } };
 uint8_t gFutureExtensionsCount       = 0;
 struct tm gValidFrom;
@@ -279,6 +288,13 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         }
         break;
 
+    case 'p':
+        if (!ParseInt(arg, gPathLengthConstraint))
+        {
+            PrintArgError("%s: Invalid value specified for path length constraint: %s\n", progName, arg);
+            return false;
+        }
+        break;
     case 'f':
         if (!ParseChip64bitAttr(arg, chip64bitAttr))
         {
@@ -451,9 +467,16 @@ bool Cmd_GenCert(int argc, char * argv[])
         ExitNow(res = false);
     }
 
-    if (gValidDays == 0)
+    if (gValidDays == kCertValidDays_Undefined)
     {
         fprintf(stderr, "Please specify the lifetime (in dys) for the new certificate using the --lifetime option.\n");
+        ExitNow(res = false);
+    }
+
+    if (gPathLengthConstraint != kPathLength_NotSpecified &&
+        (gCertType == kCertType_Node || gCertType == kCertType_FirmwareSigning))
+    {
+        fprintf(stderr, "Path length constraint shouldn't be specified for the leaf certificate.\n");
         ExitNow(res = false);
     }
 
@@ -491,8 +514,8 @@ bool Cmd_GenCert(int argc, char * argv[])
 
     if (gSelfSign)
     {
-        res = MakeCert(gCertType, &gSubjectDN, newCert.get(), newKey.get(), gValidFrom, gValidDays, gFutureExtensions,
-                       gFutureExtensionsCount, newCert.get(), newKey.get());
+        res = MakeCert(gCertType, &gSubjectDN, newCert.get(), newKey.get(), gValidFrom, gValidDays, gPathLengthConstraint,
+                       gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get());
         VerifyTrueOrExit(res);
     }
     else
@@ -506,8 +529,8 @@ bool Cmd_GenCert(int argc, char * argv[])
         res = ReadKey(gCAKeyFileName, caKey.get());
         VerifyTrueOrExit(res);
 
-        res = MakeCert(gCertType, &gSubjectDN, caCert.get(), caKey.get(), gValidFrom, gValidDays, gFutureExtensions,
-                       gFutureExtensionsCount, newCert.get(), newKey.get());
+        res = MakeCert(gCertType, &gSubjectDN, caCert.get(), caKey.get(), gValidFrom, gValidDays, gPathLengthConstraint,
+                       gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get());
         VerifyTrueOrExit(res);
     }
 

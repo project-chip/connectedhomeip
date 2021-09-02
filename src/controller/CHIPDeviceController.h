@@ -29,22 +29,23 @@
 #pragma once
 
 #include <app/InteractionModelDelegate.h>
+#include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
 #include <controller/OperationalCredentialsDelegate.h>
-#include <controller/data_model/gen/CHIPClientCallbacks.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPPersistentStorageDelegate.h>
-#include <core/CHIPTLV.h>
 #include <credentials/CHIPOperationalCredentials.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/SerializableIntegerSet.h>
 #include <lib/support/Span.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
-#include <support/DLLUtil.h>
-#include <support/SerializableIntegerSet.h>
-#include <transport/AdminPairingTable.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+#include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -58,12 +59,14 @@
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <controller/DeviceAddressUpdateDelegate.h>
-#include <mdns/Resolver.h>
+#include <lib/mdns/Resolver.h>
 #endif
 
 namespace chip {
 
 namespace Controller {
+
+using namespace chip::Protocols::UserDirectedCommissioning;
 
 constexpr uint16_t kNumMaxActiveDevices = 64;
 constexpr uint16_t kNumMaxPairedDevices = 128;
@@ -88,6 +91,21 @@ struct ControllerInitParams
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
+
+    /* The following keypair must correspond to the public key used for generating
+       controllerNOC. It's used by controller to establish CASE sessions with devices */
+    Crypto::P256Keypair * ephemeralKeypair = nullptr;
+
+    /* The following certificates must be in x509 DER format */
+    ByteSpan controllerNOC;
+    ByteSpan controllerICAC;
+    ByteSpan controllerRCAC;
+
+    uint16_t controllerVendorId;
+
+    /* The port used for operational communication to listen for and send messages over UDP/TCP.
+     * The default value of `0` will pick any available port. */
+    uint16_t listenPort = 0;
 };
 
 enum CommissioningStage : uint8_t
@@ -176,7 +194,16 @@ public:
 
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
                       Protocols::InteractionModel::ProtocolCode status) override;
-    CHIP_ERROR ReportError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
+    CHIP_ERROR ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
+
+    CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient,
+                                   const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
+                                   const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
+                                   uint8_t aCommandIndex) override;
+
+    CHIP_ERROR WriteResponseProtocolError(const app::WriteClient * apWriteClient, uint8_t aAttributeIndex) override;
+
+    CHIP_ERROR WriteResponseError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override;
 };
 
 /**
@@ -198,7 +225,7 @@ public:
     DeviceController();
     virtual ~DeviceController() {}
 
-    CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
+    CHIP_ERROR Init(ControllerInitParams params);
 
     /**
      * @brief
@@ -242,12 +269,11 @@ public:
      *   This function update the device informations asynchronously using mdns.
      *   If new device informations has been found, it will be persisted.
      *
-     * @param[in] deviceId  Node ID for the CHIP devicex
-     * @param[in] fabricId  The fabricId used for mdns resolution
+     * @param[in] deviceId  Node ID for the CHIP device
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR UpdateDevice(NodeId deviceId, uint64_t fabricId);
+    CHIP_ERROR UpdateDevice(NodeId deviceId);
 
     void PersistDevice(Device * device);
 
@@ -268,21 +294,14 @@ public:
     CHIP_ERROR ServiceEvents();
 
     /**
-     * @brief
-     *   Allow the CHIP Stack to process any pending events
-     *   This can be called in an event handler loop to trigger callbacks within the CHIP stack
-     * @return CHIP_ERROR   The return status
+     * @brief Get the Compressed Fabric ID assigned to the device.
      */
-    CHIP_ERROR ServiceEventSignal();
+    uint64_t GetCompressedFabricId() const { return mLocalId.GetCompressedFabricId(); }
 
     /**
-     * @brief Get the Fabric ID assigned to the device.
-     *
-     * @param[out] fabricId   Fabric ID of the device.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * @brief Get the raw Fabric ID assigned to the device.
      */
-    CHIP_ERROR GetFabricId(uint64_t & fabricId);
+    uint64_t GetFabricId() const { return mFabricId; }
 
 protected:
     enum class State
@@ -302,7 +321,9 @@ protected:
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
-    NodeId mLocalDeviceId;
+    PeerId mLocalId    = PeerId();
+    FabricId mFabricId = kUndefinedFabricId;
+
     DeviceTransportMgr * mTransportMgr                             = nullptr;
     SecureSessionMgr * mSessionMgr                                 = nullptr;
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
@@ -323,7 +344,7 @@ protected:
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
-    uint16_t FindDeviceIndex(SecureSessionHandle session);
+    uint16_t FindDeviceIndex(SessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     void ReleaseDeviceById(NodeId remoteDeviceId);
@@ -333,16 +354,14 @@ protected:
 
     void PersistNextKeyId();
 
-    Transport::AdminId mAdminId = 0;
-    Transport::AdminPairingTable mAdmins;
+    FabricIndex mFabricIndex = Transport::kMinValidFabricIndex;
+    Transport::FabricTable mFabrics;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
-    Credentials::ChipCertificateSet mCertificates;
-    Credentials::OperationalCredentialSet mCredentials;
-    Credentials::CertificateKeyId mRootKeyId;
-
     SessionIDAllocator mIDAllocator;
+
+    uint16_t mVendorId;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     //////////// ResolverDelegate Implementation ///////////////
@@ -351,13 +370,6 @@ protected:
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
-    // This function uses `OperationalCredentialsDelegate` to generate the operational certificates
-    // for the given device. The output is a TLV encoded array of compressed CHIP certificates. The
-    // array can contain up to two certificates (node operational certificate, and ICA certificate).
-    // If the certificate issuer doesn't require an ICA (i.e. NOC is signed by the root CA), the array
-    // will have only one certificate (node operational certificate).
-    CHIP_ERROR GenerateOperationalCertificates(const ByteSpan & noc, MutableByteSpan & cert);
-
 private:
     //////////// ExchangeDelegate Implementation ///////////////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
@@ -365,15 +377,12 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     void ReleaseAllDevices();
 
-    CHIP_ERROR LoadLocalCredentials(Transport::AdminPairingInfo * admin);
-
-    static void OnLocalNOCGenerated(void * context, const ByteSpan & noc);
-    Callback::Callback<NOCGenerated> mLocalNOCCallback;
+    CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
 };
 
 /**
@@ -403,17 +412,29 @@ public:
  *   required to provide write access to the persistent storage, where the paired device information
  *   will be stored.
  */
-class DLL_EXPORT DeviceCommissioner : public DeviceController, public SessionEstablishmentDelegate
+class DLL_EXPORT DeviceCommissioner : public DeviceController,
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+                                      public Protocols::UserDirectedCommissioning::InstanceNameResolver,
+                                      public Protocols::UserDirectedCommissioning::UserConfirmationProvider,
+#endif
+                                      public SessionEstablishmentDelegate
 
 {
 public:
     DeviceCommissioner();
     ~DeviceCommissioner() {}
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    /**
+     * Set port for User Directed Commissioning
+     */
+    CHIP_ERROR SetUdcListenPort(uint16_t listenPort);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
     /**
      * Commissioner-specific initialization, includes parameters such as the pairing delegate.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
+    CHIP_ERROR Init(CommissionerInitParams params);
 
     /**
      * @brief
@@ -473,6 +494,31 @@ public:
      */
     CHIP_ERROR OperationalDiscoveryComplete(NodeId remoteDeviceId);
 
+    /**
+     * @brief
+     *   Trigger a paired device to re-enter the commissioning mode. The device will exit the commissioning mode
+     *   after a successful commissioning, or after the given `timeout` time.
+     *
+     * @param[in] deviceId        The device Id.
+     * @param[in] timeout         The commissioning mode should terminate after this much time.
+     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+     *                            PAKE passcode verifier to be used for this commissioning.
+     * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
+     * @param[in] option          The commissioning window can be opened using the original setup code, or an
+     *                            onboarding token can be generated using a random setup PIN code (or with
+     *                            the PIN code provied in the setupPayload).
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+                                       uint8_t option);
+
+    /**
+     *  This function call indicates commissioning complete and sends commissioining complete
+     *  complete event to the application.
+     */
+    CHIP_ERROR CommissioningComplete(NodeId remoteDeviceId);
+
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
@@ -520,8 +566,46 @@ public:
 
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    /**
+     * @brief
+     *   Called when a UDC message is received specifying the given instanceName
+     * This method indicates that UDC Server needs the Commissionable Node corresponding to
+     * the given instance name to be found. UDC Server will wait for OnCommissionableNodeFound.
+     *
+     * @param instanceName DNS-SD instance name for the client requesting commissioning
+     *
+     */
+    void FindCommissionableNode(char * instanceName) override;
+
+    /**
+     * @brief
+     *   Called when a UDC message has been received and corresponding nodeData has been found.
+     * It is expected that the implementer will prompt the user to confirm their intention to
+     * commission the given node, and provide the setup code to allow commissioning to proceed.
+     *
+     * @param nodeData DNS-SD node information for the client requesting commissioning
+     *
+     */
+    void OnUserDirectedCommissioningRequest(const Mdns::DiscoveredNodeData & nodeData) override;
+
+    /**
+     * @brief
+     *   Overrides method from AbstractMdnsDiscoveryController
+     *
+     * @param nodeData DNS-SD node information
+     *
+     */
+    void OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData) override;
+
+    /**
+     * @brief
+     *   Return the UDC Server instance
+     *
+     */
+    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
@@ -548,6 +632,13 @@ private:
 
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    UserDirectedCommissioningServer * mUdcServer = nullptr;
+    // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
+    DeviceTransportMgr * mUdcTransportMgr = nullptr;
+    uint16_t mUdcListenPort               = CHIP_UDC_PORT;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
     void PersistDeviceList();
 
     void FreeRendezvousSession();
@@ -556,7 +647,7 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError);
+    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
     /* This function sends an OpCSR request to the device.
        The function does not hold a refernce to the device object.
@@ -569,7 +660,7 @@ private:
     /* This function sends the trusted root certificate to the device.
        The function does not hold a refernce to the device object.
      */
-    CHIP_ERROR SendTrustedRootCertificate(Device * device);
+    CHIP_ERROR SendTrustedRootCertificate(Device * device, const ByteSpan & rcac);
 
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
@@ -585,21 +676,16 @@ private:
      *   This function is called by the IM layer when the commissioner receives the CSR from the device.
      *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
      *
-     * @param[in] context         The context provided while registering the callback.
-     * @param[in] CSR             The Certificate Signing Request.
-     * @param[in] CSRNonce        The Nonce sent by us when we requested the CSR.
-     * @param[in] VendorReserved1 vendor-specific information that may aid in device commissioning.
-     * @param[in] VendorReserved2 vendor-specific information that may aid in device commissioning.
-     * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
-     * @param[in] Signature       Cryptographic signature generated for the fields in the response message.
+     * @param[in] context               The context provided while registering the callback.
+     * @param[in] NOCSRElements         CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] AttestationSignature  Cryptographic signature generated for the fields in the response message.
      */
-    static void OnOperationalCertificateSigningRequest(void * context, ByteSpan CSR, ByteSpan CSRNonce, ByteSpan VendorReserved1,
-                                                       ByteSpan VendorReserved2, ByteSpan VendorReserved3, ByteSpan Signature);
+    static void OnOperationalCertificateSigningRequest(void * context, ByteSpan NOCSRElements, ByteSpan AttestationSignature);
 
     /* Callback when adding operational certs to device results in failure */
-    static void OnAddOpCertFailureResponse(void * context, uint8_t status);
+    static void OnAddNOCFailureResponse(void * context, uint8_t status);
     /* Callback when the device confirms that it has added the operational certificates */
-    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText);
+    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex, ByteSpan DebugText);
 
     /* Callback when the device confirms that it has added the root certificate */
     static void OnRootCertSuccessResponse(void * context);
@@ -609,31 +695,28 @@ private:
     static void OnDeviceConnectedFn(void * context, Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
-    static void OnDeviceNOCGenerated(void * context, const ByteSpan & noc);
+    static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
+                                           const ByteSpan & rcac);
 
     /**
      * @brief
      *   This function processes the CSR sent by the device.
      *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
      *
-     * @param[in] CSR             The Certificate Signing Request.
-     * @param[in] CSRNonce        The Nonce sent by us when we requested the CSR.
-     * @param[in] VendorReserved1 vendor-specific information that may aid in device commissioning.
-     * @param[in] VendorReserved2 vendor-specific information that may aid in device commissioning.
-     * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
-     * @param[in] Signature       Cryptographic signature generated for all the above fields.
+     * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
      */
-    CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
-                            const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
+    CHIP_ERROR ProcessOpCSR(const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature);
 
     // Cluster callbacks for advancing commissioning flows
     Callback::Callback<BasicSuccessCallback> mSuccess;
     Callback::Callback<BasicFailureCallback> mFailure;
 
     CommissioningStage GetNextCommissioningStage();
+    static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
-    Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> mOpCertResponseCallback;
+    Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
     Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
     Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
@@ -642,7 +725,7 @@ private:
     Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
-    Callback::Callback<NOCGenerated> mDeviceNOCCallback;
+    Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
 
     PASESession mPairingSession;
 };

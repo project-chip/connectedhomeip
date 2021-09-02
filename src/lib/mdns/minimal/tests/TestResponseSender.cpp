@@ -14,19 +14,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <mdns/minimal/ResponseSender.h>
+#include <lib/mdns/minimal/ResponseSender.h>
 
 #include <string>
 #include <vector>
 
-#include <mdns/minimal/RecordData.h>
-#include <mdns/minimal/core/FlatAllocatedQName.h>
-#include <mdns/minimal/responders/Ptr.h>
-#include <mdns/minimal/responders/Srv.h>
-#include <mdns/minimal/responders/Txt.h>
+#include <lib/mdns/minimal/RecordData.h>
+#include <lib/mdns/minimal/core/FlatAllocatedQName.h>
+#include <lib/mdns/minimal/responders/Ptr.h>
+#include <lib/mdns/minimal/responders/Srv.h>
+#include <lib/mdns/minimal/responders/Txt.h>
+#include <lib/mdns/minimal/tests/CheckOnlyServer.h>
 
-#include <support/CHIPMem.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -35,122 +36,7 @@ namespace {
 using namespace std;
 using namespace chip;
 using namespace mdns::Minimal;
-
-class CheckOnlyServer : public ServerBase, public ParserDelegate
-{
-public:
-    CheckOnlyServer(nlTestSuite * inSuite) : ServerBase(nullptr, 0), mInSuite(inSuite) {}
-    ~CheckOnlyServer() {}
-
-    void OnHeader(ConstHeaderRef & header) override
-    {
-        NL_TEST_ASSERT(mInSuite, header.GetFlags().IsResponse());
-        NL_TEST_ASSERT(mInSuite, header.GetFlags().IsValidMdns());
-        NL_TEST_ASSERT(mInSuite, header.GetAnswerCount() + header.GetAdditionalCount() == GetNumExpectedRecords());
-        headerFound = true;
-    }
-
-    void OnResource(ResourceType type, const ResourceData & data) override
-    {
-        bool recordIsExpected = false;
-        for (size_t i = 0; i < kMaxExpectedRecords; ++i)
-        {
-            if (expectedRecord[i] == nullptr)
-            {
-                continue;
-            }
-            // For now, types and names are sufficient for checking that the response sender is sending out the correct records.
-            if (data.GetType() == expectedRecord[i]->GetType() && data.GetName() == expectedRecord[i]->GetName())
-            {
-                if (data.GetType() == QType::PTR)
-                {
-                    // Check that the internal values are the same
-                    SerializedQNameIterator dataTarget;
-                    ParsePtrRecord(data.GetData(), data.GetData(), &dataTarget);
-                    const PtrResourceRecord * expectedPtr = static_cast<const PtrResourceRecord *>(expectedRecord[i]);
-                    if (dataTarget == expectedPtr->GetPtr())
-                    {
-                        foundRecord[i]   = true;
-                        recordIsExpected = true;
-                        break;
-                    }
-                }
-                else
-                {
-                    foundRecord[i]   = true;
-                    recordIsExpected = true;
-                    break;
-                }
-            }
-        }
-        NL_TEST_ASSERT(mInSuite, recordIsExpected);
-    }
-
-    void OnQuery(const QueryData & data) override {}
-
-    CHIP_ERROR
-    DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
-               chip::Inet::InterfaceId interface) override
-    {
-        ResetFoundRecords();
-        ParsePacket(BytesRange(data->Start(), data->Start() + data->TotalLength()), this);
-        TestGotAllExpectedPackets();
-        sendCalled = true;
-        return CHIP_NO_ERROR;
-    }
-
-    void AddExpectedRecord(ResourceRecord * record)
-    {
-        for (size_t i = 0; i < kMaxExpectedRecords; ++i)
-        {
-            if (expectedRecord[i] == nullptr)
-            {
-                expectedRecord[i] = record;
-                foundRecord[i]    = false;
-                return;
-            }
-        }
-    }
-    bool GetSendCalled() { return sendCalled; }
-    bool GetHeaderFound() { return headerFound; }
-
-private:
-    nlTestSuite * mInSuite;
-    static constexpr size_t kMaxExpectedRecords          = 10;
-    ResourceRecord * expectedRecord[kMaxExpectedRecords] = {};
-    bool foundRecord[kMaxExpectedRecords];
-    bool headerFound = false;
-    bool sendCalled  = false;
-    void ResetFoundRecords()
-    {
-        for (size_t i = 0; i < kMaxExpectedRecords; ++i)
-        {
-            if (expectedRecord[i] == nullptr)
-            {
-                foundRecord[i] = true;
-            }
-        }
-    }
-    int GetNumExpectedRecords()
-    {
-        int num = 0;
-        for (size_t i = 0; i < kMaxExpectedRecords; ++i)
-        {
-            if (expectedRecord[i] != nullptr)
-            {
-                ++num;
-            }
-        }
-        return num;
-    }
-    void TestGotAllExpectedPackets()
-    {
-        for (size_t i = 0; i < kMaxExpectedRecords; ++i)
-        {
-            NL_TEST_ASSERT(mInSuite, foundRecord[i] == true);
-        }
-    }
-};
+using namespace mdns::Minimal::test;
 
 struct CommonTestElements
 {

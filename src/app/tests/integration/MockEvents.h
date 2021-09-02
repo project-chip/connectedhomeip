@@ -27,7 +27,7 @@
 
 #include <app/EventLoggingDelegate.h>
 #include <app/InteractionModelEngine.h>
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -66,7 +66,7 @@ public:
     bool IsEventGeneratorStopped();
 
 private:
-    static void HandleNextEvent(chip::System::Layer * apSystemLayer, void * apAppState, CHIP_ERROR aErr);
+    static void HandleNextEvent(chip::System::Layer * apSystemLayer, void * apAppState);
     chip::Messaging::ExchangeManager * mpExchangeMgr;
     uint32_t mTimeBetweenEvents; //< delay, in miliseconds, between events.
     bool mEventWraparound;       //< does the event generator run indefinitely, or does it stop after iterating through its states

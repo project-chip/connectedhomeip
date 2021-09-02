@@ -19,7 +19,7 @@
 
 #include <string.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <lib/shell/streamer.h>
@@ -42,7 +42,9 @@ constexpr size_t kNumHeapTraceRecords = 100;
 constexpr size_t kNumHeapTasks        = 20;
 constexpr size_t kNumHeapBlocks       = 20;
 
+#if CONFIG_HEAP_TRACING_STANDALONE
 heap_trace_record_t sTraceRecords[kNumHeapTraceRecords];
+#endif
 
 Engine sShellHeapSubCommands;
 
