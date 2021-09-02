@@ -32,6 +32,9 @@ namespace Logging {
 ///     VerifyOrReturnError(somecondition, tracer.log(CHIP_ERROR_INVALID_ARGUMENT));
 ///     VerifyOrReturnError(otherCondition, tracer.log(CHIP_ERROR_INVALID_ARGUMENT, "othercondition"));
 ///
+///     ReturnTracedErrorOnFailure(foo.Bar(), tracer);
+///     ReturnTracedErrorOnFailure(foo.Baz(), tracer);
+///
 ///     return CHIP_NO_ERROR;
 class LogTracer
 {
