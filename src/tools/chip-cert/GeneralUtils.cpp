@@ -27,7 +27,7 @@
 
 #include "chip-cert.h"
 
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 using namespace chip;
 using namespace chip::Credentials;

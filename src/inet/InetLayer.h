@@ -84,7 +84,7 @@
 #include <system/SystemLayer.h>
 #include <system/SystemStats.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #if INET_CONFIG_MAX_DROPPABLE_EVENTS
 

@@ -26,7 +26,7 @@
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
-#include <support/Span.h>
+#include <lib/support/Span.h>
 
 #include "ota-provider-delegate.h"
 #include "ota-provider.h"

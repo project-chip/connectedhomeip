@@ -28,7 +28,7 @@
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #include <map>
 

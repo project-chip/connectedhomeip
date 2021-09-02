@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include <core/CHIPConfig.h>
-#include <support/TypeTraits.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/TypeTraits.h>
 
 #include <inttypes.h>
 #include <limits>

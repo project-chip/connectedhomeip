@@ -25,10 +25,10 @@
 
 #include <platform/Zephyr/ZephyrConfig.h>
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <settings/settings.h>
 

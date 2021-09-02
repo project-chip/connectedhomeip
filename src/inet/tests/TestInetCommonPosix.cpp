@@ -47,9 +47,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <support/CHIPMem.h>
-#include <support/ErrorStr.h>
-#include <support/ScopedBuffer.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/ScopedBuffer.h>
 #include <system/SystemClock.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

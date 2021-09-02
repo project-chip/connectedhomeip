@@ -20,9 +20,9 @@
 #import "CHIPLogging.h"
 #import "CHIPSetupPayload_Internal.h"
 
+#import <lib/support/CHIPMem.h>
 #import <setup_payload/ManualSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>
-#import <support/CHIPMem.h>
 
 @implementation CHIPManualSetupPayloadParser {
     NSString * _decimalStringRepresentation;

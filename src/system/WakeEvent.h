@@ -27,7 +27,7 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <system/SocketEvents.h>
 
 namespace chip {

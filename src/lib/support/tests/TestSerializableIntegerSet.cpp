@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
-#include <support/SerializableIntegerSet.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/SerializableIntegerSet.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

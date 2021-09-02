@@ -18,9 +18,9 @@
 #import "CHIPPersistentStorageDelegateBridge.h"
 
 #include <algorithm>
+#include <lib/support/Base64.h>
 #include <memory>
 #include <string>
-#include <support/Base64.h>
 
 namespace {
 

@@ -49,8 +49,8 @@
 
 #include <platform/LockTracker.h>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <errno.h>
 #include <stddef.h>

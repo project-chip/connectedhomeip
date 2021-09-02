@@ -20,10 +20,10 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC
 #include <platform/NFCManager.h>
 
-#include <support/CHIPPlatformMemory.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

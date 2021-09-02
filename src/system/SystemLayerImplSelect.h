@@ -29,7 +29,7 @@
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-#include <support/ObjectLifeCycle.h>
+#include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemLayer.h>
 #include <system/WakeEvent.h>
 

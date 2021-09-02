@@ -23,9 +23,9 @@
 
 #pragma once
 
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

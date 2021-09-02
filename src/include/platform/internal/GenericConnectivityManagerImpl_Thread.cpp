@@ -25,9 +25,9 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_CPP
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_CPP
 
+#include <lib/support/CodeUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

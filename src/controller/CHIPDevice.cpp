@@ -40,19 +40,19 @@
 #include <app/CommandSender.h>
 #include <app/ReadPrepareParams.h>
 #include <app/util/DataModelHandler.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPSafeCasts.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/Base64.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/PersistentStorageMacros.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/TypeTraits.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <protocols/Protocols.h>
 #include <protocols/service_provisioning/ServiceProvisioning.h>
-#include <support/Base64.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/PersistentStorageMacros.h>
-#include <support/SafeInt.h>
-#include <support/TypeTraits.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
@@ -364,8 +364,8 @@ void Device::OnOpenPairingWindowFailureResponse(void * context, uint8_t status)
     ChipLogError(Controller, "Failed to open pairing window on the device. Status %d", status);
 }
 
-CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, PairingWindowOption option, const ByteSpan & salt,
-                                           SetupPayload & setupPayload)
+CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, CommissioningWindowOption option,
+                                           const ByteSpan & salt, SetupPayload & setupPayload)
 {
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
@@ -375,9 +375,9 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
     Callback::Cancelable * successCallback = mOpenPairingSuccessCallback.Cancel();
     Callback::Cancelable * failureCallback = mOpenPairingFailureCallback.Cancel();
 
-    if (option != PairingWindowOption::kOriginalSetupCode)
+    if (option != CommissioningWindowOption::kOriginalSetupCode)
     {
-        bool randomSetupPIN = (option == PairingWindowOption::kTokenWithRandomPIN);
+        bool randomSetupPIN = (option == CommissioningWindowOption::kTokenWithRandomPIN);
         PASEVerifier verifier;
 
         ReturnErrorOnFailure(
@@ -404,7 +404,7 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
+CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, CommissioningWindowOption option, SetupPayload & setupPayload)
 {
     ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
 

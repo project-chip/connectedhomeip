@@ -27,12 +27,12 @@
 #include <string>
 #include <unistd.h>
 
+#include <lib/support/Base64.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/CHIPLinuxStorageIni.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/Base64.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

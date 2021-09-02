@@ -23,8 +23,8 @@
 
 #include <stddef.h>
 
-#include <core/CHIPError.h>
-#include <core/CHIPSafeCasts.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPSafeCasts.h>
 
 struct pbkdf2_test_vector
 {

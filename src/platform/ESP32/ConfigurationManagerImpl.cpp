@@ -25,11 +25,11 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <core/CHIPKeyIds.h>
+#include <lib/core/CHIPKeyIds.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
-#include <support/CodeUtils.h>
 
 #include "esp_wifi.h"
 #include "nvs.h"

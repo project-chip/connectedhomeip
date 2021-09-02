@@ -31,9 +31,9 @@
 #include <platform/mbed/BLEManagerImpl.h>
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 // Show BLE status with LEDs
 #define _BLEMGRIMPL_USE_LEDS 0

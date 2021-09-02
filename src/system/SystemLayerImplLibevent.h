@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <support/ObjectLifeCycle.h>
+#include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemLayer.h>
 #include <system/WakeEvent.h>
 

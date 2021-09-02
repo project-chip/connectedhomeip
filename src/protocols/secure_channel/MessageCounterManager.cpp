@@ -21,18 +21,18 @@
  *
  */
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPKeyIds.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPKeyIds.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace secure_channel {

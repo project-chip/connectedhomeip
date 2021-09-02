@@ -29,10 +29,10 @@
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
 #include <ble/BleUUID.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/logging/CHIPLogging.h>
 
 #import "UUIDHelper.h"
 

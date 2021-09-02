@@ -25,8 +25,8 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ClusterInfo.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/Constants.h>

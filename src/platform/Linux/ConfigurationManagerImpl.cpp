@@ -28,12 +28,12 @@
 #include <ifaddrs.h>
 #include <netpacket/packet.h>
 
-#include <core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Linux/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -27,7 +27,7 @@
 
 #include "PigweedLoggerMutex.h"
 #include "RpcService.h"
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "lwip/err.h"
 #include "lwip/sockets.h"

@@ -19,9 +19,9 @@
 
 #include <platform/NFCManager.h>
 
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <nfc/ndef/uri_msg.h>
 #include <nfc/ndef/uri_rec.h>

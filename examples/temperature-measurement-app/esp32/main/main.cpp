@@ -36,7 +36,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#include <support/ErrorStr.h>
+#include <lib/support/ErrorStr.h>
 
 using namespace ::chip;
 using namespace ::chip::Credentials;

@@ -35,7 +35,7 @@
 
 #include <inet/InetLayer.h>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #include "TestInetCommon.h"
 

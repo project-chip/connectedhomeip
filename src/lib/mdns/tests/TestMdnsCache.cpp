@@ -15,21 +15,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <support/logging/CHIPLogging.h>
+
 // set this to 1 to enable DumpCache to see the state of the cache when needed
 // #define MDNS_LOGGING 1
-#include <iostream>
-#include <mdns/MdnsCache.h>
-
 #include <cstdint>
+#include <iostream>
 #include <nlunit-test.h>
-#include <support/UnitTestRegistration.h>
 
-#include <core/CHIPError.h>
-#include <core/PeerId.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/PeerId.h>
+#include <lib/mdns/MdnsCache.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemTimer.h>
 #include <system/TimeSource.h>
 

@@ -22,16 +22,16 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <core/CHIPPersistentStorageDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/CHIPMem.h>
-#include <support/DLLUtil.h>
-#include <support/Span.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
@@ -188,6 +188,8 @@ public:
     }
 
     CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
+
+    const Crypto::P256PublicKey & GetRootPubkey() const { return mRootPubkey; }
 
     friend class FabricTable;
 

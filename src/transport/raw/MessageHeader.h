@@ -28,12 +28,12 @@
 
 #include <type_traits>
 
-#include <core/CHIPError.h>
-#include <core/Optional.h>
-#include <core/PeerId.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/core/PeerId.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
-#include <support/BitFlags.h>
-#include <support/TypeTraits.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {

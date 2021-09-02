@@ -32,16 +32,16 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPKeyIds.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPKeyIds.h>
+#include <lib/support/Defer.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
-#include <support/Defer.h>
-#include <support/logging/CHIPLogging.h>
 
 using namespace chip::Encoding;
 using namespace chip::Inet;

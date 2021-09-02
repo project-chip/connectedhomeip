@@ -28,10 +28,11 @@
 #include <app/util/af.h>
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPEncoding.h>
-#include <support/SafeInt.h>
-#include <support/TypeTraits.h>
-#include <support/logging/CHIPLogging.h>
+#include <app/util/prepare-list.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/TypeTraits.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::app::List;
@@ -348,31 +349,6 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     Callback::Callback<DefaultSuccessCallback> * cb = Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext);
     return true;
-}
-
-static EmberAfStatus PrepareListFromTLV(TLV::TLVReader * tlvData, const uint8_t *& message, uint16_t & messageLen)
-{
-    CHIP_ERROR tlvError = CHIP_NO_ERROR;
-    TLV::TLVReader reader;
-    TLV::TLVType type;
-    reader.Init(*tlvData);
-    reader.EnterContainer(type);
-    tlvError = reader.Next();
-    if (tlvError != CHIP_NO_ERROR && tlvError != CHIP_END_OF_TLV && CanCastTo<uint16_t>(reader.GetLength()))
-    {
-        return EMBER_ZCL_STATUS_INVALID_VALUE;
-    }
-    if (tlvError == CHIP_NO_ERROR)
-    {
-        tlvError   = reader.GetDataPtr(message);
-        messageLen = static_cast<uint16_t>(reader.GetLength());
-    }
-    if (tlvError != CHIP_NO_ERROR)
-    {
-        return EMBER_ZCL_STATUS_INVALID_VALUE;
-    }
-    reader.ExitContainer(type);
-    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::TLVReader * tlvData,
@@ -860,12 +836,18 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
     _FabricDescriptor data[count];
     for (size_t i = 0; i < count; i++)
     {
-        CHECK_MESSAGE_LENGTH_VOID(8);
-        data[i].FabricId = emberAfGetInt64u(message, 0, 8);
-        message += 8;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].FabricIndex = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 67, &data[i].RootPublicKey));
+        messageLen = static_cast<uint16_t>(messageLen - 67);
+        message += 67;
         CHECK_MESSAGE_LENGTH_VOID(2);
         data[i].VendorId = emberAfGetInt16u(message, 0, 2);
         message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(8);
+        data[i].FabricId = emberAfGetInt64u(message, 0, 8);
+        message += 8;
         CHECK_MESSAGE_LENGTH_VOID(8);
         data[i].NodeId = emberAfGetInt64u(message, 0, 8);
         message += 8;

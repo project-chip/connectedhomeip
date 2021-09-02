@@ -29,15 +29,15 @@
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequest.h>
 #include <app/ReadPrepareParams.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {

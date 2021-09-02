@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <mdns/minimal/responders/ReplyFilter.h>
+#include <lib/mdns/minimal/responders/ReplyFilter.h>
 
 #include "Parser.h"
 #include "Query.h"

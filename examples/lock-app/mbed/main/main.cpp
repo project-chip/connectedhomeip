@@ -20,10 +20,10 @@
 #include "AppTask.h"
 
 #include "mbedtls/platform.h"
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mbed/Logging.h>
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;

@@ -46,27 +46,27 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/error-mapping.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPSafeCasts.h>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/NodeId.h>
+#include <lib/support/Base64.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/PersistentStorageMacros.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/TimeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
-#include <support/Base64.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/PersistentStorageMacros.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
-#include <support/TimeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
@@ -1044,7 +1044,7 @@ CHIP_ERROR DeviceCommissioner::OperationalDiscoveryComplete(NodeId remoteDeviceI
 CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration,
                                                        uint16_t discriminator, uint8_t option)
 {
-    ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID %" PRIu64, deviceId);
+    ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, deviceId);
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     Device * device = nullptr;
@@ -1053,7 +1053,7 @@ CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t
     std::string QRCode;
     std::string manualPairingCode;
     SetupPayload payload;
-    Device::PairingWindowOption pairingWindowOption;
+    Device::CommissioningWindowOption commissioningWindowOption;
     ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
 
     payload.discriminator = discriminator;
@@ -1061,22 +1061,22 @@ CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t
     switch (option)
     {
     case 0:
-        pairingWindowOption = Device::PairingWindowOption::kOriginalSetupCode;
+        commissioningWindowOption = Device::CommissioningWindowOption::kOriginalSetupCode;
         break;
     case 1:
-        pairingWindowOption = Device::PairingWindowOption::kTokenWithRandomPIN;
+        commissioningWindowOption = Device::CommissioningWindowOption::kTokenWithRandomPIN;
         break;
     case 2:
-        pairingWindowOption = Device::PairingWindowOption::kTokenWithProvidedPIN;
+        commissioningWindowOption = Device::CommissioningWindowOption::kTokenWithProvidedPIN;
         break;
     default:
         ChipLogError(Controller, "Invalid Pairing Window option");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ReturnErrorOnFailure(device->OpenCommissioningWindow(timeout, iteration, pairingWindowOption, salt, payload));
+    ReturnErrorOnFailure(device->OpenCommissioningWindow(timeout, iteration, commissioningWindowOption, salt, payload));
 
-    if (pairingWindowOption != Device::PairingWindowOption::kOriginalSetupCode)
+    if (commissioningWindowOption != Device::CommissioningWindowOption::kOriginalSetupCode)
     {
         ReturnErrorOnFailure(ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode));
         ChipLogProgress(Controller, "Manual pairing code: [%s]", manualPairingCode.c_str());

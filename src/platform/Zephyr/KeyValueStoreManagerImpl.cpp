@@ -21,9 +21,9 @@
  *          Platform-specific key value storage implementation for Zephyr
  */
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <logging/log.h>
 #include <settings/settings.h>

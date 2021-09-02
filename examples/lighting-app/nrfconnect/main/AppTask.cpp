@@ -36,7 +36,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include <support/ErrorStr.h>
+#include <lib/support/ErrorStr.h>
 #include <system/SystemClock.h>
 
 #include <dk_buttons_and_leds.h>

@@ -21,7 +21,7 @@
 #include <app/MessageDef/EventPath.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
-#include <support/TypeTraits.h>
+#include <lib/support/TypeTraits.h>
 
 namespace chip {
 namespace app {

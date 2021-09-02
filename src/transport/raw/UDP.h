@@ -27,10 +27,10 @@
 
 #include <utility>
 
-#include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
 #include <inet/InetInterface.h>
+#include <lib/core/CHIPCore.h>
 #include <transport/raw/Base.h>
 
 namespace chip {
