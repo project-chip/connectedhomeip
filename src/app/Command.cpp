@@ -29,101 +29,97 @@
 
 #include <app/AppBuildConfig.h>
 #include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/logging/Trace.h>
 
 namespace chip {
 namespace app {
 
 CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    Logging::LogTracer tracer(__func__);
+
     // Error if already initialized.
-    VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(apExchangeMgr != nullptr, tracer.logError(CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturnError(mpExchangeMgr == nullptr, tracer.logError(CHIP_ERROR_INCORRECT_STATE));
 
     mpExchangeMgr = apExchangeMgr;
     mpDelegate    = apDelegate;
-    err           = Reset();
-    SuccessOrExit(err);
 
-exit:
-    ChipLogFunctError(err);
-    return err;
+    ReturnTracedErrorOnFailure(Reset(), tracer);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Command::Reset()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandList::Builder commandListBuilder;
+    Logging::LogTracer tracer(__func__);
+
     AbortExistingExchangeContext();
 
     mCommandMessageWriter.Reset();
 
     System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-    VerifyOrExit(!commandPacket.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!commandPacket.IsNull(), tracer.logError(CHIP_ERROR_NO_MEMORY));
 
     mCommandMessageWriter.Init(std::move(commandPacket));
-    err = mInvokeCommandBuilder.Init(&mCommandMessageWriter);
-    SuccessOrExit(err);
 
-    commandListBuilder = mInvokeCommandBuilder.CreateCommandListBuilder();
-    err                = commandListBuilder.GetError();
-    SuccessOrExit(err);
+    ReturnTracedErrorOnFailure(mInvokeCommandBuilder.Init(&mCommandMessageWriter), tracer);
+
+    CommandList::Builder commandListBuilder = mInvokeCommandBuilder.CreateCommandListBuilder();
+
+    ReturnTracedErrorOnFailure(commandListBuilder.GetError(), tracer);
+
     MoveToState(CommandState::Initialized);
-
     mCommandIndex = 0;
 
-exit:
-    ChipLogFunctError(err);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    Logging::LogTracer tracer(__func__);
+
     chip::System::PacketBufferTLVReader reader;
-    chip::TLV::TLVReader commandListReader;
-    InvokeCommand::Parser invokeCommandParser;
-    CommandList::Parser commandListParser;
-
     reader.Init(std::move(payload));
-    err = reader.Next();
-    SuccessOrExit(err);
+    ReturnTracedErrorOnFailure(reader.Next(), tracer);
 
-    err = invokeCommandParser.Init(reader);
-    SuccessOrExit(err);
+    InvokeCommand::Parser invokeCommandParser;
+    ReturnTracedErrorOnFailure(invokeCommandParser.Init(reader), tracer);
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = invokeCommandParser.CheckSchemaValidity();
-    SuccessOrExit(err);
+    ReturnTracedErrorOnFailure(invokeCommandParser.CheckSchemaValidity(), tracer);
 #endif
-    err = invokeCommandParser.GetCommandList(&commandListParser);
-    SuccessOrExit(err);
 
+    CommandList::Parser commandListParser;
+    ReturnTracedErrorOnFailure(invokeCommandParser.GetCommandList(&commandListParser), tracer);
+
+    chip::TLV::TLVReader commandListReader;
     commandListParser.GetReader(&commandListReader);
 
+    CHIP_ERROR err;
     while (CHIP_NO_ERROR == (err = commandListReader.Next()))
     {
-        VerifyOrExit(chip::TLV::AnonymousTag == commandListReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(chip::TLV::kTLVType_Structure == commandListReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+        VerifyOrReturnError(chip::TLV::AnonymousTag == commandListReader.GetTag(), tracer.logError(CHIP_ERROR_INVALID_TLV_TAG));
+        VerifyOrReturnError(chip::TLV::kTLVType_Structure == commandListReader.GetType(),
+                            tracer.logError(CHIP_ERROR_WRONG_TLV_TYPE));
 
         CommandDataElement::Parser commandElement;
 
-        err = commandElement.Init(commandListReader);
-        SuccessOrExit(err);
-
-        err = ProcessCommandDataElement(commandElement);
-        SuccessOrExit(err);
+        ReturnTracedErrorOnFailure(commandElement.Init(commandListReader), tracer);
+        ReturnTracedErrorOnFailure(ProcessCommandDataElement(commandElement), tracer);
     }
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        err = CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
+    }
+    else if (CHIP_NO_ERROR != err)
+    {
+        return tracer.logError(err);
     }
 
-exit:
-    ChipLogFunctError(err);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void Command::Shutdown()
@@ -147,24 +143,27 @@ void Command::ShutdownInternal()
 
 CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandDataElement::Builder commandDataElement;
-    VerifyOrExit(mState == CommandState::Initialized || mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
-    commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
-    err                = commandDataElement.GetError();
-    SuccessOrExit(err);
+    Logging::LogTracer tracer(__func__);
 
-    err = ConstructCommandPath(aCommandPathParams, commandDataElement);
-    SuccessOrExit(err);
+    VerifyOrReturnError(mState == CommandState::Initialized || mState == CommandState::AddCommand,
+                        tracer.logError(CHIP_ERROR_INCORRECT_STATE));
+
+    CommandDataElement::Builder commandDataElement;
+    commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
+
+    ReturnTracedErrorOnFailure(commandDataElement.GetError(), tracer);
+
+    ReturnTracedErrorOnFailure(ConstructCommandPath(aCommandPathParams, commandDataElement), tracer);
 
     if (!aIsStatus)
     {
-        err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data),
-                                                             TLV::kTLVType_Structure, mDataElementContainerType);
+        ReturnTracedErrorOnFailure(commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data),
+                                                                                  TLV::kTLVType_Structure,
+                                                                                  mDataElementContainerType),
+                                   tracer);
     }
-exit:
-    ChipLogFunctError(err);
-    return err;
+
+    return CHIP_NO_ERROR;
 }
 
 TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
@@ -174,22 +173,20 @@ TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
 
 CHIP_ERROR Command::FinishCommand(bool aIsStatus)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    Logging::LogTracer tracer(__func__);
 
     CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
     if (!aIsStatus)
     {
-        err = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
-        SuccessOrExit(err);
+        ReturnTracedErrorOnFailure(commandDataElement.GetWriter()->EndContainer(mDataElementContainerType), tracer);
     }
+
     commandDataElement.EndOfCommandDataElement();
-    err = commandDataElement.GetError();
-    SuccessOrExit(err);
+    ReturnTracedErrorOnFailure(commandDataElement.GetError(), tracer);
+
     MoveToState(CommandState::AddCommand);
 
-exit:
-    ChipLogFunctError(err);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams,
@@ -226,22 +223,21 @@ CHIP_ERROR Command::AbortExistingExchangeContext()
 
 CHIP_ERROR Command::FinalizeCommandsMessage(System::PacketBufferHandle & commandPacket)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    Logging::LogTracer tracer(__func__);
+
+    VerifyOrReturnError(mState == CommandState::AddCommand, tracer.logError(CHIP_ERROR_INCORRECT_STATE));
+
     CommandList::Builder commandListBuilder;
-    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
     commandListBuilder = mInvokeCommandBuilder.GetCommandListBuilder().EndOfCommandList();
-    err                = commandListBuilder.GetError();
-    SuccessOrExit(err);
+
+    ReturnTracedErrorOnFailure(commandListBuilder.GetError(), tracer);
 
     mInvokeCommandBuilder.EndOfInvokeCommand();
-    err = mInvokeCommandBuilder.GetError();
-    SuccessOrExit(err);
+    ReturnTracedErrorOnFailure(mInvokeCommandBuilder.GetError(), tracer);
 
-    err = mCommandMessageWriter.Finalize(&commandPacket);
-    SuccessOrExit(err);
-exit:
-    ChipLogFunctError(err);
-    return err;
+    ReturnTracedErrorOnFailure(mCommandMessageWriter.Finalize(&commandPacket), tracer);
+
+    return CHIP_NO_ERROR;
 }
 
 const char * Command::GetStateStr() const
