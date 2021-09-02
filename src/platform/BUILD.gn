@@ -258,6 +258,7 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "DeviceControlServer.cpp",
+      "Entropy.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",
       "LockTracker.cpp",
@@ -270,6 +271,7 @@ if (chip_device_platform != "none") {
 
     public_deps = [
       ":platform_base",
+      "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
     ]
 
