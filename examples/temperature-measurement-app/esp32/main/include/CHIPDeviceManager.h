@@ -27,11 +27,11 @@
 #ifndef CHIP_DEVICEMANAGER_H_
 #define CHIP_DEVICEMANAGER_H_
 
-#include <core/CHIPCore.h>
-#include <core/CHIPError.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #include <stdarg.h>
 #include <stdlib.h>

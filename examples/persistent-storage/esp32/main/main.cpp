@@ -20,8 +20,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include <lib/support/ErrorStr.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/ErrorStr.h>
 
 const char * TAG = "persistent-storage";
 

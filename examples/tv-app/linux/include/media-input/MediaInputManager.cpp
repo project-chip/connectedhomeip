@@ -19,9 +19,9 @@
 
 #include <app/util/af.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CodeUtils.h>
 #include <map>
 #include <string>
-#include <support/CodeUtils.h>
 
 CHIP_ERROR MediaInputManager::Init()
 {

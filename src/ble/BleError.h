@@ -32,7 +32,7 @@
 
 #include "BleConfig.h"
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 #define CHIP_BLE_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kBLE, (e))
 

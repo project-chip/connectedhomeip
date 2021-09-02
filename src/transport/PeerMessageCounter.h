@@ -24,7 +24,7 @@
 #include <array>
 #include <bitset>
 
-#include <support/Span.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace Transport {

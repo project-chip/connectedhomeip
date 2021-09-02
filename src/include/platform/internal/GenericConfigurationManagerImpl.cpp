@@ -27,14 +27,14 @@
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 
 #include <ble/CHIPBleServiceData.h>
-#include <core/CHIPConfig.h>
 #include <inttypes.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/Base64.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-#include <support/Base64.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ScopedBuffer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>

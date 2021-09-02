@@ -44,7 +44,7 @@
 #include <vector>
 #endif
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #include <system/SystemError.h>
 #include <system/SystemStats.h>

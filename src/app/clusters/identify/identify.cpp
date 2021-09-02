@@ -54,7 +54,7 @@
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 #include <app/util/common.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 

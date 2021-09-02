@@ -29,7 +29,7 @@
 #include <bluetooth/conn.h>
 #include <bluetooth/gatt.h>
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

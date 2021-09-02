@@ -26,10 +26,9 @@
 
 #pragma once
 
-#include <asn1/ASN1OID.h>
-#include <core/CHIPConfig.h>
-#include <support/BitFlags.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace TestCerts {

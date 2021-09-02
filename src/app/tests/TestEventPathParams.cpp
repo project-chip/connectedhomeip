@@ -23,8 +23,8 @@
  */
 
 #include <app/EventPathParams.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
-#include <support/UnitTestRegistration.h>
 
 namespace chip {
 namespace app {

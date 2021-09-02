@@ -23,9 +23,9 @@
 
 #pragma once
 
+#include <lib/support/CHIPMem.h>
 #include <messaging/ApplicationExchangeDispatch.h>
 #include <messaging/ExchangeMessageDispatch.h>
-#include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/MessageHeader.h>

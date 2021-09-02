@@ -31,7 +31,7 @@
 
 #include "ASN1Config.h"
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 #define CHIP_ASN1_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kASN1, (e))
 

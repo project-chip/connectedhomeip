@@ -25,10 +25,10 @@
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 #include "esp_event.h"
 #include "esp_netif.h"

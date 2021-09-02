@@ -27,9 +27,9 @@
 #include "common.h"
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
+#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 

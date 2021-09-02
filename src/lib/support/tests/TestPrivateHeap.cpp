@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <support/PrivateHeap.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/PrivateHeap.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <string.h>
 

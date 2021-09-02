@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <support/BitFlags.h>
+#include <lib/support/BitFlags.h>
 
 namespace chip {
 namespace app {

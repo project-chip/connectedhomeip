@@ -33,7 +33,7 @@
 
 #include <inet/IPAddress.h>
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
 
 #include "arpa-inet-compatibility.h"
 

@@ -38,7 +38,7 @@
 #include <string>
 #include <vector>
 
-#include <support/ErrorStr.h>
+#include <lib/support/ErrorStr.h>
 
 #if CONFIG_ENABLE_PW_RPC
 #include "PigweedLogger.h"

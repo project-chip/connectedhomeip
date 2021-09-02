@@ -27,7 +27,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <platform/PlatformManager.h>
 #include <platform/SoftwareUpdateManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>

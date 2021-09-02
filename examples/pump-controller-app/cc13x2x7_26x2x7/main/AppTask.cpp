@@ -24,9 +24,9 @@
 
 #include "FreeRTOS.h"
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 

@@ -22,7 +22,7 @@
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <vector>
 
 class ClusterManager

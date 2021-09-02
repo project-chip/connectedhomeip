@@ -26,9 +26,9 @@
 
 #pragma once
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
-#include <asn1/ASN1Error.h>
+#include <lib/asn1/ASN1Error.h>
 
 namespace chip {
 namespace TLV {

@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <stdlib.h>
 
 #include <new>

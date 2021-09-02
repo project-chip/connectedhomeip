@@ -27,8 +27,8 @@
 
 #pragma once
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <transport/TransportMgrBase.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>

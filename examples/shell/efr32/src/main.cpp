@@ -31,10 +31,10 @@
 #include <ChipShellCollection.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
 
 #include <AppConfig.h>
 #include <app/server/Server.h>

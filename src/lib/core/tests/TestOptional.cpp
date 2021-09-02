@@ -28,7 +28,7 @@
 #include <string.h>
 
 #include <lib/core/Optional.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

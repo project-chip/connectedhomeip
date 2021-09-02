@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <mdns/minimal/responders/Responder.h>
+#include <lib/mdns/minimal/responders/Responder.h>
 namespace mdns {
 namespace Minimal {
 

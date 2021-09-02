@@ -17,7 +17,7 @@
 
 #include <stdio.h>
 
-#include <mdns/minimal/Server.h>
+#include <lib/mdns/minimal/Server.h>
 
 namespace chip {
 namespace Mdns {

@@ -21,16 +21,16 @@
  *      This file implements unit tests for the MessageCounterManager implementation.
  */
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
-#include <support/logging/CHIPLogging.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>

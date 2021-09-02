@@ -19,8 +19,8 @@
  *          Provides a C-callable wrapper around CHIPMem.h.
  */
 
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 
 extern "C" {
 

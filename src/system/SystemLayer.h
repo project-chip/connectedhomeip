@@ -28,11 +28,11 @@
 // Include configuration headers
 #include <system/SystemConfig.h>
 
-#include <core/CHIPCallback.h>
+#include <lib/core/CHIPCallback.h>
 
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/ObjectLifeCycle.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>

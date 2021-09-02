@@ -35,9 +35,9 @@
 #include "SystemLayerPrivate.h"
 
 // Include local headers
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemMutex.h>
 #include <system/SystemStats.h>
@@ -56,7 +56,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
-#include <support/CHIPMem.h>
+#include <lib/support/CHIPMem.h>
 #endif
 
 namespace chip {

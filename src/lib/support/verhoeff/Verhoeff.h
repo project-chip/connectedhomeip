@@ -29,7 +29,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 class VerhoeffTest;
 

@@ -29,12 +29,12 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVTags.h>
-#include <core/CHIPTLVTypes.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVTags.h>
+#include <lib/core/CHIPTLVTypes.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #include <stdlib.h>
 

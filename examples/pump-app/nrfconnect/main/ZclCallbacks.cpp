@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "AppTask.h"
 #include "PumpManager.h"

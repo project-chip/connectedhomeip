@@ -26,8 +26,8 @@
 #include <inttypes.h>
 #include <limits>
 
-#include <support/logging/CHIPLogging.h>
-#include <support/verhoeff/Verhoeff.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/verhoeff/Verhoeff.h>
 
 namespace chip {
 

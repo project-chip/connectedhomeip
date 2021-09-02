@@ -28,10 +28,10 @@
 #include <FreeRTOS.h>
 #include <mbedtls/threading.h>
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
 
 #include <AppTask.h>
 

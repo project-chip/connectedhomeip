@@ -20,10 +20,12 @@
 // Prevent multiple inclusion
 #pragma once
 
-#include "enums.h"
-#include <app/util/basic-types.h>
 #include <stdint.h>
-#include <support/Span.h>
+
+#include <app/util/basic-types.h>
+#include <lib/support/Span.h>
+
+#include "enums.h"
 
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp

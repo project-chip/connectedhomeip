@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 

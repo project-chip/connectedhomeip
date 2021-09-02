@@ -29,7 +29,7 @@
 #include <lib/core/NodeId.h>
 
 // Pull in VendorId
-#include <core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 
 namespace chip {
 typedef uint8_t ActionId;
