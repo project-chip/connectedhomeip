@@ -279,7 +279,7 @@ inline void ObjectPool<T, N>::Reset()
     memset(mArena.uMemory, 0, N * sizeof(T));
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    mHighWatermark      = 0;
+    mHighWatermark = 0;
 #endif
 #endif
 }
