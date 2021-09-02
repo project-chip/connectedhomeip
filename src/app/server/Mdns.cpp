@@ -333,9 +333,9 @@ CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rot
     ReturnErrorOnFailure(
         chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
     ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
-    return AdditionalDataPayloadGenerator().generateRotatingDeviceId(lifetimeCounter, serialNumber, serialNumberSize,
-                                                                     rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
-                                                                     rotatingDeviceIdValueOutputSize);
+    return AdditionalDataPayloadGenerator().generateRotatingDeviceIdInString(lifetimeCounter, serialNumber, serialNumberSize,
+                                                                             rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+                                                                             rotatingDeviceIdValueOutputSize);
 }
 #endif
 
