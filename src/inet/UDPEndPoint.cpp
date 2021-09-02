@@ -246,7 +246,7 @@ CHIP_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = SystemLayer().GetDispatchQueue();
+    dispatch_queue_t dispatchQueue = Layer().SystemLayer()->GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
         unsigned long fd = static_cast<unsigned long>(mSocket);
@@ -349,8 +349,8 @@ CHIP_ERROR UDPEndPoint::Listen(OnMessageReceivedFunct onMessageReceived, OnRecei
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Wait for ability to read on this endpoint.
-    ReturnErrorOnFailure(SystemLayer().SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
-    ReturnErrorOnFailure(SystemLayer().RequestCallbackOnPendingRead(mWatch));
+    ReturnErrorOnFailure(Layer().SystemLayer()->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
+    ReturnErrorOnFailure(Layer().SystemLayer()->RequestCallbackOnPendingRead(mWatch));
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return CHIP_NO_ERROR;
@@ -393,7 +393,7 @@ void UDPEndPoint::Close()
 
         if (mSocket != INET_INVALID_SOCKET_FD)
         {
-            SystemLayer().StopWatchingSocket(&mWatch);
+            Layer().SystemLayer()->StopWatchingSocket(&mWatch);
             close(mSocket);
             mSocket = INET_INVALID_SOCKET_FD;
         }
@@ -859,10 +859,9 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
 void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port)
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
-    UDPEndPoint * ep                   = static_cast<UDPEndPoint *>(arg);
-    chip::System::Layer & lSystemLayer = ep->SystemLayer();
-    IPPacketInfo * pktInfo             = NULL;
-    System::PacketBufferHandle buf     = System::PacketBufferHandle::Adopt(p);
+    UDPEndPoint * ep               = static_cast<UDPEndPoint *>(arg);
+    IPPacketInfo * pktInfo         = NULL;
+    System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
 
     pktInfo = GetPacketInfo(buf);
     if (pktInfo != NULL)
@@ -890,7 +889,7 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
         pktInfo->DestPort  = pcb->local_port;
     }
 
-    PostPacketBufferEvent(lSystemLayer, *ep, kInetEvent_UDPDataReceived, std::move(buf));
+    PostPacketBufferEvent(ep->Layer().SystemLayer(), *ep, kInetEvent_UDPDataReceived, std::move(buf));
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
