@@ -121,7 +121,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)renameOutput:(uint8_t)index name:(NSString *)name responseHandler:(ResponseHandler)responseHandler;
 - (void)selectOutput:(uint8_t)index responseHandler:(ResponseHandler)responseHandler;
 
-- (void)readAttributeAudioOutputListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeCurrentAudioOutputWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -476,7 +475,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPDescriptor : CHIPCluster
 
-- (void)readAttributeDeviceListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeServerListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClientListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributePartsListWithResponseHandler:(ResponseHandler)responseHandler;
@@ -605,7 +603,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPFixedLabel : CHIPCluster
 
-- (void)readAttributeLabelListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -642,7 +639,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBreadcrumbWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBreadcrumbWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeBasicCommissioningInfoListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -653,7 +649,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGeneralDiagnostics : CHIPCluster
 
-- (void)readAttributeNetworkInterfacesWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeRebootCountWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -665,8 +660,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGroupKeyManagement : CHIPCluster
 
-- (void)readAttributeGroupsWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeGroupKeysWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -782,7 +775,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)selectInput:(uint8_t)index responseHandler:(ResponseHandler)responseHandler;
 - (void)showInputStatus:(ResponseHandler)responseHandler;
 
-- (void)readAttributeMediaInputListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeCurrentMediaInputWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -963,7 +955,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateFabricLabel:(NSString *)label responseHandler:(ResponseHandler)responseHandler;
 - (void)updateNOC:(NSData *)nOCArray responseHandler:(ResponseHandler)responseHandler;
 
-- (void)readAttributeFabricsListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeSupportedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
@@ -1104,7 +1095,6 @@ NS_ASSUME_NONNULL_BEGIN
               responseHandler:(ResponseHandler)responseHandler;
 - (void)skipChannel:(uint16_t)count responseHandler:(ResponseHandler)responseHandler;
 
-- (void)readAttributeTvChannelListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeTvChannelLineupWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeCurrentTvChannelWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
@@ -1119,7 +1109,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)navigateTarget:(uint8_t)target data:(NSString *)data responseHandler:(ResponseHandler)responseHandler;
 
-- (void)readAttributeTargetNavigatorListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1188,7 +1177,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeLongOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLongOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeCharStringWithResponseHandler:(ResponseHandler)responseHandler;
@@ -1282,8 +1270,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeExtendedPanIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeMeshLocalPrefixWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeNeighborTableListWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeRouteTableListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributePartitionIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeWeightingWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeDataVersionWithResponseHandler:(ResponseHandler)responseHandler;
@@ -1331,9 +1317,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeRxErrSecCountWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeRxErrFcsCountWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeRxErrOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeSecurityPolicyWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeChannelMaskWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeOperationalDatasetComponentsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeActiveNetworkFaultsListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 

@@ -29,16 +29,15 @@
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPEncoding.h>
+#include <core/CHIPTLVUtilities.hpp>
+#include <support/BytesToHex.h>
+#include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/TypeTraits.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::app::List;
-
-namespace {
-[[maybe_unused]] constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
-} // namespace
 
 #define CHECK_STATUS_WITH_RETVAL(error, retval)                                                                                    \
     if (CHIP_NO_ERROR != error)                                                                                                    \
@@ -350,97 +349,95 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
-static EmberAfStatus PrepareListFromTLV(TLV::TLVReader * tlvData, const uint8_t *& message, uint16_t & messageLen)
-{
-    CHIP_ERROR tlvError = CHIP_NO_ERROR;
-    TLV::TLVReader reader;
-    TLV::TLVType type;
-    reader.Init(*tlvData);
-    reader.EnterContainer(type);
-    tlvError = reader.Next();
-    if (tlvError != CHIP_NO_ERROR && tlvError != CHIP_END_OF_TLV && CanCastTo<uint16_t>(reader.GetLength()))
-    {
-        return EMBER_ZCL_STATUS_INVALID_VALUE;
-    }
-    if (tlvError == CHIP_NO_ERROR)
-    {
-        tlvError   = reader.GetDataPtr(message);
-        messageLen = static_cast<uint16_t>(reader.GetLength());
-    }
-    if (tlvError != CHIP_NO_ERROR)
-    {
-        return EMBER_ZCL_STATUS_INVALID_VALUE;
-    }
-    reader.ExitContainer(type);
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
 void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                               Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback)
 {
-    // TODO: Add actual support for array and lists.
-    const uint8_t * message = nullptr;
-    uint16_t messageLen     = 0;
-    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
-    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    size_t count   = 0;
+    TLV::TLVType tmpType;
+    TLV::TLVReader reader;
+
+    if (tlvData != nullptr && tlvData->GetType() == chip::TLV::TLVType::kTLVType_Array)
+    {
+        reader.Init(*tlvData);
+        reader.EnterContainer(tmpType);
+    }
+    if (tlvData == nullptr || tlvData->GetType() != chip::TLV::TLVType::kTLVType_Array ||
+        chip::TLV::Utilities::Count(reader, count, false /* recursive */) != CHIP_NO_ERROR || !chip::CanCastTo<uint16_t>(count))
     {
         Callback::Callback<DefaultFailureCallback> * cb =
             Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    CHECK_MESSAGE_LENGTH_VOID(2);
-    uint16_t count = Encoding::LittleEndian::Read16(message);
     _BasicCommissioningInfoType data[count];
-    for (size_t i = 0; i < count; i++)
+    for (size_t i = 0; i < count && CHIP_NO_ERROR == (err = reader.Next()); i++)
     {
-        CHECK_MESSAGE_LENGTH_VOID(4);
-        data[i].FailSafeExpiryLengthMs = emberAfGetInt32u(message, 0, 4);
-        message += 4;
+        SuccessOrExit(reader.Get(data[i]));
     }
-    Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback> * cb =
-        Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, count, data);
+    SuccessOrExit(err);
+    // If we have exactly count elements, we should not see any errors above, but should meet an error exactly after we iterated all
+    // elements.
+    VerifyOrExit(reader.Next() == CHIP_END_OF_TLV, err = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
+exit:
+    if (CHIP_NO_ERROR == err)
+    {
+        Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback> * cb =
+            Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(
+                onSuccessCallback);
+        cb->mCall(cb->mContext, static_cast<uint16_t>(count), data);
+    }
+    else
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+    }
 }
-
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
-    // TODO: Add actual support for array and lists.
-    const uint8_t * message = nullptr;
-    uint16_t messageLen     = 0;
-    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
-    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    size_t count   = 0;
+    TLV::TLVType tmpType;
+    TLV::TLVReader reader;
+
+    if (tlvData != nullptr && tlvData->GetType() == chip::TLV::TLVType::kTLVType_Array)
+    {
+        reader.Init(*tlvData);
+        reader.EnterContainer(tmpType);
+    }
+    if (tlvData == nullptr || tlvData->GetType() != chip::TLV::TLVType::kTLVType_Array ||
+        chip::TLV::Utilities::Count(reader, count, false /* recursive */) != CHIP_NO_ERROR || !chip::CanCastTo<uint16_t>(count))
     {
         Callback::Callback<DefaultFailureCallback> * cb =
             Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
         return;
     }
-
-    CHECK_MESSAGE_LENGTH_VOID(2);
-    uint16_t count = Encoding::LittleEndian::Read16(message);
     _FabricDescriptor data[count];
-    for (size_t i = 0; i < count; i++)
+    for (size_t i = 0; i < count && CHIP_NO_ERROR == (err = reader.Next()); i++)
     {
-        CHECK_MESSAGE_LENGTH_VOID(8);
-        data[i].FabricId = emberAfGetInt64u(message, 0, 8);
-        message += 8;
-        CHECK_MESSAGE_LENGTH_VOID(2);
-        data[i].VendorId = emberAfGetInt16u(message, 0, 2);
-        message += 2;
-        CHECK_MESSAGE_LENGTH_VOID(8);
-        data[i].NodeId = emberAfGetInt64u(message, 0, 8);
-        message += 8;
-        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].Label));
-        messageLen = static_cast<uint16_t>(messageLen - 34);
-        message += 34;
+        SuccessOrExit(reader.Get(data[i]));
     }
-    Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
-        Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, count, data);
+    SuccessOrExit(err);
+    // If we have exactly count elements, we should not see any errors above, but should meet an error exactly after we iterated all
+    // elements.
+    VerifyOrExit(reader.Next() == CHIP_END_OF_TLV, err = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
+exit:
+    if (CHIP_NO_ERROR == err)
+    {
+        Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
+            Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
+        cb->mCall(cb->mContext, static_cast<uint16_t>(count), data);
+    }
+    else
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+    }
 }
 
 bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,

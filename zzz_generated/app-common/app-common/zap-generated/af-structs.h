@@ -22,6 +22,7 @@
 
 #include "enums.h"
 #include <app/util/basic-types.h>
+#include <core/CHIPTLV.h>
 #include <stdint.h>
 #include <support/Span.h>
 
@@ -29,7 +30,11 @@
 typedef struct _ApplicationLauncherApp
 {
     uint16_t catalogVendorId;
-    uint8_t * applicationId;
+    const uint8_t * applicationId;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfApplicationLauncherApp;
 
 // Struct for AudioOutputInfo
@@ -38,12 +43,20 @@ typedef struct _AudioOutputInfo
     uint8_t index;
     uint8_t outputType;
     chip::ByteSpan name;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfAudioOutputInfo;
 
 // Struct for BasicCommissioningInfoType
 typedef struct _BasicCommissioningInfoType
 {
     uint32_t FailSafeExpiryLengthMs;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfBasicCommissioningInfoType;
 
 // Struct for ConfigureReportingRecord
@@ -56,6 +69,10 @@ typedef struct _ConfigureReportingRecord
     uint16_t maximumReportingInterval;
     uint8_t * reportableChangeLocation;
     uint16_t timeoutPeriod;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfConfigureReportingRecord;
 
 // Struct for ConfigureReportingStatusRecord
@@ -64,48 +81,72 @@ typedef struct _ConfigureReportingStatusRecord
     uint8_t status;
     uint8_t direction;
     chip::AttributeId attributeId;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfConfigureReportingStatusRecord;
 
 // Struct for ContentLaunchAdditionalInfo
 typedef struct _ContentLaunchAdditionalInfo
 {
-    uint8_t * name;
-    uint8_t * value;
+    const uint8_t * name;
+    const uint8_t * value;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfContentLaunchAdditionalInfo;
 
 // Struct for ContentLaunchBrandingInformation
 typedef struct _ContentLaunchBrandingInformation
 {
-    uint8_t * providerName;
+    const uint8_t * providerName;
     uint8_t background;
     uint8_t logo;
     uint8_t progressBar;
     uint8_t splash;
     uint8_t waterMark;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfContentLaunchBrandingInformation;
 
 // Struct for ContentLaunchDimension
 typedef struct _ContentLaunchDimension
 {
-    uint8_t * width;
-    uint8_t * height;
+    const uint8_t * width;
+    const uint8_t * height;
     uint8_t metric;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfContentLaunchDimension;
 
 // Struct for ContentLaunchParamater
 typedef struct _ContentLaunchParamater
 {
     uint8_t Type;
-    uint8_t * Value;
-    /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
+    const uint8_t * Value;
+    const /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfContentLaunchParamater;
 
 // Struct for ContentLaunchStyleInformation
 typedef struct _ContentLaunchStyleInformation
 {
-    uint8_t * imageUrl;
-    uint8_t * color;
+    const uint8_t * imageUrl;
+    const uint8_t * color;
     uint8_t size;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfContentLaunchStyleInformation;
 
 // Struct for DeviceType
@@ -113,6 +154,10 @@ typedef struct _DeviceType
 {
     chip::DeviceTypeId type;
     uint16_t revision;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfDeviceType;
 
 // Struct for DiscoverAttributesInfoRecord
@@ -120,6 +165,10 @@ typedef struct _DiscoverAttributesInfoRecord
 {
     chip::AttributeId attributeId;
     uint8_t attributeType;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfDiscoverAttributesInfoRecord;
 
 // Struct for ExtendedDiscoverAttributesInfoRecord
@@ -128,6 +177,10 @@ typedef struct _ExtendedDiscoverAttributesInfoRecord
     chip::AttributeId attributeId;
     uint8_t attributeType;
     uint8_t attributeAccessControl;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfExtendedDiscoverAttributesInfoRecord;
 
 // Struct for FabricDescriptor
@@ -137,6 +190,10 @@ typedef struct _FabricDescriptor
     uint16_t VendorId;
     chip::NodeId NodeId;
     chip::ByteSpan Label;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfFabricDescriptor;
 
 // Struct for GroupKey
@@ -147,6 +204,10 @@ typedef struct _GroupKey
     chip::ByteSpan GroupKeyRoot;
     uint64_t GroupKeyEpochStartTime;
     uint8_t GroupKeySecurityPolicy;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfGroupKey;
 
 // Struct for GroupState
@@ -155,6 +216,10 @@ typedef struct _GroupState
     uint16_t VendorId;
     uint16_t VendorGroupId;
     uint16_t GroupKeySetIndex;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfGroupState;
 
 // Struct for IasAceZoneStatusResult
@@ -162,6 +227,10 @@ typedef struct _IasAceZoneStatusResult
 {
     uint8_t zoneId;
     uint16_t zoneStatus;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfIasAceZoneStatusResult;
 
 // Struct for LabelStruct
@@ -169,6 +238,10 @@ typedef struct _LabelStruct
 {
     chip::ByteSpan label;
     chip::ByteSpan value;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfLabelStruct;
 
 // Struct for MediaInputInfo
@@ -178,6 +251,10 @@ typedef struct _MediaInputInfo
     uint8_t inputType;
     chip::ByteSpan name;
     chip::ByteSpan description;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfMediaInputInfo;
 
 // Struct for MediaPlaybackPosition
@@ -185,6 +262,10 @@ typedef struct _MediaPlaybackPosition
 {
     uint64_t updatedAt;
     uint64_t position;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfMediaPlaybackPosition;
 
 // Struct for NavigateTargetTargetInfo
@@ -192,6 +273,10 @@ typedef struct _NavigateTargetTargetInfo
 {
     uint8_t identifier;
     chip::ByteSpan name;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfNavigateTargetTargetInfo;
 
 // Struct for NeighborTable
@@ -211,6 +296,10 @@ typedef struct _NeighborTable
     bool FullThreadDevice;
     bool FullNetworkData;
     bool IsChild;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfNeighborTable;
 
 // Struct for NetworkInterfaceType
@@ -222,6 +311,10 @@ typedef struct _NetworkInterfaceType
     bool OffPremiseServicesReachableIPv6;
     chip::ByteSpan HardwareAddress;
     uint8_t Type;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfNetworkInterfaceType;
 
 // Struct for Notification
@@ -229,6 +322,10 @@ typedef struct _Notification
 {
     uint16_t contentId;
     uint8_t statusFeedback;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfNotification;
 
 // Struct for OperationalDatasetComponents
@@ -246,6 +343,10 @@ typedef struct _OperationalDatasetComponents
     bool PskcPresent;
     bool SecurityPolicyPresent;
     bool ChannelMaskPresent;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfOperationalDatasetComponents;
 
 // Struct for PowerProfileRecord
@@ -255,6 +356,10 @@ typedef struct _PowerProfileRecord
     uint8_t energyPhaseId;
     bool powerProfileRemoteControl;
     uint8_t powerProfileState;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfPowerProfileRecord;
 
 // Struct for ReadAttributeStatusRecord
@@ -264,6 +369,10 @@ typedef struct _ReadAttributeStatusRecord
     uint8_t status;
     uint8_t attributeType;
     uint8_t * attributeLocation;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfReadAttributeStatusRecord;
 
 // Struct for ReadReportingConfigurationAttributeRecord
@@ -271,6 +380,10 @@ typedef struct _ReadReportingConfigurationAttributeRecord
 {
     uint8_t direction;
     chip::AttributeId attributeId;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfReadReportingConfigurationAttributeRecord;
 
 // Struct for ReadReportingConfigurationRecord
@@ -284,6 +397,10 @@ typedef struct _ReadReportingConfigurationRecord
     uint16_t maximumReportingInterval;
     uint8_t * reportableChangeLocation;
     uint16_t timeoutPeriod;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfReadReportingConfigurationRecord;
 
 // Struct for ReadStructuredAttributeRecord
@@ -292,6 +409,10 @@ typedef struct _ReadStructuredAttributeRecord
     chip::AttributeId attributeId;
     uint8_t indicator;
     uint16_t indicies;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfReadStructuredAttributeRecord;
 
 // Struct for ReportAttributeRecord
@@ -300,6 +421,10 @@ typedef struct _ReportAttributeRecord
     chip::AttributeId attributeId;
     uint8_t attributeType;
     uint8_t * attributeLocation;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfReportAttributeRecord;
 
 // Struct for RouteTable
@@ -315,6 +440,10 @@ typedef struct _RouteTable
     uint8_t Age;
     bool Allocated;
     bool LinkEstablished;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfRouteTable;
 
 // Struct for SceneExtensionAttributeInfo
@@ -322,6 +451,10 @@ typedef struct _SceneExtensionAttributeInfo
 {
     uint8_t attributeType;
     uint8_t * attributeLocation;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfSceneExtensionAttributeInfo;
 
 // Struct for SceneExtensionFieldSet
@@ -330,6 +463,10 @@ typedef struct _SceneExtensionFieldSet
     chip::ClusterId clusterId;
     uint8_t length;
     uint8_t value;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfSceneExtensionFieldSet;
 
 // Struct for ScheduledPhase
@@ -337,6 +474,10 @@ typedef struct _ScheduledPhase
 {
     uint8_t energyPhaseId;
     uint16_t scheduledTime;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfScheduledPhase;
 
 // Struct for SecurityPolicy
@@ -344,6 +485,10 @@ typedef struct _SecurityPolicy
 {
     uint16_t RotationTime;
     uint8_t Flags;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfSecurityPolicy;
 
 // Struct for TestListStructOctet
@@ -351,12 +496,20 @@ typedef struct _TestListStructOctet
 {
     uint64_t fabricIndex;
     chip::ByteSpan operationalCert;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfTestListStructOctet;
 
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {
     chip::ByteSpan DiscoveryResponse;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfThreadInterfaceScanResult;
 
 // Struct for ThreadMetrics
@@ -367,6 +520,10 @@ typedef struct _ThreadMetrics
     uint32_t StackFreeCurrent;
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfThreadMetrics;
 
 // Struct for TransferredPhase
@@ -378,6 +535,10 @@ typedef struct _TransferredPhase
     uint16_t peakPower;
     uint16_t energy;
     uint16_t maxActivationDelay;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfTransferredPhase;
 
 // Struct for TvChannelInfo
@@ -388,15 +549,23 @@ typedef struct _TvChannelInfo
     chip::ByteSpan name;
     chip::ByteSpan callSign;
     chip::ByteSpan affiliateCallSign;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfTvChannelInfo;
 
 // Struct for TvChannelLineupInfo
 typedef struct _TvChannelLineupInfo
 {
-    uint8_t * operatorName;
-    uint8_t * lineupName;
-    uint8_t * postalCode;
+    const uint8_t * operatorName;
+    const uint8_t * lineupName;
+    const uint8_t * postalCode;
     uint8_t lineupInfoType;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfTvChannelLineupInfo;
 
 // Struct for WiFiInterfaceScanResult
@@ -407,6 +576,10 @@ typedef struct _WiFiInterfaceScanResult
     chip::ByteSpan BSSID;
     uint8_t Channel;
     uint32_t FrequencyBand;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfWiFiInterfaceScanResult;
 
 // Struct for WriteAttributeRecord
@@ -415,6 +588,10 @@ typedef struct _WriteAttributeRecord
     chip::AttributeId attributeId;
     uint8_t attributeType;
     uint8_t * attributeLocation;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfWriteAttributeRecord;
 
 // Struct for WriteAttributeStatusRecord
@@ -422,6 +599,10 @@ typedef struct _WriteAttributeStatusRecord
 {
     uint8_t status;
     chip::AttributeId attributeId;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfWriteAttributeStatusRecord;
 
 // Struct for WriteStructuredAttributeRecord
@@ -432,6 +613,10 @@ typedef struct _WriteStructuredAttributeRecord
     uint16_t indicies;
     uint8_t attributeType;
     uint8_t * attributeLocation;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfWriteStructuredAttributeRecord;
 
 // Struct for WriteStructuredAttributeStatusRecord
@@ -441,4 +626,19 @@ typedef struct _WriteStructuredAttributeStatusRecord
     chip::AttributeId attributeId;
     uint8_t indicator;
     uint16_t indicies;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } EmberAfWriteStructuredAttributeStatusRecord;
+
+// Struct for simplestruct
+typedef struct _simplestruct
+{
+    uint64_t fieldA;
+    uint32_t fieldB;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
+} EmberAfsimplestruct;

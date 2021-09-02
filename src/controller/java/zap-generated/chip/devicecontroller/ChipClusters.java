@@ -358,11 +358,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
     }
-
-    public void readAudioOutputListAttribute(AudioOutputListAttributeCallback callback) {
-      readAudioOutputListAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type AudioOutputInfo
     public void readCurrentAudioOutputAttribute(IntegerAttributeCallback callback) {
       readCurrentAudioOutputAttribute(chipClusterPtr, callback);
     }
@@ -370,10 +366,7 @@ public class ChipClusters {
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readAudioOutputListAttribute(
-        long chipClusterPtr, AudioOutputListAttributeCallback callback);
-
+    // TODO: Unsupported type AudioOutputInfo
     private native void readCurrentAudioOutputAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -1823,11 +1816,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
     }
-
-    public void readDeviceListAttribute(DeviceListAttributeCallback callback) {
-      readDeviceListAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type DeviceType
     public void readServerListAttribute(ServerListAttributeCallback callback) {
       readServerListAttribute(chipClusterPtr, callback);
     }
@@ -1843,10 +1832,7 @@ public class ChipClusters {
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readDeviceListAttribute(
-        long chipClusterPtr, DeviceListAttributeCallback callback);
-
+    // TODO: Unsupported type DeviceType
     private native void readServerListAttribute(
         long chipClusterPtr, ServerListAttributeCallback callback);
 
@@ -2496,18 +2482,11 @@ public class ChipClusters {
 
       void onError(Exception ex);
     }
-
-    public void readLabelListAttribute(LabelListAttributeCallback callback) {
-      readLabelListAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type LabelStruct
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readLabelListAttribute(
-        long chipClusterPtr, LabelListAttributeCallback callback);
-
+    // TODO: Unsupported type LabelStruct
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
@@ -2635,12 +2614,7 @@ public class ChipClusters {
     public void writeBreadcrumbAttribute(DefaultClusterCallback callback, long value) {
       writeBreadcrumbAttribute(chipClusterPtr, callback, value);
     }
-
-    public void readBasicCommissioningInfoListAttribute(
-        BasicCommissioningInfoListAttributeCallback callback) {
-      readBasicCommissioningInfoListAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type BasicCommissioningInfoType
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -2650,10 +2624,7 @@ public class ChipClusters {
 
     private native void writeBreadcrumbAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, long value);
-
-    private native void readBasicCommissioningInfoListAttribute(
-        long chipClusterPtr, BasicCommissioningInfoListAttributeCallback callback);
-
+    // TODO: Unsupported type BasicCommissioningInfoType
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
@@ -2695,11 +2666,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
     }
-
-    public void readNetworkInterfacesAttribute(NetworkInterfacesAttributeCallback callback) {
-      readNetworkInterfacesAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type NetworkInterfaceType
     public void readRebootCountAttribute(IntegerAttributeCallback callback) {
       readRebootCountAttribute(chipClusterPtr, callback);
     }
@@ -2707,10 +2674,7 @@ public class ChipClusters {
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readNetworkInterfacesAttribute(
-        long chipClusterPtr, NetworkInterfacesAttributeCallback callback);
-
+    // TODO: Unsupported type NetworkInterfaceType
     private native void readRebootCountAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -2770,24 +2734,13 @@ public class ChipClusters {
 
       void onError(Exception ex);
     }
-
-    public void readGroupsAttribute(GroupsAttributeCallback callback) {
-      readGroupsAttribute(chipClusterPtr, callback);
-    }
-
-    public void readGroupKeysAttribute(GroupKeysAttributeCallback callback) {
-      readGroupKeysAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type GroupState
+    // TODO: Unsupported type GroupKey
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readGroupsAttribute(long chipClusterPtr, GroupsAttributeCallback callback);
-
-    private native void readGroupKeysAttribute(
-        long chipClusterPtr, GroupKeysAttributeCallback callback);
-
+    // TODO: Unsupported type GroupState
+    // TODO: Unsupported type GroupKey
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
@@ -3157,11 +3110,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
     }
-
-    public void readMediaInputListAttribute(MediaInputListAttributeCallback callback) {
-      readMediaInputListAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type MediaInputInfo
     public void readCurrentMediaInputAttribute(IntegerAttributeCallback callback) {
       readCurrentMediaInputAttribute(chipClusterPtr, callback);
     }
@@ -3169,10 +3118,7 @@ public class ChipClusters {
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readMediaInputListAttribute(
-        long chipClusterPtr, MediaInputListAttributeCallback callback);
-
+    // TODO: Unsupported type MediaInputInfo
     private native void readCurrentMediaInputAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -3926,11 +3872,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
     }
-
-    public void readFabricsListAttribute(FabricsListAttributeCallback callback) {
-      readFabricsListAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type FabricDescriptor
     public void readSupportedFabricsAttribute(IntegerAttributeCallback callback) {
       readSupportedFabricsAttribute(chipClusterPtr, callback);
     }
@@ -3942,10 +3884,7 @@ public class ChipClusters {
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readFabricsListAttribute(
-        long chipClusterPtr, FabricsListAttributeCallback callback);
-
+    // TODO: Unsupported type FabricDescriptor
     private native void readSupportedFabricsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -4398,11 +4337,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
     }
-
-    public void readTvChannelListAttribute(TvChannelListAttributeCallback callback) {
-      readTvChannelListAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type TvChannelInfo
     public void readTvChannelLineupAttribute(OctetStringAttributeCallback callback) {
       readTvChannelLineupAttribute(chipClusterPtr, callback);
     }
@@ -4414,10 +4349,7 @@ public class ChipClusters {
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readTvChannelListAttribute(
-        long chipClusterPtr, TvChannelListAttributeCallback callback);
-
+    // TODO: Unsupported type TvChannelInfo
     private native void readTvChannelLineupAttribute(
         long chipClusterPtr, OctetStringAttributeCallback callback);
 
@@ -4464,18 +4396,11 @@ public class ChipClusters {
 
       void onError(Exception ex);
     }
-
-    public void readTargetNavigatorListAttribute(TargetNavigatorListAttributeCallback callback) {
-      readTargetNavigatorListAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type NavigateTargetTargetInfo
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readTargetNavigatorListAttribute(
-        long chipClusterPtr, TargetNavigatorListAttributeCallback callback);
-
+    // TODO: Unsupported type NavigateTargetTargetInfo
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
@@ -4731,12 +4656,7 @@ public class ChipClusters {
     public void readListOctetStringAttribute(ListOctetStringAttributeCallback callback) {
       readListOctetStringAttribute(chipClusterPtr, callback);
     }
-
-    public void readListStructOctetStringAttribute(
-        ListStructOctetStringAttributeCallback callback) {
-      readListStructOctetStringAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type TestListStructOctet
     public void readLongOctetStringAttribute(OctetStringAttributeCallback callback) {
       readLongOctetStringAttribute(chipClusterPtr, callback);
     }
@@ -4760,7 +4680,7 @@ public class ChipClusters {
     public void writeLongCharStringAttribute(DefaultClusterCallback callback, String value) {
       writeLongCharStringAttribute(chipClusterPtr, callback, value);
     }
-
+    // TODO: Unsupported type simplestruct
     public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
       readUnsupportedAttribute(chipClusterPtr, callback);
     }
@@ -4862,10 +4782,7 @@ public class ChipClusters {
 
     private native void readListOctetStringAttribute(
         long chipClusterPtr, ListOctetStringAttributeCallback callback);
-
-    private native void readListStructOctetStringAttribute(
-        long chipClusterPtr, ListStructOctetStringAttributeCallback callback);
-
+    // TODO: Unsupported type TestListStructOctet
     private native void readLongOctetStringAttribute(
         long chipClusterPtr, OctetStringAttributeCallback callback);
 
@@ -4883,7 +4800,7 @@ public class ChipClusters {
 
     private native void writeLongCharStringAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, String value);
-
+    // TODO: Unsupported type simplestruct
     private native void readUnsupportedAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
 
@@ -5402,15 +5319,8 @@ public class ChipClusters {
     public void readOverrunCountAttribute(LongAttributeCallback callback) {
       readOverrunCountAttribute(chipClusterPtr, callback);
     }
-
-    public void readNeighborTableListAttribute(NeighborTableListAttributeCallback callback) {
-      readNeighborTableListAttribute(chipClusterPtr, callback);
-    }
-
-    public void readRouteTableListAttribute(RouteTableListAttributeCallback callback) {
-      readRouteTableListAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type NeighborTable
+    // TODO: Unsupported type RouteTable
     public void readPartitionIdAttribute(LongAttributeCallback callback) {
       readPartitionIdAttribute(chipClusterPtr, callback);
     }
@@ -5598,20 +5508,11 @@ public class ChipClusters {
     public void readRxErrOtherCountAttribute(LongAttributeCallback callback) {
       readRxErrOtherCountAttribute(chipClusterPtr, callback);
     }
-
-    public void readSecurityPolicyAttribute(SecurityPolicyAttributeCallback callback) {
-      readSecurityPolicyAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type SecurityPolicy
     public void readChannelMaskAttribute(IntegerAttributeCallback callback) {
       readChannelMaskAttribute(chipClusterPtr, callback);
     }
-
-    public void readOperationalDatasetComponentsAttribute(
-        OperationalDatasetComponentsAttributeCallback callback) {
-      readOperationalDatasetComponentsAttribute(chipClusterPtr, callback);
-    }
-
+    // TODO: Unsupported type OperationalDatasetComponents
     public void readActiveNetworkFaultsListAttribute(
         ActiveNetworkFaultsListAttributeCallback callback) {
       readActiveNetworkFaultsListAttribute(chipClusterPtr, callback);
@@ -5640,13 +5541,8 @@ public class ChipClusters {
 
     private native void readOverrunCountAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
-
-    private native void readNeighborTableListAttribute(
-        long chipClusterPtr, NeighborTableListAttributeCallback callback);
-
-    private native void readRouteTableListAttribute(
-        long chipClusterPtr, RouteTableListAttributeCallback callback);
-
+    // TODO: Unsupported type NeighborTable
+    // TODO: Unsupported type RouteTable
     private native void readPartitionIdAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
 
@@ -5787,16 +5683,10 @@ public class ChipClusters {
 
     private native void readRxErrOtherCountAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
-
-    private native void readSecurityPolicyAttribute(
-        long chipClusterPtr, SecurityPolicyAttributeCallback callback);
-
+    // TODO: Unsupported type SecurityPolicy
     private native void readChannelMaskAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void readOperationalDatasetComponentsAttribute(
-        long chipClusterPtr, OperationalDatasetComponentsAttributeCallback callback);
-
+    // TODO: Unsupported type OperationalDatasetComponents
     private native void readActiveNetworkFaultsListAttribute(
         long chipClusterPtr, ActiveNetworkFaultsListAttributeCallback callback);
 
