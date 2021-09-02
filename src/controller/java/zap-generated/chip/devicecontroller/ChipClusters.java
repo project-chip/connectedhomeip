@@ -3632,6 +3632,61 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
+  public static class OtaSoftwareUpdateRequestorCluster extends BaseChipCluster {
+    public OtaSoftwareUpdateRequestorCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void announceOtaProvider(
+        DefaultClusterCallback callback,
+        byte[] serverLocation,
+        int vendorId,
+        int announcementReason,
+        byte[] metadataForNode) {
+      announceOtaProvider(
+          chipClusterPtr, callback, serverLocation, vendorId, announcementReason, metadataForNode);
+    }
+
+    private native void announceOtaProvider(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        byte[] serverLocation,
+        int vendorId,
+        int announcementReason,
+        byte[] metadataForNode);
+
+    public void readDefaultOtaProviderAttribute(OctetStringAttributeCallback callback) {
+      readDefaultOtaProviderAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeDefaultOtaProviderAttribute(DefaultClusterCallback callback, byte[] value) {
+      writeDefaultOtaProviderAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readUpdatePossibleAttribute(BooleanAttributeCallback callback) {
+      readUpdatePossibleAttribute(chipClusterPtr, callback);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readDefaultOtaProviderAttribute(
+        long chipClusterPtr, OctetStringAttributeCallback callback);
+
+    private native void writeDefaultOtaProviderAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, byte[] value);
+
+    private native void readUpdatePossibleAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class OccupancySensingCluster extends BaseChipCluster {
     public OccupancySensingCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
