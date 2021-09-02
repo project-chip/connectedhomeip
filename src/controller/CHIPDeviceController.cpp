@@ -1044,7 +1044,7 @@ CHIP_ERROR DeviceCommissioner::OperationalDiscoveryComplete(NodeId remoteDeviceI
 CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration,
                                                        uint16_t discriminator, uint8_t option)
 {
-    ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID %" PRIu64, deviceId);
+    ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, deviceId);
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     Device * device = nullptr;
