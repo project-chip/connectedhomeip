@@ -217,29 +217,34 @@ public:
     template <typename Function>
     bool ForEachActiveObject(Function && function)
     {
-        LambdaProxy<Function> proxy(std::forward<Function>(function));
-        return ForEachActiveObjectInner(&proxy, &LambdaProxy<Function>::Call);
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        std::lock_guard<std::mutex> lock(mMutex);
+        Object * p = mDummyHead.mNext;
+        while (p)
+        {
+            if (!function(static_cast<T *>(p)))
+            {
+                return false;
+            }
+            p = p->mNext;
+        }
+#else
+        for (unsigned int i = 0; i < N; ++i)
+        {
+            T & lObject = reinterpret_cast<T *>(mArena.uMemory)[i];
+
+            if (lObject.IsRetained())
+            {
+                if (!function(&lObject))
+                    return false;
+            }
+        }
+#endif
+        return true;
     }
 
 private:
     friend class TestObject;
-
-    template <typename Function>
-    class LambdaProxy
-    {
-    public:
-        LambdaProxy(Function && function) : mFunction(std::move(function)) {}
-        static bool Call(void * context, void * target)
-        {
-            return static_cast<LambdaProxy *>(context)->mFunction(static_cast<T *>(target));
-        }
-
-    private:
-        Function mFunction;
-    };
-
-    using Lambda = bool (*)(void *, void *);
-    bool ForEachActiveObjectInner(void * context, Lambda lambda);
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     std::mutex mMutex;
@@ -274,7 +279,7 @@ inline void ObjectPool<T, N>::Reset()
     memset(mArena.uMemory, 0, N * sizeof(T));
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    mHighWatermark      = 0;
+    mHighWatermark = 0;
 #endif
 #endif
 }
@@ -344,35 +349,6 @@ inline T * ObjectPool<T, N>::TryCreate()
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
     return lReturn;
-}
-
-template <class T, unsigned int N>
-inline bool ObjectPool<T, N>::ForEachActiveObjectInner(void * context, Lambda lambda)
-{
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    std::lock_guard<std::mutex> lock(mMutex);
-    Object * p = mDummyHead.mNext;
-    while (p)
-    {
-        if (!lambda(context, static_cast<void *>(p)))
-        {
-            return false;
-        }
-        p = p->mNext;
-    }
-#else
-    for (unsigned int i = 0; i < N; ++i)
-    {
-        T & lObject = reinterpret_cast<T *>(mArena.uMemory)[i];
-
-        if (lObject.IsRetained())
-        {
-            if (!lambda(context, static_cast<void *>(&lObject)))
-                return false;
-        }
-    }
-#endif
-    return true;
 }
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
