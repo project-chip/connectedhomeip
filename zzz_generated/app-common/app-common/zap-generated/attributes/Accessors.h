@@ -602,8 +602,6 @@ EmberAfStatus GetSupportedFabrics(chip::EndpointId endpoint, uint8_t * supported
 EmberAfStatus SetSupportedFabrics(chip::EndpointId endpoint, uint8_t supportedFabrics);
 EmberAfStatus GetCommissionedFabrics(chip::EndpointId endpoint, uint8_t * commissionedFabrics); // int8u
 EmberAfStatus SetCommissionedFabrics(chip::EndpointId endpoint, uint8_t commissionedFabrics);
-EmberAfStatus GetCurrentFabricIndex(chip::EndpointId endpoint, uint8_t * currentFabricIndex); // int8u
-EmberAfStatus SetCurrentFabricIndex(chip::EndpointId endpoint, uint8_t currentFabricIndex);
 } // namespace Attributes
 } // namespace OperationalCredentials
 

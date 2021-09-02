@@ -475,12 +475,10 @@ static constexpr AttributeId MultiPressMax     = 0x00000002;
 namespace OperationalCredentials {
 namespace Attributes {
 namespace Ids {
-static constexpr AttributeId NOCs                    = 0x00000000;
 static constexpr AttributeId FabricsList             = 0x00000001;
 static constexpr AttributeId SupportedFabrics        = 0x00000002;
 static constexpr AttributeId CommissionedFabrics     = 0x00000003;
 static constexpr AttributeId TrustedRootCertificates = 0x00000004;
-static constexpr AttributeId CurrentFabricIndex      = 0x00000005;
 } // namespace Ids
 } // namespace Attributes
 } // namespace OperationalCredentials

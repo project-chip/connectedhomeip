@@ -405,38 +405,6 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
     cb->mCall(cb->mContext, count, data);
 }
 
-void OperationalCredentialsClusterNOCsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    // TODO: Add actual support for array and lists.
-    const uint8_t * message = nullptr;
-    uint16_t messageLen     = 0;
-    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
-    if (res != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
-        return;
-    }
-
-    CHECK_MESSAGE_LENGTH_VOID(2);
-    uint16_t count = Encoding::LittleEndian::Read16(message);
-    _NOCStruct data[count];
-    for (size_t i = 0; i < count; i++)
-    {
-        CHECK_MESSAGE_LENGTH_VOID(1);
-        data[i].FabricIndex = emberAfGetInt8u(message, 0, 1);
-        message += 1;
-        CHECK_STATUS_VOID(ReadByteSpan(message, 2, &data[i].NOC));
-        messageLen = static_cast<uint16_t>(messageLen - 2);
-        message += 2;
-    }
-    Callback::Callback<OperationalCredentialsNOCsListAttributeCallback> * cb =
-        Callback::Callback<OperationalCredentialsNOCsListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, count, data);
-}
-
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {

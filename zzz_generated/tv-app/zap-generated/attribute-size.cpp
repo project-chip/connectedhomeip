@@ -417,29 +417,6 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-        case 0x0000: // NOCs
-        {
-            entryLength = 3;
-            if (((index - 1) * entryLength) > (am->size - entryLength))
-            {
-                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                return 0;
-            }
-            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-            // Struct _NOCStruct
-            _NOCStruct * entry = reinterpret_cast<_NOCStruct *>(write ? src : dest);
-            copyListMember(write ? dest : (uint8_t *) &entry->FabricIndex, write ? (uint8_t *) &entry->FabricIndex : src, write,
-                           &entryOffset, sizeof(entry->FabricIndex)); // INT8U
-            ByteSpan * NOCSpan = &entry->NOC;                         // OCTET_STRING
-            if (CHIP_NO_ERROR !=
-                (write ? WriteByteSpan(dest + entryOffset, 2, NOCSpan) : ReadByteSpan(src + entryOffset, 2, NOCSpan)))
-            {
-                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                return 0;
-            }
-            entryOffset = static_cast<uint16_t>(entryOffset + 2);
-            break;
-        }
         case 0x0001: // fabrics list
         {
             entryLength = 120;
@@ -858,10 +835,6 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     case 0x003E: // Operational Credentials Cluster
         switch (attributeId)
         {
-        case 0x0000: // NOCs
-            // Struct _NOCStruct
-            entryLength = 3;
-            break;
         case 0x0001: // fabrics list
             // Struct _FabricDescriptor
             entryLength = 120;

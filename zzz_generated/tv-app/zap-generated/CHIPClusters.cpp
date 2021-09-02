@@ -761,18 +761,6 @@ CHIP_ERROR OperationalCredentialsCluster::DiscoverAttributes(Callback::Cancelabl
     COMMAND_FOOTER();
 }
 
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeNOCs(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             OperationalCredentialsClusterNOCsListAttributeFilter);
-}
-
 CHIP_ERROR OperationalCredentialsCluster::ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback)
 {
@@ -819,18 +807,6 @@ CHIP_ERROR OperationalCredentialsCluster::ReadAttributeTrustedRootCertificates(C
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeCurrentFabricIndex(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
 CHIP_ERROR OperationalCredentialsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,

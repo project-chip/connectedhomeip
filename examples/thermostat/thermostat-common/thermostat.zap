@@ -3374,21 +3374,6 @@
           ],
           "attributes": [
             {
-              "name": "NOCs",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
               "name": "fabrics list",
               "code": 1,
               "mfgCode": null,
@@ -3440,21 +3425,6 @@
               "side": "server",
               "included": 1,
               "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "CurrentFabricIndex",
-              "code": 5,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
