@@ -29,10 +29,6 @@
 #include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
 
-#define sleep unistd_sleep
-#include <platform/CHIPDeviceLayer.h>
-#undef sleep
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;

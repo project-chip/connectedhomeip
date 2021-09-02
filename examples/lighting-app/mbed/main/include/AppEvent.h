@@ -56,7 +56,6 @@ struct AppEvent
         struct
         {
             uint8_t Value;
-
         } SliderEvent;
     };
 
