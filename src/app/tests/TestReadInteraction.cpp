@@ -165,13 +165,10 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient) override
     {
-        if (aError == CHIP_NO_ERROR)
-        {
-            mGotReadStatusResponse = true;
-        }
-        return aError;
+        mGotReadStatusResponse = true;
+        return CHIP_NO_ERROR;
     }
 
     bool mGotEventResponse      = false;

@@ -450,13 +450,10 @@ public:
         printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format());
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient) override
     {
-        if (aError == CHIP_NO_ERROR)
-        {
-            HandleReadComplete();
-        }
-        return aError;
+        HandleReadComplete();
+        return CHIP_NO_ERROR;
     }
     CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * apCommandSender,
                                      const chip::Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
