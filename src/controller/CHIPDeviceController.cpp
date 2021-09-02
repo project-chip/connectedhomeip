@@ -1044,7 +1044,7 @@ CHIP_ERROR DeviceCommissioner::OperationalDiscoveryComplete(NodeId remoteDeviceI
 CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration,
                                                        uint16_t discriminator, uint8_t option)
 {
-    ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID %" PRIu64, deviceId);
+    ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, deviceId);
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     Device * device = nullptr;
@@ -1053,7 +1053,7 @@ CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t
     std::string QRCode;
     std::string manualPairingCode;
     SetupPayload payload;
-    Device::PairingWindowOption pairingWindowOption;
+    Device::CommissioningWindowOption commissioningWindowOption;
     ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
 
     payload.discriminator = discriminator;
@@ -1061,22 +1061,22 @@ CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t
     switch (option)
     {
     case 0:
-        pairingWindowOption = Device::PairingWindowOption::kOriginalSetupCode;
+        commissioningWindowOption = Device::CommissioningWindowOption::kOriginalSetupCode;
         break;
     case 1:
-        pairingWindowOption = Device::PairingWindowOption::kTokenWithRandomPIN;
+        commissioningWindowOption = Device::CommissioningWindowOption::kTokenWithRandomPIN;
         break;
     case 2:
-        pairingWindowOption = Device::PairingWindowOption::kTokenWithProvidedPIN;
+        commissioningWindowOption = Device::CommissioningWindowOption::kTokenWithProvidedPIN;
         break;
     default:
         ChipLogError(Controller, "Invalid Pairing Window option");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ReturnErrorOnFailure(device->OpenCommissioningWindow(timeout, iteration, pairingWindowOption, salt, payload));
+    ReturnErrorOnFailure(device->OpenCommissioningWindow(timeout, iteration, commissioningWindowOption, salt, payload));
 
-    if (pairingWindowOption != Device::PairingWindowOption::kOriginalSetupCode)
+    if (commissioningWindowOption != Device::CommissioningWindowOption::kOriginalSetupCode)
     {
         ReturnErrorOnFailure(ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode));
         ChipLogProgress(Controller, "Manual pairing code: [%s]", manualPairingCode.c_str());

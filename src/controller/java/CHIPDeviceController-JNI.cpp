@@ -549,7 +549,8 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
 
-    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
+    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::CommissioningWindowOption::kOriginalSetupCode,
+                                        setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
