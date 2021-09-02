@@ -192,7 +192,7 @@ CHIP_ERROR LayerImplLibevent::StartTimer(uint32_t delayMilliseconds, TimerComple
     timer->mEvent = e;
 
     timeval delay;
-    MillisecondsToTimeval(delayMilliseconds, delay);
+    Clock::MillisecondsToTimeval(delayMilliseconds, delay);
     int status = evtimer_add(e, &delay);
     VerifyOrReturnError(status == 0, CHIP_ERROR_INTERNAL);
 
