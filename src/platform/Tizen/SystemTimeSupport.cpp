@@ -25,8 +25,8 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <support/TimeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/TimeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace System {
