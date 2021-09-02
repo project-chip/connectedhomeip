@@ -123,7 +123,7 @@
     _deltaInFahrenheitTextField = [UITextField new];
     _deltaInFahrenheitTextField.keyboardType = UIKeyboardTypeNumberPad;
     UILabel * deltaInFahrenheitLabel = [UILabel new];
-    [deltaInFahrenheitLabel setText:@"Delta (F):"];
+    [deltaInFahrenheitLabel setText:@"Delta (°C):"];
     UIView * deltaInFahrenheitView = [CHIPUIViewUtils viewWithLabel:deltaInFahrenheitLabel textField:_deltaInFahrenheitTextField];
     [stackView addArrangedSubview:deltaInFahrenheitView];
 
