@@ -74,6 +74,12 @@ class TestObject : public Object
 public:
     CHIP_ERROR Init();
 
+    TestObject() = default;
+    TestObject(unsigned int index) { mIndex = index; }
+
+    unsigned int GetIndex() { return mIndex; }
+
+    static void CheckCreation(nlTestSuite * inSuite, void * aContext);
     static void CheckIteration(nlTestSuite * inSuite, void * aContext);
     static void CheckRetention(nlTestSuite * inSuite, void * aContext);
     static void CheckConcurrency(nlTestSuite * inSuite, void * aContext);
@@ -92,6 +98,8 @@ private:
     static_assert(kPoolSize < CHIP_SYS_STATS_COUNT_MAX, "kPoolSize is not less than CHIP_SYS_STATS_COUNT_MAX");
 
     static ObjectPool<TestObject, kPoolSize> sPool;
+
+    unsigned int mIndex;
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     unsigned int mDelay;
@@ -132,6 +140,33 @@ struct TestContext
 
 struct TestContext sContext;
 } // namespace
+
+// Test Object Creation
+
+void TestObject::CheckCreation(nlTestSuite * inSuite, void * aContext)
+{
+    TestContext & lContext = *static_cast<TestContext *>(aContext);
+    unsigned int i;
+
+    sPool.Reset();
+
+    for (i = 0; i < kPoolSize; ++i)
+    {
+        TestObject * lCreated = sPool.TryCreate(i);
+
+        NL_TEST_ASSERT(lContext.mTestSuite, lCreated != nullptr);
+        NL_TEST_ASSERT(lContext.mTestSuite, lCreated->GetIndex() == i);
+        lCreated->Init();
+    }
+
+    i = 0;
+    sPool.ForEachActiveObject([&](TestObject * lCreated) {
+        NL_TEST_ASSERT(lContext.mTestSuite, lCreated->IsRetained());
+        i++;
+        return true;
+    });
+    NL_TEST_ASSERT(lContext.mTestSuite, i == kPoolSize);
+}
 
 // Test Object Iteration
 
@@ -386,6 +421,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 // clang-format off
 static const nlTest sTests[] =
 {
+    NL_TEST_DEF("Creation",                 TestObject::CheckCreation),
     NL_TEST_DEF("Iteration",                TestObject::CheckIteration),
     NL_TEST_DEF("Retention",                TestObject::CheckRetention),
     NL_TEST_DEF("Concurrency",              TestObject::CheckConcurrency),

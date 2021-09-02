@@ -65,7 +65,7 @@ DLL_EXPORT void Object::Release()
     }
 }
 
-DLL_EXPORT bool Object::TryCreate(size_t aOctets)
+DLL_EXPORT bool Object::TryCreate()
 {
     if (!__sync_bool_compare_and_swap(&this->mRefCount, 0, 1))
     {
@@ -73,7 +73,6 @@ DLL_EXPORT bool Object::TryCreate(size_t aOctets)
     }
 
     this->AppState = nullptr;
-    memset(reinterpret_cast<char *>(this) + sizeof(*this), 0, aOctets - sizeof(*this));
 
     return true;
 }

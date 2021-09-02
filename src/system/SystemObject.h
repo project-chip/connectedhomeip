@@ -133,22 +133,15 @@ private:
      *      If reference count is non-zero, tryCreate will fail and return false.
      *      If reference count is zero, then:
      *         - reference count will be set to  1
-     *         - The size of the created object (assumed to be derived from SystemObject) is aOctects.
-     *           the method will memset to 0 the bytes following sizeof(SystemObject).
      *
      *       Typical usage is like:
-     *           class Foo: public SystemObject {...}
+     *           class Foo: public Object {...}
      *           ....
      *           Foo foo;
-     *           foo.TryCreate(sizeof(foo));
+     *           foo.TryCreate();
      *
-     *       IMPORTANT inheritance precondition:
-     *           0 memset assumes that SystemObject is the top of the inheritance. This will NOT work properly:
-     *           class Bar: public Baz, SystemObject {...}
-     *           Bar bar;
-     *           bar.TryCreate(sizeof(bar)); /// NOT safe: this will clear sizeof(Baz) extra bytes in unallocated space.
      */
-    bool TryCreate(size_t aOctets);
+    bool TryCreate();
 
 public:
     void * AppState; /**< Generic pointer to app-specific data associated with the object. */
@@ -204,8 +197,75 @@ class ObjectPool
 public:
     void Reset();
 
-    T * TryCreate();
     void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
+
+    template <typename... Args>
+    T * TryCreate(Args &&... args)
+    {
+        T * lReturn = nullptr;
+
+        (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        T * newNode = new T(std::forward<Args>(args)...);
+
+        if (newNode->TryCreate())
+        {
+            std::lock_guard<std::mutex> lock(mMutex);
+            Object * p = &mDummyHead;
+            if (p->mNext)
+            {
+                p->mNext->mPrev = newNode;
+            }
+            newNode->mNext     = p->mNext;
+            p->mNext           = newNode;
+            newNode->mPrev     = p;
+            newNode->mMutexRef = &mMutex;
+            lReturn            = newNode;
+        }
+        else
+        {
+            delete newNode;
+        }
+#else // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        unsigned int lIndex = 0;
+
+        for (lIndex = 0; lIndex < N; ++lIndex)
+        {
+            T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
+
+            if (lObject.TryCreate())
+            {
+                char buffer[sizeof(T)];
+                new (buffer) T(std::forward<Args>(args)...);
+                size_t octets = sizeof(Object);
+
+                memcpy(reinterpret_cast<char *>(&lObject) + octets, buffer + octets, sizeof(T) - octets);
+                lReturn = &lObject;
+                break;
+            }
+        }
+
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+        unsigned int lNumInUse = 0;
+
+        if (lReturn != nullptr)
+        {
+            lIndex++;
+            lNumInUse = lIndex;
+            GetNumObjectsInUse(lIndex, lNumInUse);
+        }
+        else
+        {
+            lNumInUse = N;
+        }
+
+        UpdateHighWatermark(lNumInUse);
+#endif
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+        return lReturn;
+    }
 
     /**
      * @brief
@@ -282,73 +342,6 @@ inline void ObjectPool<T, N>::Reset()
     mHighWatermark = 0;
 #endif
 #endif
-}
-
-/**
- *  @brief
- *      Tries to initially retain the first object in the pool that is not retained.
- */
-template <class T, unsigned int N>
-inline T * ObjectPool<T, N>::TryCreate()
-{
-    T * lReturn = nullptr;
-
-    (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
-
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    T * newNode = new T();
-
-    if (newNode->TryCreate(sizeof(T)))
-    {
-        std::lock_guard<std::mutex> lock(mMutex);
-        Object * p = &mDummyHead;
-        if (p->mNext)
-        {
-            p->mNext->mPrev = newNode;
-        }
-        newNode->mNext     = p->mNext;
-        p->mNext           = newNode;
-        newNode->mPrev     = p;
-        newNode->mMutexRef = &mMutex;
-        lReturn            = newNode;
-    }
-    else
-    {
-        delete newNode;
-    }
-#else // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    unsigned int lIndex = 0;
-
-    for (lIndex = 0; lIndex < N; ++lIndex)
-    {
-        T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
-
-        if (lObject.TryCreate(sizeof(T)))
-        {
-            lReturn = &lObject;
-            break;
-        }
-    }
-
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    unsigned int lNumInUse = 0;
-
-    if (lReturn != nullptr)
-    {
-        lIndex++;
-        lNumInUse = lIndex;
-        GetNumObjectsInUse(lIndex, lNumInUse);
-    }
-    else
-    {
-        lNumInUse = N;
-    }
-
-    UpdateHighWatermark(lNumInUse);
-#endif
-#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-
-    return lReturn;
 }
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
