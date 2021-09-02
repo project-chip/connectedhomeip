@@ -39,10 +39,9 @@ struct ReadPrepareParams
     uint16_t mMinIntervalSeconds                    = 0;
     uint16_t mMaxIntervalSeconds                    = 0;
 
-    ReadPrepareParams() {}
-    ReadPrepareParams(ReadPrepareParams && other)
+    ReadPrepareParams(SessionHandle sessionHandle) : mSessionHandle(sessionHandle) {}
+    ReadPrepareParams(ReadPrepareParams && other) : mSessionHandle(other.mSessionHandle)
     {
-        mSessionHandle                     = other.mSessionHandle;
         mpEventPathParamsList              = other.mpEventPathParamsList;
         mEventPathParamsListSize           = other.mEventPathParamsListSize;
         mpAttributePathParamsList          = other.mpAttributePathParamsList;

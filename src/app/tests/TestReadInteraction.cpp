@@ -303,9 +303,8 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     err                            = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    ReadPrepareParams readPrepareParams;
-    readPrepareParams.mSessionHandle = ctx.GetSessionLocalToPeer();
-    err                              = readClient.SendReadRequest(readPrepareParams);
+    ReadPrepareParams readPrepareParams(ctx.GetSessionLocalToPeer());
+    err = readClient.SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf);
@@ -329,9 +328,8 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    Messaging::ExchangeManager exchangeManager;
-    Messaging::ExchangeContext * exchangeCtx = exchangeManager.NewContext(SessionHandle(), nullptr);
-    readHandler.Init(&exchangeManager, nullptr, exchangeCtx);
+    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToPeer(nullptr);
+    readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx);
 
     GenerateReportData(apSuite, apContext, reportDatabuf);
     err = readHandler.SendReportData(std::move(reportDatabuf));
@@ -364,6 +362,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     err = readHandler.OnReadInitialRequest(std::move(readRequestbuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    exchangeCtx->Close();
     engine->Shutdown();
 }
 
@@ -431,9 +430,8 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     err                            = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    ReadPrepareParams readPrepareParams;
-    readPrepareParams.mSessionHandle = ctx.GetSessionLocalToPeer();
-    err                              = readClient.SendReadRequest(readPrepareParams);
+    ReadPrepareParams readPrepareParams(ctx.GetSessionLocalToPeer());
+    err = readClient.SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/);
@@ -458,9 +456,8 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    Messaging::ExchangeManager exchangeManager;
-    Messaging::ExchangeContext * exchangeCtx = exchangeManager.NewContext(SessionHandle(), nullptr);
-    readHandler.Init(&exchangeManager, nullptr, exchangeCtx);
+    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToPeer(nullptr);
+    readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx);
 
     GenerateReportData(apSuite, apContext, reportDatabuf);
     err = readHandler.SendReportData(std::move(reportDatabuf));
@@ -488,6 +485,8 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
 
     err = readHandler.OnReadInitialRequest(std::move(readRequestbuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+
+    exchangeCtx->Close();
     engine->Shutdown();
 }
 
@@ -638,8 +637,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     attributePathParams[1].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     attributePathParams[1].mFlags.Set(chip::app::AttributePathParams::Flags::kListIndexValid);
 
-    ReadPrepareParams readPrepareParams;
-    readPrepareParams.mSessionHandle               = ctx.GetSessionLocalToPeer();
+    ReadPrepareParams readPrepareParams(ctx.GetSessionLocalToPeer());
     readPrepareParams.mpEventPathParamsList        = eventPathParams;
     readPrepareParams.mEventPathParamsListSize     = 2;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
@@ -684,8 +682,7 @@ void TestReadInteraction::TestReadInvalidAttributePathRoundtrip(nlTestSuite * ap
     attributePathParams[0].mListIndex  = 0;
     attributePathParams[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
-    ReadPrepareParams readPrepareParams;
-    readPrepareParams.mSessionHandle               = ctx.GetSessionLocalToPeer();
+    ReadPrepareParams readPrepareParams(ctx.GetSessionLocalToPeer());
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams);
