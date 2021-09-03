@@ -65,7 +65,7 @@ public class ChipClusters {
     public abstract long initWithDevice(long devicePtr, int endpointId);
 
     public native void deleteCluster(long chipClusterPtr);
-    
+
     @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
       super.finalize();
@@ -102,7 +102,7 @@ public class ChipClusters {
       void onSuccess(
       String setupPIN
       );
-      
+
       void onError(Exception error);
     }
 
@@ -256,7 +256,7 @@ public class ChipClusters {
       int status
       , String data
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1516,7 +1516,7 @@ public class ChipClusters {
       String data
       , int contentLaunchStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1525,7 +1525,7 @@ public class ChipClusters {
       String data
       , int contentLaunchStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1581,7 +1581,7 @@ public class ChipClusters {
     public static class DeviceListAttribute {
       public long type;
             public int revision;
-      
+
       public DeviceListAttribute(
         long type,
                 int revision
@@ -1849,7 +1849,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1857,7 +1857,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1865,7 +1865,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1873,7 +1873,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1881,7 +1881,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1889,7 +1889,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1897,7 +1897,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1909,7 +1909,7 @@ public class ChipClusters {
       , long localEndTime
       , int operatingModeDuringHoliday
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1923,7 +1923,7 @@ public class ChipClusters {
       , int userId
       , String pin
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1934,7 +1934,7 @@ public class ChipClusters {
       , int userType
       , String pin
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1945,7 +1945,7 @@ public class ChipClusters {
       , int userType
       , String rfid
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1954,7 +1954,7 @@ public class ChipClusters {
       int userId
       , int userType
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1969,7 +1969,7 @@ public class ChipClusters {
       , int endHour
       , int endMinute
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1981,7 +1981,7 @@ public class ChipClusters {
       , long localStartTime
       , long localEndTime
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1989,7 +1989,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -1997,7 +1997,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2005,7 +2005,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2013,7 +2013,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2021,7 +2021,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2029,7 +2029,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2037,7 +2037,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2045,7 +2045,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2053,7 +2053,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2383,7 +2383,7 @@ public class ChipClusters {
       int errorCode
       , String debugText
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2392,7 +2392,7 @@ public class ChipClusters {
       int errorCode
       , String debugText
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2401,14 +2401,14 @@ public class ChipClusters {
       int errorCode
       , String debugText
       );
-      
+
       void onError(Exception error);
     }
 
 
     public static class BasicCommissioningInfoListAttribute {
       public long failSafeExpiryLengthMs;
-      
+
       public BasicCommissioningInfoListAttribute(
         long failSafeExpiryLengthMs
               ) {
@@ -2469,7 +2469,7 @@ public class ChipClusters {
             public boolean offPremiseServicesReachableIPv6;
             public byte[] hardwareAddress;
       public int type;
-      
+
       public NetworkInterfacesAttribute(
         byte[] name,
         boolean fabricConnected,
@@ -2531,7 +2531,7 @@ public class ChipClusters {
       public int vendorId;
             public int vendorGroupId;
             public int groupKeySetIndex;
-      
+
       public GroupsAttribute(
         int vendorId,
                 int vendorGroupId,
@@ -2555,7 +2555,7 @@ public class ChipClusters {
             public byte[] groupKeyRoot;
       public long groupKeyEpochStartTime;
             public int groupKeySecurityPolicy;
-      
+
       public GroupKeysAttribute(
         int vendorId,
                 int groupKeyIndex,
@@ -2657,7 +2657,7 @@ public class ChipClusters {
       int status
       , int groupId
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2665,10 +2665,10 @@ public class ChipClusters {
       void onSuccess(
       int capacity
       , int groupCount
-      // groupList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+      // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2677,7 +2677,7 @@ public class ChipClusters {
       int status
       , int groupId
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2687,7 +2687,7 @@ public class ChipClusters {
       , int groupId
       , String groupName
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2735,7 +2735,7 @@ public class ChipClusters {
       void onSuccess(
       int timeout
       );
-      
+
       void onError(Exception error);
     }
 
@@ -2782,7 +2782,7 @@ public class ChipClusters {
       void onSuccess(
       int status
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3079,7 +3079,7 @@ public class ChipClusters {
       void onSuccess(
       int mediaPlaybackStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3087,7 +3087,7 @@ public class ChipClusters {
       void onSuccess(
       int mediaPlaybackStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3095,7 +3095,7 @@ public class ChipClusters {
       void onSuccess(
       int mediaPlaybackStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3103,7 +3103,7 @@ public class ChipClusters {
       void onSuccess(
       int mediaPlaybackStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3111,7 +3111,7 @@ public class ChipClusters {
       void onSuccess(
       int mediaPlaybackStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3119,7 +3119,7 @@ public class ChipClusters {
       void onSuccess(
       int mediaPlaybackStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3127,7 +3127,7 @@ public class ChipClusters {
       void onSuccess(
       int mediaPlaybackStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3135,7 +3135,7 @@ public class ChipClusters {
       void onSuccess(
       int mediaPlaybackStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3143,7 +3143,7 @@ public class ChipClusters {
       void onSuccess(
       int mediaPlaybackStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3151,7 +3151,7 @@ public class ChipClusters {
       void onSuccess(
       int mediaPlaybackStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3159,7 +3159,7 @@ public class ChipClusters {
       void onSuccess(
       int mediaPlaybackStatus
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3249,7 +3249,7 @@ public class ChipClusters {
       int errorCode
       , String debugText
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3258,7 +3258,7 @@ public class ChipClusters {
       int errorCode
       , String debugText
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3267,7 +3267,7 @@ public class ChipClusters {
       int errorCode
       , String debugText
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3276,7 +3276,7 @@ public class ChipClusters {
       int errorCode
       , String debugText
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3285,7 +3285,7 @@ public class ChipClusters {
       int errorCode
       , String debugText
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3293,12 +3293,12 @@ public class ChipClusters {
       void onSuccess(
       int errorCode
       , String debugText
-      // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+      // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
-      // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+      // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3307,7 +3307,7 @@ public class ChipClusters {
       int errorCode
       , String debugText
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3316,7 +3316,7 @@ public class ChipClusters {
       int errorCode
       , String debugText
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3372,7 +3372,7 @@ public class ChipClusters {
       int action
       , long delayedActionTime
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3386,7 +3386,7 @@ public class ChipClusters {
       , boolean userConsentNeeded
       , byte[] metadataForRequestor
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3671,7 +3671,7 @@ public class ChipClusters {
       , int FabricIndex
       , byte[] DebugText
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3680,7 +3680,7 @@ public class ChipClusters {
       byte[] NOCSRElements
       , byte[] AttestationSignature
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3976,7 +3976,7 @@ public class ChipClusters {
       , int groupId
       , int sceneId
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3986,10 +3986,10 @@ public class ChipClusters {
       , int capacity
       , int groupId
       , int sceneCount
-      // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+      // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       );
-      
+
       void onError(Exception error);
     }
 
@@ -3998,7 +3998,7 @@ public class ChipClusters {
       int status
       , int groupId
       );
-      
+
       void onError(Exception error);
     }
 
@@ -4008,7 +4008,7 @@ public class ChipClusters {
       , int groupId
       , int sceneId
       );
-      
+
       void onError(Exception error);
     }
 
@@ -4018,7 +4018,7 @@ public class ChipClusters {
       , int groupId
       , int sceneId
       );
-      
+
       void onError(Exception error);
     }
 
@@ -4029,10 +4029,10 @@ public class ChipClusters {
       , int sceneId
       , int transitionTime
       , String sceneName
-      // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t * 
+      // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       );
-      
+
       void onError(Exception error);
     }
 
@@ -4184,11 +4184,11 @@ public class ChipClusters {
 
     public interface ChangeChannelResponseCallback {
       void onSuccess(
-      // ChannelMatch: /* TYPE WARNING: array array defaults to */ uint8_t * 
+      // ChannelMatch: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       int ErrorType
       );
-      
+
       void onError(Exception error);
     }
 
@@ -4274,7 +4274,7 @@ public class ChipClusters {
       int status
       , String data
       );
-      
+
       void onError(Exception error);
     }
 
@@ -4404,7 +4404,7 @@ public class ChipClusters {
       void onSuccess(
       int returnValue
       );
-      
+
       void onError(Exception error);
     }
 
@@ -4412,7 +4412,7 @@ public class ChipClusters {
       void onSuccess(
       int returnValue
       );
-      
+
       void onError(Exception error);
     }
 
@@ -5093,7 +5093,7 @@ public class ChipClusters {
             public boolean fullThreadDevice;
             public boolean fullNetworkData;
             public boolean isChild;
-      
+
       public NeighborTableListAttribute(
         long extAddress,
                 long age,
@@ -5144,7 +5144,7 @@ public class ChipClusters {
             public int age;
             public boolean allocated;
             public boolean linkEstablished;
-      
+
       public RouteTableListAttribute(
         long extAddress,
                 int rloc16,
@@ -5179,7 +5179,7 @@ public class ChipClusters {
     public static class SecurityPolicyAttribute {
       public int rotationTime;
             public int flags;
-      
+
       public SecurityPolicyAttribute(
         int rotationTime,
                 int flags
@@ -5208,7 +5208,7 @@ public class ChipClusters {
             public boolean pskcPresent;
             public boolean securityPolicyPresent;
             public boolean channelMaskPresent;
-      
+
       public OperationalDatasetComponentsAttribute(
         boolean activeTimestampPresent,
                 boolean pendingTimestampPresent,
