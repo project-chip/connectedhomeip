@@ -221,10 +221,7 @@ private:
 
     FabricId mFabricId = 0;
 
-    // KeySize is defined in the header so we always see its definition before
-    // its uses, which is necessary for a constexpr function to actually be
-    // treated as constexpr.
-    static constexpr size_t KeySize() { return sizeof(kFabricTableKeyPrefix) + 2 * sizeof(FabricIndex); }
+    static constexpr size_t kKeySize = sizeof(kFabricTableKeyPrefix) + 2 * sizeof(FabricIndex);
 
     static CHIP_ERROR GenerateKey(FabricIndex id, char * key, size_t len);
 
