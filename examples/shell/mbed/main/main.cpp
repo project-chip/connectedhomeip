@@ -15,18 +15,10 @@
  *    limitations under the License.
  */
 
-#include <lib/shell/Engine.h>
-
 #include <lib/core/CHIPCore.h>
-#include <lib/support/Base64.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/RandUtils.h>
+#include <lib/shell/Engine.h>
+#include <platform/mbed/Logging.h>
 #include <support/logging/CHIPLogging.h>
-
-#ifdef MBED_CONF_MBED_TRACE_ENABLE
-#include "mbed-trace/mbed_trace.h"
-#endif
 
 #include "ChipShellMbedCollection.h"
 #include "rtos/Thread.h"
@@ -34,21 +26,24 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-using namespace chip;
-using namespace chip::Shell;
+using namespace ::chip;
+using namespace ::chip::Shell;
+using namespace ::chip::Platform;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::Logging::Platform;
 
 rtos::Thread shellThread{ osPriorityNormal, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE,
                           /* memory provided */ nullptr, "Shell" };
 
 int main()
 {
-    chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_Progress);
+    mbed_logging_init();
 
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+    MemoryInit();
+    PlatformMgr().InitChipStack();
+    PlatformMgr().StartEventLoopTask();
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
+    ConnectivityManagerImpl().StartWiFiManagement();
 #endif
 
     // Initialize the default streamer that was linked.
@@ -59,12 +54,6 @@ int main()
         return rc;
     }
 
-#ifdef MBED_CONF_MBED_TRACE_ENABLE
-    mbed_trace_init();
-    mbed_trace_include_filters_set("BSDS,NETS");
-    mbed_trace_config_set(TRACE_ACTIVE_LEVEL_ALL | TRACE_MODE_COLOR);
-#endif
-
     cmd_misc_init();
     cmd_otcli_init();
     cmd_ping_init();
@@ -74,7 +63,7 @@ int main()
     auto error = shellThread.start([] { Engine::Root().RunMainLoop(); });
     if (error != osOK)
     {
-        ChipLogError(Shell, "Run shell thread failed: %d", error);
+        ChipLogError(Shell, "Run shell thread failed: %d", (int) error);
         return error;
     }
 
