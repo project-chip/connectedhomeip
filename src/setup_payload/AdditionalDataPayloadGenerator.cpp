@@ -78,7 +78,7 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeC
 }
 
 CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdInBinary(uint16_t lifetimeCounter, const char * serialNumberBuffer,
-                                                                    size_t serialNumberBufferSize, uint8_t rotatingDeviceIdBuffer[],
+                                                                    size_t serialNumberBufferSize, uint8_t * rotatingDeviceIdBuffer,
                                                                     size_t rotatingDeviceIdBufferSize,
                                                                     size_t & rotatingDeviceIdValueOutputSize)
 {
@@ -105,14 +105,14 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdInBinary(uint
     outputBufferWriter.Put(&hashOutputBuffer[kSHA256_Hash_Length - RotatingDeviceId::kHashSuffixLength],
                            RotatingDeviceId::kHashSuffixLength);
 
-    rotatingDeviceIdBuffer = outputBuffer;
     rotatingDeviceIdValueOutputSize = outputBufferWriter.Needed();
+    memmove(rotatingDeviceIdBuffer, outputBuffer, rotatingDeviceIdValueOutputSize);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdInString(uint16_t lifetimeCounter, const char * serialNumberBuffer,
-                                                                    size_t serialNumberBufferSize, char rotatingDeviceIdBuffer[],
+                                                                    size_t serialNumberBufferSize, char * rotatingDeviceIdBuffer,
                                                                     size_t rotatingDeviceIdBufferSize,
                                                                     size_t & rotatingDeviceIdValueOutputSize)
 {

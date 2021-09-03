@@ -28,7 +28,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
+#endif
 #include <transport/FabricTable.h>
 
 #include <app/server/Server.h>

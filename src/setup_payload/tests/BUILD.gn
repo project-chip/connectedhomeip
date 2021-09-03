@@ -25,6 +25,7 @@ chip_test_suite("tests") {
     "TestManualCode.cpp",
     "TestQRCode.cpp",
     "TestQRCodeTLV.cpp",
+    "TestAdditionalDataPayload.cpp",
   ]
 
   sources = [ "TestHelpers.h" ]
