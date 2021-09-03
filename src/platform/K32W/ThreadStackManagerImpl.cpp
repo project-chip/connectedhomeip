@@ -81,18 +81,6 @@ extern "C" void otTaskletsSignalPending(otInstance * p_instance)
     ThreadStackMgrImpl().SignalThreadActivityPending();
 }
 
-#if (!defined(cPWR_UsePowerDownMode) || (cPWR_UsePowerDownMode == 0))
-/**
- * Glue function called directly by the OpenThread stack when system event processing work
- * is pending.
- */
-extern "C" void otSysEventSignalPending(void)
-{
-    BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
-    portYIELD_FROM_ISR(yieldRequired);
-}
-#endif
-
 extern "C" void * pvPortCallocRtos(size_t num, size_t size)
 {
     size_t totalAllocSize = (size_t)(num * size);

@@ -176,9 +176,23 @@
  */
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
 
+/**
+ * CONFIG_CHIP_NFC_COMMISSIONING, CHIP_DEVICE_CONFIG_ENABLE_NFC
+ *
+ * Set these defines to 1 if NFC Commissioning is needed
+ */
 #define CONFIG_CHIP_NFC_COMMISSIONING 1
-
 #define CHIP_DEVICE_CONFIG_ENABLE_NFC 1
+
+/**
+ *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *
+ *  @brief
+ *    Maximum number of administrators that can provision the device. Each admin
+ *    can provision the device with their unique operational credentials and manage
+ *    their access control lists.
+ */
+#define CHIP_CONFIG_MAX_DEVICE_ADMINS 4 // 3 fabrics + 1 for rotation slack
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE

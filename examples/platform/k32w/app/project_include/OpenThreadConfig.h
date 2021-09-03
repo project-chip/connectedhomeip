@@ -52,6 +52,11 @@
 #define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE 0
 #define OPENTHREAD_CONFIG_DHCP6_CLIENT_ENABLE 0
 #define OPENTHREAD_CONFIG_DHCP6_SERVER_ENABLE 0
+#define OPENTHREAD_CONFIG_TCP_ENABLE 0
+
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 44
+
+//#define OPENTHREAD_CONFIG_LOG_LEVEL                            OT_LOG_LEVEL_DEBG
 
 // Use the NXP-supplied default platform configuration for remainder
 // of OpenThread config options.
