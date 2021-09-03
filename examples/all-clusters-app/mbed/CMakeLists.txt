@@ -6,10 +6,9 @@ cmake_minimum_required(VERSION 3.19.0)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
-get_filename_component(ALL_CLUSTERS_COMMON ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
 get_filename_component(APP_UTIL ${CHIP_ROOT}/src/app/util REALPATH)
 get_filename_component(APP_CLUSTERS ${CHIP_ROOT}/src/app/clusters REALPATH)
-get_filename_component(APP_COMMON_GEN ${CHIP_ROOT}/src/app/common/gen REALPATH)
+get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
@@ -39,8 +38,9 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${MBED_COMMON}/util/include
                            ${CHIP_ROOT}/src/app
                            ${CHIP_ROOT}/third_party/nlio/repo/include
-                           ${APP_COMMON_GEN}
-                           ${APP_COMMON_GEN}/attributes
+                           ${GEN_DIR}/all-clusters-app
+                           ${GEN_DIR}/ota-provider-app
+                           ${GEN_DIR}/app-common
 )
 
 target_sources(${APP_TARGET} PRIVATE
@@ -48,12 +48,12 @@ target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/tv-callbacks.cpp
-               ${ALL_CLUSTERS_COMMON}/gen/attribute-size.cpp
-               ${ALL_CLUSTERS_COMMON}/gen/callback-stub.cpp
-               ${ALL_CLUSTERS_COMMON}/gen/CHIPClientCallbacks.cpp
-               ${ALL_CLUSTERS_COMMON}/gen/CHIPClusters.cpp
-               ${ALL_CLUSTERS_COMMON}/gen/encoder.cpp
-               ${ALL_CLUSTERS_COMMON}/gen/IMClusterCommandHandler.cpp
+               ${GEN_DIR}/all-clusters-app/zap-generated/attribute-size.cpp
+               ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/all-clusters-app/zap-generated/CHIPClientCallbacks.cpp
+               ${GEN_DIR}/all-clusters-app/zap-generated/CHIPClusters.cpp
+               ${GEN_DIR}/ota-provider-app/zap-generated/encoder.cpp
+               ${GEN_DIR}/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
                ${CHIP_ROOT}/src/app/server/Mdns.cpp
@@ -122,7 +122,8 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/thread_network_diagnostics_server/thread_network_diagnostics_server.cpp
                ${APP_CLUSTERS}/wifi_network_diagnostics_server/wifi_network_diagnostics_server.cpp
                ${APP_CLUSTERS}/pump-configuration-and-control-server/pump-configuration-and-control-server.cpp
-               ${APP_COMMON_GEN}/attributes/Accessors.cpp              
+               ${APP_CLUSTERS}/administrator-commissioning-server/administrator-commissioning-server.cpp
+               ${GEN_DIR}/app-common/app-common/zap-generated/attributes/Accessors.cpp
 )
 
 add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)

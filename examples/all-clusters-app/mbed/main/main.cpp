@@ -24,10 +24,12 @@
 #include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
 
-using namespace chip;
-using namespace chip::Inet;
-using namespace chip::Transport;
-using namespace chip::DeviceLayer;
+using namespace ::chip;
+using namespace ::chip::Inet;
+using namespace ::chip::Platform;
+using namespace ::chip::Transport;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::Logging::Platform;
 
 int main(int argc, char * argv[])
 {
@@ -43,11 +45,11 @@ int main(int argc, char * argv[])
         goto exit;
     }
 
-    err = chip::Platform::MemoryInit();
+    err = MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Platform::MemoryInit() failed");
-        ret = static_cast<int>(ChipError::GetValue(err));
+        ret = static_cast<int>(err.GetValue());
         goto exit;
     }
 
@@ -56,7 +58,7 @@ int main(int argc, char * argv[])
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed");
-        ret = static_cast<int>(ChipError::GetValue(err));
+        ret = static_cast<int>(err.GetValue());
         goto exit;
     }
 
@@ -65,7 +67,7 @@ int main(int argc, char * argv[])
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "PlatformMgr().StartEventLoopTask() failed");
-        ret = static_cast<int>(ChipError::GetValue(err));
+        ret = static_cast<int>(err.GetValue());
         goto exit;
     }
 
