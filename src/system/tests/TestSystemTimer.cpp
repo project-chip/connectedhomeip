@@ -29,10 +29,10 @@
 
 #include <system/SystemConfig.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
 
@@ -58,7 +58,7 @@ static void ServiceEvents(Layer & aLayer)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (aLayer.State() == LayerState::kInitialized)
+    if (aLayer.IsInitialized())
     {
         aLayer.WatchableEventsManager().HandlePlatformTimer();
     }

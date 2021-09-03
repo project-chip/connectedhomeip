@@ -41,8 +41,8 @@
  *
  */
 
-//#include <core/CHIPConfig.h>
-#include <support/CHIPMem.h>
+//#include <lib/core/CHIPConfig.h>
+#include <lib/support/CHIPMem.h>
 
 #include "heap_4_silabs.h"
 #include "task.h"

@@ -16,8 +16,8 @@
  */
 
 #include "chip-zcl-zpro-codec.h"
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Encoding::LittleEndian;
 

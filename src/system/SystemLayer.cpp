@@ -24,46 +24,49 @@
 
 #include <system/SystemLayer.h>
 
+#include <lib/support/CodeUtils.h>
 #include <platform/LockTracker.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace System {
 
-Layer::Layer() : mLayerState(LayerState::kUninitialized) {}
+Layer::~Layer()
+{
+    VerifyOrReturn(mLayerState.Destroy());
+}
 
 CHIP_ERROR Layer::Init()
 {
-    VerifyOrReturnError(State() == LayerState::kUninitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mWatchableEventsManager.Init(*this));
-    this->mLayerState = LayerState::kInitialized;
+    mLayerState.Init();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Layer::Shutdown()
 {
-    VerifyOrReturnError(State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.Shutdown(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mWatchableEventsManager.Shutdown());
-    this->mLayerState = LayerState::kUninitialized;
+    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Layer::StartTimer(uint32_t aDelayMilliseconds, TimerCompleteCallback aComplete, void * aAppState)
 {
-    VerifyOrReturnError(State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return mWatchableEventsManager.StartTimer(aDelayMilliseconds, aComplete, aAppState);
 }
 
 void Layer::CancelTimer(TimerCompleteCallback aOnComplete, void * aAppState)
 {
-    VerifyOrReturn(this->State() == LayerState::kInitialized);
+    VerifyOrReturn(mLayerState.IsInitialized());
     return mWatchableEventsManager.CancelTimer(aOnComplete, aAppState);
 }
 
 CHIP_ERROR Layer::ScheduleWork(TimerCompleteCallback aComplete, void * aAppState)
 {
     assertChipStackLockedByCurrentThread();
-    VerifyOrReturnError(State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return mWatchableEventsManager.ScheduleWork(aComplete, aAppState);
 }
 
@@ -91,19 +94,16 @@ CHIP_ERROR Layer::RequestCallbackOnPendingWrite(SocketWatchToken token)
 
 CHIP_ERROR Layer::ClearCallbackOnPendingRead(SocketWatchToken token)
 {
-    VerifyOrReturnError(State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     return mWatchableEventsManager.ClearCallbackOnPendingRead(token);
 }
 
 CHIP_ERROR Layer::ClearCallbackOnPendingWrite(SocketWatchToken token)
 {
-    VerifyOrReturnError(State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     return mWatchableEventsManager.ClearCallbackOnPendingWrite(token);
 }
 
 CHIP_ERROR Layer::StopWatchingSocket(SocketWatchToken * tokenInOut)
 {
-    VerifyOrReturnError(State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     return mWatchableEventsManager.StopWatchingSocket(tokenInOut);
 }
 
@@ -116,11 +116,13 @@ SocketWatchToken Layer::InvalidSocketWatchToken()
 
 void Layer::SetDispatchQueue(dispatch_queue_t dispatchQueue)
 {
+    VerifyOrReturn(mLayerState.IsInitialized());
     mWatchableEventsManager.SetDispatchQueue(dispatchQueue);
 }
 
 dispatch_queue_t Layer::GetDispatchQueue()
 {
+    VerifyOrReturnError(mLayerState.IsInitialized(), nullptr);
     return mWatchableEventsManager.GetDispatchQueue();
 }
 
@@ -132,13 +134,13 @@ dispatch_queue_t Layer::GetDispatchQueue()
 
 CHIP_ERROR Layer::AddEventHandlerDelegate(LwIPEventHandlerDelegate & aDelegate)
 {
-    VerifyOrReturnError(mLayerState == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return mWatchableEventsManager.AddEventHandlerDelegate(aDelegate);
 }
 
 CHIP_ERROR Layer::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
-    VerifyOrReturnError(mLayerState == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return mWatchableEventsManager.PostEvent(aTarget, aEventType, aArgument);
 }
 

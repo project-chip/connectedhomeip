@@ -31,16 +31,19 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate, Messaging::ExchangeContext * apExchangeContext)
+CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                             Messaging::ExchangeContext * apExchangeContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
     VerifyOrReturnError(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    mpExchangeMgr              = apExchangeMgr;
     mpExchangeCtx              = apExchangeContext;
     mSuppressResponse          = true;
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
+    mInitialReport             = true;
     MoveToState(HandlerState::Initialized);
     mpDelegate = apDelegate;
     if (apExchangeContext != nullptr)
@@ -51,8 +54,21 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate, Messaging::E
     return err;
 }
 
-void ReadHandler::Shutdown()
+void ReadHandler::Shutdown(ShutdownOptions aOptions)
 {
+    if (aOptions == ShutdownOptions::AbortCurrentExchange)
+    {
+        if (mpExchangeCtx != nullptr)
+        {
+            mpExchangeCtx->Abort();
+            mpExchangeCtx = nullptr;
+        }
+    }
+
+    if (IsReporting())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
     mpExchangeCtx = nullptr;
@@ -60,10 +76,11 @@ void ReadHandler::Shutdown()
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
+    mInitialReport             = false;
     mpDelegate                 = nullptr;
 }
 
-CHIP_ERROR ReadHandler::OnReadRequest(System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
@@ -84,54 +101,42 @@ CHIP_ERROR ReadHandler::OnStatusReport(Messaging::ExchangeContext * apExchangeCo
     Protocols::SecureChannel::StatusReport statusReport;
     err = statusReport.Parse(std::move(aPayload));
     SuccessOrExit(err);
-    ChipLogProgress(DataManagement, "Receive Status Report, protocol id is %" PRIu32 ", protocol code is %" PRIu16,
-                    statusReport.GetProtocolId(), statusReport.GetProtocolCode());
-    if ((statusReport.GetProtocolId() == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm()) &&
-        (statusReport.GetProtocolCode() == to_underlying(Protocols::InteractionModel::ProtocolCode::Success)))
+    ChipLogProgress(DataManagement, "in state %s, receive status report, protocol id is %" PRIu32 ", protocol code is %" PRIu16,
+                    GetStateStr(), statusReport.GetProtocolId(), statusReport.GetProtocolCode());
+    VerifyOrExit((statusReport.GetProtocolId() == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm()) &&
+                     (statusReport.GetProtocolCode() == to_underlying(Protocols::InteractionModel::ProtocolCode::Success)),
+                 err = CHIP_ERROR_INVALID_ARGUMENT);
+    switch (mState)
     {
-        switch (mState)
-        {
-        case HandlerState::Reporting:
-            InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
-            break;
-        case HandlerState::Reportable:
-        case HandlerState::Initialized:
-        case HandlerState::Uninitialized:
-        default:
-            err = CHIP_ERROR_INCORRECT_STATE;
-            break;
-        }
+    case HandlerState::Reporting:
+        Shutdown();
+        break;
+    case HandlerState::Reportable:
+    case HandlerState::Initialized:
+    case HandlerState::Uninitialized:
+    default:
+        err = CHIP_ERROR_INCORRECT_STATE;
+        break;
     }
-    else
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
 exit:
-    Shutdown();
-    return err;
-}
-
-CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(IsReportable(), err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
-    if (err == CHIP_NO_ERROR)
-    {
-        MoveToState(HandlerState::Reporting);
-    }
-
-exit:
-    ChipLogFunctError(err);
     if (err != CHIP_NO_ERROR)
     {
         Shutdown();
     }
     return err;
+}
+
+CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
+{
+    VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
+    if (IsInitialReport())
+    {
+        VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    }
+    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    MoveToState(HandlerState::Reporting);
+    return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
+                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
 }
 
 CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
@@ -154,10 +159,6 @@ CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchange
                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
-    if (IsReporting())
-    {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
-    }
     Shutdown();
     return CHIP_ERROR_INVALID_MESSAGE_TYPE;
 }
@@ -166,10 +167,6 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
-    if (IsReporting())
-    {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
-    }
     Shutdown();
 }
 
@@ -286,9 +283,17 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         }
         SuccessOrExit(err);
 
-        err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
-        SuccessOrExit(err);
-        mpAttributeClusterInfoList->SetDirty();
+        if (MergeOverlappedAttributePath(clusterInfo))
+        {
+            continue;
+        }
+        else
+        {
+            err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
+            SuccessOrExit(err);
+            mpAttributeClusterInfoList->SetDirty();
+            mInitialReport = true;
+        }
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -299,6 +304,31 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
 exit:
     ChipLogFunctError(err);
     return err;
+}
+
+bool ReadHandler::MergeOverlappedAttributePath(ClusterInfo & aAttributePath)
+{
+    ClusterInfo * runner = mpAttributeClusterInfoList;
+    while (runner != nullptr)
+    {
+        // If overlapped, we would skip this target path,
+        // --If targetPath is part of previous path, return true
+        // --If previous path is part of target path, update filedid and listindex and mflags with target path, return true
+        if (runner->IsAttributePathSupersetOf(aAttributePath))
+        {
+            return true;
+        }
+        if (aAttributePath.IsAttributePathSupersetOf(*runner))
+        {
+            runner->mListIndex = aAttributePath.mListIndex;
+            runner->mFieldId   = aAttributePath.mFieldId;
+            runner->mFlags     = aAttributePath.mFlags;
+            runner->SetDirty();
+            return true;
+        }
+        runner = runner->mpNext;
+    }
+    return false;
 }
 
 CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathListParser)

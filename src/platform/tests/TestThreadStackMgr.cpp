@@ -18,9 +18,9 @@
 #include <assert.h>
 #include <memory>
 
-#include <support/CHIPMem.h>
-#include <support/ThreadOperationalDataset.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 

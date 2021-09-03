@@ -200,6 +200,7 @@ if (chip_device_platform != "none") {
       chip_device_config_enable_mdns = chip_mdns != "none"
       defines += [
         "CHIP_DEVICE_CONFIG_ENABLE_MDNS=${chip_device_config_enable_mdns}",
+        "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=${chip_use_clusters_for_ip_commissioning}",
         "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"",
       ]
     }
@@ -257,6 +258,7 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "DeviceControlServer.cpp",
+      "Entropy.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",
       "LockTracker.cpp",
@@ -269,6 +271,7 @@ if (chip_device_platform != "none") {
 
     public_deps = [
       ":platform_base",
+      "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
     ]
 

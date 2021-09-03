@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
 #include <jni.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <pthread.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace Controller {

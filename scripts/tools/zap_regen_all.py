@@ -52,10 +52,12 @@ def getGlobalTemplatesTargets():
 
         targets.append([str(filepath), '-o', output_dir])
 
-    targets.extend([[str(filepath)]
-                   for filepath in Path('./src/darwin').rglob('*.zap')])
-    targets.extend([[str(filepath)] for filepath in Path(
-        './src/controller/data_model').rglob('*.zap')])
+    targets.extend([
+        [
+            './src/controller/data_model/controller-clusters.zap',
+            '-o',
+            os.path.join('zzz_generated/controller-clusters/zap-generated')]])
+
     return targets
 
 
@@ -101,7 +103,9 @@ def main():
 
     targets = getTargets()
     for target in targets:
-        subprocess.check_call(['./scripts/tools/zap/generate.py'] + target)
+        exec_list = ['./scripts/tools/zap/generate.py'] + target
+        logging.info("Generating target: %s" % " ".join(exec_list))
+        subprocess.check_call(exec_list)
 
 
 if __name__ == '__main__':

@@ -24,10 +24,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/BleApplicationDelegate.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
 #include <platform/Darwin/BlePlatformDelegate.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <new>
 

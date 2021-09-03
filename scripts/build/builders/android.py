@@ -92,6 +92,7 @@ class AndroidBuilder(Builder):
             gn_args['target_cpu'] = self.board.TargetCpuName()
             gn_args['android_ndk_root'] = os.environ['ANDROID_NDK_HOME']
             gn_args['android_sdk_root'] = os.environ['ANDROID_HOME']
+            gn_args['chip_use_clusters_for_ip_commissioning'] = 'true'
 
             args = '--args=%s' % (' '.join([
                 '%s="%s"' % (key, shlex.quote(value))
@@ -121,11 +122,12 @@ class AndroidBuilder(Builder):
 
         # JNILibs will be copied as long as they reside in src/main/jniLibs/ABI:
         #    https://developer.android.com/studio/projects/gradle-external-native-builds#jniLibs
+        # to avoid redefined in IDE mode, copy to another place and add that path in build.gradle
 
         # We do NOT use python builtins for copy, so that the 'execution commands' are available
         # when using dry run.
         jnilibs_dir = os.path.join(
-            self.root, 'src/android/CHIPTool/app/src/main/jniLibs', self.board.AbiName())
+            self.root, 'src/android/CHIPTool/app/libs/jniLibs', self.board.AbiName())
         self._Execute(['mkdir', '-p', jnilibs_dir],
                       title='Prepare Native libs ' + self.identifier)
 

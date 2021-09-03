@@ -25,14 +25,14 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Protocols {
@@ -103,7 +103,7 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
     EchoFunct OnEchoResponseReceived          = nullptr;
-    SessionHandle mSecureSession;
+    Optional<SessionHandle> mSecureSession    = Optional<SessionHandle>();
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                  const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;

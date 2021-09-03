@@ -23,7 +23,7 @@
 
 #include "SetupPayload.h"
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <string>
 #include <utility>
 

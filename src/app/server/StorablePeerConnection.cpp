@@ -16,8 +16,8 @@
  */
 
 #include <app/server/StorablePeerConnection.h>
-#include <core/CHIPEncoding.h>
-#include <support/SafeInt.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 
@@ -28,6 +28,7 @@ StorablePeerConnection::StorablePeerConnection(PASESession & session, FabricInde
     mKeyId           = session.GetLocalKeyId();
 }
 
+#pragma GCC diagnostic ignored "-Wstack-usage="
 CHIP_ERROR StorablePeerConnection::StoreIntoKVS(PersistentStorageDelegate & kvs)
 {
     char key[KeySize()];

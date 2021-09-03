@@ -24,7 +24,7 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 

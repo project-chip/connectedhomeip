@@ -9,8 +9,7 @@
             "nsapi.default-wifi-ssid": "\"YOUR_SSID\"",
             "nsapi.default-wifi-password": "\"YOUR_PASSWORD\"",
             "mbed-trace.max-level": "TRACE_LEVEL_DEBUG",
-            "mbed-trace.enable": false,
-            "target.printf_lib": "std"
+            "mbed-trace.enable": true
         },
         "DISCO_L475VG_IOT01A": {
             "target.components_add": ["wifi_ism43362", "BlueNRG_MS"],

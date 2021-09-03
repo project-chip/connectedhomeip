@@ -3280,11 +3280,13 @@ public:
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
-                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedLongLong:entries[i].FabricId],
-                                                  @"FabricId", [NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
-                                                  [NSNumber numberWithUnsignedLongLong:entries[i].NodeId], @"NodeId",
-                                                  [NSData dataWithBytes:entries[i].Label.data() length:entries[i].Label.size()],
-                                                  @"Label", nil];
+                values[i] = [[NSDictionary alloc]
+                    initWithObjectsAndKeys:[NSNumber numberWithUnsignedChar:entries[i].FabricIndex], @"FabricIndex",
+                    [NSData dataWithBytes:entries[i].RootPublicKey.data() length:entries[i].RootPublicKey.size()], @"RootPublicKey",
+                    [NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
+                    [NSNumber numberWithUnsignedLongLong:entries[i].FabricId], @"FabricId",
+                    [NSNumber numberWithUnsignedLongLong:entries[i].NodeId], @"NodeId",
+                    [NSData dataWithBytes:entries[i].Label.data() length:entries[i].Label.size()], @"Label", nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];

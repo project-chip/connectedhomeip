@@ -18,7 +18,7 @@ cmake_minimum_required(VERSION 3.13.1)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
-get_filename_component(PUMP_COMMON ${CHIP_ROOT}/examples/pump-controller-app/pump-controller-common REALPATH)
+get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
@@ -49,9 +49,10 @@ project(chip-nrfconnect-pump-example)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 
-target_include_directories(app PRIVATE 
-                           main/include 
-                           ${PUMP_COMMON} 
+target_include_directories(app PRIVATE
+                           main/include
+                           ${GEN_DIR}/app-common
+                           ${GEN_DIR}/pump-app
                            ${NLIO_ROOT}
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)
@@ -61,9 +62,9 @@ target_sources(app PRIVATE
                main/PumpManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${PUMP_COMMON}/gen/attribute-size.cpp
-               ${PUMP_COMMON}/gen/callback-stub.cpp
-               ${PUMP_COMMON}/gen/IMClusterCommandHandler.cpp
+               ${GEN_DIR}/pump-app/zap-generated/attribute-size.cpp
+               ${GEN_DIR}/pump-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/pump-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
@@ -97,10 +98,13 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
                ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
+               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp)
+               ${CHIP_ROOT}/src/app/clusters/pump-configuration-and-control-server/pump-configuration-and-control-server.cpp
+)
 
 if(BUILD_WITH_DFU)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)

@@ -24,8 +24,8 @@
 #include <cstdlib>
 #include <new>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
@@ -631,6 +631,11 @@ void ConnectivityManagerImpl::StartWiFiManagement()
 
     wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
                                                 kWpaSupplicantObjectPath, nullptr, _OnWpaProxyReady, nullptr);
+}
+
+bool ConnectivityManagerImpl::IsWiFiManagementStarted()
+{
+    return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
 }
 
 void ConnectivityManagerImpl::DriveAPState()

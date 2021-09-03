@@ -24,8 +24,8 @@
 
 #pragma once
 
+#include <lib/support/BitFlags.h>
 #include <platform/ThreadStackManager.h>
-#include <support/BitFlags.h>
 
 #include <cstdint>
 

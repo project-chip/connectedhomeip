@@ -34,11 +34,11 @@
 
 #pragma once
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 #include <platform/logging/LogV.h>
 
-#include <support/logging/Constants.h>
+#include <lib/support/logging/Constants.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

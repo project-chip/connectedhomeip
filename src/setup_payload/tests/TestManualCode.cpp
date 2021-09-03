@@ -30,8 +30,8 @@
 #include <setup_payload/SetupPayload.cpp>
 #include <setup_payload/SetupPayload.h>
 
-#include <support/UnitTestRegistration.h>
-#include <support/verhoeff/Verhoeff.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/verhoeff/Verhoeff.h>
 
 using namespace chip;
 

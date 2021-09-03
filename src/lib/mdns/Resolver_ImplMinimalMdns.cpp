@@ -15,20 +15,21 @@
  *    limitations under the License.
  */
 
+#include "MdnsCache.h"
 #include "Resolver.h"
 
 #include <limits>
 
-#include "MinimalMdnsServer.h"
-#include "ServiceNaming.h"
-
-#include <mdns/TxtFields.h>
-#include <mdns/minimal/Parser.h>
-#include <mdns/minimal/QueryBuilder.h>
-#include <mdns/minimal/RecordData.h>
-#include <mdns/minimal/core/FlatAllocatedQName.h>
-#include <support/CHIPMemString.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/mdns/MinimalMdnsServer.h>
+#include <lib/mdns/ServiceNaming.h>
+#include <lib/mdns/TxtFields.h>
+#include <lib/mdns/minimal/Parser.h>
+#include <lib/mdns/minimal/QueryBuilder.h>
+#include <lib/mdns/minimal/RecordData.h>
+#include <lib/mdns/minimal/core/FlatAllocatedQName.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 // MDNS servers will receive all broadcast packets over the network.
 // Disable 'invalid packet' messages because the are expected and common
@@ -62,12 +63,13 @@ constexpr size_t kMdnsMaxPacketSize = 1024;
 constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
+using MdnsCacheType = Mdns::MdnsCache<CHIP_CONFIG_MDNS_CACHE_SIZE>;
 
 class PacketDataReporter : public ParserDelegate
 {
 public:
     PacketDataReporter(ResolverDelegate * delegate, chip::Inet::InterfaceId interfaceId, DiscoveryType discoveryType,
-                       const BytesRange & packet) :
+                       const BytesRange & packet, MdnsCacheType & mdnsCache) :
         mDelegate(delegate),
         mDiscoveryType(discoveryType), mPacketRange(packet)
     {
@@ -356,6 +358,9 @@ private:
     }
     static constexpr int kMaxQnameSize = 100;
     char qnameStorage[kMaxQnameSize];
+    // should this be static?
+    // original version had:    static Mdns::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> sIPCache;
+    MdnsCacheType sMdnsCache;
 };
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
@@ -365,7 +370,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
         return;
     }
 
-    PacketDataReporter reporter(mDelegate, info->Interface, mDiscoveryType, data);
+    PacketDataReporter reporter(mDelegate, info->Interface, mDiscoveryType, data, sMdnsCache);
 
     if (!ParsePacket(data, &reporter))
     {

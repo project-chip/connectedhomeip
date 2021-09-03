@@ -111,6 +111,15 @@ def main():
     logger.info("Testing closing sessions")
     FailIfNot(test.TestCloseSession(nodeid=1), "Failed to close sessions")
 
+    logger.info("Testing resolve")
+    FailIfNot(test.TestResolve(nodeid=1),
+              "Failed to resolve nodeid")
+
+    logger.info("Testing on off cluster over resolved connection")
+    FailIfNot(test.TestOnOffCluster(nodeid=1,
+                                    endpoint=LIGHTING_ENDPOINT_ID,
+                                    group=GROUP_ID), "Failed to test on off cluster")
+
     logger.info("Testing non-controller APIs")
     FailIfNot(test.TestNonControllerAPIs(), "Non controller API test failed")
 

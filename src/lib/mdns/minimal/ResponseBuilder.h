@@ -19,8 +19,8 @@
 
 #include <system/SystemPacketBuffer.h>
 
-#include <mdns/minimal/core/DnsHeader.h>
-#include <mdns/minimal/records/ResourceRecord.h>
+#include <lib/mdns/minimal/core/DnsHeader.h>
+#include <lib/mdns/minimal/records/ResourceRecord.h>
 
 namespace mdns {
 namespace Minimal {

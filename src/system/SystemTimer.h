@@ -31,7 +31,7 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
@@ -226,6 +226,8 @@ private:
     TimerCompleteCallback mOnComplete;
     Clock::MonotonicMilliseconds mAwakenTime;
     Timer * mNextTimer;
+
+    Layer * mSystemLayer;
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_source_t mTimerSource = nullptr;

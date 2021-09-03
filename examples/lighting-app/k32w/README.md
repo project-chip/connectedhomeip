@@ -162,10 +162,10 @@ will be initiated.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [K32W061 SDK 2.6.3 for Project CHIP](https://mcuxpresso.nxp.com/).
+-   Download [K32W061 SDK 2.6.4 for Project CHIP](https://mcuxpresso.nxp.com/).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
-    SDK_2.6.3_K32W061DK6. The SDK Builder UI selection should be similar with
+    SDK_2_6_4_K32W061DK6. The SDK Builder UI selection should be similar with
     the one from the image below.
     ![MCUXpresso SDK Download](../../platform/k32w/doc/images/mcux-sdk-download.JPG)
 
@@ -173,7 +173,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
     -   with Secure Element
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.3_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2_6_4_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/k32w/
@@ -186,7 +186,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/k32w$ $K32W061_S
         Exactly the same steps as above but set chip_with_se05x=0 in the gn command
 
 Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
-2.6.3.
+2.6.4.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set

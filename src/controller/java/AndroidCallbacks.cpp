@@ -19,9 +19,9 @@
 #include "JniTypeWrappers.h"
 
 #include <jni.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Controller;
 

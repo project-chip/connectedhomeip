@@ -2359,6 +2359,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MDNS_CACHE_SIZE
+ *
+ * @brief
+ *      Define the size of the MDNS cache
+ *
+ *      If CHIP_CONFIG_MDNS_CACHE_SIZE is 0, the builtin cache is not used.
+ *
+ */
+#ifndef CHIP_CONFIG_MDNS_CACHE_SIZE
+#define CHIP_CONFIG_MDNS_CACHE_SIZE 20
+#endif
+/**
  *  @name Interaction Model object pool configuration.
  *
  *  @brief
@@ -2427,7 +2439,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 8
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 4
 #endif
 
 /**

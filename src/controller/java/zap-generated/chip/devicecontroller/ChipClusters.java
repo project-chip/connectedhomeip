@@ -3908,14 +3908,24 @@ public class ChipClusters {
     }
 
     public static class FabricsListAttribute {
-      public long fabricId;
+      public int fabricIndex;
+      public byte[] rootPublicKey;
       public int vendorId;
+      public long fabricId;
       public long nodeId;
       public byte[] label;
 
-      public FabricsListAttribute(long fabricId, int vendorId, long nodeId, byte[] label) {
-        this.fabricId = fabricId;
+      public FabricsListAttribute(
+          int fabricIndex,
+          byte[] rootPublicKey,
+          int vendorId,
+          long fabricId,
+          long nodeId,
+          byte[] label) {
+        this.fabricIndex = fabricIndex;
+        this.rootPublicKey = rootPublicKey;
         this.vendorId = vendorId;
+        this.fabricId = fabricId;
         this.nodeId = nodeId;
         this.label = label;
       }

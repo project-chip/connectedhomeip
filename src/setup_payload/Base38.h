@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 
 #include <stdint.h>
 

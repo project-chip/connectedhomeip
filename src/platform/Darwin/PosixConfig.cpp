@@ -27,9 +27,9 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/Darwin/PosixConfig.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

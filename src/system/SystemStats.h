@@ -30,11 +30,11 @@
 #endif
 
 // Include configuration headers
-#include <core/CHIPConfig.h>
 #include <inet/InetConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 // Include dependent headers
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/mem.h>

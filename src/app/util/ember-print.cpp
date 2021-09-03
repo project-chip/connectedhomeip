@@ -21,9 +21,9 @@
 #include <app/util/af.h>
 #include <app/util/debug-printing.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 bool emberAfPrintReceivedMessages = true;
 

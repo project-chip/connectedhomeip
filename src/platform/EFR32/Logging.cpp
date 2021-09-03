@@ -1,11 +1,11 @@
 /* See Project CHIP LICENSE file for licensing information. */
 #include <platform/logging/LogV.h>
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 
-#include <support/SafeString.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/SafeString.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>

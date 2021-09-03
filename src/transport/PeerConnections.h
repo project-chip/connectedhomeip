@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <system/TimeSource.h>
 #include <transport/FabricTable.h>
 #include <transport/PeerConnectionState.h>
@@ -252,7 +252,7 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        assert(begin == nullptr || (begin >= iter && begin < &mStates[kMaxConnectionCount]));
+        VerifyOrDie(begin == nullptr || (begin >= iter && begin < &mStates[kMaxConnectionCount]));
 
         if (begin != nullptr)
         {

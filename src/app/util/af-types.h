@@ -55,8 +55,8 @@
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
 
+#include <lib/support/Variant.h>
 #include <messaging/ExchangeContext.h>
-#include <support/Variant.h>
 
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"
@@ -1297,50 +1297,42 @@ public:
 private:
     struct VariantViaBinding
     {
-        static constexpr const std::size_t VariantId = 1;
         explicit VariantViaBinding(uint8_t bindingIndex) : mBindingIndex(bindingIndex) {}
         uint8_t mBindingIndex;
     };
 
     struct VariantViaAddressTable
     {
-        static constexpr const std::size_t VariantId = 2;
     };
 
     struct VariantDirect
     {
-        static constexpr const std::size_t VariantId = 3;
         explicit VariantDirect(NodeId nodeId) : mNodeId(nodeId) {}
         NodeId mNodeId;
     };
 
     struct VariantMulticast
     {
-        static constexpr const std::size_t VariantId = 4;
         explicit VariantMulticast(GroupId groupId) : mGroupId(groupId) {}
         GroupId mGroupId;
     };
 
     struct VariantMulticastWithAlias
     {
-        static constexpr const std::size_t VariantId = 5;
         explicit VariantMulticastWithAlias(GroupId groupId) : mGroupId(groupId) {}
         GroupId mGroupId;
     };
 
     struct VariantBroadcast
     {
-        static constexpr const std::size_t VariantId = 6;
     };
 
     struct VariantBroadcastWithAlias
     {
-        static constexpr const std::size_t VariantId = 7;
     };
 
     struct VariantViaExchange
     {
-        static constexpr const std::size_t VariantId = 8;
         explicit VariantViaExchange(Messaging::ExchangeContext * exchangeContext) : mExchangeContext(exchangeContext) {}
         Messaging::ExchangeContext * mExchangeContext;
     };

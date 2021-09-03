@@ -40,6 +40,33 @@ android {
             }
         }
     }
+
+    if (rootProject.ext.matterBuildSrcDir == null) {
+        sourceSets {
+            main {
+                jniLibs.srcDirs = ['libs/jniLibs']
+            }
+        }
+    }
+    else {
+        sourceSets {
+            main {
+                java.srcDirs = [
+                        'src/main/java/',
+                        '../../../setup_payload/java/src',
+                        '../../../controller/java/zap-generated',
+                        '../../../controller/java/src',
+                ]
+            }
+        }
+
+        externalNativeBuild {
+            cmake {
+                path file(rootProject.ext.matterBuildSrcDir + '/CMakeLists.txt')
+                version '3.10.2'
+            }
+        }
+    }
 }
 
 dependencies {
@@ -48,13 +75,15 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
-    // local in-source-tree copy of the dependencies. Useful for IDE compilation
-    implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
+    if(rootProject.ext.matterBuildSrcDir == null) {
+         // local in-source-tree copy of the dependencies. Useful for IDE compilation
+        implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
 
-    // build time dependencies
-    if (project.hasProperty("chipSdkJarDir")) {
-       println "Compiling using custom sdk jar file directory: ${chipSdkJarDir}"
-       implementation fileTree(dir: "${chipSdkJarDir}", include: ["*.jar", "*.so"])
+        // build time dependencies
+        if (project.hasProperty("chipSdkJarDir")) {
+            println "Compiling using custom sdk jar file directory: ${chipSdkJarDir}"
+            implementation fileTree(dir: "${chipSdkJarDir}", include: ["*.jar", "*.so"])
+        }
     }
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
@@ -64,7 +93,7 @@ dependencies {
     implementation "androidx.annotation:annotation:1.1.0"
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.0'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

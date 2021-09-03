@@ -21,8 +21,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/server/OnboardingCodesUtil.h>
-#include <core/CHIPError.h>
 #include <lcd.h>
+#include <lib/core/CHIPError.h>
 #include <lib/mdns/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>

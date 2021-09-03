@@ -23,8 +23,8 @@
  */
 
 #include <app/ClusterInfo.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
-#include <support/UnitTestRegistration.h>
 
 namespace chip {
 namespace app {
@@ -37,12 +37,82 @@ void TestDirty(nlTestSuite * apSuite, void * apContext)
     clusterInfo1.ClearDirty();
     NL_TEST_ASSERT(apSuite, !clusterInfo1.IsDirty());
 }
+
+void TestAttributePathIncludedSameFieldId(nlTestSuite * apSuite, void * apContext)
+{
+    ClusterInfo clusterInfo1;
+    ClusterInfo clusterInfo2;
+    ClusterInfo clusterInfo3;
+    clusterInfo1.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
+    clusterInfo2.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
+    clusterInfo3.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
+    clusterInfo1.mFieldId = 1;
+    clusterInfo2.mFieldId = 1;
+    clusterInfo3.mFieldId = 1;
+    NL_TEST_ASSERT(apSuite, clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
+    clusterInfo2.mFlags.Set(ClusterInfo::Flags::kListIndexValid);
+    clusterInfo2.mListIndex = 1;
+    NL_TEST_ASSERT(apSuite, clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
+    clusterInfo1.mFlags.Set(ClusterInfo::Flags::kListIndexValid);
+    NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo3));
+    clusterInfo3.mFlags.Set(ClusterInfo::Flags::kListIndexValid);
+    NL_TEST_ASSERT(apSuite, clusterInfo1.IsAttributePathSupersetOf(clusterInfo3));
+    clusterInfo3.mListIndex = 1;
+    NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo3));
+}
+
+void TestAttributePathIncludedDifferentFieldId(nlTestSuite * apSuite, void * apContext)
+{
+    ClusterInfo clusterInfo1;
+    ClusterInfo clusterInfo2;
+    clusterInfo1.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
+    clusterInfo2.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
+    clusterInfo1.mFieldId = 1;
+    clusterInfo2.mFieldId = 2;
+    NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
+    clusterInfo1.mFieldId = 0xFFFFFFFF;
+    clusterInfo2.mFieldId = 2;
+    NL_TEST_ASSERT(apSuite, clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
+    clusterInfo1.mFieldId = 0xFFFFFFFF;
+    clusterInfo2.mFieldId = 0xFFFFFFFF;
+    NL_TEST_ASSERT(apSuite, clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
+    clusterInfo1.mFieldId = 1;
+    clusterInfo2.mFieldId = 0xFFFFFFFF;
+    NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
+}
+
+void TestAttributePathIncludedDifferentEndpointId(nlTestSuite * apSuite, void * apContext)
+{
+    ClusterInfo clusterInfo1;
+    ClusterInfo clusterInfo2;
+    clusterInfo1.mEndpointId = 1;
+    clusterInfo2.mEndpointId = 2;
+    NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
+}
+
+void TestAttributePathIncludedDifferentClusterId(nlTestSuite * apSuite, void * apContext)
+{
+    ClusterInfo clusterInfo1;
+    ClusterInfo clusterInfo2;
+    clusterInfo1.mClusterId = 1;
+    clusterInfo2.mClusterId = 2;
+    NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
+}
 } // namespace TestClusterInfo
 } // namespace app
 } // namespace chip
 
 namespace {
-const nlTest sTests[] = { NL_TEST_DEF("TestDirty", chip::app::TestClusterInfo::TestDirty), NL_TEST_SENTINEL() };
+const nlTest sTests[] = {
+    NL_TEST_DEF("TestDirty", chip::app::TestClusterInfo::TestDirty),
+    NL_TEST_DEF("TestAttributePathIncludedSameFieldId", chip::app::TestClusterInfo::TestAttributePathIncludedSameFieldId),
+    NL_TEST_DEF("TestAttributePathIncludedDifferentFieldId", chip::app::TestClusterInfo::TestAttributePathIncludedDifferentFieldId),
+    NL_TEST_DEF("TestAttributePathIncludedDifferentEndpointId",
+                chip::app::TestClusterInfo::TestAttributePathIncludedDifferentEndpointId),
+    NL_TEST_DEF("TestAttributePathIncludedDifferentClusterId",
+                chip::app::TestClusterInfo::TestAttributePathIncludedDifferentClusterId),
+    NL_TEST_SENTINEL()
+};
 }
 
 int TestClusterInfo()

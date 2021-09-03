@@ -54,7 +54,7 @@
 #include "app/framework/plugin/comms-hub-function-sub-ghz/comms-hub-function-sub-ghz.h"
 #endif
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 

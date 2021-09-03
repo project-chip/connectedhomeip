@@ -23,7 +23,7 @@
  */
 
 #include "CHIPCryptoPALHsm_SE05X_utils.h"
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
 
 #if ENABLE_HSM_HKDF_SHA256
 

@@ -17,8 +17,8 @@
 
 #include "MessagingContext.h"
 
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
 
 namespace chip {
 namespace Test {
