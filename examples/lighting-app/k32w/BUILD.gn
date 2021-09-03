@@ -73,8 +73,8 @@ k32w_executable("light_app") {
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w_platform_dir}/app/support:freertos_mbedtls_utils",
-    "${openthread_root}:libopenthread-cli-mtd",
-    "${openthread_root}:libopenthread-mtd",
+    "${openthread_root}:libopenthread-cli-ftd",
+    "${openthread_root}:libopenthread-ftd",
   ]
 
   cflags = [ "-Wconversion" ]
