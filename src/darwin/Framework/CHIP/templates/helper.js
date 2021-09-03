@@ -42,6 +42,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'OperationalCredentials':
   case 'TrustedRootCertificates':
   case 'OtaSoftwareUpdateProvider':
+  case 'OtaSoftwareUpdateRequestor':
     return 0;
   }
   return 1;
