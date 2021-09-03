@@ -29,8 +29,8 @@ namespace Logging {
 /// Typical usage:
 ///     LogTracer tracer(__func__);
 ///
-///     VerifyOrReturnError(somecondition, tracer.log(CHIP_ERROR_INVALID_ARGUMENT));
-///     VerifyOrReturnError(otherCondition, tracer.log(CHIP_ERROR_INVALID_ARGUMENT, "othercondition"));
+///     VerifyOrReturnError(somecondition, tracer.LogError(CHIP_ERROR_INVALID_ARGUMENT));
+///     VerifyOrReturnError(otherCondition, tracer.LogError(CHIP_ERROR_INVALID_ARGUMENT, "othercondition"));
 ///
 ///     ReturnTracedErrorOnFailure(foo.Bar(), tracer);
 ///     ReturnTracedErrorOnFailure(foo.Baz(), tracer);
@@ -41,13 +41,13 @@ class LogTracer
 #if CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
 public:
     LogTracer(const char * name) : mName(name) {}
-    inline CHIP_ERROR logError(CHIP_ERROR err)
+    CHIP_ERROR LogError(CHIP_ERROR err)
     {
         ChipLogError(NotSpecified, "%s in %s", ErrorStr(err), mName);
         return err;
     }
 
-    inline CHIP_ERROR logError(CHIP_ERROR err, const char * context)
+    CHIP_ERROR LogError(CHIP_ERROR err, const char * context)
     {
         ChipLogError(NotSpecified, "%s/%s in %s", ErrorStr(err), context, mName);
         return err;
@@ -59,8 +59,8 @@ private:
 #else
 public:
     LogTracer(const char *) {}
-    inline constexpr CHIP_ERROR logError(CHIP_ERROR err) { return err; }
-    inline constexpr CHIP_ERROR logError(CHIP_ERROR err, const char *) { return err; }
+    constexpr CHIP_ERROR LogError(CHIP_ERROR err) { return err; }
+    constexpr CHIP_ERROR LogError(CHIP_ERROR err, const char *) { return err; }
 #endif
 };
 
@@ -73,6 +73,6 @@ public:
         auto __err = (expr);                                                                                                       \
         if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
-            return tracer.logError(__err);                                                                                         \
+            return tracer.LogError(__err);                                                                                         \
         }                                                                                                                          \
     } while (false)
