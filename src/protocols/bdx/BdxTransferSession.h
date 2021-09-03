@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>

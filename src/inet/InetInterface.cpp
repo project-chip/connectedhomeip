@@ -32,9 +32,9 @@
 #include "InetLayer.h"
 #include "InetLayerEvents.h"
 
-#include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/netif.h>

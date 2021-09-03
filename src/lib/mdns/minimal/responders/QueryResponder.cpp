@@ -17,9 +17,9 @@
 
 #include "QueryResponder.h"
 
-#include <mdns/minimal/records/Ptr.h>
+#include <lib/mdns/minimal/records/Ptr.h>
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace mdns {
 namespace Minimal {

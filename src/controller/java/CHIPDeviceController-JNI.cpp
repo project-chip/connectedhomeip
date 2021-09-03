@@ -38,16 +38,16 @@
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
 #include <jni.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
 #include <protocols/temp_zcl/TempZCL.h>
 #include <pthread.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/SafeInt.h>
-#include <support/ThreadOperationalDataset.h>
-#include <support/logging/CHIPLogging.h>
 
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
 #ifndef PTHREAD_NULL
@@ -549,7 +549,8 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
 
-    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
+    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::CommissioningWindowOption::kOriginalSetupCode,
+                                        setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {

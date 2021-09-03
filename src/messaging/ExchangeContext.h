@@ -24,15 +24,15 @@
 #pragma once
 
 #include <lib/core/ReferenceCounted.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/ReferenceCountedHandle.h>
+#include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeACL.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 #include <protocols/Protocols.h>
-#include <support/BitFlags.h>
-#include <support/DLLUtil.h>
-#include <support/ReferenceCountedHandle.h>
-#include <support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -156,7 +156,7 @@ public:
     {
         if (mExchangeACL == nullptr)
         {
-            Transport::FabricInfo * fabric = table.FindFabricWithIndex(mSecureSession.GetFabricIndex());
+            Transport::FabricInfo * fabric = table.FindFabricWithIndex(mSecureSession.Value().GetFabricIndex());
             if (fabric != nullptr)
             {
                 mExchangeACL = chip::Platform::New<CASEExchangeACL>(fabric);
@@ -166,7 +166,7 @@ public:
         return mExchangeACL;
     }
 
-    SessionHandle GetSecureSession() { return mSecureSession; }
+    SessionHandle GetSecureSession() { return mSecureSession.Value(); }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -188,8 +188,8 @@ private:
 
     ExchangeMessageDispatch * mDispatch = nullptr;
 
-    SessionHandle mSecureSession; // The connection state
-    uint16_t mExchangeId;         // Assigned exchange ID.
+    Optional<SessionHandle> mSecureSession; // The connection state
+    uint16_t mExchangeId;                   // Assigned exchange ID.
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over

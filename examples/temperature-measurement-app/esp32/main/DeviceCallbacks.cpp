@@ -29,7 +29,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Mdns.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 static const char * TAG = "echo-devicecallbacks";
 

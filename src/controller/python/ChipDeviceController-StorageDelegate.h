@@ -21,7 +21,7 @@
 #include <map>
 #include <string>
 
-#include <core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 class PythonPersistentStorageDelegate;
 

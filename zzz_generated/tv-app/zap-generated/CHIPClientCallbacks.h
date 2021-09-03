@@ -68,3 +68,8 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(chip::TLV::TLVR
                                                                  chip::Callback::Cancelable * onSuccessCallback,
                                                                  chip::Callback::Cancelable * onFailureCallback);
 typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(void * context, uint16_t count, _FabricDescriptor * entries);
+void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                             chip::Callback::Cancelable * onSuccessCallback,
+                                                                             chip::Callback::Cancelable * onFailureCallback);
+typedef void (*OperationalCredentialsTrustedRootCertificatesListAttributeCallback)(void * context, uint16_t count,
+                                                                                   chip::ByteSpan * entries);

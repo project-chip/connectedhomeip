@@ -26,7 +26,7 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 class LightingManager
 {

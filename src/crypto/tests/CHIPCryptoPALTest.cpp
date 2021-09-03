@@ -40,11 +40,11 @@
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
-#include <support/CodeUtils.h>
-#include <support/ScopedBuffer.h>
-#include <support/UnitTestRegistration.h>
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -52,7 +52,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <support/BytesToHex.h>
+#include <lib/support/BytesToHex.h>
 
 #if CHIP_CRYPTO_OPENSSL
 #include "X509_PKCS7Extraction_test_vectors.h"

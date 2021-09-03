@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 

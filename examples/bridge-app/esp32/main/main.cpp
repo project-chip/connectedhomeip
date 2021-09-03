@@ -25,11 +25,11 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <core/CHIPError.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <support/CHIPMemString.h>
-#include <support/ErrorStr.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/ErrorStr.h>
 
 #include <app/server/Server.h>
 

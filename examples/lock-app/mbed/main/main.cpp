@@ -20,31 +20,22 @@
 #include "AppTask.h"
 
 #include "mbedtls/platform.h"
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
-
-#ifdef MBED_CONF_MBED_TRACE_ENABLE
-#include "mbed-trace/mbed_trace.h"
-#endif
+#include <platform/mbed/Logging.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Logging::Platform;
 
 int main()
 {
     int ret        = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#ifdef MBED_CONF_MBED_TRACE_ENABLE
-    mbed_trace_init();
-    mbed_trace_include_filters_set("BSDS,NETS");
-    mbed_trace_config_set(TRACE_ACTIVE_LEVEL_ALL | TRACE_MODE_COLOR);
-#endif
-
-    // note: Make sure to turn the filtering on with CHIP_LOG_FILTERING=1
-    chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_Progress);
+    mbed_logging_init();
 
     ret = mbedtls_platform_setup(NULL);
     if (ret)

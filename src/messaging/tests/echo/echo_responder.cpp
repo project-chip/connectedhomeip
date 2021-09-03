@@ -29,11 +29,11 @@
 
 #include "common.h"
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>

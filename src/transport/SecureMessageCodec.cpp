@@ -25,8 +25,8 @@
  *
  */
 
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <transport/SecureMessageCodec.h>
 
 namespace chip {

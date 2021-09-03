@@ -17,7 +17,7 @@
  */
 
 #include "DiscoverCommissionablesCommand.h"
-#include <support/BytesToHex.h>
+#include <lib/support/BytesToHex.h>
 
 using namespace ::chip;
 

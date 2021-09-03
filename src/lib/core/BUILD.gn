@@ -69,10 +69,7 @@ source_set("chip_config_header") {
     "CHIPTimeConfig.h",
   ]
 
-  public_configs = [
-    "${chip_root}/src:includes",
-    "${chip_root}/src/lib:includes",
-  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 
   public_deps = [
     ":chip_buildconfig",

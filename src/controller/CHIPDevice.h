@@ -31,9 +31,12 @@
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
-#include <core/CHIPCallback.h>
-#include <core/CHIPCore.h>
 #include <credentials/CHIPOperationalCredentials.h>
+#include <lib/core/CHIPCallback.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/Base64.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
@@ -42,9 +45,6 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/Base64.h>
-#include <support/DLLUtil.h>
-#include <support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -105,7 +105,7 @@ public:
     {}
     Device(const Device &) = delete;
 
-    enum class PairingWindowOption
+    enum class CommissioningWindowOption
     {
         kOriginalSetupCode = 0,
         kTokenWithRandomPIN,
@@ -291,16 +291,16 @@ public:
 
     /**
      * @brief
-     *   Trigger a paired device to re-enter the pairing mode. If an onboarding token is provided, the device will use
-     *   the provided setup PIN code and the discriminator to advertise itself for pairing availability. If the token
+     *   Trigger a paired device to re-enter the commissioning mode. If an onboarding token is provided, the device will use
+     *   the provided setup PIN code and the discriminator to advertise itself for commissioning availability. If the token
      *   is not provided, the device will use the manufacturer assigned setup PIN code and discriminator.
      *
-     *   The device will exit the pairing mode after a successful pairing, or after the given `timeout` time.
+     *   The device will exit the commissioning mode after a successful commissioning, or after the given `timeout` time.
      *
-     * @param[in] timeout         The pairing mode should terminate after this much time.
+     * @param[in] timeout         The commissioning mode should terminate after this much time.
      * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
      *                            PAKE passcode verifier to be used for this commissioning.
-     * @param[in] option          The pairing window can be opened using the original setup code, or an
+     * @param[in] option          The commissioning window can be opened using the original setup code, or an
      *                            onboarding token can be generated using a random setup PIN code (or with
      *                            the PIN code provied in the setupPayload).
      * @param[in] salt            The PAKE Salt associated with the PAKE Passcode ID and ephemeral PAKE passcode
@@ -309,19 +309,19 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, PairingWindowOption option, const ByteSpan & salt,
-                                       SetupPayload & setupPayload);
+    CHIP_ERROR OpenCommissioningWindow(uint16_t timeout, uint32_t iteration, CommissioningWindowOption option,
+                                       const ByteSpan & salt, SetupPayload & setupPayload);
 
     /**
      * @brief
-     *   Trigger a paired device to re-enter the pairing mode. If an onboarding token is provided, the device will use
-     *   the provided setup PIN code and the discriminator to advertise itself for pairing availability. If the token
+     *   Trigger a paired device to re-enter the commissioning mode. If an onboarding token is provided, the device will use
+     *   the provided setup PIN code and the discriminator to advertise itself for commissioning availability. If the token
      *   is not provided, the device will use the manufacturer assigned setup PIN code and discriminator.
      *
-     *   The device will exit the pairing mode after a successful pairing, or after the given `timeout` time.
+     *   The device will exit the commissioning mode after a successful commissioning, or after the given `timeout` time.
      *
-     * @param[in] timeout         The pairing mode should terminate after this much time.
-     * @param[in] option          The pairing window can be opened using the original setup code, or an
+     * @param[in] timeout         The commissioning mode should terminate after this much time.
+     * @param[in] option          The commissioning window can be opened using the original setup code, or an
      *                            onboarding token can be generated using a random setup PIN code (or with
      *                            the PIN code provied in the setupPayload). This argument selects one of these
      *                            methods.
@@ -329,7 +329,7 @@ public:
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenPairingWindow(uint16_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
+    CHIP_ERROR OpenPairingWindow(uint16_t timeout, CommissioningWindowOption option, SetupPayload & setupPayload);
 
     /**
      *  In case there exists an open session to the device, mark it as expired.
@@ -366,9 +366,9 @@ public:
 
     NodeId GetDeviceId() const { return mDeviceId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession == session; }
+    bool MatchesSession(SessionHandle session) const { return mSecureSession.HasValue() && mSecureSession.Value() == session; }
 
-    SessionHandle GetSecureSession() const { return mSecureSession; }
+    SessionHandle GetSecureSession() const { return mSecureSession.Value(); }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
@@ -474,7 +474,7 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    SessionHandle mSecureSession = {};
+    Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
 
     uint8_t mSequenceNumber = 0;
 

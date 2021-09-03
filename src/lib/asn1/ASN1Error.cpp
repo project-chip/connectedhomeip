@@ -24,8 +24,8 @@
 
 #include <stdlib.h>
 
-#include <asn1/ASN1.h>
-#include <support/ErrorStr.h>
+#include <lib/asn1/ASN1.h>
+#include <lib/support/ErrorStr.h>
 
 namespace chip {
 namespace ASN1 {

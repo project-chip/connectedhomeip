@@ -28,7 +28,7 @@
 #include "InteractionModelEngine.h"
 
 #include <app/AppBuildConfig.h>
-#include <core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVDebug.hpp>
 
 namespace chip {
 namespace app {

@@ -22,7 +22,7 @@
 #include <string.h>
 #include <type_traits>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 

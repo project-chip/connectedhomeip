@@ -29,11 +29,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #define ASN1_DEFINE_OID_TABLE
 #define ASN1_DEFINE_OID_NAME_TABLE
-#include <asn1/ASN1.h>
+#include <lib/asn1/ASN1.h>
 
 namespace chip {
 namespace ASN1 {

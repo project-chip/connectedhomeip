@@ -21,8 +21,8 @@
 #include <app/AttributePathParams.h>
 #include <app/EventPathParams.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
 
 namespace chip {
@@ -39,10 +39,9 @@ struct ReadPrepareParams
     uint16_t mMinIntervalSeconds                    = 0;
     uint16_t mMaxIntervalSeconds                    = 0;
 
-    ReadPrepareParams() {}
-    ReadPrepareParams(ReadPrepareParams && other)
+    ReadPrepareParams(SessionHandle sessionHandle) : mSessionHandle(sessionHandle) {}
+    ReadPrepareParams(ReadPrepareParams && other) : mSessionHandle(other.mSessionHandle)
     {
-        mSessionHandle                     = other.mSessionHandle;
         mpEventPathParamsList              = other.mpEventPathParamsList;
         mEventPathParamsListSize           = other.mEventPathParamsListSize;
         mpAttributePathParamsList          = other.mpAttributePathParamsList;

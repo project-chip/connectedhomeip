@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/af-structs.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <vector>
 class AudioOutputManager
 {

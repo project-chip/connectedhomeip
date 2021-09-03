@@ -36,8 +36,8 @@
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
 
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4

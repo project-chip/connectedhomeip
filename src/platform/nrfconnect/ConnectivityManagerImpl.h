@@ -31,7 +31,7 @@
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Inet {

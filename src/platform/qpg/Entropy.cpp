@@ -42,8 +42,8 @@
 // provided by Nordic.
 //
 
+#include <lib/support/crypto/CHIPRNG.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/crypto/CHIPRNG.h>
 
 #include <openthread/platform/random.h>
 

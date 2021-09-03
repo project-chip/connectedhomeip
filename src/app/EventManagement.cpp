@@ -18,12 +18,12 @@
 
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <core/CHIPEventLoggingConfig.h>
-#include <core/CHIPTLVUtilities.hpp>
 #include <inttypes.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPEventLoggingConfig.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::TLV;
 

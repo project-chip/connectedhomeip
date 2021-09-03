@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 // clang-format off
 

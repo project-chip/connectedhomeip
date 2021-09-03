@@ -26,10 +26,13 @@
 
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVDebug.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -37,9 +40,6 @@
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
@@ -231,7 +231,7 @@ void TestCommandInteraction::TestCommandSenderWithWrongState(nlTestSuite * apSui
     err                            = commandSender.Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = commandSender.SendCommandRequest(kTestDeviceNodeId, gFabricIndex, nullptr);
+    err = commandSender.SendCommandRequest(kTestDeviceNodeId, gFabricIndex, Optional<SessionHandle>::Missing());
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 }
 
@@ -270,7 +270,7 @@ void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSu
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     AddCommandDataElement(apSuite, apContext, &commandSender, false);
-    err = commandSender.SendCommandRequest(kTestDeviceNodeId, gFabricIndex, nullptr);
+    err = commandSender.SendCommandRequest(kTestDeviceNodeId, gFabricIndex, Optional<SessionHandle>::Missing());
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 
     GenerateReceivedCommand(apSuite, apContext, buf, true /*aNeedCommandData*/);

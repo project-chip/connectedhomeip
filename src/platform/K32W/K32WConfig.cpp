@@ -27,7 +27,7 @@
 
 #include <platform/K32W/K32WConfig.h>
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 #include "FreeRTOS.h"

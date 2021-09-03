@@ -30,7 +30,7 @@
 
 #include <stdint.h>
 
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPTLV.h>
 
 /*
  *  @brief Integral truncate L to the least significant 32-bit

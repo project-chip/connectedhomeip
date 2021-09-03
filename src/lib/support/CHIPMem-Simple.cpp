@@ -20,7 +20,7 @@
 
 #include <string.h>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <system/SystemMutex.h>
 
 namespace chip {

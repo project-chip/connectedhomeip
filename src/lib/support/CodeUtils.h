@@ -28,9 +28,9 @@
 
 #ifdef __cplusplus
 
-#include <core/CHIPError.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 /**
  *  @name chip-specific nlassert.h Overrides

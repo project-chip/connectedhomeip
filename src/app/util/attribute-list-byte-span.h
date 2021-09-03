@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
-#include <support/Span.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {

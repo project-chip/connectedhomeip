@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
-#include <support/CHIPMem.h>
-#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

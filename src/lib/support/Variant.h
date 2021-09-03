@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 
 #include <algorithm>
 #include <new>

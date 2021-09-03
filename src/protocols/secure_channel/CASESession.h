@@ -31,12 +31,12 @@
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
+#include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
-#include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/FabricTable.h>
 #include <transport/PairingSession.h>

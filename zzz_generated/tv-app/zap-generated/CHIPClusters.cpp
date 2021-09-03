@@ -21,18 +21,15 @@
 
 #include <cstdint>
 
-#include <support/BufferWriter.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
-#include <system/SystemPacketBuffer.h>
-
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/InteractionModelEngine.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/basic-types.h>
-
-#include <app/InteractionModelEngine.h>
+#include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
 #define COMMAND_HEADER(name, clusterId)                                                                                            \
@@ -795,6 +792,18 @@ CHIP_ERROR OperationalCredentialsCluster::ReadAttributeCommissionedFabrics(Callb
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR OperationalCredentialsCluster::ReadAttributeTrustedRootCertificates(Callback::Cancelable * onSuccessCallback,
+                                                                               Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000004;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter);
 }
 
 CHIP_ERROR OperationalCredentialsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,

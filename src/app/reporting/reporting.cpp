@@ -48,7 +48,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/binding-table.h>
 #include <app/util/common.h>
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <system/SystemLayer.h>
 
 using namespace chip;

@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <asn1/ASN1.h>
+#include <lib/asn1/ASN1.h>
 
 namespace chip {
 namespace ASN1 {
