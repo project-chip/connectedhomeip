@@ -174,15 +174,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient) override { return CHIP_NO_ERROR; }
 
-    bool mGotEventResponse      = false;
-    int mNumAttributeResponse   = 0;
-    bool mGotReport             = false;
-    bool mReadError = false;
+    bool mGotEventResponse    = false;
+    int mNumAttributeResponse = 0;
+    bool mGotReport           = false;
+    bool mReadError           = false;
 };
 } // namespace
 

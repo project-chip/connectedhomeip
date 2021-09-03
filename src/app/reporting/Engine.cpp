@@ -55,9 +55,9 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 CHIP_ERROR
 Engine::RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo)
 {
-    CHIP_ERROR err                              = CHIP_NO_ERROR;
+    CHIP_ERROR err                                            = CHIP_NO_ERROR;
     AttributeDataElement::Builder attributeDataElementBuilder = aAttributeDataList.CreateAttributeDataElementBuilder();
-    AttributePath::Builder attributePathBuilder = attributeDataElementBuilder.CreateAttributePathBuilder();
+    AttributePath::Builder attributePathBuilder               = attributeDataElementBuilder.CreateAttributePathBuilder();
     attributePathBuilder.NodeId(aClusterInfo.mNodeId)
         .EndpointId(aClusterInfo.mEndpointId)
         .ClusterId(aClusterInfo.mClusterId)
