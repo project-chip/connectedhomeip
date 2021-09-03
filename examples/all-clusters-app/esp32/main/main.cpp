@@ -356,12 +356,12 @@ public:
         }
         else if (i == 2)
         {
-            app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledBasic);
+            app::Mdns::StartServer(Mdns::CommissioningMode::kEnabledBasic);
             OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
         }
         else if (i == 3)
         {
-            app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledEnhanced);
+            app::Mdns::StartServer(Mdns::CommissioningMode::kEnabledEnhanced);
             OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
         }
     }
