@@ -84,8 +84,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::SetIssuerID(CHIPPersistentStorage
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    uint16_t idStringLen = 16;
-    char issuerIdString[idStringLen];
+    char issuerIdString[16];
+    uint16_t idStringLen = sizeof(issuerIdString);
     if (CHIP_NO_ERROR != storage->SyncGetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, issuerIdString, idStringLen)) {
         mIssuerId = arc4random();
         CHIP_LOG_ERROR("Assigned %d certificate issuer ID to the commissioner", mIssuerId);
