@@ -17,8 +17,8 @@ import("//build_overrides/chip.gni")
 
 executable("chip-ota-requestor-app") {
   sources = [
+    "PersistentStorage.cpp",
     "main.cpp",
-    "PersistentStorage.cpp"
   ]
 
   deps = [
@@ -33,7 +33,5 @@ executable("chip-ota-requestor-app") {
 }
 
 group("linux") {
-  deps = [
-    ":chip-ota-requestor-app" 
-  ]
+  deps = [ ":chip-ota-requestor-app" ]
 }
