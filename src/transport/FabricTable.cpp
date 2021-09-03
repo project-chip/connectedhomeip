@@ -43,7 +43,6 @@ CHIP_ERROR FabricInfo::SetFabricLabel(const uint8_t * fabricLabel)
     return CHIP_NO_ERROR;
 }
 
-#pragma GCC diagnostic ignored "-Wstack-usage="
 CHIP_ERROR FabricInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -195,11 +194,6 @@ CHIP_ERROR FabricInfo::DeleteFromKVS(PersistentStorageDelegate * kvs, FabricInde
         ChipLogDetail(Discovery, "Fabric %d is not yet configured", id);
     }
     return err;
-}
-
-constexpr size_t FabricInfo::KeySize()
-{
-    return sizeof(kFabricTableKeyPrefix) + 2 * sizeof(FabricIndex);
 }
 
 CHIP_ERROR FabricInfo::GenerateKey(FabricIndex id, char * key, size_t len)

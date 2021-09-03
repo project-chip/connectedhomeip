@@ -596,7 +596,6 @@ CHIP_ERROR CASESession::HandleSigmaR2_and_SendSigmaR3(System::PacketBufferHandle
     return CHIP_NO_ERROR;
 }
 
-#pragma GCC diagnostic ignored "-Wstack-usage="
 CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
