@@ -24,14 +24,15 @@
 #include "pw_sys_io/sys_io.h"
 #include "pw_sys_io_mbed/init.h"
 
-//#include <platform/mbed/Logging.h>
+#include <platform/mbed/Logging.h>
 #include <support/logging/CHIPLogging.h>
 
 #include "rtos/Mutex.h"
 #include "rtos/Thread.h"
 
-using namespace chip::rpc;
+using namespace ::chip::rpc;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Logging::Platform;
 
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
 
@@ -60,11 +61,13 @@ int main()
 {
     pw_sys_io_Init();
 
-    // mbed_logging_init();
+    mbed_logging_init();
 
     ChipLogProgress(NotSpecified, "==================================================\r\n");
-    ChipLogProgress(NotSpecified, "chip-mbed-pigweed-example starting\r\n");
+    ChipLogProgress(NotSpecified, "CHIP Mbed Pigweed application example starting\r\n");
     ChipLogProgress(NotSpecified, "==================================================\r\n");
+
+    sStatusLED.Set(true);
 
     auto error = rpcThread.start(RunRpcService);
     if (error != osOK)
