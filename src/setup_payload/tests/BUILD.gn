@@ -22,10 +22,10 @@ chip_test_suite("tests") {
   output_name = "libSetupPayloadTests"
 
   test_sources = [
+    "TestAdditionalDataPayload.cpp",
     "TestManualCode.cpp",
     "TestQRCode.cpp",
     "TestQRCodeTLV.cpp",
-    "TestAdditionalDataPayload.cpp",
   ]
 
   sources = [ "TestHelpers.h" ]
