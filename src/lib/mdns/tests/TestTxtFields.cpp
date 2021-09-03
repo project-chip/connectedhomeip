@@ -160,7 +160,7 @@ void TestGetCommissioningMode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 1);
 
     sprintf(cm, "2");
-    NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 1);
+    NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 2);
 
     // overflow a uint8
     sprintf(cm, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);

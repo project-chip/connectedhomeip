@@ -373,6 +373,24 @@ void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
 
+    ChipLogProgress(Discovery, "Testing response to _matterc._udp.local for large basic parameters");
+    server.Reset();
+    server.AddExpectedRecord(&ptrCommissionableNode);
+    server.AddExpectedRecord(&srvCommissionableNode);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeBasic);
+    NL_TEST_ASSERT(inSuite, SendQuery(kMatterCommissionableNodeQueryName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    ChipLogProgress(Discovery, "Testing response to instance name for large basic parameters");
+    server.Reset();
+    // Just the SRV and TXT should return
+    server.AddExpectedRecord(&srvCommissionableNode);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeBasic);
+    NL_TEST_ASSERT(inSuite, SendQuery(instanceName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsLargeEnhanced) == CHIP_NO_ERROR);
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local for large enhanced parameters");
     server.Reset();
@@ -386,30 +404,12 @@ void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
 
-    ChipLogProgress(Discovery, "Testing response to _matterc._udp.local for large basic parameters");
-    server.Reset();
-    server.AddExpectedRecord(&ptrCommissionableNode);
-    server.AddExpectedRecord(&srvCommissionableNode);
-    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeBasic);
-    NL_TEST_ASSERT(inSuite, SendQuery(kMatterCommissionableNodeQueryName) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
-    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
-
     ChipLogProgress(Discovery, "Testing response to _matterc._udp.local for large enhanced parameters");
     server.Reset();
     server.AddExpectedRecord(&ptrCommissionableNode);
     server.AddExpectedRecord(&srvCommissionableNode);
     server.AddExpectedRecord(&txtCommissionableNodeParamsLargeEnhanced);
     NL_TEST_ASSERT(inSuite, SendQuery(kMatterCommissionableNodeQueryName) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
-    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
-
-    ChipLogProgress(Discovery, "Testing response to instance name for large basic parameters");
-    server.Reset();
-    // Just the SRV and TXT should return
-    server.AddExpectedRecord(&srvCommissionableNode);
-    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeBasic);
-    NL_TEST_ASSERT(inSuite, SendQuery(instanceName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
 
@@ -469,7 +469,7 @@ void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext
     server.Reset();
     server.AddExpectedRecord(&ptrCommissionableNode);
     server.AddExpectedRecord(&srvCommissionableNode);
-    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeBasic);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeEnhanced);
     NL_TEST_ASSERT(inSuite, SendQuery(kMatterCommissionableNodeQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -497,7 +497,7 @@ void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext
     server.Reset();
     // Just the SRV and TXT should return
     server.AddExpectedRecord(&srvCommissionableNode);
-    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeBasic);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeEnhanced);
     NL_TEST_ASSERT(inSuite, SendQuery(instanceName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
