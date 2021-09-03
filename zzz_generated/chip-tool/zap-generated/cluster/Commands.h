@@ -724,7 +724,6 @@ static void OnApplicationLauncherApplicationLauncherListListAttributeResponse(vo
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnAudioOutputAudioOutputListListAttributeResponse(void * context, uint16_t count, _AudioOutputInfo * entries)
 {
     ChipLogProgress(chipTool, "OnAudioOutputAudioOutputListListAttributeResponse: %" PRIu16 " entries", count);
@@ -740,7 +739,6 @@ static void OnAudioOutputAudioOutputListListAttributeResponse(void * context, ui
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context, uint16_t count, chip::ByteSpan * entries)
 {
     ChipLogProgress(chipTool, "OnContentLauncherAcceptsHeaderListListAttributeResponse: %" PRIu16 " entries", count);
@@ -753,7 +751,6 @@ static void OnContentLauncherAcceptsHeaderListListAttributeResponse(void * conte
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
 {
     ChipLogProgress(chipTool, "OnContentLauncherSupportedStreamingTypesListAttributeResponse: %" PRIu16 " entries", count);
@@ -766,7 +763,6 @@ static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(void *
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnDescriptorDeviceListListAttributeResponse(void * context, uint16_t count, _DeviceType * entries)
 {
     ChipLogProgress(chipTool, "OnDescriptorDeviceListListAttributeResponse: %" PRIu16 " entries", count);
@@ -781,7 +777,6 @@ static void OnDescriptorDeviceListListAttributeResponse(void * context, uint16_t
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnDescriptorServerListListAttributeResponse(void * context, uint16_t count, chip::ClusterId * entries)
 {
     ChipLogProgress(chipTool, "OnDescriptorServerListListAttributeResponse: %" PRIu16 " entries", count);
@@ -794,7 +789,6 @@ static void OnDescriptorServerListListAttributeResponse(void * context, uint16_t
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnDescriptorClientListListAttributeResponse(void * context, uint16_t count, chip::ClusterId * entries)
 {
     ChipLogProgress(chipTool, "OnDescriptorClientListListAttributeResponse: %" PRIu16 " entries", count);
@@ -807,7 +801,6 @@ static void OnDescriptorClientListListAttributeResponse(void * context, uint16_t
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnDescriptorPartsListListAttributeResponse(void * context, uint16_t count, chip::EndpointId * entries)
 {
     ChipLogProgress(chipTool, "OnDescriptorPartsListListAttributeResponse: %" PRIu16 " entries", count);
@@ -820,7 +813,6 @@ static void OnDescriptorPartsListListAttributeResponse(void * context, uint16_t 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnFixedLabelLabelListListAttributeResponse(void * context, uint16_t count, _LabelStruct * entries)
 {
     ChipLogProgress(chipTool, "OnFixedLabelLabelListListAttributeResponse: %" PRIu16 " entries", count);
@@ -835,7 +827,6 @@ static void OnFixedLabelLabelListListAttributeResponse(void * context, uint16_t 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeResponse(void * context, uint16_t count,
                                                                                   _BasicCommissioningInfoType * entries)
 {
@@ -850,7 +841,6 @@ static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeRespons
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(void * context, uint16_t count,
                                                                        _NetworkInterfaceType * entries)
 {
@@ -870,7 +860,6 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(void * co
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnGroupKeyManagementGroupsListAttributeResponse(void * context, uint16_t count, _GroupState * entries)
 {
     ChipLogProgress(chipTool, "OnGroupKeyManagementGroupsListAttributeResponse: %" PRIu16 " entries", count);
@@ -886,7 +875,6 @@ static void OnGroupKeyManagementGroupsListAttributeResponse(void * context, uint
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnGroupKeyManagementGroupKeysListAttributeResponse(void * context, uint16_t count, _GroupKey * entries)
 {
     ChipLogProgress(chipTool, "OnGroupKeyManagementGroupKeysListAttributeResponse: %" PRIu16 " entries", count);
@@ -904,7 +892,6 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(void * context, u
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnMediaInputMediaInputListListAttributeResponse(void * context, uint16_t count, _MediaInputInfo * entries)
 {
     ChipLogProgress(chipTool, "OnMediaInputMediaInputListListAttributeResponse: %" PRIu16 " entries", count);
@@ -921,7 +908,6 @@ static void OnMediaInputMediaInputListListAttributeResponse(void * context, uint
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnOperationalCredentialsFabricsListListAttributeResponse(void * context, uint16_t count, _FabricDescriptor * entries)
 {
     ChipLogProgress(chipTool, "OnOperationalCredentialsFabricsListListAttributeResponse: %" PRIu16 " entries", count);
@@ -940,7 +926,6 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(void * cont
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnTvChannelTvChannelListListAttributeResponse(void * context, uint16_t count, _TvChannelInfo * entries)
 {
     ChipLogProgress(chipTool, "OnTvChannelTvChannelListListAttributeResponse: %" PRIu16 " entries", count);
@@ -958,7 +943,6 @@ static void OnTvChannelTvChannelListListAttributeResponse(void * context, uint16
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(void * context, uint16_t count,
                                                                       _NavigateTargetTargetInfo * entries)
 {
@@ -974,7 +958,6 @@ static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(void * con
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnTestClusterListInt8uListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
 {
     ChipLogProgress(chipTool, "OnTestClusterListInt8uListAttributeResponse: %" PRIu16 " entries", count);
@@ -987,7 +970,6 @@ static void OnTestClusterListInt8uListAttributeResponse(void * context, uint16_t
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnTestClusterListOctetStringListAttributeResponse(void * context, uint16_t count, chip::ByteSpan * entries)
 {
     ChipLogProgress(chipTool, "OnTestClusterListOctetStringListAttributeResponse: %" PRIu16 " entries", count);
@@ -1000,7 +982,6 @@ static void OnTestClusterListOctetStringListAttributeResponse(void * context, ui
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnTestClusterListStructOctetStringListAttributeResponse(void * context, uint16_t count, _TestListStructOctet * entries)
 {
     ChipLogProgress(chipTool, "OnTestClusterListStructOctetStringListAttributeResponse: %" PRIu16 " entries", count);
@@ -1015,7 +996,13 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(void * conte
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
+static void OnTestClusterSimpleStructStructAttributeResponse(void * context, _simplestruct value)
+{
+    ChipLogProgress(chipTool, "OnTestClusterSimpleStructStructAttributeResponse: TODO: Print struct content.");
+    IgnoreUnusedVariable(value);
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
 static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(void * context, uint16_t count,
                                                                              _NeighborTable * entries)
 {
@@ -1043,7 +1030,6 @@ static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(voi
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(void * context, uint16_t count, _RouteTable * entries)
 {
     ChipLogProgress(chipTool, "OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse: %" PRIu16 " entries", count);
@@ -1066,7 +1052,6 @@ static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(void *
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(void * context, uint16_t count, _SecurityPolicy * entries)
 {
     ChipLogProgress(chipTool, "OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse: %" PRIu16 " entries", count);
@@ -1081,7 +1066,6 @@ static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(void *
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeResponse(void * context, uint16_t count,
                                                                                         _OperationalDatasetComponents * entries)
 {
@@ -1108,7 +1092,6 @@ static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeR
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
 static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeResponse(void * context, uint16_t count,
                                                                                    uint8_t * entries)
 {
@@ -17587,6 +17570,7 @@ private:
 | * LongOctetString                                                   | 0x001D |
 | * CharString                                                        | 0x001E |
 | * LongCharString                                                    | 0x001F |
+| * SimpleStruct                                                      | 0x0020 |
 | * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -19152,6 +19136,41 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     char * mValue;
+};
+
+/*
+ * Attribute SimpleStruct
+ */
+class ReadTestClusterSimpleStruct : public ModelCommand
+{
+public:
+    ReadTestClusterSimpleStruct() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "simple-struct");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterSimpleStruct()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSimpleStruct(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<TestClusterSimpleStructAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<TestClusterSimpleStructAttributeCallback>(OnTestClusterSimpleStructStructAttributeResponse,
+                                                                               this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -25534,6 +25553,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterCharString>(),           //
         make_unique<ReadTestClusterLongCharString>(),        //
         make_unique<WriteTestClusterLongCharString>(),       //
+        make_unique<ReadTestClusterSimpleStruct>(),          //
         make_unique<ReadTestClusterUnsupported>(),           //
         make_unique<WriteTestClusterUnsupported>(),          //
         make_unique<ReadTestClusterClusterRevision>(),       //
