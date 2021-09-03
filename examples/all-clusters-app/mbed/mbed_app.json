@@ -9,7 +9,8 @@
             "nsapi.default-wifi-ssid": "\"YOUR_SSID\"",
             "nsapi.default-wifi-password": "\"YOUR_PASSWORD\"",
             "mbed-trace.max-level": "TRACE_LEVEL_DEBUG",
-            "mbed-trace.enable": true
+            "mbed-trace.enable": true,
+            "target.printf_lib": "std"
         },
         "DISCO_L475VG_IOT01A": {
             "target.components_add": ["wifi_ism43362", "BlueNRG_MS"],
@@ -17,9 +18,7 @@
             "target.network-default-interface-type": "WIFI",
             "target.macros_add": ["MBEDTLS_SHA1_C"],
             "target.features_add": ["BLE"],
-            "target.extra_labels_add": ["CORDIO"],
-            "led-active-state": 1,
-            "function-button": "NC"
+            "target.extra_labels_add": ["CORDIO"]
         },
         "CY8CPROTO_062_4343W": {
             "target.network-default-interface-type": "WIFI",
@@ -28,10 +27,7 @@
                 "NL_ASSERT_LOG=NL_ASSERT_LOG_DEFAULT",
                 "NL_ASSERT_EXPECT_FLAGS=NL_ASSERT_FLAG_LOG",
                 "WHD_PRINT_DISABLE"
-            ],
-            "led-active-state": 0,
-            "system-state-led": "LED1",
-            "function-button": "P9_7"
+            ]
         }
     },
     "config": {
@@ -39,9 +35,13 @@
             "help": "System status LED.",
             "value": "LED1"
         },
+        "led-active-state": {
+            "help": "GPIO output to turn the LED on.",
+            "value": 0
+        },
         "device-name": {
             "help": "Name used for BLE advertising.",
-            "value": "\"CHIP-clusters\""
+            "value": "\"CHIP-all-clusters\""
         },
         "use-gatt-indication-ack-hack": {
             "help": "Fake a TX transfer confirmation. Send a 'kCHIPoBLEIndicateConfirm' event as soon as data is sent, without waiting for the actual ACK from the GATT client. This hack has to stay until we provide a fix in the Mbed OS repo.",
