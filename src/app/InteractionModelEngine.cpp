@@ -229,8 +229,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                        const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
+                                                        System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -240,9 +241,9 @@ CHIP_ERROR InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * ap
     {
         if (readHandler.IsFree())
         {
-            err = readHandler.Init(mpDelegate, apExchangeContext);
+            err = readHandler.Init(mpExchangeMgr, mpDelegate, apExchangeContext);
             SuccessOrExit(err);
-            err               = readHandler.OnReadRequest(std::move(aPayload));
+            err               = readHandler.OnReadInitialRequest(std::move(aPayload));
             apExchangeContext = nullptr;
             break;
         }
@@ -299,7 +300,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
-        err = OnReadRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+        err = OnReadInitialRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {

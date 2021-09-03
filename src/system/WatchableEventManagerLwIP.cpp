@@ -145,10 +145,6 @@ CHIP_ERROR WatchableEventManager::PostEvent(Object & aTarget, EventType aEventTy
 {
     VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    // Sanity check that this instance and the target layer haven't been "crossed".
-    VerifyOrDieWithMsg(aTarget.IsRetained(*mSystemLayer), chipSystemLayer, "wrong poster! [target %p != this %p]",
-                       &(aTarget.SystemLayer()), mSystemLayer);
-
     CHIP_ERROR lReturn = PlatformEventing::PostEvent(*mSystemLayer, aTarget, aEventType, aArgument);
     if (lReturn != CHIP_NO_ERROR)
     {
@@ -199,10 +195,6 @@ CHIP_ERROR WatchableEventManager::DispatchEvent(Event aEvent)
 CHIP_ERROR WatchableEventManager::HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
     VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-
-    // Sanity check that this instance and the target layer haven't been "crossed".
-    VerifyOrDieWithMsg(aTarget.IsRetained(*mSystemLayer), chipSystemLayer, "wrong handler! [target %p != this %p]",
-                       &(aTarget.SystemLayer()), mSystemLayer);
 
     // Prevent the target object from being freed while dispatching the event.
     aTarget.Retain();

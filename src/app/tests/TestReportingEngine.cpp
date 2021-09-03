@@ -133,7 +133,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    readHandler.OnReadRequest(std::move(readRequestbuf));
+    readHandler.OnReadInitialRequest(std::move(readRequestbuf));
     reportingEngine.Init();
     err = reportingEngine.BuildAndSendSingleReportData(&readHandler);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);

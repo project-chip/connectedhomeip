@@ -171,6 +171,24 @@ class {{filename}}: public TestCommand
             return;
           }
         {{/if}}
+
+        {{#if expectedConstraints.minValue}}
+          if ({{asLowerCamelCase name}} < {{expectedConstraints.minValue}})
+          {
+            ChipLogError(chipTool, "Error: {{asLowerCamelCase name}} is lower than expected. Min value is {{expectedConstraints.minValue}} but got '%d'", {{asLowerCamelCase name}});
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+          }
+        {{/if}}
+
+        {{#if expectedConstraints.maxValue}}
+          if ({{asLowerCamelCase name}} > {{expectedConstraints.maxValue}})
+          {
+            ChipLogError(chipTool, "Error: {{asLowerCamelCase name}} is higher than expected. Max value is {{expectedConstraints.maxValue}} but got '%d'", {{asLowerCamelCase name}});
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+          }
+        {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}
 

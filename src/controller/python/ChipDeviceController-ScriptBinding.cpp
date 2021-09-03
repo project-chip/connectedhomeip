@@ -98,6 +98,8 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
                                                                  uint16_t * outPort);
 ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl,
                                                                      uint64_t * outFabricId);
+ChipError::StorageType pychip_DeviceController_CommissioiningComplete(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                      chip::NodeId nodeId);
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 
 // Rendezvous
@@ -126,6 +128,10 @@ ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTa
 
 ChipError::StorageType
 pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand(chip::Controller::DeviceCommissioner * devCtrl);
+
+ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                       chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
+                                                                       uint16_t discriminator, uint8_t option);
 
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
@@ -249,6 +255,12 @@ ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Contr
     return CHIP_NO_ERROR.AsInteger();
 }
 
+ChipError::StorageType pychip_DeviceController_CommissioiningComplete(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                      chip::NodeId nodeId)
+{
+    return devCtrl->CommissioningComplete(nodeId).AsInteger();
+}
+
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId)
 {
     *outFabricId = devCtrl->GetFabricId();
@@ -366,6 +378,13 @@ pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromComma
 {
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kCommissioningModeFromCommand, 1);
     return devCtrl->DiscoverCommissionableNodes(filter).AsInteger();
+}
+
+ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                       chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
+                                                                       uint16_t discriminator, uint8_t option)
+{
+    return devCtrl->OpenCommissioningWindow(nodeid, timeout, iteration, discriminator, option).AsInteger();
 }
 
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl)

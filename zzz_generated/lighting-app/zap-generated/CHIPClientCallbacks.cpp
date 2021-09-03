@@ -36,7 +36,9 @@
 using namespace ::chip;
 using namespace ::chip::app::List;
 
-constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
+namespace {
+[[maybe_unused]] constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
+} // namespace
 
 #define CHECK_STATUS_WITH_RETVAL(error, retval)                                                                                    \
     if (CHIP_NO_ERROR != error)                                                                                                    \

@@ -27,10 +27,6 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
     // No op
   }
 
-  override fun onNetworkCommissioningComplete(code: Int) {
-    // No op
-  }
-
   override fun onNotifyChipConnectionClosed() {
     // No op
   }

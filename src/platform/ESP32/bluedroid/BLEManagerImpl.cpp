@@ -1170,6 +1170,10 @@ void BLEManagerImpl::HandleDisconnect(esp_ble_gatts_cb_param_t * param)
         }
         PlatformMgr().PostEvent(&event);
 
+        ChipDeviceEvent disconnectEvent;
+        disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
+        PlatformMgr().PostEvent(&disconnectEvent);
+
         // Force a refresh of the advertising state.
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);
         mFlags.Clear(Flags::kAdvertisingConfigured);
