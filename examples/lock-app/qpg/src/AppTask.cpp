@@ -389,7 +389,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
 void AppTask::CancelTimer()
 {
-    SystemLayer.CancelTimer(TimerEventHandler, this);
+    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
     mFunctionTimerActive = false;
 }
 
@@ -397,8 +397,8 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
     CHIP_ERROR err;
 
-    SystemLayer.CancelTimer(TimerEventHandler, this);
-    err = SystemLayer.StartTimer(aTimeoutInMs, TimerEventHandler, this);
+    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(aTimeoutInMs, TimerEventHandler, this);
     SuccessOrExit(err);
 
     mFunctionTimerActive = true;

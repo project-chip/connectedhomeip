@@ -39,7 +39,12 @@
 
 namespace chip {
 namespace DeviceLayer {
+
+extern chip::System::Layer * globalSystemLayer;
+
 namespace Internal {
+
+extern chip::System::LayerImpl staticSystemLayer;
 
 extern CHIP_ERROR InitEntropy();
 
@@ -71,8 +76,11 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP system layer.
-    new (&SystemLayer) System::LayerImpl();
-    err = SystemLayer.Init();
+    if (globalSystemLayer == nullptr)
+    {
+        globalSystemLayer = &staticSystemLayer;
+    }
+    err = globalSystemLayer->Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
@@ -80,8 +88,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP Inet layer.
-    new (&InetLayer) Inet::InetLayer();
-    err = InetLayer.Init(SystemLayer, nullptr);
+    err = InetLayer.Init(*globalSystemLayer, nullptr);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));
@@ -139,7 +146,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 #endif
 
     ChipLogError(DeviceLayer, "System Layer shutdown");
-    err = SystemLayer.Shutdown();
+    err = globalSystemLayer->Shutdown();
 
     return err;
 }
@@ -218,7 +225,7 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         break;
 
     case DeviceEventType::kChipSystemLayerEvent:
-        // If the event is a CHIP System or Inet Layer event, deliver it to the SystemLayer event handler.
+        // If the event is a CHIP System or Inet Layer event, deliver it to the System::Layer event handler.
         Impl()->DispatchEventToSystemLayer(event);
         break;
 
@@ -254,13 +261,14 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const ChipDeviceEvent * event)
 {
-    // TODO(#788): remove ifdef LWIP once SystemLayer event APIs are generally available
+    // TODO(#788): remove ifdef LWIP once System::Layer event APIs are generally available
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Invoke the System Layer's event handler function.
-    err = SystemLayer.HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
-                                  event->ChipSystemLayerEvent.Argument);
+    err = static_cast<System::LayerImplLwIP &>(SystemLayer())
+              .HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
+                           event->ChipSystemLayerEvent.Argument);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s", event->Type, ErrorStr(err));

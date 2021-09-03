@@ -128,7 +128,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 #if CONFIG_DEVICE_LAYER
         ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
-        mSystemLayer = &DeviceLayer::SystemLayer;
+        mSystemLayer = &DeviceLayer::SystemLayer();
         mInetLayer   = &DeviceLayer::InetLayer;
 #endif // CONFIG_DEVICE_LAYER
     }

@@ -25,11 +25,12 @@
 namespace chip {
 namespace DeviceLayer {
 
-chip::System::LayerImpl SystemLayer;
+chip::System::Layer * globalSystemLayer = nullptr;
 chip::Inet::InetLayer InetLayer;
 
 namespace Internal {
 
+chip::System::LayerImpl staticSystemLayer;
 const char * const TAG = "CHIP[DL]";
 
 } // namespace Internal
