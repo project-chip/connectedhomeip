@@ -156,7 +156,10 @@ public:
     void OnReportData(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath,
                       chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::ProtocolCode status) override
     {
-        mNumAttributeResponse++;
+        if (status == chip::Protocols::InteractionModel::ProtocolCode::Success)
+        {
+            mNumAttributeResponse++;
+        }
     }
 
     CHIP_ERROR ReportProcessed(const chip::app::ReadClient * apReadClient) override
@@ -165,19 +168,21 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    CHIP_ERROR ReadError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
-        if (aError == CHIP_NO_ERROR)
-        {
-            mGotReadStatusResponse = true;
-        }
-        return aError;
+        mReadError = true;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient) override
+    {
+        return CHIP_NO_ERROR;
     }
 
     bool mGotEventResponse      = false;
     int mNumAttributeResponse   = 0;
     bool mGotReport             = false;
-    bool mGotReadStatusResponse = false;
+    bool mReadError = false;
 };
 } // namespace
 
@@ -185,19 +190,36 @@ namespace chip {
 namespace app {
 CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
     uint64_t version = 0;
-    VerifyOrExit(aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId,
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(apWriter != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    ChipLogDetail(DataManagement, "TEST Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId,
+                  aClusterInfo.mFieldId);
+    if (apWriter == nullptr)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
-    err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), kTestFieldValue1);
-    SuccessOrExit(err);
-    err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
+    if (!(aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId))
+    {
+        if (apDataExists != nullptr)
+        {
+            *apDataExists = false;
+        }
 
-exit:
-    ChipLogFunctError(err);
-    return err;
+        return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
+                             chip::Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute);
+    }
+
+    if (apDataExists != nullptr)
+    {
+        *apDataExists = true;
+    }
+
+    CHIP_ERROR err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), kTestFieldValue1);
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+    return apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
 }
 
 class TestReadInteraction
@@ -649,7 +671,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
-
+    NL_TEST_ASSERT(apSuite, !delegate.mReadError);
     // By now we should have closed all exchanges and sent all pending acks, so
     // there should be no queued-up things in the retransmit table.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
@@ -690,7 +712,7 @@ void TestReadInteraction::TestReadInvalidAttributePathRoundtrip(nlTestSuite * ap
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
 
-    NL_TEST_ASSERT(apSuite, !delegate.mGotReport);
+    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
     // By now we should have closed all exchanges and sent all pending acks, so
     // there should be no queued-up things in the retransmit table.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);

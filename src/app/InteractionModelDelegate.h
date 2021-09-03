@@ -196,13 +196,16 @@ public:
     }
 
     /**
-     * Notification that a read client has completed the read interaction.
+     * Notification that a read client has completed the current interaction.
      * @param[in]  apReadClient  A current read client which can identify the read client to the consumer, particularly
      * during multiple read interactions
      * @param[in]  aError  notify final error regarding the current read interaction
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
-    virtual CHIP_ERROR ReadDone(const ReadClient * apReadClient, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR ReadDone(const ReadClient * apReadClient)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     virtual ~InteractionModelDelegate() = default;
 };
