@@ -494,6 +494,12 @@ menu "CHIP Device Layer"
                 The amount of time (in milliseconds) after which the CHIP platform will deactivate the soft-AP
                 if it has been idle.
 
+        config WIFI_AP_RANDOM_MAC
+            bool "Enable Random MAC address"
+            default y
+            help
+                Enables support of random MAC address(SoftAP interface) on every boot for privacy/tracking reasons.
+
     endmenu
 
     menu "BLE Options"

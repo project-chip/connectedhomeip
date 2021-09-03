@@ -58,8 +58,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     esp_err_t err;
     wifi_init_config_t cfg;
-    uint8_t ap_mac[6];
-    wifi_mode_t mode;
 
     // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
     Internal::ESP32Utils::RegisterESP32ErrorFormatter();
@@ -94,6 +92,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         goto exit;
     }
 
+#if CHIP_DEVICE_RENDEZVOUS_MODE_SOFTAP && CHIP_DEVICE_CONFIG_RANDOM_MAC
+    uint8_t ap_mac[6];
+    wifi_mode_t mode;
     esp_wifi_get_mode(&mode);
     if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
     {
@@ -106,6 +107,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
             goto exit;
         }
     }
+#endif
 
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
 
