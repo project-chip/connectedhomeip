@@ -29,6 +29,7 @@ chip_test_suite("tests") {
     "TestDataModelSerialization.cpp",
     "TestEventLogging.cpp",
     "TestEventPathParams.cpp",
+    "TestGroupDataProvider.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestStatusResponse.cpp",
