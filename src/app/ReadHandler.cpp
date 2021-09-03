@@ -292,7 +292,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
             err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
             SuccessOrExit(err);
             mpAttributeClusterInfoList->SetDirty();
-            SetInitialReport();
+            mInitialReport = true;
         }
     }
     // if we have exhausted this container
