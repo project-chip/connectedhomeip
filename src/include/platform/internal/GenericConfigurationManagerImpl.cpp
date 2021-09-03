@@ -146,7 +146,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetVendorName(char * buf
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreVendorName(const char *vname, size_t vsize)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreVendorName(const char * vname, size_t vsize)
 {
     return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_VendorName, vname, vsize);
 }
