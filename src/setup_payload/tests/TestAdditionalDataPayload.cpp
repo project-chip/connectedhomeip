@@ -43,7 +43,7 @@ void TestGeneratingAdditionalDataPayloadWithRotatingId(nlTestSuite * inSuite, vo
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle bufferHandle;
 
-    char serialNumber [] = "89051AAZZ236";
+    char serialNumber[]      = "89051AAZZ236";
     uint16_t lifetimeCounter = 10;
     BitFlags<AdditionalDataFields> additionalDataFields;
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
@@ -51,14 +51,13 @@ void TestGeneratingAdditionalDataPayloadWithRotatingId(nlTestSuite * inSuite, vo
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
-    err = AdditionalDataPayloadGenerator()
-                    .generateAdditionalDataPayload(lifetimeCounter, serialNumber, ArraySize(serialNumber), bufferHandle, additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, ArraySize(serialNumber),
+                                                                         bufferHandle, additionalDataFields);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !bufferHandle.IsNull());
 
     char output[51];
-    err = BytesToUppercaseHexString(bufferHandle->Start(), bufferHandle->DataLength(),
-                                    output, ArraySize(output));
+    err = BytesToUppercaseHexString(bufferHandle->Start(), bufferHandle->DataLength(), output, ArraySize(output));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(output, "5500003000120A00D1414E39C9A08469DA2E29F0ACAA086618") == 0);
@@ -69,21 +68,20 @@ void TestGeneratingAdditionalDataPayloadWithoutRotatingId(nlTestSuite * inSuite,
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle bufferHandle;
 
-    char serialNumber [] = "89051AAZZ236";
+    char serialNumber[]      = "89051AAZZ236";
     uint16_t lifetimeCounter = 10;
     BitFlags<AdditionalDataFields> additionalDataFields;
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
-    err = AdditionalDataPayloadGenerator()
-                    .generateAdditionalDataPayload(lifetimeCounter, serialNumber, ArraySize(serialNumber), bufferHandle, additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, ArraySize(serialNumber),
+                                                                         bufferHandle, additionalDataFields);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !bufferHandle.IsNull());
 
     char output[51];
-    err = BytesToUppercaseHexString(bufferHandle->Start(), bufferHandle->DataLength(),
-                                    output, ArraySize(output));
+    err = BytesToUppercaseHexString(bufferHandle->Start(), bufferHandle->DataLength(), output, ArraySize(output));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(output, "55000018") == 0);
@@ -94,7 +92,7 @@ void TestGeneratingAdditionalDataPayloadWithRotatingIdAndParsingIt(nlTestSuite *
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle bufferHandle;
 
-    char serialNumber [] = "89051AAZZ236";
+    char serialNumber[]      = "89051AAZZ236";
     uint16_t lifetimeCounter = 10;
     BitFlags<AdditionalDataFields> additionalDataFields;
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
@@ -102,14 +100,13 @@ void TestGeneratingAdditionalDataPayloadWithRotatingIdAndParsingIt(nlTestSuite *
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
-    err = AdditionalDataPayloadGenerator()
-                    .generateAdditionalDataPayload(lifetimeCounter, serialNumber, ArraySize(serialNumber), bufferHandle, additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, ArraySize(serialNumber),
+                                                                         bufferHandle, additionalDataFields);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !bufferHandle.IsNull());
 
     char output[51];
-    err = BytesToUppercaseHexString(bufferHandle->Start(), bufferHandle->DataLength(),
-                                    output, ArraySize(output));
+    err = BytesToUppercaseHexString(bufferHandle->Start(), bufferHandle->DataLength(), output, ArraySize(output));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(output, "5500003000120A00D1414E39C9A08469DA2E29F0ACAA086618") == 0);
@@ -125,21 +122,20 @@ void TestGeneratingAdditionalDataPayloadWithoutRotatingIdAndParsingIt(nlTestSuit
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle bufferHandle;
 
-    char serialNumber [] = "89051AAZZ236";
+    char serialNumber[]      = "89051AAZZ236";
     uint16_t lifetimeCounter = 10;
     BitFlags<AdditionalDataFields> additionalDataFields;
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
-    err = AdditionalDataPayloadGenerator()
-                    .generateAdditionalDataPayload(lifetimeCounter, serialNumber, ArraySize(serialNumber), bufferHandle, additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, ArraySize(serialNumber),
+                                                                         bufferHandle, additionalDataFields);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !bufferHandle.IsNull());
 
     char output[51];
-    err = BytesToUppercaseHexString(bufferHandle->Start(), bufferHandle->DataLength(),
-                                    output, ArraySize(output));
+    err = BytesToUppercaseHexString(bufferHandle->Start(), bufferHandle->DataLength(), output, ArraySize(output));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(output, "55000018") == 0);

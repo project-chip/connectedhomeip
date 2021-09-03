@@ -30,8 +30,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
-#include <lib/support/CodeUtils.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CodeUtils.h>
 #include <protocols/Protocols.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 
@@ -56,7 +56,8 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayloadData::Additi
         VerifyOrReturnError(rotatingDeviceId.size() < RotatingDeviceId::kHexMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
         char rotatingDeviceIdBufferTemp[RotatingDeviceId::kHexMaxLength];
 
-        ReturnErrorOnFailure(Encoding::BytesToUppercaseHexString(rotatingDeviceId.data(), rotatingDeviceId.size(), rotatingDeviceIdBufferTemp, RotatingDeviceId::kHexMaxLength));
+        ReturnErrorOnFailure(Encoding::BytesToUppercaseHexString(rotatingDeviceId.data(), rotatingDeviceId.size(),
+                                                                 rotatingDeviceIdBufferTemp, RotatingDeviceId::kHexMaxLength));
         outPayload.rotatingDeviceId = std::string(rotatingDeviceIdBufferTemp, RotatingDeviceId::kHexMaxLength);
     }
     else
