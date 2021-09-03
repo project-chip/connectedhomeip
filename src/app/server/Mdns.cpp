@@ -271,9 +271,10 @@ CHIP_ERROR ScheduleDiscoveryExpiration()
     }
     ChipLogDetail(Discovery, "Scheduling Discovery timeout in secs=%d", gDiscoveryTimeoutSecs);
 
-    gDiscoveryExpirationMs = gTimeSource.GetCurrentMonotonicTimeMs() + gDiscoveryTimeoutSecs * 1000;
+    gDiscoveryExpirationMs = gTimeSource.GetCurrentMonotonicTimeMs() + static_cast<uint64_t>(gDiscoveryTimeoutSecs) * 1000;
 
-    ReturnErrorOnFailure(DeviceLayer::SystemLayer.StartTimer(gDiscoveryTimeoutSecs * 1000, HandleDiscoveryExpiration, nullptr));
+    ReturnErrorOnFailure(DeviceLayer::SystemLayer.StartTimer(static_cast<uint32_t>(gDiscoveryTimeoutSecs) * 1000,
+                                                             HandleDiscoveryExpiration, nullptr));
 
     return CHIP_NO_ERROR;
 }
@@ -288,10 +289,11 @@ CHIP_ERROR ScheduleExtendedDiscoveryExpiration()
     }
     ChipLogDetail(Discovery, "Scheduling Extended Discovery timeout in secs=%d", extendedDiscoveryTimeoutSecs);
 
-    gExtendedDiscoveryExpirationMs = gTimeSource.GetCurrentMonotonicTimeMs() + extendedDiscoveryTimeoutSecs * 1000;
+    gExtendedDiscoveryExpirationMs =
+        gTimeSource.GetCurrentMonotonicTimeMs() + static_cast<uint64_t>(extendedDiscoveryTimeoutSecs) * 1000;
 
-    ReturnErrorOnFailure(
-        DeviceLayer::SystemLayer.StartTimer(extendedDiscoveryTimeoutSecs * 1000, HandleExtendedDiscoveryExpiration, nullptr));
+    ReturnErrorOnFailure(DeviceLayer::SystemLayer.StartTimer(static_cast<uint32_t>(extendedDiscoveryTimeoutSec) s * 1000,
+                                                             HandleExtendedDiscoveryExpiration, nullptr));
 
     return CHIP_NO_ERROR;
 }
