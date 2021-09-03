@@ -22,10 +22,7 @@
  *          on the Linux platforms.
  */
 
-#include <lib/support/crypto/CHIPRNG.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-using namespace ::chip;
+#include <crypto/CHIPCryptoPAL.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -33,23 +30,10 @@ namespace Internal {
 
 CHIP_ERROR InitEntropy()
 {
-    CHIP_ERROR err;
     unsigned int seed;
-
-    // Initialize the source used by CHIP to get secure random data.
-    err = Platform::Security::InitSecureRandomDataSource(getentropy, 64, NULL, 0);
-    SuccessOrExit(err);
-
-    // Seed the standard rand() pseudo-random generator with data from the secure random source.
-    err = Platform::Security::GetSecureRandomData((uint8_t *) &seed, sizeof(seed));
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(chip::Crypto::DRBG_get_bytes((uint8_t *) &seed, sizeof(seed)));
     srand(seed);
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Crypto, "InitEntropy() failed: %d" err);
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal
