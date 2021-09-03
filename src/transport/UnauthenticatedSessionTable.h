@@ -184,7 +184,9 @@ private:
             return false;
         case Transport::Type::kUdp:
         case Transport::Type::kTcp:
-            return a1.GetIPAddress() == a2.GetIPAddress() && a1.GetPort() == a2.GetPort() && (a1.GetInterface() == INET_NULL_INTERFACEID || a2.GetInterface() == INET_NULL_INTERFACEID || a1.GetInterface() == a2.GetInterface());
+            return a1.GetIPAddress() == a2.GetIPAddress() && a1.GetPort() == a2.GetPort() &&
+                (a1.GetInterface() == INET_NULL_INTERFACEID || a2.GetInterface() == INET_NULL_INTERFACEID ||
+                 a1.GetInterface() == a2.GetInterface());
         case Transport::Type::kBle:
             // TODO: complete BLE address comparation
             return true;
