@@ -52,7 +52,7 @@ void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommission
     if (selectedCommissioner != nullptr)
     {
         // Advertise self as Commissionable Node over mDNS
-        ReturnOnFailure(app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledBasic));
+        ReturnOnFailure(app::Mdns::StartServer(Mdns::CommissioningMode::kEnabledBasic));
 
         // Send User Directed commissioning request
         ReturnOnFailure(SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
