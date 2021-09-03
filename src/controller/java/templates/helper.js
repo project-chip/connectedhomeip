@@ -122,8 +122,9 @@ function asJniBasicTypeForZclType(type)
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options)
-        .then(zclType => { return convertBasicCTypeToJniType(ChipTypesHelper.asBasicType(zclType)); })
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+      return convertBasicCTypeToJniType(ChipTypesHelper.asBasicType(zclType));
+    })
   }
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
@@ -138,8 +139,9 @@ function asJniSignature(type)
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options)
-        .then(zclType => { return convertCTypeToJniSignature(ChipTypesHelper.asBasicType(zclType)); })
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+      return convertCTypeToJniSignature(ChipTypesHelper.asBasicType(zclType));
+    })
   }
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
