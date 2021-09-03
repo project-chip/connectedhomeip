@@ -1222,9 +1222,14 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     /* Start of chain  */
     result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(leafCertificate), leafCertificateLen);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-    /* Add the intermediate to the chain  */
-    result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(caCertificate), caCertificateLen);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    if (caCertificate != nullptr && caCertificateLen != 0)
+    {
+        /* Add the intermediate to the chain  */
+        result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(caCertificate), caCertificateLen);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    }
+
     /* Add the root to the chain */
     result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(rootCertificate), rootCertificateLen);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
@@ -1233,6 +1238,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     result = mbedtls_x509_crt_parse(&root_cert, Uint8::to_const_uchar(rootCertificate), rootCertificateLen);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
+    // TODO: If any specific error occurs here, it should be flagged accordingly
     /* Verify the chain against the root */
     result = mbedtls_x509_crt_verify(&mbed_cert, &root_cert, NULL, NULL, &flags, NULL, NULL);
     VerifyOrExit(result == 0 && flags == 0, error = CHIP_ERROR_CERT_NOT_TRUSTED);
@@ -1374,7 +1380,9 @@ CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     // vendor id is the second element of subject and should be of size 4
-    VerifyOrExit(mbed_cert.subject.next->val.len == 4, error = CHIP_ERROR_WRONG_CERT_SUBJECT);
+    // returning CHIP_ERROR_KEY_NOT_FOUND to sinalize VID is not present in the certificate.
+    VerifyOrExit(mbed_cert.subject.next->val.p != nullptr && mbed_cert.subject.next->val.len == 4,
+                 error = CHIP_ERROR_KEY_NOT_FOUND);
 
     // vendor id is of size 4, we should ensure the string is null terminated before passing in to strtoul to avoid undefined
     // behavior

@@ -1263,8 +1263,8 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()) == 0);
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
-        csr[length - 2] = (uint8_t)(csr[length - 2] + 1);
-        csr[length - 1] = (uint8_t)(csr[length - 1] + 1);
+        csr[length - 2] = (uint8_t) (csr[length - 2] + 1);
+        csr[length - 1] = (uint8_t) (csr[length - 1] + 1);
 
         NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csr, length, pubkey) != CHIP_NO_ERROR);
     }
@@ -1817,7 +1817,16 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
 
     err = ValidateCertificateChain(root_cert.data(), root_cert.size(), ica_cert.data(), ica_cert.size(), leaf_cert.data(),
                                    leaf_cert.size());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    // Now test chain without ICA certificate
+    err = GetTestCert(TestCert::kRoot01, TestCertLoadFlags::kDERForm, root_cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = GetTestCert(TestCert::kNode01_02, TestCertLoadFlags::kDERForm, leaf_cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ValidateCertificateChain(root_cert.data(), root_cert.size(), nullptr, 0, leaf_cert.data(), leaf_cert.size());
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -1849,6 +1858,8 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
 static void TestVID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 {
+    using namespace TestCerts;
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     VendorId vid;
     /*
@@ -1900,6 +1911,12 @@ static void TestVID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     err = ExtractVIDFromX509Cert(cert, vid);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, vid == expectedVid);
+
+    // Test scenario where Certificate does not contain a Vendor ID field
+    err = GetTestCert(TestCert::kNode01_01, TestCertLoadFlags::kDERForm, cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = ExtractVIDFromX509Cert(cert, vid);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_KEY_NOT_FOUND);
 }
 
 /**

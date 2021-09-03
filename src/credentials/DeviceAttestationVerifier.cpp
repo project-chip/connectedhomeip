@@ -53,9 +53,10 @@ DeviceAttestationVerifier * gDacVerifier = &gDefaultDACVerifier;
 
 } // namespace
 
-CHIP_ERROR DeviceAttestationVerifier::ValidateAttestationData(const P256PublicKey & pubkey, const ByteSpan & attestationElements,
-                                                              const ByteSpan & attestationChallenge,
-                                                              const P256ECDSASignature & signature)
+CHIP_ERROR DeviceAttestationVerifier::ValidateAttestationSignature(const P256PublicKey & pubkey,
+                                                                   const ByteSpan & attestationElements,
+                                                                   const ByteSpan & attestationChallenge,
+                                                                   const P256ECDSASignature & signature)
 {
     Hash_SHA256_stream hashStream;
     uint8_t md[kSHA256_Hash_Length];

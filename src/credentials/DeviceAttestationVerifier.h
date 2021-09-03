@@ -32,7 +32,7 @@ enum class AttestationVerificationResult : uint16_t
     kPaaExpired          = 102,
     kPaaSignatureInvalid = 103,
     kPaaRevoked          = 104,
-    kPaaFormatInvalid    = 103,
+    kPaaFormatInvalid    = 105,
 
     kPaiExpired           = 200,
     kPaiSignatureInvalid  = 201,
@@ -97,8 +97,9 @@ public:
     // TODO: Validate Firmware Information
 
 protected:
-    CHIP_ERROR ValidateAttestationData(const chip::Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
-                                       const ByteSpan & attestationChallenge, const chip::Crypto::P256ECDSASignature & signature);
+    CHIP_ERROR ValidateAttestationSignature(const chip::Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
+                                            const ByteSpan & attestationChallenge,
+                                            const chip::Crypto::P256ECDSASignature & signature);
 };
 
 /**
