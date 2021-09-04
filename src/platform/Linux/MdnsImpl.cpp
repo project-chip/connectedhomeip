@@ -605,9 +605,9 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
 
             Platform::CopyString(service.mName, name);
             CopyTypeWithoutProtocol(service.mType, type);
-            service.mProtocol               = GetProtocolInType(type);
-            service.mAddressType            = ToAddressType(protocol);
-            service.mInterface              = INET_NULL_INTERFACEID;
+            service.mProtocol    = GetProtocolInType(type);
+            service.mAddressType = ToAddressType(protocol);
+            service.mInterface   = INET_NULL_INTERFACEID;
             if (interface != AVAHI_IF_UNSPEC)
             {
                 service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
