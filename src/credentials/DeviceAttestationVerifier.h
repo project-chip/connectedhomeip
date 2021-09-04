@@ -54,13 +54,15 @@ enum class AttestationVerificationResult : uint16_t
 
     kCertificationDeclarationMissing = 500,
 
-    kNonceMismatch,
+    kNonceMismatch = 600,
 
-    kInvalidSignature,
+    kInvalidSignatureFormat = 700,
 
-    kNoMemory,
+    kAttestationSignatureInvalid = 800,
 
-    kNotImplemented,
+    kNoMemory = 900,
+
+    kNotImplemented = 0xFFFFU,
 
     // TODO: Add more attestation verification errors
 };
@@ -78,20 +80,21 @@ public:
     /**
      * @brief Verify an attestation information payload against a DAC/PAI chain.
      *
-     * @param[in] attestation_info_buffer Buffer containing attestation information portion of Attestation Response (raw TLV)
-     * @param[in] attestation_challenge_buffer Buffer containing the attestation challenge from the secure session
-     * @param[in] attestation_signature_buffer Buffer the signature portion of Attestation Response
-     * @param[in] pai_cert_der_buffer Buffer containing the PAI certificate from device in DER format.
+     * @param[in] attestationInfoBuffer Buffer containing attestation information portion of Attestation Response (raw TLV)
+     * @param[in] attestationChallengeBuffer Buffer containing the attestation challenge from the secure session
+     * @param[in] attestationSignatureBuffer Buffer the signature portion of Attestation Response
+     * @param[in] paiCertDerBuffer Buffer containing the PAI certificate from device in DER format.
      *                                If length zero, there was no PAI certificate.
-     * @param[in] dac_cert_der_buffer Buffer containing the DAC certificate from device in DER format.
+     * @param[in] dacCertDerBuffer Buffer containing the DAC certificate from device in DER format.
+     * @param[in] attestationNonce Buffer containing attestation nonce.
      *
      * @returns AttestationVerificationResult::kSuccess on success or another specific
      *          value from AttestationVerificationResult enum on failure.
      */
     virtual AttestationVerificationResult
-    VerifyAttestationInformation(const ByteSpan & attestation_info_buffer, const ByteSpan & attestation_challenge_buffer,
-                                 const ByteSpan & attestation_signature_buffer, const ByteSpan & pai_cert_der_buffer,
-                                 const ByteSpan & dac_cert_der_buffer, const ByteSpan & attestation_nonce) = 0;
+    VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
+                                 const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiCertDerBuffer,
+                                 const ByteSpan & dacCertDerBuffer, const ByteSpan & attestationNonce) = 0;
 
     // TODO: Validate Certification Declaration
     // TODO: Validate Firmware Information

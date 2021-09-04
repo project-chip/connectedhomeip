@@ -1211,41 +1211,41 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
-    mbedtls_x509_crt mbed_cert;
+    mbedtls_x509_crt cert_chain;
     mbedtls_x509_crt root_cert;
     int result;
     uint32_t flags;
 
-    mbedtls_x509_crt_init(&mbed_cert);
+    mbedtls_x509_crt_init(&cert_chain);
     mbedtls_x509_crt_init(&root_cert);
 
     /* Start of chain  */
-    result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(leafCertificate), leafCertificateLen);
+    result = mbedtls_x509_crt_parse(&cert_chain, Uint8::to_const_uchar(leafCertificate), leafCertificateLen);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     if (caCertificate != nullptr && caCertificateLen != 0)
     {
         /* Add the intermediate to the chain  */
-        result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(caCertificate), caCertificateLen);
+        result = mbedtls_x509_crt_parse(&cert_chain, Uint8::to_const_uchar(caCertificate), caCertificateLen);
         VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
     }
 
     /* Add the root to the chain */
-    result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(rootCertificate), rootCertificateLen);
+    result = mbedtls_x509_crt_parse(&cert_chain, Uint8::to_const_uchar(rootCertificate), rootCertificateLen);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     /* Parse the root cert */
     result = mbedtls_x509_crt_parse(&root_cert, Uint8::to_const_uchar(rootCertificate), rootCertificateLen);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    // TODO: If any specific error occurs here, it should be flagged accordingly
+    // TODO: If any specific error occurs here, it should be flagged accordingly, such as specific chain element errors
     /* Verify the chain against the root */
-    result = mbedtls_x509_crt_verify(&mbed_cert, &root_cert, NULL, NULL, &flags, NULL, NULL);
+    result = mbedtls_x509_crt_verify(&cert_chain, &root_cert, NULL, NULL, &flags, NULL, NULL);
     VerifyOrExit(result == 0 && flags == 0, error = CHIP_ERROR_CERT_NOT_TRUSTED);
 
 exit:
     _log_mbedTLS_error(result);
-    mbedtls_x509_crt_free(&mbed_cert);
+    mbedtls_x509_crt_free(&cert_chain);
     mbedtls_x509_crt_free(&root_cert);
 
 #else

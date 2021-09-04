@@ -24,9 +24,9 @@
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>
-#include <support/CHIPMem.h>
 
 #include <nlunit-test.h>
 

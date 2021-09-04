@@ -30,17 +30,18 @@ namespace {
 class UnimplementedDACVerifier : public DeviceAttestationVerifier
 {
 public:
-    AttestationVerificationResult
-    VerifyAttestationInformation(const ByteSpan & attestation_info_buffer, const ByteSpan & attestation_challenge_buffer,
-                                 const ByteSpan & attestation_signature_buffer, const ByteSpan & pai_cert_der_buffer,
-                                 const ByteSpan & dac_cert_der_buffer, const ByteSpan & attestation_nonce) override
+    AttestationVerificationResult VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
+                                                               const ByteSpan & attestationChallengeBuffer,
+                                                               const ByteSpan & attestationSignatureBuffer,
+                                                               const ByteSpan & paiCertDerBuffer, const ByteSpan & dacCertDerBuffer,
+                                                               const ByteSpan & attestationNonce) override
     {
-        (void) attestation_info_buffer;
-        (void) attestation_challenge_buffer;
-        (void) attestation_signature_buffer;
-        (void) pai_cert_der_buffer;
-        (void) dac_cert_der_buffer;
-        (void) attestation_nonce;
+        (void) attestationInfoBuffer;
+        (void) attestationChallengeBuffer;
+        (void) attestationSignatureBuffer;
+        (void) paiCertDerBuffer;
+        (void) dacCertDerBuffer;
+        (void) attestationNonce;
         return AttestationVerificationResult::kNotImplemented;
     }
 };
