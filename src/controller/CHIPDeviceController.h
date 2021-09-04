@@ -514,8 +514,10 @@ public:
                                        uint8_t option);
 
     /**
-     *  This function call indicates commissioning complete and sends commissioining complete
-     *  complete event to the application.
+     *  This function call causes the DeviceCommissioner to send a
+     *  CommissioningComplete command to the given node.  At least sometimes.
+     *  Depending on which commissioning state machine we might or might not be
+     *  using.
      */
     CHIP_ERROR CommissioningComplete(NodeId remoteDeviceId);
 
