@@ -26,10 +26,10 @@
 #include <crypto/CryptoBuildConfig.h>
 #endif
 
-#include <core/CHIPError.h>
-#include <core/CHIPVendorIdentifiers.hpp>
-#include <support/CodeUtils.h>
-#include <support/Span.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 #include <stddef.h>
 #include <string.h>

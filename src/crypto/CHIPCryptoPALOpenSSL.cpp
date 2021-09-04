@@ -1732,7 +1732,7 @@ CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
         }
     }
 
-    // returning CHIP_ERROR_KEY_NOT_FOUND to sinalize VID is not present in the certificate.
+    // returning CHIP_ERROR_KEY_NOT_FOUND to indicate VID is not present in the certificate.
     VerifyOrReturnError(x509EntryCountIdx < X509_NAME_entry_count(subject), CHIP_ERROR_KEY_NOT_FOUND);
 
 exit:
