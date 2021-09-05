@@ -191,6 +191,11 @@ public:
 
     const Crypto::P256PublicKey & GetRootPubkey() const { return mRootPubkey; }
 
+    /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
+       root public key of the fabric. The generated compressed ID is returned via compressedPeerId
+       output parameter */
+    CHIP_ERROR GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
+
     friend class FabricTable;
 
 private:
@@ -231,11 +236,6 @@ private:
 
     void ReleaseOperationalCerts();
     void ReleaseRootCert();
-
-    /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
-       root public key of the fabric. The generated compressed ID is returned via compressedPeerId
-       output parameter */
-    CHIP_ERROR GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
 
     struct StorableFabricInfo
     {
