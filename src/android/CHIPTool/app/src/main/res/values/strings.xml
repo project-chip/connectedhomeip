@@ -29,6 +29,7 @@
     <string name="enter_device_id_hint_text">Enter Device ID</string>
     <string name="enter_endpoint_id_hint_text">Enter Endpoint ID</string>
     <string name="update_device_address_btn_text">Update address</string>
+    <string name="update_device_address_failure">Device address update failed: %1$s</string>
 
     <string name="address_commissioning_title_text">Commission with IP address</string>
     <string name="default_discriminator">3840</string>
