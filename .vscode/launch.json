@@ -91,7 +91,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
             "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.elf",
-            "armToolchainPath": "${workspaceRoot}/.environment/cipd/pigweed/bin/",
+            "armToolchainPath": "${workspaceRoot}/.environment/cipd/pigweed/bin/", // Pigweed environment bootstraping required
             "openocdPath": "${env:OPENOCD_PATH/bin}",
             "servertype": "openocd",
             "searchDir": [
@@ -124,7 +124,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
             "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.elf",
-            "armToolchainPath": "${workspaceRoot}/.environment/cipd/pigweed/bin/",
+            "armToolchainPath": "${workspaceRoot}/.environment/cipd/pigweed/bin/", // Pigweed environment bootstraping required
             "servertype": "external",
             "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
             "overrideLaunchCommands": [
@@ -151,7 +151,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
             "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.elf",
-            "armToolchainPath": "${workspaceRoot}/.environment/cipd/pigweed/bin/",
+            "armToolchainPath": "${workspaceRoot}/.environment/cipd/pigweed/bin/", // Pigweed environment bootstraping required
             "openocdPath": "${env:OPENOCD_PATH/bin}",
             "servertype": "openocd",
             "searchDir": [
@@ -176,7 +176,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
             "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.elf",
-            "armToolchainPath": "${workspaceRoot}/.environment/cipd/pigweed/bin/",
+            "armToolchainPath": "${workspaceRoot}/.environment/cipd/pigweed/bin/", // Pigweed environment bootstraping required
             "servertype": "external",
             "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
             "overrideLaunchCommands": [
