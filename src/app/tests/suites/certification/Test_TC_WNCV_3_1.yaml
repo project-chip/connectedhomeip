@@ -27,7 +27,9 @@ tests:
       command: "DownOrClose"
 
     ### Depends on the FeatureMap
-    - label: "1b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"
+    - label:
+          "1b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
       disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
@@ -36,7 +38,9 @@ tests:
               type: uint16
 
     ### Depends on the FeatureMap
-    - label: "1b: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"
+    - label:
+          "1b: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
+          from DUT"
       disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
@@ -54,7 +58,9 @@ tests:
                 value: 0
 
     ### Depends on the FeatureMap
-    - label: "2b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT"
+    - label:
+          "2b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
+          from DUT"
       disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
@@ -63,7 +69,9 @@ tests:
               type: uint16
 
     ### Depends on the FeatureMap
-    - label: "2c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT"
+    - label:
+          "2c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
+          from DUT"
       disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
@@ -84,7 +92,9 @@ tests:
           value: 0
 
     ### Depends on the FeatureMap
-    - label: "3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"
+    - label:
+          "3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute
+          from DUT"
       disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
@@ -93,7 +103,9 @@ tests:
               type: uint16
 
     ### Depends on the FeatureMap
-    - label: "3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"
+    - label:
+          "3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
+          from DUT"
       disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
