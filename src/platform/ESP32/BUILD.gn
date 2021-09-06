@@ -55,17 +55,17 @@ static_library("ESP32") {
     sources += [
       "../OpenThread/MdnsImpl.cpp",
       "../OpenThread/OpenThreadUtils.cpp",
+      "ConnectivityManagerImpl_Thread.cpp",
+      "ConnectivityManagerImpl_Thread.h",
       "ESPThreadConfig.h",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
-      "ConnectivityManagerImpl_Thread.cpp",
-      "ConnectivityManagerImpl_Thread.h",
     ]
   } else {
     sources += [
-      "MdnsImpl.cpp",
       "ConnectivityManagerImpl_WiFi.cpp",
       "ConnectivityManagerImpl_WiFi.h",
+      "MdnsImpl.cpp",
       "ServiceProvisioning.cpp",
       "ServiceProvisioning.h",
     ]
