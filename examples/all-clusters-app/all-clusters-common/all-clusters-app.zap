@@ -9204,7 +9204,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 0
             },
             {
@@ -9212,7 +9212,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 0
             },
             {
@@ -9220,7 +9220,7 @@
               "code": 2,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 0
             },
             {
