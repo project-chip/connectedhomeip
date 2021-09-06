@@ -24,4 +24,3 @@
 #elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ESP32/ConnectivityManagerImpl_Thread.h>
 #endif
-

@@ -57,7 +57,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
- 
+
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
     bool _HaveIPv4InternetConnectivity(void);
