@@ -74,6 +74,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterTargetNavigatorCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterTargetNavigatorCommandReadAttribute_0()
@@ -139,6 +140,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterTargetNavigatorCommandNavigateTarget_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterTargetNavigatorCommandNavigateTarget_1()
@@ -247,6 +249,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterAudioOutputCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterAudioOutputCommandReadAttribute_0()
@@ -311,6 +314,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterAudioOutputCommandSelectOutput_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterAudioOutputCommandSelectOutput_1()
@@ -368,6 +372,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterAudioOutputCommandRenameOutput_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterAudioOutputCommandRenameOutput_2()
@@ -478,6 +483,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterApplicationLauncherCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterApplicationLauncherCommandReadAttribute_0()
@@ -542,6 +548,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterApplicationLauncherCommandLaunchApp_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterApplicationLauncherCommandLaunchApp_1()
@@ -603,6 +610,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterApplicationLauncherCommandReadAttribute_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterApplicationLauncherCommandReadAttribute_2()
@@ -666,6 +674,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterApplicationLauncherCommandReadAttribute_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterApplicationLauncherCommandReadAttribute_3()
@@ -771,6 +780,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterKeypadInputCommandSendKey_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterKeypadInputCommandSendKey_0()
@@ -874,6 +884,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterAccountLoginCommandGetSetupPIN_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterAccountLoginCommandGetSetupPIN_0()
@@ -930,6 +941,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterAccountLoginCommandLogin_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterAccountLoginCommandLogin_1()
@@ -1032,6 +1044,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterWakeOnLanCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterWakeOnLanCommandReadAttribute_0()
@@ -1149,6 +1162,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterApplicationBasicCommandChangeStatus_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterApplicationBasicCommandChangeStatus_0()
@@ -1206,6 +1220,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterApplicationBasicCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_1()
@@ -1269,6 +1284,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterApplicationBasicCommandReadAttribute_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_2()
@@ -1332,6 +1348,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterApplicationBasicCommandReadAttribute_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_3()
@@ -1468,6 +1485,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterMediaPlaybackCommandMediaPlay_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaPlay_0()
@@ -1531,6 +1549,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterMediaPlaybackCommandMediaPause_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaPause_1()
@@ -1594,6 +1613,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterMediaPlaybackCommandMediaStop_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaStop_2()
@@ -1657,6 +1677,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterMediaPlaybackCommandMediaStartOver_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaStartOver_3()
@@ -1720,6 +1741,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
         OnTestSendClusterMediaPlaybackCommandMediaPrevious_4_FailureResponse, this
     };
+
     bool mIsFailureExpected_4 = 0;
 
     CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaPrevious_4()
@@ -1783,6 +1805,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterMediaPlaybackCommandMediaNext_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaNext_5()
@@ -1846,6 +1869,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
         OnTestSendClusterMediaPlaybackCommandMediaRewind_6_FailureResponse, this
     };
+
     bool mIsFailureExpected_6 = 0;
 
     CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaRewind_6()
@@ -1909,6 +1933,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
         OnTestSendClusterMediaPlaybackCommandMediaFastForward_7_FailureResponse, this
     };
+
     bool mIsFailureExpected_7 = 0;
 
     CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaFastForward_7()
@@ -1972,6 +1997,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
         OnTestSendClusterMediaPlaybackCommandMediaSkipForward_8_FailureResponse, this
     };
+
     bool mIsFailureExpected_8 = 0;
 
     CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaSkipForward_8()
@@ -2037,6 +2063,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
         OnTestSendClusterMediaPlaybackCommandMediaSkipBackward_9_FailureResponse, this
     };
+
     bool mIsFailureExpected_9 = 0;
 
     CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaSkipBackward_9()
@@ -2103,6 +2130,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
         OnTestSendClusterMediaPlaybackCommandMediaSeek_10_FailureResponse, this
     };
+
     bool mIsFailureExpected_10 = 0;
 
     CHIP_ERROR TestSendClusterMediaPlaybackCommandMediaSeek_10()
@@ -2216,6 +2244,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterTvChannelCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterTvChannelCommandReadAttribute_0()
@@ -2280,6 +2309,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterTvChannelCommandChangeChannelByNumber_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterTvChannelCommandChangeChannelByNumber_1()
@@ -2339,6 +2369,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterTvChannelCommandSkipChannel_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterTvChannelCommandSkipChannel_2()
@@ -2437,6 +2468,7 @@ private:
                                                                       this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{ OnTestSendClusterLowPowerCommandSleep_0_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterLowPowerCommandSleep_0()
@@ -2551,6 +2583,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterMediaInputCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterMediaInputCommandReadAttribute_0()
@@ -2615,6 +2648,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterMediaInputCommandSelectInput_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterMediaInputCommandSelectInput_1()
@@ -2672,6 +2706,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterMediaInputCommandReadAttribute_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterMediaInputCommandReadAttribute_2()
@@ -2735,6 +2770,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterMediaInputCommandHideInputStatus_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterMediaInputCommandHideInputStatus_3()
@@ -2791,6 +2827,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
         OnTestSendClusterMediaInputCommandShowInputStatus_4_FailureResponse, this
     };
+
     bool mIsFailureExpected_4 = 0;
 
     CHIP_ERROR TestSendClusterMediaInputCommandShowInputStatus_4()
@@ -2847,6 +2884,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterMediaInputCommandRenameInput_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterMediaInputCommandRenameInput_5()
@@ -3280,6 +3318,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterTestClusterCommandTest_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandTest_0()
@@ -3336,6 +3375,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterTestClusterCommandTestNotHandled_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 1;
 
     CHIP_ERROR TestSendClusterTestClusterCommandTestNotHandled_1()
@@ -3392,6 +3432,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterTestClusterCommandTestSpecific_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandTestSpecific_2()
@@ -3455,6 +3496,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterTestClusterCommandTestAddArguments_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandTestAddArguments_3()
@@ -3520,6 +3562,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
         OnTestSendClusterTestClusterCommandTestAddArguments_4_FailureResponse, this
     };
+
     bool mIsFailureExpected_4 = 1;
 
     CHIP_ERROR TestSendClusterTestClusterCommandTestAddArguments_4()
@@ -3578,6 +3621,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterTestClusterCommandReadAttribute_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_5()
@@ -3641,6 +3685,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
         OnTestSendClusterTestClusterCommandWriteAttribute_6_FailureResponse, this
     };
+
     bool mIsFailureExpected_6 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_6()
@@ -3698,6 +3743,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
         OnTestSendClusterTestClusterCommandReadAttribute_7_FailureResponse, this
     };
+
     bool mIsFailureExpected_7 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_7()
@@ -3761,6 +3807,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
         OnTestSendClusterTestClusterCommandWriteAttribute_8_FailureResponse, this
     };
+
     bool mIsFailureExpected_8 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_8()
@@ -3818,6 +3865,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
         OnTestSendClusterTestClusterCommandReadAttribute_9_FailureResponse, this
     };
+
     bool mIsFailureExpected_9 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_9()
@@ -3881,6 +3929,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
         OnTestSendClusterTestClusterCommandReadAttribute_10_FailureResponse, this
     };
+
     bool mIsFailureExpected_10 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_10()
@@ -3944,6 +3993,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{
         OnTestSendClusterTestClusterCommandWriteAttribute_11_FailureResponse, this
     };
+
     bool mIsFailureExpected_11 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_11()
@@ -4001,6 +4051,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_12{
         OnTestSendClusterTestClusterCommandReadAttribute_12_FailureResponse, this
     };
+
     bool mIsFailureExpected_12 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_12()
@@ -4064,6 +4115,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_13{
         OnTestSendClusterTestClusterCommandWriteAttribute_13_FailureResponse, this
     };
+
     bool mIsFailureExpected_13 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_13()
@@ -4121,6 +4173,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_14{
         OnTestSendClusterTestClusterCommandReadAttribute_14_FailureResponse, this
     };
+
     bool mIsFailureExpected_14 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_14()
@@ -4184,6 +4237,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_15{
         OnTestSendClusterTestClusterCommandReadAttribute_15_FailureResponse, this
     };
+
     bool mIsFailureExpected_15 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_15()
@@ -4247,6 +4301,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_16{
         OnTestSendClusterTestClusterCommandWriteAttribute_16_FailureResponse, this
     };
+
     bool mIsFailureExpected_16 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_16()
@@ -4304,6 +4359,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_17{
         OnTestSendClusterTestClusterCommandReadAttribute_17_FailureResponse, this
     };
+
     bool mIsFailureExpected_17 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_17()
@@ -4367,6 +4423,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_18{
         OnTestSendClusterTestClusterCommandWriteAttribute_18_FailureResponse, this
     };
+
     bool mIsFailureExpected_18 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_18()
@@ -4424,6 +4481,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_19{
         OnTestSendClusterTestClusterCommandReadAttribute_19_FailureResponse, this
     };
+
     bool mIsFailureExpected_19 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_19()
@@ -4487,6 +4545,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_20{
         OnTestSendClusterTestClusterCommandReadAttribute_20_FailureResponse, this
     };
+
     bool mIsFailureExpected_20 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_20()
@@ -4550,6 +4609,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_21{
         OnTestSendClusterTestClusterCommandWriteAttribute_21_FailureResponse, this
     };
+
     bool mIsFailureExpected_21 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_21()
@@ -4607,6 +4667,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_22{
         OnTestSendClusterTestClusterCommandReadAttribute_22_FailureResponse, this
     };
+
     bool mIsFailureExpected_22 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_22()
@@ -4670,6 +4731,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_23{
         OnTestSendClusterTestClusterCommandWriteAttribute_23_FailureResponse, this
     };
+
     bool mIsFailureExpected_23 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_23()
@@ -4727,6 +4789,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_24{
         OnTestSendClusterTestClusterCommandReadAttribute_24_FailureResponse, this
     };
+
     bool mIsFailureExpected_24 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_24()
@@ -4790,6 +4853,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_25{
         OnTestSendClusterTestClusterCommandReadAttribute_25_FailureResponse, this
     };
+
     bool mIsFailureExpected_25 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_25()
@@ -4853,6 +4917,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_26{
         OnTestSendClusterTestClusterCommandWriteAttribute_26_FailureResponse, this
     };
+
     bool mIsFailureExpected_26 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_26()
@@ -4910,6 +4975,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_27{
         OnTestSendClusterTestClusterCommandReadAttribute_27_FailureResponse, this
     };
+
     bool mIsFailureExpected_27 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_27()
@@ -4973,6 +5039,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_28{
         OnTestSendClusterTestClusterCommandWriteAttribute_28_FailureResponse, this
     };
+
     bool mIsFailureExpected_28 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_28()
@@ -5030,6 +5097,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_29{
         OnTestSendClusterTestClusterCommandReadAttribute_29_FailureResponse, this
     };
+
     bool mIsFailureExpected_29 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_29()
@@ -5093,6 +5161,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_30{
         OnTestSendClusterTestClusterCommandReadAttribute_30_FailureResponse, this
     };
+
     bool mIsFailureExpected_30 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_30()
@@ -5156,6 +5225,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_31{
         OnTestSendClusterTestClusterCommandWriteAttribute_31_FailureResponse, this
     };
+
     bool mIsFailureExpected_31 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_31()
@@ -5213,6 +5283,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_32{
         OnTestSendClusterTestClusterCommandReadAttribute_32_FailureResponse, this
     };
+
     bool mIsFailureExpected_32 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_32()
@@ -5276,6 +5347,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_33{
         OnTestSendClusterTestClusterCommandWriteAttribute_33_FailureResponse, this
     };
+
     bool mIsFailureExpected_33 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_33()
@@ -5333,6 +5405,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_34{
         OnTestSendClusterTestClusterCommandReadAttribute_34_FailureResponse, this
     };
+
     bool mIsFailureExpected_34 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_34()
@@ -5396,6 +5469,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_35{
         OnTestSendClusterTestClusterCommandReadAttribute_35_FailureResponse, this
     };
+
     bool mIsFailureExpected_35 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_35()
@@ -5459,6 +5533,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_36{
         OnTestSendClusterTestClusterCommandWriteAttribute_36_FailureResponse, this
     };
+
     bool mIsFailureExpected_36 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_36()
@@ -5516,6 +5591,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_37{
         OnTestSendClusterTestClusterCommandReadAttribute_37_FailureResponse, this
     };
+
     bool mIsFailureExpected_37 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_37()
@@ -5579,6 +5655,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_38{
         OnTestSendClusterTestClusterCommandWriteAttribute_38_FailureResponse, this
     };
+
     bool mIsFailureExpected_38 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_38()
@@ -5636,6 +5713,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_39{
         OnTestSendClusterTestClusterCommandReadAttribute_39_FailureResponse, this
     };
+
     bool mIsFailureExpected_39 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_39()
@@ -5699,6 +5777,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_40{
         OnTestSendClusterTestClusterCommandReadAttribute_40_FailureResponse, this
     };
+
     bool mIsFailureExpected_40 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_40()
@@ -5762,6 +5841,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_41{
         OnTestSendClusterTestClusterCommandWriteAttribute_41_FailureResponse, this
     };
+
     bool mIsFailureExpected_41 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_41()
@@ -5819,6 +5899,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_42{
         OnTestSendClusterTestClusterCommandReadAttribute_42_FailureResponse, this
     };
+
     bool mIsFailureExpected_42 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_42()
@@ -5882,6 +5963,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_43{
         OnTestSendClusterTestClusterCommandWriteAttribute_43_FailureResponse, this
     };
+
     bool mIsFailureExpected_43 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_43()
@@ -5939,6 +6021,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_44{
         OnTestSendClusterTestClusterCommandReadAttribute_44_FailureResponse, this
     };
+
     bool mIsFailureExpected_44 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_44()
@@ -6002,6 +6085,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_45{
         OnTestSendClusterTestClusterCommandReadAttribute_45_FailureResponse, this
     };
+
     bool mIsFailureExpected_45 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_45()
@@ -6065,6 +6149,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_46{
         OnTestSendClusterTestClusterCommandWriteAttribute_46_FailureResponse, this
     };
+
     bool mIsFailureExpected_46 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_46()
@@ -6122,6 +6207,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_47{
         OnTestSendClusterTestClusterCommandReadAttribute_47_FailureResponse, this
     };
+
     bool mIsFailureExpected_47 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_47()
@@ -6185,6 +6271,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_48{
         OnTestSendClusterTestClusterCommandWriteAttribute_48_FailureResponse, this
     };
+
     bool mIsFailureExpected_48 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_48()
@@ -6242,6 +6329,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_49{
         OnTestSendClusterTestClusterCommandReadAttribute_49_FailureResponse, this
     };
+
     bool mIsFailureExpected_49 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_49()
@@ -6305,6 +6393,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_50{
         OnTestSendClusterTestClusterCommandReadAttribute_50_FailureResponse, this
     };
+
     bool mIsFailureExpected_50 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_50()
@@ -6368,6 +6457,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_51{
         OnTestSendClusterTestClusterCommandWriteAttribute_51_FailureResponse, this
     };
+
     bool mIsFailureExpected_51 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_51()
@@ -6425,6 +6515,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_52{
         OnTestSendClusterTestClusterCommandReadAttribute_52_FailureResponse, this
     };
+
     bool mIsFailureExpected_52 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_52()
@@ -6488,6 +6579,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_53{
         OnTestSendClusterTestClusterCommandWriteAttribute_53_FailureResponse, this
     };
+
     bool mIsFailureExpected_53 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_53()
@@ -6545,6 +6637,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_54{
         OnTestSendClusterTestClusterCommandReadAttribute_54_FailureResponse, this
     };
+
     bool mIsFailureExpected_54 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_54()
@@ -6608,6 +6701,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_55{
         OnTestSendClusterTestClusterCommandWriteAttribute_55_FailureResponse, this
     };
+
     bool mIsFailureExpected_55 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_55()
@@ -6665,6 +6759,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_56{
         OnTestSendClusterTestClusterCommandReadAttribute_56_FailureResponse, this
     };
+
     bool mIsFailureExpected_56 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_56()
@@ -6728,6 +6823,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_57{
         OnTestSendClusterTestClusterCommandReadAttribute_57_FailureResponse, this
     };
+
     bool mIsFailureExpected_57 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_57()
@@ -6791,6 +6887,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_58{
         OnTestSendClusterTestClusterCommandWriteAttribute_58_FailureResponse, this
     };
+
     bool mIsFailureExpected_58 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_58()
@@ -6848,6 +6945,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_59{
         OnTestSendClusterTestClusterCommandReadAttribute_59_FailureResponse, this
     };
+
     bool mIsFailureExpected_59 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_59()
@@ -6911,6 +7009,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_60{
         OnTestSendClusterTestClusterCommandWriteAttribute_60_FailureResponse, this
     };
+
     bool mIsFailureExpected_60 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_60()
@@ -6968,6 +7067,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_61{
         OnTestSendClusterTestClusterCommandReadAttribute_61_FailureResponse, this
     };
+
     bool mIsFailureExpected_61 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_61()
@@ -7031,6 +7131,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_62{
         OnTestSendClusterTestClusterCommandWriteAttribute_62_FailureResponse, this
     };
+
     bool mIsFailureExpected_62 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_62()
@@ -7088,6 +7189,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_63{
         OnTestSendClusterTestClusterCommandReadAttribute_63_FailureResponse, this
     };
+
     bool mIsFailureExpected_63 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_63()
@@ -7151,6 +7253,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_64{
         OnTestSendClusterTestClusterCommandReadAttribute_64_FailureResponse, this
     };
+
     bool mIsFailureExpected_64 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_64()
@@ -7214,6 +7317,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_65{
         OnTestSendClusterTestClusterCommandWriteAttribute_65_FailureResponse, this
     };
+
     bool mIsFailureExpected_65 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_65()
@@ -7271,6 +7375,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_66{
         OnTestSendClusterTestClusterCommandReadAttribute_66_FailureResponse, this
     };
+
     bool mIsFailureExpected_66 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_66()
@@ -7334,6 +7439,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_67{
         OnTestSendClusterTestClusterCommandWriteAttribute_67_FailureResponse, this
     };
+
     bool mIsFailureExpected_67 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_67()
@@ -7391,6 +7497,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_68{
         OnTestSendClusterTestClusterCommandReadAttribute_68_FailureResponse, this
     };
+
     bool mIsFailureExpected_68 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_68()
@@ -7454,6 +7561,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_69{
         OnTestSendClusterTestClusterCommandWriteAttribute_69_FailureResponse, this
     };
+
     bool mIsFailureExpected_69 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_69()
@@ -7511,6 +7619,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_70{
         OnTestSendClusterTestClusterCommandReadAttribute_70_FailureResponse, this
     };
+
     bool mIsFailureExpected_70 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_70()
@@ -7574,6 +7683,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_71{
         OnTestSendClusterTestClusterCommandReadAttribute_71_FailureResponse, this
     };
+
     bool mIsFailureExpected_71 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_71()
@@ -7637,6 +7747,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_72{
         OnTestSendClusterTestClusterCommandWriteAttribute_72_FailureResponse, this
     };
+
     bool mIsFailureExpected_72 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_72()
@@ -7694,6 +7805,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_73{
         OnTestSendClusterTestClusterCommandReadAttribute_73_FailureResponse, this
     };
+
     bool mIsFailureExpected_73 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_73()
@@ -7757,6 +7869,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_74{
         OnTestSendClusterTestClusterCommandWriteAttribute_74_FailureResponse, this
     };
+
     bool mIsFailureExpected_74 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_74()
@@ -7814,6 +7927,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_75{
         OnTestSendClusterTestClusterCommandReadAttribute_75_FailureResponse, this
     };
+
     bool mIsFailureExpected_75 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_75()
@@ -7877,6 +7991,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_76{
         OnTestSendClusterTestClusterCommandWriteAttribute_76_FailureResponse, this
     };
+
     bool mIsFailureExpected_76 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_76()
@@ -7934,6 +8049,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_77{
         OnTestSendClusterTestClusterCommandReadAttribute_77_FailureResponse, this
     };
+
     bool mIsFailureExpected_77 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_77()
@@ -7997,6 +8113,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_78{
         OnTestSendClusterTestClusterCommandReadAttribute_78_FailureResponse, this
     };
+
     bool mIsFailureExpected_78 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_78()
@@ -8060,6 +8177,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_79{
         OnTestSendClusterTestClusterCommandWriteAttribute_79_FailureResponse, this
     };
+
     bool mIsFailureExpected_79 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_79()
@@ -8117,6 +8235,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_80{
         OnTestSendClusterTestClusterCommandReadAttribute_80_FailureResponse, this
     };
+
     bool mIsFailureExpected_80 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_80()
@@ -8180,6 +8299,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_81{
         OnTestSendClusterTestClusterCommandWriteAttribute_81_FailureResponse, this
     };
+
     bool mIsFailureExpected_81 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_81()
@@ -8237,6 +8357,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_82{
         OnTestSendClusterTestClusterCommandReadAttribute_82_FailureResponse, this
     };
+
     bool mIsFailureExpected_82 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_82()
@@ -8300,6 +8421,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_83{
         OnTestSendClusterTestClusterCommandReadAttribute_83_FailureResponse, this
     };
+
     bool mIsFailureExpected_83 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_83()
@@ -8363,6 +8485,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_84{
         OnTestSendClusterTestClusterCommandWriteAttribute_84_FailureResponse, this
     };
+
     bool mIsFailureExpected_84 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_84()
@@ -8420,6 +8543,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_85{
         OnTestSendClusterTestClusterCommandReadAttribute_85_FailureResponse, this
     };
+
     bool mIsFailureExpected_85 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_85()
@@ -8483,6 +8607,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_86{
         OnTestSendClusterTestClusterCommandWriteAttribute_86_FailureResponse, this
     };
+
     bool mIsFailureExpected_86 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_86()
@@ -8540,6 +8665,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_87{
         OnTestSendClusterTestClusterCommandReadAttribute_87_FailureResponse, this
     };
+
     bool mIsFailureExpected_87 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_87()
@@ -8603,6 +8729,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_88{
         OnTestSendClusterTestClusterCommandReadAttribute_88_FailureResponse, this
     };
+
     bool mIsFailureExpected_88 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_88()
@@ -8667,6 +8794,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_89{
         OnTestSendClusterTestClusterCommandWriteAttribute_89_FailureResponse, this
     };
+
     bool mIsFailureExpected_89 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_89()
@@ -8725,6 +8853,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_90{
         OnTestSendClusterTestClusterCommandReadAttribute_90_FailureResponse, this
     };
+
     bool mIsFailureExpected_90 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_90()
@@ -8789,6 +8918,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_91{
         OnTestSendClusterTestClusterCommandWriteAttribute_91_FailureResponse, this
     };
+
     bool mIsFailureExpected_91 = true;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_91()
@@ -8848,6 +8978,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_92{
         OnTestSendClusterTestClusterCommandReadAttribute_92_FailureResponse, this
     };
+
     bool mIsFailureExpected_92 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_92()
@@ -8912,6 +9043,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_93{
         OnTestSendClusterTestClusterCommandWriteAttribute_93_FailureResponse, this
     };
+
     bool mIsFailureExpected_93 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_93()
@@ -8970,6 +9102,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_94{
         OnTestSendClusterTestClusterCommandReadAttribute_94_FailureResponse, this
     };
+
     bool mIsFailureExpected_94 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_94()
@@ -9034,6 +9167,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_95{
         OnTestSendClusterTestClusterCommandWriteAttribute_95_FailureResponse, this
     };
+
     bool mIsFailureExpected_95 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_95()
@@ -9099,6 +9233,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_96{
         OnTestSendClusterTestClusterCommandReadAttribute_96_FailureResponse, this
     };
+
     bool mIsFailureExpected_96 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_96()
@@ -9173,6 +9308,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_97{
         OnTestSendClusterTestClusterCommandWriteAttribute_97_FailureResponse, this
     };
+
     bool mIsFailureExpected_97 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_97()
@@ -9231,6 +9367,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_98{
         OnTestSendClusterTestClusterCommandReadAttribute_98_FailureResponse, this
     };
+
     bool mIsFailureExpected_98 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_98()
@@ -9295,6 +9432,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_99{
         OnTestSendClusterTestClusterCommandWriteAttribute_99_FailureResponse, this
     };
+
     bool mIsFailureExpected_99 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_99()
@@ -9352,6 +9490,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_100{
         OnTestSendClusterTestClusterCommandWriteAttribute_100_FailureResponse, this
     };
+
     bool mIsFailureExpected_100 = true;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_100()
@@ -9411,6 +9550,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_101{
         OnTestSendClusterTestClusterCommandWriteAttribute_101_FailureResponse, this
     };
+
     bool mIsFailureExpected_101 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_101()
@@ -9469,6 +9609,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_102{
         OnTestSendClusterTestClusterCommandReadAttribute_102_FailureResponse, this
     };
+
     bool mIsFailureExpected_102 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_102()
@@ -9533,6 +9674,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_103{
         OnTestSendClusterTestClusterCommandWriteAttribute_103_FailureResponse, this
     };
+
     bool mIsFailureExpected_103 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_103()
@@ -9598,6 +9740,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_104{
         OnTestSendClusterTestClusterCommandReadAttribute_104_FailureResponse, this
     };
+
     bool mIsFailureExpected_104 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_104()
@@ -9672,6 +9815,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_105{
         OnTestSendClusterTestClusterCommandWriteAttribute_105_FailureResponse, this
     };
+
     bool mIsFailureExpected_105 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_105()
@@ -9730,6 +9874,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_106{
         OnTestSendClusterTestClusterCommandReadAttribute_106_FailureResponse, this
     };
+
     bool mIsFailureExpected_106 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_106()
@@ -9794,6 +9939,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_107{
         OnTestSendClusterTestClusterCommandReadAttribute_107_FailureResponse, this
     };
+
     bool mIsFailureExpected_107 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_107()
@@ -9858,6 +10004,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_108{
         OnTestSendClusterTestClusterCommandReadAttribute_108_FailureResponse, this
     };
+
     bool mIsFailureExpected_108 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_108()
@@ -9923,6 +10070,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_109{
         OnTestSendClusterTestClusterCommandReadAttribute_109_FailureResponse, this
     };
+
     bool mIsFailureExpected_109 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_109()
@@ -9992,6 +10140,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_110{
         OnTestSendClusterTestClusterCommandWriteAttribute_110_FailureResponse, this
     };
+
     bool mIsFailureExpected_110 = 0;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_110()
@@ -10056,6 +10205,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_111{
         OnTestSendClusterTestClusterCommandTest_111_FailureResponse, this
     };
+
     bool mIsFailureExpected_111 = 1;
 
     CHIP_ERROR TestSendClusterTestClusterCommandTest_111()
@@ -10102,6 +10252,141 @@ private:
         }
 
         runner->NextTest();
+    }
+};
+
+class TestSubscribe_OnOff : public TestCommand
+{
+public:
+    TestSubscribe_OnOff() : TestCommand("TestSubscribe_OnOff"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "TestSubscribe_OnOff: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterOnOffCommandSubscribeAttribute_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "TestSubscribe_OnOff: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    // Test Subscribe OnOff Attribute
+    using SuccessCallback_0 = void (*)(void * context);
+    chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{
+        OnTestSendClusterOnOffCommandSubscribeAttribute_0_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
+        OnTestSendClusterOnOffCommandSubscribeAttribute_0_FailureResponse, this
+    };
+    chip::Callback::Callback<BooleanAttributeCallback> mOnReportCallback_0{ SubscribeAttribute_0_OnReportCallback, this };
+
+    bool mIsFailureExpected_0 = 0;
+
+    size_t mReceivedReport_0                  = 0;
+    static constexpr size_t kExpectedReport_0 = 1 + 1;
+
+    CHIP_ERROR TestSendClusterOnOffCommandSubscribeAttribute_0()
+    {
+        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Sending command...");
+
+        chip::Controller::OnOffCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        cluster.ReportAttributeOnOff(mOnReportCallback_0.Cancel());
+        err = cluster.ConfigureAttributeOnOff(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(), 1, 10);
+
+        return err;
+    }
+
+    static void SubscribeAttribute_0_OnReportCallback(void * context, bool value)
+    {
+        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Report Data");
+        IgnoreUnusedVariable(value);
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+
+        switch (runner->mReceivedReport_0)
+        {
+        case 0:
+            chip::DeviceLayer::SystemLayer.StartTimer(3 * 1000, SubscribeAttribute_0_kick_0, runner);
+            break;
+        default:
+            runner->NextTest();
+            break;
+        }
+        runner->mReceivedReport_0++;
+
+        ChipLogProgress(chipTool, "On/Off - %zu report received, %zu report expected.", runner->mReceivedReport_0,
+                        kExpectedReport_0);
+    }
+
+    static void SubscribeAttribute_0_kick_0(chip::System::Layer * layer, void * context)
+    {
+        IgnoreUnusedVariable(layer);
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+        chip::Controller::OnOffCluster cluster;
+        cluster.Associate(runner->mDevice, 1);
+        /* The we will check the command result by checking if we have received reports, so OnSuccess and OnFailure are nullptr
+         * here. */
+        cluster.Toggle(nullptr, nullptr);
+    }
+
+    static void OnTestSendClusterOnOffCommandSubscribeAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Failure Response");
+
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterOnOffCommandSubscribeAttribute_0_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Success Response");
+
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
     }
 };
 
@@ -10163,6 +10448,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterOnOffCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_0()
@@ -10225,6 +10511,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterOnOffCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_1()
@@ -10287,6 +10574,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterOnOffCommandReadAttribute_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_2()
@@ -10349,6 +10637,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterOnOffCommandReadAttribute_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_3()
@@ -10487,6 +10776,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterOnOffCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_0()
@@ -10549,6 +10839,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterOnOffCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_1()
@@ -10611,6 +10902,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterOnOffCommandReadAttribute_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_2()
@@ -10673,6 +10965,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterOnOffCommandReadAttribute_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_3()
@@ -10735,6 +11028,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
         OnTestSendClusterOnOffCommandReadAttribute_4_FailureResponse, this
     };
+
     bool mIsFailureExpected_4 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_4()
@@ -10797,6 +11091,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterOnOffCommandReadAttribute_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_5()
@@ -10859,6 +11154,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
         OnTestSendClusterOnOffCommandWriteAttribute_6_FailureResponse, this
     };
+
     bool mIsFailureExpected_6 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandWriteAttribute_6()
@@ -10915,6 +11211,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
         OnTestSendClusterOnOffCommandWriteAttribute_7_FailureResponse, this
     };
+
     bool mIsFailureExpected_7 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandWriteAttribute_7()
@@ -10971,6 +11268,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
         OnTestSendClusterOnOffCommandWriteAttribute_8_FailureResponse, this
     };
+
     bool mIsFailureExpected_8 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandWriteAttribute_8()
@@ -11028,6 +11326,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
         OnTestSendClusterOnOffCommandReadAttribute_9_FailureResponse, this
     };
+
     bool mIsFailureExpected_9 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_9()
@@ -11091,6 +11390,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
         OnTestSendClusterOnOffCommandReadAttribute_10_FailureResponse, this
     };
+
     bool mIsFailureExpected_10 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_10()
@@ -11154,6 +11454,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{
         OnTestSendClusterOnOffCommandReadAttribute_11_FailureResponse, this
     };
+
     bool mIsFailureExpected_11 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_11()
@@ -11296,6 +11597,7 @@ private:
     chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{ OnTestSendClusterOnOffCommandOff_0_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{ OnTestSendClusterOnOffCommandOff_0_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOff_0()
@@ -11351,6 +11653,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterOnOffCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_1()
@@ -11411,6 +11714,7 @@ private:
     chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{ OnTestSendClusterOnOffCommandOn_2_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{ OnTestSendClusterOnOffCommandOn_2_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOn_2()
@@ -11466,6 +11770,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterOnOffCommandReadAttribute_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_3()
@@ -11526,6 +11831,7 @@ private:
     chip::Callback::Callback<SuccessCallback_4> mOnSuccessCallback_4{ OnTestSendClusterOnOffCommandOff_4_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{ OnTestSendClusterOnOffCommandOff_4_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_4 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOff_4()
@@ -11581,6 +11887,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterOnOffCommandReadAttribute_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_5()
@@ -11641,6 +11948,7 @@ private:
     chip::Callback::Callback<SuccessCallback_6> mOnSuccessCallback_6{ OnTestSendClusterOnOffCommandToggle_6_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{ OnTestSendClusterOnOffCommandToggle_6_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_6 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandToggle_6()
@@ -11696,6 +12004,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
         OnTestSendClusterOnOffCommandReadAttribute_7_FailureResponse, this
     };
+
     bool mIsFailureExpected_7 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_7()
@@ -11756,6 +12065,7 @@ private:
     chip::Callback::Callback<SuccessCallback_8> mOnSuccessCallback_8{ OnTestSendClusterOnOffCommandToggle_8_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{ OnTestSendClusterOnOffCommandToggle_8_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_8 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandToggle_8()
@@ -11811,6 +12121,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
         OnTestSendClusterOnOffCommandReadAttribute_9_FailureResponse, this
     };
+
     bool mIsFailureExpected_9 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_9()
@@ -11871,6 +12182,7 @@ private:
     chip::Callback::Callback<SuccessCallback_10> mOnSuccessCallback_10{ OnTestSendClusterOnOffCommandOn_10_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{ OnTestSendClusterOnOffCommandOn_10_FailureResponse,
                                                                             this };
+
     bool mIsFailureExpected_10 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOn_10()
@@ -11927,6 +12239,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{
         OnTestSendClusterOnOffCommandReadAttribute_11_FailureResponse, this
     };
+
     bool mIsFailureExpected_11 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_11()
@@ -11987,6 +12300,7 @@ private:
     chip::Callback::Callback<SuccessCallback_12> mOnSuccessCallback_12{ OnTestSendClusterOnOffCommandOff_12_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_12{ OnTestSendClusterOnOffCommandOff_12_FailureResponse,
                                                                             this };
+
     bool mIsFailureExpected_12 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOff_12()
@@ -12043,6 +12357,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_13{
         OnTestSendClusterOnOffCommandReadAttribute_13_FailureResponse, this
     };
+
     bool mIsFailureExpected_13 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_13()
@@ -12199,6 +12514,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterBasicCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_0()
@@ -12257,6 +12573,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterBasicCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_1()
@@ -12321,6 +12638,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterBasicCommandReadAttribute_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_2()
@@ -12378,6 +12696,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterBasicCommandReadAttribute_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_3()
@@ -12442,6 +12761,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
         OnTestSendClusterBasicCommandReadAttribute_4_FailureResponse, this
     };
+
     bool mIsFailureExpected_4 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_4()
@@ -12499,6 +12819,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterBasicCommandReadAttribute_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_5()
@@ -12563,6 +12884,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
         OnTestSendClusterBasicCommandReadAttribute_6_FailureResponse, this
     };
+
     bool mIsFailureExpected_6 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_6()
@@ -12630,6 +12952,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
         OnTestSendClusterBasicCommandReadAttribute_7_FailureResponse, this
     };
+
     bool mIsFailureExpected_7 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_7()
@@ -12687,6 +13010,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
         OnTestSendClusterBasicCommandReadAttribute_8_FailureResponse, this
     };
+
     bool mIsFailureExpected_8 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_8()
@@ -12761,6 +13085,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
         OnTestSendClusterBasicCommandReadAttribute_9_FailureResponse, this
     };
+
     bool mIsFailureExpected_9 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_9()
@@ -12819,6 +13144,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
         OnTestSendClusterBasicCommandReadAttribute_10_FailureResponse, this
     };
+
     bool mIsFailureExpected_10 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_10()
@@ -12897,6 +13223,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{
         OnTestSendClusterBasicCommandReadAttribute_11_FailureResponse, this
     };
+
     bool mIsFailureExpected_11 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_11()
@@ -12978,6 +13305,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_12{
         OnTestSendClusterBasicCommandReadAttribute_12_FailureResponse, this
     };
+
     bool mIsFailureExpected_12 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_12()
@@ -13049,6 +13377,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_13{
         OnTestSendClusterBasicCommandReadAttribute_13_FailureResponse, this
     };
+
     bool mIsFailureExpected_13 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_13()
@@ -13122,6 +13451,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_14{
         OnTestSendClusterBasicCommandReadAttribute_14_FailureResponse, this
     };
+
     bool mIsFailureExpected_14 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_14()
@@ -13193,6 +13523,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_15{
         OnTestSendClusterBasicCommandReadAttribute_15_FailureResponse, this
     };
+
     bool mIsFailureExpected_15 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_15()
@@ -13264,6 +13595,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_16{
         OnTestSendClusterBasicCommandReadAttribute_16_FailureResponse, this
     };
+
     bool mIsFailureExpected_16 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_16()
@@ -13328,6 +13660,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_17{
         OnTestSendClusterBasicCommandReadAttribute_17_FailureResponse, this
     };
+
     bool mIsFailureExpected_17 = 0;
 
     CHIP_ERROR TestSendClusterBasicCommandReadAttribute_17()
@@ -13529,6 +13862,7 @@ private:
     chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{ OnTestSendClusterOnOffCommandOn_0_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{ OnTestSendClusterOnOffCommandOn_0_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOn_0()
@@ -13584,6 +13918,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterOnOffCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_1()
@@ -13647,6 +13982,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterColorControlCommandMoveToHue_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveToHue_2()
@@ -13709,6 +14045,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterColorControlCommandMoveToHue_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveToHue_3()
@@ -13771,6 +14108,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
         OnTestSendClusterColorControlCommandMoveToHue_4_FailureResponse, this
     };
+
     bool mIsFailureExpected_4 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveToHue_4()
@@ -13833,6 +14171,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterColorControlCommandMoveToHue_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveToHue_5()
@@ -13894,6 +14233,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
         OnTestSendClusterColorControlCommandMoveHue_6_FailureResponse, this
     };
+
     bool mIsFailureExpected_6 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveHue_6()
@@ -13954,6 +14294,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
         OnTestSendClusterColorControlCommandMoveHue_7_FailureResponse, this
     };
+
     bool mIsFailureExpected_7 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveHue_7()
@@ -14014,6 +14355,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
         OnTestSendClusterColorControlCommandMoveHue_8_FailureResponse, this
     };
+
     bool mIsFailureExpected_8 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveHue_8()
@@ -14074,6 +14416,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
         OnTestSendClusterColorControlCommandMoveHue_9_FailureResponse, this
     };
+
     bool mIsFailureExpected_9 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveHue_9()
@@ -14135,6 +14478,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
         OnTestSendClusterColorControlCommandStepHue_10_FailureResponse, this
     };
+
     bool mIsFailureExpected_10 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandStepHue_10()
@@ -14197,6 +14541,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{
         OnTestSendClusterColorControlCommandStepHue_11_FailureResponse, this
     };
+
     bool mIsFailureExpected_11 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandStepHue_11()
@@ -14259,6 +14604,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_12{
         OnTestSendClusterColorControlCommandMoveToSaturation_12_FailureResponse, this
     };
+
     bool mIsFailureExpected_12 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveToSaturation_12()
@@ -14320,6 +14666,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_13{
         OnTestSendClusterColorControlCommandMoveSaturation_13_FailureResponse, this
     };
+
     bool mIsFailureExpected_13 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveSaturation_13()
@@ -14381,6 +14728,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_14{
         OnTestSendClusterColorControlCommandMoveSaturation_14_FailureResponse, this
     };
+
     bool mIsFailureExpected_14 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveSaturation_14()
@@ -14442,6 +14790,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_15{
         OnTestSendClusterColorControlCommandStepSaturation_15_FailureResponse, this
     };
+
     bool mIsFailureExpected_15 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandStepSaturation_15()
@@ -14504,6 +14853,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_16{
         OnTestSendClusterColorControlCommandStepSaturation_16_FailureResponse, this
     };
+
     bool mIsFailureExpected_16 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandStepSaturation_16()
@@ -14566,6 +14916,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_17{
         OnTestSendClusterColorControlCommandMoveToHueAndSaturation_17_FailureResponse, this
     };
+
     bool mIsFailureExpected_17 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveToHueAndSaturation_17()
@@ -14626,6 +14977,7 @@ private:
     chip::Callback::Callback<SuccessCallback_18> mOnSuccessCallback_18{ OnTestSendClusterOnOffCommandOff_18_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_18{ OnTestSendClusterOnOffCommandOff_18_FailureResponse,
                                                                             this };
+
     bool mIsFailureExpected_18 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOff_18()
@@ -14682,6 +15034,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_19{
         OnTestSendClusterOnOffCommandReadAttribute_19_FailureResponse, this
     };
+
     bool mIsFailureExpected_19 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_19()
@@ -14806,6 +15159,7 @@ private:
     chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{ OnTestSendClusterOnOffCommandOn_0_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{ OnTestSendClusterOnOffCommandOn_0_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOn_0()
@@ -14861,6 +15215,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterOnOffCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_1()
@@ -14924,6 +15279,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterColorControlCommandMoveToColor_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveToColor_2()
@@ -14986,6 +15342,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterColorControlCommandMoveColor_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveColor_3()
@@ -15047,6 +15404,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
         OnTestSendClusterColorControlCommandStopMoveStep_4_FailureResponse, this
     };
+
     bool mIsFailureExpected_4 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandStopMoveStep_4()
@@ -15106,6 +15464,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterColorControlCommandStepColor_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandStepColor_5()
@@ -15165,6 +15524,7 @@ private:
     chip::Callback::Callback<SuccessCallback_6> mOnSuccessCallback_6{ OnTestSendClusterOnOffCommandOff_6_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{ OnTestSendClusterOnOffCommandOff_6_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_6 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOff_6()
@@ -15220,6 +15580,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
         OnTestSendClusterOnOffCommandReadAttribute_7_FailureResponse, this
     };
+
     bool mIsFailureExpected_7 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_7()
@@ -15350,6 +15711,7 @@ private:
     chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{ OnTestSendClusterOnOffCommandOn_0_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{ OnTestSendClusterOnOffCommandOn_0_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOn_0()
@@ -15405,6 +15767,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterOnOffCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_1()
@@ -15468,6 +15831,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterColorControlCommandMoveToColorTemperature_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveToColorTemperature_2()
@@ -15529,6 +15893,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterColorControlCommandMoveColorTemperature_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveColorTemperature_3()
@@ -15593,6 +15958,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
         OnTestSendClusterColorControlCommandMoveColorTemperature_4_FailureResponse, this
     };
+
     bool mIsFailureExpected_4 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveColorTemperature_4()
@@ -15657,6 +16023,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterColorControlCommandMoveColorTemperature_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandMoveColorTemperature_5()
@@ -15721,6 +16088,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
         OnTestSendClusterColorControlCommandStepColorTemperature_6_FailureResponse, this
     };
+
     bool mIsFailureExpected_6 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandStepColorTemperature_6()
@@ -15786,6 +16154,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
         OnTestSendClusterColorControlCommandStepColorTemperature_7_FailureResponse, this
     };
+
     bool mIsFailureExpected_7 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandStepColorTemperature_7()
@@ -15848,6 +16217,7 @@ private:
     chip::Callback::Callback<SuccessCallback_8> mOnSuccessCallback_8{ OnTestSendClusterOnOffCommandOff_8_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{ OnTestSendClusterOnOffCommandOff_8_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_8 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOff_8()
@@ -15903,6 +16273,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
         OnTestSendClusterOnOffCommandReadAttribute_9_FailureResponse, this
     };
+
     bool mIsFailureExpected_9 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_9()
@@ -16042,6 +16413,7 @@ private:
     chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{ OnTestSendClusterOnOffCommandOn_0_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{ OnTestSendClusterOnOffCommandOn_0_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOn_0()
@@ -16097,6 +16469,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterOnOffCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_1()
@@ -16160,6 +16533,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterColorControlCommandEnhancedMoveToHue_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveToHue_2()
@@ -16222,6 +16596,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterColorControlCommandReadAttribute_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_3()
@@ -16291,6 +16666,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
         OnTestSendClusterColorControlCommandEnhancedMoveHue_4_FailureResponse, this
     };
+
     bool mIsFailureExpected_4 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveHue_4()
@@ -16352,6 +16728,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterColorControlCommandEnhancedMoveHue_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveHue_5()
@@ -16413,6 +16790,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
         OnTestSendClusterColorControlCommandEnhancedMoveHue_6_FailureResponse, this
     };
+
     bool mIsFailureExpected_6 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveHue_6()
@@ -16474,6 +16852,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
         OnTestSendClusterColorControlCommandEnhancedMoveHue_7_FailureResponse, this
     };
+
     bool mIsFailureExpected_7 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveHue_7()
@@ -16535,6 +16914,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
         OnTestSendClusterColorControlCommandEnhancedStepHue_8_FailureResponse, this
     };
+
     bool mIsFailureExpected_8 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandEnhancedStepHue_8()
@@ -16597,6 +16977,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
         OnTestSendClusterColorControlCommandEnhancedStepHue_9_FailureResponse, this
     };
+
     bool mIsFailureExpected_9 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandEnhancedStepHue_9()
@@ -16659,6 +17040,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
         OnTestSendClusterColorControlCommandEnhancedMoveToHueAndSaturation_10_FailureResponse, this
     };
+
     bool mIsFailureExpected_10 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveToHueAndSaturation_10()
@@ -16720,6 +17102,7 @@ private:
     chip::Callback::Callback<SuccessCallback_11> mOnSuccessCallback_11{ OnTestSendClusterOnOffCommandOff_11_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{ OnTestSendClusterOnOffCommandOff_11_FailureResponse,
                                                                             this };
+
     bool mIsFailureExpected_11 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOff_11()
@@ -16776,6 +17159,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_12{
         OnTestSendClusterOnOffCommandReadAttribute_12_FailureResponse, this
     };
+
     bool mIsFailureExpected_12 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_12()
@@ -16924,6 +17308,7 @@ private:
     chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{ OnTestSendClusterOnOffCommandOn_0_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{ OnTestSendClusterOnOffCommandOn_0_FailureResponse,
                                                                            this };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOn_0()
@@ -16979,6 +17364,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterOnOffCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_1()
@@ -17042,6 +17428,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterColorControlCommandColorLoopSet_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandColorLoopSet_2()
@@ -17107,6 +17494,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterColorControlCommandReadAttribute_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_3()
@@ -17170,6 +17558,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
         OnTestSendClusterColorControlCommandReadAttribute_4_FailureResponse, this
     };
+
     bool mIsFailureExpected_4 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_4()
@@ -17233,6 +17622,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterColorControlCommandReadAttribute_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_5()
@@ -17297,6 +17687,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
         OnTestSendClusterColorControlCommandReadAttribute_6_FailureResponse, this
     };
+
     bool mIsFailureExpected_6 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_6()
@@ -17360,6 +17751,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
         OnTestSendClusterColorControlCommandColorLoopSet_7_FailureResponse, this
     };
+
     bool mIsFailureExpected_7 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandColorLoopSet_7()
@@ -17425,6 +17817,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
         OnTestSendClusterColorControlCommandReadAttribute_8_FailureResponse, this
     };
+
     bool mIsFailureExpected_8 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_8()
@@ -17488,6 +17881,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
         OnTestSendClusterColorControlCommandColorLoopSet_9_FailureResponse, this
     };
+
     bool mIsFailureExpected_9 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandColorLoopSet_9()
@@ -17556,6 +17950,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
         OnTestSendClusterColorControlCommandReadAttribute_10_FailureResponse, this
     };
+
     bool mIsFailureExpected_10 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_10()
@@ -17619,6 +18014,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{
         OnTestSendClusterColorControlCommandReadAttribute_11_FailureResponse, this
     };
+
     bool mIsFailureExpected_11 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_11()
@@ -17682,6 +18078,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_12{
         OnTestSendClusterColorControlCommandColorLoopSet_12_FailureResponse, this
     };
+
     bool mIsFailureExpected_12 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandColorLoopSet_12()
@@ -17747,6 +18144,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_13{
         OnTestSendClusterColorControlCommandReadAttribute_13_FailureResponse, this
     };
+
     bool mIsFailureExpected_13 = 0;
 
     CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_13()
@@ -17807,6 +18205,7 @@ private:
     chip::Callback::Callback<SuccessCallback_14> mOnSuccessCallback_14{ OnTestSendClusterOnOffCommandOff_14_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_14{ OnTestSendClusterOnOffCommandOff_14_FailureResponse,
                                                                             this };
+
     bool mIsFailureExpected_14 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandOff_14()
@@ -17863,6 +18262,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_15{
         OnTestSendClusterOnOffCommandReadAttribute_15_FailureResponse, this
     };
+
     bool mIsFailureExpected_15 = 0;
 
     CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_15()
@@ -17972,6 +18372,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterWindowCoveringCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_0()
@@ -18035,6 +18436,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterWindowCoveringCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_1()
@@ -18171,6 +18573,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterWindowCoveringCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_0()
@@ -18234,6 +18637,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterWindowCoveringCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_1()
@@ -18297,6 +18701,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterWindowCoveringCommandReadAttribute_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_2()
@@ -18360,6 +18765,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
         OnTestSendClusterWindowCoveringCommandReadAttribute_3_FailureResponse, this
     };
+
     bool mIsFailureExpected_3 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_3()
@@ -18423,6 +18829,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
         OnTestSendClusterWindowCoveringCommandReadAttribute_4_FailureResponse, this
     };
+
     bool mIsFailureExpected_4 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_4()
@@ -18487,6 +18894,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
         OnTestSendClusterWindowCoveringCommandReadAttribute_5_FailureResponse, this
     };
+
     bool mIsFailureExpected_5 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_5()
@@ -18550,6 +18958,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
         OnTestSendClusterWindowCoveringCommandReadAttribute_6_FailureResponse, this
     };
+
     bool mIsFailureExpected_6 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_6()
@@ -18613,6 +19022,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
         OnTestSendClusterWindowCoveringCommandReadAttribute_7_FailureResponse, this
     };
+
     bool mIsFailureExpected_7 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_7()
@@ -18676,6 +19086,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
         OnTestSendClusterWindowCoveringCommandReadAttribute_8_FailureResponse, this
     };
+
     bool mIsFailureExpected_8 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_8()
@@ -18739,6 +19150,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
         OnTestSendClusterWindowCoveringCommandWriteAttribute_9_FailureResponse, this
     };
+
     bool mIsFailureExpected_9 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandWriteAttribute_9()
@@ -18796,6 +19208,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
         OnTestSendClusterWindowCoveringCommandReadAttribute_10_FailureResponse, this
     };
+
     bool mIsFailureExpected_10 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_10()
@@ -18905,6 +19318,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterBinaryInputBasicCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterBinaryInputBasicCommandReadAttribute_0()
@@ -18968,6 +19382,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterBinaryInputBasicCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterBinaryInputBasicCommandReadAttribute_1()
@@ -19117,6 +19532,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterTemperatureMeasurementCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterTemperatureMeasurementCommandReadAttribute_0()
@@ -19181,6 +19597,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterTemperatureMeasurementCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterTemperatureMeasurementCommandReadAttribute_1()
@@ -19291,6 +19708,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterOccupancySensingCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterOccupancySensingCommandReadAttribute_0()
@@ -19354,6 +19772,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterOccupancySensingCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterOccupancySensingCommandReadAttribute_1()
@@ -19463,6 +19882,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterOperationalCredentialsCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterOperationalCredentialsCommandReadAttribute_0()
@@ -19529,6 +19949,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterOperationalCredentialsCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterOperationalCredentialsCommandReadAttribute_1()
@@ -19606,6 +20027,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TV_LowPowerCluster>(),
         make_unique<TV_MediaInputCluster>(),
         make_unique<TestCluster>(),
+        make_unique<TestSubscribe_OnOff>(),
         make_unique<Test_TC_OO_1_1>(),
         make_unique<Test_TC_OO_2_1>(),
         make_unique<Test_TC_OO_2_2>(),
