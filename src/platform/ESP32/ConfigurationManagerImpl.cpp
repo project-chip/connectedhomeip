@@ -30,9 +30,8 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 #include "esp_wifi.h"
-#endif
 #include "nvs.h"
 #include "nvs_flash.h"
 namespace chip {
@@ -114,7 +113,7 @@ CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
 }
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 CHIP_ERROR ConfigurationManagerImpl::MapConfigError(esp_err_t error)
 {
     switch (error)
@@ -130,7 +129,7 @@ CHIP_ERROR ConfigurationManagerImpl::MapConfigError(esp_err_t error)
         return CHIP_ERROR_INTERNAL;
     }
 }
-#endif
+
 bool ConfigurationManagerImpl::_CanFactoryReset()
 {
     // TODO: query the application to determine if factory reset is allowed.

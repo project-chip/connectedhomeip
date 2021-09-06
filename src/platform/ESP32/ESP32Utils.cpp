@@ -30,11 +30,9 @@
 #include <platform/ESP32/ESP32Utils.h>
 
 #include "esp_event.h"
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include "esp_netif.h"
 #include "esp_netif_net_stack.h"
 #include "esp_wifi.h"
-#endif
 
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;

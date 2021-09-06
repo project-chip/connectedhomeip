@@ -35,17 +35,15 @@
 #include "esp_log.h"
 #include "esp_spi_flash.h"
 #include "esp_system.h"
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include "esp_netif.h"
 #include "esp_wifi.h"
-#endif
+
 namespace chip {
 namespace DeviceLayer {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 namespace Internal {
 extern CHIP_ERROR InitLwIPCoreLock(void);
 }
-#endif
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
@@ -81,7 +79,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         goto exit;
     }
 
-    SuccessOrExit(err);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     esp_netif_create_default_wifi_ap();
     esp_netif_create_default_wifi_sta();
@@ -120,7 +117,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 exit:
     return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
 }
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
 {
     return Internal::InitLwIPCoreLock();
@@ -199,6 +196,5 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
     sInstance.PostEvent(&event);
 }
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 } // namespace DeviceLayer
 } // namespace chip

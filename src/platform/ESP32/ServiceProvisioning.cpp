@@ -21,13 +21,13 @@
 #include <platform/ESP32/ESP32Utils.h>
 
 #include <algorithm>
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 #include "esp_wifi.h"
-#endif
+
 #include "ServiceProvisioning.h"
 
 using namespace ::chip::DeviceLayer;
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
 {
     ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled);
@@ -54,4 +54,3 @@ CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
 
     return CHIP_NO_ERROR;
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
