@@ -47,7 +47,9 @@ tests:
 
     ### 2c Check equality with a tolerance between Target & Current for Lift
     ### Depends on the FeatureMap
-    - label: "2c-1: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT"
+    - label:
+          "2c-1: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
+          from DUT"
       disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
@@ -55,7 +57,9 @@ tests:
           constraints:
               type: uint16
 
-    - label: "2c-2: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT"
+    - label:
+          "2c-2: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
+          attribute from DUT"
       disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
@@ -65,7 +69,9 @@ tests:
 
     ### 2d Check equality with a tolerance between Target & Current for Tilt
     ### Depends on the FeatureMap
-    - label: "2d-1: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT"
+    - label:
+          "2d-1: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
+          from DUT"
       disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
@@ -73,7 +79,9 @@ tests:
           constraints:
               type: uint16
 
-    - label: "2d-2: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT"
+    - label:
+          "2d-2: If (PA & TL) TH reads CurrentPositionTiltPercent100ths
+          attribute from DUT"
       disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
