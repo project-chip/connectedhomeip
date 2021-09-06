@@ -100,4 +100,3 @@ tests:
       response:
           constraints:
               type: uint16
-
