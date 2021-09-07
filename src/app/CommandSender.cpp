@@ -64,7 +64,6 @@ exit:
     {
         AbortExistingExchangeContext();
     }
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -82,7 +81,6 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     SuccessOrExit(err);
 
 exit:
-    ChipLogFunctError(err);
 
     if (mpDelegate != nullptr)
     {
@@ -159,7 +157,6 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     }
 
 exit:
-    ChipLogFunctError(err);
     if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
     {
         mpDelegate->CommandResponseProtocolError(this, mCommandIndex);

@@ -121,7 +121,6 @@ exit:
     {
         aReportDataBuilder.Rollback(backup);
     }
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -225,7 +224,6 @@ exit:
     {
         aReportDataBuilder.Rollback(backup);
     }
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -289,7 +287,6 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
                   mCurReadHandlerIdx, mMoreChunkedMessages ? "more messages" : "no more messages");
 
 exit:
-    ChipLogFunctError(err);
     if (err != CHIP_NO_ERROR)
     {
         apReadHandler->Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);

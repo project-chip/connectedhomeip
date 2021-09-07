@@ -88,7 +88,6 @@ CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayl
     err = ProcessReadRequest(std::move(aPayload));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogFunctError(err);
         Shutdown();
     }
 
@@ -236,7 +235,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     // this method to return a failure.
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -302,7 +300,6 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -372,7 +369,6 @@ CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathL
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 

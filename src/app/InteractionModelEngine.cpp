@@ -191,7 +191,6 @@ CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext *
 
     apExchangeContext = nullptr;
 
-    ChipLogFunctError(err);
 
     // Todo: Fix the below check after the above status report is implemented.
     if (nullptr != apExchangeContext)
@@ -220,7 +219,6 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
     }
 
 exit:
-    ChipLogFunctError(err);
 
     if (nullptr != apExchangeContext)
     {
@@ -250,7 +248,6 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     }
 
 exit:
-    ChipLogFunctError(err);
 
     if (nullptr != apExchangeContext)
     {
@@ -280,7 +277,6 @@ CHIP_ERROR InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * a
     }
 
 exit:
-    ChipLogFunctError(err);
 
     if (nullptr != apExchangeContext)
     {

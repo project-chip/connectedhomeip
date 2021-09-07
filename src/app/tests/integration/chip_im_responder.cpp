@@ -117,7 +117,6 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -134,7 +133,6 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 
     err = apWriteHandler->AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
                                                  Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
-    ChipLogFunctError(err);
     return err;
 }
 } // namespace app
