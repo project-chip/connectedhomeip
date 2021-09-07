@@ -460,6 +460,22 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
                                                       : Protocols::SecureChannel::GeneralStatusCode::kFailure,
                                                   Protocols::SecureChannel::Id, imCode);
 }
-
 } // namespace app
 } // namespace chip
+
+void InteractionModelReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                             uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
+{
+    IgnoreUnusedVariable(manufacturerCode);
+    IgnoreUnusedVariable(type);
+    IgnoreUnusedVariable(data);
+    IgnoreUnusedVariable(mask);
+
+    ClusterInfo info;
+    info.mClusterId  = clusterId;
+    info.mFieldId    = attributeId;
+    info.mEndpointId = endpoint;
+    info.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
+
+    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
+}

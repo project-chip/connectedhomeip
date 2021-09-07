@@ -60,6 +60,8 @@ public:
      */
     CHIP_ERROR Init();
 
+    void Shutdown();
+
     /**
      * Main work-horse function that executes the run-loop.
      */
@@ -77,6 +79,11 @@ public:
      */
     CHIP_ERROR ScheduleRun();
 
+    /**
+     * Application marks mutated change path and would be sent out in later report.
+     */
+    CHIP_ERROR SetDirty(ClusterInfo & aClusterInfo);
+
 private:
     friend class TestReportingEngine;
     /**
@@ -90,6 +97,7 @@ private:
     CHIP_ERROR RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo);
     EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
 
+    void UpdateReadHandlerDirty(ReadHandler & aReadHandler);
     /**
      * Send Report via ReadHandler
      *
@@ -119,6 +127,8 @@ private:
      *
      */
     uint32_t mCurReadHandlerIdx = 0;
+
+    ClusterInfo * mpChangePathList = nullptr;
 };
 
 }; // namespace reporting
