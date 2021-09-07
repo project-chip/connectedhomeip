@@ -124,6 +124,7 @@ public:
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
+    // TODO - Optimize persistent storage of NOC and Root Cert in FabricInfo.
     CHIP_ERROR SetOperationalCertsFromCertArray(const chip::ByteSpan & certArray);
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
 

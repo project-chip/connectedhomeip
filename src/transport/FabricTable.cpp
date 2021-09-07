@@ -174,7 +174,7 @@ exit:
 CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
 {
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    uint8_t compressedFabricIdBuf[sizeof(CompressedFabricId)];
+    uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
     MutableByteSpan compressedFabricIdSpan(compressedFabricIdBuf);
     ReturnErrorOnFailure(GenerateCompressedFabricId(mRootPubkey, fabricId, compressedFabricIdSpan));
 
