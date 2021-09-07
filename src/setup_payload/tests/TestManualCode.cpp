@@ -396,88 +396,102 @@ void TestCheckDecimalStringValidity(nlTestSuite * inSuite, void * inContext)
     std::string decimalString;
 
     representationWithoutCheckDigit = "";
-    NL_TEST_ASSERT(
-        inSuite, CheckDecimalStringValidity(representationWithoutCheckDigit, outReprensation) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite,
+                   ManualSetupPayloadParser::CheckDecimalStringValidity(representationWithoutCheckDigit, outReprensation) ==
+                       CHIP_ERROR_INVALID_STRING_LENGTH);
 
     representationWithoutCheckDigit = "1";
-    NL_TEST_ASSERT(
-        inSuite, CheckDecimalStringValidity(representationWithoutCheckDigit, outReprensation) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite,
+                   ManualSetupPayloadParser::CheckDecimalStringValidity(representationWithoutCheckDigit, outReprensation) ==
+                       CHIP_ERROR_INVALID_STRING_LENGTH);
 
     representationWithoutCheckDigit = "10109";
     checkDigit                      = Verhoeff10::ComputeCheckChar(representationWithoutCheckDigit.c_str());
     decimalString                   = representationWithoutCheckDigit + checkDigit;
-    NL_TEST_ASSERT(inSuite, CheckDecimalStringValidity(decimalString, outReprensation) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::CheckDecimalStringValidity(decimalString, outReprensation) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, outReprensation == representationWithoutCheckDigit);
 
     representationWithoutCheckDigit = "0000";
     checkDigit                      = Verhoeff10::ComputeCheckChar(representationWithoutCheckDigit.c_str());
     decimalString                   = representationWithoutCheckDigit + checkDigit;
-    NL_TEST_ASSERT(inSuite, CheckDecimalStringValidity(decimalString, outReprensation) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::CheckDecimalStringValidity(decimalString, outReprensation) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, outReprensation == representationWithoutCheckDigit);
 }
 
 void TestCheckCodeLengthValidity(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, CheckCodeLengthValidity("01234567890123456789", true) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, CheckCodeLengthValidity("0123456789", false) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::CheckCodeLengthValidity("01234567890123456789", true) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::CheckCodeLengthValidity("0123456789", false) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, CheckCodeLengthValidity("01234567891", false) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    NL_TEST_ASSERT(inSuite, CheckCodeLengthValidity("012345678", false) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    NL_TEST_ASSERT(inSuite, CheckCodeLengthValidity("012345678901234567891", true) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    NL_TEST_ASSERT(inSuite, CheckCodeLengthValidity("0123456789012345678", true) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite,
+                   ManualSetupPayloadParser::CheckCodeLengthValidity("01234567891", false) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite,
+                   ManualSetupPayloadParser::CheckCodeLengthValidity("012345678", false) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite,
+                   ManualSetupPayloadParser::CheckCodeLengthValidity("012345678901234567891", true) ==
+                       CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite,
+                   ManualSetupPayloadParser::CheckCodeLengthValidity("0123456789012345678", true) ==
+                       CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
 void TestDecimalStringToNumber(nlTestSuite * inSuite, void * inContext)
 {
     uint32_t number;
-    NL_TEST_ASSERT(inSuite, ToNumber("12345", number) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::ToNumber("12345", number) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 12345);
 
-    NL_TEST_ASSERT(inSuite, ToNumber("01234567890", number) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::ToNumber("01234567890", number) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 1234567890);
 
-    NL_TEST_ASSERT(inSuite, ToNumber("00000001", number) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::ToNumber("00000001", number) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 1);
 
-    NL_TEST_ASSERT(inSuite, ToNumber("0", number) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::ToNumber("0", number) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 0);
 
-    NL_TEST_ASSERT(inSuite, ToNumber("012345.123456789", number) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, ToNumber("/", number) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::ToNumber("012345.123456789", number) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::ToNumber("/", number) == CHIP_ERROR_INVALID_INTEGER_VALUE);
 }
 
 void TestReadCharsFromDecimalString(nlTestSuite * inSuite, void * inContext)
 {
     uint32_t number;
     size_t index = 3;
-    NL_TEST_ASSERT(inSuite, ReadDigitsFromDecimalString("12345", index, number, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::ReadDigitsFromDecimalString("12345", index, number, 2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 45);
 
     index = 2;
-    NL_TEST_ASSERT(inSuite, ReadDigitsFromDecimalString("6256276377282", index, number, 7) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   ManualSetupPayloadParser::ReadDigitsFromDecimalString("6256276377282", index, number, 7) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 5627637);
 
     index = 0;
-    NL_TEST_ASSERT(inSuite, ReadDigitsFromDecimalString("10", index, number, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::ReadDigitsFromDecimalString("10", index, number, 2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 10);
 
     index = 0;
-    NL_TEST_ASSERT(inSuite, ReadDigitsFromDecimalString("01", index, number, 2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::ReadDigitsFromDecimalString("01", index, number, 2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 1);
 
     index = 1;
-    NL_TEST_ASSERT(inSuite, ReadDigitsFromDecimalString("11", index, number, 1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::ReadDigitsFromDecimalString("11", index, number, 1) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 1);
 
     index = 2;
-    NL_TEST_ASSERT(inSuite, ReadDigitsFromDecimalString("100001", index, number, 3) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ManualSetupPayloadParser::ReadDigitsFromDecimalString("100001", index, number, 3) == CHIP_NO_ERROR);
 
     index = 1;
-    NL_TEST_ASSERT(inSuite, ReadDigitsFromDecimalString("12345", index, number, 5) == CHIP_ERROR_INVALID_STRING_LENGTH);
-    NL_TEST_ASSERT(inSuite, ReadDigitsFromDecimalString("12", index, number, 5) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite,
+                   ManualSetupPayloadParser::ReadDigitsFromDecimalString("12345", index, number, 5) ==
+                       CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(
+        inSuite, ManualSetupPayloadParser::ReadDigitsFromDecimalString("12", index, number, 5) == CHIP_ERROR_INVALID_STRING_LENGTH);
 
     index = 200;
-    NL_TEST_ASSERT(inSuite, ReadDigitsFromDecimalString("6256276377282", index, number, 1) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite,
+                   ManualSetupPayloadParser::ReadDigitsFromDecimalString("6256276377282", index, number, 1) ==
+                       CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
 void TestShortCodeCharLengths(nlTestSuite * inSuite, void * inContext)

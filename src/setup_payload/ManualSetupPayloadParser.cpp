@@ -33,7 +33,8 @@
 
 namespace chip {
 
-CHIP_ERROR CheckDecimalStringValidity(std::string decimalString, std::string & decimalStringWithoutCheckDigit)
+CHIP_ERROR ManualSetupPayloadParser::CheckDecimalStringValidity(std::string decimalString,
+                                                                std::string & decimalStringWithoutCheckDigit)
 {
     if (decimalString.length() < 2)
     {
@@ -51,7 +52,7 @@ CHIP_ERROR CheckDecimalStringValidity(std::string decimalString, std::string & d
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CheckCodeLengthValidity(const std::string & decimalString, bool isLongCode)
+CHIP_ERROR ManualSetupPayloadParser::CheckCodeLengthValidity(const std::string & decimalString, bool isLongCode)
 {
     size_t expectedCharLength = isLongCode ? kManualSetupLongCodeCharLength : kManualSetupShortCodeCharLength;
     if (decimalString.length() != expectedCharLength)
@@ -63,7 +64,7 @@ CHIP_ERROR CheckCodeLengthValidity(const std::string & decimalString, bool isLon
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ToNumber(const std::string & decimalString, uint32_t & dest)
+CHIP_ERROR ManualSetupPayloadParser::ToNumber(const std::string & decimalString, uint32_t & dest)
 {
     uint32_t number = 0;
     for (char c : decimalString)
@@ -81,8 +82,8 @@ CHIP_ERROR ToNumber(const std::string & decimalString, uint32_t & dest)
 }
 
 // Populate numberOfChars into dest from decimalString starting at startIndex (least significant digit = left-most digit)
-CHIP_ERROR ReadDigitsFromDecimalString(const std::string & decimalString, size_t & index, uint32_t & dest,
-                                       size_t numberOfCharsToRead)
+CHIP_ERROR ManualSetupPayloadParser::ReadDigitsFromDecimalString(const std::string & decimalString, size_t & index, uint32_t & dest,
+                                                                 size_t numberOfCharsToRead)
 {
     if (decimalString.length() < numberOfCharsToRead || (numberOfCharsToRead + index > decimalString.length()))
     {

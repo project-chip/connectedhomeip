@@ -283,7 +283,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, cons
     return parseTLVFields(outPayload, tlvArray.Get(), tlvBytesLength);
 }
 
-std::string ExtractPayload(std::string inString)
+std::string QRCodeSetupPayloadParser::ExtractPayload(std::string inString)
 {
     std::string chipSegment;
     char delimiter = '%';

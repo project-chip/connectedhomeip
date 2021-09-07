@@ -33,8 +33,6 @@
 
 namespace chip {
 
-std::string ExtractPayload(std::string inString);
-
 /**
  * @class QRCodeSetupPayloadParser
  * A class that can be used to convert a base38 encoded payload to a SetupPayload object
@@ -47,6 +45,7 @@ private:
 public:
     QRCodeSetupPayloadParser(std::string base38Representation) : mBase38Representation(std::move(base38Representation)) {}
     CHIP_ERROR populatePayload(SetupPayload & outPayload);
+    static std::string ExtractPayload(std::string inString);
 
 private:
     CHIP_ERROR retrieveOptionalInfos(SetupPayload & outPayload, TLV::ContiguousBufferTLVReader & reader);
