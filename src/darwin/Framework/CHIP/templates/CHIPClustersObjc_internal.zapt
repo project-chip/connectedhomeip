@@ -1,0 +1,13 @@
+{{> header}}
+
+#import <Foundation/Foundation.h>
+
+#import "CHIPDevice.h"
+
+{{#chip_client_clusters}}
+
+@interface CHIP{{asUpperCamelCase name}} ()
+@property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster cppCluster;
+@end
+
+{{/chip_client_clusters}}

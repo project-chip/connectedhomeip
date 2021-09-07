@@ -381,16 +381,15 @@ CHIP_ERROR K32WConfig::FactoryResetConfigInternal(Key firstKey, Key lastKey)
     CHIP_ERROR err;
 
     // Iterate over all the CHIP Config PDM ID records and delete each one
-    err = ForEachRecord(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig, false,
-                        [](const Key & pdmKey, const size_t & length) -> CHIP_ERROR {
-                            CHIP_ERROR err2;
+    err = ForEachRecord(firstKey, lastKey, false, [](const Key & pdmKey, const size_t & length) -> CHIP_ERROR {
+        CHIP_ERROR err2;
 
-                            err2 = ClearConfigValue(pdmKey);
-                            SuccessOrExit(err2);
+        err2 = ClearConfigValue(pdmKey);
+        SuccessOrExit(err2);
 
-                        exit:
-                            return err2;
-                        });
+    exit:
+        return err2;
+    });
 
     // Return success at end of iterations.
     if (err == CHIP_END_OF_INPUT)

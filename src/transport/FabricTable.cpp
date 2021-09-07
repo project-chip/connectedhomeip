@@ -43,12 +43,11 @@ CHIP_ERROR FabricInfo::SetFabricLabel(const uint8_t * fabricLabel)
     return CHIP_NO_ERROR;
 }
 
-#pragma GCC diagnostic ignored "-Wstack-usage="
 CHIP_ERROR FabricInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    char key[KeySize()];
+    char key[kKeySize];
     ReturnErrorOnFailure(GenerateKey(mFabric, key, sizeof(key)));
 
     StorableFabricInfo * info = chip::Platform::New<StorableFabricInfo>();
@@ -112,7 +111,7 @@ exit:
 CHIP_ERROR FabricInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    char key[KeySize()];
+    char key[kKeySize];
     ReturnErrorOnFailure(GenerateKey(mFabric, key, sizeof(key)));
 
     StorableFabricInfo * info = chip::Platform::New<StorableFabricInfo>();
@@ -174,9 +173,13 @@ exit:
 CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
 {
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    CompressedFabricId compressedFabricId = 0;
-    MutableByteSpan fabricIdSpan(reinterpret_cast<uint8_t *>(&compressedFabricId), sizeof(compressedFabricId));
-    ReturnErrorOnFailure(GenerateCompressedFabricId(mRootPubkey, fabricId, fabricIdSpan));
+    uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
+    MutableByteSpan compressedFabricIdSpan(compressedFabricIdBuf);
+    ReturnErrorOnFailure(GenerateCompressedFabricId(mRootPubkey, fabricId, compressedFabricIdSpan));
+
+    // Decode compressed fabric ID accounting for endianness, as GenerateCompressedFabricId()
+    // returns a binary buffer and is agnostic of usage of the output as an integer type.
+    CompressedFabricId compressedFabricId = Encoding::BigEndian::Get64(compressedFabricIdBuf);
     compressedPeerId->SetCompressedFabricId(compressedFabricId);
     compressedPeerId->SetNodeId(nodeId);
     return CHIP_NO_ERROR;
@@ -186,7 +189,7 @@ CHIP_ERROR FabricInfo::DeleteFromKVS(PersistentStorageDelegate * kvs, FabricInde
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    char key[KeySize()];
+    char key[kKeySize];
     ReturnErrorOnFailure(GenerateKey(id, key, sizeof(key)));
 
     err = kvs->SyncDeleteKeyValue(key);
@@ -197,14 +200,9 @@ CHIP_ERROR FabricInfo::DeleteFromKVS(PersistentStorageDelegate * kvs, FabricInde
     return err;
 }
 
-constexpr size_t FabricInfo::KeySize()
-{
-    return sizeof(kFabricTableKeyPrefix) + 2 * sizeof(FabricIndex);
-}
-
 CHIP_ERROR FabricInfo::GenerateKey(FabricIndex id, char * key, size_t len)
 {
-    VerifyOrReturnError(len >= KeySize(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(len >= kKeySize, CHIP_ERROR_INVALID_ARGUMENT);
     int keySize = snprintf(key, len, "%s%x", kFabricTableKeyPrefix, id);
     VerifyOrReturnError(keySize > 0, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(len > (size_t) keySize, CHIP_ERROR_INTERNAL);

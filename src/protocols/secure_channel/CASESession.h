@@ -205,7 +205,10 @@ private:
     CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
     CHIP_ERROR RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk);
 
-    constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }
+    static constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields)
+    {
+        return dataLen + (sizeof(uint64_t) * nFields);
+    }
 
     void SendErrorMsg(SigmaErrorType errorCode);
 

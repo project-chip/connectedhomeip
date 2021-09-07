@@ -118,7 +118,6 @@ public:
     void MoveToNextScheduledDirtyPriority();
 
     bool IsInitialReport() { return mInitialReport; }
-    void ClearInitialReport() { mInitialReport = false; }
 
 private:
     enum class HandlerState
@@ -138,7 +137,6 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
     CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    void SetInitialReport() { mInitialReport = true; }
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;

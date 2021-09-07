@@ -45,6 +45,14 @@ class {{filename}}: public TestCommand
     //
 
     {{#chip_tests_items}}
+    {{#if (isTestOnlyCluster cluster)}}
+    CHIP_ERROR TestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}()
+    {
+        ChipLogProgress(chipTool, "{{cluster}} - {{label}}");
+
+        return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{definedValue}}{{/chip_tests_item_parameters}});
+    }
+    {{else}}
     // Test {{label}}
     using SuccessCallback_{{index}} = void (*)(void * context{{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
     chip::Callback::Callback<SuccessCallback_{{index}}> mOnSuccessCallback_{{index}} { OnTestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}_SuccessResponse, this };
@@ -195,6 +203,7 @@ class {{filename}}: public TestCommand
         runner->NextTest();
     }
 
+    {{/if}}
     {{/chip_tests_items}}
 };
 

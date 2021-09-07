@@ -58,7 +58,7 @@ class Button final : public generated::Button<Button>
 public:
     pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
     {
-        GetAppTask().ButtonEventHandler(request.idx /* PB 0 or PB 1 */, request.pushed);
+        GetAppTask().ButtonEventHandler(SL_SIMPLE_BUTTON_INSTANCE(request.idx) /* PB 0 or PB 1 */, request.pushed);
         return pw::OkStatus();
     }
 };
