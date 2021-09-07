@@ -203,8 +203,7 @@ public:
     T * TryCreate(Args &&... args)
     {
         T * lReturn = nullptr;
-
-        (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
+        static_assert(std::is_base_of<Object, T>::value, "Try to create an object which is not derived from class Object");
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
         T * newNode = new T(std::forward<Args>(args)...);
@@ -240,6 +239,9 @@ public:
                 new (buffer) T(std::forward<Args>(args)...);
                 size_t octets = sizeof(Object);
 
+                // We assume the created object is derived from class Object. The top portion taken by class Object is
+                // used to lock the empty slot in the static pool with atomic operations within TryCreate(), we shall not
+                // re-initialize this part during object construction.
                 memcpy(reinterpret_cast<char *>(&lObject) + octets, buffer + octets, sizeof(T) - octets);
                 lReturn = &lObject;
                 break;
