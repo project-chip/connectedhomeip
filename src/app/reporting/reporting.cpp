@@ -762,7 +762,7 @@ static void scheduleTick(void)
             uint32_t minIntervalMs = (entry.data.reported.minInterval * MILLISECOND_TICKS_PER_SECOND);
             uint32_t maxIntervalMs = (entry.data.reported.maxInterval * MILLISECOND_TICKS_PER_SECOND);
             uint32_t elapsedMs     = elapsedTimeInt32u(emAfPluginReportVolatileData[i].lastReportTimeMs,
-                                                       chip::System::Clock::GetMonotonicMilliseconds());
+                                                   chip::System::Clock::GetMonotonicMilliseconds());
             uint32_t remainingMs   = MAX_INT32U_VALUE;
             if (emAfPluginReportVolatileData[i].reportableChange)
             {
