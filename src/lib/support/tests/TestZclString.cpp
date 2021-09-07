@@ -81,15 +81,29 @@ static void TestZclStringEqualsMaximumSize(nlTestSuite * inSuite, void * inConte
 {
     uint8_t bufferMemory[256];
     MutableByteSpan zclString(bufferMemory);
+    chip::Platform::ScopedMemoryBuffer<char> cString254;
+    NL_TEST_ASSERT(inSuite, cString254.Calloc(1024));
+    memset(cString254.Get(), 'A', 254);
+
+    CHIP_ERROR err = MakeZclCharString(zclString, cString254.Get());
+
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 254);
+    NL_TEST_ASSERT(inSuite, allCharactersSame(zclString.data()) == true);
+}
+
+static void TestSizeZclStringBiggerThanMaximumSize_Length_255(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t bufferMemory[256];
+    MutableByteSpan zclString(bufferMemory);
     chip::Platform::ScopedMemoryBuffer<char> cString255;
     NL_TEST_ASSERT(inSuite, cString255.Calloc(1024));
     memset(cString255.Get(), 'A', 255);
 
     CHIP_ERROR err = MakeZclCharString(zclString, cString255.Get());
 
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 255);
-    NL_TEST_ASSERT(inSuite, allCharactersSame(zclString.data()) == true);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 0);
 }
 
 static void TestSizeZclStringBiggerThanMaximumSize_Length_256(nlTestSuite * inSuite, void * inContext)
@@ -148,6 +162,7 @@ int TestZclString_Teardown(void * inContext)
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestZclStringWhenBufferIsZero),
                                  NL_TEST_DEF_FN(TestZclStringLessThanMaximumSize_Length_64),
                                  NL_TEST_DEF_FN(TestZclStringEqualsMaximumSize),
+                                 NL_TEST_DEF_FN(TestSizeZclStringBiggerThanMaximumSize_Length_255),
                                  NL_TEST_DEF_FN(TestSizeZclStringBiggerThanMaximumSize_Length_256),
                                  NL_TEST_DEF_FN(TestZclStringBiggerThanMaximumSize_Length_257),
                                  NL_TEST_SENTINEL() };

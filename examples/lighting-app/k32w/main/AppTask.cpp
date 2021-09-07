@@ -145,7 +145,7 @@ CHIP_ERROR AppTask::Init()
 
     K32W_LOG("Current Firmware Version: %s", currentFirmwareRev);
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_COMMISSIONING
     PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
 #endif
 
@@ -500,7 +500,7 @@ void AppTask::BleHandler(AppEvent * aEvent)
     }
 }
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_COMMISSIONING
 void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)

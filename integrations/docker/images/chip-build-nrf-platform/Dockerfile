@@ -30,7 +30,9 @@ RUN set -x \
     # python3-yaml package conflicts with nRF Python requirements
     && (apt remove -fy python3-yaml && apt autoremove || exit 0) \
     && python3 -m pip install -U --no-cache-dir pip setuptools wheel cmake west \
-    && west init -m https://github.com/nrfconnect/sdk-nrf --mr "$NCS_REVISION" \
+    && west init -m https://github.com/nrfconnect/sdk-nrf \
+    && git -C nrf fetch origin "$NCS_REVISION" \
+    && git -C nrf checkout FETCH_HEAD \
     && west config update.narrow true \
     && west config update.fetch smart \
     && west update -o=--depth=1 -n -f smart \

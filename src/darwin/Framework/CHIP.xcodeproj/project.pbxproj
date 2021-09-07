@@ -33,6 +33,9 @@
 		1EB41B7B263C4CC60048E4C1 /* CHIPClustersTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */; };
 		1EC4CE5D25CC26E900D7304F /* CHIPClustersObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE5925CC26E900D7304F /* CHIPClustersObjc.mm */; };
 		1EC4CE6425CC276600D7304F /* CHIPClustersObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1ED276E026C57CF000547A89 /* CHIPCallbackBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ED276DF26C57CF000547A89 /* CHIPCallbackBridge.mm */; };
+		1ED276E226C5812A00547A89 /* CHIPCluster.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ED276E126C5812A00547A89 /* CHIPCluster.mm */; };
+		1ED276E426C5832500547A89 /* CHIPCluster.h in Headers */ = {isa = PBXBuildFile; fileRef = 1ED276E326C5832500547A89 /* CHIPCluster.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C1B027A2641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C1B02782641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.mm */; };
 		2C1B027B2641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C1B02792641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.h */; };
 		2C222AD0255C620600E446B9 /* CHIPDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C222ACE255C620600E446B9 /* CHIPDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -115,6 +118,9 @@
 		1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPClustersTests.m; sourceTree = "<group>"; };
 		1EC4CE5925CC26E900D7304F /* CHIPClustersObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPClustersObjc.mm; path = "zap-generated/CHIPClustersObjc.mm"; sourceTree = "<group>"; };
 		1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPClustersObjc.h; path = "zap-generated/CHIPClustersObjc.h"; sourceTree = "<group>"; };
+		1ED276DF26C57CF000547A89 /* CHIPCallbackBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPCallbackBridge.mm; path = zap-generated/CHIPCallbackBridge.mm; sourceTree = "<group>"; };
+		1ED276E126C5812A00547A89 /* CHIPCluster.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPCluster.mm; sourceTree = "<group>"; };
+		1ED276E326C5832500547A89 /* CHIPCluster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPCluster.h; sourceTree = "<group>"; };
 		2C1B02782641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPOperationalCredentialsDelegate.mm; sourceTree = "<group>"; };
 		2C1B02792641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPOperationalCredentialsDelegate.h; sourceTree = "<group>"; };
 		2C222ACE255C620600E446B9 /* CHIPDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDevice.h; sourceTree = "<group>"; };
@@ -215,6 +221,7 @@
 		1EC4CE5825CC26AB00D7304F /* CHIPGeneratedFiles */ = {
 			isa = PBXGroup;
 			children = (
+				1ED276DF26C57CF000547A89 /* CHIPCallbackBridge.mm */,
 				1E85730A265519AE0050A4D9 /* attribute-size.cpp */,
 				1E857307265519AE0050A4D9 /* callback-stub.cpp */,
 				1E857309265519AE0050A4D9 /* CHIPClusters.cpp */,
@@ -251,6 +258,8 @@
 		B202528F2459E34F00F97062 /* CHIP */ = {
 			isa = PBXGroup;
 			children = (
+				1ED276E326C5832500547A89 /* CHIPCluster.h */,
+				1ED276E126C5812A00547A89 /* CHIPCluster.mm */,
 				2C5EEEF4268A85C400CAE3D3 /* CHIPDeviceConnectionBridge.h */,
 				2C5EEEF5268A85C400CAE3D3 /* CHIPDeviceConnectionBridge.mm */,
 				1E857311265519DE0050A4D9 /* CHIPApp */,
@@ -331,6 +340,7 @@
 				997DED182695344800975E97 /* CHIPThreadOperationalDataset.h in Headers */,
 				9956064426420367000C28DE /* CHIPSetupPayload_Internal.h in Headers */,
 				998F286D26D55E10001846C6 /* CHIPKeypair.h in Headers */,
+				1ED276E426C5832500547A89 /* CHIPCluster.h in Headers */,
 				5129BCFD26A9EE3300122DDF /* CHIPError.h in Headers */,
 				2C8C8FC1253E0C2100797F05 /* CHIPPersistentStorageDelegate.h in Headers */,
 				B2E0D7B5245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h in Headers */,
@@ -482,12 +492,14 @@
 				2F79A67726CE6672006377B0 /* im-client-callbacks.cpp in Sources */,
 				1E85732226551A490050A4D9 /* binding-table.cpp in Sources */,
 				1E85733426551A700050A4D9 /* reporting.cpp in Sources */,
+				1ED276E226C5812A00547A89 /* CHIPCluster.mm in Sources */,
 				1E85733026551A490050A4D9 /* process-cluster-message.cpp in Sources */,
 				1E85732526551A490050A4D9 /* message.cpp in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,
 				1E85732726551A490050A4D9 /* client-api.cpp in Sources */,
 				1E85730C265519AE0050A4D9 /* callback-stub.cpp in Sources */,
 				1E857310265519AE0050A4D9 /* IMClusterCommandHandler.cpp in Sources */,
+				1ED276E026C57CF000547A89 /* CHIPCallbackBridge.mm in Sources */,
 				1E85732D26551A490050A4D9 /* util.cpp in Sources */,
 				1E85732B26551A490050A4D9 /* af-main-common.cpp in Sources */,
 				2FD775552695557E00FF4B12 /* error-mapping.cpp in Sources */,
