@@ -59,7 +59,7 @@ executable("chip-lighting-app") {
 
     include_dirs += [
       "${chip_root}/examples/common",
-      "${chip_root}/examples/common/pigweed"
+      "${chip_root}/examples/common/pigweed",
     ]
 
     deps += [
