@@ -57,13 +57,17 @@ void ReadClient::Shutdown()
 
 void ReadClient::ShutdownInternal(CHIP_ERROR aError)
 {
-    mpExchangeMgr = nullptr;
-    mpExchangeCtx = nullptr;
     if (mpDelegate != nullptr)
     {
-        mpDelegate->ReadDone(this, aError);
+        if (aError != CHIP_NO_ERROR)
+        {
+            mpDelegate->ReadError(this, aError);
+        }
+        mpDelegate->ReadDone(this);
         mpDelegate = nullptr;
     }
+    mpExchangeMgr  = nullptr;
+    mpExchangeCtx  = nullptr;
     mInitialReport = true;
     MoveToState(ClientState::Uninitialized);
 }
@@ -263,11 +267,6 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        mpDelegate->ReadError(this, err);
-    }
-
     ShutdownInternal(err);
 
     return err;
@@ -369,7 +368,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
 exit:
     SendStatusReport(err);
-    ClearInitialReport();
+    mInitialReport = false;
     return err;
 }
 
@@ -377,10 +376,6 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: %d",
                     apExchangeContext->GetExchangeId());
-    if (nullptr != mpDelegate)
-    {
-        mpDelegate->ReadError(this, CHIP_ERROR_TIMEOUT);
-    }
     ShutdownInternal(CHIP_ERROR_TIMEOUT);
 }
 

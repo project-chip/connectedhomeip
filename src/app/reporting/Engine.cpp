@@ -53,10 +53,11 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 }
 
 CHIP_ERROR
-Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo)
+Engine::RetrieveClusterData(AttributeDataList::Builder & aAttributeDataList, ClusterInfo & aClusterInfo)
 {
-    CHIP_ERROR err                              = CHIP_NO_ERROR;
-    AttributePath::Builder attributePathBuilder = aAttributeDataElementBuilder.CreateAttributePathBuilder();
+    CHIP_ERROR err                                            = CHIP_NO_ERROR;
+    AttributeDataElement::Builder attributeDataElementBuilder = aAttributeDataList.CreateAttributeDataElementBuilder();
+    AttributePath::Builder attributePathBuilder               = attributeDataElementBuilder.CreateAttributePathBuilder();
     attributePathBuilder.NodeId(aClusterInfo.mNodeId)
         .EndpointId(aClusterInfo.mEndpointId)
         .ClusterId(aClusterInfo.mClusterId)
@@ -68,11 +69,11 @@ Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElemen
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId,
                   aClusterInfo.mFieldId);
 
-    err = ReadSingleClusterData(aClusterInfo, aAttributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
+    err = ReadSingleClusterData(aClusterInfo, attributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
     SuccessOrExit(err);
-    aAttributeDataElementBuilder.MoreClusterData(false);
-    aAttributeDataElementBuilder.EndOfAttributeDataElement();
-    err = aAttributeDataElementBuilder.GetError();
+    attributeDataElementBuilder.MoreClusterData(false);
+    attributeDataElementBuilder.EndOfAttributeDataElement();
+    err = attributeDataElementBuilder.GetError();
 
 exit:
     aClusterInfo.ClearDirty();
@@ -100,11 +101,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
     {
         if (clusterInfo->IsDirty())
         {
-            AttributeDataElement::Builder attributeDataElementBuilder = attributeDataList.CreateAttributeDataElementBuilder();
             if (apReadHandler->IsInitialReport())
             {
                 // Retrieve data for this cluster instance and clear its dirty flag.
-                err = RetrieveClusterData(attributeDataElementBuilder, *clusterInfo);
+                err = RetrieveClusterData(attributeDataList, *clusterInfo);
                 VerifyOrExit(err == CHIP_NO_ERROR,
                              ChipLogError(DataManagement, "<RE:Run> Error retrieving data from cluster, aborting"));
                 attributeClean = false;
@@ -343,11 +343,6 @@ CHIP_ERROR Engine::SendReport(ReadHandler * apReadHandler, System::PacketBufferH
     mNumReportsInFlight++;
 
     err = apReadHandler->SendReportData(std::move(aPayload));
-
-    if (err != CHIP_NO_ERROR)
-    {
-        mNumReportsInFlight--;
-    }
     return err;
 }
 

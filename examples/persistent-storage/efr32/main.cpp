@@ -30,6 +30,7 @@
 #include "AppConfig.h"
 #include "KeyValueStorageTest.h"
 #include "init_efrPlatform.h"
+#include "sl_system_kernel.h"
 #include <platform/KeyValueStoreManager.h>
 
 static TaskHandle_t sTestTaskHandle;
@@ -55,7 +56,7 @@ int main(void)
     // Run tests
     xTaskCreate(TestTask, "Test", 2048, NULL, 1, &sTestTaskHandle);
     EFR32_LOG("Starting FreeRTOS scheduler");
-    vTaskStartScheduler();
+    sl_system_kernel_start();
 
     // Should never get here.
     EFR32_LOG("vTaskStartScheduler() failed");
