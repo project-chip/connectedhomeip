@@ -1813,17 +1813,6 @@
 #endif
 
 /**
- *  @def CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
- *
- *  @brief
- *    If asserted (1), enable logging of errors at function exit via the
- *    ChipLogFunctError() macro.
- */
-#ifndef CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-#define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 0
-#endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-
-/**
  *  @def CHIP_CONFIG_ENABLE_CONDITION_LOGGING
  *
  *  @brief
