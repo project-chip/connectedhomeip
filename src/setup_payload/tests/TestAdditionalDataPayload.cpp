@@ -25,13 +25,13 @@
 #include <nlunit-test.h>
 #include <stdio.h>
 
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <setup_payload/AdditionalDataPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/SystemPacketBuffer.h>
-#include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPPlatformMemory.h>
 
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/verhoeff/Verhoeff.h>
@@ -40,30 +40,31 @@ using namespace chip;
 
 namespace {
 
-constexpr char kSerialNumber[] = "89051AAZZ236";
-constexpr char kAdditionalDataPayloadWithoutRotatingDeviceId[] = "1518";
-constexpr char kAdditionalDataPayloadWithRotatingDeviceId[] = "153000120A001998AB7130E38B7E9A401CFE9F7B79AF18";
+constexpr char kSerialNumber[]                                           = "89051AAZZ236";
+constexpr char kAdditionalDataPayloadWithoutRotatingDeviceId[]           = "1518";
+constexpr char kAdditionalDataPayloadWithRotatingDeviceId[]              = "153000120A001998AB7130E38B7E9A401CFE9F7B79AF18";
 constexpr char kAdditionalDataPayloadWithInvalidRotatingDeviceIdLength[] = "153000FF0A001998AB7130E38B7E9A401CFE9F7B79AF18";
-constexpr char kAdditionalDataPayloadWithLongRotatingDeviceId[] = "153000130A00191998AB7130E38B7E9A401CFE9F7B79AF18";
+constexpr char kAdditionalDataPayloadWithLongRotatingDeviceId[]          = "153000130A00191998AB7130E38B7E9A401CFE9F7B79AF18";
 constexpr char kAdditionalDataPayloadWithRotatingDeviceIdAndMaxLifetimeCounter[] = "15300012FFFFFC1670A9F9666D1C4587FCBC4811549018";
-constexpr char kRotatingDeviceId[] = "0A001998AB7130E38B7E9A401CFE9F7B79AF";
-constexpr uint16_t kLifetimeCounter = 10;
-constexpr uint16_t kAdditionalDataPayloadLength = 51;
+constexpr char kRotatingDeviceId[]                                               = "0A001998AB7130E38B7E9A401CFE9F7B79AF";
+constexpr uint16_t kLifetimeCounter                                              = 10;
+constexpr uint16_t kAdditionalDataPayloadLength                                  = 51;
 
 CHIP_ERROR GenerateAdditionalDataPayload(nlTestSuite * inSuite, uint16_t lifetimeCounter, const char * serialNumberBuffer,
-                                     size_t serialNumberBufferSize, BitFlags<AdditionalDataFields> additionalDataFields,
-                                     char * additionalDataPayloadOutput)
+                                         size_t serialNumberBufferSize, BitFlags<AdditionalDataFields> additionalDataFields,
+                                         char * additionalDataPayloadOutput)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle bufferHandle;
 
-    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumberBuffer, serialNumberBufferSize,
-                                                                         bufferHandle, additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(
+        lifetimeCounter, serialNumberBuffer, serialNumberBufferSize, bufferHandle, additionalDataFields);
     if (err == CHIP_NO_ERROR)
     {
         NL_TEST_ASSERT(inSuite, !bufferHandle.IsNull());
     }
-    else {
+    else
+    {
         return err;
     }
     char output[kAdditionalDataPayloadLength];
@@ -76,7 +77,8 @@ CHIP_ERROR GenerateAdditionalDataPayload(nlTestSuite * inSuite, uint16_t lifetim
     return err;
 }
 
-CHIP_ERROR ParseAdditionalDataPayload(const char * additionalDataPayload, chip::SetupPayloadData::AdditionalDataPayload & outPayload)
+CHIP_ERROR ParseAdditionalDataPayload(const char * additionalDataPayload,
+                                      chip::SetupPayloadData::AdditionalDataPayload & outPayload)
 {
     std::vector<uint8_t> payloadData;
     std::string payloadString(additionalDataPayload);
@@ -100,8 +102,9 @@ void TestGeneratingAdditionalDataPayloadWithRotatingDeviceId(nlTestSuite * inSui
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
 
     char output[kAdditionalDataPayloadLength];
-    NL_TEST_ASSERT(inSuite, GenerateAdditionalDataPayload(inSuite, kLifetimeCounter, kSerialNumber, strlen(kSerialNumber),
-                                                          additionalDataFields, output) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   GenerateAdditionalDataPayload(inSuite, kLifetimeCounter, kSerialNumber, strlen(kSerialNumber),
+                                                 additionalDataFields, output) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, strcmp(output, kAdditionalDataPayloadWithRotatingDeviceId) == 0);
 }
@@ -112,9 +115,9 @@ void TestGeneratingAdditionalDataPayloadWithRotatingDeviceIdAndMaxLifetimeCounte
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
 
     char output[kAdditionalDataPayloadLength];
-    NL_TEST_ASSERT(inSuite, GenerateAdditionalDataPayload(inSuite, std::numeric_limits<uint16_t>::max(),
-                                                          kSerialNumber, strlen(kSerialNumber),
-                                                          additionalDataFields, output) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   GenerateAdditionalDataPayload(inSuite, std::numeric_limits<uint16_t>::max(), kSerialNumber,
+                                                 strlen(kSerialNumber), additionalDataFields, output) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, strcmp(output, kAdditionalDataPayloadWithRotatingDeviceIdAndMaxLifetimeCounter) == 0);
 }
@@ -125,17 +128,18 @@ void TestGeneratingAdditionalDataPayloadWithRotatingDeviceIdWithNullInputs(nlTes
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
 
     char output[kAdditionalDataPayloadLength];
-    NL_TEST_ASSERT(inSuite, GenerateAdditionalDataPayload(inSuite, 0,
-                                                          nullptr, strlen(kSerialNumber),
-                                                          additionalDataFields, output) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite,
+                   GenerateAdditionalDataPayload(inSuite, 0, nullptr, strlen(kSerialNumber), additionalDataFields, output) ==
+                       CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 void TestGeneratingAdditionalDataPayloadWithoutRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
 {
     BitFlags<AdditionalDataFields> additionalDataFields;
     char output[kAdditionalDataPayloadLength];
-    NL_TEST_ASSERT(inSuite, GenerateAdditionalDataPayload(inSuite, kLifetimeCounter, kSerialNumber, strlen(kSerialNumber),
-                                                          additionalDataFields, output) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   GenerateAdditionalDataPayload(inSuite, kLifetimeCounter, kSerialNumber, strlen(kSerialNumber),
+                                                 additionalDataFields, output) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(output, kAdditionalDataPayloadWithoutRotatingDeviceId) == 0);
 }
 
@@ -144,9 +148,9 @@ void TestGeneratingRotatingDeviceIdAsString(nlTestSuite * inSuite, void * inCont
     CHIP_ERROR err = CHIP_NO_ERROR;
     char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
     size_t rotatingDeviceIdValueOutputSize = 0;
-    err = AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(kLifetimeCounter, kSerialNumber, strlen(kSerialNumber),
-                                                                            rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer),
-                                                                            rotatingDeviceIdValueOutputSize);
+    err                                    = AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
+        kLifetimeCounter, kSerialNumber, strlen(kSerialNumber), rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer),
+        rotatingDeviceIdValueOutputSize);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(rotatingDeviceIdHexBuffer, kRotatingDeviceId) == 0);
     // Parsing out the lifetime counter value
@@ -165,11 +169,10 @@ void TestGeneratingRotatingDeviceIdAsStringWithNullInputs(nlTestSuite * inSuite,
     CHIP_ERROR err = CHIP_NO_ERROR;
     char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
     size_t rotatingDeviceIdValueOutputSize = 0;
-    err = AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(0, nullptr, strlen(kSerialNumber),
-                                                                            rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer),
-                                                                            rotatingDeviceIdValueOutputSize);
+    err                                    = AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
+        0, nullptr, strlen(kSerialNumber), rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer),
+        rotatingDeviceIdValueOutputSize);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
-
 }
 
 void TestParsingAdditionalDataPayloadWithRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
@@ -182,20 +185,25 @@ void TestParsingAdditionalDataPayloadWithRotatingDeviceId(nlTestSuite * inSuite,
 void TestParsingAdditionalDataPayloadWithoutRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
 {
     chip::SetupPayloadData::AdditionalDataPayload resultPayload;
-    NL_TEST_ASSERT(inSuite, ParseAdditionalDataPayload(kAdditionalDataPayloadWithoutRotatingDeviceId, resultPayload) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   ParseAdditionalDataPayload(kAdditionalDataPayloadWithoutRotatingDeviceId, resultPayload) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(resultPayload.rotatingDeviceId.c_str(), "") == 0);
 }
 
 void TestParsingAdditionalDataPayloadWithInvalidRotatingDeviceIdLength(nlTestSuite * inSuite, void * inContext)
 {
     chip::SetupPayloadData::AdditionalDataPayload resultPayload;
-    NL_TEST_ASSERT(inSuite, ParseAdditionalDataPayload(kAdditionalDataPayloadWithInvalidRotatingDeviceIdLength, resultPayload) == CHIP_ERROR_TLV_UNDERRUN);
+    NL_TEST_ASSERT(inSuite,
+                   ParseAdditionalDataPayload(kAdditionalDataPayloadWithInvalidRotatingDeviceIdLength, resultPayload) ==
+                       CHIP_ERROR_TLV_UNDERRUN);
 }
 
 void TestParsingAdditionalDataPayloadWithLongRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
 {
     chip::SetupPayloadData::AdditionalDataPayload resultPayload;
-    NL_TEST_ASSERT(inSuite, ParseAdditionalDataPayload(kAdditionalDataPayloadWithLongRotatingDeviceId, resultPayload) == CHIP_ERROR_INVALID_STRING_LENGTH);
+    NL_TEST_ASSERT(inSuite,
+                   ParseAdditionalDataPayload(kAdditionalDataPayloadWithLongRotatingDeviceId, resultPayload) ==
+                       CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
 /**
