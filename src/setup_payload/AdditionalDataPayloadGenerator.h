@@ -29,7 +29,6 @@
 
 namespace chip {
 namespace RotatingDeviceId {
-static constexpr unsigned DiscoveryExtensionDescriptorTag = 0;
 static constexpr unsigned kLifetimeCounterSize            = 2;
 static constexpr unsigned kHashSuffixLength               = 16;
 static constexpr unsigned kMaxLength                      = kLifetimeCounterSize + kHashSuffixLength;
@@ -74,19 +73,19 @@ public:
                                              size_t serialNumberBufferSize, chip::System::PacketBufferHandle & bufferHandle,
                                              BitFlags<AdditionalDataFields> additionalDataFields);
     /**
-     * Generate Device Rotating ID in Binary Format
+     * Generate Rotating Device ID in Binary Format
      *
      * @param lifetimeCounter lifetime counter
      * @param serialNumberBuffer null-terminated serial number buffer
      * @param serialNumberBufferSize size of the serial number buffer supplied.
      * @param rotatingDeviceIdBuffer rotating device id buffer
      * @param rotatingDeviceIdBufferSize the current size of the supplied buffer
-     * @param rotatingDeviceIdValueOutputSize the number of chars making up the actual value of the returned rotating device id
+     * @param rotatingDeviceIdValueOutputSize the number of octets making up the actual value of the returned rotating device id
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise.
      *
      */
-    CHIP_ERROR generateRotatingDeviceIdInBinary(uint16_t lifetimeCounter, const char * serialNumberBuffer,
+    CHIP_ERROR generateRotatingDeviceIdAsBinary(uint16_t lifetimeCounter, const char * serialNumberBuffer,
                                                 size_t serialNumberBufferSize, uint8_t * rotatingDeviceIdBuffer,
                                                 size_t rotatingDeviceIdBufferSize, size_t & rotatingDeviceIdValueOutputSize);
 
@@ -103,7 +102,7 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise.
      *
      */
-    CHIP_ERROR generateRotatingDeviceIdInString(uint16_t lifetimeCounter, const char * serialNumberBuffer,
+    CHIP_ERROR generateRotatingDeviceIdAsHexString(uint16_t lifetimeCounter, const char * serialNumberBuffer,
                                                 size_t serialNumberBufferSize, char * rotatingDeviceIdBuffer,
                                                 size_t rotatingDeviceIdBufferSize, size_t & rotatingDeviceIdValueOutputSize);
 };
