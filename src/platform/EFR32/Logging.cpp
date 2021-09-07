@@ -13,7 +13,6 @@
 
 #include <FreeRTOS.h>
 #include <queue.h>
-#include <retargetserial.h>
 #include <stdio.h>
 #include <string.h>
 #include <task.h>
