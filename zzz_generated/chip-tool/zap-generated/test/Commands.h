@@ -10105,6 +10105,56 @@ private:
     }
 };
 
+class TestDelayCommands : public TestCommand
+{
+public:
+    TestDelayCommands() : TestCommand("TestDelayCommands"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "TestDelayCommands: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterDelayCommandsCommandWaitForMs_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "TestDelayCommands: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestSendClusterDelayCommandsCommandWaitForMs_0()
+    {
+        ChipLogProgress(chipTool, "DelayCommands - Wait 100ms");
+
+        return WaitForMs(100);
+    }
+};
+
 class Test_TC_OO_1_1 : public TestCommand
 {
 public:
@@ -19606,6 +19656,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TV_LowPowerCluster>(),
         make_unique<TV_MediaInputCluster>(),
         make_unique<TestCluster>(),
+        make_unique<TestDelayCommands>(),
         make_unique<Test_TC_OO_1_1>(),
         make_unique<Test_TC_OO_2_1>(),
         make_unique<Test_TC_OO_2_2>(),

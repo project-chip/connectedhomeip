@@ -30,6 +30,7 @@
 #include <pigweed/RpcService.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <sl_system_kernel.h>
 #include <task.h>
 
 extern "C" int printf(const char * format, ...)
@@ -195,7 +196,7 @@ int main(void)
     sTestTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TEST_TASK", ArraySize(sTestTaskStack), nullptr, TEST_TASK_PRIORITY,
                                         sTestTaskStack, &sTestTaskBuffer);
     EFR32_LOG("Starting FreeRTOS scheduler");
-    vTaskStartScheduler();
+    sl_system_kernel_start();
 
     // Should never get here.
     EFR32_LOG("vTaskStartScheduler() failed");

@@ -16,6 +16,7 @@
  */
 
 // pull together CHIP headers
+#import <CHIP/CHIPCluster.h>
 #import <CHIP/CHIPClustersObjc.h>
 #import <CHIP/CHIPDevice.h>
 #import <CHIP/CHIPDeviceController.h>

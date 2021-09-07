@@ -40,9 +40,6 @@ fi
 set -x
 [[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
 
-export ZEPHYR_TOOLCHAIN_VARIANT=cross-compile
-export CROSS_COMPILE="$TELINK_TOOLCHAIN_PATH"/riscv32-elf-
-
 env
 
 west build -b "$BOARD" -d "$APP/telink/build/$BOARD" "$APP/telink" -- "$@"

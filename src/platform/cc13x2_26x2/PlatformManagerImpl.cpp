@@ -132,13 +132,13 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
 
+    app_random_init();
+    err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
+    SuccessOrExit(err);
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
-    SuccessOrExit(err);
-
-    app_random_init();
-    err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);
 
 exit:

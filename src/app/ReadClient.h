@@ -67,11 +67,7 @@ public:
     /**
      *  Send a Read Request.  There can be one Read Request outstanding on a given ReadClient.
      *  If SendReadRequest returns success, no more Read Requests can be sent on this ReadClient
-     *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReadError
-     *  call happens with guarantee.
-     *
-     *  Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
-     *  Default timeout value will be used otherwise.
+     *  until the corresponding InteractionModelDelegate::ReadDone call happens with guarantee.
      *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
@@ -139,7 +135,6 @@ private:
      * our exchange and don't need to manually close it.
      */
     void ShutdownInternal(CHIP_ERROR aError);
-    void ClearInitialReport() { mInitialReport = false; }
     bool IsInitialReport() { return mInitialReport; }
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;

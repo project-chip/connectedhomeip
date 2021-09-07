@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,22 +15,22 @@
  *    limitations under the License.
  */
 
-#pragma once
+#import <Foundation/Foundation.h>
 
-#include <stdint.h>
+@class CHIPDevice;
 
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
+NS_ASSUME_NONNULL_BEGIN
 
-class ButtonHandler
-{
-public:
-    static void Init(void);
+/**
+ * CHIPCluster
+ *    This is the base class for clusters.
+ */
+@interface CHIPCluster : NSObject
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
 
-private:
-    static void GpioInit(void);
-    static void Button0Isr(uint8_t pin);
-    static void Button1Isr(uint8_t pin);
-    static void EventHelper(uint8_t btnIdx, bool isrContext);
-    static void TimerCallback(TimerHandle_t xTimer);
-};
+NS_ASSUME_NONNULL_END

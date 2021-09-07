@@ -66,9 +66,14 @@ Silicon Labs platform.
         915MHz@19dBm
     -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
 
-    MG21 boards:
+    MG21 boards: Currently not supported due to RAM limitation.
 
     -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+
+    MG24 boards :
+
+    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
 *   Build the example application:
 
@@ -171,10 +176,11 @@ combination with JLinkRTTClient as follows:
 ## Running the Complete Example
 
 -   It is assumed here that you already have an OpenThread border router
-    configured and running. If not, see the following guide
-    [OpenThread Border Router](https://openthread.io/guides/border-router) for
-    more information on how to setup a border router. Take note that the RCP
-    code is available directly through
+    configured and running. If not see the following guide
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    for more information on how to setup a border router on a raspberryPi.
+
+    Take note that the RCP code is available directly through
     [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
     under File->New->Project Wizard->Examples->Thread : ot-rcp
 
@@ -224,43 +230,28 @@ combination with JLinkRTTClient as follows:
 
     **Push Button 1** Toggles the light state On/Off
 
--   Once the device is provisioned, it will join the Thread network is
-    established, look for the RTT log
+*   You can provision and control the Chip device using the python controller,
+    Chip tool standalone, Android or iOS app
+
+    [Python Controller](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/README.md)
+
+    Here is an example with the Python controller:
 
     ```
-        [DL] Device Role: CHILD
-        [DL] Partition Id:0x6A7491B7
-        [DL] \_OnPlatformEvent default: event->Type = 32778
-        [DL] OpenThread State Changed (Flags: 0x00000001)
-        [DL] Thread Unicast Addresses:
-        [DL]    2001:DB8::E1A2:87F1:7D5D:FECA/64 valid preferred
-        [DL]    FDDE:AD00:BEEF::FF:FE00:2402/64 valid preferred rloc
-        [DL]    FDDE:AD00:BEEF:0:383F:5E81:A05A:B168/64 valid preferred
-        [DL]    FE80::D8F2:592E:C109:CF00/64 valid preferred
-        [DL] LwIP Thread interface addresses updated
-        [DL] FE80::D8F2:592E:C109:CF00 IPv6 link-local address, preferred)
-        [DL] FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local address, preferred)
-        [DL] 2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast address, preferred)
+      chip-device-ctrl
+
+      connect -ble 3840 73141520 1234
+
+      zcl NetworkCommissioning AddThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000000000000300000b35060004001fffe00208dead00beef00cafe0708fddead00beef000005108e11d8ea8ffaa875713699f59e8807e0030a4f70656e5468726561640102c2980410edc641eb63b100b87e90a9980959befc0c0402a0fff8 breadcrumb=0 timeoutMs=1000
+
+      zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=hex:dead00beef00cafe breadcrumb=0 timeoutMs=1000
+
+      close-ble
+
+      resolve 0 1234
+
+      zcl OnOff Toggle 1234 1 0
     ```
-
-    Keep The global unicast address; It is to be used to reach the Device with
-    the chip-tool. The device will be promoted to Router shortly after [DL]
-    Device Role: ROUTER
-
-    (you can verify that the device is on the thread network with the command
-    `router table` using a serial terminal (screen / minicom etc.) on the board
-    running the lighting-app example. You can also get the address list with the
-    command ipaddr again in the serial terminal )
-
--   Using chip-tool you can now control the light status with on/off command
-    such as `chip-tool onoff on 1`
-
-    \*\* Currently, chip-tool for Mac or Linux do not yet have the Thread
-    provisioning feature
-    `chip-tool bypass <Global ipv6 address of the node> 5540`
-
-    You can provision the Chip device using Chip tool Android or iOS app or
-    through CLI commands on your OT BR
 
 ### Notes
 
@@ -304,9 +295,9 @@ via 2002::2
 While most of the RAM usage in CHIP is static, allowing easier debugging and
 optimization with symbols analysis, we still need some HEAP for the crypto and
 OpenThread. Size of the HEAP can be modified by changing the value of the
-`SL_STACK_SIZE` define inside of the BUILD.gn file of this example. Please take
-note that a HEAP size smaller than 5k can and will cause a Mbedtls failure
-during the BLE rendez-vous.
+`configTOTAL_HEAP_SIZE` define inside of the FreeRTOSConfig.h file of this
+example. Please take note that a HEAP size smaller than 13k can and will cause a
+Mbedtls failure during the BLE rendez-vous or CASE session
 
 To track memory usage you can set `enable_heap_monitoring = true` either in the
 BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
