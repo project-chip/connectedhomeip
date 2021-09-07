@@ -221,7 +221,7 @@ private:
 
     FabricId mFabricId = 0;
 
-    static constexpr size_t KeySize();
+    static constexpr size_t kKeySize = sizeof(kFabricTableKeyPrefix) + 2 * sizeof(FabricIndex);
 
     static CHIP_ERROR GenerateKey(FabricIndex id, char * key, size_t len);
 

@@ -722,8 +722,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
     CHIP_ERROR err;
     sl_status_t ret;
-    const uint8_t kResolvableRandomAddrType = 2; // Private resolvable random address type
-    bd_addr unusedBdAddr;                        // We can ignore this field when setting random address.
     uint32_t interval_min;
     uint32_t interval_max;
     uint32_t BleAdvTimeoutMs;
@@ -734,18 +732,24 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     // If already advertising, stop it, before changing values
     if (mFlags.Has(Flags::kAdvertising))
     {
-        sl_bt_advertiser_stop(sInstance.advertising_set_handle);
+        sl_bt_advertiser_stop(advertising_set_handle);
     }
     else
     {
         ChipLogDetail(DeviceLayer, "Start BLE advertissement");
     }
 
-    err = ConfigureAdvertisingData();
-    SuccessOrExit(err);
-
+#ifndef EFR32MG24
+    // set_random_address call causes problems with MG24 family.
+    // Todo fix in GSDK.
+    const uint8_t kResolvableRandomAddrType = 2; // Private resolvable random address type
+    bd_addr unusedBdAddr;                        // We can ignore this field when setting random address.
     sl_bt_advertiser_set_random_address(advertising_set_handle, kResolvableRandomAddrType, unusedBdAddr, &unusedBdAddr);
     (void) unusedBdAddr;
+#endif
+
+    err = ConfigureAdvertisingData();
+    SuccessOrExit(err);
 
     mFlags.Clear(Flags::kRestartAdvertising);
 

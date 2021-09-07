@@ -28,7 +28,6 @@ StorablePeerConnection::StorablePeerConnection(PASESession & session, FabricInde
     mKeyId           = session.GetLocalKeyId();
 }
 
-#pragma GCC diagnostic ignored "-Wstack-usage="
 CHIP_ERROR StorablePeerConnection::StoreIntoKVS(PersistentStorageDelegate & kvs)
 {
     char key[KeySize()];
@@ -52,11 +51,6 @@ CHIP_ERROR StorablePeerConnection::DeleteFromKVS(PersistentStorageDelegate & kvs
     ReturnErrorOnFailure(GenerateKey(keyId, key, sizeof(key)));
 
     return kvs.SyncDeleteKeyValue(key);
-}
-
-constexpr size_t StorablePeerConnection::KeySize()
-{
-    return sizeof(kStorablePeerConnectionKeyPrefix) + 2 * sizeof(uint16_t);
 }
 
 CHIP_ERROR StorablePeerConnection::GenerateKey(uint16_t id, char * key, size_t len)

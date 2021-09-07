@@ -39,6 +39,7 @@
 #include <AppConfig.h>
 #include <app/server/Server.h>
 #include <init_efrPlatform.h>
+#include <sl_system_kernel.h>
 
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
@@ -181,5 +182,5 @@ int main(void)
         EFR32_LOG("MEMORY ERROR!!!");
     }
 
-    vTaskStartScheduler();
+    sl_system_kernel_start();
 }

@@ -21,12 +21,10 @@
 #include <LEDWidget.h>
 #include <WindowApp.h>
 #include <queue.h>
+#include <sl_simple_button_instances.h>
 #include <string>
 #include <task.h>
 #include <timers.h>
-
-#include <gpiointerrupt.h>
-#include <hal-config-board.h>
 
 class WindowAppImpl : public WindowApp
 {
@@ -38,6 +36,7 @@ public:
     CHIP_ERROR Start() override;
     void Finish() override;
     void PostEvent(const WindowApp::Event & event) override;
+    friend void sl_button_on_change(const sl_button_t * handle);
 
 protected:
     struct Timer : public WindowApp::Timer
@@ -55,28 +54,13 @@ protected:
 
     struct Button : public WindowApp::Button
     {
-        struct Config
-        {
-            GPIO_Port_TypeDef port;
-            unsigned int pin;
-        };
         Button(Button::Id id, const char * name);
-
-        GPIO_Port_TypeDef mPort;
-        unsigned int mPin;
-        bool mIsPressed = false;
-        Timer mTimer;
-
-        static const Config & GetConfig(Button::Id id);
-        static void OnButtonInterrupt(uint8_t pin);
-        static void OnButtonTimeout(WindowApp::Timer & timer);
-
-        static const Config sEfr32Configs[BSP_BUTTON_COUNT];
     };
 
     WindowApp::Timer * CreateTimer(const char * name, uint32_t timeoutInMs, WindowApp::Timer::Callback callback,
                                    void * context) override;
     WindowApp::Button * CreateButton(WindowApp::Button::Id id, const char * name) override;
+    void OnButtonChange(const sl_button_t * handle);
     void ProcessEvents();
     void DispatchEvent(const WindowApp::Event & event) override;
     void UpdateLEDs();
