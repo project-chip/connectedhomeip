@@ -22,25 +22,11 @@
 
 #import <Foundation/Foundation.h>
 
-@class CHIPDevice;
+#include "CHIPCluster.h"
 
 typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
 
 NS_ASSUME_NONNULL_BEGIN
-
-/**
- * CHIPCluster
- *    This is the base class for clusters.
- */
-@interface CHIPCluster : NSObject
-
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
-@end
 
 /**
  * Cluster Account Login
@@ -84,12 +70,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)changeStatus:(uint8_t)status responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeApplicationNameWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeProductIdWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeApplicationIdWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCatalogVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeApplicationStatusWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -106,8 +99,11 @@ NS_ASSUME_NONNULL_BEGIN
     responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeApplicationLauncherListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCatalogVendorIdWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeApplicationIdWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -122,7 +118,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)selectOutput:(uint8_t)index responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeAudioOutputListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentAudioOutputWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -137,9 +135,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)barrierControlStop:(ResponseHandler)responseHandler;
 
 - (void)readAttributeBarrierMovingStateWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeBarrierSafetyStatusWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeBarrierCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeBarrierPositionWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -153,26 +155,44 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mfgSpecificPing:(ResponseHandler)responseHandler;
 
 - (void)readAttributeInteractionModelVersionWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeVendorIDWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeProductNameWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeProductIDWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUserLabelWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeLocationWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLocationWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeHardwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeHardwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSoftwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSoftwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeManufacturingDateWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePartNumberWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeProductURLWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeProductLabelWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeLocalConfigDisabledWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLocalConfigDisabledWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -185,17 +205,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOutOfServiceWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOutOfServiceWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributePresentValueWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributePresentValueWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeStatusFlagsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeStatusFlagsWithMinInterval:(uint16_t)minInterval
                                          maxInterval:(uint16_t)maxInterval
                                      responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeStatusFlagsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -228,20 +251,34 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPBridgedDeviceBasic : CHIPCluster
 
 - (void)readAttributeVendorNameWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeVendorIDWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeProductNameWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeUserLabelWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUserLabelWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeHardwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeHardwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSoftwareVersionWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSoftwareVersionStringWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeManufacturingDateWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePartNumberWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeProductURLWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeProductLabelWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -367,90 +404,142 @@ NS_ASSUME_NONNULL_BEGIN
                                              change:(uint8_t)change
                                     responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentHueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentSaturationWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeCurrentSaturationWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                                     change:(uint8_t)change
                                            responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentSaturationWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRemainingTimeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentXWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeCurrentXWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                            change:(uint16_t)change
                                   responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentXWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentYWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeCurrentYWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                            change:(uint16_t)change
                                   responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentYWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeDriftCompensationWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCompensationTextWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorTemperatureWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeColorTemperatureWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                                    change:(uint16_t)change
                                           responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeColorTemperatureWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorModeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorControlOptionsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeColorControlOptionsWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeNumberOfPrimariesWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary1XWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary1YWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary1IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary2XWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary2YWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary2IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary3XWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary3YWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary3IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary4XWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary4YWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary4IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary5XWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary5YWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary5IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary6XWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary6YWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePrimary6IntensityWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeWhitePointXWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeWhitePointXWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeWhitePointYWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeWhitePointYWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorPointRXWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeColorPointRXWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorPointRYWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeColorPointRYWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorPointRIntensityWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeColorPointRIntensityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorPointGXWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeColorPointGXWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorPointGYWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeColorPointGYWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorPointGIntensityWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeColorPointGIntensityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorPointBXWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeColorPointBXWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorPointBYWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeColorPointBYWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorPointBIntensityWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeColorPointBIntensityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeEnhancedCurrentHueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeEnhancedColorModeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorLoopActiveWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorLoopDirectionWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorLoopTimeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorLoopStartEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorLoopStoredEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorTempPhysicalMinWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeColorTempPhysicalMaxWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCoupleColorTempToLevelMinMiredsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeStartUpColorTemperatureMiredsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -465,7 +554,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)launchURL:(NSString *)contentURL displayString:(NSString *)displayString responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeAcceptsHeaderListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSupportedStreamingTypesWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -477,9 +568,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPDescriptor : CHIPCluster
 
 - (void)readAttributeDeviceListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeServerListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClientListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePartsListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -555,8 +650,11 @@ NS_ASSUME_NONNULL_BEGIN
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeLockStateWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeLockTypeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeActuatorEnabledWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -568,16 +666,27 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPElectricalMeasurement : CHIPCluster
 
 - (void)readAttributeMeasurementTypeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTotalActivePowerWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRmsVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRmsVoltageMinWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRmsVoltageMaxWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRmsCurrentWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRmsCurrentMinWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRmsCurrentMaxWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeActivePowerWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeActivePowerMinWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeActivePowerMaxWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -591,10 +700,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetCounts:(ResponseHandler)responseHandler;
 
 - (void)readAttributePacketRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePacketTxCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxErrCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCollisionCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -606,6 +720,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPFixedLabel : CHIPCluster
 
 - (void)readAttributeLabelListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -617,8 +732,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPFlowMeasurement : CHIPCluster
 
 - (void)readAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -642,7 +760,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBreadcrumbWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBreadcrumbWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeBasicCommissioningInfoListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -654,7 +774,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPGeneralDiagnostics : CHIPCluster
 
 - (void)readAttributeNetworkInterfacesWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRebootCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -666,7 +788,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPGroupKeyManagement : CHIPCluster
 
 - (void)readAttributeGroupsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeGroupKeysWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -685,6 +809,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)viewGroup:(uint16_t)groupId responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeNameSupportWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -700,6 +825,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeIdentifyTimeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeIdentifyTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -755,6 +881,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                change:(uint8_t)change
                                       responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentLevelWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -783,7 +910,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showInputStatus:(ResponseHandler)responseHandler;
 
 - (void)readAttributeMediaInputListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentMediaInputWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -853,6 +982,7 @@ NS_ASSUME_NONNULL_BEGIN
           responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -893,8 +1023,11 @@ NS_ASSUME_NONNULL_BEGIN
                                        maxInterval:(uint16_t)maxInterval
                                    responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeOccupancyWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOccupancySensorTypeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOccupancySensorTypeBitmapWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -920,14 +1053,20 @@ NS_ASSUME_NONNULL_BEGIN
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeOnOffWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeGlobalSceneControlWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOnTimeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOnTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOffWaitTimeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOffWaitTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeStartUpOnOffWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeStartUpOnOffWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -939,8 +1078,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOnOffSwitchConfiguration : CHIPCluster
 
 - (void)readAttributeSwitchTypeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSwitchActionsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeSwitchActionsWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -964,8 +1105,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateNOC:(NSData *)nOCArray responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeFabricsListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSupportedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -982,8 +1126,11 @@ NS_ASSUME_NONNULL_BEGIN
                                                 change:(int16_t)change
                                        responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -995,18 +1142,25 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPumpConfigurationAndControl : CHIPCluster
 
 - (void)readAttributeMaxPressureWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMaxSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMaxFlowWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeEffectiveOperationModeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeEffectiveControlModeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCapacityWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeCapacityWithMinInterval:(uint16_t)minInterval
                                       maxInterval:(uint16_t)maxInterval
                                            change:(int16_t)change
                                   responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCapacityWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOperationModeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOperationModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1023,8 +1177,11 @@ NS_ASSUME_NONNULL_BEGIN
                                                 change:(uint16_t)change
                                        responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1054,10 +1211,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)viewScene:(uint16_t)groupId sceneId:(uint8_t)sceneId responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeSceneCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentSceneWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentGroupWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSceneValidWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeNameSupportWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1071,6 +1233,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetWatermarks:(ResponseHandler)responseHandler;
 
 - (void)readAttributeCurrentHeapHighWatermarkWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1082,12 +1245,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPSwitch : CHIPCluster
 
 - (void)readAttributeNumberOfPositionsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentPositionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeCurrentPositionWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                                   change:(uint8_t)change
                                          responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentPositionWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1105,8 +1270,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)skipChannel:(uint16_t)count responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeTvChannelListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTvChannelLineupWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentTvChannelWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1120,6 +1288,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)navigateTarget:(uint8_t)target data:(NSString *)data responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeTargetNavigatorListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1136,8 +1305,11 @@ NS_ASSUME_NONNULL_BEGIN
                                                 change:(int16_t)change
                                        responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMinMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMaxMeasuredValueWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1156,47 +1328,70 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBooleanWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBooleanWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeBitmap8WithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBitmap8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeBitmap16WithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBitmap16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeBitmap32WithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBitmap32WithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeBitmap64WithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBitmap64WithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInt8uWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeInt8uWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInt16uWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeInt16uWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInt32uWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeInt32uWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInt64uWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeInt64uWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInt8sWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeInt8sWithValue:(int8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInt16sWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeInt16sWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInt32sWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeInt32sWithValue:(int32_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInt64sWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeInt64sWithValue:(int64_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeEnum8WithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeEnum8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeEnum16WithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeEnum16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeLongOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLongOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCharStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeCharStringWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeLongCharStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLongCharStringWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1223,30 +1418,47 @@ NS_ASSUME_NONNULL_BEGIN
                                                    change:(int16_t)change
                                           responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeLocalTemperatureWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeAbsMinHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeAbsMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeAbsMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeAbsMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOccupiedCoolingSetpointWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOccupiedCoolingSetpointWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOccupiedHeatingSetpointWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOccupiedHeatingSetpointWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMinHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMinHeatSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMaxHeatSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMinCoolSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeMaxCoolSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeControlSequenceOfOperationWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeControlSequenceOfOperationWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSystemModeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeSystemModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeStartOfWeekWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeNumberOfWeeklyTransitionsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeNumberOfDailyTransitionsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1259,10 +1471,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTemperatureDisplayModeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeTemperatureDisplayModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeKeypadLockoutWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeKeypadLockoutWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeScheduleProgrammingVisibilityWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeScheduleProgrammingVisibilityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1276,65 +1491,125 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetCounts:(ResponseHandler)responseHandler;
 
 - (void)readAttributeChannelWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRoutingRoleWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeNetworkNameWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePanIdWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeExtendedPanIdWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeMeshLocalPrefixWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeNeighborTableListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRouteTableListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePartitionIdWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeWeightingWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeDataVersionWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeStableDataVersionWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeLeaderRouterIdWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeDetachedRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeChildRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRouterRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeLeaderRoleCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePartitionIdChangeCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeBetterPartitionAttachAttemptCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeParentChangeCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxTotalCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxAckedCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxNoAckRequestedCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxDataCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxRetryCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxDirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxIndirectMaxRetryExpiryCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxErrCcaCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxErrAbortCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTxErrBusyChannelCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxTotalCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxUnicastCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxBroadcastCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxDataCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxDataPollCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxBeaconCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxBeaconRequestCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxAddressFilteredCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxDestAddrFilteredCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxDuplicatedCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxErrNoFrameCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxErrUnknownNeighborCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxErrInvalidSrcAddrCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxErrSecCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxErrFcsCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRxErrOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSecurityPolicyWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeChannelMaskWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOperationalDatasetComponentsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeActiveNetworkFaultsListWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1346,6 +1621,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPWakeOnLan : CHIPCluster
 
 - (void)readAttributeWakeOnLanMacAddressWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1359,10 +1635,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetCounts:(ResponseHandler)responseHandler;
 
 - (void)readAttributeBssidWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSecurityTypeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeWiFiVersionWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeChannelNumberWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeRssiWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1386,62 +1667,80 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)upOrOpen:(ResponseHandler)responseHandler;
 
 - (void)readAttributeTypeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentPositionLiftWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentPositionTiltWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeConfigStatusWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentPositionLiftPercentageWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeCurrentPositionLiftPercentageWithMinInterval:(uint16_t)minInterval
                                                            maxInterval:(uint16_t)maxInterval
                                                                 change:(uint8_t)change
                                                        responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentPositionLiftPercentageWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentPositionTiltPercentageWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeCurrentPositionTiltPercentageWithMinInterval:(uint16_t)minInterval
                                                            maxInterval:(uint16_t)maxInterval
                                                                 change:(uint8_t)change
                                                        responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentPositionTiltPercentageWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeOperationalStatusWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeOperationalStatusWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeOperationalStatusWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTargetPositionLiftPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeTargetPositionLiftPercent100thsWithMinInterval:(uint16_t)minInterval
                                                              maxInterval:(uint16_t)maxInterval
                                                                   change:(uint16_t)change
                                                          responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeTargetPositionLiftPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeTargetPositionTiltPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeTargetPositionTiltPercent100thsWithMinInterval:(uint16_t)minInterval
                                                              maxInterval:(uint16_t)maxInterval
                                                                   change:(uint16_t)change
                                                          responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeTargetPositionTiltPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeEndProductTypeWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentPositionLiftPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeCurrentPositionLiftPercent100thsWithMinInterval:(uint16_t)minInterval
                                                               maxInterval:(uint16_t)maxInterval
                                                                    change:(uint16_t)change
                                                           responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentPositionLiftPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeCurrentPositionTiltPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeCurrentPositionTiltPercent100thsWithMinInterval:(uint16_t)minInterval
                                                               maxInterval:(uint16_t)maxInterval
                                                                    change:(uint16_t)change
                                                           responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentPositionTiltPercent100thsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInstalledOpenLimitLiftWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInstalledClosedLimitLiftWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInstalledOpenLimitTiltWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeInstalledClosedLimitTiltWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeModeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSafetyStatusWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributeSafetyStatusWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeSafetyStatusWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
