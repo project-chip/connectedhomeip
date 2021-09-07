@@ -173,9 +173,13 @@ exit:
 CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
 {
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    CompressedFabricId compressedFabricId = 0;
-    MutableByteSpan fabricIdSpan(reinterpret_cast<uint8_t *>(&compressedFabricId), sizeof(compressedFabricId));
-    ReturnErrorOnFailure(GenerateCompressedFabricId(mRootPubkey, fabricId, fabricIdSpan));
+    uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
+    MutableByteSpan compressedFabricIdSpan(compressedFabricIdBuf);
+    ReturnErrorOnFailure(GenerateCompressedFabricId(mRootPubkey, fabricId, compressedFabricIdSpan));
+
+    // Decode compressed fabric ID accounting for endianness, as GenerateCompressedFabricId()
+    // returns a binary buffer and is agnostic of usage of the output as an integer type.
+    CompressedFabricId compressedFabricId = Encoding::BigEndian::Get64(compressedFabricIdBuf);
     compressedPeerId->SetCompressedFabricId(compressedFabricId);
     compressedPeerId->SetNodeId(nodeId);
     return CHIP_NO_ERROR;

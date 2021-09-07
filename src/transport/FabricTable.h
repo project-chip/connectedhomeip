@@ -124,6 +124,7 @@ public:
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
+    // TODO - Optimize persistent storage of NOC and Root Cert in FabricInfo.
     CHIP_ERROR SetOperationalCertsFromCertArray(const chip::ByteSpan & certArray);
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
 
@@ -191,6 +192,11 @@ public:
 
     const Crypto::P256PublicKey & GetRootPubkey() const { return mRootPubkey; }
 
+    /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
+       root public key of the fabric. The generated compressed ID is returned via compressedPeerId
+       output parameter */
+    CHIP_ERROR GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
+
     friend class FabricTable;
 
 private:
@@ -231,11 +237,6 @@ private:
 
     void ReleaseOperationalCerts();
     void ReleaseRootCert();
-
-    /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
-       root public key of the fabric. The generated compressed ID is returned via compressedPeerId
-       output parameter */
-    CHIP_ERROR GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
 
     struct StorableFabricInfo
     {
