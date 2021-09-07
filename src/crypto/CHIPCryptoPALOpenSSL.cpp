@@ -1720,7 +1720,7 @@ CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
         VerifyOrExit(object != nullptr, err = CHIP_ERROR_INTERNAL);
         VerifyOrExit(OBJ_obj2txt(buff, sizeof(buff), object, 0) != 0, err = CHIP_ERROR_INTERNAL);
 
-        if (memcmp(vidNeedle, buff, vidNeedleSize) == 0)
+        if (strncmp(vidNeedle, buff, vidNeedleSize) == 0)
         {
             ASN1_STRING * data_entry = X509_NAME_ENTRY_get_data(name_entry);
             VerifyOrExit(data_entry != nullptr, err = CHIP_ERROR_INTERNAL);
