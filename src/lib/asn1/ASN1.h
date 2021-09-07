@@ -26,9 +26,12 @@
 
 #pragma once
 
-#include <lib/support/DLLUtil.h>
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+#include <asn1/ASN1OID.h>
+#endif
 
 #include <lib/asn1/ASN1Error.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 namespace TLV {
@@ -46,10 +49,6 @@ class TLVReader;
 
 namespace chip {
 namespace ASN1 {
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-#include <asn1/ASN1OID.h>
-#endif
 
 static constexpr size_t kMaxConstructedAndEncapsulatedTypesDepth = 10;
 

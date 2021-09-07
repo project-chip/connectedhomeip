@@ -236,6 +236,11 @@ TEMPLATE = '''/*
 
 #pragma once
 
+#include <cstdint>
+
+namespace chip {
+namespace ASN1 {
+
 enum OIDCategory
 %(oid_category_enums)s
 
@@ -277,6 +282,9 @@ const OIDNameTableEntry sOIDNameTable[] =
 %(oid_name_table)s
 
 #endif // ASN1_DEFINE_OID_NAME_TABLE
+
+} // namespace ASN1
+} // namespace chip
 '''
 
 oid_category_enums = "{\n"
