@@ -70,15 +70,8 @@ class TelinkBuilder(Builder):
                     raise Exception(
                         "Telink builds require TELINK_ZEPHYR_BASE to be set")
 
-                # Check Telink toolchain
-                if 'TELINK_TOOLCHAIN_PATH' not in os.environ:
-                    raise Exception(
-                        "Telink requires TELINK_TOOLCHAIN_PATH to be set")
-
             cmd = '''
 source "$TELINK_ZEPHYR_BASE/zephyr-env.sh";
-export ZEPHYR_TOOLCHAIN_VARIANT=cross-compile;
-export CROSS_COMPILE=$TELINK_TOOLCHAIN_PATH/riscv32-elf-;
 west build -d {outdir} -b {board} {sourcedir}
         '''.format(
                 outdir=shlex.quote(
