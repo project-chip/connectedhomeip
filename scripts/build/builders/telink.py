@@ -71,6 +71,8 @@ class TelinkBuilder(Builder):
                 else if 'ZEPHYR_BASE' not in os.environ:
                     raise Exception(
                         "Telink builds require TELINK_ZEPHYR_BASE or ZEPHYR_BASE to be set")
+                else:
+                    cmd =''
 
             # TODO: TELINK_ZEPHYR_SDK_DIR should be used for compilation and
             # NOT hardcoding of zephyr-sdk-0.13.0
