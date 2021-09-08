@@ -28,9 +28,9 @@
 #include <nlunit-test.h>
 #include <system/SystemClock.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 #include <lwip/sys.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 #include <errno.h>
@@ -51,10 +51,10 @@ void TestRealClock(nlTestSuite * inSuite, void * inContext)
     Clock::MonotonicMicroseconds newMicro = Clock::GetMonotonicMicroseconds();
     NL_TEST_ASSERT(inSuite, newMicro >= oldMicro);
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME || CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
     constexpr int kDelayMilliseconds = 3;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
     sys_msleep(kDelayMilliseconds);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -71,7 +71,7 @@ void TestRealClock(nlTestSuite * inSuite, void * inContext)
     newMicro = Clock::GetMonotonicMicroseconds();
     NL_TEST_ASSERT(inSuite, newMicro > oldMicro);
 
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME || CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 }
 
 void TestMockClock(nlTestSuite * inSuite, void * inContext)
