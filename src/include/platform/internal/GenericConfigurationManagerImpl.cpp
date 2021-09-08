@@ -794,7 +794,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioning
         ChipDeviceEvent event;
         event.Type                                   = DeviceEventType::kAccountPairingChange;
         event.AccountPairingChange.IsPairedToAccount = false;
-        PlatformMgr().PostEvent(&event);
+        ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
     }
 
     // If necessary, post an event alerting other subsystems to the change in
@@ -805,7 +805,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioning
         event.Type                                           = DeviceEventType::kServiceProvisioningChange;
         event.ServiceProvisioningChange.IsServiceProvisioned = false;
         event.ServiceProvisioningChange.ServiceConfigUpdated = false;
-        PlatformMgr().PostEvent(&event);
+        ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
     }
 
     mFlags.Clear(Flags::kIsServiceProvisioned);

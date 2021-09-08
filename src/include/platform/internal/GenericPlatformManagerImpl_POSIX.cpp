@@ -121,11 +121,12 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t 
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
     mChipEventQueue.Push(*event);
 
     SystemLayer.Signal(); // Trigger wake select on CHIP thread
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>

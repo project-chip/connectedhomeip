@@ -201,7 +201,11 @@ void GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFun
     event.CallWorkFunct.WorkFunct = workFunct;
     event.CallWorkFunct.Arg       = arg;
 
-    Impl()->PostEvent(&event);
+    CHIP_ERROR status = Impl()->PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, status.Format());
+    }
 }
 
 template <class ImplClass>

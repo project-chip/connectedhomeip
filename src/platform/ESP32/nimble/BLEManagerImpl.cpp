@@ -277,7 +277,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChipDeviceEvent connectionEvent;
             connectionEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-            PlatformMgr().PostEvent(&connectionEvent);
+            PlatformMgr().PostEventLoggingErrors(&connectionEvent);
         }
         break;
 
@@ -531,7 +531,7 @@ void BLEManagerImpl::DriveBLEState(void)
                     ChipDeviceEvent advChange;
                     advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
                     advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-                    PlatformMgr().PostEvent(&advChange);
+                    err                                        = PlatformMgr().PostEvent(&advChange);
                 }
             }
         }
@@ -566,7 +566,7 @@ void BLEManagerImpl::DriveBLEState(void)
                     ChipDeviceEvent advChange;
                     advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
                     advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-                    PlatformMgr().PostEvent(&advChange);
+                    err                                        = PlatformMgr().PostEvent(&advChange);
                 }
             }
 
@@ -738,7 +738,7 @@ void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = param->conn_handle;
         event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
-        PlatformMgr().PostEvent(&event);
+        err                               = PlatformMgr().PostEvent(&event);
     }
 
 exit:
@@ -802,7 +802,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent)
         event.Type = (indicationsEnabled || notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe
                                                                   : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = gapEvent->subscribe.conn_handle;
-        PlatformMgr().PostEvent(&event);
+        err                           = PlatformMgr().PostEvent(&event);
     }
 
     ChipLogProgress(DeviceLayer, "CHIPoBLE %s received",
@@ -830,7 +830,7 @@ CHIP_ERROR BLEManagerImpl::HandleTXComplete(struct ble_gap_event * gapEvent)
         ChipDeviceEvent event;
         event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
         event.CHIPoBLEIndicateConfirm.ConId = gapEvent->notify_tx.conn_handle;
-        PlatformMgr().PostEvent(&event);
+        ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
     }
 
     else
@@ -839,7 +839,7 @@ CHIP_ERROR BLEManagerImpl::HandleTXComplete(struct ble_gap_event * gapEvent)
         event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
         event.CHIPoBLEConnectionError.ConId  = gapEvent->notify_tx.conn_handle;
         event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
-        PlatformMgr().PostEvent(&event);
+        ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
     }
 
     return CHIP_NO_ERROR;
@@ -908,7 +908,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
 
     ChipDeviceEvent disconnectEvent;
     disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
-    PlatformMgr().PostEvent(&disconnectEvent);
+    ReturnErrorOnFailure(PlatformMgr().PostEvent(&disconnectEvent));
 
     // Force a reconfiguration of advertising in case we switched to non-connectable mode when
     // the BLE connection was established.

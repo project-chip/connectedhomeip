@@ -98,7 +98,7 @@ void PlatformManagerImpl::_UnlockChipStack()
     mChipStackMutex.unlock();
 }
 
-void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
+CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
 {
     auto handle = mQueue.call([event = *eventPtr, this] {
         LockChipStack();
@@ -109,7 +109,9 @@ void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
     if (!handle)
     {
         ChipLogError(DeviceLayer, "Error posting event: Not enough memory");
+        return CHIP_ERROR_NO_MEMORY;
     }
+    return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::ProcessDeviceEvents()

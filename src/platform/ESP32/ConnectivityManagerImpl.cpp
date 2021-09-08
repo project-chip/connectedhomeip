@@ -667,7 +667,7 @@ void ConnectivityManagerImpl::OnStationConnected()
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventLoggingErrors(&event);
 
     UpdateInternetConnectivityState();
 }
@@ -680,7 +680,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Lost;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventLoggingErrors(&event);
 
     UpdateInternetConnectivityState();
 }
@@ -950,7 +950,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
         event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
         addr.ToString(event.InternetConnectivityChange.address);
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventLoggingErrors(&event);
 
         if (haveIPv4Conn != hadIPv4Conn)
         {
@@ -981,7 +981,7 @@ void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(const ip_event_got_i
     ChipDeviceEvent event;
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventLoggingErrors(&event);
 }
 
 void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
@@ -995,7 +995,7 @@ void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
     ChipDeviceEvent event;
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Lost;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventLoggingErrors(&event);
 }
 
 void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip)
@@ -1014,7 +1014,7 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & 
     ChipDeviceEvent event;
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventLoggingErrors(&event);
 }
 
 void ConnectivityManagerImpl::RefreshMessageLayer(void) {}
