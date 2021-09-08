@@ -63,7 +63,7 @@ class {{filename}}: public TestCommand
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Sending command...");
 
-        chip::Controller::{{asUpperCamelCase cluster}}Cluster cluster;
+        chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
         cluster.Associate(mDevice, {{endpoint}});
 
         CHIP_ERROR err = CHIP_NO_ERROR;

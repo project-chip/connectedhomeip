@@ -53,6 +53,8 @@ template("chip_data_model") {
   _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
                              invoker.use_default_im_dispatch
 
+  _use_tests_apis = defined(invoker.use_tests_apis) && invoker.use_tests_apis
+
   _use_default_client_callbacks =
       defined(invoker.use_default_client_callbacks) &&
       invoker.use_default_client_callbacks
@@ -168,6 +170,13 @@ template("chip_data_model") {
       if (_use_default_im_dispatch) {
         sources +=
             [ "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp" ]
+      }
+
+      if (_use_tests_apis) {
+        sources += [
+          "${invoker.zap_pregenerated_dir}/tests/CHIPClusters.h",
+          "${invoker.zap_pregenerated_dir}/tests/CHIPClusters.cpp",
+        ]
       }
     }
 
