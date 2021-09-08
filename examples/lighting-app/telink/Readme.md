@@ -17,13 +17,21 @@
     here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
     attention that OUTPUT_DIR should conatins ABSOLUTE path to output dir**
 
+1. Bootstrap the build environment:
+
+    ```
+    source ./scripts/bootstrap.sh
+    ```
+
 1. Run build script:
+
     ```
     ./scripts/build/build_examples.py --app light --platform telink build
     ```
+
 1. Exit docker container and collect build artifacts. Firmware binary would be
    located in
-   **\${CHIP_BASE}/examples/lighting-app/telink/build/tlsr9518adk80d/zephyr/zephyr.bin**
+   **\${CHIP_BASE}/out/telink-tlsr9518adk80d-light/zephyr/zephyr.bin**
 
 ## Flash
 
