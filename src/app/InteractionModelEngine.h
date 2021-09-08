@@ -103,8 +103,8 @@ public:
     CHIP_ERROR NewCommandSender(CommandSender ** const apCommandSender);
 
     /**
-     *  Creates a new read client and send ReadRequest message to the node using the read client. User should use this method since
-     * it takes care of the life cycle of ReadClient.
+     *  Creates a new read client and send ReadRequest message to the node using the read client,
+     *  shutdown if fail to send it out
      *
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
@@ -169,8 +169,6 @@ private:
     /**
      *  Retrieve a ReadClient that the SDK consumer can use to send do a read.  If the call succeeds, the consumer
      *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
-     *
-     *  @param[out]    apReadClient    A pointer to the ReadClient object.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.

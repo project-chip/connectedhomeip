@@ -605,8 +605,13 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
 
             Platform::CopyString(service.mName, name);
             CopyTypeWithoutProtocol(service.mType, type);
-            service.mProtocol               = GetProtocolInType(type);
-            service.mAddressType            = ToAddressType(protocol);
+            service.mProtocol    = GetProtocolInType(type);
+            service.mAddressType = ToAddressType(protocol);
+            service.mInterface   = INET_NULL_INTERFACEID;
+            if (interface != AVAHI_IF_UNSPEC)
+            {
+                service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
+            }
             service.mType[kMdnsTypeMaxSize] = 0;
             context->mServices.push_back(service);
         }
@@ -686,6 +691,11 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         result.mProtocol    = GetProtocolInType(type);
         result.mPort        = port;
         result.mAddressType = ToAddressType(protocol);
+        result.mInterface   = INET_NULL_INTERFACEID;
+        if (interface != AVAHI_IF_UNSPEC)
+        {
+            result.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
+        }
         Platform::CopyString(result.mHostName, host_name);
         // Returned value is full QName, want only host part.
         char * dot = strchr(result.mHostName, '.');

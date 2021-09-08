@@ -27,6 +27,9 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <qrcodegen.h>
+#include <sl_simple_button_instances.h>
+#include <sl_simple_led_instances.h>
+#include <sl_system_kernel.h>
 
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
@@ -36,6 +39,8 @@
 #define LCD_ICON_TIMEOUT 1000
 
 using namespace chip::app::Clusters::WindowCovering;
+#define APP_STATE_LED &sl_led_led0
+#define APP_ACTION_LED &sl_led_led1
 
 //------------------------------------------------------------------------------
 // Timers
@@ -107,49 +112,6 @@ void WindowAppImpl::Timer::TimerCallback(TimerHandle_t xTimer)
 }
 
 //------------------------------------------------------------------------------
-// Buttons
-//------------------------------------------------------------------------------
-
-const WindowAppImpl::Button::Config WindowAppImpl::Button::sEfr32Configs[BSP_BUTTON_COUNT] = BSP_BUTTON_INIT;
-
-WindowAppImpl::Button::Button(WindowApp::Button::Id id, const char * name) :
-    WindowApp::Button(id, name), mTimer(name, APP_BUTTON_DEBOUNCE_PERIOD_MS, OnButtonTimeout, this)
-{
-    const Button::Config & config = Button::GetConfig(id);
-    mPort                         = config.port;
-    mPin                          = config.pin;
-    GPIO_PinModeSet(mPort, mPin, gpioModeInputPull, 1);
-    GPIO_IntConfig(mPort, mPin, true, true, true);
-    GPIOINT_CallbackRegister(mPin, OnButtonInterrupt);
-}
-
-const WindowAppImpl::Button::Config & WindowAppImpl::Button::GetConfig(Button::Id id)
-{
-    return Button::Id::Up == id ? sEfr32Configs[0] : sEfr32Configs[1];
-}
-
-void WindowAppImpl::Button::OnButtonInterrupt(uint8_t pin)
-{
-    const Button::Config & up = Button::GetConfig(Button::Id::Up);
-    Button * btn              = static_cast<Button *>(up.pin == pin ? sInstance.mButtonUp : sInstance.mButtonDown);
-    btn->mIsPressed           = !GPIO_PinInGet(btn->mPort, btn->mPin);
-    btn->mTimer.IsrStart();
-}
-
-void WindowAppImpl::Button::OnButtonTimeout(WindowApp::Timer & timer)
-{
-    Button * btn = static_cast<Button *>(timer.mContext);
-    if (btn->mIsPressed)
-    {
-        btn->Press();
-    }
-    else
-    {
-        btn->Release();
-    }
-}
-
-//------------------------------------------------------------------------------
 // Main Task
 //------------------------------------------------------------------------------
 
@@ -199,11 +161,6 @@ CHIP_ERROR WindowAppImpl::Init()
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    // Initialize Buttons
-    GPIOINT_Init();
-    NVIC_SetPriority(GPIO_EVEN_IRQn, 5);
-    NVIC_SetPriority(GPIO_ODD_IRQn, 5);
-
     // Initialize LEDs
     LEDWidget::InitGpio();
     mStatusLED.Init(APP_STATE_LED);
@@ -218,7 +175,8 @@ CHIP_ERROR WindowAppImpl::Init()
 CHIP_ERROR WindowAppImpl::Start()
 {
     EFR32_LOG("Starting FreeRTOS scheduler");
-    vTaskStartScheduler();
+    sl_system_kernel_start();
+
     return CHIP_NO_ERROR;
 }
 
@@ -235,7 +193,26 @@ void WindowAppImpl::PostEvent(const WindowApp::Event & event)
 {
     if (mQueue)
     {
-        if (!xQueueSend(mQueue, &event, 1))
+        BaseType_t status;
+        if (xPortIsInsideInterrupt())
+        {
+            BaseType_t higherPrioTaskWoken = pdFALSE;
+            status                         = xQueueSendFromISR(mQueue, &event, &higherPrioTaskWoken);
+
+#ifdef portYIELD_FROM_ISR
+            portYIELD_FROM_ISR(higherPrioTaskWoken);
+#elif portEND_SWITCHING_ISR // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+            portEND_SWITCHING_ISR(higherPrioTaskWoken);
+#else                       // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+#error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
+#endif // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+        }
+        else
+        {
+            status = xQueueSend(mQueue, &event, 1);
+        }
+
+        if (!status)
         {
             EFR32_LOG("Failed to post event to app task event queue");
         }
@@ -386,4 +363,30 @@ void WindowAppImpl::OnMainLoop()
 {
     mStatusLED.Animate();
     mActionLED.Animate();
+}
+
+//------------------------------------------------------------------------------
+// Buttons
+//------------------------------------------------------------------------------
+WindowAppImpl::Button::Button(WindowApp::Button::Id id, const char * name) : WindowApp::Button(id, name) {}
+
+void WindowAppImpl::OnButtonChange(const sl_button_t * handle)
+{
+    WindowApp::Button * btn = static_cast<Button *>((handle == &sl_button_btn0) ? sInstance.mButtonUp : sInstance.mButtonDown);
+
+    if (sl_button_get_state(handle) == SL_SIMPLE_BUTTON_PRESSED)
+    {
+        btn->Press();
+    }
+    else
+    {
+        btn->Release();
+    }
+}
+
+// Silabs button callback from button event ISR
+void sl_button_on_change(const sl_button_t * handle)
+{
+    WindowAppImpl * app = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
+    app->OnButtonChange(handle);
 }

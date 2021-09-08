@@ -70,9 +70,14 @@ Silicon Labs platform.
         915MHz@19dBm
     -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
 
-    MG21 boards:
+    MG21 boards: Currently not supported due to RAM limitation.
 
     -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+
+    MG24 boards :
+
+    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
 *   Build the example application:
 
@@ -175,10 +180,11 @@ combination with JLinkRTTClient as follows:
 ## Running the Complete Example
 
 -   It is assumed here that you already have an OpenThread border router
-    configured and running. If not, see the following guide
-    [OpenThread Border Router](https://openthread.io/guides/border-router) for
-    more information on how to setup a border router. Take note that the RCP
-    code is available directly through
+    configured and running. If not see the following guide
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    for more information on how to setup a border router on a raspberryPi.
+
+    Take note that the RCP code is available directly through
     [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
     under File->New->Project Wizard->Examples->Thread : ot-rcp
 
@@ -256,10 +262,6 @@ combination with JLinkRTTClient as follows:
         [DL] FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local address, preferred)
         [DL] 2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast address, preferred)
     ```
-
-    Keep The global unicast address; It is to be used to reach the Device with
-    the chip-tool. The device will be promoted to Router shortly after [DL]
-    Device Role: ROUTER
 
     (you can verify that the device is on the thread network with the command
     `router table` using a serial terminal (screen / minicom etc.) on the board

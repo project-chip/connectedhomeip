@@ -1,7 +1,7 @@
 /*
  *
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,22 +16,26 @@
  *    limitations under the License.
  */
 
-#pragma once
+/**
+ *    @file
+ *          Provides implementations for the chip entropy sourcing functions
+ *          on the Linux platforms.
+ */
 
-#include <stdint.h>
+#include <crypto/CHIPCryptoPAL.h>
 
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
 
-class ButtonHandler
+CHIP_ERROR InitEntropy()
 {
-public:
-    static void Init(void);
+    unsigned int seed;
+    ReturnErrorOnFailure(chip::Crypto::DRBG_get_bytes((uint8_t *) &seed, sizeof(seed)));
+    srand(seed);
+    return CHIP_NO_ERROR;
+}
 
-private:
-    static void GpioInit(void);
-    static void Button0Isr(uint8_t pin);
-    static void Button1Isr(uint8_t pin);
-    static void EventHelper(uint8_t btnIdx, bool isrContext);
-    static void TimerCallback(TimerHandle_t xTimer);
-};
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip

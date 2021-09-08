@@ -35,6 +35,14 @@ const uint16_t kRemotePort = 5540;
 const uint16_t kLocalPort = 5541;
 NSString * kAddress = @"::1";
 
+// Test Util APIs
+void WaitForMs(XCTestExpectation * expectation, dispatch_queue_t queue, unsigned int ms)
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC), queue, ^{
+        [expectation fulfill];
+    });
+}
+
 CHIPDevice * GetPairedDevice(uint64_t deviceId)
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
@@ -2328,6 +2336,14 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestDelayCommands_000000_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 100ms"];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 100);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 

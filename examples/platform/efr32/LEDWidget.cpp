@@ -18,36 +18,41 @@
  */
 
 #include "LEDWidget.h"
-
-#include "bsp.h"
+#include "sl_simple_led_instances.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
 void LEDWidget::InitGpio(void)
 {
     // Sets gpio pin mode for ALL board Leds.
-    BSP_LedsInit();
+    sl_simple_led_init_instances();
 }
 
-void LEDWidget::Init(int ledNum)
+void LEDWidget::Init(const sl_led_t * led)
 {
     mLastChangeTimeUS = 0;
     mBlinkOnTimeMS    = 0;
     mBlinkOffTimeMS   = 0;
-    mLedNum           = ledNum;
+    mLed              = led;
 
     Set(false);
 }
 
 void LEDWidget::Invert(void)
 {
-    Set(!mState);
+    if (mLed)
+    {
+        sl_led_toggle(mLed);
+    }
 }
 
 void LEDWidget::Set(bool state)
 {
     mLastChangeTimeUS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
-    DoSet(state);
+    if (mLed)
+    {
+        state ? sl_led_turn_on(mLed) : sl_led_turn_off(mLed);
+    }
 }
 
 void LEDWidget::Blink(uint32_t changeRateMS)
@@ -67,27 +72,13 @@ void LEDWidget::Animate()
     if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
     {
         int64_t nowUS            = ::chip::System::Clock::GetMonotonicMicroseconds();
-        int64_t stateDurUS       = ((mState) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
+        int64_t stateDurUS       = ((sl_led_get_state(mLed)) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
         int64_t nextChangeTimeUS = mLastChangeTimeUS + stateDurUS;
 
         if (nowUS > nextChangeTimeUS)
         {
-            DoSet(!mState);
+            Invert();
             mLastChangeTimeUS = nowUS;
         }
-    }
-}
-
-void LEDWidget::DoSet(bool state)
-{
-    mState = state;
-
-    if (state)
-    {
-        BSP_LedSet(mLedNum);
-    }
-    else
-    {
-        BSP_LedClear(mLedNum);
     }
 }
