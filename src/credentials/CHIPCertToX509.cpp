@@ -842,7 +842,7 @@ DLL_EXPORT CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, Mutable
 
     reader.Init(chipCert);
 
-    writer.Init(x509Cert.data(), static_cast<uint32_t>(x509Cert.size()));
+    writer.Init(x509Cert);
 
     certData.Clear();
 
