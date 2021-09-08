@@ -72,8 +72,8 @@ vector<EmberAfContentLaunchStreamingType> ContentLauncherManager::proxyGetSuppor
     return supportedStreamingTypes;
 }
 
-ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<ContentLaunchParamater> parameterList,
-                                                                        bool autoplay, string data)
+ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<ContentLaunchParamater> parameterList, bool autoplay,
+                                                                        string data)
 {
     // TODO: Insert code here
     ContentLaunchResponse response;
