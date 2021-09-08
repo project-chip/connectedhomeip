@@ -1843,6 +1843,8 @@ NS_ASSUME_NONNULL_BEGIN
                                       responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeSafetyStatusWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
