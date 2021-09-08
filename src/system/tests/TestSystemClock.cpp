@@ -86,7 +86,7 @@ void TestMockClock(nlTestSuite * inSuite, void * inContext)
     MockClock clock;
 
     ClockBase * savedRealClock = globalClock;
-    globalClock = &clock;
+    globalClock                = &clock;
 
     NL_TEST_ASSERT(inSuite, Clock::GetMonotonicMilliseconds() == 0);
     NL_TEST_ASSERT(inSuite, Clock::GetMonotonicMicroseconds() == 0);
