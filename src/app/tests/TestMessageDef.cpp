@@ -981,7 +981,10 @@ void BuildSubscribeResponse(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWrite
     subscribeResponseBuilder.SubscriptionId(1);
     NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeResponseBuilder.FinalSyncIntervalSeconds(1);
+    subscribeResponseBuilder.MinIntervalFloorSeconds(1);
+    NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeResponseBuilder.MaxIntervalCeilingSeconds(2);
     NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
 
     subscribeResponseBuilder.EndOfSubscribeResponse();
@@ -993,10 +996,10 @@ void ParseSubscribeResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     SubscribeResponse::Parser subscribeResponseParser;
-    uint64_t subscriptionId           = 0;
-    uint16_t finalSyncIntervalSeconds = 0;
-
-    err = subscribeResponseParser.Init(aReader);
+    uint64_t subscriptionId            = 0;
+    uint16_t minIntervalFloorSeconds   = 0;
+    uint16_t maxIntervalCeilingSeconds = 0;
+    err                                = subscribeResponseParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = subscribeResponseParser.CheckSchemaValidity();
@@ -1005,8 +1008,11 @@ void ParseSubscribeResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
     err = subscribeResponseParser.GetSubscriptionId(&subscriptionId);
     NL_TEST_ASSERT(apSuite, subscriptionId == 1 && err == CHIP_NO_ERROR);
 
-    err = subscribeResponseParser.GetFinalSyncIntervalSeconds(&finalSyncIntervalSeconds);
-    NL_TEST_ASSERT(apSuite, finalSyncIntervalSeconds == 1 && err == CHIP_NO_ERROR);
+    err = subscribeResponseParser.GetMinIntervalFloorSeconds(&minIntervalFloorSeconds);
+    NL_TEST_ASSERT(apSuite, minIntervalFloorSeconds == 1 && err == CHIP_NO_ERROR);
+
+    err = subscribeResponseParser.GetMaxIntervalCeilingSeconds(&maxIntervalCeilingSeconds);
+    NL_TEST_ASSERT(apSuite, maxIntervalCeilingSeconds == 2 && err == CHIP_NO_ERROR);
 }
 
 void BuildTimedRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)

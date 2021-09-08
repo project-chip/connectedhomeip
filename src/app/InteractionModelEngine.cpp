@@ -313,13 +313,7 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
             continue;
         }
 
-        readClient.SetExchangeContext(apExchangeContext);
-        CHIP_ERROR err = readClient.ProcessReportData(std::move(aPayload));
-        if (err != CHIP_NO_ERROR)
-        {
-            readClient.Shutdown();
-        }
-        return err;
+        return readClient.OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
     }
     return CHIP_NO_ERROR;
 }
@@ -377,14 +371,9 @@ CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrep
 CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier)
 {
     ReadClient * client = nullptr;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aAppIdentifier));
-    err = client->SendSubscribeRequest(aReadPrepareParams);
-    if (err != CHIP_NO_ERROR)
-    {
-        client->Shutdown();
-    }
-    return err;
+    ReturnErrorOnFailure(client->SendSubscribeRequest(aReadPrepareParams));
+    return CHIP_NO_ERROR;
 }
 
 uint16_t InteractionModelEngine::GetReadClientArrayIndex(const ReadClient * const apReadClient) const

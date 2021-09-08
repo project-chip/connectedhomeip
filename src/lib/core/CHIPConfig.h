@@ -2449,6 +2449,3 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
 #endif
 
-/**
- * @}
- */

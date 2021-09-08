@@ -199,39 +199,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTestCluster_Reporting_0002_ReportOnOff_Test
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"First report received"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPOnOff * onOffCluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(onOffCluster);
-    [onOffCluster reportAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Reporting Test Report first report: %@", err);
-        [expectation fulfill];
-        XCTAssertEqual(err.code, 0);
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterTestCluster_Reporting_0003_StopReportOnOff_Test
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reporting OnOff cancelled"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPOnOff * onOffCluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(onOffCluster);
-    [onOffCluster configureAttributeOnOffWithMinInterval:0
-                                             maxInterval:0xffff
-                                         responseHandler:^(NSError * err, NSDictionary * values) {
-                                             NSLog(@"Reporting Test Cancel Reports status: %@", err);
-
-                                             XCTAssertEqual(err.code, 0);
-                                             [expectation fulfill];
-                                         }];
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
+// Spec compliant reporting Tests goes into test suite now.
 
 - (void)testSendClusterTestCluster_000000_Test
 {

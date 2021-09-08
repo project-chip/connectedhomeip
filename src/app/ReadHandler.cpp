@@ -84,11 +84,11 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     }
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
-    mSubscriptionId     = 0;
-    mMinIntervalSeconds = 0;
-    mMaxIntervalSeconds = 0;
-    mInteractionType    = InteractionType::Read;
-    mpExchangeCtx       = nullptr;
+    mSubscriptionId            = 0;
+    mMinIntervalFloorSeconds   = 0;
+    mMaxIntervalCeilingSeconds = 0;
+    mInteractionType           = InteractionType::Read;
+    mpExchangeCtx              = nullptr;
     MoveToState(HandlerState::Uninitialized);
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
@@ -480,7 +480,10 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
 
     SubscribeResponse::Builder response;
     ReturnLogErrorOnFailure(response.Init(&writer));
-    response.SubscriptionId(mSubscriptionId).FinalSyncIntervalSeconds(mMaxIntervalSeconds).EndOfSubscribeResponse();
+    response.SubscriptionId(mSubscriptionId)
+        .MinIntervalFloorSeconds(mMaxIntervalCeilingSeconds)
+        .MaxIntervalCeilingSeconds(mMaxIntervalCeilingSeconds)
+        .EndOfSubscribeResponse();
     ReturnLogErrorOnFailure(response.GetError());
 
     ReturnLogErrorOnFailure(writer.Finalize(&packet));
@@ -532,8 +535,8 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
     ReturnLogErrorOnFailure(err);
 
-    ReturnLogErrorOnFailure(subscribeRequestParser.GetMinIntervalSeconds(&mMinIntervalSeconds));
-    ReturnLogErrorOnFailure(subscribeRequestParser.GetMaxIntervalSeconds(&mMaxIntervalSeconds));
+    ReturnLogErrorOnFailure(subscribeRequestParser.GetMinIntervalSeconds(&mMinIntervalFloorSeconds));
+    ReturnLogErrorOnFailure(subscribeRequestParser.GetMaxIntervalSeconds(&mMaxIntervalCeilingSeconds));
 
     // TODO: Use GetSecureRandomData to generate subscription id
     // it needs #include <support/crypto/CHIPRNG.h>, but somehow CHIPRNG.h is missing
@@ -562,12 +565,12 @@ void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLa
 
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 {
-    ChipLogProgress(DataManagement, "ReadHandler::Refresh Subscribe Sync Timer with %d seconds", mMinIntervalSeconds);
+    ChipLogProgress(DataManagement, "ReadHandler::Refresh Subscribe Sync Timer with %d seconds", mMinIntervalFloorSeconds);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->CancelTimer(
         OnRefreshSubscribeTimerSyncCallback, this);
     mHoldReport = true;
     return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->StartTimer(
-        mMinIntervalSeconds * kMillisecondsPerSecond, OnRefreshSubscribeTimerSyncCallback, this);
+        mMinIntervalFloorSeconds * kMillisecondsPerSecond, OnRefreshSubscribeTimerSyncCallback, this);
 }
 } // namespace app
 } // namespace chip
