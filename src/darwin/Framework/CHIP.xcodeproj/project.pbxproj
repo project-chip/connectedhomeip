@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E16A8FE26B9876900683C53 /* CHIPClusters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E16A8FD26B9876900683C53 /* CHIPClusters.cpp */; };
+		1E16A90226B98AB700683C53 /* CHIPTestClustersObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1E16A8FA26B9835700683C53 /* CHIPTestClustersObjc.mm */; };
+		1E16A90326B98AF100683C53 /* CHIPTestClustersObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E16A8F926B9835600683C53 /* CHIPTestClustersObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1E857306265519720050A4D9 /* CHIPClientCallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E857305265519720050A4D9 /* CHIPClientCallbacks.cpp */; };
 		1E85730C265519AE0050A4D9 /* callback-stub.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E857307265519AE0050A4D9 /* callback-stub.cpp */; };
 		1E85730E265519AE0050A4D9 /* CHIPClusters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E857309265519AE0050A4D9 /* CHIPClusters.cpp */; };
@@ -92,6 +95,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1E16A8F926B9835600683C53 /* CHIPTestClustersObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPTestClustersObjc.h; path = zap-generated/CHIPTestClustersObjc.h; sourceTree = "<group>"; };
+		1E16A8FA26B9835700683C53 /* CHIPTestClustersObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPTestClustersObjc.mm; path = zap-generated/CHIPTestClustersObjc.mm; sourceTree = "<group>"; };
+		1E16A8FD26B9876900683C53 /* CHIPClusters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CHIPClusters.cpp; path = "../../../../zzz_generated/controller-clusters/zap-generated/tests/CHIPClusters.cpp"; sourceTree = "<group>"; };
 		1E857305265519720050A4D9 /* CHIPClientCallbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CHIPClientCallbacks.cpp; path = "../../../../zzz_generated/controller-clusters/zap-generated/CHIPClientCallbacks.cpp"; sourceTree = "<group>"; };
 		1E857307265519AE0050A4D9 /* callback-stub.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "callback-stub.cpp"; path = "../../../../zzz_generated/controller-clusters/zap-generated/callback-stub.cpp"; sourceTree = "<group>"; };
 		1E857309265519AE0050A4D9 /* CHIPClusters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CHIPClusters.cpp; path = "../../../../zzz_generated/controller-clusters/zap-generated/CHIPClusters.cpp"; sourceTree = "<group>"; };
@@ -195,6 +201,7 @@
 			isa = PBXGroup;
 			children = (
 				2F79A67626CE6672006377B0 /* im-client-callbacks.cpp */,
+				1E16A8FD26B9876900683C53 /* CHIPClusters.cpp */,
 				2FD775542695557E00FF4B12 /* error-mapping.cpp */,
 				1E85733326551A700050A4D9 /* reporting-default-configuration.cpp */,
 				1E85733226551A700050A4D9 /* reporting.cpp */,
@@ -221,6 +228,8 @@
 		1EC4CE5825CC26AB00D7304F /* CHIPGeneratedFiles */ = {
 			isa = PBXGroup;
 			children = (
+				1E16A8F926B9835600683C53 /* CHIPTestClustersObjc.h */,
+				1E16A8FA26B9835700683C53 /* CHIPTestClustersObjc.mm */,
 				1ED276DF26C57CF000547A89 /* CHIPCallbackBridge.mm */,
 				1E85730A265519AE0050A4D9 /* attribute-size.cpp */,
 				1E857307265519AE0050A4D9 /* callback-stub.cpp */,
@@ -329,6 +338,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CB7163B252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h in Headers */,
+				1E16A90326B98AF100683C53 /* CHIPTestClustersObjc.h in Headers */,
 				2C1B027B2641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.h in Headers */,
 				B289D4212639C0D300D4E314 /* CHIPOnboardingPayloadParser.h in Headers */,
 				2CB7163F252F731E0026E2BB /* CHIPDevicePairingDelegate.h in Headers */,
@@ -481,6 +491,7 @@
 				1E85732426551A490050A4D9 /* attribute-list-byte-span.cpp in Sources */,
 				998F287126D56940001846C6 /* CHIPP256KeypairBridge.mm in Sources */,
 				1E85730E265519AE0050A4D9 /* CHIPClusters.cpp in Sources */,
+				1E16A90226B98AB700683C53 /* CHIPTestClustersObjc.mm in Sources */,
 				1E85732326551A490050A4D9 /* process-global-message.cpp in Sources */,
 				1E85732E26551A490050A4D9 /* ember-print.cpp in Sources */,
 				2C5EEEF7268A85C400CAE3D3 /* CHIPDeviceConnectionBridge.mm in Sources */,
@@ -497,6 +508,7 @@
 				1E85732526551A490050A4D9 /* message.cpp in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,
 				1E85732726551A490050A4D9 /* client-api.cpp in Sources */,
+				1E16A8FE26B9876900683C53 /* CHIPClusters.cpp in Sources */,
 				1E85730C265519AE0050A4D9 /* callback-stub.cpp in Sources */,
 				1E857310265519AE0050A4D9 /* IMClusterCommandHandler.cpp in Sources */,
 				1ED276E026C57CF000547A89 /* CHIPCallbackBridge.mm in Sources */,
