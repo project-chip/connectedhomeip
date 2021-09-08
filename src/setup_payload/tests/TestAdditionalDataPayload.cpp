@@ -24,6 +24,7 @@
 
 #include <nlunit-test.h>
 #include <stdio.h>
+#include <math.h>
 
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
@@ -78,22 +79,13 @@ CHIP_ERROR GenerateAdditionalDataPayload(nlTestSuite * inSuite, uint16_t lifetim
 }
 
 CHIP_ERROR ParseAdditionalDataPayload(const char * additionalDataPayload,
+                                      size_t additionalDataPayloadLength,
                                       chip::SetupPayloadData::AdditionalDataPayload & outPayload)
 {
-    std::vector<uint8_t> payloadData;
-    std::string payloadString(additionalDataPayload);
-
-    // Decode input payload
-    size_t len = payloadString.length();
-
-    for (size_t i = 0; i < len; i += 2)
-    {
-        auto str  = payloadString.substr(i, 2);
-        uint8_t x = (uint8_t) stoi(str, 0, 16);
-        payloadData.push_back(x);
-    }
-
-    return AdditionalDataPayloadParser(payloadData.data(), (uint32_t) payloadData.size()).populatePayload(outPayload);
+    size_t additionalDataPayloadBytesLength = static_cast<size_t>(ceil(additionalDataPayloadLength/2));
+    uint8_t additionalDataPayloadBytes[additionalDataPayloadBytesLength];
+    size_t bufferSize = chip::Encoding::HexToBytes(additionalDataPayload, additionalDataPayloadLength, additionalDataPayloadBytes, additionalDataPayloadBytesLength);
+    return AdditionalDataPayloadParser(additionalDataPayloadBytes, bufferSize).populatePayload(outPayload);
 }
 
 void TestGeneratingAdditionalDataPayloadWithRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
@@ -178,7 +170,9 @@ void TestGeneratingRotatingDeviceIdAsStringWithNullInputs(nlTestSuite * inSuite,
 void TestParsingAdditionalDataPayloadWithRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
 {
     chip::SetupPayloadData::AdditionalDataPayload resultPayload;
-    NL_TEST_ASSERT(inSuite, ParseAdditionalDataPayload(kAdditionalDataPayloadWithRotatingDeviceId, resultPayload) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, ParseAdditionalDataPayload(kAdditionalDataPayloadWithRotatingDeviceId,
+                                                       strlen(kAdditionalDataPayloadWithRotatingDeviceId),
+                                                       resultPayload) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(resultPayload.rotatingDeviceId.c_str(), kRotatingDeviceId) == 0);
 }
 
@@ -186,7 +180,9 @@ void TestParsingAdditionalDataPayloadWithoutRotatingDeviceId(nlTestSuite * inSui
 {
     chip::SetupPayloadData::AdditionalDataPayload resultPayload;
     NL_TEST_ASSERT(inSuite,
-                   ParseAdditionalDataPayload(kAdditionalDataPayloadWithoutRotatingDeviceId, resultPayload) == CHIP_NO_ERROR);
+                   ParseAdditionalDataPayload(kAdditionalDataPayloadWithoutRotatingDeviceId,
+                                              strlen(kAdditionalDataPayloadWithoutRotatingDeviceId),
+                                              resultPayload) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(resultPayload.rotatingDeviceId.c_str(), "") == 0);
 }
 
@@ -194,16 +190,18 @@ void TestParsingAdditionalDataPayloadWithInvalidRotatingDeviceIdLength(nlTestSui
 {
     chip::SetupPayloadData::AdditionalDataPayload resultPayload;
     NL_TEST_ASSERT(inSuite,
-                   ParseAdditionalDataPayload(kAdditionalDataPayloadWithInvalidRotatingDeviceIdLength, resultPayload) ==
-                       CHIP_ERROR_TLV_UNDERRUN);
+                   ParseAdditionalDataPayload(kAdditionalDataPayloadWithInvalidRotatingDeviceIdLength,
+                                              strlen(kAdditionalDataPayloadWithInvalidRotatingDeviceIdLength),
+                                              resultPayload) == CHIP_ERROR_TLV_UNDERRUN);
 }
 
 void TestParsingAdditionalDataPayloadWithLongRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
 {
     chip::SetupPayloadData::AdditionalDataPayload resultPayload;
     NL_TEST_ASSERT(inSuite,
-                   ParseAdditionalDataPayload(kAdditionalDataPayloadWithLongRotatingDeviceId, resultPayload) ==
-                       CHIP_ERROR_INVALID_STRING_LENGTH);
+                   ParseAdditionalDataPayload(kAdditionalDataPayloadWithLongRotatingDeviceId,
+                                              strlen(kAdditionalDataPayloadWithLongRotatingDeviceId),
+                                              resultPayload) == CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
 /**

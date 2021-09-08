@@ -20,28 +20,21 @@
 #include <setup_payload/AdditionalDataPayload.h>
 #include <setup_payload/AdditionalDataPayloadParser.h>
 #include <string>
+#include <math.h>
 
 using namespace ::chip;
 using namespace ::chip::SetupPayloadData;
 
 CHIP_ERROR AdditionalDataParseCommand::Run()
 {
-    std::vector<uint8_t> payloadData;
     AdditionalDataPayload resultPayload;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    std::string payloadString(mPayload);
 
-    // Decode input payload
-    size_t len = payloadString.length();
+    size_t additionalDataPayloadBytesLength = static_cast<size_t>(ceil(strlen(mPayload)/2));
+    uint8_t additionalDataPayloadBytes[additionalDataPayloadBytesLength];
+    size_t bufferSize = chip::Encoding::HexToBytes(mPayload, strlen(mPayload), additionalDataPayloadBytes, additionalDataPayloadBytesLength);
 
-    for (size_t i = 0; i < len; i += 2)
-    {
-        auto str  = payloadString.substr(i, 2);
-        uint8_t x = (uint8_t) stoi(str, 0, 16);
-        payloadData.push_back(x);
-    }
-
-    err = AdditionalDataPayloadParser(payloadData.data(), (uint32_t) payloadData.size()).populatePayload(resultPayload);
+    err = AdditionalDataPayloadParser(additionalDataPayloadBytes, bufferSize).populatePayload(resultPayload);
     SuccessOrExit(err);
 
     ChipLogProgress(chipTool, "AdditionalDataParseCommand, RotatingDeviceId=%s", resultPayload.rotatingDeviceId.c_str());
