@@ -62,17 +62,17 @@ class TelinkBuilder(Builder):
     def generate(self):
 
         if not os.path.exists(self.output_dir):
+            cmd = 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"'
 
             if not self._runner.dry_run:
 
                 # Zephyr base
-                if 'TELINK_ZEPHYR_BASE' in os.environ:
-                    cmd = 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"'
-                else if 'ZEPHYR_BASE' not in os.environ:
+                if 'TELINK_ZEPHYR_BASE' not in os.environ:
+                    # TODO: remove once variable in all images
+                    cmd = ''
+                elif 'ZEPHYR_BASE' not in os.environ:
                     raise Exception(
                         "Telink builds require TELINK_ZEPHYR_BASE or ZEPHYR_BASE to be set")
-                else:
-                    cmd =''
 
             # TODO: TELINK_ZEPHYR_SDK_DIR should be used for compilation and
             # NOT hardcoding of zephyr-sdk-0.13.0
