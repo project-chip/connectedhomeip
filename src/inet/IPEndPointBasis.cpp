@@ -658,7 +658,7 @@ done:
     return (lPacketInfo);
 }
 
-CHIP_ERROR IPEndPointBasis::PostPacketBufferEvent(chip::System::Layer * aLayer, System::Object & aTarget,
+CHIP_ERROR IPEndPointBasis::PostPacketBufferEvent(chip::System::LayerLwIP * aLayer, System::Object & aTarget,
                                                   System::EventType aEventType, System::PacketBufferHandle && aBuffer)
 {
     VerifyOrReturnError(aLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -943,7 +943,7 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
         mSocket = ::socket(family, aType, aProtocol);
         if (mSocket == -1)
             return chip::System::MapErrorPOSIX(errno);
-        ReturnErrorOnFailure(Layer().SystemLayer()->StartWatchingSocket(mSocket, &mWatch));
+        ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->StartWatchingSocket(mSocket, &mWatch));
 
         mAddrType = aAddressType;
 

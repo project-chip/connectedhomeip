@@ -39,6 +39,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <system/SystemLayerImpl.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
@@ -55,7 +56,7 @@ static const uint32_t kLivenessChangeEvent      = 1;
 static const chip::EndpointId kTestEndpointId   = 2;
 static const uint64_t kLivenessDeviceStatus     = chip::TLV::ContextTag(1);
 static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-static chip::System::Layer gSystemLayer;
+static chip::System::LayerImpl gSystemLayer;
 
 static uint8_t gDebugEventBuffer[128];
 static uint8_t gInfoEventBuffer[128];

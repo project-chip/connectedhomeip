@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements WatchableEventManager using select().
+ *      This file implements Layer using select().
  */
 
 #include <lib/support/CodeUtils.h>
@@ -26,7 +26,7 @@
 #include <platform/LockTracker.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
-#include <system/WatchableEventManager.h>
+#include <system/SystemLayerImplSelect.h>
 
 #include <errno.h>
 
@@ -51,11 +51,11 @@ void HandleMdnsTimeout();
 namespace chip {
 namespace System {
 
-CHIP_ERROR WatchableEventManager::Init(Layer & systemLayer)
+CHIP_ERROR LayerImplSelect::Init()
 {
-    RegisterPOSIXErrorFormatter();
+    VerifyOrReturnError(!mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    mSystemLayer = &systemLayer;
+    RegisterPOSIXErrorFormatter();
 
     ReturnErrorOnFailure(mTimerList.Init());
 
@@ -69,11 +69,16 @@ CHIP_ERROR WatchableEventManager::Init(Layer & systemLayer)
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
-    return mWakeEvent.Open(systemLayer);
+    ReturnErrorOnFailure(mWakeEvent.Open(*this));
+
+    VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::Shutdown()
+CHIP_ERROR LayerImplSelect::Shutdown()
 {
+    VerifyOrReturnError(mLayerState.Shutdown(), CHIP_ERROR_INCORRECT_STATE);
+
     Timer * timer;
     while ((timer = mTimerList.PopEarliest()) != nullptr)
     {
@@ -89,12 +94,12 @@ CHIP_ERROR WatchableEventManager::Shutdown()
 
         timer->Release();
     }
-    mWakeEvent.Close(*mSystemLayer);
-    mSystemLayer = nullptr;
+    mWakeEvent.Close(*this);
+    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }
 
-void WatchableEventManager::Signal()
+void LayerImplSelect::Signal()
 {
     /*
      * Wake up the I/O thread by writing a single byte to the wake pipe.
@@ -120,13 +125,15 @@ void WatchableEventManager::Signal()
     }
 }
 
-CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplSelect::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
 {
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delayMilliseconds = 0);
 
     CancelTimer(onComplete, appState);
 
-    Timer * timer = Timer::New(*mSystemLayer, delayMilliseconds, onComplete, appState);
+    Timer * timer = Timer::New(*this, delayMilliseconds, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -161,8 +168,10 @@ CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, TimerCo
     return CHIP_NO_ERROR;
 }
 
-void WatchableEventManager::CancelTimer(TimerCompleteCallback onComplete, void * appState)
+void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
+    VerifyOrReturn(mLayerState.IsInitialized());
+
     Timer * timer = mTimerList.Remove(onComplete, appState);
     VerifyOrReturn(timer != nullptr);
 
@@ -180,11 +189,13 @@ void WatchableEventManager::CancelTimer(TimerCompleteCallback onComplete, void *
     Signal();
 }
 
-CHIP_ERROR WatchableEventManager::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     CancelTimer(onComplete, appState);
 
-    Timer * timer = Timer::New(*mSystemLayer, 0, onComplete, appState);
+    Timer * timer = Timer::New(*this, 0, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -207,7 +218,7 @@ CHIP_ERROR WatchableEventManager::ScheduleWork(TimerCompleteCallback onComplete,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)
+CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)
 {
     // Find a free slot.
     SocketWatch * watch = nullptr;
@@ -231,7 +242,7 @@ CHIP_ERROR WatchableEventManager::StartWatchingSocket(int fd, SocketWatchToken *
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data)
+CHIP_ERROR LayerImplSelect::SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -241,7 +252,7 @@ CHIP_ERROR WatchableEventManager::SetCallback(SocketWatchToken token, SocketWatc
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::RequestCallbackOnPendingRead(SocketWatchToken token)
+CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingRead(SocketWatchToken token)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -250,7 +261,7 @@ CHIP_ERROR WatchableEventManager::RequestCallbackOnPendingRead(SocketWatchToken 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::RequestCallbackOnPendingWrite(SocketWatchToken token)
+CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingWrite(SocketWatchToken token)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -259,7 +270,7 @@ CHIP_ERROR WatchableEventManager::RequestCallbackOnPendingWrite(SocketWatchToken
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::ClearCallbackOnPendingRead(SocketWatchToken token)
+CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingRead(SocketWatchToken token)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -267,7 +278,7 @@ CHIP_ERROR WatchableEventManager::ClearCallbackOnPendingRead(SocketWatchToken to
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::ClearCallbackOnPendingWrite(SocketWatchToken token)
+CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingWrite(SocketWatchToken token)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -275,7 +286,7 @@ CHIP_ERROR WatchableEventManager::ClearCallbackOnPendingWrite(SocketWatchToken t
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::StopWatchingSocket(SocketWatchToken * tokenInOut)
+CHIP_ERROR LayerImplSelect::StopWatchingSocket(SocketWatchToken * tokenInOut)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(*tokenInOut);
     *tokenInOut         = InvalidSocketWatchToken();
@@ -303,8 +314,8 @@ CHIP_ERROR WatchableEventManager::StopWatchingSocket(SocketWatchToken * tokenInO
  *
  *  @param[in]    exceptfds  A pointer to the set of file descriptors with errors.
  */
-SocketEvents WatchableEventManager::SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds,
-                                                        const fd_set & exceptfds)
+SocketEvents LayerImplSelect::SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds,
+                                                  const fd_set & exceptfds)
 {
     SocketEvents res;
 
@@ -322,7 +333,7 @@ SocketEvents WatchableEventManager::SocketEventsFromFDs(int socket, const fd_set
     return res;
 }
 
-void WatchableEventManager::PrepareEvents()
+void LayerImplSelect::PrepareEvents()
 {
     assertChipStackLockedByCurrentThread();
 
@@ -368,12 +379,12 @@ void WatchableEventManager::PrepareEvents()
     }
 }
 
-void WatchableEventManager::WaitForEvents()
+void LayerImplSelect::WaitForEvents()
 {
     mSelectResult = select(mMaxFd + 1, &mSelected.mReadSet, &mSelected.mWriteSet, &mSelected.mErrorSet, &mNextTimeout);
 }
 
-void WatchableEventManager::HandleEvents()
+void LayerImplSelect::HandleEvents()
 {
     assertChipStackLockedByCurrentThread();
 
@@ -382,8 +393,6 @@ void WatchableEventManager::HandleEvents()
         ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
         return;
     }
-
-    VerifyOrDie(mSystemLayer != nullptr);
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = pthread_self();
@@ -420,14 +429,14 @@ void WatchableEventManager::HandleEvents()
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-void WatchableEventManager::HandleTimerComplete(Timer * timer)
+void LayerImplSelect::HandleTimerComplete(Timer * timer)
 {
     mTimerList.Remove(timer);
     timer->HandleComplete();
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
-void WatchableEventManager::SocketWatch::Clear()
+void LayerImplSelect::SocketWatch::Clear()
 {
     mFD = kInvalidFd;
     mPendingIO.ClearAll();

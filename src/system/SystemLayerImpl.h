@@ -1,8 +1,7 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
- *    All rights reserved.
+ *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,22 +15,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/internal/BLEManager.h>
-#include <system/SystemLayerImpl.h>
+/**
+ * This file includes a specific configured concrete implementation of System::Layer.
+ */
 
-namespace chip {
-namespace DeviceLayer {
+#pragma once
 
-chip::System::LayerImpl SystemLayer;
-chip::Inet::InetLayer InetLayer;
+#include <system/SystemLayer.h>
 
-namespace Internal {
-
-const char * const TAG = "CHIP[DL]";
-
-} // namespace Internal
-} // namespace DeviceLayer
-} // namespace chip
+#ifdef CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE
+#include CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE
+#else // CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE
+#include <system/SystemLayerImplSelect.h>
+#endif // CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE
+#undef INCLUDING_CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE
