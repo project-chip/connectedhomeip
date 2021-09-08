@@ -88,10 +88,11 @@ static uint32_t chunk3PayloadRepresentation(const SetupPayload & payload)
 }
 
 // TODO: issue #3663 - Unbounded stack in src/setup_payload
-#if !defined(__clang__)
 #pragma GCC diagnostic push
+#if !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wstack-usage="
 #endif
+#pragma GCC diagnostic ignored "-Wvla"
 
 static std::string decimalStringWithPadding(uint32_t number, int minLength)
 {
@@ -100,9 +101,7 @@ static std::string decimalStringWithPadding(uint32_t number, int minLength)
     return std::string(buf);
 }
 
-#if !defined(__clang__)
 #pragma GCC diagnostic pop
-#endif
 
 CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::string & outDecimalString)
 {

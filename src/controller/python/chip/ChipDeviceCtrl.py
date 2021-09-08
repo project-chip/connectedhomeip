@@ -213,7 +213,7 @@ class ChipDeviceController(object):
 
     def CommissioningComplete(self, nodeid):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_CommissioiningComplete(
+            lambda: self._dmLib.pychip_DeviceController_CommissioningComplete(
                 self.devCtrl, nodeid)
         )
 

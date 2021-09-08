@@ -95,7 +95,6 @@ private:
     std::chrono::steady_clock::time_point mEarliestTimeout;
 
     AvahiPoll mAvahiPoller;
-    System::WatchableEventManager * mWatchableEvents;
 };
 
 class MdnsAvahi

@@ -17,14 +17,14 @@
 
 /**
  *    @file
- *      This file implements WatchableEventManager using libevent.
+ *      This file implements System::Layer using libevent.
  */
 
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
-#include <system/WatchableEventManager.h>
+#include <system/SystemLayerImplLibevent.h>
 
 #include <algorithm>
 #include <fcntl.h>
@@ -53,8 +53,10 @@ System::SocketEvents SocketEventsFromLibeventFlags(short eventFlags)
 
 } // anonymous namespace
 
-CHIP_ERROR WatchableEventManager::Init(System::Layer & systemLayer)
+CHIP_ERROR LayerImplLibevent::Init(System::Layer & systemLayer)
 {
+    VerifyOrReturnError(!mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     RegisterPOSIXErrorFormatter();
 
 #if CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
@@ -81,18 +83,19 @@ CHIP_ERROR WatchableEventManager::Init(System::Layer & systemLayer)
 
     Mutex::Init(mTimerListMutex);
 
+    VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
 // static
-void WatchableEventManager::MdnsTimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
+void LayerImplLibevent::MdnsTimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
 {
-    reinterpret_cast<WatchableEventManager *>(data)->MdnsTimeoutCallbackHandler();
+    reinterpret_cast<LayerImplLibevent *>(data)->MdnsTimeoutCallbackHandler();
 }
 
-void WatchableEventManager::MdnsTimeoutCallbackHandler()
+void LayerImplLibevent::MdnsTimeoutCallbackHandler()
 {
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = pthread_self();
@@ -106,8 +109,10 @@ void WatchableEventManager::MdnsTimeoutCallbackHandler()
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
-CHIP_ERROR WatchableEventManager::Shutdown()
+CHIP_ERROR LayerImplLibevent::Shutdown()
 {
+    VerifyOrReturnError(mLayerState.Shutdown(), CHIP_ERROR_INCORRECT_STATE);
+
     event_base_loopbreak(mEventBase);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
@@ -128,10 +133,11 @@ CHIP_ERROR WatchableEventManager::Shutdown()
     mEventBase   = nullptr;
     mSystemLayer = nullptr;
 
+    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }
 
-void WatchableEventManager::Signal()
+void LayerImplLibevent::Signal()
 {
     /*
      * Wake up the I/O thread by writing a single byte to the wake pipe.
@@ -157,8 +163,10 @@ void WatchableEventManager::Signal()
     }
 }
 
-CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplLibevent::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
 {
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     std::lock_guard<Mutex> lock(mTimerListMutex);
     mTimers.push_back(std::make_unique<LibeventTimer>(this, onComplete, appState));
     LibeventTimer * timer = mTimers.back().get();
@@ -180,8 +188,10 @@ CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, TimerCo
     return CHIP_NO_ERROR;
 }
 
-void WatchableEventManager::CancelTimer(TimerCompleteCallback onComplete, void * appState)
+void LayerImplLibevent::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     std::lock_guard<Mutex> lock(mTimerListMutex);
     auto it = std::find_if(mTimers.begin(), mTimers.end(), [onComplete, appState](const std::unique_ptr<LibeventTimer> & timer) {
         return timer->mOnComplete == onComplete && timer->mCallbackData == appState;
@@ -194,8 +204,16 @@ void WatchableEventManager::CancelTimer(TimerCompleteCallback onComplete, void *
     }
 }
 
+CHIP_ERROR LayerImplLibevent::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
+{
+    assertChipStackLockedByCurrentThread();
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+    return StartTimer(0, onComplete, appState);
+}
+
 // static
-void WatchableEventManager::TimerCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
+void LayerImplLibevent::TimerCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
 {
     // Copy the necessary timer information and remove it from the list.
     LibeventTimer * timer            = reinterpret_cast<LibeventTimer *>(data);
@@ -209,7 +227,7 @@ void WatchableEventManager::TimerCallbackHandler(evutil_socket_t fd, short event
     }
 }
 
-WatchableEventManager::LibeventTimer::~LibeventTimer()
+LayerImplLibevent::LibeventTimer::~LibeventTimer()
 {
     mEventManager = nullptr;
     mOnComplete   = nullptr;
@@ -225,7 +243,7 @@ WatchableEventManager::LibeventTimer::~LibeventTimer()
     }
 };
 
-CHIP_ERROR WatchableEventManager::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)
+CHIP_ERROR LayerImplLibevent::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)
 {
     mSocketWatches.push_back(std::make_unique<SocketWatch>(this, fd));
     SocketWatch * watch = mSocketWatches.back().get();
@@ -239,7 +257,7 @@ CHIP_ERROR WatchableEventManager::StartWatchingSocket(int fd, SocketWatchToken *
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data)
+CHIP_ERROR LayerImplLibevent::SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -249,27 +267,27 @@ CHIP_ERROR WatchableEventManager::SetCallback(SocketWatchToken token, SocketWatc
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::RequestCallbackOnPendingRead(SocketWatchToken token)
+CHIP_ERROR LayerImplLibevent::RequestCallbackOnPendingRead(SocketWatchToken token)
 {
     return SetWatch(token, EV_READ);
 }
 
-CHIP_ERROR WatchableEventManager::RequestCallbackOnPendingWrite(SocketWatchToken token)
+CHIP_ERROR LayerImplLibevent::RequestCallbackOnPendingWrite(SocketWatchToken token)
 {
     return SetWatch(token, EV_WRITE);
 }
 
-CHIP_ERROR WatchableEventManager::ClearCallbackOnPendingRead(SocketWatchToken token)
+CHIP_ERROR LayerImplLibevent::ClearCallbackOnPendingRead(SocketWatchToken token)
 {
     return ClearWatch(token, EV_READ);
 }
 
-CHIP_ERROR WatchableEventManager::ClearCallbackOnPendingWrite(SocketWatchToken token)
+CHIP_ERROR LayerImplLibevent::ClearCallbackOnPendingWrite(SocketWatchToken token)
 {
     return ClearWatch(token, EV_WRITE);
 }
 
-CHIP_ERROR WatchableEventManager::StopWatchingSocket(SocketWatchToken * tokenInOut)
+CHIP_ERROR LayerImplLibevent::StopWatchingSocket(SocketWatchToken * tokenInOut)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(*tokenInOut);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -285,7 +303,7 @@ SocketWatchToken InvalidSocketWatchToken()
     return reinterpret_cast<SocketWatchToken>(nullptr);
 }
 
-CHIP_ERROR WatchableEventManager::SetWatch(SocketWatchToken token, short eventFlags)
+CHIP_ERROR LayerImplLibevent::SetWatch(SocketWatchToken token, short eventFlags)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -294,7 +312,7 @@ CHIP_ERROR WatchableEventManager::SetWatch(SocketWatchToken token, short eventFl
     return UpdateWatch(watch, static_cast<short>(EV_PERSIST | oldFlags | eventFlags));
 }
 
-CHIP_ERROR WatchableEventManager::ClearWatch(SocketWatchToken token, short eventFlags)
+CHIP_ERROR LayerImplLibevent::ClearWatch(SocketWatchToken token, short eventFlags)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -303,7 +321,7 @@ CHIP_ERROR WatchableEventManager::ClearWatch(SocketWatchToken token, short event
     return UpdateWatch(watch, static_cast<short>(EV_PERSIST | (oldFlags & ~eventFlags)));
 }
 
-CHIP_ERROR WatchableEventManager::UpdateWatch(SocketWatch * watch, short eventFlags)
+CHIP_ERROR LayerImplLibevent::UpdateWatch(SocketWatch * watch, short eventFlags)
 {
     if (watch->mEvent != nullptr)
     {
@@ -339,7 +357,7 @@ CHIP_ERROR WatchableEventManager::UpdateWatch(SocketWatch * watch, short eventFl
 }
 
 // static
-void WatchableEventManager::SocketCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
+void LayerImplLibevent::SocketCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
 {
     SocketWatch * const watch = reinterpret_cast<SocketWatch *>(data);
     VerifyOrDie(watch != nullptr);
@@ -349,7 +367,7 @@ void WatchableEventManager::SocketCallbackHandler(evutil_socket_t fd, short even
     watch->mEventManager->mActiveSocketWatches.push_back(watch);
 }
 
-WatchableEventManager::SocketWatch::~SocketWatch()
+LayerImplLibevent::SocketWatch::~SocketWatch()
 {
     mEventManager = nullptr;
     mFD           = kInvalidFd;
@@ -366,7 +384,7 @@ WatchableEventManager::SocketWatch::~SocketWatch()
     }
 }
 
-void WatchableEventManager::PrepareEvents()
+void LayerImplLibevent::PrepareEvents()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
     timeval mdnsTimeout = { 0, 0 };
@@ -378,13 +396,13 @@ void WatchableEventManager::PrepareEvents()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 }
 
-void WatchableEventManager::WaitForEvents()
+void LayerImplLibevent::WaitForEvents()
 {
     VerifyOrDie(mEventBase != nullptr);
     event_base_loop(mEventBase, EVLOOP_ONCE);
 }
 
-void WatchableEventManager::HandleEvents()
+void LayerImplLibevent::HandleEvents()
 {
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = pthread_self();

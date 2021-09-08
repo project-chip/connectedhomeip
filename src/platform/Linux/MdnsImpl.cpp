@@ -150,7 +150,6 @@ Poller::Poller()
     mAvahiPoller.timeout_free   = TimeoutFree;
 
     mEarliestTimeout = std::chrono::steady_clock::time_point();
-    mWatchableEvents = &DeviceLayer::SystemLayer.WatchableEventsManager();
 }
 
 AvahiWatch * Poller::WatchNew(const struct AvahiPoll * poller, int fd, AvahiWatchEvent event, AvahiWatchCallback callback,

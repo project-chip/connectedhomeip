@@ -353,7 +353,11 @@ void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttribu
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+    {{! TODO: This VLA is not OK.  See https://github.com/project-chip/connectedhomeip/issues/8558 }}
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     {{chipType}} data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         {{#if isStruct}}
