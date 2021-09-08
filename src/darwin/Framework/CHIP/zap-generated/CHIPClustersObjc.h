@@ -1026,7 +1026,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDefaultOtaProviderWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeDefaultOtaProviderWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeUpdatePossibleWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

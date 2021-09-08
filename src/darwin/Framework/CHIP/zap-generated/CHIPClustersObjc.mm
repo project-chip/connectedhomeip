@@ -2882,6 +2882,55 @@ using chip::Callback::Cancelable;
 
 @end
 
+@implementation CHIPOtaSoftwareUpdateRequestor
+
+- (chip::Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)announceOtaProvider:(NSData *)serverLocation
+                   vendorId:(uint16_t)vendorId
+         announcementReason:(uint8_t)announcementReason
+            metadataForNode:(NSData *)metadataForNode
+            responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.AnnounceOtaProvider(
+            success, failure, [self asSpan:serverLocation], vendorId, announcementReason, [self asSpan:metadataForNode]);
+    });
+}
+
+- (void)readAttributeDefaultOtaProviderWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeDefaultOtaProvider(success, failure);
+    });
+}
+
+- (void)writeAttributeDefaultOtaProviderWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeDefaultOtaProvider(success, failure, [self asSpan:value]);
+    });
+}
+
+- (void)readAttributeUpdatePossibleWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeUpdatePossible(success, failure);
+    });
+}
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+    });
+}
+
+@end
+
 @implementation CHIPOccupancySensing
 
 - (chip::Controller::ClusterBase *)getCluster
