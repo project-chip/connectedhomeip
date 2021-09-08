@@ -62,7 +62,7 @@ class TelinkBuilder(Builder):
     def generate(self):
 
         if not os.path.exists(self.output_dir):
-            cmd = 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"'
+            cmd = 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"\n'
 
             if not self._runner.dry_run:
 
