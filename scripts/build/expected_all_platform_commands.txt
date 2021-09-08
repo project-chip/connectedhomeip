@@ -126,9 +126,10 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 gn gen --check --fail-on-unused-args --root=/TEST/BUILD/ROOT/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' /OUTPUT/DIR/infineon-p6board-lock
 
 # Generating telink-tlsr9518adk80d-light
-bash -c 'source "$TELINK_ZEPHYR_BASE/zephyr-env.sh";
-export ZEPHYR_TOOLCHAIN_VARIANT=cross-compile;
-export CROSS_COMPILE=$TELINK_TOOLCHAIN_PATH/riscv32-elf-;
+bash -c 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_BASE/../../zephyr-sdk-0.13.0"
+source "$ZEPHYR_BASE/zephyr-env.sh";
 west build -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {root}/examples/lighting-app/telink'
 
 # Building {real_platform}-native-all_clusters
