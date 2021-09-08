@@ -47,7 +47,3 @@ tests:
       response:
           constraints:
               notValue: 6
-
-
-
-
