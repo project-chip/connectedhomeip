@@ -191,7 +191,6 @@ CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext *
 
     apExchangeContext = nullptr;
 
-
     // Todo: Fix the below check after the above status report is implemented.
     if (nullptr != apExchangeContext)
     {
