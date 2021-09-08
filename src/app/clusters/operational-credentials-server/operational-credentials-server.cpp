@@ -90,7 +90,7 @@ EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nod
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    EmberAfFabricDescriptor * fabricDescriptor = chip::Platform::New<EmberAfFabricDescriptor>();
+    FabricDescriptor * fabricDescriptor = chip::Platform::New<FabricDescriptor>();
     VerifyOrReturnError(fabricDescriptor != nullptr, EMBER_ZCL_STATUS_FAILURE);
 
     fabricDescriptor->FabricIndex   = fabricIndex;
