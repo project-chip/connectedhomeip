@@ -10105,6 +10105,304 @@ private:
     }
 };
 
+class TestConstraints : public TestCommand
+{
+public:
+    TestConstraints() : TestCommand("TestConstraints"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "TestConstraints: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterTestClusterCommandWriteAttribute_0();
+            break;
+        case 1:
+            err = TestSendClusterTestClusterCommandReadAttribute_1();
+            break;
+        case 2:
+            err = TestSendClusterTestClusterCommandReadAttribute_2();
+            break;
+        case 3:
+            err = TestSendClusterTestClusterCommandReadAttribute_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "TestConstraints: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    //
+    // Tests methods
+    //
+
+    // Test Write attribute INT32U Value
+    using SuccessCallback_0 = void (*)(void * context, uint32_t int32u);
+    chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{
+        OnTestSendClusterTestClusterCommandWriteAttribute_0_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
+        OnTestSendClusterTestClusterCommandWriteAttribute_0_FailureResponse, this
+    };
+    bool mIsFailureExpected_0 = 0;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute INT32U Value: Sending command...");
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint32_t int32uArgument = 5UL;
+        err = cluster.WriteAttributeInt32u(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel(), int32uArgument);
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandWriteAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute INT32U Value: Failure Response");
+
+        TestConstraints * runner = reinterpret_cast<TestConstraints *>(context);
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandWriteAttribute_0_SuccessResponse(void * context, uint32_t int32u)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute INT32U Value: Success Response");
+
+        TestConstraints * runner = reinterpret_cast<TestConstraints *>(context);
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute INT32U Value MinValue Constraints
+    using SuccessCallback_1 = void (*)(void * context, uint32_t int32u);
+    chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{
+        OnTestSendClusterTestClusterCommandReadAttribute_1_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
+        OnTestSendClusterTestClusterCommandReadAttribute_1_FailureResponse, this
+    };
+    bool mIsFailureExpected_1 = 0;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_1()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value MinValue Constraints: Sending command...");
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeInt32u(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value MinValue Constraints: Failure Response");
+
+        TestConstraints * runner = reinterpret_cast<TestConstraints *>(context);
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_1_SuccessResponse(void * context, uint32_t int32u)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value MinValue Constraints: Success Response");
+
+        TestConstraints * runner = reinterpret_cast<TestConstraints *>(context);
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (int32u < 5)
+        {
+            ChipLogError(chipTool, "Error: int32u is lower than expected. Min value is 5 but got '%d'", int32u);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute INT32U Value MaxValue Constraints
+    using SuccessCallback_2 = void (*)(void * context, uint32_t int32u);
+    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
+        OnTestSendClusterTestClusterCommandReadAttribute_2_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
+        OnTestSendClusterTestClusterCommandReadAttribute_2_FailureResponse, this
+    };
+    bool mIsFailureExpected_2 = 0;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_2()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value MaxValue Constraints: Sending command...");
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeInt32u(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value MaxValue Constraints: Failure Response");
+
+        TestConstraints * runner = reinterpret_cast<TestConstraints *>(context);
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_2_SuccessResponse(void * context, uint32_t int32u)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value MaxValue Constraints: Success Response");
+
+        TestConstraints * runner = reinterpret_cast<TestConstraints *>(context);
+
+        if (runner->mIsFailureExpected_2 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (int32u > 4)
+        {
+            ChipLogError(chipTool, "Error: int32u is higher than expected. Max value is 4 but got '%d'", int32u);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute INT32U Value NotValue Constraints
+    using SuccessCallback_3 = void (*)(void * context, uint32_t int32u);
+    chip::Callback::Callback<SuccessCallback_3> mOnSuccessCallback_3{
+        OnTestSendClusterTestClusterCommandReadAttribute_3_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
+        OnTestSendClusterTestClusterCommandReadAttribute_3_FailureResponse, this
+    };
+    bool mIsFailureExpected_3 = 0;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandReadAttribute_3()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value NotValue Constraints: Sending command...");
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeInt32u(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_3_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value NotValue Constraints: Failure Response");
+
+        TestConstraints * runner = reinterpret_cast<TestConstraints *>(context);
+
+        if (runner->mIsFailureExpected_3 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandReadAttribute_3_SuccessResponse(void * context, uint32_t int32u)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value NotValue Constraints: Success Response");
+
+        TestConstraints * runner = reinterpret_cast<TestConstraints *>(context);
+
+        if (runner->mIsFailureExpected_3 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (int32u == 6)
+        {
+            ChipLogError(chipTool, "Error: int32u is equal to an unexpected value. Not value is 6 but got '%d'", int32u);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
 class TestDelayCommands : public TestCommand
 {
 public:
@@ -19656,6 +19954,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TV_LowPowerCluster>(),
         make_unique<TV_MediaInputCluster>(),
         make_unique<TestCluster>(),
+        make_unique<TestConstraints>(),
         make_unique<TestDelayCommands>(),
         make_unique<Test_TC_OO_1_1>(),
         make_unique<Test_TC_OO_2_1>(),
