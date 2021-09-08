@@ -19786,6 +19786,9 @@ public:
         case 1:
             err = TestSendClusterOperationalCredentialsCommandReadAttribute_1();
             break;
+        case 2:
+            err = TestSendClusterOperationalCredentialsCommandRemoveFabric_2();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -19797,7 +19800,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 3;
 
     //
     // Tests methods
@@ -19929,6 +19932,65 @@ private:
         {
             ChipLogError(chipTool, "Error: commissionedFabrics is lower than expected. Min value is 1 but got '%d'",
                          commissionedFabrics);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Remove fabric
+    using SuccessCallback_2 = void (*)(void * context, uint8_t statusCode, uint8_t fabricIndex, chip::ByteSpan debugText);
+    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
+        OnTestSendClusterOperationalCredentialsCommandRemoveFabric_2_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
+        OnTestSendClusterOperationalCredentialsCommandRemoveFabric_2_FailureResponse, this
+    };
+    bool mIsFailureExpected_2 = 0;
+
+    CHIP_ERROR TestSendClusterOperationalCredentialsCommandRemoveFabric_2()
+    {
+        ChipLogProgress(chipTool, "Operational Credentials - Remove fabric: Sending command...");
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t fabricIndexArgument = 1;
+        err = cluster.RemoveFabric(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(), fabricIndexArgument);
+
+        return err;
+    }
+
+    static void OnTestSendClusterOperationalCredentialsCommandRemoveFabric_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Operational Credentials - Remove fabric: Failure Response");
+
+        OperationalCredentialsCluster * runner = reinterpret_cast<OperationalCredentialsCluster *>(context);
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterOperationalCredentialsCommandRemoveFabric_2_SuccessResponse(void * context, uint8_t statusCode,
+                                                                                             uint8_t fabricIndex,
+                                                                                             chip::ByteSpan debugText)
+    {
+        ChipLogProgress(chipTool, "Operational Credentials - Remove fabric: Success Response");
+
+        OperationalCredentialsCluster * runner = reinterpret_cast<OperationalCredentialsCluster *>(context);
+
+        if (runner->mIsFailureExpected_2 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }

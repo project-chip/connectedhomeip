@@ -238,6 +238,30 @@ void emberAfPluginOperationalCredentialsServerInitCallback(void)
     writeFabricsIntoFabricsListAttribute();
 }
 
+namespace {
+class OpCredsClusterExchangeDelegate : public Messaging::ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+    void OnExchangeClosing(Messaging::ExchangeContext * ec) override
+    {
+        ec->GetExchangeMgr()->GetReliableMessageMgr()->ClearRetransTable(static_cast<Messaging::ReliableMessageContext *>(ec));
+        ec->GetExchangeMgr()->GetSessionMgr()->ExpireAllPairingsForFabric(mFabricIndex);
+        mFabricIndex = 0;
+    }
+
+    FabricIndex mFabricIndex = 0;
+};
+
+OpCredsClusterExchangeDelegate gFabricCleanupExchangeDelegate;
+
+} // namespace
+
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoint, app::CommandHandler * commandObj,
                                                               FabricIndex fabricIndex)
 {
@@ -250,6 +274,8 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoin
 exit:
     writeFabricsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
+    gFabricCleanupExchangeDelegate.mFabricIndex = fabricIndex;
+    emberAfCurrentCommand()->source->SetDelegate(&gFabricCleanupExchangeDelegate);
     return true;
 }
 

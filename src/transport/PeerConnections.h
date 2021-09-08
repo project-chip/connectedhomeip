@@ -316,6 +316,40 @@ public:
         return state;
     }
 
+    /**
+     * Get a peer connection state that matches the given fabric index.
+     *
+     * @param fabric The fabric index to match
+     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
+     *
+     * @return the state found, nullptr if not found
+     */
+    CHECK_RETURN_VALUE
+    PeerConnectionState * FindPeerConnectionStateByFabric(FabricIndex fabric, PeerConnectionState * begin)
+    {
+        PeerConnectionState * state = nullptr;
+        PeerConnectionState * iter  = &mStates[0];
+
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
+        {
+            iter = begin + 1;
+        }
+
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
+        {
+            if (!iter->IsInitialized())
+            {
+                continue;
+            }
+            if (iter->GetFabricIndex() == fabric)
+            {
+                state = iter;
+                break;
+            }
+        }
+        return state;
+    }
+
     /// Convenience method to mark a peer connection state as active
     void MarkConnectionActive(PeerConnectionState * state)
     {

@@ -357,7 +357,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     }
 
     const ExchangeMessageDispatch * dispatcher = rc->GetExchangeContext()->GetMessageDispatch();
-    if (dispatcher == nullptr)
+    if (dispatcher == nullptr || !rc->GetExchangeContext()->HasSecureSession())
     {
         // Using same error message for all errors to reduce code size.
         ChipLogError(ExchangeManager, "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
