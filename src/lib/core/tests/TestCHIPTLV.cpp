@@ -30,7 +30,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVData.hpp>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVText.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 
 #include <lib/support/CHIPMem.h>
@@ -1377,28 +1377,6 @@ void CheckSimpleWriteRead(nlTestSuite * inSuite, void * inContext)
 }
 
 /**
- *  Log the specified message in the form of @a aFormat.
- *
- *  @param[in]     aFormat   A pointer to a NULL-terminated C string with
- *                           C Standard Library-style format specifiers
- *                           containing the log message to be formatted and
- *                           logged.
- *  @param[in]     ...       An argument list whose elements should correspond
- *                           to the format specifiers in @a aFormat.
- *
- */
-void SimpleDumpWriter(const char * aFormat, ...)
-{
-    va_list args;
-
-    va_start(args, aFormat);
-
-    vprintf(aFormat, args);
-
-    va_end(args);
-}
-
-/**
  *  Test Pretty Printer
  */
 void CheckPrettyPrinter(nlTestSuite * inSuite, void * inContext)
@@ -1419,7 +1397,7 @@ void CheckPrettyPrinter(nlTestSuite * inSuite, void * inContext)
 
     reader.Init(buf, encodedLen);
     reader.ImplicitProfileId = TestProfile_2;
-    chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
+    chip::TLV::Debug::Print(reader);
 }
 
 /**

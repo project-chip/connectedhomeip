@@ -97,6 +97,8 @@ static_library("core") {
     "CHIPTLVDebug.cpp",
     "CHIPTLVReader.cpp",
     "CHIPTLVTags.h",
+    "CHIPTLVText.cpp",
+    "CHIPTLVText.hpp",
     "CHIPTLVTypes.h",
     "CHIPTLVUpdater.cpp",
     "CHIPTLVUtilities.cpp",
