@@ -90,6 +90,10 @@ public:
 
     virtual ~PASESession();
 
+    // TODO: The SetPeerNodeId method should not be exposed; we should not need
+    // to associate a node ID with a PASE session.
+    using PairingSession::SetPeerNodeId;
+
     /**
      * @brief
      *   Initialize using setup PIN code and wait for pairing requests.
