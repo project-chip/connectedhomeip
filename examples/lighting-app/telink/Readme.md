@@ -19,7 +19,7 @@
 
 1. Run build script:
     ```
-    cd /root/chip/scripts/examples && ./telink_example.sh lighting-app tlsr9518adk80d
+    ./scripts/build/build_examples.py --app light --platform telink build
     ```
 1. Exit docker container and collect build artifacts. Firmware binary would be
    located in
