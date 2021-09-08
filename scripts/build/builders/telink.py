@@ -65,16 +65,16 @@ class TelinkBuilder(Builder):
 
             if not self._runner.dry_run:
 
-                # Check Zephyr base
-                if 'TELINK_ZEPHYR_BASE' not in os.environ:
-                    raise Exception(
-                        "Telink builds require TELINK_ZEPHYR_BASE to be set")
+                # Zephyr base
+                if 'TELINK_ZEPHYR_BASE' in os.environ:
+                    cmd = 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"'
+                else if 'ZEPHYR_BASE' not in os.environ:
+                    raise Exception("Telink builds require TELINK_ZEPHYR_BASE or ZEPHYR_BASE to be set")
                 
 
             # TODO: TELINK_ZEPHYR_SDK_DIR should be used for compilation and
             # NOT hardcoding of zephyr-sdk-0.13.0
-            cmd = '''
-export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+            cmd += '''
 export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_BASE/../../zephyr-sdk-0.13.0"
 source "$ZEPHYR_BASE/zephyr-env.sh";
