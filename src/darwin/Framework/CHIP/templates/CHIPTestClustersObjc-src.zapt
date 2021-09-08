@@ -1,0 +1,50 @@
+{{#if (chip_has_client_clusters)}}
+{{> header}}
+#import <Foundation/Foundation.h>
+
+#import "CHIPCallbackBridge_internal.h"
+#import "CHIPCluster_internal.h"
+#import "CHIPDevice.h"
+#import "CHIPDevice_Internal.h"
+
+#import "zap-generated/tests/CHIPClusters.h"
+#import "zap-generated/CHIPTestClustersObjc.h"
+
+using chip::Callback::Cancelable;
+
+{{#chip_client_clusters}}
+
+@interface CHIPTest{{asUpperCamelCase name}} ()
+@property (readonly) chip::Controller::{{asUpperCamelCase name}}ClusterTest cppCluster;
+@end
+
+@implementation CHIPTest{{asUpperCamelCase name}}
+
+- (chip::Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+{{#chip_server_cluster_attributes}}
+{{#unless isWritableAttribute}}
+{{#unless isList}}
+{{#unless isStruct}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
+{{#*inline "callbackName"}}DefaultSuccess{{/inline}}
+{{#*inline "callbackParams"}}, {{#if (isString type)}}[self asSpan:{{/if}}value{{#if (isString type)}}]{{/if}}{{/inline}}
+- (void)write{{>attribute}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.Write{{>attribute}}(success, failure{{>callbackParams}});
+    });
+}
+
+{{/unless}}
+{{/unless}}
+{{/unless}}
+{{/chip_server_cluster_attributes}}
+
+@end
+
+{{/chip_client_clusters}}
+{{/if}}
