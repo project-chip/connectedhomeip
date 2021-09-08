@@ -60,7 +60,9 @@ enum class AttestationVerificationResult : uint16_t
 
     kAttestationSignatureInvalid = 800,
 
-    kNoMemory = 900,
+    kAttestationElementsMalformed = 900,
+
+    kNoMemory = 1000,
 
     kNotImplemented = 0xFFFFU,
 

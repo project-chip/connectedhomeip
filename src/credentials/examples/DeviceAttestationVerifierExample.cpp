@@ -17,6 +17,7 @@
 #include "DeviceAttestationVerifierExample.h"
 
 #include <credentials/CHIPCert.h>
+#include <credentials/DeviceAttestationConstructor.h>
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <lib/core/CHIPError.h>
@@ -198,14 +199,20 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
                                                  dacCertDerBuffer.data(), dacCertDerBuffer.size()) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kDacSignatureInvalid);
 
-    // TODO: Re-enable this when Construct/DeconstructAttestationElements methods are introduced
-#if 0
-    ReturnErrorOnFailure(
-        DeconstructAttestationElements(attestationElements, certDeclaration, attestationNonce, timestamp, firmwareInfo));
+    ByteSpan certificationDeclarationSpan;
+    ByteSpan attestationNonceSpan;
+    uint32_t timestampDeconstructed;
+    ByteSpan firmwareInfoSpan;
+    std::vector<ByteSpan> vendorReservedDeconstructed;
+    uint16_t vendorIdDeconstructed;
+    uint16_t profileNumDeconstructed;
+    VerifyOrReturnError(DeconstructAttestationElements(attestationInfoBuffer, certificationDeclarationSpan, attestationNonceSpan,
+                                                       timestampDeconstructed, firmwareInfoSpan, vendorReservedDeconstructed,
+                                                       vendorIdDeconstructed, profileNumDeconstructed) == CHIP_NO_ERROR,
+                        AttestationVerificationResult::kAttestationElementsMalformed);
 
     // Verify that Nonce matches with what we sent
-    VerifyOrReturnError(attestation_nonce.data_equal(attestationNonce), AttestationVerificationResult::kNonceMismatch);
-#endif
+    VerifyOrReturnError(attestationNonceSpan.data_equal(attestationNonce), AttestationVerificationResult::kNonceMismatch);
 
     return AttestationVerificationResult::kSuccess;
 }
