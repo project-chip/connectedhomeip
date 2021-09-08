@@ -80,7 +80,7 @@ class TelinkBuilder(Builder):
 export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_BASE/../../zephyr-sdk-0.13.0"
 source "$ZEPHYR_BASE/zephyr-env.sh";
-west build -d {outdir} -b {board} {sourcedir}
+west build --cmake-only -d {outdir} -b {board} {sourcedir}
         '''.format(
                 outdir=shlex.quote(
                     self.output_dir), board=self.board.GnArgName(), sourcedir=shlex.quote(
