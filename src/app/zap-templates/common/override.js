@@ -20,6 +20,11 @@ function atomicType(arg)
   switch (arg.name) {
   case 'boolean':
     return 'bool';
+  case 'int64s':
+    return 'int64_t';
+  case 'int64u':
+  case 'bitmap64':
+    return 'uint64_t';
   case 'action_id':
   case 'cluster_id':
   case 'command_id':

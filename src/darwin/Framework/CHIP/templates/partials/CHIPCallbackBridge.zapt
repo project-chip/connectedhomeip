@@ -1,9 +1,9 @@
 {{#if header}}
-class CHIP{{@partial-block}}Bridge : public CHIPCallbackBridge<{{@partial-block}}>
+class CHIP{{> @partial-block}}Bridge : public CHIPCallbackBridge<{{> @partial-block}}>
 {
 public:
-    CHIP{{@partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action, bool keepAlive = false)
-      : CHIPCallbackBridge<{{@partial-block}}>(queue, handler, action, OnSuccessFn, keepAlive)
+    CHIP{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action, bool keepAlive = false)
+      : CHIPCallbackBridge<{{> @partial-block}}>(queue, handler, action, OnSuccessFn, keepAlive)
       {};
     
     static void OnSuccessFn(void * context
@@ -18,7 +18,7 @@ public:
     );
 };
 {{else}}
-void CHIP{{@partial-block}}Bridge::OnSuccessFn(void * context
+void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
   {{#if (isStrEqual partial-type "Command")}}
   {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
   {{else if (isStrEqual partial-type "List")}}

@@ -41,10 +41,10 @@ exit:
     return err;
 }
 
-std::vector<EmberAfTvChannelInfo> TvChannelManager::proxyGetTvChannelList()
+std::vector<TvChannelInfo> TvChannelManager::proxyGetTvChannelList()
 {
     // TODO: Insert code here
-    std::vector<EmberAfTvChannelInfo> tvChannels;
+    std::vector<TvChannelInfo> tvChannels;
     int maximumVectorSize    = 2;
     char affiliateCallSign[] = "exampleASign";
     char callSign[]          = "exampleCSign";
@@ -52,7 +52,7 @@ std::vector<EmberAfTvChannelInfo> TvChannelManager::proxyGetTvChannelList()
 
     for (int i = 0; i < maximumVectorSize; ++i)
     {
-        EmberAfTvChannelInfo channelInfo;
+        TvChannelInfo channelInfo;
         channelInfo.affiliateCallSign = ByteSpan(Uint8::from_char(affiliateCallSign), sizeof(affiliateCallSign));
         channelInfo.callSign          = ByteSpan(Uint8::from_char(callSign), sizeof(callSign));
         channelInfo.name              = ByteSpan(Uint8::from_char(name), sizeof(name));
@@ -64,10 +64,10 @@ std::vector<EmberAfTvChannelInfo> TvChannelManager::proxyGetTvChannelList()
     return tvChannels;
 }
 
-EmberAfTvChannelInfo tvChannelClusterChangeChannel(std::string match)
+TvChannelInfo tvChannelClusterChangeChannel(std::string match)
 {
     // TODO: Insert code here
-    EmberAfTvChannelInfo channel = {};
+    TvChannelInfo channel = {};
     return channel;
 }
 bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
