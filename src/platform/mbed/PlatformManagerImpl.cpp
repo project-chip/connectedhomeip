@@ -54,7 +54,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         new (&mQueue) events::EventQueue(event_size * CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
 
         mQueue.background([&](int t) {
-            MbedEventTimeout::AttachTimeout([&] { SystemLayerSocketsLoop().Signal(); }, std::chrono::milliseconds{ t });
+            if (t < 0)
+            {
+                MbedEventTimeout::DetachTimeout();
+            }
+            else
+            {
+                MbedEventTimeout::AttachTimeout([&] { SystemLayerSocketsLoop.Signal(); }, std::chrono::milliseconds{ t });
+            }
         });
 
         // Reinitialize the Mutexes
@@ -266,6 +273,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     if (err == CHIP_NO_ERROR)
     {
         mInitialized = false;
+        mQueue.background(nullptr);
     }
     return err;
 }
