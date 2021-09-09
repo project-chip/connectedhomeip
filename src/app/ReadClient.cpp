@@ -46,7 +46,6 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interact
     AbortExistingExchangeContext();
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -162,7 +161,6 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     MoveToState(ClientState::AwaitingInitialReport);
 
 exit:
-    ChipLogFunctError(err);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -220,7 +218,6 @@ CHIP_ERROR ReadClient::GenerateEventPathList(EventPathList::Builder & aEventPath
     SuccessOrExit(err = aEventPathListBuilder.GetError());
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -270,7 +267,6 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
 
 exit:
-    ChipLogFunctError(err);
     ShutdownInternal(err);
 
     return err;
@@ -371,7 +367,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         mpDelegate->ReportProcessed(this);
     }
 exit:
-    ChipLogFunctError(err);
     SendStatusReport(err);
     mInitialReport = false;
     return err;
@@ -456,7 +451,6 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 }; // namespace app

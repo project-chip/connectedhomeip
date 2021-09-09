@@ -77,7 +77,6 @@ CHIP_ERROR ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
