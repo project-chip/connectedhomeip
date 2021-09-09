@@ -21,18 +21,65 @@
 #include <controller/CHIPCommissionableNodeController.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <support/CHIPArgParser.hpp>
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
 
 using namespace chip;
 using namespace chip::Controller;
+using chip::ArgParser::HelpOptions;
+using chip::ArgParser::OptionDef;
+using chip::ArgParser::OptionSet;
 
-constexpr int kTvDeviceType                         = 35;
-constexpr uint16_t commissioningWindowTimeoutInSec  = 3 * 60;
-constexpr uint32_t commissionerDiscoveryTimeoutInMs = 5 * 1000;
+constexpr int kVideoPlayerDeviceType                 = 35;
+constexpr uint16_t kOptionDeviceType                 = 't';
+constexpr uint16_t kCommissioningWindowTimeoutInSec  = 3 * 60;
+constexpr uint32_t kcommissionerDiscoveryTimeoutInMs = 5 * 1000;
 
-CommissionableNodeController commissionableNodeController;
-chip::System::SocketWatchToken token;
+CommissionableNodeController gCommissionableNodeController;
+chip::System::SocketWatchToken gToken;
+Mdns::DiscoveryFilter gDiscoveryFilter = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, kVideoPlayerDeviceType);
+
+bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
+{
+    bool retval = true;
+
+    switch (aIdentifier)
+    {
+    case kOptionDeviceType:
+        if (strcasecmp(aValue, "all") == 0)
+        {
+            gDiscoveryFilter = Mdns::DiscoveryFilter();
+        }
+        else
+        {
+            uint16_t deviceType = (uint16_t) strtol(aValue, nullptr, 10);
+            gDiscoveryFilter    = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, deviceType);
+        }
+        break;
+    default:
+        ChipLogError(Zcl, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
+        retval = false;
+        break;
+    }
+
+    return retval;
+}
+
+OptionDef cmdLineOptionsDef[] = {
+    { "device-type", chip::ArgParser::kArgumentRequired, kOptionDeviceType },
+    {},
+};
+
+OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
+                             "  -t <commissioner device type>\n"
+                             "  --device-type <commissioner device type>\n"
+                             "        Device type of the commissioner to discover and request commissioning from. Specify value "
+                             "'all' to allow all commissioner device types. Defaults to 35 (Video Player)\n" };
+
+HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.0");
+
+OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
 /**
  * Enters commissioning mode, opens commissioning window, logs onboarding payload.
@@ -43,7 +90,7 @@ void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommission
 {
     // Enter commissioning mode, open commissioning window
     InitServer();
-    ReturnOnFailure(OpenBasicCommissioningWindow(ResetFabrics::kYes, commissioningWindowTimeoutInSec));
+    ReturnOnFailure(OpenBasicCommissioningWindow(ResetFabrics::kYes, kCommissioningWindowTimeoutInSec));
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
@@ -73,10 +120,10 @@ void RequestUserDirectedCommissioning(System::SocketEvents events, intptr_t data
     int selectedCommissionerNumber = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
     scanf("%d", &selectedCommissionerNumber);
     printf("%d\n", selectedCommissionerNumber);
-    chip::DeviceLayer::SystemLayer.StopWatchingSocket(&token);
+    chip::DeviceLayer::SystemLayer.StopWatchingSocket(&gToken);
 
     const Mdns::DiscoveredNodeData * selectedCommissioner =
-        commissionableNodeController.GetDiscoveredCommissioner(selectedCommissionerNumber - 1);
+        gCommissionableNodeController.GetDiscoveredCommissioner(selectedCommissionerNumber - 1);
     VerifyOrReturn(selectedCommissioner != nullptr, ChipLogError(Zcl, "No such commissioner!"));
     PrepareForCommissioning(selectedCommissioner);
 }
@@ -88,7 +135,7 @@ void InitCommissioningFlow(intptr_t commandArg)
     // Display discovered commissioner TVs to ask user to select one
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
-        const Mdns::DiscoveredNodeData * commissioner = commissionableNodeController.GetDiscoveredCommissioner(i);
+        const Mdns::DiscoveredNodeData * commissioner = gCommissionableNodeController.GetDiscoveredCommissioner(i);
         if (commissioner != nullptr)
         {
             ChipLogProgress(Zcl, "Discovered Commissioner #%d", ++commissionerCount);
@@ -105,9 +152,9 @@ void InitCommissioningFlow(intptr_t commandArg)
         int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         VerifyOrReturn(fcntl(0, F_SETFL, flags | O_NONBLOCK) == 0,
                        ChipLogError(Zcl, "Could not set non-blocking mode for user input!"));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayer.StartWatchingSocket(STDIN_FILENO, &token));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayer.SetCallback(token, RequestUserDirectedCommissioning, (intptr_t) NULL));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayer.RequestCallbackOnPendingRead(token));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayer.StartWatchingSocket(STDIN_FILENO, &gToken));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayer.SetCallback(gToken, RequestUserDirectedCommissioning, (intptr_t) NULL));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayer.RequestCallbackOnPendingRead(gToken));
     }
     else
     {
@@ -119,16 +166,21 @@ void InitCommissioningFlow(intptr_t commandArg)
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
     SuccessOrExit(err = chip::Platform::MemoryInit());
     SuccessOrExit(err = chip::DeviceLayer::PlatformMgr().InitChipStack());
 
+    if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))
+    {
+        return 1;
+    }
+
     // Send discover commissioners request
-    SuccessOrExit(err = commissionableNodeController.DiscoverCommissioners(
-                      Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, kTvDeviceType)));
+    SuccessOrExit(err = gCommissionableNodeController.DiscoverCommissioners(gDiscoveryFilter));
 
     // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
     DeviceLayer::SystemLayer.StartTimer(
-        commissionerDiscoveryTimeoutInMs,
+        kcommissionerDiscoveryTimeoutInMs,
         [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
 
     // TBD: Content casting commands
