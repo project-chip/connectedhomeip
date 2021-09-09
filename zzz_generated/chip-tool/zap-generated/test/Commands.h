@@ -10394,7 +10394,7 @@ private:
 
         if (int32u == 6)
         {
-            ChipLogError(chipTool, "Error: int32u is equal to an unexpected value. Not value is 6 but got '%d'", int32u);
+            ChipLogError(chipTool, "Error: int32u was not expected to be '6' due to notValue constraint");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
