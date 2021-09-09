@@ -450,7 +450,6 @@ def gh_send_change_report(db: SizeDatabase, df: pd.DataFrame,
     text = md.getvalue()
     md.close()
 
-    print(text)
     try:
         if existing_comment_id:
             db.gh.issues.update_comment(existing_comment_id, text)
