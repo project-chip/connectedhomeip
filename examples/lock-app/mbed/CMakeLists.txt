@@ -23,10 +23,6 @@ add_subdirectory(${MBED_PATH} ./mbed_build)
 
 add_subdirectory($ENV{MBED_OS_POSIX_SOCKET_PATH} ./mbed_os_posix_socket_build)
 
-if(MBED_TARGET STREQUAL "DISCO_L475VG_IOT01A")
-    add_subdirectory($ENV{WIFI_ISM43362_PATH} ./wifi_ism43362_build)
-endif()
-
 add_executable(${APP_TARGET})
 
 target_include_directories(${APP_TARGET} PRIVATE
@@ -97,10 +93,6 @@ mbed_configure_app_target(${APP_TARGET})
 project(${APP_TARGET})
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)
-
-if(MBED_TARGET STREQUAL "DISCO_L475VG_IOT01A")
-    target_link_libraries(${APP_TARGET} wifi-ism43362)
-endif()
 
 if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W")
     target_link_libraries(${APP_TARGET} mbed-cy-psoc6-common-network)

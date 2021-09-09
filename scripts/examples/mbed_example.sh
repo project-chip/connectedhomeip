@@ -21,13 +21,13 @@ CHIP_ROOT=$PWD
 cd "$CHIP_ROOT"/examples
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
-SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A CY8CPROTO_062_4343W)
+SUPPORTED_TARGET_BOARD=(CY8CPROTO_062_4343W)
 SUPPORTED_APP=(lock-app lighting-app)
 SUPPORTED_PROFILES=(release develop debug)
 SUPPORTED_COMMAND=(build flash build-flash)
 
 COMMAND=build
-APP=shell
+APP=lock-app
 TARGET_BOARD=CY8CPROTO_062_4343W
 TOOLCHAIN=GCC_ARM
 PROFILE=release
@@ -105,14 +105,6 @@ if [[ "$COMMAND" == *"build"* ]]; then
 
     # Set Mbed OS posix socket submodule path
     export MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
-
-    if [ "$TARGET_BOARD" == "DISCO_L475VG_IOT01A" ]; then
-        # Set ISM43362 Wi-Fi submodule path
-        export WIFI_ISM43362_PATH="$CHIP_ROOT"/third_party/wifi-ism43362/repo
-
-        # Create symlinks to WIFI-ISM43362 submodule
-        ln -sfTr "$WIFI_ISM43362_PATH" "$APP/mbed/wifi-ism43362"
-    fi
 
     # Generate config file for selected target, toolchain and hardware
     mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/ --mbed-os-path "$MBED_OS_PATH"

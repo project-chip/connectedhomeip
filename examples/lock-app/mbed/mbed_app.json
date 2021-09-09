@@ -11,17 +11,6 @@
             "mbed-trace.max-level": "TRACE_LEVEL_DEBUG",
             "mbed-trace.enable": true
         },
-        "DISCO_L475VG_IOT01A": {
-            "target.components_add": ["wifi_ism43362", "BlueNRG_MS"],
-            "ism43362.provide-default": true,
-            "target.network-default-interface-type": "WIFI",
-            "target.macros_add": ["MBEDTLS_SHA1_C"],
-            "target.features_add": ["BLE"],
-            "target.extra_labels_add": ["CORDIO"],
-            "led-active-state": 1,
-            "lock-button": "BUTTON1",
-            "function-button": "NC"
-        },
         "CY8CPROTO_062_4343W": {
             "target.network-default-interface-type": "WIFI",
             "target.macros_add": [

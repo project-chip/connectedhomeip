@@ -87,10 +87,6 @@
 	path = third_party/mbed-os/repo
 	url = https://github.com/ARMmbed/mbed-os.git
 	branch = master
-[submodule "third_party/wifi-ism43362/repo"]
-	path = third_party/wifi-ism43362/repo
-	url = https://github.com/ATmobica/wifi-ism43362.git
-	branch  = master
 [submodule "third_party/mbed-os-posix-socket/repo"]
 	path = third_party/mbed-os-posix-socket/repo
 	url = https://github.com/ARMmbed/mbed-os-posix-socket.git
