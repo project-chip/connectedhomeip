@@ -201,7 +201,7 @@ class {{filename}}: public TestCommand
         {{#if expectedConstraints.notValue}}
           if ({{asLowerCamelCase name}} == {{expectedConstraints.notValue}})
           {
-            ChipLogError(chipTool, "Error: {{asLowerCamelCase name}} is equal to an unexpected value. Not value is {{expectedConstraints.notValue}} but got '%d'", {{asLowerCamelCase name}});
+            ChipLogError(chipTool, "Error: {{asLowerCamelCase name}} was not expected to be '{{expectedConstraints.notValue}}' due to notValue constraint");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
           }
