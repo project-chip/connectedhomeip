@@ -76,6 +76,7 @@ bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, u
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaR2):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaR3):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaErr):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StatusReport):
             return true;
 
         default:

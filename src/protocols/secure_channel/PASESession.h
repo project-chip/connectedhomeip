@@ -256,19 +256,21 @@ private:
     CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const ByteSpan & salt);
 
     CHIP_ERROR SendPBKDFParamRequest();
-    CHIP_ERROR HandlePBKDFParamRequest(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandlePBKDFParamRequest(System::PacketBufferHandle && msg);
 
-    CHIP_ERROR SendPBKDFParamResponse();
-    CHIP_ERROR HandlePBKDFParamResponse(const System::PacketBufferHandle & msg);
+    CHIP_ERROR SendPBKDFParamResponse(ByteSpan initiatorRandom, bool initiatorHasPBKDFParams);
+    CHIP_ERROR HandlePBKDFParamResponse(System::PacketBufferHandle && msg);
 
     CHIP_ERROR SendMsg1();
 
-    CHIP_ERROR HandleMsg1_and_SendMsg2(const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleMsg2_and_SendMsg3(const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleMsg3(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleMsg1_and_SendMsg2(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleMsg2_and_SendMsg3(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleMsg3(System::PacketBufferHandle && msg);
 
-    void SendErrorMsg(Spake2pErrorType errorCode);
-    CHIP_ERROR HandleErrorMsg(const System::PacketBufferHandle & msg);
+    void SendStatusReport(uint16_t protocolCode);
+    CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg);
+
+    constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }
 
     void CloseExchange();
 
@@ -291,6 +293,8 @@ private:
     uint32_t mSetupPINCode;
 
     bool mComputeVerifier = true;
+
+    bool mHavePBKDFParameters = false;
 
     Hash_SHA256_stream mCommissioningHash;
     uint32_t mIterationCount = 0;
