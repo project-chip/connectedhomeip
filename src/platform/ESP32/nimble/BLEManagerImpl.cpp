@@ -615,7 +615,8 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     VerifyOrExit(!mFlags.Has(Flags::kESPBLELayerInitialized), /* */);
 
     semaphoreHandle = xSemaphoreCreateBinary();
-    if (semaphoreHandle == NULL) {
+    if (semaphoreHandle == NULL)
+    {
         err = CHIP_ERROR_NO_MEMORY;
         ESP_LOGE(TAG, "Failed to create semaphore");
         ExitNow();
