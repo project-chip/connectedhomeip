@@ -98,7 +98,7 @@ if [[ "$COMMAND" == *"build"* ]]; then
     echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
 
     # Config directory setup
-    MBED_CONFIG_PATH="$APP"/mbed/cmake_build/"$TARGET_BOARD"/develop/"$TOOLCHAIN"/
+    MBED_CONFIG_PATH="$APP"/mbed/config/"$TARGET_BOARD"/"$PROFILE"/"$TOOLCHAIN"/
 
     # Set Mbed OS path
     export MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
@@ -107,7 +107,7 @@ if [[ "$COMMAND" == *"build"* ]]; then
     export MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
 
     # Generate config file for selected target, toolchain and hardware
-    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/ --mbed-os-path "$MBED_OS_PATH"
+    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/ -o "$MBED_CONFIG_PATH" --mbed-os-path "$MBED_OS_PATH"
 
     # Remove old artifacts to force linking
     rm -rf "$BUILD_DIRECTORY/chip-"*
