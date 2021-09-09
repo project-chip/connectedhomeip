@@ -85,18 +85,6 @@ private:
 
     static Server sServer;
 
-    class DeviceDiscriminatorCache
-    {
-    public:
-        CHIP_ERROR UpdateDiscriminator(uint16_t discriminator);
-
-        CHIP_ERROR RestoreDiscriminator();
-
-    private:
-        bool mOriginalDiscriminatorCached = false;
-        uint16_t mOriginalDiscriminator   = 0;
-    };
-
     class ServerStorageDelegate : public PersistentStorageDelegate
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
@@ -138,7 +126,6 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     SecurePairingUsingTestSecret mTestPairing;
 
-    DeviceDiscriminatorCache mDeviceDiscriminatorCache;
     ServerStorageDelegate mServerStorage;
     CommissionManager mCommissionManager;
 

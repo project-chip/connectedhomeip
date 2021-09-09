@@ -273,28 +273,4 @@ void Server::OnResponseTimeout(Messaging::ExchangeContext * ec)
     }
 }
 
-CHIP_ERROR Server::DeviceDiscriminatorCache::UpdateDiscriminator(uint16_t discriminator)
-{
-    if (!mOriginalDiscriminatorCached)
-    {
-        // Cache the original discriminator
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(mOriginalDiscriminator));
-        mOriginalDiscriminatorCached = true;
-    }
-
-    return DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(discriminator);
-}
-
-CHIP_ERROR Server::DeviceDiscriminatorCache::RestoreDiscriminator()
-{
-    if (mOriginalDiscriminatorCached)
-    {
-        // Restore the original discriminator
-        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(mOriginalDiscriminator));
-        mOriginalDiscriminatorCached = false;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 } // namespace chip
