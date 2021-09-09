@@ -24,6 +24,7 @@
 #include <nlunit-test.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
+#include <system/SystemLayerImpl.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/PeerAddress.h>
@@ -45,7 +46,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     SecureSessionMgr sessionMgr;
     ExchangeManager exchangeMgr;
     Inet::InetLayer inetLayer;
-    System::Layer systemLayer;
+    System::LayerImpl systemLayer;
     Ble::BleLayer blelayer;
     FabricTable fabrics;
     secure_channel::MessageCounterManager messageCounterManager;
@@ -87,6 +88,15 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
 
     device.OperationalCertProvisioned();
     NL_TEST_ASSERT(inSuite, device.EstablishConnectivity(nullptr, nullptr) == CHIP_NO_ERROR);
+
+    device.Reset();
+    messageCounterManager.Shutdown();
+    exchangeMgr.Shutdown();
+    sessionMgr.Shutdown();
+    transportMgr.Close();
+    inetLayer.Shutdown();
+    systemLayer.Shutdown();
+    Platform::MemoryShutdown();
 }
 
 // clang-format off
