@@ -1054,6 +1054,30 @@ public:
                             chip::ByteSpan metadataForRequestor);
 };
 
+class CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsClusterAttestationResponseCallback>
+{
+public:
+    CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsClusterAttestationResponseCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::ByteSpan AttestationElements, chip::ByteSpan Signature);
+};
+
+class CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsClusterCertChainResponseCallback>
+{
+public:
+    CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsClusterCertChainResponseCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::ByteSpan Certificate);
+};
+
 class CHIPOperationalCredentialsClusterNOCResponseCallbackBridge
     : public CHIPCallbackBridge<OperationalCredentialsClusterNOCResponseCallback>
 {

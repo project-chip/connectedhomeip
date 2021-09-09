@@ -475,6 +475,9 @@ void Device::Reset()
         mExchangeMgr->CloseAllContextsForDelegate(this);
     }
     mExchangeMgr = nullptr;
+
+    ReleaseDAC();
+    ReleasePAI();
 }
 
 CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
@@ -624,6 +627,78 @@ void Device::OnSessionEstablished()
     }
 }
 
+void Device::ReleaseDAC()
+{
+    if (mDAC != nullptr)
+    {
+        Platform::MemoryFree(mDAC);
+    }
+    mDACLen = 0;
+    mDAC    = nullptr;
+}
+
+CHIP_ERROR Device::SetDAC(const ByteSpan & dac)
+{
+    if (dac.size() == 0)
+    {
+        ReleaseDAC();
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(dac.size() <= Crypto::kMax_x509_Certificate_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mDACLen != 0)
+    {
+        ReleaseDAC();
+    }
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(dac.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    if (mDAC == nullptr)
+    {
+        mDAC = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(dac.size()));
+    }
+    VerifyOrReturnError(mDAC != nullptr, CHIP_ERROR_NO_MEMORY);
+    mDACLen = static_cast<uint16_t>(dac.size());
+    memcpy(mDAC, dac.data(), mDACLen);
+
+    return CHIP_NO_ERROR;
+}
+
+void Device::ReleasePAI()
+{
+    if (mPAI != nullptr)
+    {
+        chip::Platform::MemoryFree(mPAI);
+    }
+    mPAILen = 0;
+    mPAI    = nullptr;
+}
+
+CHIP_ERROR Device::SetPAI(const chip::ByteSpan & pai)
+{
+    if (pai.size() == 0)
+    {
+        ReleasePAI();
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(pai.size() <= Crypto::kMax_x509_Certificate_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mPAILen != 0)
+    {
+        ReleasePAI();
+    }
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(pai.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    if (mPAI == nullptr)
+    {
+        mPAI = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(pai.size()));
+    }
+    VerifyOrReturnError(mPAI != nullptr, CHIP_ERROR_NO_MEMORY);
+    mPAILen = static_cast<uint16_t>(pai.size());
+    memcpy(mPAI, pai.data(), mPAILen);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Device::EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
                                          Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
@@ -752,6 +827,9 @@ Device::~Device()
         // point.
         mExchangeMgr->CloseAllContextsForDelegate(this);
     }
+
+    ReleaseDAC();
+    ReleasePAI();
 }
 
 CHIP_ERROR Device::ReduceNOCChainBufferSize(size_t new_size)

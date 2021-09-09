@@ -62,8 +62,9 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-constexpr size_t kMaxBlePendingPackets = 1;
-constexpr uint32_t kOpCSRNonceLength   = 32;
+constexpr size_t kMaxBlePendingPackets   = 1;
+constexpr size_t kOpCSRNonceLength       = 32;
+constexpr size_t kAttestationNonceLength = 32;
 
 using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
@@ -412,6 +413,23 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
+    CHIP_ERROR SetAttestationNonce(ByteSpan attestationNonce)
+    {
+        VerifyOrReturnError(attestationNonce.size() == sizeof(mAttestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mAttestationNonce, attestationNonce.data(), attestationNonce.size());
+        return CHIP_NO_ERROR;
+    }
+
+    ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)); }
+
+    bool AreCredentialsAvailable() const { return (mDAC != nullptr && mDACLen != 0); }
+
+    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
+    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
+
+    CHIP_ERROR SetDAC(const ByteSpan & dac);
+    CHIP_ERROR SetPAI(const ByteSpan & pai);
+
     MutableByteSpan GetMutableNOCChain() { return MutableByteSpan(mNOCChainBuffer, sizeof(mNOCChainBuffer)); }
 
     CHIP_ERROR ReduceNOCChainBufferSize(size_t new_size);
@@ -510,6 +528,9 @@ private:
 
     CHIP_ERROR WarmupCASESession();
 
+    void ReleaseDAC();
+    void ReleasePAI();
+
     static void OnOpenPairingWindowSuccessResponse(void * context);
     static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
 
@@ -525,6 +546,12 @@ private:
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
     uint8_t mCSRNonce[kOpCSRNonceLength];
+    uint8_t mAttestationNonce[kAttestationNonceLength];
+
+    uint8_t * mDAC   = nullptr;
+    uint16_t mDACLen = 0;
+    uint8_t * mPAI   = nullptr;
+    uint16_t mPAILen = 0;
 
     // The chain can contain ICAC and OpCert
     uint8_t mNOCChainBuffer[Credentials::kMaxCHIPCertLength * 2];

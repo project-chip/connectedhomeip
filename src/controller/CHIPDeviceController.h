@@ -617,6 +617,15 @@ private:
        If no device is currently being paired, this value will be kNumMaxPairedDevices.  */
     uint16_t mDeviceBeingPaired;
 
+    enum CertificateChainType : uint16_t
+    {
+        kUnknown = 0,
+        kDAC     = 1,
+        kPAI     = 2,
+    };
+
+    CertificateChainType mCertificateChainBeingRequested = CertificateChainType::kUnknown;
+
     /* TODO: BLE rendezvous and IP rendezvous should share the same procedure, so this is just a
        workaround-like flag and should be removed in the future.
        When using IP rendezvous, we need to disable network provisioning. In the future, network
@@ -649,6 +658,14 @@ private:
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
+    /* This function sends a Device Attestation Certificate chain request to the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SendCertificateChainRequestCommand(Device * device, CertificateChainType certificateChainType);
+    /* This function sends a Device Attestation Certificate chain request to the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SendAttestationRequestCommand(Device * device);
     /* This function sends an OpCSR request to the device.
        The function does not hold a refernce to the device object.
      */
@@ -670,6 +687,12 @@ private:
 
     /* Callback when the previously sent CSR request results in failure */
     static void OnCSRFailureResponse(void * context, uint8_t status);
+
+    static void OnCertChainFailureResponse(void * context, uint8_t status);
+    static void OnCertificateChainResponse(void * context, ByteSpan certificate);
+
+    static void OnAttestationFailureResponse(void * context, uint8_t status);
+    static void OnAttestationResponse(void * context, chip::ByteSpan attestationElements, chip::ByteSpan signature);
 
     /**
      * @brief
@@ -708,6 +731,10 @@ private:
      */
     CHIP_ERROR ProcessOpCSR(const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature);
 
+    CHIP_ERROR ProcessCertificateChain(const ByteSpan & certificate);
+
+    CHIP_ERROR ValidateAttestationInfo(chip::ByteSpan attestationElements, chip::ByteSpan signature);
+
     // Cluster callbacks for advancing commissioning flows
     Callback::Callback<BasicSuccessCallback> mSuccess;
     Callback::Callback<BasicFailureCallback> mFailure;
@@ -715,9 +742,13 @@ private:
     CommissioningStage GetNextCommissioningStage();
     static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
+    Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback> mCertChainResponseCallback;
+    Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> mAttestationResponseCallback;
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
     Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
     Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
+    Callback::Callback<DefaultFailureCallback> mOnCertChainFailureCallback;
+    Callback::Callback<DefaultFailureCallback> mOnAttestationFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;

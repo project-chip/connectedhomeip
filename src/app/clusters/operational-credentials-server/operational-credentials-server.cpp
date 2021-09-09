@@ -32,6 +32,10 @@
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <credentials/CHIPCert.h>
+#include <credentials/DeviceAttestationConstructor.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/CodeUtils.h>
@@ -44,6 +48,9 @@
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
+
+constexpr uint16_t kDACCertificate = 1;
+constexpr uint16_t kPAICertificate = 2;
 
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr uint16_t kMaxRspLen = 900;
@@ -412,6 +419,138 @@ exit:
     if (nocResponse != EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed UpdateNOC request. Status %d", nocResponse);
+    }
+
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterCertChainRequestCallback(EndpointId endpoint, app::CommandHandler * commandObj,
+                                                                  uint16_t certChainType)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Device Attestation Credentials");
+
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
+                                         ZCL_CERT_CHAIN_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t derBuf[Credentials::kMaxDERCertLength];
+    MutableByteSpan derBufSpan(derBuf);
+
+    // TODO: remove line below
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
+
+    VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+    writer = commandObj->GetCommandDataElementTLVWriter();
+    if (certChainType == kDACCertificate)
+    {
+        SuccessOrExit(err = dacProvider->GetDeviceAttestationCert(derBufSpan));
+    }
+    else if (certChainType == kPAICertificate)
+    {
+        SuccessOrExit(err = dacProvider->GetProductAttestationIntermediateCert(derBufSpan));
+    }
+    else
+    {
+        SuccessOrExit(status = EMBER_ZCL_STATUS_FAILURE);
+    }
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), derBufSpan));
+    SuccessOrExit(err = commandObj->FinishCommand());
+
+exit:
+    if (status == EMBER_ZCL_STATUS_FAILURE)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed CertChainRequest.");
+        emberAfSendImmediateDefaultResponse(status);
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command: %s", ErrorStr(err));
+    }
+
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterAttestationRequestCallback(EndpointId endpoint, app::CommandHandler * commandObj,
+                                                                    ByteSpan attestationNonce)
+{
+    EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
+    size_t attestationElementsLen;
+    Crypto::P256ECDSASignature signature;
+    PeerConnectionState * state;
+    uint8_t md[Crypto::kSHA256_Hash_Length];
+    MutableByteSpan messageDigestSpan(md);
+
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Attestation");
+
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
+                                         ZCL_ATTESTATION_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+
+    // TODO: remove line below
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
+
+    VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(attestationNonce.size() == 32, status = EMBER_ZCL_STATUS_FAILURE);
+
+    {
+        uint16_t vendorId   = 0xFFF1;
+        uint16_t profileNum = 0x003E;
+        std::vector<ByteSpan> vendorReserved;
+        uint8_t certDeclBuf[512];
+        MutableByteSpan certDeclSpan(certDeclBuf);
+
+        SuccessOrExit(err = dacProvider->GetCertificationDeclaration(certDeclSpan));
+
+        attestationElementsLen = certDeclSpan.size() + attestationNonce.size() + sizeof(uint64_t) * 8;
+        VerifyOrExit(attestationElements.Alloc(attestationElementsLen), err = CHIP_ERROR_NO_MEMORY);
+
+        MutableByteSpan attestationElementsSpan(attestationElements.Get(), attestationElementsLen);
+        SuccessOrExit(err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, 0, ByteSpan(), vendorReserved,
+                                                                      vendorId, profileNum, attestationElementsSpan));
+        attestationElementsLen = attestationElementsSpan.size();
+    }
+
+    // Retrieve attestation challenge
+    state = commandObj->GetExchangeContext()->GetExchangeMgr()->GetSessionMgr()->GetPeerConnectionState(
+        commandObj->GetExchangeContext()->GetSecureSession());
+    VerifyOrExit(state != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+
+    {
+        Hash_SHA256_stream hashStream;
+        SuccessOrExit(err = hashStream.Begin());
+        SuccessOrExit(err = hashStream.AddData(ByteSpan(attestationElements.Get(), attestationElementsLen)));
+        SuccessOrExit(err = hashStream.AddData(state->GetSecureSession().GetAttestationChallenge()));
+        SuccessOrExit(err = hashStream.Finish(messageDigestSpan));
+
+        MutableByteSpan signatureSpan(signature, signature.Capacity());
+        SuccessOrExit(err = dacProvider->SignWithDeviceAttestationKey(messageDigestSpan, signatureSpan));
+        SuccessOrExit(err = signature.SetLength(signatureSpan.size()));
+    }
+
+    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+    writer = commandObj->GetCommandDataElementTLVWriter();
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(attestationElements.Get(), attestationElementsLen)));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), ByteSpan(signature, signature.Length())));
+    SuccessOrExit(err = commandObj->FinishCommand());
+
+exit:
+    if (status == EMBER_ZCL_STATUS_FAILURE)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AttestationRequest.");
+        emberAfSendImmediateDefaultResponse(status);
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command: %s", ErrorStr(err));
     }
 
     return true;

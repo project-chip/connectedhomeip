@@ -3145,6 +3145,22 @@ using chip::Callback::Cancelable;
     });
 }
 
+- (void)attestationRequest:(NSData *)attestationNonce responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.AttestationRequest(success, failure, [self asSpan:attestationNonce]);
+        });
+}
+
+- (void)certChainRequest:(uint16_t)certChainType responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.CertChainRequest(success, failure, certChainType);
+        });
+}
+
 - (void)opCSRRequest:(NSData *)cSRNonce responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge(
