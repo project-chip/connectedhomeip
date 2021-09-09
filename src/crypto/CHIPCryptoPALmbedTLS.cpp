@@ -254,7 +254,7 @@ CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
     CHIP_ERROR result = Finish(out_buffer);
 
     // Restore context prior to finalization.
-    *context = previous_ctx;
+    mbedtls_sha256_clone(context, &previous_ctx);
 
     return result;
 }

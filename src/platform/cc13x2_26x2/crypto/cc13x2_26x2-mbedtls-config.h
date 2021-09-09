@@ -42,7 +42,7 @@
 #define MBEDTLS_ECJPAKE_ALT
 #define MBEDTLS_AES_ALT
 #define MBEDTLS_SHA256_ALT
-//#define MBEDTLS_ENTROPY_HARDWARE_ALT
+#define MBEDTLS_ENTROPY_HARDWARE_ALT
 
 /**
  * Enable Crypto and Entropy modules

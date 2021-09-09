@@ -74,17 +74,10 @@ constexpr size_t kEmitDerIntegerWithoutTagOverhead = 1; // 1 sign stuffer
 constexpr size_t kEmitDerIntegerOverhead           = 3; // Tag + Length byte + 1 sign stuffer
 
 /*
- * Worst case is OpenSSL, so let's use its worst case and let static assert tell us if
- * we are wrong, since `typedef SHA_LONG unsigned int` is default.
- *   SHA_LONG h[8];
- *   SHA_LONG Nl, Nh;
- *   SHA_LONG data[SHA_LBLOCK]; // SHA_LBLOCK is 16 for SHA256
- *   unsigned int num, md_len;
- *
- * We also have to account for possibly some custom extensions on some targets,
- * especially for mbedTLS, so an extra sizeof(uint64_t) is added to account.
+ * Worst case is TI mbedtls hardware accelerated context, so let's use its
+ * worst case and let static assert tell us if we are wrong.
  */
-constexpr size_t kMAX_Hash_SHA256_Context_Size = ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t));
+constexpr size_t kMAX_Hash_SHA256_Context_Size = (sizeof(unsigned int) * 76);
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
