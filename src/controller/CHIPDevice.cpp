@@ -552,6 +552,7 @@ void Device::OperationalCertProvisioned()
 
     Persist();
     CloseSession();
+    mState = ConnectionState::NotConnected;
 }
 
 CHIP_ERROR Device::WarmupCASESession()
