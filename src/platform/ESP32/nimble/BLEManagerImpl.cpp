@@ -90,6 +90,8 @@ const ble_uuid128_t UUID_CHIPoBLEChar_TX   = {
     { BLE_UUID_TYPE_128 }, { 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
 };
 
+SemaphoreHandle_t semaphoreHandle = NULL;
+
 } // unnamed namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -595,9 +597,7 @@ void BLEManagerImpl::bleprph_on_reset(int reason)
 
 void BLEManagerImpl::bleprph_on_sync(void)
 {
-    sInstance.mFlags.Set(Flags::kESPBLELayerInitialized);
-    sInstance.mFlags.Set(Flags::kGATTServiceStarted);
-    ESP_LOGI(TAG, "BLE host-controller synced");
+    xSemaphoreGive(semaphoreHandle);
 }
 
 void BLEManagerImpl::bleprph_host_task(void * param)
@@ -613,6 +613,13 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(!mFlags.Has(Flags::kESPBLELayerInitialized), /* */);
+
+    semaphoreHandle = xSemaphoreCreateBinary();
+    if (semaphoreHandle == NULL) {
+        err = CHIP_ERROR_NO_MEMORY;
+        ESP_LOGE(TAG, "Failed to create semaphore");
+        ExitNow();
+    }
 
     for (int i = 0; i < kMaxConnections; i++)
     {
@@ -654,6 +661,14 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     }
 
     nimble_port_freertos_init(bleprph_host_task);
+
+    xSemaphoreTake(semaphoreHandle, portMAX_DELAY);
+    vSemaphoreDelete(semaphoreHandle);
+    semaphoreHandle = NULL;
+
+    sInstance.mFlags.Set(Flags::kESPBLELayerInitialized);
+    sInstance.mFlags.Set(Flags::kGATTServiceStarted);
+    ESP_LOGI(TAG, "BLE host-controller synced");
 
 exit:
     return err;
