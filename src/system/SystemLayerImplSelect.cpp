@@ -349,7 +349,7 @@ void LayerImplSelect::PrepareEvents()
     }
 
     const Clock::MonotonicMilliseconds sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : 0;
-    MillisecondsToTimeval(sleepTime, mNextTimeout);
+    Clock::MillisecondsToTimeval(sleepTime, mNextTimeout);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
     chip::Mdns::GetMdnsTimeout(mNextTimeout);
