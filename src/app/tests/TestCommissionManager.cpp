@@ -17,7 +17,6 @@
 
 #include <app/server/CommissionManager.h>
 #include <app/server/Server.h>
-#include <bits/stdint-uintn.h>
 #include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/tests/echo/common.h>
