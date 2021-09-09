@@ -40,11 +40,10 @@
 namespace chip {
 namespace DeviceLayer {
 
-extern chip::System::Layer * globalSystemLayer;
-
 namespace Internal {
 
-extern chip::System::LayerImpl staticSystemLayer;
+extern chip::System::Layer * gSystemLayer;
+extern chip::System::LayerImpl gSystemLayerImpl;
 
 extern CHIP_ERROR InitEntropy();
 
@@ -76,11 +75,11 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP system layer.
-    if (globalSystemLayer == nullptr)
+    if (gSystemLayer == nullptr)
     {
-        globalSystemLayer = &staticSystemLayer;
+        gSystemLayer = &gSystemLayerImpl;
     }
-    err = globalSystemLayer->Init();
+    err = gSystemLayer->Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
@@ -88,7 +87,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP Inet layer.
-    err = InetLayer.Init(*globalSystemLayer, nullptr);
+    err = InetLayer.Init(*gSystemLayer, nullptr);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));
@@ -146,7 +145,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 #endif
 
     ChipLogError(DeviceLayer, "System Layer shutdown");
-    err = globalSystemLayer->Shutdown();
+    err = gSystemLayer->Shutdown();
 
     return err;
 }

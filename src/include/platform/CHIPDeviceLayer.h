@@ -44,27 +44,28 @@
 namespace chip {
 namespace DeviceLayer {
 
+namespace Internal {
+extern chip::System::Layer * gSystemLayer;
+} // namespace Internal
+
 struct ChipDeviceEvent;
 extern Inet::InetLayer InetLayer;
 
 inline chip::System::Layer & SystemLayer()
 {
-    extern chip::System::Layer * globalSystemLayer;
-    return *globalSystemLayer;
+    return *Internal::gSystemLayer;
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 inline chip::System::LayerSockets & SystemLayerSockets()
 {
-    extern chip::System::Layer * globalSystemLayer;
-    return *static_cast<chip::System::LayerSockets *>(globalSystemLayer);
+    return *static_cast<chip::System::LayerSockets *>(Internal::gSystemLayer);
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 inline void SetSystemLayerForTesting(System::Layer * layer)
 {
-    extern chip::System::Layer * globalSystemLayer;
-    globalSystemLayer = layer;
+    Internal::gSystemLayer = layer;
 }
 
 } // namespace DeviceLayer
