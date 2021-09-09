@@ -159,7 +159,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
 
         The incoming arguments must contain the non-ID column names from
         ‘thing’ and ‘build’ tables, plus a 'sizes' entry that is a sequence
-        of mappings containing 'section' and 'size'.
+        of mappings containing 'name' and 'size'.
         """
         td = {k: kwargs[k] for k in ('platform', 'config', 'target')}
         thing = self.store_and_return_id('thing', **td)
@@ -177,7 +177,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         r['sizes'] = [{
             'name': s[by],
             'size': s['size']
-        } for s in r['frames']['sizes']]
+        } for s in r['frames'][by]]
         self.add_sizes(**r)
 
     def add_sizes_from_zipfile(self, f: Union[IO, Path], origin: Dict):

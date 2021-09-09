@@ -51,8 +51,9 @@ binary's directory. This file has the form:
     "hash": "496620796f752063616e20726561642074686973",
     "parent": "20796f752061726520746f6f20636c6f73652e0a",
     "pr": 12345,
+    "by": "section",
     "frames": {
-        "sizes": [
+        "section": [
           {"section": ".bss", "size": 260496},
           {"section": ".data", "size": 1648},
           {"section": ".text", "size": 740236}
@@ -173,7 +174,7 @@ def main(argv):
         dfs: DFs = memdf.collect.collect_files(config, [binary])
         symbols = dfs[SymbolDF.name]
         summary = memdf.select.groupby(config, symbols)
-        summary.attrs['name'] = "sizes"
+        summary.attrs['name'] = config['report.by']
 
         # Write configured (json) report to the output file.
         memdf.report.write_dfs(config, {SymbolDF.name: summary})
