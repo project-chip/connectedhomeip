@@ -4770,7 +4770,7 @@ public class ChipClusters {
     public void writeLongCharStringAttribute(DefaultClusterCallback callback, String value) {
       writeLongCharStringAttribute(chipClusterPtr, callback, value);
     }
-
+    // TODO: Unsupported type STRUCT
     public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
       readUnsupportedAttribute(chipClusterPtr, callback);
     }
@@ -4893,7 +4893,7 @@ public class ChipClusters {
 
     private native void writeLongCharStringAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, String value);
-
+    // TODO: Unsupported type STRUCT
     private native void readUnsupportedAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
 
