@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 """
 This is similar to scripts/tools/memory/report_summary.py, but generates
 a specific output format with a simplified interface for use in github
@@ -74,8 +73,7 @@ import memdf.report
 import memdf.select
 import memdf.util
 
-from memdf import Config, ConfigDescription, DFs, SymbolDF
-
+from memdf import Config, ConfigDescription, DFs, SectionDF
 
 PLATFORM_CONFIG_DIR = pathlib.Path('scripts/tools/memory/platform')
 
@@ -115,15 +113,15 @@ def main(argv):
         _, platform, config_name, target_name, binary, *args = argv
     except ValueError:
         program = pathlib.Path(argv[0])
-        logging.error("""
+        logging.error(
+            """
             Usage: %s platform config target binary [output] [options]
 
             This is intended for use in github workflows.
             For other purposes, a general program for the same operations is
             %s/report_summary.py
 
-            """,
-                      program.name, program.parent)
+            """, program.name, program.parent)
         return 1
 
     try:
@@ -148,8 +146,6 @@ def main(argv):
             **memdf.util.config.CONFIG,
             **memdf.collect.CONFIG,
             **memdf.select.CONFIG,
-            **memdf.report.REPORT_CONFIG,
-            **memdf.report.REPORT_BY_CONFIG,
             **memdf.report.OUTPUT_CONFIG,
             **CONFIG,
         })
@@ -166,21 +162,27 @@ def main(argv):
         config.put('output.metadata.target', target_name)
         config.put('output.metadata.time', config['timestamp'])
         config.put('output.metadata.input', binary)
-        config.put('output.metadata.by', config['report.by'])
+        config.put('output.metadata.by', 'section')
         for key in ['event', 'hash', 'parent', 'pr']:
             if value := config[key]:
                 config.putl(['output', 'metadata', key], value)
 
-        dfs: DFs = memdf.collect.collect_files(config, [binary])
-        symbols = dfs[SymbolDF.name]
-        summary = memdf.select.groupby(config, symbols)
-        summary.attrs['name'] = config['report.by']
+        collected: DFs = memdf.collect.collect_files(config, [binary])
+
+        sections = collected[SectionDF.name]
+        section_summary = sections[['section',
+                                    'size']].sort_values(by='section')
+        section_summary.attrs['name'] = "section"
+
+        summaries = {
+            'section': section_summary,
+        }
 
         # Write configured (json) report to the output file.
-        memdf.report.write_dfs(config, {SymbolDF.name: summary})
+        memdf.report.write_dfs(config, summaries)
 
         # Write text report to stdout.
-        memdf.report.write_text(config, summary, sys.stdout)
+        memdf.report.write_dfs(config, summaries, sys.stdout, 'simple')
 
     except Exception as exception:
         status = 1
