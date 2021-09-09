@@ -147,7 +147,7 @@ CHIP_ERROR LayerImplLwIP::HandleSystemLayerEvent(Object & aTarget, EventType aEv
 
 CHIP_ERROR LayerImplLwIP::AddEventHandlerDelegate(EventHandlerDelegate & aDelegate)
 {
-    LwIPEventHandlerDelegate lDelegate = static_cast<LwIPEventHandlerDelegate &>(aDelegate);
+    LwIPEventHandlerDelegate & lDelegate = static_cast<LwIPEventHandlerDelegate &>(aDelegate);
     VerifyOrReturnError(lDelegate.GetFunction() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     lDelegate.Prepend(mEventDelegateList);
     return CHIP_NO_ERROR;
