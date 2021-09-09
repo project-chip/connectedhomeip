@@ -24,13 +24,13 @@
 
 set -e
 
-SCRIPT_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
 # Activate Matter environment
-source "$SCRIPT_PATH/../../scripts/activate.sh"
+source "$DIR/../activate.sh"
 
 # Set RPC console directory
-RPC_CONSOLE_DIR="$SCRIPT_PATH/../../examples/common/pigweed/rpc_console"
+RPC_CONSOLE_DIR="$DIR/../../examples/common/pigweed/rpc_console"
 OUTPUT_DIR=rpc_console_out
 
 for i in "$@"; do
