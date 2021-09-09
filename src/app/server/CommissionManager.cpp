@@ -43,9 +43,9 @@ CHIP_ERROR CommissionManager::OpenBasicCommissioningWindow(ResetFabrics resetFab
     RendezvousParameters params;
 
     params.SetSetupPINCode(pinCode);
+    params.SetAdvertisementDelegate(this);
 #if CONFIG_NETWORK_LAYER_BLE
     SetBLE(advertisementMode == chip::CommissioningWindowAdvertisement::kBle);
-    params.SetAdvertisementDelegate(this);
     if (advertisementMode == chip::CommissioningWindowAdvertisement::kBle)
     {
         params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
@@ -84,9 +84,9 @@ CHIP_ERROR CommissionManager::OpenEnhancedCommissioningWindow(uint16_t commissio
     ReturnErrorOnFailure(SetTemporaryDiscriminator(discriminator));
 
     SetBLE(false);
+    params.SetAdvertisementDelegate(this);
 #if CONFIG_NETWORK_LAYER_BLE
     SetBLE(true);
-    params.SetAdvertisementDelegate(this);
     params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
 #endif
 
