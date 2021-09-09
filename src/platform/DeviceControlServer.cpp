@@ -72,8 +72,7 @@ CHIP_ERROR DeviceControlServer::CommissioningComplete()
     ChipDeviceEvent event;
     event.Type                         = DeviceEventType::kCommissioningComplete;
     event.CommissioningComplete.status = CHIP_NO_ERROR;
-    ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
-    return CHIP_NO_ERROR;
+    return PlatformMgr().PostEvent(&event);
 }
 
 CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const char * countryCode, uint64_t breadcrumb)

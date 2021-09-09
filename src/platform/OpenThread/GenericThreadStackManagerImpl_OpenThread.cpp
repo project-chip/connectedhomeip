@@ -244,14 +244,16 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
     Impl()->LockThreadStack();
     otErr = otDatasetSetActiveTlvs(mOTInst, &tlvs);
     Impl()->UnlockThreadStack();
+    if (otErr != OT_ERROR_NONE)
+    {
+        return MapOpenThreadError(otErr);
+    }
 
     // post an event alerting other subsystems about change in provisioning state
     ChipDeviceEvent event;
     event.Type                                           = DeviceEventType::kServiceProvisioningChange;
     event.ServiceProvisioningChange.IsServiceProvisioned = true;
-    ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
-
-    return MapOpenThreadError(otErr);
+    return PlatformMgr().PostEvent(&event);
 }
 
 template <class ImplClass>

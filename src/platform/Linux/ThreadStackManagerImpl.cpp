@@ -220,9 +220,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
     ChipDeviceEvent event;
     event.Type                                           = DeviceEventType::kServiceProvisioningChange;
     event.ServiceProvisioningChange.IsServiceProvisioned = true;
-    ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
-
-    return CHIP_NO_ERROR;
+    return PlatformMgr().PostEvent(&event);
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
