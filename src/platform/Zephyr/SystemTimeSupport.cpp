@@ -33,7 +33,9 @@
 namespace chip {
 namespace System {
 
-ClockImpl staticClock;
+namespace Internal {
+ClockImpl gClockImpl;
+} // namespace Internal
 
 Clock::MonotonicMicroseconds ClockImpl::GetMonotonicMicroseconds(void)
 {
