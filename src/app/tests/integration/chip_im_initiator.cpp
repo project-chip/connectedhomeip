@@ -724,6 +724,7 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    gTransportManager.Close();
     ShutdownChip();
 exit:
     if (err != CHIP_NO_ERROR || (gCommandRespCount != kMaxCommandMessageCount + kTotalFailureCommandMessageCount))

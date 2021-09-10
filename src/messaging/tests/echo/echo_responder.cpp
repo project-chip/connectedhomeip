@@ -140,6 +140,8 @@ exit:
         gEchoServer.Shutdown();
     }
 
+    gUDPManager.Close();
+
     ShutdownChip();
 
     return EXIT_SUCCESS;

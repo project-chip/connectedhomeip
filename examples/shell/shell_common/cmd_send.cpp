@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>
@@ -26,6 +27,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/TCP.h>

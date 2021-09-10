@@ -74,9 +74,9 @@ enum
     kNumEntries
 };
 
-typedef int8_t count_t;
+typedef uint8_t count_t;
 #define PRI_CHIP_SYS_STATS_COUNT PRId8
-#define CHIP_SYS_STATS_COUNT_MAX INT8_MAX
+constexpr const auto CHIP_SYS_STATS_COUNT_MAX = std::numeric_limits<count_t>::max();
 
 extern count_t ResourcesInUse[kNumEntries];
 extern count_t HighWatermarks[kNumEntries];

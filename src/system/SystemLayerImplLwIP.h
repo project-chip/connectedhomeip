@@ -24,6 +24,7 @@
 
 #include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemLayer.h>
+#include <system/SystemTimer.h>
 
 namespace chip {
 namespace System {

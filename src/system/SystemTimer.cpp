@@ -81,7 +81,7 @@ ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
 
 Timer * Timer::New(System::Layer & systemLayer, uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
 {
-    Timer * timer = Timer::sPool.TryCreate();
+    Timer * timer = Timer::sPool.CreateObject();
     if (timer == nullptr)
     {
         ChipLogError(chipSystemLayer, "Timer pool EMPTY");
@@ -129,7 +129,7 @@ void Timer::HandleComplete()
     // Since this thread changed the state of mOnComplete, release the timer.
     AppState     = nullptr;
     mSystemLayer = nullptr;
-    this->Release();
+    ReleaseTimer(this);
 
     // Invoke the app's callback, if it's still valid.
     if (lOnComplete != nullptr)

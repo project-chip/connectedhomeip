@@ -37,7 +37,9 @@
 // clang-format on
 
 #include <system/SystemLayer.h>
+#include <system/SystemPool.h>
 
+#include <lib/core/ReferenceCounted.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -69,7 +71,14 @@ namespace System {
 static int Initialize(void * aContext);
 static int Finalize(void * aContext);
 
-class TestObject : public Object
+class TestObject;
+class TestObjectDeletor
+{
+public:
+    static void Release(TestObject * obj);
+};
+
+class TestObject : public AtomicReferenceCounted<TestObject, TestObjectDeletor>
 {
 public:
     CHIP_ERROR Init();
@@ -77,10 +86,7 @@ public:
     static void CheckIteration(nlTestSuite * inSuite, void * aContext);
     static void CheckRetention(nlTestSuite * inSuite, void * aContext);
     static void CheckConcurrency(nlTestSuite * inSuite, void * aContext);
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     static void CheckHighWatermark(nlTestSuite * inSuite, void * aContext);
-    static void CheckHighWatermarkConcurrency(nlTestSuite * inSuite, void * aContext);
-#endif
 
 private:
     static constexpr int kNumThreads         = 16;
@@ -89,8 +95,9 @@ private:
     static constexpr int kPoolSize           = (kNumThreads * 7) + 1;
 
     static_assert(kNumThreads > 1, "kNumThreads should be more than 1");
-    static_assert(kPoolSize < CHIP_SYS_STATS_COUNT_MAX, "kPoolSize is not less than CHIP_SYS_STATS_COUNT_MAX");
+    static_assert(kPoolSize < Stats::CHIP_SYS_STATS_COUNT_MAX, "kPoolSize is not less than CHIP_SYS_STATS_COUNT_MAX");
 
+    friend class TestObjectDeletor;
     static ObjectPool<TestObject, kPoolSize> sPool;
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
@@ -98,15 +105,18 @@ private:
 
     void Delay(volatile unsigned int & aAccumulator);
     static void * CheckConcurrencyThread(void * aContext);
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     static void * CheckHighWatermarkThread(void * aContext);
-#endif
     static void MultithreadedTest(nlTestSuite * inSuite, void * aContext, void * (*aStartRoutine)(void *) );
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     // Not defined
     TestObject & operator=(const TestObject &) = delete;
 };
+
+void TestObjectDeletor::Release(TestObject * obj)
+{
+    TestObject::sPool.ReleaseObject(obj);
+}
 
 ObjectPool<TestObject, TestObject::kPoolSize> TestObject::sPool;
 
@@ -140,11 +150,15 @@ void TestObject::CheckIteration(nlTestSuite * inSuite, void * aContext)
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     unsigned int i;
 
-    sPool.Reset();
+    // Pool should be empty before tests.
+    sPool.ForEachActiveObject([&](auto object) {
+        NL_TEST_ASSERT(lContext.mTestSuite, false);
+        return true;
+    });
 
     for (i = 0; i < kPoolSize; ++i)
     {
-        TestObject * lCreated = sPool.TryCreate();
+        TestObject * lCreated = sPool.CreateObject();
 
         NL_TEST_ASSERT(lContext.mTestSuite, lCreated != nullptr);
         lCreated->Init();
@@ -152,7 +166,7 @@ void TestObject::CheckIteration(nlTestSuite * inSuite, void * aContext)
 
     i = 0;
     sPool.ForEachActiveObject([&](TestObject * lCreated) {
-        NL_TEST_ASSERT(lContext.mTestSuite, lCreated->IsRetained());
+        NL_TEST_ASSERT(lContext.mTestSuite, lCreated->GetReferenceCount() > 0);
         i++;
         return true;
     });
@@ -167,6 +181,12 @@ void TestObject::CheckIteration(nlTestSuite * inSuite, void * aContext)
         return true;
     });
     NL_TEST_ASSERT(lContext.mTestSuite, i == kPoolSize / 2);
+
+    // Clear the pool
+    sPool.ForEachActiveObject([&](auto object) {
+        object->Release();
+        return true;
+    });
 }
 
 // Test Object retention
@@ -176,11 +196,15 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     unsigned int i;
 
-    sPool.Reset();
+    // Pool should be empty before tests.
+    sPool.ForEachActiveObject([&](auto object) {
+        NL_TEST_ASSERT(lContext.mTestSuite, false);
+        return true;
+    });
 
     for (i = 0; i < kPoolSize; ++i)
     {
-        TestObject * lCreated = sPool.TryCreate();
+        TestObject * lCreated = sPool.CreateObject();
 
         NL_TEST_ASSERT(lContext.mTestSuite, lCreated != nullptr);
 
@@ -202,6 +226,12 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
         return true;
     });
     NL_TEST_ASSERT(lContext.mTestSuite, i == kPoolSize);
+
+    // Clear the pool
+    sPool.ForEachActiveObject([&](auto object) {
+        object->Release();
+        return true;
+    });
 }
 
 // Test Object concurrency
@@ -238,10 +268,10 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
         lObject = nullptr;
         while (lObject == nullptr)
         {
-            lObject = sPool.TryCreate();
+            lObject = sPool.CreateObject();
         }
 
-        NL_TEST_ASSERT(lContext.mTestSuite, lObject->IsRetained());
+        NL_TEST_ASSERT(lContext.mTestSuite, lObject->GetReferenceCount() > 0);
 
         lObject->Init();
         lObject->Delay(lContext.mAccumulator);
@@ -254,10 +284,10 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
         lObject = nullptr;
         while (lObject == nullptr)
         {
-            lObject = sPool.TryCreate();
+            lObject = sPool.CreateObject();
         }
 
-        NL_TEST_ASSERT(lContext.mTestSuite, lObject->IsRetained());
+        NL_TEST_ASSERT(lContext.mTestSuite, lObject->GetReferenceCount() > 0);
 
         lObject->Init();
         lObject->Delay(lContext.mAccumulator);
@@ -268,36 +298,16 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
     return aContext;
 }
 
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-void * TestObject::CheckHighWatermarkThread(void * aContext)
-{
-    TestContext & lContext = *static_cast<TestContext *>(aContext);
-    int i;
-    chip::System::Stats::count_t lNumInUse;
-    chip::System::Stats::count_t lHighWatermark;
-
-    i = (rand() % CHIP_SYS_STATS_COUNT_MAX);
-
-    sPool.UpdateHighWatermark(static_cast<unsigned int>(i));
-
-    sPool.GetStatistics(lNumInUse, lHighWatermark);
-
-    NL_TEST_ASSERT(lContext.mTestSuite, lHighWatermark >= i);
-    if (lHighWatermark < i)
-    {
-        printf("hwm: %d, i: %d\n", lHighWatermark, i);
-    }
-
-    return aContext;
-}
-#endif
-
 void TestObject::MultithreadedTest(nlTestSuite * inSuite, void * aContext, void * (*aStartRoutine)(void *) )
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     pthread_t lThread[kNumThreads];
 
-    sPool.Reset();
+    // Pool should be empty before tests.
+    sPool.ForEachActiveObject([&](auto object) {
+        NL_TEST_ASSERT(lContext.mTestSuite, false);
+        return true;
+    });
 
     for (unsigned int i = 0; i < kNumThreads; ++i)
     {
@@ -320,28 +330,27 @@ void TestObject::CheckConcurrency(nlTestSuite * inSuite, void * aContext)
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     MultithreadedTest(inSuite, aContext, CheckConcurrencyThread);
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-}
 
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-void TestObject::CheckHighWatermarkConcurrency(nlTestSuite * inSuite, void * aContext)
-{
-    sPool.Reset();
-
-#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-    for (unsigned int i = 0; i < 100; i++)
-    {
-        MultithreadedTest(inSuite, aContext, CheckHighWatermarkThread);
-    }
-#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+    // Clear the pool
+    sPool.ForEachActiveObject([&](auto object) {
+        object->Release();
+        return true;
+    });
 }
 
 void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 {
-    sPool.Reset();
-
-    const int kNumObjects  = kPoolSize;
-    TestObject * lObject   = nullptr;
     TestContext & lContext = *static_cast<TestContext *>(aContext);
+
+    // Pool should be empty before tests.
+    sPool.ForEachActiveObject([&](auto object) {
+        NL_TEST_ASSERT(lContext.mTestSuite, false);
+        return true;
+    });
+    sPool.ResetStatistics();
+
+    const int kNumObjects = kPoolSize;
+    TestObject * lObject  = nullptr;
     chip::System::Stats::count_t lNumInUse;
     chip::System::Stats::count_t lHighWatermark;
 
@@ -349,19 +358,22 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     // increases monotonically
     for (int i = 0; i < kNumObjects; ++i)
     {
-        lObject = sPool.TryCreate();
+        lObject = sPool.CreateObject();
 
-        NL_TEST_ASSERT(lContext.mTestSuite, lObject->IsRetained());
+        NL_TEST_ASSERT(lContext.mTestSuite, lObject->GetReferenceCount() > 0);
 
         sPool.GetStatistics(lNumInUse, lHighWatermark);
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
         NL_TEST_ASSERT(lContext.mTestSuite, lNumInUse == (i + 1));
         NL_TEST_ASSERT(lContext.mTestSuite, lHighWatermark == lNumInUse);
-
+#endif
         lObject->Init();
     }
 
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     // Fail an allocation and check that both stats don't change
-    NL_TEST_ASSERT(lContext.mTestSuite, sPool.TryCreate() == nullptr);
+    NL_TEST_ASSERT(lContext.mTestSuite, sPool.CreateObject() == nullptr);
+#endif
 
     sPool.GetStatistics(lNumInUse, lHighWatermark);
     NL_TEST_ASSERT(lContext.mTestSuite, lNumInUse == kNumObjects);
@@ -370,13 +382,22 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     // Free the last object and check that the watermark does not
     // change.
     lObject->Release();
-    NL_TEST_ASSERT(lContext.mTestSuite, !lObject->IsRetained());
+    // Verify that lObject is not in the pool
+    sPool.ForEachActiveObject([&](auto object) {
+        NL_TEST_ASSERT(lContext.mTestSuite, lObject != object);
+        return true;
+    });
 
     sPool.GetStatistics(lNumInUse, lHighWatermark);
     NL_TEST_ASSERT(lContext.mTestSuite, lNumInUse == (kNumObjects - 1));
     NL_TEST_ASSERT(lContext.mTestSuite, lHighWatermark == kNumObjects);
+
+    // Clear the pool
+    sPool.ForEachActiveObject([&](auto object) {
+        object->Release();
+        return true;
+    });
 }
-#endif // !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 // Test Suite
 
@@ -389,11 +410,8 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Iteration",                TestObject::CheckIteration),
     NL_TEST_DEF("Retention",                TestObject::CheckRetention),
     NL_TEST_DEF("Concurrency",              TestObject::CheckConcurrency),
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     NL_TEST_DEF("HighWatermark",            TestObject::CheckHighWatermark),
-    NL_TEST_DEF("HighWatermarkConcurrency", TestObject::CheckHighWatermarkConcurrency),
-#endif
-	NL_TEST_SENTINEL()
+    NL_TEST_SENTINEL()
 };
 
 static nlTestSuite sTestSuite =

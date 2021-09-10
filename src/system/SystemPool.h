@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
@@ -15,17 +16,33 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file contains declarations of the following classes and
+ *      templates:
+ *
+ *        - class chip::System::Object
+ *        - template<typename ALIGN, size_t SIZE> union chip::System::ObjectArena
+ *        - template<class T, unsigned int N> class chip::System::ObjectPool
+ */
+
 #pragma once
 
-#include <system/SystemConfig.h>
+#include <lib/core/CHIPConfig.h>
+
+#include <system/SystemPoolHeap.h>
+#include <system/SystemPoolNonHeap.h>
 
 namespace chip {
 namespace System {
 
-// An empty object, all its functionality is decoupled, but we still need for the type system.
-class DLL_EXPORT Object
-{
-};
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+template <class T, unsigned int N>
+using ObjectPool = ObjectPoolHeap<T, N>;
+#else
+template <class T, unsigned int N>
+using ObjectPool = ObjectPoolNonHeap<T, N>;
+#endif
 
 } // namespace System
 } // namespace chip

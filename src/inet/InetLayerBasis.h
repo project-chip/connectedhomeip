@@ -51,11 +51,13 @@ class InetLayer;
  *    InetLayer object.
  *
  */
-class InetLayerBasis : public chip::System::Object
+class InetLayerBasis : public System::Object
 {
 public:
     InetLayer & Layer() const;
     bool IsCreatedByInetLayer(const InetLayer & aInetLayer) const;
+
+    void * AppState;
 
 protected:
     void InitInetLayerBasis(InetLayer & aInetLayer, void * aAppState = nullptr);

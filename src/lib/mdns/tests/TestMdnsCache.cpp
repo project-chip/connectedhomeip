@@ -20,6 +20,8 @@
 // #define MDNS_LOGGING 1
 #include <cstdint>
 #include <iostream>
+#include <unistd.h>
+
 #include <nlunit-test.h>
 
 #include <inet/IPAddress.h>

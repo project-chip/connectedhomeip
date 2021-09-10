@@ -30,8 +30,8 @@
 
 #include "inet/IPEndPointBasis.h"
 #include <inet/IPAddress.h>
-
 #include <system/SystemPacketBuffer.h>
+#include <system/SystemPool.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #include <dispatch/dispatch.h>
@@ -69,6 +69,14 @@ public:
     CHIP_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
     void Close();
     void Free();
+
+    enum ReleaseDeferralErrorTactic
+    {
+        kReleaseDeferralErrorTactic_Ignore,  /**< No action. */
+        kReleaseDeferralErrorTactic_Release, /**< Release immediately. */
+        kReleaseDeferralErrorTactic_Die,     /**< Die with message. */
+    };
+    void DeferredFree(ReleaseDeferralErrorTactic aTactic);
 
 private:
     UDPEndPoint(const UDPEndPoint &) = delete;
