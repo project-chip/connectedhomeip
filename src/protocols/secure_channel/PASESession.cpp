@@ -412,6 +412,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     SuccessOrExit(err = tlvReader.Get(initiatorSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session ID %d", initiatorSessionId);
+    // TODO - Update <Set/Get><Local/Peer>KeyId() functions to <Set/Get><Local/Peer>SessionId()
     SetPeerKeyId(initiatorSessionId);
 
     SuccessOrExit(err = tlvReader.Next());
@@ -527,6 +528,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
     if (mHavePBKDFParameters)
     {
+        // TODO - Add a unit test that exercises mHavePBKDFParameters path
         err = SetupSpake2p(mIterationCount, ByteSpan(mSalt, mSaltLength));
         SuccessOrExit(err);
     }
@@ -670,8 +672,6 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
 
     System::PacketBufferHandle resp;
 
-    uint16_t spake2pErr = kProtocolCodeInvalidParam;
-
     ChipLogDetail(SecureChannel, "Received spake2p msg2");
 
     System::PacketBufferTLVReader tlvReader;
@@ -701,13 +701,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
 
     SuccessOrExit(err = mSpake2p.ComputeRoundTwo(Y, Y_len, verifier, &verifier_len));
 
-    err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len);
-    if (err != CHIP_NO_ERROR)
-    {
-        spake2pErr = kProtocolCodeNoSharedRoot;
-        SuccessOrExit(err);
-    }
-
+    SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
     SuccessOrExit(err = mSpake2p.GetKeys(mKe, &mKeLen));
     msg2 = nullptr;
 
@@ -739,15 +733,14 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        SendStatusReport(spake2pErr);
+        SendStatusReport(kProtocolCodeInvalidParam);
     }
     return err;
 }
 
 CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint16_t spake2pErr = kProtocolCodeInvalidParam;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogDetail(SecureChannel, "Received spake2p msg3");
 
@@ -771,13 +764,7 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
 
     VerifyOrExit(peer_verifier_len == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len);
-    if (err != CHIP_NO_ERROR)
-    {
-        spake2pErr = kProtocolCodeNoSharedRoot;
-        SuccessOrExit(err);
-    }
-
+    SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
     SuccessOrExit(err = mSpake2p.GetKeys(mKe, &mKeLen));
 
     // Send confirmation to peer that we succeeded so they can start using the session.
@@ -795,16 +782,18 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        SendStatusReport(spake2pErr);
+        SendStatusReport(kProtocolCodeInvalidParam);
     }
     return err;
 }
 
 void PASESession::SendStatusReport(uint16_t protocolCode)
 {
+    // TODO - Move SendStatusReport to a common part of the code.
+    // This could be reused for all secure channel protocol state machinies.
     GeneralStatusCode generalCode =
         (protocolCode == kProtocolCodeSuccess) ? GeneralStatusCode::kSuccess : GeneralStatusCode::kFailure;
-    uint32_t protocolId = Id.ToFullyQualifiedSpecForm();
+    uint32_t protocolId = Protocols::SecureChannel::Id.ToFullyQualifiedSpecForm();
 
     ChipLogDetail(SecureChannel, "Sending status report");
 
@@ -825,6 +814,8 @@ CHIP_ERROR PASESession::HandleStatusReport(System::PacketBufferHandle && msg)
     StatusReport report;
     CHIP_ERROR err = report.Parse(std::move(msg));
     ReturnErrorOnFailure(err);
+    VerifyOrReturnError(report.GetProtocolId() == Protocols::SecureChannel::Id.ToFullyQualifiedSpecForm(),
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     if (report.GetGeneralCode() == GeneralStatusCode::kSuccess && report.GetProtocolCode() == kProtocolCodeSuccess)
     {
@@ -840,10 +831,6 @@ CHIP_ERROR PASESession::HandleStatusReport(System::PacketBufferHandle && msg)
     {
         switch (report.GetProtocolCode())
         {
-        case kProtocolCodeNoSharedRoot:
-            err = CHIP_ERROR_KEY_CONFIRMATION_FAILED;
-            break;
-
         case kProtocolCodeInvalidParam:
             err = CHIP_ERROR_INVALID_PASE_PARAMETER;
             break;
@@ -852,7 +839,8 @@ CHIP_ERROR PASESession::HandleStatusReport(System::PacketBufferHandle && msg)
             err = CHIP_ERROR_INTERNAL;
             break;
         };
-        ChipLogError(SecureChannel, "Received error during pairing process. %s", ErrorStr(err));
+        ChipLogError(SecureChannel, "Received error (protocol code %d) during pairing process. %s", report.GetProtocolCode(),
+                     ErrorStr(err));
     }
 
     return err;

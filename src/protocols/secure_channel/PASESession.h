@@ -270,6 +270,7 @@ private:
     void SendStatusReport(uint16_t protocolCode);
     CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg);
 
+    // TODO - Move EstimateTLVStructOverhead to CHIPTLV header file
     constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }
 
     void CloseExchange();
