@@ -69,6 +69,10 @@ int main()
         goto exit;
     }
 
+#ifdef MBED_CONF_APP_BLE_DEVICE_NAME
+    ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_BLE_DEVICE_NAME);
+#endif
+
     ChipLogProgress(NotSpecified, "Starting CHIP task");
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
