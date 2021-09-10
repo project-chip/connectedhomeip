@@ -53,8 +53,89 @@ using namespace chip::Protocols;
 using TestContext = chip::Test::MessagingContext;
 
 namespace {
+
+/**
+ * A transport class that allows us to modify the messages that get sent and
+ * inject invalid messages at a specific part of the process.
+ */
+class CASETestTransport : public Test::LoopbackTransport
+{
+public:
+    // The transport is a singleton, so to enable per-test behavior we have a
+    // mutable member that tests can set to get a chance to modify messages.
+    class Adjuster
+    {
+    public:
+        Adjuster(CASETestTransport & transport) : mTransport(transport) { mTransport.mAdjuster = this; }
+
+        virtual ~Adjuster() { mTransport.mAdjuster = nullptr; }
+
+        virtual CHIP_ERROR AdjustMessage(const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg) = 0;
+
+        void NoteMessage(const PayloadHeader & payloadHeader)
+        {
+            if (payloadHeader.HasMessageType(SecureChannel::MsgType::CASE_SigmaR1))
+            {
+                mSaw1 = true;
+            }
+            else if (payloadHeader.HasMessageType(SecureChannel::MsgType::CASE_SigmaR2))
+            {
+                mSaw2 = true;
+            }
+            else if (payloadHeader.HasMessageType(SecureChannel::MsgType::CASE_SigmaR3))
+            {
+                mSaw3 = true;
+            }
+            else if (payloadHeader.HasMessageType(SecureChannel::MsgType::CASE_SigmaErr))
+            {
+                mSawStatus = true;
+            }
+            else
+            {
+                mSawOther = true;
+            }
+        }
+
+        bool mSaw1      = false;
+        bool mSaw2      = false;
+        bool mSaw3      = false;
+        bool mSawStatus = false;
+        bool mSawOther  = false;
+
+    private:
+        CASETestTransport & mTransport;
+    };
+
+protected:
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override
+    {
+        System::PacketBufferHandle msg(std::move(msgBuf));
+        if (mAdjuster)
+        {
+            // Strip off the headers.
+            PacketHeader packetHeader;
+            ReturnErrorOnFailure(packetHeader.DecodeAndConsume(msg));
+
+            PayloadHeader payloadHeader;
+            ReturnErrorOnFailure(payloadHeader.DecodeAndConsume(msg));
+
+            // Let the adjuster adjust the payload.
+            mAdjuster->NoteMessage(payloadHeader);
+            ReturnErrorOnFailure(mAdjuster->AdjustMessage(payloadHeader, msg));
+
+            // Put the headers back.
+            ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msg));
+            ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msg));
+        }
+        return Test::LoopbackTransport::SendMessage(address, std::move(msg));
+    }
+
+    friend class Adjuster;
+    Adjuster * mAdjuster = nullptr;
+};
+
 TransportMgrBase gTransportMgr;
-Test::LoopbackTransport gLoopback;
+CASETestTransport gLoopback;
 chip::Test::IOContext gIOContext;
 
 FabricTable gCommissionerFabrics;
@@ -207,7 +288,7 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 }
 
 void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
-                                           TestCASESecurePairingDelegate & delegateCommissioner)
+                                           TestCASESecurePairingDelegate & delegateCommissioner, bool expectSuccess = true)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -222,8 +303,8 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
-                       Protocols::SecureChannel::MsgType::CASE_SigmaR1, &pairingAccessory) == CHIP_NO_ERROR);
+                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(SecureChannel::MsgType::CASE_SigmaR1,
+                                                                                     &pairingAccessory) == CHIP_NO_ERROR);
 
     ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
 
@@ -236,15 +317,24 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
                    pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
                                                         contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
+    if (expectSuccess)
+    {
+        NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
+        NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
+        NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.ToSerializable(serializableCommissioner) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pairingAccessory.ToSerializable(serializableAccessory) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, pairingCommissioner.ToSerializable(serializableCommissioner) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, pairingAccessory.ToSerializable(serializableAccessory) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite,
+                       memcmp(serializableCommissioner.mSharedSecret, serializableAccessory.mSharedSecret,
+                              serializableCommissioner.mSharedSecretLen) == 0);
+    }
+
+    // Unregister the unsolicited message handler, since it's about to go out of
+    // scope.
     NL_TEST_ASSERT(inSuite,
-                   memcmp(serializableCommissioner.mSharedSecret, serializableAccessory.mSharedSecret,
-                          serializableCommissioner.mSharedSecretLen) == 0);
+                   ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(SecureChannel::MsgType::CASE_SigmaR1) ==
+                       CHIP_NO_ERROR);
 }
 
 void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
@@ -432,6 +522,40 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     chip::Platform::Delete(testPairingSession2);
 }
 
+void CASE_SecurePairingEmptySigmaR1(nlTestSuite * inSuite, void * inContext)
+{
+    TestCASESecurePairingDelegate delegateCommissioner;
+    TestCASESessionIPK pairingCommissioner;
+
+    class R1Emptier : public CASETestTransport::Adjuster
+    {
+    public:
+        R1Emptier(CASETestTransport & transport) : CASETestTransport::Adjuster(transport) {}
+
+    private:
+        CHIP_ERROR AdjustMessage(const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg) override
+        {
+            if (payloadHeader.HasMessageType(SecureChannel::MsgType::CASE_SigmaR1))
+            {
+                // Empty out the payload
+                msg->SetDataLength(0);
+            }
+            return CHIP_NO_ERROR;
+        }
+    };
+
+    R1Emptier adjuster(gLoopback);
+
+    CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner,
+                                          /* expectSuccess = */ false);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, adjuster.mSaw1);
+    NL_TEST_ASSERT(inSuite, !adjuster.mSaw2);
+    NL_TEST_ASSERT(inSuite, !adjuster.mSaw3);
+    NL_TEST_ASSERT(inSuite, adjuster.mSawStatus);
+    NL_TEST_ASSERT(inSuite, !adjuster.mSawOther);
+}
+
 // Test Suite
 
 /**
@@ -445,6 +569,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Handshake",   CASE_SecurePairingHandshakeTest),
     NL_TEST_DEF("ServerHandshake", CASE_SecurePairingHandshakeServerTest),
     NL_TEST_DEF("Serialize",   CASE_SecurePairingSerializeTest),
+    NL_TEST_DEF("EmptySigmaR1", CASE_SecurePairingEmptySigmaR1),
 
     NL_TEST_SENTINEL()
 };
