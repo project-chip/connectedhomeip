@@ -263,8 +263,8 @@ int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 {
     GVariantBuilder filterBuilder;
     GVariantBuilder uuidsBuilder;
-    GVariant *filter;
-    GVariant *uuids;
+    GVariant * filter;
+    GVariant * uuids;
     GError * error = nullptr;
 
     self->mObjectAddedSignal = g_signal_connect(self->mManager, "object-added", G_CALLBACK(SignalObjectAdded), self);
