@@ -19,37 +19,35 @@
 #include "AppTask.h"
 
 #include "mbedtls/platform.h"
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mbed/Logging.h>
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
-using namespace ::chip::Platform;
-using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging::Platform;
 
 int main(int argc, char * argv[])
 {
-    int ret;
-    CHIP_ERROR err;
+    int ret        = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     mbed_logging_init();
 
     ret = mbedtls_platform_setup(NULL);
     if (ret)
     {
-        ChipLogError(NotSpecified, "Mbed TLS platform initialization failed with error %d", ret);
+        ChipLogError(NotSpecified, "Mbed TLS platform initialization failed [%d]", ret);
         goto exit;
     }
 
     err = MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Platform::MemoryInit() failed");
-        ret = static_cast<int>(err.GetValue());
+        ChipLogError(NotSpecified, "Memory initalization failed: %s", err.AsString());
+        ret = EXIT_FAILURE;
         goto exit;
     }
 
@@ -57,17 +55,27 @@ int main(int argc, char * argv[])
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed");
-        ret = static_cast<int>(err.GetValue());
+        ChipLogError(NotSpecified, "Chip stack initalization failed: %s", err.AsString());
+        ret = EXIT_FAILURE;
         goto exit;
     }
+
+#ifdef MBED_CONF_APP_BLE_DEVICE_NAME
+    err = ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_BLE_DEVICE_NAME);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Set BLE device name failed: %s", err.AsString());
+        ret = EXIT_FAILURE;
+        goto exit;
+    }
+#endif
 
     ChipLogProgress(NotSpecified, "Starting CHIP task");
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "PlatformMgr().StartEventLoopTask() failed");
-        ret = static_cast<int>(err.GetValue());
+        ChipLogError(NotSpecified, "Chip stack start failed: %s", err.AsString());
+        ret = EXIT_FAILURE;
         goto exit;
     }
 
