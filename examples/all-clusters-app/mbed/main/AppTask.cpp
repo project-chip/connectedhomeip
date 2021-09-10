@@ -95,6 +95,8 @@ int AppTask::StartApp()
         return ret;
     }
 
+    ChipLogProgress(NotSpecified, "Mbed all-clusters-app example application run");
+
     while (true)
     {
         sAppEventQueue.dispatch(100);

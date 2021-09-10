@@ -36,6 +36,8 @@ int main(int argc, char * argv[])
 
     mbed_logging_init();
 
+    ChipLogProgress(NotSpecified, "Mbed all-clusters-app example application start");
+
     ret = mbedtls_platform_setup(NULL);
     if (ret)
     {
@@ -43,7 +45,7 @@ int main(int argc, char * argv[])
         goto exit;
     }
 
-    err = MemoryInit();
+    err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Memory initalization failed: %s", err.AsString());
@@ -51,7 +53,6 @@ int main(int argc, char * argv[])
         goto exit;
     }
 
-    ChipLogProgress(NotSpecified, "Init CHIP Stack\r\n");
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -70,7 +71,6 @@ int main(int argc, char * argv[])
     }
 #endif
 
-    ChipLogProgress(NotSpecified, "Starting CHIP task");
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
