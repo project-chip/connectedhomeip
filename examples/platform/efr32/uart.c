@@ -20,7 +20,8 @@
 #include "assert.h"
 #include "em_core.h"
 #include "em_usart.h"
-#include "hal-config.h"
+#include "sl_board_control.h"
+#include "sl_uartdrv_instances.h"
 #include "sl_uartdrv_usart_vcom_config.h"
 #include "uartdrv.h"
 #include <stddef.h>
@@ -37,9 +38,6 @@
 #define HELPER3(x) USART##x##_RX_IRQHandler
 #define HELPER4(x) HELPER3(x)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
-
-DEFINE_BUF_QUEUE(EMDRV_UARTDRV_MAX_CONCURRENT_RX_BUFS, sUartRxQueue);
-DEFINE_BUF_QUEUE(EMDRV_UARTDRV_MAX_CONCURRENT_TX_BUFS, sUartTxQueue);
 
 typedef struct
 {
@@ -65,9 +63,6 @@ static uint16_t lastCount; // Nb of bytes already processed from the active dmaB
 // Rx buffer for the receive Fifo
 static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
 static Fifo_t sReceiveFifo;
-
-static UARTDRV_HandleData_t sUartHandleData;
-static UARTDRV_Handle_t sUartHandle = &sUartHandleData;
 
 static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount);
 
@@ -181,47 +176,13 @@ static uint8_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeToR
  */
 void uartConsoleInit(void)
 {
-    UARTDRV_Init_t uartInit = {
-        .port     = USART0,
-        .baudRate = HAL_SERIAL_APP_BAUD_RATE,
-#if defined(_USART_ROUTELOC0_MASK)
-        .portLocationTx = BSP_SERIAL_APP_TX_LOC,
-        .portLocationRx = BSP_SERIAL_APP_RX_LOC,
-#elif defined(_USART_ROUTE_MASK)
-#error This configuration is not supported
-#elif defined(_GPIO_USART_ROUTEEN_MASK)
-        .txPort  = BSP_SERIAL_APP_TX_PORT, /* USART Tx port number */
-        .rxPort  = BSP_SERIAL_APP_RX_PORT, /* USART Rx port number */
-        .txPin   = BSP_SERIAL_APP_TX_PIN,  /* USART Tx pin number */
-        .rxPin   = BSP_SERIAL_APP_RX_PIN,  /* USART Rx pin number */
-        .uartNum = 0,                      /* UART instance number */
-#endif
-#if defined(USART_CTRL_MVDIS)
-        .mvdis = false,
-#endif
-        .stopBits     = (USART_Stopbits_TypeDef) USART_FRAME_STOPBITS_ONE,
-        .parity       = (USART_Parity_TypeDef) USART_FRAME_PARITY_NONE,
-        .oversampling = (USART_OVS_TypeDef) USART_CTRL_OVS_X16,
-        .fcType       = HAL_SERIAL_APP_FLOW_CONTROL,
-        .ctsPort      = BSP_SERIAL_APP_CTS_PORT,
-        .ctsPin       = BSP_SERIAL_APP_CTS_PIN,
-        .rtsPort      = BSP_SERIAL_APP_RTS_PORT,
-        .rtsPin       = BSP_SERIAL_APP_RTS_PIN,
-        .rxQueue      = (UARTDRV_Buffer_FifoQueue_t *) &sUartRxQueue,
-        .txQueue      = (UARTDRV_Buffer_FifoQueue_t *) &sUartTxQueue,
-#if defined(_USART_ROUTELOC1_MASK)
-        .portLocationCts = BSP_SERIAL_APP_CTS_LOC,
-        .portLocationRts = BSP_SERIAL_APP_RTS_LOC,
-#endif
-    };
-
+    sl_board_enable_vcom();
     // Init a fifo for the data received on the uart
     InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
 
-    UARTDRV_InitUart(sUartHandle, &uartInit);
     // Activate 2 dma queues to always have one active
-    UARTDRV_Receive(sUartHandle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
-    UARTDRV_Receive(sUartHandle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
+    UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
+    UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
 
     // Enable USART0 interrupt to wake OT task when data arrives
     NVIC_ClearPendingIRQ(USART_IRQ);
@@ -250,7 +211,7 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
         lastCount = 0;
     }
 
-    UARTDRV_Receive(sUartHandle, data, transferCount, UART_rx_callback);
+    UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, data, transferCount, UART_rx_callback);
 #ifndef PW_RPC_ENABLED
     otSysEventSignalPending();
 #endif
@@ -270,7 +231,7 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
 
     // Use of ForceTransmit here. Transmit with DMA was causing errors with PW_RPC
     // TODO Use DMA and find/fix what causes the issue with PW
-    if (UARTDRV_ForceTransmit(sUartHandle, (uint8_t *) Buf, BufLength) == ECODE_EMDRV_UARTDRV_OK)
+    if (UARTDRV_ForceTransmit(sl_uartdrv_usart_vcom_handle, (uint8_t *) Buf, BufLength) == ECODE_EMDRV_UARTDRV_OK)
     {
         return BufLength;
     }
@@ -297,10 +258,11 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
     {
         // Not enough data available in the fifo for the read size request
         // If there is data available in dma buffer, get it now.
-        CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(sUartHandle, &data, &count, &remaining); if (count > lastCount) {
-            WriteToFifo(&sReceiveFifo, data + lastCount, count - lastCount);
-            lastCount = count;
-        })
+        CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(sl_uartdrv_usart_vcom_handle, &data, &count, &remaining);
+                            if (count > lastCount) {
+                                WriteToFifo(&sReceiveFifo, data + lastCount, count - lastCount);
+                                lastCount = count;
+                            })
     }
 
     return (int16_t) RetrieveFromFifo(&sReceiveFifo, (uint8_t *) Buf, NbBytesToRead);

@@ -26,8 +26,8 @@
 
 #include "CHIPDeviceCallbacksMgr.h"
 
-#include <core/CHIPCore.h>
 #include <inttypes.h>
+#include <lib/core/CHIPCore.h>
 
 namespace {
 

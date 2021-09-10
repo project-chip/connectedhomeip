@@ -19,10 +19,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

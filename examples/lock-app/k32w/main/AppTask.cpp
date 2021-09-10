@@ -18,19 +18,19 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "support/ErrorStr.h"
 #include <app/server/Server.h>
+#include <lib/support/ErrorStr.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <support/ThreadOperationalDataset.h>
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
 #include "Keyboard.h"
@@ -47,8 +47,10 @@ TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 static SemaphoreHandle_t sCHIPEventLock;
 static QueueHandle_t sAppEventQueue;
 
+#if !cPWR_UsePowerDownMode
 static LEDWidget sStatusLED;
 static LEDWidget sLockLED;
+#endif
 
 static bool sIsThreadProvisioned     = false;
 static bool sIsThreadEnabled         = false;
@@ -96,6 +98,7 @@ CHIP_ERROR AppTask::Init()
     TMR_Init();
 
     /* HW init leds */
+#if !cPWR_UsePowerDownMode
     LED_Init();
 
     /* start with all LEDS turnedd off */
@@ -103,6 +106,7 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
+#endif
     UpdateClusterState();
 
     /* intialize the Keyboard and button press calback */
@@ -146,12 +150,11 @@ CHIP_ERROR AppTask::Init()
         assert(err == CHIP_NO_ERROR);
     }
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_COMMISSIONING
     PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
 #endif
 
     K32W_LOG("Current Firmware Version: %s", currentFirmwareRev);
-
     return err;
 }
 
@@ -168,7 +171,13 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+        TickType_t xTicksToWait = pdMS_TO_TICKS(10);
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+        xTicksToWait = portMAX_DELAY;
+#endif
+
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, xTicksToWait);
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
@@ -205,6 +214,8 @@ void AppTask::AppTaskMain(void * pvParameter)
         // rate of 100ms.
         //
         // Otherwise, blink the LED ON for a very short time.
+
+#if !cPWR_UsePowerDownMode
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
             if (sHaveServiceConnectivity)
@@ -227,8 +238,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
         sStatusLED.Animate();
         sLockLED.Animate();
-
-        HandleKeyboard();
+#endif
     }
 }
 
@@ -273,6 +283,8 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 void AppTask::KBD_Callback(uint8_t events)
 {
     eventMask = eventMask | (uint32_t)(1 << events);
+
+    HandleKeyboard();
 }
 
 void AppTask::HandleKeyboard(void)
@@ -295,11 +307,20 @@ void AppTask::HandleKeyboard(void)
         switch (keyEvent)
         {
         case gKBD_EventPB1_c:
+            K32W_LOG("pb1 short press");
+
 #if (defined OM15082)
             ButtonEventHandler(RESET_BUTTON, RESET_BUTTON_PUSH);
             break;
 #else
-            ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
+            if (sAppTask.mResetTimerActive)
+            {
+                ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
+            }
+            else
+            {
+                ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
+            }
             break;
 #endif
         case gKBD_EventPB2_c:
@@ -313,6 +334,7 @@ void AppTask::HandleKeyboard(void)
             break;
 #if !(defined OM15082)
         case gKBD_EventLongPB1_c:
+            K32W_LOG("pb1 long press");
             ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
             break;
 #endif
@@ -331,8 +353,10 @@ void AppTask::TimerEventHandler(TimerHandle_t xTimer)
     sAppTask.PostEvent(&event);
 }
 
-void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
+void AppTask::FunctionTimerEventHandler(void * aGenericEvent)
 {
+    AppEvent * aEvent = (AppEvent *) aGenericEvent;
+
     if (aEvent->Type != AppEvent::kEventType_Timer)
         return;
 
@@ -342,8 +366,10 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     ConfigurationMgr().InitiateFactoryReset();
 }
 
-void AppTask::ResetActionEventHandler(AppEvent * aEvent)
+void AppTask::ResetActionEventHandler(void * aGenericEvent)
 {
+    AppEvent * aEvent = (AppEvent *) aGenericEvent;
+
     if (aEvent->ButtonEvent.PinNo != RESET_BUTTON && aEvent->ButtonEvent.PinNo != BLE_BUTTON)
         return;
 
@@ -352,6 +378,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
         sAppTask.CancelTimer();
         sAppTask.mFunction = kFunction_NoneSelected;
 
+#if !cPWR_UsePowerDownMode
         /* restore initial state for the LED indicating Lock state */
         if (BoltLockMgr().IsUnlocked())
         {
@@ -361,6 +388,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
         {
             sLockLED.Set(true);
         }
+#endif
 
         K32W_LOG("Factory Reset was cancelled!");
     }
@@ -378,18 +406,21 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
         sAppTask.mFunction = kFunction_FactoryReset;
 
         /* LEDs will start blinking to signal that a Factory Reset was scheduled */
+#if !cPWR_UsePowerDownMode
         sStatusLED.Set(false);
         sLockLED.Set(false);
 
         sStatusLED.Blink(500);
         sLockLED.Blink(500);
+#endif
 
         sAppTask.StartTimer(kFactoryResetTriggerTimeout);
     }
 }
 
-void AppTask::LockActionEventHandler(AppEvent * aEvent)
+void AppTask::LockActionEventHandler(void * aGenericEvent)
 {
+    AppEvent * aEvent = (AppEvent *) aGenericEvent;
     BoltLockManager::Action_t action;
     CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t actor  = 0;
@@ -456,8 +487,10 @@ void AppTask::ThreadStart()
     ThreadStackMgr().SetThreadEnabled(true);
 }
 
-void AppTask::JoinHandler(AppEvent * aEvent)
+void AppTask::JoinHandler(void * aGenericEvent)
 {
+    AppEvent * aEvent = (AppEvent *) aGenericEvent;
+
     if (aEvent->ButtonEvent.PinNo != JOIN_BUTTON)
         return;
 
@@ -473,8 +506,10 @@ void AppTask::JoinHandler(AppEvent * aEvent)
     ThreadStart();
 }
 
-void AppTask::BleHandler(AppEvent * aEvent)
+void AppTask::BleHandler(void * aGenericEvent)
 {
+    AppEvent * aEvent = (AppEvent *) aGenericEvent;
+
     if (aEvent->ButtonEvent.PinNo != BLE_BUTTON)
         return;
 
@@ -504,7 +539,7 @@ void AppTask::BleHandler(AppEvent * aEvent)
     }
 }
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_COMMISSIONING
 void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
@@ -583,7 +618,10 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
     }
 
     sAppTask.mFunction = kFunctionLockUnlock;
+
+#if !cPWR_UsePowerDownMode
     sLockLED.Blink(50, 50);
+#endif
 }
 
 void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
@@ -594,12 +632,16 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     if (aAction == BoltLockManager::LOCK_ACTION)
     {
         K32W_LOG("Lock Action has been completed")
+#if !cPWR_UsePowerDownMode
         sLockLED.Set(true);
+#endif
     }
     else if (aAction == BoltLockManager::UNLOCK_ACTION)
     {
         K32W_LOG("Unlock Action has been completed")
+#if !cPWR_UsePowerDownMode
         sLockLED.Set(false);
+#endif
     }
 
     if (sAppTask.mSyncClusterToButtonAction)
@@ -623,9 +665,21 @@ void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aA
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
+    portBASE_TYPE taskToWake = pdFALSE;
     if (sAppEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, aEvent, 1))
+        if (__get_IPSR())
+        {
+            if (!xQueueSendToFrontFromISR(sAppEventQueue, aEvent, &taskToWake))
+            {
+                K32W_LOG("Failed to post event to app task event queue");
+            }
+            if (taskToWake)
+            {
+                portYIELD_FROM_ISR(taskToWake);
+            }
+        }
+        else if (!xQueueSend(sAppEventQueue, aEvent, 0))
         {
             K32W_LOG("Failed to post event to app task event queue");
         }
@@ -634,6 +688,14 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    /* specific processing for events sent from App_PostCallbackMessage (see main.cpp) */
+    if (aEvent->Type == AppEvent::kEventType_Lp)
+    {
+        aEvent->Handler(aEvent->param);
+    }
+#endif
+
     if (aEvent->Handler)
     {
         aEvent->Handler(aEvent);

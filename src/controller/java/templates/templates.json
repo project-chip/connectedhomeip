@@ -34,7 +34,7 @@
         {
             "path": "ChipClusters-java.zapt",
             "name": "CHIP ZCL API for Java",
-            "output": "src/controller/java/zap-generated/ChipClusters.java"
+            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipClusters.java"
         }
     ]
 }

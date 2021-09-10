@@ -1,7 +1,7 @@
 {{> header}}
 
-#include <app/common/gen/callback.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <lib/support/Span.h>
 
 using namespace chip;

@@ -23,13 +23,14 @@
 #if !CHIP_DEVICE_LAYER_NONE
 
 #include <ble/BleLayer.h>
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <platform/CHIPDeviceError.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/GeneralUtils.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
+#include <system/SystemLayerImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 #include <platform/SoftwareUpdateManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
@@ -44,7 +45,7 @@ namespace chip {
 namespace DeviceLayer {
 
 struct ChipDeviceEvent;
-extern chip::System::Layer SystemLayer;
+extern chip::System::LayerImpl SystemLayer;
 extern Inet::InetLayer InetLayer;
 
 } // namespace DeviceLayer

@@ -19,17 +19,17 @@
 #include "DeviceCallbacks.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <core/CHIPError.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <support/CHIPMemString.h>
-#include <support/ErrorStr.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/ErrorStr.h>
 
 #include <app/server/Server.h>
 

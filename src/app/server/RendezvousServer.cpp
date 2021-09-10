@@ -18,15 +18,15 @@
 #include <app/server/RendezvousServer.h>
 
 #include <app/server/Mdns.h>
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
 #endif
-#include <mdns/Advertiser.h>
+#include <lib/mdns/Advertiser.h>
 
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -176,10 +176,7 @@ void RendezvousServer::OnSessionEstablished()
     }
     else
     {
-        // TODO: remove this once we move all tools / examples onto cluster-based IP commissioning.
-#if CONFIG_RENDEZVOUS_WAIT_FOR_COMMISSIONING_COMPLETE
         Cleanup();
-#endif
     }
 
     ChipLogProgress(AppServer, "Device completed Rendezvous process");

@@ -27,14 +27,14 @@
 #include <openthread/error.h>
 #include <openthread/heap.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
-#include <support/logging/CHIPLogging.h>
 
-#include "FreeRtosMbedtlsUtils.h"
+#include "FreeRtosHooks.h"
 #include "app_config.h"
 
 #include "radio.h"

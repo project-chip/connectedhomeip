@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include <core/CHIPConfig.h>
-#include <support/TypeTraits.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/TypeTraits.h>
 
 #include <inttypes.h>
 #include <limits>
@@ -2163,6 +2163,14 @@ using CHIP_ERROR = ::chip::ChipError;
  *   The received public key doesn't match locally generated key.
  */
 #define CHIP_ERROR_INVALID_PUBLIC_KEY                          CHIP_CORE_ERROR(0xc5)
+
+/**
+ * @def CHIP_ERROR_FABRIC_MISMATCH_ON_ICA
+ *
+ * @brief
+ *   The fabric ID in ICA certificate doesn't match the one in NOC.
+ */
+#define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                          CHIP_CORE_ERROR(0xc6)
 
 /**
  *  @}

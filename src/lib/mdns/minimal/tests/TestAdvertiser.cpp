@@ -14,21 +14,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <mdns/Advertiser.h>
+#include <lib/mdns/Advertiser.h>
 
 #include <string>
 #include <utility>
 
-#include <mdns/Advertiser.h>
-#include <mdns/MinimalMdnsServer.h>
-#include <mdns/minimal/Query.h>
-#include <mdns/minimal/QueryBuilder.h>
-#include <mdns/minimal/core/QName.h>
-#include <mdns/minimal/records/Ptr.h>
-#include <mdns/minimal/records/Srv.h>
-#include <mdns/minimal/records/Txt.h>
-#include <mdns/minimal/tests/CheckOnlyServer.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/mdns/Advertiser.h>
+#include <lib/mdns/MinimalMdnsServer.h>
+#include <lib/mdns/minimal/Query.h>
+#include <lib/mdns/minimal/QueryBuilder.h>
+#include <lib/mdns/minimal/core/QName.h>
+#include <lib/mdns/minimal/records/Ptr.h>
+#include <lib/mdns/minimal/records/Srv.h>
+#include <lib/mdns/minimal/records/Txt.h>
+#include <lib/mdns/minimal/tests/CheckOnlyServer.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <nlunit-test.h>
@@ -52,12 +52,12 @@ const FullQName kHostnameName       = FullQName(kHostnameParts);
 // Operational records and queries.
 const QNamePart kMatterOperationalQueryParts[3] = { "_matter", "_tcp", "local" };
 const FullQName kMatterOperationalQueryName     = FullQName(kMatterOperationalQueryParts);
-const PeerId kPeerId1                           = PeerId().SetFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
-const PeerId kPeerId2                           = PeerId().SetFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
-const PeerId kPeerId3                           = PeerId().SetFabricId(0x3333333333333333).SetNodeId(0x3333333333333333);
-const PeerId kPeerId4                           = PeerId().SetFabricId(0x4444444444444444).SetNodeId(0x4444444444444444);
-const PeerId kPeerId5                           = PeerId().SetFabricId(0x5555555555555555).SetNodeId(0x5555555555555555);
-const PeerId kPeerId6                           = PeerId().SetFabricId(0x6666666666666666).SetNodeId(0x6666666666666666);
+const PeerId kPeerId1                           = PeerId().SetCompressedFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
+const PeerId kPeerId2                           = PeerId().SetCompressedFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
+const PeerId kPeerId3                           = PeerId().SetCompressedFabricId(0x3333333333333333).SetNodeId(0x3333333333333333);
+const PeerId kPeerId4                           = PeerId().SetCompressedFabricId(0x4444444444444444).SetNodeId(0x4444444444444444);
+const PeerId kPeerId5                           = PeerId().SetCompressedFabricId(0x5555555555555555).SetNodeId(0x5555555555555555);
+const PeerId kPeerId6                           = PeerId().SetCompressedFabricId(0x6666666666666666).SetNodeId(0x6666666666666666);
 const QNamePart kInstanceNameParts1[]           = { "BEEFBEEFF00DF00D-1111222233334444", "_matter", "_tcp", "local" };
 const FullQName kInstanceName1                  = FullQName(kInstanceNameParts1);
 const QNamePart kInstanceNameParts2[]           = { "5555666677778888-1212343456567878", "_matter", "_tcp", "local" };

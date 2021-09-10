@@ -1,5 +1,5 @@
 {
-  "featureLevel": 45,
+  "featureLevel": 51,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1661,7 +1661,7 @@
           ],
           "attributes": [
             {
-              "name": "FabricId",
+              "name": "Breadcrumb",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -1676,7 +1676,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Breadcrumb",
+              "name": "BasicCommissioningInfoList",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -9926,6 +9926,5 @@
       "endpointVersion": null,
       "deviceIdentifier": null
     }
-  ],
-  "log": []
+  ]
 }

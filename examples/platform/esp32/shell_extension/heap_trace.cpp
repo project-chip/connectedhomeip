@@ -19,7 +19,7 @@
 
 #include <string.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <lib/shell/streamer.h>

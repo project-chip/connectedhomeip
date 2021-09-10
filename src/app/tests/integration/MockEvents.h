@@ -27,7 +27,7 @@
 
 #include <app/EventLoggingDelegate.h>
 #include <app/InteractionModelEngine.h>
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>

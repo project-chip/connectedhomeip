@@ -62,9 +62,9 @@
 #include <ble/BlePlatformDelegate.h>
 #include <ble/BleUUID.h>
 
-#include <core/CHIPEncoding.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 // Magic values expected in first 2 bytes of valid BLE transport capabilities request or response:
 #define CAPABILITIES_MSG_CHECK_BYTE_1 'n'

@@ -27,7 +27,7 @@
 
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif

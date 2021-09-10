@@ -31,18 +31,18 @@
 
 #include <stddef.h>
 
-#include <asn1/ASN1.h>
-#include <asn1/ASN1Macros.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
-#include <core/CHIPTLV.h>
 #include <credentials/CHIPCert.h>
+#include <lib/asn1/ASN1.h>
+#include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/TimeUtils.h>
 #include <protocols/Protocols.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
-#include <support/TimeUtils.h>
 
 namespace chip {
 namespace Credentials {
@@ -910,25 +910,28 @@ exit:
     return err;
 }
 
-CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, PeerId * peerId)
+CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, NodeId * outNodeId, FabricId * outFabricId)
 {
     // Since we assume the cert is pre-validated, we are going to assume that
     // its subject in fact has both a node id and a fabric id.
-    PeerId id;
-    bool foundNodeId         = false;
-    bool foundFabricId       = false;
+    ReturnErrorCodeIf(outNodeId == nullptr || outFabricId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    NodeId nodeId      = 0;
+    FabricId fabricId  = kUndefinedFabricId;
+    bool foundNodeId   = false;
+    bool foundFabricId = false;
+
     const ChipDN & subjectDN = opcert.mSubjectDN;
     for (uint8_t i = 0; i < subjectDN.RDNCount(); ++i)
     {
         const auto & rdn = subjectDN.rdn[i];
         if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipNodeId)
         {
-            id.SetNodeId(rdn.mChipVal);
+            nodeId      = rdn.mChipVal;
             foundNodeId = true;
         }
         else if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipFabricId)
         {
-            id.SetFabricId(rdn.mChipVal);
+            fabricId      = rdn.mChipVal;
             foundFabricId = true;
         }
     }
@@ -937,7 +940,8 @@ CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, PeerId * 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    *peerId = id;
+    *outNodeId   = nodeId;
+    *outFabricId = fabricId;
     return CHIP_NO_ERROR;
 }
 
@@ -957,7 +961,7 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId)
+CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nodeId, FabricId * fabricId)
 {
     ChipCertificateSet certSet;
 
@@ -965,16 +969,16 @@ CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId)
 
     ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
 
-    return ExtractPeerIdFromOpCert(certSet.GetCertSet()[0], peerId);
+    return ExtractNodeIdFabricIdFromOpCert(certSet.GetCertSet()[0], nodeId, fabricId);
 }
 
-CHIP_ERROR ExtractPeerIdFromOpCertArray(const ByteSpan & opcertarray, PeerId * peerId)
+CHIP_ERROR ExtractNodeIdFabricIdFromOpCertArray(const ByteSpan & opcertarray, NodeId * nodeId, FabricId * fabricId)
 {
     ByteSpan noc;
     ByteSpan icac;
     ReturnErrorOnFailure(ExtractCertsFromCertArray(opcertarray, noc, icac));
 
-    return ExtractPeerIdFromOpCert(noc, peerId);
+    return ExtractNodeIdFabricIdFromOpCert(noc, nodeId, fabricId);
 }
 
 } // namespace Credentials

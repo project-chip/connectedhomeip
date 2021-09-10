@@ -20,11 +20,11 @@
 #include <arpa/inet.h>
 #include <strings.h>
 
-#include <mdns/Advertiser.h>
+#include <lib/mdns/Advertiser.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/Span.h>
 
 using namespace chip;
 
@@ -289,7 +289,7 @@ int main(int argc, char ** args)
                 .EnableIpV4(gOptions.enableIpV4)
                 .SetPort(CHIP_PORT)
                 .SetMac(chip::ByteSpan(gOptions.mac, 6))
-                .SetPeerId(PeerId().SetFabricId(gOptions.fabricId).SetNodeId(gOptions.nodeId)));
+                .SetPeerId(PeerId().SetCompressedFabricId(gOptions.fabricId).SetNodeId(gOptions.nodeId)));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kCommissioner)
     {

@@ -27,10 +27,10 @@
 
 #include <vector>
 
-#include <core/CHIPCore.h>
 #include <inet/InetArgParser.h>
 #include <inet/InetLayer.h>
-#include <support/CHIPArgParser.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <system/SystemLayer.h>
 
 #define TOOL_OPTIONS_ENV_VAR_NAME "CHIP_INET_TEST_OPTIONS"

@@ -36,9 +36,7 @@ efr32_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
-    "${efr32_project_dir}/src",
     "${examples_plat_dir}",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
   defines = [ "BOARD_ID=${efr32_board}" ]
@@ -51,7 +49,6 @@ efr32_executable("persistent_storage") {
     "${efr32_project_dir}/../KeyValueStorageTest.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.c",
     "main.cpp",
   ]
 
@@ -67,11 +64,7 @@ efr32_executable("persistent_storage") {
     "${efr32_project_dir}/include",
   ]
 
-  if (efr32_family == "efr32mg12") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG12P.ld"
-  } else if (efr32_family == "efr32mg21") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
-  }
+  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
 
   inputs = [ ldscript ]
 

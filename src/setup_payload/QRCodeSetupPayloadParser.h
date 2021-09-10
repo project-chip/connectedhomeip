@@ -23,8 +23,8 @@
 
 #include "SetupPayload.h"
 
-#include <core/CHIPError.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLV.h>
 
 #include <string>
 #include <utility>
@@ -45,7 +45,7 @@ public:
     CHIP_ERROR populatePayload(SetupPayload & outPayload);
 
 private:
-    CHIP_ERROR retrieveOptionalInfos(SetupPayload & outPayload, TLV::TLVReader & reader);
+    CHIP_ERROR retrieveOptionalInfos(SetupPayload & outPayload, TLV::ContiguousBufferTLVReader & reader);
     CHIP_ERROR populateTLV(SetupPayload & outPayload, const std::vector<uint8_t> & buf, size_t & index);
     CHIP_ERROR parseTLVFields(chip::SetupPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes);
 };

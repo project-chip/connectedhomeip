@@ -18,11 +18,11 @@
 
 #pragma once
 
+#include <app-common/zap-generated/enums.h>
 #include <app/clusters/media-playback-server/media-playback-server.h>
-#include <app/common/gen/enums.h>
 #include <app/util/af-types.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 class MediaPlaybackManager
 {

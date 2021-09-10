@@ -30,6 +30,7 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
 
 @protocol CHIPDevicePairingDelegate;
 @protocol CHIPPersistentStorageDelegate;
+@protocol CHIPKeypair;
 
 @interface CHIPDeviceController : NSObject
 
@@ -97,8 +98,11 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  *
  * @param[in] storageDelegate The delegate for persistent storage
  * @param[in] vendorId The vendor ID of the commissioner application
+ * @param[in] nocSigner The CHIPKeypair that is used to generate and sign Node Operational Credentials
  */
-- (BOOL)startup:(nullable id<CHIPPersistentStorageDelegate>)storageDelegate vendorId:(uint16_t)vendorId;
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+       vendorId:(uint16_t)vendorId
+      nocSigner:(nullable id<CHIPKeypair>)nocSigner;
 
 /**
  * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.

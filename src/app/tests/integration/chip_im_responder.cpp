@@ -30,13 +30,13 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
@@ -117,7 +117,6 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -134,7 +133,6 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 
     err = apWriteHandler->AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
                                                  Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
-    ChipLogFunctError(err);
     return err;
 }
 } // namespace app

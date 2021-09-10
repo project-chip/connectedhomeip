@@ -45,3 +45,14 @@ void TestCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, C
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
     command->SetCommandExitStatus(error);
 }
+
+void TestCommand::OnWaitForMsFn(chip::System::Layer * systemLayer, void * context)
+{
+    auto * command = static_cast<TestCommand *>(context);
+    command->NextTest();
+}
+
+CHIP_ERROR TestCommand::WaitForMs(uint32_t ms)
+{
+    return chip::DeviceLayer::SystemLayer.StartTimer(ms, OnWaitForMsFn, this);
+}

@@ -62,7 +62,11 @@ class DeviceProvisioningFragment : Fragment() {
     deviceInfo = checkNotNull(requireArguments().getParcelable(ARG_DEVICE_INFO))
     return inflater.inflate(R.layout.single_fragment_container, container, false).apply {
       if (savedInstanceState == null) {
-        startConnectingToDevice()
+        if (deviceInfo.ipAddress != null) {
+          pairDeviceWithAddress()
+        } else {
+          startConnectingToDevice()
+        }
       }
     }
   }
@@ -71,6 +75,23 @@ class DeviceProvisioningFragment : Fragment() {
     super.onStop()
     gatt = null
     scope.cancel()
+  }
+
+  private fun pairDeviceWithAddress() {
+    // IANA CHIP port
+    val port = 5540
+    val id = DeviceIdUtil.getNextAvailableId(requireContext())
+    val deviceController = ChipClient.getDeviceController(requireContext())
+    DeviceIdUtil.setNextAvailableId(requireContext(), id + 1)
+    deviceController.setCompletionListener(ConnectionCallback())
+    deviceController.pairDeviceWithAddress(
+      id,
+      deviceInfo.ipAddress,
+      port,
+      deviceInfo.discriminator,
+      deviceInfo.setupPinCode,
+      null
+    )
   }
 
   private fun startConnectingToDevice() {
@@ -119,6 +140,17 @@ class DeviceProvisioningFragment : Fragment() {
       Log.d(TAG, "onConnectDeviceComplete")
     }
 
+    /**
+     * This would only happen in the on-network case. In other cases, we need network commissioning
+     * first before this callback can be invoked, so we would use the callback implementation in
+     * EnterNetworkFragment.
+     */
+    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+      Log.d(TAG, "Commissioning complete for $nodeId with errorCode $errorCode")
+      FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
+        ?.onCommissioningComplete(0)
+    }
+
     override fun onStatusUpdate(status: Int) {
       Log.d(TAG, "Pairing status update: $status")
     }
@@ -141,19 +173,6 @@ class DeviceProvisioningFragment : Fragment() {
 
     override fun onPairingDeleted(code: Int) {
       Log.d(TAG, "onPairingDeleted: $code")
-    }
-
-    override fun onNetworkCommissioningComplete(code: Int) {
-      Log.d(TAG, "onNetworkCommissioningComplete: $code")
-
-      if (code == 0) {
-        showMessage(R.string.rendezvous_over_ble_commissioning_success_text)
-      } else {
-        showMessage(R.string.rendezvous_over_ble_commissioning_failure_text)
-      }
-
-      FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
-          ?.onCommissioningComplete(code)
     }
 
     override fun onCloseBleComplete() {

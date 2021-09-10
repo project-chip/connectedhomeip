@@ -25,10 +25,10 @@
 
 #include <netinet/in.h>
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
 
 using chip::Mdns::kMdnsTypeMaxSize;
 using chip::Mdns::MdnsServiceProtocol;
@@ -149,8 +149,6 @@ Poller::Poller()
     mAvahiPoller.timeout_new    = TimeoutNew;
     mAvahiPoller.timeout_update = TimeoutUpdate;
     mAvahiPoller.timeout_free   = TimeoutFree;
-
-    mWatchableEvents = &DeviceLayer::SystemLayer.WatchableEventsManager();
 }
 
 AvahiWatch * Poller::WatchNew(const struct AvahiPoll * poller, int fd, AvahiWatchEvent event, AvahiWatchCallback callback,
@@ -605,8 +603,13 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
 
             Platform::CopyString(service.mName, name);
             CopyTypeWithoutProtocol(service.mType, type);
-            service.mProtocol               = GetProtocolInType(type);
-            service.mAddressType            = ToAddressType(protocol);
+            service.mProtocol    = GetProtocolInType(type);
+            service.mAddressType = ToAddressType(protocol);
+            service.mInterface   = INET_NULL_INTERFACEID;
+            if (interface != AVAHI_IF_UNSPEC)
+            {
+                service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
+            }
             service.mType[kMdnsTypeMaxSize] = 0;
             context->mServices.push_back(service);
         }
@@ -686,6 +689,11 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         result.mProtocol    = GetProtocolInType(type);
         result.mPort        = port;
         result.mAddressType = ToAddressType(protocol);
+        result.mInterface   = INET_NULL_INTERFACEID;
+        if (interface != AVAHI_IF_UNSPEC)
+        {
+            result.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
+        }
         Platform::CopyString(result.mHostName, host_name);
         // Returned value is full QName, want only host part.
         char * dot = strchr(result.mHostName, '.');

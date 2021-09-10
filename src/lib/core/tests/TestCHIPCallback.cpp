@@ -21,9 +21,9 @@
  *      This file implements a test for  CHIP Callback
  *
  */
-#include <core/CHIPCallback.h>
-#include <support/CHIPMem.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPCallback.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

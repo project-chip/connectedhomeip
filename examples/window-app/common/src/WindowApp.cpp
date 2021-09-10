@@ -17,6 +17,7 @@
 
 #include <AppConfig.h>
 #include <WindowApp.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
@@ -26,6 +27,7 @@
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace chip::app::Clusters::WindowCovering;
 
 void WindowApp::Timer::Timeout()
 {
@@ -38,12 +40,30 @@ void WindowApp::Timer::Timeout()
 
 void WindowApp::Button::Press()
 {
-    Instance().PostEvent(Button::Id::Up == mId ? WindowApp::Event::UpPressed : WindowApp::Event::DownPressed);
+    EventId event = Button::Id::Up == mId ? EventId::UpPressed : EventId::DownPressed;
+    Instance().PostEvent(WindowApp::Event(event));
 }
 
 void WindowApp::Button::Release()
 {
-    Instance().PostEvent(Button::Id::Up == mId ? WindowApp::Event::UpReleased : WindowApp::Event::DownReleased);
+    Instance().PostEvent(Button::Id::Up == mId ? EventId::UpReleased : EventId::DownReleased);
+}
+
+WindowApp::Cover & WindowApp::GetCover()
+{
+    return mCoverList[mCurrentCover];
+}
+
+WindowApp::Cover * WindowApp::GetCover(chip::EndpointId endpoint)
+{
+    for (uint16_t i = 0; i < WINDOW_COVER_COUNT; ++i)
+    {
+        if (mCoverList[i].mEndpoint == endpoint)
+        {
+            return &mCoverList[i];
+        }
+    }
+    return nullptr;
 }
 
 CHIP_ERROR WindowApp::Init()
@@ -57,58 +77,15 @@ CHIP_ERROR WindowApp::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     // Timers
-    mLiftTimer      = CreateTimer("Timer:Lift", COVER_LIFT_TILT_TIMEOUT, OnLiftTimeout, this);
-    mTiltTimer      = CreateTimer("Timer:Tilt", COVER_LIFT_TILT_TIMEOUT, OnTiltTimeout, this);
-    mCoverTypeTimer = CreateTimer("Timer:CoverType", WINDOW_COVER_TYPE_CYCLE_TIMEOUT, OnCoverTypeTimeout, this);
-    mResetTimer     = CreateTimer("Timer:Reset", FACTORY_RESET_WINDOW_TIMEOUT, OnResetTimeout, this);
+    mLongPressTimer = CreateTimer("Timer:LongPress", LONG_PRESS_TIMEOUT, OnLongPressTimeout, this);
 
     // Buttons
     mButtonUp   = CreateButton(Button::Id::Up, "UP");
     mButtonDown = CreateButton(Button::Id::Down, "DOWN");
 
-    //
-    // Cover Initial state
-    //
-
-    WindowCover & cover = WindowCover::Instance();
-
-    // Initialize Actuators
-    cover.Lift().OpenLimitSet(LIFT_OPEN_LIMIT);
-    cover.Lift().ClosedLimitSet(LIFT_CLOSED_LIMIT);
-    cover.Lift().PositionValueSet(LIFT_CLOSED_LIMIT);
-    cover.Tilt().OpenLimitSet(TILT_OPEN_LIMIT);
-    cover.Tilt().ClosedLimitSet(TILT_CLOSED_LIMIT);
-    cover.Tilt().PositionValueSet(TILT_CLOSED_LIMIT);
-
-    // Attribute: Id  0 Type
-    cover.TypeSet(EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT);
-
-    // Attribute: Id  7 ConfigStatus
-    WindowCover::ConfigStatus configStatus = { .operational             = 1,
-                                               .online                  = 1,
-                                               .liftIsReversed          = 0,
-                                               .liftIsPA                = 1,
-                                               .tiltIsPA                = 1,
-                                               .liftIsEncoderControlled = 1,
-                                               .tiltIsEncoderControlled = 1 };
-    cover.ConfigStatusSet(configStatus);
-
-    // Attribute: Id 10 OperationalStatus
-    WindowCover::OperationalStatus operationalStatus = { .global = WindowCover::OperationalState::Stall,
-                                                         .lift   = WindowCover::OperationalState::Stall,
-                                                         .tilt   = WindowCover::OperationalState::Stall };
-    cover.OperationalStatusSet(operationalStatus);
-
-    // Attribute: Id 13 EndProductType
-    cover.EndProductTypeSet(EMBER_ZCL_WC_END_PRODUCT_TYPE_INTERIOR_BLIND);
-
-    // Attribute: Id 24 Mode
-    WindowCover::Mode mode = { .motorDirReversed = 0, .calibrationMode = 1, .maintenanceMode = 1, .ledDisplay = 1 };
-    cover.ModeSet(mode);
-
-    // Attribute: Id 27 SafetyStatus (Optional)
-    WindowCover::SafetyStatus safetyStatus = { 0x00 }; // 0 is no issues;
-    cover.SafetyStatusSet(safetyStatus);
+    // Coverings
+    mCoverList[0].Init(WINDOW_COVER_ENDPOINT1);
+    mCoverList[1].Init(WINDOW_COVER_ENDPOINT2);
 
     return CHIP_NO_ERROR;
 }
@@ -140,19 +117,19 @@ CHIP_ERROR WindowApp::Run()
         if (mState.isThreadProvisioned != oldState.isThreadProvisioned)
         {
             // Provisioned state changed
-            DispatchEvent(WindowApp::Event::ProvisionedStateChanged);
+            DispatchEvent(EventId::ProvisionedStateChanged);
         }
 
         if (mState.haveServiceConnectivity != oldState.haveServiceConnectivity)
         {
             // Provisioned state changed
-            DispatchEvent(WindowApp::Event::ConnectivityStateChanged);
+            DispatchEvent(EventId::ConnectivityStateChanged);
         }
 
         if (mState.haveBLEConnections != oldState.haveBLEConnections)
         {
             // Provisioned state changed
-            DispatchEvent(WindowApp::Event::BLEConnectionsChanged);
+            DispatchEvent(EventId::BLEConnectionsChanged);
         }
 
         OnMainLoop();
@@ -164,145 +141,139 @@ CHIP_ERROR WindowApp::Run()
 
 void WindowApp::Finish()
 {
-    DestroyTimer(mLiftTimer);
-    DestroyTimer(mTiltTimer);
-    DestroyTimer(mCoverTypeTimer);
-    DestroyTimer(mResetTimer);
+    DestroyTimer(mLongPressTimer);
     DestroyButton(mButtonUp);
     DestroyButton(mButtonDown);
+    for (uint16_t i = 0; i < WINDOW_COVER_COUNT; ++i)
+    {
+        mCoverList[i].Finish();
+    }
 }
 
 void WindowApp::DispatchEvent(const WindowApp::Event & event)
 {
-    switch (event)
+    Cover * cover = nullptr;
+
+    switch (event.mId)
     {
-    case WindowApp::Event::ResetPressed:
-        mState.longPress = true;
-        if (mState.resetWarning)
+    case EventId::ResetWarning:
+        mResetWarning = true;
+        if (mLongPressTimer)
         {
-            mState.resetWarning = false;
-            PostEvent(WindowApp::Event::Reset);
-        }
-        else if (mResetTimer)
-        {
-            mState.resetWarning = true;
-            PostEvent(WindowApp::Event::ResetWarning);
-            mResetTimer->Start();
+            mLongPressTimer->Start();
         }
         break;
 
-    case WindowApp::Event::Reset:
+    case EventId::ResetCanceled:
+        mResetWarning = false;
+        break;
+
+    case EventId::Reset:
         ConfigurationMgr().InitiateFactoryReset();
         break;
 
-    case WindowApp::Event::UpPressed:
-        mState.upPressed = true;
-        if (mState.downPressed)
+    case EventId::UpPressed:
+        mUpPressed = true;
+        if (mLongPressTimer)
         {
-            mState.longPress = true;
-            mState.tiltMode  = !mState.tiltMode;
-            PostEvent(WindowApp::Event::TiltModeChange);
-        }
-        else if (mResetTimer)
-        {
-            // Start the reset timer
-            mResetTimer->Start();
-        }
-        if (mCoverTypeTimer)
-        {
-            mCoverTypeTimer->Stop();
+            mLongPressTimer->Start();
         }
         break;
 
-    case WindowApp::Event::UpReleased:
-        mState.upPressed = false;
-        if (mResetTimer)
+    case EventId::UpReleased:
+        mUpPressed = false;
+        if (mLongPressTimer)
         {
-            if (mState.resetWarning)
-            {
-                mState.resetWarning = false;
-                PostEvent(WindowApp::Event::ResetCanceled);
-            }
-            mResetTimer->Stop();
+            mLongPressTimer->Stop();
         }
-        if (mState.downPressed)
+        if (mResetWarning)
         {
-            // Ignore
+            PostEvent(EventId::ResetCanceled);
         }
-        else if (mState.longPress)
+        if (mUpSuppressed)
         {
-            mState.longPress = false;
+            mUpSuppressed = false;
         }
-        else if (mState.tiltMode)
+        else if (mDownPressed)
         {
-            TiltUp();
+            mTiltMode     = !mTiltMode;
+            mUpSuppressed = mDownSuppressed = true;
+            PostEvent(EventId::TiltModeChange);
+        }
+        else if (mTiltMode)
+        {
+            GetCover().TiltUp();
         }
         else
         {
-            LiftUp();
+            GetCover().LiftUp();
         }
         break;
 
-    case WindowApp::Event::DownPressed:
-        mState.downPressed = true;
-        if (mState.upPressed)
+    case EventId::DownPressed:
+        mDownPressed = true;
+        if (mLongPressTimer)
         {
-            mState.longPress = true;
-            mState.tiltMode  = !mState.tiltMode;
-            PostEvent(WindowApp::Event::TiltModeChange);
-        }
-        else if (mCoverTypeTimer)
-        {
-            mCoverTypeTimer->Start();
+            mLongPressTimer->Start();
         }
         break;
 
-    case WindowApp::Event::DownReleased:
-        mState.downPressed = false;
-        if (mCoverTypeTimer)
+    case EventId::DownReleased:
+        mDownPressed = false;
+        if (mLongPressTimer)
         {
-            mCoverTypeTimer->Stop();
+            mLongPressTimer->Stop();
         }
-        if (mState.upPressed)
+        if (mResetWarning)
         {
-            // Ignore
+            PostEvent(EventId::ResetCanceled);
         }
-        else if (mState.longPress)
+        if (mDownSuppressed)
         {
-            mState.longPress = false;
+            mDownSuppressed = false;
         }
-        else if (mState.tiltMode)
+        else if (mUpPressed)
         {
-            TiltDown();
+            mTiltMode     = !mTiltMode;
+            mUpSuppressed = mDownSuppressed = true;
+            PostEvent(EventId::TiltModeChange);
+        }
+        else if (mTiltMode)
+        {
+            GetCover().TiltDown();
         }
         else
         {
-            LiftDown();
+            GetCover().LiftDown();
         }
         break;
 
-    case WindowApp::Event::CoverTypeChange:
-        if (mState.downPressed && mCoverTypeTimer)
+    case EventId::LiftUp:
+    case EventId::LiftDown:
+        cover = GetCover(event.mEndpoint);
+        if (cover)
         {
-            // Keep cycling
-            mCoverTypeTimer->Start();
+            cover->GotoLift(event.mId);
         }
         break;
 
-    case WindowApp::Event::LiftUp:
-    case WindowApp::Event::LiftDown:
-        mLiftAction = event;
-        GotoLift();
+    case EventId::TiltUp:
+    case EventId::TiltDown:
+        cover = GetCover(event.mEndpoint);
+        if (cover)
+        {
+            cover->GotoTilt(event.mId);
+        }
         break;
 
-    case WindowApp::Event::TiltUp:
-    case WindowApp::Event::TiltDown:
-        mTiltAction = event;
-        GotoTilt();
+    case EventId::StopMotion:
+        cover = GetCover(event.mEndpoint);
+        if (cover)
+        {
+            cover->StopMotion();
+        }
         break;
-    case WindowApp::Event::StopMotion:
-        StopMotion();
-        break;
+
     default:
         break;
     }
@@ -324,10 +295,102 @@ void WindowApp::DestroyButton(Button * btn)
     }
 }
 
-void WindowApp::LiftUp()
+void WindowApp::HandleLongPress()
 {
-    WindowCover::LiftActuator & lift = WindowCover::Instance().Lift();
-    uint16_t percent100ths           = lift.PositionGet();
+    if (mUpPressed && mDownPressed)
+    {
+        // Long press both buttons: Cycle between window coverings
+        mUpSuppressed = mDownSuppressed = true;
+        mCurrentCover                   = mCurrentCover < WINDOW_COVER_COUNT - 1 ? mCurrentCover + 1 : 0;
+        PostEvent(EventId::CoverChange);
+    }
+    else if (mUpPressed)
+    {
+        mUpSuppressed = true;
+        if (mResetWarning)
+        {
+            // Double long press button up: Reset now, you were warned!
+            PostEvent(EventId::Reset);
+        }
+        else
+        {
+            // Long press button up: Reset warning!
+            PostEvent(EventId::ResetWarning);
+        }
+    }
+    else if (mDownPressed)
+    {
+        // Long press button down: Cycle between covering types
+        mDownSuppressed          = true;
+        EmberAfWcType cover_type = GetCover().CycleType();
+        mTiltMode                = mTiltMode && (EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT == cover_type);
+    }
+}
+
+void WindowApp::OnLongPressTimeout(WindowApp::Timer & timer)
+{
+    WindowApp * app = static_cast<WindowApp *>(timer.mContext);
+    if (app)
+    {
+        app->HandleLongPress();
+    }
+}
+
+void WindowApp::Cover::Init(chip::EndpointId endpoint)
+{
+    mEndpoint  = endpoint;
+    mLiftTimer = WindowApp::Instance().CreateTimer("Timer:Lift", COVER_LIFT_TILT_TIMEOUT, OnLiftTimeout, this);
+    mTiltTimer = WindowApp::Instance().CreateTimer("Timer:Tilt", COVER_LIFT_TILT_TIMEOUT, OnTiltTimeout, this);
+
+    Attributes::SetInstalledOpenLimitLift(endpoint, LIFT_OPEN_LIMIT);
+    Attributes::SetInstalledClosedLimitLift(endpoint, LIFT_CLOSED_LIMIT);
+    LiftPositionSet(endpoint, LiftToPercent100ths(endpoint, LIFT_CLOSED_LIMIT));
+    Attributes::SetInstalledOpenLimitTilt(endpoint, TILT_OPEN_LIMIT);
+    Attributes::SetInstalledClosedLimitTilt(endpoint, TILT_CLOSED_LIMIT);
+    TiltPositionSet(endpoint, TiltToPercent100ths(endpoint, TILT_CLOSED_LIMIT));
+
+    // Attribute: Id  0 Type
+    TypeSet(endpoint, EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT);
+
+    // Attribute: Id  7 ConfigStatus
+    ConfigStatus configStatus = { .operational             = 1,
+                                  .online                  = 1,
+                                  .liftIsReversed          = 0,
+                                  .liftIsPA                = 1,
+                                  .tiltIsPA                = 1,
+                                  .liftIsEncoderControlled = 1,
+                                  .tiltIsEncoderControlled = 1 };
+    ConfigStatusSet(endpoint, configStatus);
+
+    // Attribute: Id 10 OperationalStatus
+    OperationalStatus operationalStatus = { .global = OperationalState::Stall,
+                                            .lift   = OperationalState::Stall,
+                                            .tilt   = OperationalState::Stall };
+    OperationalStatusSet(endpoint, operationalStatus);
+
+    // Attribute: Id 13 EndProductType
+    EndProductTypeSet(endpoint, EMBER_ZCL_WC_END_PRODUCT_TYPE_INTERIOR_BLIND);
+
+    // Attribute: Id 24 Mode
+    Mode mode = { .motorDirReversed = 0, .calibrationMode = 1, .maintenanceMode = 1, .ledDisplay = 1 };
+    ModeSet(endpoint, mode);
+
+    // Attribute: Id 27 SafetyStatus (Optional)
+    SafetyStatus safetyStatus = { 0x00 }; // 0 is no issues;
+    SafetyStatusSet(endpoint, safetyStatus);
+}
+
+void WindowApp::Cover::Finish()
+{
+    WindowApp::Instance().DestroyTimer(mLiftTimer);
+    WindowApp::Instance().DestroyTimer(mTiltTimer);
+}
+
+void WindowApp::Cover::LiftUp()
+{
+    uint16_t percent100ths = 0;
+
+    Attributes::GetCurrentPositionLiftPercent100ths(mEndpoint, &percent100ths);
     if (percent100ths < 9000)
     {
         percent100ths += 1000;
@@ -336,13 +399,14 @@ void WindowApp::LiftUp()
     {
         percent100ths = 10000;
     }
-    lift.PositionSet(percent100ths);
+    LiftPositionSet(mEndpoint, percent100ths);
 }
 
-void WindowApp::LiftDown()
+void WindowApp::Cover::LiftDown()
 {
-    WindowCover::LiftActuator & lift = WindowCover::Instance().Lift();
-    uint16_t percent100ths           = lift.PositionGet();
+    uint16_t percent100ths = 0;
+
+    Attributes::GetCurrentPositionLiftPercent100ths(mEndpoint, &percent100ths);
     if (percent100ths > 1000)
     {
         percent100ths -= 1000;
@@ -351,46 +415,22 @@ void WindowApp::LiftDown()
     {
         percent100ths = 0;
     }
-    lift.PositionSet(percent100ths);
+    LiftPositionSet(mEndpoint, percent100ths);
 }
 
-void WindowApp::TiltUp()
+void WindowApp::Cover::GotoLift(EventId action)
 {
-    WindowCover::TiltActuator & tilt = WindowCover::Instance().Tilt();
-    uint16_t percent100ths           = tilt.PositionGet();
-    if (percent100ths < 9000)
-    {
-        percent100ths += 1000;
-    }
-    else
-    {
-        percent100ths = 10000;
-    }
-    tilt.PositionSet(percent100ths);
-}
+    uint16_t current = 0;
+    uint16_t target  = 0;
+    Attributes::GetTargetPositionLiftPercent100ths(mEndpoint, &target);
+    Attributes::GetCurrentPositionLiftPercent100ths(mEndpoint, &current);
 
-void WindowApp::TiltDown()
-{
-    WindowCover::TiltActuator & tilt = WindowCover::Instance().Tilt();
-    uint16_t percent100ths           = tilt.PositionGet();
-    if (percent100ths > 1000)
+    if (EventId::None != action)
     {
-        percent100ths -= 1000;
+        mLiftAction = action;
     }
-    else
-    {
-        percent100ths = 0;
-    }
-    tilt.PositionSet(percent100ths);
-}
 
-void WindowApp::GotoLift()
-{
-    WindowCover::LiftActuator & lift = WindowCover::Instance().Lift();
-    uint16_t current                 = lift.PositionGet();
-    uint16_t target                  = lift.TargetGet();
-
-    if (WindowApp::Event::LiftUp == mLiftAction)
+    if (EventId::LiftUp == mLiftAction)
     {
         if (current < target)
         {
@@ -398,7 +438,7 @@ void WindowApp::GotoLift()
         }
         else
         {
-            mLiftAction = WindowApp::Event::None;
+            mLiftAction = EventId::None;
         }
     }
     else
@@ -409,23 +449,60 @@ void WindowApp::GotoLift()
         }
         else
         {
-            mLiftAction = WindowApp::Event::None;
+            mLiftAction = EventId::None;
         }
     }
 
-    if (WindowApp::Event::None != mLiftAction && mLiftTimer)
+    if (EventId::None != mLiftAction && mLiftTimer)
     {
         mLiftTimer->Start();
     }
 }
 
-void WindowApp::GotoTilt()
+void WindowApp::Cover::TiltUp()
 {
-    WindowCover::TiltActuator & tilt = WindowCover::Instance().Tilt();
-    uint16_t current                 = tilt.PositionGet();
-    uint16_t target                  = tilt.TargetGet();
+    uint16_t percent100ths = 0;
+    Attributes::GetCurrentPositionTiltPercent100ths(mEndpoint, &percent100ths);
+    if (percent100ths < 9000)
+    {
+        percent100ths += 1000;
+    }
+    else
+    {
+        percent100ths = 10000;
+    }
+    TiltPositionSet(mEndpoint, percent100ths);
+}
 
-    if (WindowApp::Event::TiltUp == mTiltAction)
+void WindowApp::Cover::TiltDown()
+{
+    uint16_t percent100ths = 0;
+    Attributes::GetCurrentPositionTiltPercent100ths(mEndpoint, &percent100ths);
+    if (percent100ths > 1000)
+    {
+        percent100ths -= 1000;
+    }
+    else
+    {
+        percent100ths = 0;
+    }
+    TiltPositionSet(mEndpoint, percent100ths);
+}
+
+void WindowApp::Cover::GotoTilt(EventId action)
+{
+    uint16_t current = 0;
+    uint16_t target  = 0;
+
+    Attributes::GetTargetPositionTiltPercent100ths(mEndpoint, &target);
+    Attributes::GetCurrentPositionTiltPercent100ths(mEndpoint, &current);
+
+    if (EventId::None != action)
+    {
+        mTiltAction = action;
+    }
+
+    if (EventId::TiltUp == mTiltAction)
     {
         if (current < target)
         {
@@ -433,7 +510,7 @@ void WindowApp::GotoTilt()
         }
         else
         {
-            mTiltAction = WindowApp::Event::None;
+            mTiltAction = EventId::None;
         }
     }
     else
@@ -444,92 +521,68 @@ void WindowApp::GotoTilt()
         }
         else
         {
-            mTiltAction = WindowApp::Event::None;
+            mTiltAction = EventId::None;
         }
     }
 
-    if (WindowApp::Event::None != mTiltAction && mTiltTimer)
+    if (EventId::None != mTiltAction && mTiltTimer)
     {
         mTiltTimer->Start();
     }
 }
 
-void WindowApp::CoverTypeCycle()
+EmberAfWcType WindowApp::Cover::CycleType()
 {
-    WindowCover & cover = WindowCover::Instance();
-    EmberAfWcType type  = cover.TypeGet();
-    bool tilt           = mState.tiltMode;
+    EmberAfWcType type = TypeGet(mEndpoint);
 
     switch (type)
     {
     case EMBER_ZCL_WC_TYPE_ROLLERSHADE:
         type = EMBER_ZCL_WC_TYPE_DRAPERY;
-        tilt = false;
+        // tilt = false;
         break;
     case EMBER_ZCL_WC_TYPE_DRAPERY:
         type = EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT;
         break;
     case EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT:
         type = EMBER_ZCL_WC_TYPE_ROLLERSHADE;
-        tilt = false;
+        // tilt = false;
         break;
     default:
         type = EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT;
     }
-    cover.TypeSet(type);
-    if (tilt != mState.tiltMode)
-    {
-        mState.tiltMode = tilt;
-        PostEvent(WindowApp::Event::TiltModeChange);
-    }
+    TypeSet(mEndpoint, type);
+    return type;
 }
 
-void WindowApp::StopMotion()
+void WindowApp::Cover::StopMotion()
 {
-    mLiftAction = WindowApp::Event::None;
+    mLiftAction = EventId::None;
     if (mLiftTimer)
     {
         mLiftTimer->Stop();
     }
-    mTiltAction = WindowApp::Event::None;
+    mTiltAction = EventId::None;
     if (mTiltTimer)
     {
         mTiltTimer->Stop();
     }
 }
 
-void WindowApp::OnLiftTimeout(WindowApp::Timer & timer)
+void WindowApp::Cover::OnLiftTimeout(WindowApp::Timer & timer)
 {
-    WindowApp * app = static_cast<WindowApp *>(timer.mContext);
-    if (app)
+    WindowApp::Cover * cover = static_cast<WindowApp::Cover *>(timer.mContext);
+    if (cover)
     {
-        app->GotoLift();
+        cover->GotoLift();
     }
 }
 
-void WindowApp::OnTiltTimeout(WindowApp::Timer & timer)
+void WindowApp::Cover::OnTiltTimeout(WindowApp::Timer & timer)
 {
-    WindowApp * app = static_cast<WindowApp *>(timer.mContext);
-    if (app)
+    WindowApp::Cover * cover = static_cast<WindowApp::Cover *>(timer.mContext);
+    if (cover)
     {
-        app->GotoTilt();
-    }
-}
-
-void WindowApp::OnCoverTypeTimeout(WindowApp::Timer & timer)
-{
-    WindowApp * app = static_cast<WindowApp *>(timer.mContext);
-    if (app)
-    {
-        app->CoverTypeCycle();
-    }
-}
-
-void WindowApp::OnResetTimeout(WindowApp::Timer & timer)
-{
-    WindowApp * app = static_cast<WindowApp *>(timer.mContext);
-    if (app)
-    {
-        app->PostEvent(WindowApp::Event::ResetPressed);
+        cover->GotoTilt();
     }
 }

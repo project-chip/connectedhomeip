@@ -30,12 +30,12 @@
 #include <string.h>
 
 #include <app/util/basic-types.h>
-#include <core/CHIPKeyIds.h>
+#include <lib/core/CHIPKeyIds.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/Constants.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
 #include <transport/FabricTable.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
@@ -66,10 +66,7 @@ uint32_t EncryptedPacketBufferHandle::GetMsgId() const
 
 SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 
-SecureSessionMgr::~SecureSessionMgr()
-{
-    CancelExpiryTimer();
-}
+SecureSessionMgr::~SecureSessionMgr() {}
 
 CHIP_ERROR SecureSessionMgr::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
                                   Transport::MessageCounterManagerInterface * messageCounterManager)
@@ -299,7 +296,7 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
     {
         PayloadHeader payloadHeader;
         ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
-        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle(), peerAddress,
+        mCB->OnMessageReceived(packetHeader, payloadHeader, SessionHandle::TemporaryUnauthenticatedSession(), peerAddress,
                                SecureSessionMgrDelegate::DuplicateMessage::No, std::move(msg));
     }
 }
@@ -439,8 +436,8 @@ void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param)
 
 PeerConnectionState * SecureSessionMgr::GetPeerConnectionState(SessionHandle session)
 {
-    return mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(session.mPeerNodeId), session.mPeerKeyId.ValueOr(0),
-                                                    nullptr);
+    return mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(session.mPeerNodeId),
+                                                              session.mLocalKeyId.ValueOr(0), nullptr);
 }
 
 } // namespace chip

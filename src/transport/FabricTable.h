@@ -22,16 +22,16 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <core/CHIPPersistentStorageDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/CHIPMem.h>
-#include <support/DLLUtil.h>
-#include <support/Span.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
@@ -94,14 +94,11 @@ public:
         ReleaseOperationalCerts();
     }
 
-    NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
-    FabricId GetFabricId() const { return mOperationalId.GetFabricId(); }
-
-    uint64_t GetCompressedFabricId() const { return mCompressedFabricId; }
-
+    PeerId GetPeerId() const { return mOperationalId; }
+    FabricId GetFabricId() const { return mFabricId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
-
     uint16_t GetVendorId() const { return mVendorId; }
+
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
     Crypto::P256Keypair * GetOperationalKey()
@@ -125,14 +122,9 @@ public:
         return (mRootCert != nullptr && mOperationalCerts != nullptr && mRootCertLen != 0 && mOperationalCertsLen != 0);
     }
 
-    const uint8_t * GetTrustedRoot(uint16_t & size)
-    {
-        size = mRootCertLen;
-        return mRootCert;
-    }
-
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
+    // TODO - Optimize persistent storage of NOC and Root Cert in FabricInfo.
     CHIP_ERROR SetOperationalCertsFromCertArray(const chip::ByteSpan & certArray);
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
 
@@ -176,7 +168,7 @@ public:
     }
 
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, Credentials::ValidationContext & context, PeerId & nocPeerId,
-                                 Crypto::P256PublicKey & nocPubkey);
+                                 FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const;
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -197,6 +189,13 @@ public:
     }
 
     CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
+
+    const Crypto::P256PublicKey & GetRootPubkey() const { return mRootPubkey; }
+
+    /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
+       root public key of the fabric. The generated compressed ID is returned via compressedPeerId
+       output parameter */
+    CHIP_ERROR GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
 
     friend class FabricTable;
 
@@ -225,17 +224,16 @@ private:
     uint16_t mRootCertAllocatedLen = 0;
     uint8_t * mOperationalCerts    = nullptr;
     uint16_t mOperationalCertsLen  = 0;
-    uint64_t mCompressedFabricId   = 0;
 
-    static constexpr size_t KeySize();
+    FabricId mFabricId = 0;
+
+    static constexpr size_t kKeySize = sizeof(kFabricTableKeyPrefix) + 2 * sizeof(FabricIndex);
 
     static CHIP_ERROR GenerateKey(FabricIndex id, char * key, size_t len);
 
     CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate * kvs);
     CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id);
-
-    void SetOperationalId(PeerId id) { mOperationalId = id; }
 
     void ReleaseOperationalCerts();
     void ReleaseRootCert();
@@ -267,7 +265,7 @@ public:
     /**
      * Gets called when a fabric is deleted from KVS store.
      **/
-    virtual void OnFabricDeletedFromStorage(FabricIndex fabricId) = 0;
+    virtual void OnFabricDeletedFromStorage(FabricIndex fabricIndex) = 0;
 
     /**
      * Gets called when a fabric is loaded into Fabric Table from KVS store.
@@ -368,9 +366,9 @@ public:
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 
-    void ReleaseFabricIndex(FabricIndex fabricId);
+    void ReleaseFabricIndex(FabricIndex fabricIndex);
 
-    FabricInfo * FindFabricWithIndex(FabricIndex fabricId);
+    FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
 
     FabricIndex FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
                                            const ByteSpan * ipkList, size_t ipkListEntries);

@@ -19,24 +19,24 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include <app/common/gen/af-structs.h>
+#include <app-common/zap-generated/af-structs.h>
 
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/chip-zcl-zpro-codec.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
-#include <core/CHIPError.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/RandUtils.h>
 #include <lib/support/ZclString.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/CHIPMem.h>
-#include <support/RandUtils.h>
 
 #include "Device.h"
 #include "Options.h"

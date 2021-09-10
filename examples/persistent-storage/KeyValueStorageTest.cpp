@@ -21,10 +21,10 @@
 #include <cstring>
 #include <string>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
 
 using namespace chip::DeviceLayer::PersistedStorage;
 

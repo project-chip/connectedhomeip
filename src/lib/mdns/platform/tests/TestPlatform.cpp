@@ -17,10 +17,10 @@
  */
 
 #include <lib/core/PeerId.h>
-#include <mdns/Discovery_ImplPlatform.h>
+#include <lib/mdns/Discovery_ImplPlatform.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/fake/MdnsImpl.h>
-#include <support/UnitTestRegistration.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <nlunit-test.h>
 
@@ -35,8 +35,8 @@ using namespace chip::Mdns;
 const uint8_t kMac[kMaxMacSize] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 const char host[]               = "0102030405060708";
 
-const PeerId kPeerId1                               = PeerId().SetFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
-const PeerId kPeerId2                               = PeerId().SetFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
+const PeerId kPeerId1 = PeerId().SetCompressedFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
+const PeerId kPeerId2 = PeerId().SetCompressedFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
 OperationalAdvertisingParameters operationalParams1 = OperationalAdvertisingParameters()
                                                           .SetPeerId(kPeerId1)
                                                           .SetMac(ByteSpan(kMac))

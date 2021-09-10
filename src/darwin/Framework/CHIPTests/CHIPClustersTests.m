@@ -35,6 +35,14 @@ const uint16_t kRemotePort = 5540;
 const uint16_t kLocalPort = 5541;
 NSString * kAddress = @"::1";
 
+// Test Util APIs
+void WaitForMs(XCTestExpectation * expectation, dispatch_queue_t queue, unsigned int ms)
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC), queue, ^{
+        [expectation fulfill];
+    });
+}
+
 CHIPDevice * GetPairedDevice(uint64_t deviceId)
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
@@ -94,7 +102,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [controller setListenPort:kLocalPort];
     [controller setPairingDelegate:pairing queue:callbackQueue];
 
-    BOOL started = [controller startup:nil vendorId:0];
+    BOOL started = [controller startup:nil vendorId:0 nocSigner:nil];
     XCTAssertTrue(started);
 
     NSError * error;
@@ -149,6 +157,79 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestCluster_Reporting_0000_BindOnOff_Test
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Binding to OnOff Cluster complete"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPBinding * bindingCluster = [[CHIPBinding alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(bindingCluster);
+    [bindingCluster bind:kDeviceId
+                 groupId:0
+              endpointId:1
+               clusterId:6
+         responseHandler:^(NSError * err, NSDictionary * values) {
+             NSLog(@"Reporting Test Binding status : %@", err);
+             XCTAssertEqual(err.code, 0);
+             [expectation fulfill];
+         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestCluster_Reporting_0001_ConfigureOnOff_Test
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reporting OnOff configured"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * onOffCluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(onOffCluster);
+    [onOffCluster configureAttributeOnOffWithMinInterval:0
+                                             maxInterval:1
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Reporting Test Configure status: %@", err);
+
+                                             XCTAssertEqual(err.code, 0);
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestCluster_Reporting_0002_ReportOnOff_Test
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"First report received"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * onOffCluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(onOffCluster);
+    [onOffCluster reportAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reporting Test Report first report: %@", err);
+        [expectation fulfill];
+        XCTAssertEqual(err.code, 0);
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestCluster_Reporting_0003_StopReportOnOff_Test
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reporting OnOff cancelled"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * onOffCluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(onOffCluster);
+    [onOffCluster configureAttributeOnOffWithMinInterval:0
+                                             maxInterval:0xffff
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"Reporting Test Cancel Reports status: %@", err);
+
+                                             XCTAssertEqual(err.code, 0);
+                                             [expectation fulfill];
+                                         }];
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -2255,6 +2336,14 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestDelayCommands_000000_WaitForMs
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 100ms"];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForMs(expectation, queue, 100);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -5041,6 +5130,43 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
         XCTAssertEqual(err.code, 0);
         XCTAssertEqual([values[@"value"] unsignedShortValue], 2);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterOperationalCredentialsCluster_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read number of supported fabrics"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeSupportedFabricsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read number of supported fabrics Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertGreaterThanOrEqual([values[@"value"] unsignedCharValue], 4);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterOperationalCredentialsCluster_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read number of commissioned fabrics"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCommissionedFabricsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read number of commissioned fabrics Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertGreaterThanOrEqual([values[@"value"] unsignedCharValue], 1);
         [expectation fulfill];
     }];
 

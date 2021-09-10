@@ -18,6 +18,7 @@
 import argparse
 import logging
 from pw_hdlc.rpc import HdlcRpcClient, default_channels, write_to_file
+from pw_status import Status
 import serial  # type: ignore
 import subprocess
 import sys
@@ -88,8 +89,11 @@ def get_hdlc_rpc_client(device: str, baudrate: int, output: Any, **kwargs):
 
 def runner(client) -> int:
     """ Run the tests"""
-    result = client.client.channel(
+    status, result = client.client.channel(
         1).rpcs.chip.rpc.NlTest.Run(pw_rpc_timeout_s=120)
+
+    if not status.ok():
+        raise Exception("Error running test RPC: {}".format(status))
 
     total_failed = 0
     total_run = 0

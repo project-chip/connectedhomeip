@@ -80,6 +80,7 @@ static_library("support") {
     "FixedBufferAllocator.h",
     "LifetimePersistedCounter.cpp",
     "LifetimePersistedCounter.h",
+    "ObjectLifeCycle.h",
     "PersistedCounter.cpp",
     "PersistedCounter.h",
     "PersistentStorageMacros.h",
@@ -143,7 +144,6 @@ static_library("support") {
 
   public_configs = [
     "${chip_root}/src:includes",
-    "${chip_root}/src/lib:includes",
     "${chip_root}/src/system:system_config",
   ]
 

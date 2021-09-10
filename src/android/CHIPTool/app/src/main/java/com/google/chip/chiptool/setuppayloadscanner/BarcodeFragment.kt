@@ -28,6 +28,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AlertDialog
@@ -40,8 +42,10 @@ import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.SelectActionFragment
 import com.google.chip.chiptool.util.FragmentUtil
 import java.io.IOException
+import kotlinx.android.synthetic.main.barcode_fragment.view.inputAddressBtn
 
 /** Launches the camera to scan for QR code. */
 class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListener {
@@ -50,6 +54,9 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
     private var cameraSourceView: CameraSourceView? = null
     private var barcodeDetector: BarcodeDetector? = null
     private var cameraStarted = false
+
+    private var manualCodeEditText: EditText? = null
+    private var manualCodeBtn: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +72,16 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
     ): View {
         return inflater.inflate(R.layout.barcode_fragment, container, false).apply {
             cameraSourceView = findViewById(R.id.camera_view)
+            
+            manualCodeEditText = findViewById(R.id.manualCodeEditText)
+            manualCodeBtn = findViewById(R.id.manualCodeBtn)
+            
+            inputAddressBtn.setOnClickListener {
+                FragmentUtil.getHost(
+                    this@BarcodeFragment,
+                    SelectActionFragment.Callback::class.java
+                )?.onShowDeviceAddressInput()
+            }
         }
     }
 
@@ -99,6 +116,13 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
             .setAutoFocusEnabled(true)
             .setRequestedFps(30.0f)
             .build()
+
+        //workaround: can not use gms to scan the code in China, added a EditText to debug
+        manualCodeBtn?.setOnClickListener {
+            var qrCode = manualCodeEditText?.text.toString()
+            Log.d(TAG, "Submit Code:$qrCode")
+            handleInputQrCode(qrCode)
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -113,6 +137,18 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
+    }
+
+    private fun handleInputQrCode(qrCode: String) {
+        lateinit var payload: SetupPayload
+        try {
+            payload = SetupPayloadParser().parseQrCode(qrCode)
+        } catch (ex: UnrecognizedQrCodeException) {
+            Log.e(TAG, "Unrecognized QR Code", ex)
+            Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+        }
+        FragmentUtil.getHost(this, Callback::class.java)
+            ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
     }
 
     @SuppressLint("MissingPermission")

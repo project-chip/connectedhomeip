@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
-#include <mdns/TxtFields.h>
+#include <lib/mdns/TxtFields.h>
 
 #include <limits>
 #include <string.h>
 
-#include <mdns/Resolver.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/mdns/Resolver.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

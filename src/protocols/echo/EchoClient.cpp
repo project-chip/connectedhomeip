@@ -38,8 +38,8 @@ CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SessionHan
     if (mExchangeMgr != nullptr)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    mExchangeMgr           = exchangeMgr;
-    mSecureSession         = session;
+    mExchangeMgr = exchangeMgr;
+    mSecureSession.SetValue(session);
     OnEchoResponseReceived = nullptr;
     mExchangeCtx           = nullptr;
 
@@ -71,7 +71,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, Me
     }
 
     // Create a new exchange context.
-    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession, this);
+    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession.Value(), this);
     if (mExchangeCtx == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;

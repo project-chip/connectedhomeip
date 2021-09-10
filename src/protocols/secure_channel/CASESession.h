@@ -31,12 +31,12 @@
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
+#include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
-#include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/FabricTable.h>
 #include <transport/PairingSession.h>
@@ -164,6 +164,11 @@ public:
         return &mMessageDispatch;
     }
 
+    FabricIndex GetFabricIndex() const
+    {
+        return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : Transport::kUndefinedFabricIndex;
+    }
+
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
      **/
@@ -181,18 +186,17 @@ private:
     CHIP_ERROR Init(uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SendSigmaR1();
-    CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleSigmaR1(System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleSigmaR1(System::PacketBufferHandle && msg);
     CHIP_ERROR SendSigmaR2();
-    CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleSigmaR2(System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleSigmaR2(System::PacketBufferHandle && msg);
     CHIP_ERROR SendSigmaR3();
-    CHIP_ERROR HandleSigmaR3(System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR3(System::PacketBufferHandle && msg);
 
     CHIP_ERROR SendSigmaR1Resume();
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
-private:
     CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                     MutableByteSpan & salt);
     CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);
@@ -201,7 +205,10 @@ private:
     CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
     CHIP_ERROR RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk);
 
-    constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }
+    static constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields)
+    {
+        return dataLen + (sizeof(uint64_t) * nFields);
+    }
 
     void SendErrorMsg(SigmaErrorType errorCode);
 

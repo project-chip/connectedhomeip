@@ -21,7 +21,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #include <app/server/Mdns.h>
-#include <support/ThreadOperationalDataset.h>
+#include <lib/support/ThreadOperationalDataset.h>
 
 #include <zephyr.h>
 

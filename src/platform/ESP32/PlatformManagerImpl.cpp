@@ -107,11 +107,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         }
     }
 
+    ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
-
-    ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
 
 exit:
     return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);

@@ -1,15 +1,15 @@
-setuptools>=21
-click>=5.0
-pyserial>=3.0
-future>=0.15.2
-cryptography>=2.1.4
-pyparsing>=2.0.3,<2.4.0
-pyelftools>=0.22
-gdbgui==0.13.2.0 ; platform_machine != 'aarch64'
-pygdbmi<=0.9.0.2
-reedsolo>=1.5.3,<=1.5.4
-bitstring>=3.1.6
-ecdsa>=0.16.0
-kconfiglib==13.7.1
-construct==2.10.54
-python-socketio<5
+setuptools>=21 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+click>=5.0 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+pyserial>=3.0 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+future>=0.15.2 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+cryptography>=2.1.4 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+pyparsing>=2.0.3,<2.4.0 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+pyelftools>=0.22 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+gdbgui==0.13.2.0 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+pygdbmi<=0.9.0.2 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+reedsolo>=1.5.3,<=1.5.4 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+bitstring>=3.1.6 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+ecdsa>=0.16.0 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+kconfiglib==13.7.1 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+construct==2.10.54 ; platform_machine != 'aarch64' and sys_platform == 'linux'
+python-socketio<5 ; platform_machine != 'aarch64' and sys_platform == 'linux'

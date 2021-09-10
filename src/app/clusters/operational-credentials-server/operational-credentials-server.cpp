@@ -20,25 +20,25 @@
  * @brief Implementation for the Operational Credentials Cluster
  ***************************************************************************/
 
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/attributes/Accessors.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-#include <app/common/gen/enums.h>
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <string.h>
-#include <support/CodeUtils.h>
-#include <support/ScopedBuffer.h>
-#include <support/logging/CHIPLogging.h>
 #include <transport/FabricTable.h>
 
 using namespace chip;
@@ -85,25 +85,32 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
                                     index + 1);
 }
 
-EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel, uint8_t index)
+EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel,
+                          const Crypto::P256PublicKey & rootPubkey, uint8_t index)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    EmberAfFabricDescriptor fabricDescriptor;
-    fabricDescriptor.FabricId = fabricId;
-    fabricDescriptor.NodeId   = nodeId;
-    fabricDescriptor.VendorId = vendorId;
+    FabricDescriptor * fabricDescriptor = chip::Platform::New<FabricDescriptor>();
+    VerifyOrReturnError(fabricDescriptor != nullptr, EMBER_ZCL_STATUS_FAILURE);
+
+    fabricDescriptor->FabricIndex   = fabricIndex;
+    fabricDescriptor->RootPublicKey = ByteSpan(rootPubkey.ConstBytes(), rootPubkey.Length());
+
+    fabricDescriptor->VendorId = vendorId;
+    fabricDescriptor->FabricId = fabricId;
+    fabricDescriptor->NodeId   = nodeId;
     if (fabricLabel != nullptr)
     {
-        size_t lengthToStore   = strnlen(Uint8::to_const_char(fabricLabel), kFabricLabelMaxLengthInBytes);
-        fabricDescriptor.Label = ByteSpan(fabricLabel, lengthToStore);
+        size_t lengthToStore    = strnlen(Uint8::to_const_char(fabricLabel), kFabricLabelMaxLengthInBytes);
+        fabricDescriptor->Label = ByteSpan(fabricLabel, lengthToStore);
     }
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                    "OpCreds: Writing fabric into attribute store at index %d: fabricId 0x" ChipLogFormatX64
                    ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                    index, ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
-    status = writeFabricAttribute((uint8_t *) &fabricDescriptor, static_cast<int32_t>(index));
+    status = writeFabricAttribute((uint8_t *) fabricDescriptor, static_cast<int32_t>(index));
+    chip::Platform::Delete(fabricDescriptor);
     return status;
 }
 
@@ -114,15 +121,15 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
 
     // Loop through fabrics
     uint8_t fabricIndex = 0;
-    for (auto & pairing : GetGlobalFabricTable())
+    for (auto & fabricInfo : GetGlobalFabricTable())
     {
-        NodeId nodeId               = pairing.GetNodeId();
-        uint64_t fabricId           = pairing.GetFabricId();
-        uint16_t vendorId           = pairing.GetVendorId();
-        const uint8_t * fabricLabel = pairing.GetFabricLabel();
+        NodeId nodeId               = fabricInfo.GetPeerId().GetNodeId();
+        uint64_t fabricId           = fabricInfo.GetFabricId();
+        uint16_t vendorId           = fabricInfo.GetVendorId();
+        const uint8_t * fabricLabel = fabricInfo.GetFabricLabel();
 
         // Skip over uninitialized fabrics
-        if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
+        if (nodeId == kUndefinedNodeId)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                            "OpCreds: Skipping over uninitialized fabric with fabricId 0x" ChipLogFormatX64
@@ -130,7 +137,8 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
             continue;
         }
-        else if (writeFabric(fabricId, nodeId, vendorId, fabricLabel, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+        else if (writeFabric(fabricInfo.GetFabricIndex(), fabricId, nodeId, vendorId, fabricLabel, fabricInfo.GetRootPubkey(),
+                             fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                            "OpCreds: Failed to write fabric with fabricId 0x" ChipLogFormatX64 " in fabrics list",
@@ -158,6 +166,15 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
+    if (err == CHIP_NO_ERROR &&
+        app::Clusters::OperationalCredentials::Attributes::SetSupportedFabrics(0, CHIP_CONFIG_MAX_DEVICE_ADMINS) !=
+            EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write %" PRIu8 " in supported fabrics count attribute",
+                       CHIP_CONFIG_MAX_DEVICE_ADMINS);
+        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+
     return err;
 }
 
@@ -173,11 +190,11 @@ static FabricInfo * retrieveCurrentFabric()
     return GetGlobalFabricTable().FindFabricWithIndex(index);
 }
 
-// TODO: The code currently has two sources of truths for fabrics, the pairing table + the attributes. There should only be one,
+// TODO: The code currently has two sources of truths for fabrics, the fabricInfo table + the attributes. There should only be one,
 // the attributes list. Currently the attributes are not persisted so we are keeping the fabric table to have the
 // fabrics/admrins be persisted. Once attributes are persisted, there should only be one sorce of truth, the attributes list and
 // only that should be modifed to perosst/read/write fabrics.
-// TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove fabricPairingTable
+// TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove fabricTable
 // logic.
 class OpCredsFabricTableDelegate : public FabricTableDelegate
 {
@@ -195,8 +212,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric 0x%" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
-                       fabric->GetVendorId());
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
+                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         writeFabricsIntoFabricsListAttribute();
     }
 
@@ -206,8 +223,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric %" PRIX16 " was persisted to storage. FabricId %0x" ChipLogFormatX64
                        ", NodeId %0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
-                       fabric->GetVendorId());
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
+                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         writeFabricsIntoFabricsListAttribute();
     }
 };

@@ -23,8 +23,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
-#include <core/CHIPEncoding.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Controller {
@@ -58,9 +58,9 @@ void AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(const chip::Mdns::
 
 CHIP_ERROR AbstractMdnsDiscoveryController::SetUpNodeDiscovery()
 {
-    chip::Mdns::Resolver::Instance().SetResolverDelegate(this);
+    ReturnErrorOnFailure(mResolver->SetResolverDelegate(this));
 #if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().StartResolver(&DeviceLayer::InetLayer, kMdnsPort));
+    ReturnErrorOnFailure(mResolver->StartResolver(&DeviceLayer::InetLayer, kMdnsPort));
 #endif
 
     auto discoveredNodes = GetDiscoveredNodes();

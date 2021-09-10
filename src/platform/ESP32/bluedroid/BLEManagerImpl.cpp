@@ -32,9 +32,9 @@
 #if CONFIG_BT_BLUEDROID_ENABLED
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"
@@ -1169,6 +1169,10 @@ void BLEManagerImpl::HandleDisconnect(esp_ble_gatts_cb_param_t * param)
             break;
         }
         PlatformMgr().PostEvent(&event);
+
+        ChipDeviceEvent disconnectEvent;
+        disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
+        PlatformMgr().PostEvent(&disconnectEvent);
 
         // Force a refresh of the advertising state.
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);

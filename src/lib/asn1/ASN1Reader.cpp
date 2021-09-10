@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -29,12 +29,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <asn1/ASN1.h>
+#include <lib/asn1/ASN1.h>
 
 namespace chip {
 namespace ASN1 {
 
-void ASN1Reader::Init(const uint8_t * buf, uint32_t len)
+void ASN1Reader::Init(const uint8_t * buf, size_t len)
 {
     ResetElementState();
     mBuf              = buf;

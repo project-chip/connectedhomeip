@@ -33,9 +33,9 @@
 #include <platform/internal/EventLogging.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -56,7 +56,12 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     // Arrange for Device Layer errors to be translated to text.
     RegisterDeviceLayerErrorFormatter();
 
-    // TODO Initialize the source used by CHIP to get secure random data.
+    err = InitEntropy();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Entropy initialization failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
 
     err = ConfigurationMgr().Init();
     if (err != CHIP_NO_ERROR)
@@ -66,7 +71,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP system layer.
-    new (&SystemLayer) System::Layer();
+    new (&SystemLayer) System::LayerImpl();
     err = SystemLayer.Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -254,8 +259,8 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const Chi
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Invoke the System Layer's event handler function.
-    err = SystemLayer.WatchableEventsManager().HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
-                                                           event->ChipSystemLayerEvent.Argument);
+    err = SystemLayer.HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
+                                  event->ChipSystemLayerEvent.Argument);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s", event->Type, ErrorStr(err));

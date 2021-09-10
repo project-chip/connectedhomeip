@@ -20,13 +20,13 @@
 #include <algorithm>
 #include <cstdint>
 
-#include <core/CHIPError.h>
-#include <core/Optional.h>
-#include <core/PeerId.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/core/PeerId.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeString.h>
 #include <lib/support/Span.h>
-#include <support/CHIPMemString.h>
-#include <support/SafeString.h>
 
 namespace chip {
 namespace Mdns {
@@ -141,12 +141,13 @@ class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionA
 {
 public:
     static constexpr uint8_t kTxtMaxNumber  = 9;
-    static constexpr uint8_t kTxtMaxKeySize = MaxStringLength("D", "VP", "CM", "DT", "DN", "RI", "PI", "PH"); // possible keys
+    static constexpr uint8_t kTxtMaxKeySize = MaxStringLength("D", "VP", "CM", "AP", "DT", "DN", "RI", "PI", "PH"); // possible keys
     static constexpr uint8_t kTxtMaxValueSize =
         std::max({ kKeyDiscriminatorMaxLength, kKeyVendorProductMaxLength, kKeyAdditionalCommissioningMaxLength,
                    kKeyCommissioningModeMaxLength, kKeyDeviceTypeMaxLength, kKeyDeviceNameMaxLength, kKeyRotatingIdMaxLength,
                    kKeyPairingInstructionMaxLength, kKeyPairingHintMaxLength });
-    static constexpr size_t kTxtTotalKeySize   = TotalStringLength("D", "VP", "CM", "DT", "DN", "RI", "PI", "PH"); // possible keys
+    static constexpr size_t kTxtTotalKeySize =
+        TotalStringLength("D", "VP", "CM", "AP", "DT", "DN", "RI", "PI", "PH"); // possible keys
     static constexpr size_t kTxtTotalValueSize = kKeyDiscriminatorMaxLength + kKeyVendorProductMaxLength +
         kKeyAdditionalCommissioningMaxLength + kKeyCommissioningModeMaxLength + kKeyDeviceTypeMaxLength + kKeyDeviceNameMaxLength +
         kKeyRotatingIdMaxLength + kKeyPairingInstructionMaxLength + kKeyPairingHintMaxLength;

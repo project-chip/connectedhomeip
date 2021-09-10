@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
-#include <support/DLLUtil.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 namespace Messaging {

@@ -25,7 +25,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "MbedConfig.h"
-#include "support/CHIPMem.h"
+#include <lib/support/CHIPMem.h>
 #include <platform/KeyValueStoreManager.h>
 
 using chip::DeviceLayer::Internal::MbedConfig;

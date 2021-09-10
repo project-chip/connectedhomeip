@@ -34,7 +34,7 @@
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
 
-#include <support/CHIPPlatformMemory.h>
+#include <lib/support/CHIPPlatformMemory.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -79,16 +79,6 @@ using namespace ::chip::DeviceLayer;
 extern "C" void otTaskletsSignalPending(otInstance * p_instance)
 {
     ThreadStackMgrImpl().SignalThreadActivityPending();
-}
-
-/**
- * Glue function called directly by the OpenThread stack when system event processing work
- * is pending.
- */
-extern "C" void otSysEventSignalPending(void)
-{
-    BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
-    portYIELD_FROM_ISR(yieldRequired);
 }
 
 extern "C" void * pvPortCallocRtos(size_t num, size_t size)

@@ -21,8 +21,8 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
@@ -97,6 +97,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::Ethernet:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
+    case PairingMode::OpenCommissioningWindow:
+        err = OpenCommissioningWindow(remoteId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption);
+        break;
     }
 
     return err;
@@ -147,6 +150,14 @@ CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress addr
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
     CHIP_ERROR err = GetExecContext()->commissioner->UnpairDevice(remoteId);
+    SetCommandExitStatus(err);
+    return err;
+}
+
+CHIP_ERROR PairingCommand::OpenCommissioningWindow(NodeId remoteId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+                                                   uint8_t option)
+{
+    CHIP_ERROR err = GetExecContext()->commissioner->OpenCommissioningWindow(remoteId, timeout, iteration, discriminator, option);
     SetCommandExitStatus(err);
     return err;
 }
@@ -391,8 +402,9 @@ void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, 
 
 CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
-    ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", mRemoteId, mFabricId);
-    return GetExecContext()->commissioner->UpdateDevice(mRemoteId, mFabricId);
+    ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " Compressed FabricId: %" PRIx64 " ...", mRemoteId,
+                    GetExecContext()->commissioner->GetCompressedFabricId());
+    return GetExecContext()->commissioner->UpdateDevice(mRemoteId);
 }
 
 void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)

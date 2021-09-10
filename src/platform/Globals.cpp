@@ -20,11 +20,12 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/internal/BLEManager.h>
+#include <system/SystemLayerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-chip::System::Layer SystemLayer;
+chip::System::LayerImpl SystemLayer;
 chip::Inet::InetLayer InetLayer;
 
 namespace Internal {

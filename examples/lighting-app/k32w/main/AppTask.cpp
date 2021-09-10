@@ -18,19 +18,19 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "support/ErrorStr.h"
 #include <app/server/Server.h>
+#include <lib/support/ErrorStr.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <support/ThreadOperationalDataset.h>
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
 #include "Keyboard.h"
@@ -145,7 +145,7 @@ CHIP_ERROR AppTask::Init()
 
     K32W_LOG("Current Firmware Version: %s", currentFirmwareRev);
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_COMMISSIONING
     PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
 #endif
 
@@ -500,7 +500,7 @@ void AppTask::BleHandler(AppEvent * aEvent)
     }
 }
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#if CONFIG_CHIP_NFC_COMMISSIONING
 void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)

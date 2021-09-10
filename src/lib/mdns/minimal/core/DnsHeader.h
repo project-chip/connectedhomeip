@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
 
 namespace mdns {
 namespace Minimal {

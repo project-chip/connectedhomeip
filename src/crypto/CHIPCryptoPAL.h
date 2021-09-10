@@ -26,9 +26,10 @@
 #include <crypto/CryptoBuildConfig.h>
 #endif
 
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
-#include <support/Span.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -312,7 +313,29 @@ struct alignas(size_t) P256KeypairContext
 
 typedef CapacityBoundBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length> P256SerializedKeypair;
 
-class P256Keypair : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
+class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
+{
+public:
+    /**
+     * @brief Initialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Initialize() = 0;
+
+    /**
+     * @brief Serialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const = 0;
+
+    /**
+     * @brief Deserialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input) = 0;
+};
+
+class P256Keypair : public P256KeypairBase
 {
 public:
     P256Keypair() {}
@@ -322,19 +345,19 @@ public:
      * @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Initialize();
+    CHIP_ERROR Initialize() override;
 
     /**
      * @brief Serialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const;
+    CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
 
     /**
      * @brief Deserialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input);
+    CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;
 
     /**
      * @brief Generate a new Certificate Signing Request (CSR).
@@ -1171,6 +1194,16 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen);
 
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey);
+
+/**
+ * @brief Extracts the Authority Key Identifier from an X509 Certificate.
+ **/
+CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);
+
+/**
+ * @brief Extracts the Vendor ID from an X509 Certificate.
+ **/
+CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid);
 
 } // namespace Crypto
 } // namespace chip

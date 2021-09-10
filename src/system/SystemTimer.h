@@ -31,7 +31,7 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
@@ -220,14 +220,17 @@ public:
     }
 
 private:
-    friend class WatchableEventManager;
+    friend class LayerImplLwIP;
     static ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
 
     TimerCompleteCallback mOnComplete;
     Clock::MonotonicMilliseconds mAwakenTime;
     Timer * mNextTimer;
 
+    Layer * mSystemLayer;
+
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    friend class LayerImplSelect;
     dispatch_source_t mTimerSource = nullptr;
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 

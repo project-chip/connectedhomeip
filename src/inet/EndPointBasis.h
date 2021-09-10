@@ -32,7 +32,7 @@
 #include <inet/InetInterface.h>
 #include <inet/InetLayerEvents.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <system/SocketEvents.h>
@@ -175,20 +175,6 @@ inline bool EndPointBasis::IsOpenEndPoint() const
 
     return lResult;
 }
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-inline void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic)
-{
-    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
-    {
-        DeferredRelease(aTactic);
-    }
-    else
-    {
-        Release();
-    }
-}
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace Inet
 } // namespace chip

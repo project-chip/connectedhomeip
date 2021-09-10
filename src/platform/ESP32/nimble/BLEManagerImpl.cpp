@@ -31,9 +31,9 @@
 #if CONFIG_BT_NIMBLE_ENABLED
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/SystemTimer.h>
 
 #include "esp_log.h"
@@ -905,6 +905,10 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
         }
         HandleConnectionError(gapEvent->disconnect.conn.conn_handle, disconReason);
     }
+
+    ChipDeviceEvent disconnectEvent;
+    disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
+    PlatformMgr().PostEvent(&disconnectEvent);
 
     // Force a reconfiguration of advertising in case we switched to non-connectable mode when
     // the BLE connection was established.

@@ -49,8 +49,8 @@
 
 #include <platform/LockTracker.h>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <errno.h>
 #include <stddef.h>
@@ -118,7 +118,7 @@ InetLayer::InetLayer()
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-chip::System::LwIPEventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
+chip::System::LayerLwIP::EventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -274,7 +274,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     err = InitQueueLimiter();
     SuccessOrExit(err);
 
-    mSystemLayer->AddEventHandlerDelegate(sInetEventHandlerDelegate);
+    static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     State = kState_Initialized;
@@ -532,7 +532,7 @@ CHIP_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEnd
 
     VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = RawEndPoint::sPool.TryCreate(*mSystemLayer);
+    *retEndPoint = RawEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "Raw");
@@ -572,7 +572,7 @@ CHIP_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = TCPEndPoint::sPool.TryCreate(*mSystemLayer);
+    *retEndPoint = TCPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "TCP");
@@ -612,7 +612,7 @@ CHIP_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 
     VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    *retEndPoint = UDPEndPoint::sPool.TryCreate(*mSystemLayer);
+    *retEndPoint = UDPEndPoint::sPool.TryCreate();
     if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "UDP");
@@ -787,7 +787,7 @@ CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
     VerifyOrExit(hostNameLen <= NL_DNS_HOSTNAME_MAX_LEN, err = INET_ERROR_HOST_NAME_TOO_LONG);
     VerifyOrExit(maxAddrs > 0, err = CHIP_ERROR_NO_MEMORY);
 
-    resolver = DNSResolver::sPool.TryCreate(*mSystemLayer);
+    resolver = DNSResolver::sPool.TryCreate();
     if (resolver != nullptr)
     {
         resolver->InitInetLayerBasis(*this);
@@ -975,18 +975,13 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
     InetLayer & lInetLayer = *reinterpret_cast<InetLayer *>(aAppState);
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();
 
-    for (size_t i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
-    {
-        TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*aSystemLayer, i);
-
-        if (lEndPoint == nullptr)
-            continue;
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
         if (!lEndPoint->IsCreatedByInetLayer(lInetLayer))
-            continue;
+            return true;
         if (!lEndPoint->IsConnected())
-            continue;
+            return true;
         if (lEndPoint->mIdleTimeout == 0)
-            continue;
+            return true;
 
         if (lEndPoint->mRemainingIdleTime == 0)
         {
@@ -996,7 +991,9 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
         {
             --lEndPoint->mRemainingIdleTime;
         }
-    }
+
+        return true;
+    });
 
     if (lTimerRequired)
     {

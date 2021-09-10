@@ -24,7 +24,7 @@
 #include <array>
 #include <bitset>
 
-#include <support/Span.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace Transport {
@@ -58,7 +58,7 @@ public:
 
     void SyncStarting(FixedByteSpan<kChallengeSize> challenge)
     {
-        assert(mStatus == Status::NotSynced);
+        VerifyOrDie(mStatus == Status::NotSynced);
         mStatus = Status::SyncInProcess;
         new (&mSyncInProcess) SyncInProcess();
         ::memcpy(mSyncInProcess.mChallenge.data(), challenge.data(), kChallengeSize);

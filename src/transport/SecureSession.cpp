@@ -22,9 +22,9 @@
  *
  */
 
-#include <core/CHIPEncoding.h>
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -136,7 +136,7 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     constexpr Header::EncryptionType encType = Header::EncryptionType::kAESCCMTagLen16;
 
     const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(encType);
-    assert(taglen <= kMaxTagLen);
+    VerifyOrDie(taglen <= kMaxTagLen);
 
     VerifyOrReturnError(mKeyAvailable, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

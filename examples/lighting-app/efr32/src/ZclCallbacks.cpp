@@ -21,12 +21,12 @@
  */
 
 #include "AppConfig.h"
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "LightingManager.h"
 
-#include <app/common/gen/ids/Attributes.h>
-#include <app/common/gen/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af-types.h>
 
 using namespace ::chip;
@@ -70,10 +70,6 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
                         ChipLogValueMEI(attributeId), type, *value, size);
 
         // WIP Apply attribute change to Light
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Unknown Cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
     }
 }
 

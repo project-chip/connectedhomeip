@@ -28,12 +28,12 @@
 #include <new>
 #include <utility>
 
-#include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
 #include <inet/InetInterface.h>
 #include <inet/TCPEndPoint.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
 #include <transport/raw/Base.h>
 
 namespace chip {

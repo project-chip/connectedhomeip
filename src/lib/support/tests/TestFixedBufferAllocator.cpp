@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <support/FixedBufferAllocator.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/FixedBufferAllocator.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <cstring>
 #include <nlunit-test.h>

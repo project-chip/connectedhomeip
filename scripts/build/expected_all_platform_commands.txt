@@ -69,6 +69,16 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
 
+# Generating nrf-nrf52840-pump
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d /OUTPUT/DIR/nrf-nrf52840-pump -b nrf52840dk_nrf52840 /TEST/BUILD/ROOT/examples/pump-app/nrfconnect'
+
+# Generating nrf-nrf52840-pump_controller
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d /OUTPUT/DIR/nrf-nrf52840-pump_controller -b nrf52840dk_nrf52840 /TEST/BUILD/ROOT/examples/pump-controller-app/nrfconnect'
+
 # Generating nrf-nrf5340-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
@@ -84,20 +94,30 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
 
+# Generating nrf-nrf5340-pump
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d /OUTPUT/DIR/nrf-nrf5340-pump -b nrf5340dk_nrf5340_cpuapp /TEST/BUILD/ROOT/examples/pump-app/nrfconnect'
+
+# Generating nrf-nrf5340-pump_controller
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d /OUTPUT/DIR/nrf-nrf5340-pump_controller -b nrf5340dk_nrf5340_cpuapp /TEST/BUILD/ROOT/examples/pump-controller-app/nrfconnect'
+
 # Generating android-arm-chip_tool
-gn gen --check --fail-on-unused-args {out}/android-arm-chip_tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME"'
+gn gen --check --fail-on-unused-args {out}/android-arm-chip_tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating android-arm64-chip_tool
-gn gen --check --fail-on-unused-args {out}/android-arm64-chip_tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME"'
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip_tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating android-x64-chip_tool
-gn gen --check --fail-on-unused-args {out}/android-x64-chip_tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME"'
+gn gen --check --fail-on-unused-args {out}/android-x64-chip_tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -162,6 +182,12 @@ ninja -C {out}/nrf-nrf52840-lock
 # Building nrf-nrf52840-shell
 ninja -C {out}/nrf-nrf52840-shell
 
+# Building nrf-nrf52840-pump
+ninja -C /OUTPUT/DIR/nrf-nrf52840-pump
+
+# Building nrf-nrf52840-pump_controller
+ninja -C /OUTPUT/DIR/nrf-nrf52840-pump_controller
+
 # Building nrf-nrf5340-light
 ninja -C {out}/nrf-nrf5340-light
 
@@ -171,17 +197,23 @@ ninja -C {out}/nrf-nrf5340-lock
 # Building nrf-nrf5340-shell
 ninja -C {out}/nrf-nrf5340-shell
 
+# Building nrf-nrf5340-pump
+ninja -C /OUTPUT/DIR/nrf-nrf5340-pump
+
+# Building nrf-nrf5340-pump_controller
+ninja -C /OUTPUT/DIR/nrf-nrf5340-pump_controller
+
 # Building JNI android-arm-chip_tool
 ninja -C {out}/android-arm-chip_tool
 
 # Prepare Native libs android-arm-chip_tool
-mkdir -p {root}/src/android/CHIPTool/app/src/main/jniLibs/armeabi-v7a
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a
 
-cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/src/main/jniLibs/armeabi-v7a/libSetupPayloadParser.so
+cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libSetupPayloadParser.so
 
-cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libCHIPController.so {root}/src/android/CHIPTool/app/src/main/jniLibs/armeabi-v7a/libCHIPController.so
+cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libCHIPController.so
 
-cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libc++_shared.so {root}/src/android/CHIPTool/app/src/main/jniLibs/armeabi-v7a/libc++_shared.so
+cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
 # Building APP android-arm-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm-chip_tool/lib -PbuildDir={out}/android-arm-chip_tool build
@@ -190,13 +222,13 @@ cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libc++_shared.so {root}/src/a
 ninja -C {out}/android-arm64-chip_tool
 
 # Prepare Native libs android-arm64-chip_tool
-mkdir -p {root}/src/android/CHIPTool/app/src/main/jniLibs/arm64-v8a
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a
 
-cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/src/main/jniLibs/arm64-v8a/libSetupPayloadParser.so
+cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
 
-cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libCHIPController.so {root}/src/android/CHIPTool/app/src/main/jniLibs/arm64-v8a/libCHIPController.so
+cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libCHIPController.so
 
-cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTool/app/src/main/jniLibs/arm64-v8a/libc++_shared.so
+cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
 # Building APP android-arm64-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm64-chip_tool/lib -PbuildDir={out}/android-arm64-chip_tool build
@@ -205,13 +237,13 @@ cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libc++_shared.so {root}/src/a
 ninja -C {out}/android-x64-chip_tool
 
 # Prepare Native libs android-x64-chip_tool
-mkdir -p {root}/src/android/CHIPTool/app/src/main/jniLibs/x86_64
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64
 
-cp {out}/android-x64-chip_tool/lib/jni/x86_64/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/src/main/jniLibs/x86_64/libSetupPayloadParser.so
+cp {out}/android-x64-chip_tool/lib/jni/x86_64/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libSetupPayloadParser.so
 
-cp {out}/android-x64-chip_tool/lib/jni/x86_64/libCHIPController.so {root}/src/android/CHIPTool/app/src/main/jniLibs/x86_64/libCHIPController.so
+cp {out}/android-x64-chip_tool/lib/jni/x86_64/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libCHIPController.so
 
-cp {out}/android-x64-chip_tool/lib/jni/x86_64/libc++_shared.so {root}/src/android/CHIPTool/app/src/main/jniLibs/x86_64/libc++_shared.so
+cp {out}/android-x64-chip_tool/lib/jni/x86_64/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libc++_shared.so
 
 # Building APP android-x64-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-x64-chip_tool/lib -PbuildDir={out}/android-x64-chip_tool build

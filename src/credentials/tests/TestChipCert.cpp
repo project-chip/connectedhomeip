@@ -24,15 +24,15 @@
  *
  */
 
-#include <core/CHIPTLV.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/core/PeerId.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -1287,11 +1287,12 @@ static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
         CHIP_ERROR err = GetTestCert(testCase.Cert, sNullLoadFlag, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        PeerId peerId;
-        err = ExtractPeerIdFromOpCert(cert, &peerId);
+        NodeId nodeId;
+        FabricId fabricId;
+        err = ExtractNodeIdFabricIdFromOpCert(cert, &nodeId, &fabricId);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, peerId.GetNodeId() == testCase.ExpectedNodeId);
-        NL_TEST_ASSERT(inSuite, peerId.GetFabricId() == testCase.ExpectedFabricId);
+        NL_TEST_ASSERT(inSuite, nodeId == testCase.ExpectedNodeId);
+        NL_TEST_ASSERT(inSuite, fabricId == testCase.ExpectedFabricId);
     }
 
     // Test extraction from the parsed form.
@@ -1304,11 +1305,12 @@ static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
         err = LoadTestCert(certSet, testCase.Cert, sNullLoadFlag, sNullDecodeFlag);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        PeerId peerId;
-        err = ExtractPeerIdFromOpCert(certSet.GetCertSet()[0], &peerId);
+        NodeId nodeId;
+        FabricId fabricId;
+        err = ExtractNodeIdFabricIdFromOpCert(certSet.GetCertSet()[0], &nodeId, &fabricId);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, peerId.GetNodeId() == testCase.ExpectedNodeId);
-        NL_TEST_ASSERT(inSuite, peerId.GetFabricId() == testCase.ExpectedFabricId);
+        NL_TEST_ASSERT(inSuite, nodeId == testCase.ExpectedNodeId);
+        NL_TEST_ASSERT(inSuite, fabricId == testCase.ExpectedFabricId);
         certSet.Release();
     }
 
@@ -1331,11 +1333,12 @@ static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
         err = ConvertX509CertsToChipCertArray(cert, icaCert, certs);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        PeerId peerId;
-        err = ExtractPeerIdFromOpCertArray(certs, &peerId);
+        NodeId nodeId;
+        FabricId fabricId;
+        err = ExtractNodeIdFabricIdFromOpCertArray(certs, &nodeId, &fabricId);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, peerId.GetNodeId() == testCase.ExpectedNodeId);
-        NL_TEST_ASSERT(inSuite, peerId.GetFabricId() == testCase.ExpectedFabricId);
+        NL_TEST_ASSERT(inSuite, nodeId == testCase.ExpectedNodeId);
+        NL_TEST_ASSERT(inSuite, fabricId == testCase.ExpectedFabricId);
     }
 }
 

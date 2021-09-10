@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <ble/BleLayer.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/CASESession.h>
@@ -37,8 +38,8 @@ public:
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             SecureSessionMgr * sessionMgr, Transport::FabricTable * fabrics,
-                                             SessionIDAllocator * idAllocator);
+                                             Ble::BleLayer * bleLayer, SecureSessionMgr * sessionMgr,
+                                             Transport::FabricTable * fabrics, SessionIDAllocator * idAllocator);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -62,8 +63,7 @@ private:
     CASESession mPairingSession;
     uint16_t mSessionKeyId         = 0;
     SecureSessionMgr * mSessionMgr = nullptr;
-
-    FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
+    Ble::BleLayer * mBleLayer      = nullptr;
 
     Transport::FabricTable * mFabrics = nullptr;
 

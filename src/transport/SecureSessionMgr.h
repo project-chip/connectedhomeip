@@ -27,12 +27,12 @@
 
 #include <utility>
 
-#include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
 #include <protocols/secure_channel/Constants.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
 #include <transport/FabricTable.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/PairingSession.h>

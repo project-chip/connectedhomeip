@@ -16,17 +16,17 @@
  */
 #include <inttypes.h>
 
-#include <core/CHIPError.h>
-#include <mdns/minimal/core/FlatAllocatedQName.h>
-#include <mdns/minimal/core/QName.h>
-#include <mdns/minimal/responders/IP.h>
-#include <mdns/minimal/responders/Ptr.h>
-#include <mdns/minimal/responders/QueryResponder.h>
-#include <mdns/minimal/responders/RecordResponder.h>
-#include <mdns/minimal/responders/Srv.h>
-#include <mdns/minimal/responders/Txt.h>
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPError.h>
+#include <lib/mdns/minimal/core/FlatAllocatedQName.h>
+#include <lib/mdns/minimal/core/QName.h>
+#include <lib/mdns/minimal/responders/IP.h>
+#include <lib/mdns/minimal/responders/Ptr.h>
+#include <lib/mdns/minimal/responders/QueryResponder.h>
+#include <lib/mdns/minimal/responders/RecordResponder.h>
+#include <lib/mdns/minimal/responders/Srv.h>
+#include <lib/mdns/minimal/responders/Txt.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Mdns {

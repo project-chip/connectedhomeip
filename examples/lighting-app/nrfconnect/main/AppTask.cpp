@@ -26,9 +26,9 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -36,7 +36,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include <support/ErrorStr.h>
+#include <lib/support/ErrorStr.h>
 #include <system/SystemClock.h>
 
 #include <dk_buttons_and_leds.h>
