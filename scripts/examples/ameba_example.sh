@@ -29,11 +29,11 @@ fi
 
 source ../../scripts/activate.sh
 
-cd ${AMEBA_PATH}/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
+cd "$AMEBA_PATH"/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
 make clean
 make all
 
-cd ${AMEBA_PATH}/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+cd "$AMEBA_PATH"/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
 make clean
 make -C asdk lib_all
 make all
