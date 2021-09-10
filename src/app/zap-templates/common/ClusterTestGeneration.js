@@ -344,14 +344,14 @@ function chip_tests_item_response_parameters(options)
         }
       }
 
-      const unusedResponseValues = responseValues.filter(response => 'value' in response);
-      unusedResponseValues.forEach(unusedResponseValue => {
-        printErrorAndExit(this,
-            'Missing "' + unusedResponseValue.name + '" in response arguments list:\n\t* '
-                + responseArgs.map(response => response.name).join('\n\t* '));
-      });
-
       return responseArg;
+    });
+
+    const unusedResponseValues = responseValues.filter(response => 'value' in response);
+    unusedResponseValues.forEach(unusedResponseValue => {
+      printErrorAndExit(this,
+          'Missing "' + unusedResponseValue.name + '" in response arguments list:\n\t* '
+              + responseArgs.map(response => response.name).join('\n\t* '));
     });
 
     return responses;
