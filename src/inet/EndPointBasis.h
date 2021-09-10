@@ -44,9 +44,6 @@
 
 //--- Declaration of LWIP protocol control buffer structure names
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-struct raw_pcb;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
 struct udp_pcb;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
@@ -107,9 +104,6 @@ protected:
     union
     {
         const void * mVoid; /**< An untyped protocol control buffer reference */
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        raw_pcb * mRaw; /**< Raw network interface protocol control */
-#endif                  // INET_CONFIG_ENABLE_RAW_ENDPOINT
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         udp_pcb * mUDP; /**< User datagram protocol (UDP) control */
 #endif                  // INET_CONFIG_ENABLE_UDP_ENDPOINT

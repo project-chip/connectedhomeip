@@ -154,21 +154,6 @@
 #endif // INET_CONFIG_MAX_DROPPABLE_EVENTS
 
 /**
- *  @def INET_CONFIG_NUM_RAW_ENDPOINTS
- *
- *  @brief
- *    This is the total number of "raw" (direct-IP, non-TCP/-UDP) end
- *    point context structures.
- *
- *    Up to this many outstanding "raw" communication flows may be in
- *    use.
- *
- */
-#ifndef INET_CONFIG_NUM_RAW_ENDPOINTS
-#define INET_CONFIG_NUM_RAW_ENDPOINTS                       8
-#endif // INET_CONFIG_NUM_RAW_ENDPOINTS
-
-/**
  *  @def INET_CONFIG_NUM_TCP_ENDPOINTS
  *
  *  @brief
@@ -245,18 +230,6 @@
 #ifndef INET_CONFIG_ENABLE_DNS_RESOLVER
 #define INET_CONFIG_ENABLE_DNS_RESOLVER                     0
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
-/**
- *  @def INET_CONFIG_ENABLE_RAW_ENDPOINT
- *
- *  @brief
- *    Defines whether (1) or not (0) to enable the ability
- *    to instantiate a Raw endpoint.
- *
- */
-#ifndef INET_CONFIG_ENABLE_RAW_ENDPOINT
-#define INET_CONFIG_ENABLE_RAW_ENDPOINT                     0
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 /**
  *  @def INET_CONFIG_ENABLE_TCP_ENDPOINT

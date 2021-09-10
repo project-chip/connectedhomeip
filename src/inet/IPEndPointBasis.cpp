@@ -344,12 +344,6 @@ CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
         switch (mLwIPEndPointType)
         {
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        case kLwIPEndPointType_Raw:
-            raw_set_flags(mRaw, RAW_FLAGS_MULTICAST_LOOP);
-            break;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         case kLwIPEndPointType_UDP:
             udp_set_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
@@ -365,12 +359,6 @@ CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
     {
         switch (mLwIPEndPointType)
         {
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        case kLwIPEndPointType_Raw:
-            raw_clear_flags(mRaw, RAW_FLAGS_MULTICAST_LOOP);
-            break;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         case kLwIPEndPointType_UDP:
