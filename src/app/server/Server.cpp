@@ -201,8 +201,8 @@ ServerRendezvousAdvertisementDelegate gAdvDelegate;
 class ServerCallback : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         // as soon as a client connects, assume it is connected
@@ -286,7 +286,7 @@ CHIP_ERROR OpenBasicCommissioningWindow(ResetFabrics resetFabrics, uint16_t comm
     if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
         ReturnErrorOnFailure(
-            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
+            DeviceLayer::SystemLayer().StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
     }
 
     return CHIP_NO_ERROR;
@@ -313,7 +313,7 @@ CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds,
     if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
         ReturnErrorOnFailure(
-            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
+            DeviceLayer::SystemLayer().StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
     }
 
     return CHIP_NO_ERROR;
@@ -384,7 +384,7 @@ void InitServer(AppDelegate * delegate)
 
     SuccessOrExit(err);
 
-    err = gSessions.Init(&DeviceLayer::SystemLayer, &gTransports, &gFabrics, &gMessageCounterManager);
+    err = gSessions.Init(&DeviceLayer::SystemLayer(), &gTransports, &gFabrics, &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeMgr.Init(&gSessions);

@@ -185,7 +185,7 @@ public:
     // Must be called before System::Layer::Shutdown(), since this holds a pointer to that.
     CHIP_ERROR Shutdown();
 
-    chip::System::Layer * SystemLayer() const;
+    chip::System::Layer * SystemLayer() const { return mSystemLayer; }
 
     // End Points
 
@@ -308,11 +308,6 @@ private:
 
     bool IsIdleTimerRunning();
 };
-
-inline chip::System::Layer * InetLayer::SystemLayer() const
-{
-    return mSystemLayer;
-}
 
 /**
  *  @class IPPacketInfo

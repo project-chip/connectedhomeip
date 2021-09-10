@@ -91,8 +91,8 @@ void TestMockClock(nlTestSuite * inSuite, void * inContext)
     };
     MockClock clock;
 
-    ClockBase * savedRealClock = globalClock;
-    globalClock                = &clock;
+    ClockBase * savedRealClock = Internal::gClockBase;
+    Internal::gClockBase       = &clock;
 
     NL_TEST_ASSERT(inSuite, Clock::GetMonotonicMilliseconds() == 0);
     NL_TEST_ASSERT(inSuite, Clock::GetMonotonicMicroseconds() == 0);
@@ -101,7 +101,7 @@ void TestMockClock(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, Clock::GetMonotonicMilliseconds() == 1234);
     NL_TEST_ASSERT(inSuite, Clock::GetMonotonicMicroseconds() == 1234 * chip::kMicrosecondsPerMillisecond);
 
-    globalClock = savedRealClock;
+    Internal::gClockBase = savedRealClock;
 }
 
 } // namespace

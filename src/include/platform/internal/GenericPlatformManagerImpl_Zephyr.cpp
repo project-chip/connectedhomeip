@@ -40,6 +40,13 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+namespace {
+System::LayerSocketsLoop & SystemLayerSocketsLoop()
+{
+    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+}
+} // anonymous namespace
+
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
 
@@ -106,7 +113,7 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDeviceEv
     // k_msgq_put takes `void*` instead of `const void*`. Nonetheless, it should be safe to
     // const_cast here and there are components in Zephyr itself which do the same.
     if (k_msgq_put(&mChipEventQueue, const_cast<ChipDeviceEvent *>(event), K_NO_WAIT) == 0)
-        SystemLayer.Signal(); // Trigger wake on CHIP thread
+        SystemLayerSocketsLoop().Signal(); // Trigger wake on CHIP thread
     else
         ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
 }
@@ -125,20 +132,20 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
 {
     Impl()->LockChipStack();
 
-    SystemLayer.EventLoopBegins();
+    SystemLayerSocketsLoop().EventLoopBegins();
     while (true)
     {
-        SystemLayer.PrepareEvents();
+        SystemLayerSocketsLoop().PrepareEvents();
 
         Impl()->UnlockChipStack();
-        SystemLayer.WaitForEvents();
+        SystemLayerSocketsLoop().WaitForEvents();
         Impl()->LockChipStack();
 
-        SystemLayer.HandleEvents();
+        SystemLayerSocketsLoop().HandleEvents();
 
         ProcessDeviceEvents();
     }
-    SystemLayer.EventLoopEnds();
+    SystemLayerSocketsLoop().EventLoopEnds();
 
     Impl()->UnlockChipStack();
 }

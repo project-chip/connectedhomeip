@@ -47,7 +47,7 @@ public:
                               EncryptedPacketBufferHandle & out) override;
     CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override;
 
-    CHIP_ERROR OnMessageReceived(const Header::Flags & headerFlags, const PayloadHeader & payloadHeader, uint32_t messageId,
+    CHIP_ERROR OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
                                  const Transport::PeerAddress & peerAddress, Messaging::MessageFlags msgFlags,
                                  Messaging::ReliableMessageContext * reliableMessageContext) override;
 

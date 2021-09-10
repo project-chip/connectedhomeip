@@ -73,7 +73,7 @@ void RequestUserDirectedCommissioning(System::SocketEvents events, intptr_t data
     int selectedCommissionerNumber = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
     scanf("%d", &selectedCommissionerNumber);
     printf("%d\n", selectedCommissionerNumber);
-    chip::DeviceLayer::SystemLayer.StopWatchingSocket(&token);
+    chip::DeviceLayer::SystemLayerSockets().StopWatchingSocket(&token);
 
     const Mdns::DiscoveredNodeData * selectedCommissioner =
         commissionableNodeController.GetDiscoveredCommissioner(selectedCommissionerNumber - 1);
@@ -105,9 +105,10 @@ void InitCommissioningFlow(intptr_t commandArg)
         int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         VerifyOrReturn(fcntl(0, F_SETFL, flags | O_NONBLOCK) == 0,
                        ChipLogError(Zcl, "Could not set non-blocking mode for user input!"));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayer.StartWatchingSocket(STDIN_FILENO, &token));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayer.SetCallback(token, RequestUserDirectedCommissioning, (intptr_t) NULL));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayer.RequestCallbackOnPendingRead(token));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayerSockets().StartWatchingSocket(STDIN_FILENO, &token));
+        ReturnOnFailure(
+            chip::DeviceLayer::SystemLayerSockets().SetCallback(token, RequestUserDirectedCommissioning, (intptr_t) NULL));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayerSockets().RequestCallbackOnPendingRead(token));
     }
     else
     {
@@ -127,7 +128,7 @@ int main(int argc, char * argv[])
                       Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, kTvDeviceType)));
 
     // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
-    DeviceLayer::SystemLayer.StartTimer(
+    DeviceLayer::SystemLayer().StartTimer(
         commissionerDiscoveryTimeoutInMs,
         [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
 
