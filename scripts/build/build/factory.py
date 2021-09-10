@@ -154,6 +154,7 @@ _MATCHERS[Platform.AMEBA].AcceptBoard(
 _MATCHERS[Platform.AMEBA].AcceptApplication(
     Application.ALL_CLUSTERS, app=AmebaApp.ALL_CLUSTERS)
 
+
 class BuilderFactory:
     """Creates application builders."""
 
