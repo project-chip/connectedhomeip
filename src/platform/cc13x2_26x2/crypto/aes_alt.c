@@ -21,7 +21,6 @@
 
 #if defined(MBEDTLS_AES_ALT)
 
-#include <assert.h>
 #include <string.h>
 
 #include "ti_drivers_config.h"
@@ -46,7 +45,8 @@ void mbedtls_aes_init(mbedtls_aes_context * ctx)
         AESECB_Params_init(&AESECBParams);
         AESECBParams.returnBehavior = AESECB_RETURN_BEHAVIOR_POLLING;
         AESECB_handle               = AESECB_open(CONFIG_AESECB_1, &AESECBParams);
-        assert(AESECB_handle != 0);
+
+        // handle will be NULL if open failed, subsequent calls will fail with a generic HW error
     }
 }
 
@@ -64,25 +64,45 @@ void mbedtls_aes_free(mbedtls_aes_context * ctx)
 
 int mbedtls_aes_setkey_enc(mbedtls_aes_context * ctx, const unsigned char * key, unsigned int keybits)
 {
-    int_fast16_t statusCrypto = 0;
+    int_fast16_t statusCrypto;
+    size_t keylen = keybits / 8U; // 8 bits in a byte
+
+    if (keylen > sizeof(ctx->keyMaterial))
+    {
+        return MBEDTLS_ERR_AES_INVALID_KEY_LENGTH;
+    }
 
     /* Initialize AES key */
-    memcpy(ctx->keyMaterial, key, (keybits >> 3));
-    statusCrypto = CryptoKeyPlaintext_initKey(&ctx->cryptoKey, (uint8_t *) ctx->keyMaterial, (keybits >> 3));
-    assert(statusCrypto == 0);
+    memcpy(ctx->keyMaterial, key, keylen);
+    statusCrypto = CryptoKeyPlaintext_initKey(&ctx->cryptoKey, (uint8_t *) ctx->keyMaterial, keylen);
 
-    return (int) statusCrypto;
+    if (CryptoKey_STATUS_SUCCESS != statusCrypto)
+    {
+        return MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
+    }
+
+    return 0;
 }
 
 int mbedtls_aes_setkey_dec(mbedtls_aes_context * ctx, const unsigned char * key, unsigned int keybits)
 {
     int_fast16_t statusCrypto;
+    size_t keylen = keybits / 8U; // 8 bits in a byte
+
+    if (keylen > sizeof(ctx->keyMaterial))
+    {
+        return MBEDTLS_ERR_AES_INVALID_KEY_LENGTH;
+    }
 
     /* Initialize AES key */
-    statusCrypto = CryptoKeyPlaintext_initKey(&ctx->cryptoKey, (uint8_t *) key, (keybits >> 3));
-    assert(statusCrypto == 0);
+    statusCrypto = CryptoKeyPlaintext_initKey(&ctx->cryptoKey, (uint8_t *) key, keylen);
 
-    return (int) statusCrypto;
+    if (CryptoKey_STATUS_SUCCESS != statusCrypto)
+    {
+        return MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
+    }
+
+    return 0;
 }
 
 int mbedtls_aes_crypt_ecb(mbedtls_aes_context * ctx, int mode, const unsigned char input[16], unsigned char output[16])
@@ -99,8 +119,12 @@ int mbedtls_aes_crypt_ecb(mbedtls_aes_context * ctx, int mode, const unsigned ch
     operationOneStepEncrypt.output      = (uint8_t *) output;
 
     statusCrypto = AESECB_oneStepEncrypt(AESECB_handle, &operationOneStepEncrypt);
-    assert(statusCrypto == 0);
 
-    return statusCrypto;
+    if (CryptoKey_STATUS_SUCCESS != statusCrypto)
+    {
+        return MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
+    }
+
+    return 0;
 }
 #endif

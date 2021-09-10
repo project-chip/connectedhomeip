@@ -26,7 +26,6 @@
 
 #if defined(MBEDTLS_SHA256_ALT)
 
-#include <assert.h>
 #include <string.h>
 
 #include <ti/drivers/SHA2.h>
