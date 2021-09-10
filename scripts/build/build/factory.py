@@ -23,6 +23,7 @@ from builders.qpg import QpgBuilder
 from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
+from builders.ameba import AmebaBuilder, AmebaBoard, AmebaApp
 
 from .targets import Application, Board, Platform
 
@@ -89,6 +90,7 @@ _MATCHERS = {
     Platform.INFINEON: Matcher(InfineonBuilder),
     Platform.TELINK: Matcher(TelinkBuilder),
     Platform.TIZEN: Matcher(TizenBuilder),
+    Platform.AMEBA: Matcher(AmebaBuilder),
 }
 
 # Matrix of what can be compiled and what build options are required
@@ -155,6 +157,11 @@ _MATCHERS[Platform.INFINEON].AcceptBoard(
 _MATCHERS[Platform.TIZEN].AcceptBoard(Board.ARM, board=TizenBoard.ARM)
 _MATCHERS[Platform.TIZEN].AcceptApplication(
     Application.LIGHT, app=TizenApp.LIGHT)
+
+_MATCHERS[Platform.AMEBA].AcceptBoard(
+    Board.AMEBAD, board=AmebaBoard.AMEBAD)
+_MATCHERS[Platform.AMEBA].AcceptApplication(
+    Application.ALL_CLUSTERS, app=AmebaApp.ALL_CLUSTERS)
 
 
 class BuilderFactory:
