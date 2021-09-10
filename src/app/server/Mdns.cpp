@@ -292,7 +292,7 @@ CHIP_ERROR ScheduleExtendedDiscoveryExpiration()
     gExtendedDiscoveryExpirationMs =
         gTimeSource.GetCurrentMonotonicTimeMs() + static_cast<uint64_t>(extendedDiscoveryTimeoutSecs) * 1000;
 
-    ReturnErrorOnFailure(DeviceLayer::SystemLayer.StartTimer(static_cast<uint32_t>(extendedDiscoveryTimeoutSec) s * 1000,
+    ReturnErrorOnFailure(DeviceLayer::SystemLayer.StartTimer(static_cast<uint32_t>(extendedDiscoveryTimeoutSecs) * 1000,
                                                              HandleExtendedDiscoveryExpiration, nullptr));
 
     return CHIP_NO_ERROR;
