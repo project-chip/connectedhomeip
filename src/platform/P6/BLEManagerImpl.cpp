@@ -556,7 +556,7 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceWrite(uint16_t conn_id, 
                 event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
                 event.CHIPoBLEWriteReceived.ConId = conn_id;
                 event.CHIPoBLEWriteReceived.Data  = buf;
-                CHIP_ERROR status                 = PlatformMgr().PostEventOrDie(&event);
+                CHIP_ERROR status                 = PlatformMgr().PostEvent(&event);
                 if (status != CHIP_NO_ERROR)
                 {
                     result = WICED_BT_GATT_INTERNAL_ERROR;
