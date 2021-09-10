@@ -221,11 +221,6 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         // Do nothing for no-op events.
         break;
 
-    case DeviceEventType::kChipSystemLayerEvent:
-        // If the event is a CHIP System or Inet Layer event, deliver it to the System::Layer event handler.
-        Impl()->DispatchEventToSystemLayer(event);
-        break;
-
     case DeviceEventType::kChipLambdaEvent:
         event->LambdaEvent();
         break;
@@ -257,24 +252,6 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         ChipLogError(DeviceLayer, "Long dispatch time: %" PRIu32 " ms, for event type %d", deltaMs, event->Type);
     }
 #endif // CHIP_PROGRESS_LOGGING
-}
-
-template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const ChipDeviceEvent * event)
-{
-    // TODO(#788): remove ifdef LWIP once System::Layer event APIs are generally available
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Invoke the System Layer's event handler function.
-    err = static_cast<System::LayerImplLwIP &>(SystemLayer())
-              .HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
-                           event->ChipSystemLayerEvent.Argument);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s", event->Type, ErrorStr(err));
-    }
-#endif
 }
 
 template <class ImplClass>
