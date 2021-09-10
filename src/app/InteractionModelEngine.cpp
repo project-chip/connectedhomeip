@@ -287,7 +287,7 @@ exit:
 }
 
 CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext,
-                                                           const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
+                                                           const PayloadHeader & aPayloadHeader,
                                                            System::PacketBufferHandle && aPayload)
 {
     System::PacketBufferTLVReader reader;
@@ -311,13 +311,7 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
             continue;
         }
 
-        readClient.SetExchangeContext(apExchangeContext);
-        CHIP_ERROR err = readClient.ProcessReportData(std::move(aPayload));
-        if (err != CHIP_NO_ERROR)
-        {
-            readClient.Shutdown();
-        }
-        return err;
+        return readClient.OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
     }
     return CHIP_NO_ERROR;
 }
@@ -331,8 +325,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
-        return OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
-                                    ReadHandler::InteractionType::Read);
+        return OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), ReadHandler::InteractionType::Read);
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
@@ -340,12 +333,12 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeRequest))
     {
-        return OnReadInitialRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload),
+        return OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
                                     ReadHandler::InteractionType::Subscribe);
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
-        return OnUnsolicitedReportData(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+        return OnUnsolicitedReportData(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
     else
     {
@@ -374,14 +367,9 @@ CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrep
 CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier)
 {
     ReadClient * client = nullptr;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aAppIdentifier));
-    err = client->SendSubscribeRequest(aReadPrepareParams);
-    if (err != CHIP_NO_ERROR)
-    {
-        client->Shutdown();
-    }
-    return err;
+    ReturnErrorOnFailure(client->SendSubscribeRequest(aReadPrepareParams));
+    return CHIP_NO_ERROR;
 }
 
 uint16_t InteractionModelEngine::GetReadClientArrayIndex(const ReadClient * const apReadClient) const

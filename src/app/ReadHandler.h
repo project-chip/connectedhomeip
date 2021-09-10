@@ -183,8 +183,8 @@ private:
     bool mInitialReport                        = false;
     InteractionType mInteractionType           = InteractionType::Read;
     uint64_t mSubscriptionId                   = 0;
-    uint16_t mMinIntervalSeconds               = 0;
-    uint16_t mMaxIntervalSeconds               = 0;
+    uint16_t mMinIntervalFloorSeconds          = 0;
+    uint16_t mMaxIntervalCeilingSeconds        = 0;
     Optional<SessionHandle> mSessionHandle;
     bool mHoldReport = false;
     bool mDirty      = false;
