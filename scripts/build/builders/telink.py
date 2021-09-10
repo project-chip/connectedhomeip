@@ -62,24 +62,25 @@ class TelinkBuilder(Builder):
     def generate(self):
 
         if not os.path.exists(self.output_dir):
+            cmd = 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"\n'
 
             if not self._runner.dry_run:
 
-                # Check Zephyr base
+                # Zephyr base
                 if 'TELINK_ZEPHYR_BASE' not in os.environ:
-                    raise Exception(
-                        "Telink builds require TELINK_ZEPHYR_BASE to be set")
+                    # TODO: remove once variable in all images
+                    cmd = ''
+                    if 'ZEPHYR_BASE' not in os.environ:
+                        raise Exception(
+                            "Telink builds require TELINK_ZEPHYR_BASE or ZEPHYR_BASE to be set")
 
-                # Check Telink toolchain
-                if 'TELINK_TOOLCHAIN_PATH' not in os.environ:
-                    raise Exception(
-                        "Telink requires TELINK_TOOLCHAIN_PATH to be set")
-
-            cmd = '''
-source "$TELINK_ZEPHYR_BASE/zephyr-env.sh";
-export ZEPHYR_TOOLCHAIN_VARIANT=cross-compile;
-export CROSS_COMPILE=$TELINK_TOOLCHAIN_PATH/riscv32-elf-;
-west build -d {outdir} -b {board} {sourcedir}
+            # TODO: TELINK_ZEPHYR_SDK_DIR should be used for compilation and
+            # NOT hardcoding of zephyr-sdk-0.13.0
+            cmd += '''
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_BASE/../../zephyr-sdk-0.13.0"
+source "$ZEPHYR_BASE/zephyr-env.sh";
+west build --cmake-only -d {outdir} -b {board} {sourcedir}
         '''.format(
                 outdir=shlex.quote(
                     self.output_dir), board=self.board.GnArgName(), sourcedir=shlex.quote(

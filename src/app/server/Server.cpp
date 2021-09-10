@@ -117,7 +117,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     SuccessOrExit(err);
 
-    err = mSessions.Init(&DeviceLayer::SystemLayer, &mTransports, &mFabrics, &mMessageCounterManager);
+    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mFabrics, &mMessageCounterManager);
     SuccessOrExit(err);
 
     err = mExchangeMgr.Init(&mSessions);
@@ -265,8 +265,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR Server::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                     const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer)
+CHIP_ERROR Server::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
+                                     System::PacketBufferHandle && buffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(!buffer.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);

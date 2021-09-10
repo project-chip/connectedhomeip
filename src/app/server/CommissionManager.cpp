@@ -71,7 +71,7 @@ CHIP_ERROR CommissionManager::OpenBasicCommissioningWindow(ResetFabrics resetFab
     if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
         ReturnErrorOnFailure(
-            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandleCommissioningWindowTimeout, this));
+            DeviceLayer::SystemLayer().StartTimer(commissioningTimeoutSeconds * 1000, HandleCommissioningWindowTimeout, this));
     }
 
     return CHIP_NO_ERROR;
@@ -102,7 +102,7 @@ CHIP_ERROR CommissionManager::OpenEnhancedCommissioningWindow(uint16_t commissio
     if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
         ReturnErrorOnFailure(
-            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandleCommissioningWindowTimeout, this));
+            DeviceLayer::SystemLayer().StartTimer(commissioningTimeoutSeconds * 1000, HandleCommissioningWindowTimeout, this));
     }
 
     return CHIP_NO_ERROR;

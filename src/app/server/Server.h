@@ -109,8 +109,8 @@ private:
     };
 
     // Messaging::ExchangeDelegate
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     AppDelegate * mAppDelegate = nullptr;
