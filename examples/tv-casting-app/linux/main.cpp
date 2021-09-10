@@ -19,9 +19,10 @@
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
-#include <support/CHIPArgParser.hpp>
+#include <support/SafeInt.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -42,28 +43,28 @@ Mdns::DiscoveryFilter gDiscoveryFilter = Mdns::DiscoveryFilter(Mdns::DiscoveryFi
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
-    bool retval = true;
-
     switch (aIdentifier)
     {
     case kOptionDeviceType:
         if (strcasecmp(aValue, "all") == 0)
         {
             gDiscoveryFilter = Mdns::DiscoveryFilter();
+            return true;
         }
         else
         {
-            uint16_t deviceType = (uint16_t) strtol(aValue, nullptr, 10);
-            gDiscoveryFilter    = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, deviceType);
+            long deviceType = strtol(aValue, nullptr, 10);
+            if (CanCastTo<uint16_t>(deviceType))
+            {
+                gDiscoveryFilter = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(deviceType));
+                return true;
+            }
         }
-        break;
+        return false;
     default:
         ChipLogError(Zcl, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
-        retval = false;
-        break;
+        return false;
     }
-
-    return retval;
 }
 
 OptionDef cmdLineOptionsDef[] = {
@@ -71,11 +72,13 @@ OptionDef cmdLineOptionsDef[] = {
     {},
 };
 
-OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -t <commissioner device type>\n"
-                             "  --device-type <commissioner device type>\n"
-                             "        Device type of the commissioner to discover and request commissioning from. Specify value "
-                             "'all' to allow all commissioner device types. Defaults to 35 (Video Player)\n" };
+OptionSet cmdLineOptions = {
+    HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
+    "  -t <commissioner device type>\n"
+    "  --device-type <commissioner device type>\n"
+    "        Device type of the commissioner to discover and request commissioning from. Specify value "
+    "'all' to allow all commissioner device types or the device type as a decimal integer. Defaults to 35 (Video Player)\n"
+};
 
 HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.0");
 
