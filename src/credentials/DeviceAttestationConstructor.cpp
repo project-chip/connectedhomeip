@@ -28,64 +28,57 @@ namespace Credentials {
 // context tag positions
 enum
 {
-    CERTIFICATION_DECLARATION = 1,
-    ATTESTATION_NONCE         = 2,
-    TIMESTAMP                 = 3,
-    FIRMWARE_INFO             = 4,
-    NUMBER_OF_VALID_TAGS      = FIRMWARE_INFO,
+    kCertificationDeclarationTagId = 1,
+    kAttestationNonceTagId         = 2,
+    kTimestampTagId                = 3,
+    kFirmwareInfoTagId             = 4,
 };
 
 CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, ByteSpan & certificationDeclaration,
                                           ByteSpan & attestationNonce, uint32_t & timestamp, ByteSpan & firmwareInfo,
-                                          std::vector<ByteSpan> & vendorReserved, uint16_t & vendorId, uint16_t & profileNum)
+                                          ByteSpan * vendorReservedArray, size_t vendorReservedArraySize, uint16_t & vendorId,
+                                          uint16_t & profileNum)
 {
-    CHIP_ERROR error                         = CHIP_NO_ERROR;
-    uint32_t currentDecodeTagId              = 0;
-    bool argExists[NUMBER_OF_VALID_TAGS + 1] = { false }; // the 0 element is not used so it aligns with tag numbers
+    bool certificationDeclarationExists = false;
+    bool attestationNonceExists         = false;
+    bool timestampExists                = false;
+    bool firmwareInfoExists             = false;
+    size_t vendorReservedIdx            = 0;
     TLV::TLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
-
-    vendorReserved.clear();
 
     tlvReader.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
     ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
+    CHIP_ERROR error = CHIP_NO_ERROR;
     while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
     {
-        uint64_t tag;
-        tag = tlvReader.GetTag();
-
-        currentDecodeTagId = TLV::TagNumFromTag(tag);
-        VerifyOrReturnError(currentDecodeTagId != 0, CHIP_ERROR_INVALID_TLV_TAG);
+        uint64_t tag = tlvReader.GetTag();
 
         if (TLV::IsContextTag(tag))
         {
-            VerifyOrReturnError(currentDecodeTagId <= NUMBER_OF_VALID_TAGS, CHIP_ERROR_INVALID_TLV_TAG);
-
-            if (argExists[currentDecodeTagId])
+            switch (TLV::TagNumFromTag(tag))
             {
-                ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(tag));
-                return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-            }
-            else
-            {
-                argExists[currentDecodeTagId] = true;
-            }
-
-            switch (currentDecodeTagId)
-            {
-            case CERTIFICATION_DECLARATION:
+            case kCertificationDeclarationTagId:
+                VerifyOrReturnError(certificationDeclarationExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
                 ReturnErrorOnFailure(tlvReader.Get(certificationDeclaration));
+                certificationDeclarationExists = true;
                 break;
-            case ATTESTATION_NONCE:
+            case kAttestationNonceTagId:
+                VerifyOrReturnError(attestationNonceExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
                 ReturnErrorOnFailure(tlvReader.Get(attestationNonce));
+                attestationNonceExists = true;
                 break;
-            case TIMESTAMP:
+            case kTimestampTagId:
+                VerifyOrReturnError(timestampExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
                 ReturnErrorOnFailure(tlvReader.Get(timestamp));
+                timestampExists = true;
                 break;
-            case FIRMWARE_INFO:
+            case kFirmwareInfoTagId:
+                VerifyOrReturnError(firmwareInfoExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
                 ReturnErrorOnFailure(tlvReader.Get(firmwareInfo));
+                firmwareInfoExists = true;
                 break;
             default:
                 return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
@@ -100,7 +93,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
 
             currentVendorId   = TLV::VendorIdFromTag(tag);
             currentProfileNum = TLV::ProfileNumFromTag(tag);
-            if (false == seenProfile)
+            if (!seenProfile)
             {
                 seenProfile = true;
                 vendorId    = currentVendorId;
@@ -115,7 +108,8 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
 
             ByteSpan vendorReservedEntry;
             ReturnErrorOnFailure(tlvReader.Get(vendorReservedEntry));
-            vendorReserved.push_back(vendorReservedEntry);
+            VerifyOrReturnError(vendorReservedIdx < vendorReservedArraySize, CHIP_ERROR_NO_MEMORY);
+            vendorReservedArray[vendorReservedIdx++] = vendorReservedEntry;
         }
         else
         {
@@ -124,21 +118,26 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
     }
 
     VerifyOrReturnError(error == CHIP_END_OF_TLV, error);
-    VerifyOrReturnError(argExists[CERTIFICATION_DECLARATION] && argExists[ATTESTATION_NONCE] && argExists[TIMESTAMP],
+    VerifyOrReturnError(certificationDeclarationExists && attestationNonceExists && timestampExists,
                         CHIP_ERROR_MISSING_TLV_ELEMENT);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaration, const ByteSpan & attestationNonce,
-                                        uint32_t timestamp, const ByteSpan & firmwareInfo, std::vector<ByteSpan> & vendorReserved,
-                                        uint16_t vendorId, uint16_t profileNum, MutableByteSpan & attestationElements)
+                                        uint32_t timestamp, const ByteSpan & firmwareInfo, ByteSpan * vendorReservedArray,
+                                        size_t vendorReservedArraySize, uint16_t vendorId, uint16_t profileNum,
+                                        MutableByteSpan & attestationElements)
 {
     TLV::TLVWriter tlvWriter;
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
     VerifyOrReturnError(!certificationDeclaration.empty() && !attestationNonce.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(attestationNonce.size() == 32, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    if (vendorReservedArraySize != 0)
+    {
+        VerifyOrReturnError(vendorReservedArray != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     tlvWriter.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
     outerContainerType = TLV::kTLVType_NotSpecified;
@@ -152,11 +151,12 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
     }
 
     uint8_t vendorTagNum = 1;
-    for (auto & vendorItem : vendorReserved)
+    for (size_t vendorReservedIdx = 0; vendorReservedIdx < vendorReservedArraySize; ++vendorReservedIdx)
     {
-        if (!vendorItem.empty())
+        if (!vendorReservedArray[vendorReservedIdx].empty())
         {
-            ReturnErrorOnFailure(tlvWriter.Put(TLV::ProfileTag(vendorId, profileNum, vendorTagNum), vendorItem));
+            ReturnErrorOnFailure(
+                tlvWriter.Put(TLV::ProfileTag(vendorId, profileNum, vendorTagNum), vendorReservedArray[vendorReservedIdx]));
         }
         vendorTagNum++;
     }
