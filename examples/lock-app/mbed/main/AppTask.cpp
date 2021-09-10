@@ -151,6 +151,8 @@ int AppTask::StartApp()
         return ret;
     }
 
+    ChipLogProgress(NotSpecified, "Mbed lock-app example application run");
+
     while (true)
     {
         sAppEventQueue.dispatch(100);

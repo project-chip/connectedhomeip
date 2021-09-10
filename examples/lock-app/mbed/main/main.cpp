@@ -45,6 +45,8 @@ int main()
     Capsense::getInstance().init();
 #endif
 
+    ChipLogProgress(NotSpecified, "Mbed lock-app example application start");
+
     ret = mbedtls_platform_setup(NULL);
     if (ret)
     {
@@ -60,7 +62,6 @@ int main()
         goto exit;
     }
 
-    ChipLogProgress(NotSpecified, "Init CHIP Stack\r\n");
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -79,7 +80,6 @@ int main()
     }
 #endif
 
-    ChipLogProgress(NotSpecified, "Starting CHIP task");
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {

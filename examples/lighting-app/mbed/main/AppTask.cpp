@@ -148,6 +148,8 @@ int AppTask::StartApp()
         return ret;
     }
 
+    ChipLogProgress(NotSpecified, "Mbed lighting-app example application run");
+
     while (true)
     {
         sAppEventQueue.dispatch(100);
