@@ -23,10 +23,18 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestCommissionableNodeController.cpp" ]
 
+  if (chip_device_platform == "linux" || chip_device_platform == "Darwin") {
+    test_sources += [ "TestDevice.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/controller",
     "${nlunit_test_root}:nlunit-test",
   ]
+
+  if (chip_device_platform == "linux" || chip_device_platform == "Darwin") {
+    public_deps += [ "${chip_root}/src/controller/data_model" ]
+  }
 }

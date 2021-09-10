@@ -84,7 +84,6 @@ CHIP_ERROR AttributeDataVersionList::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -111,7 +110,6 @@ bool AttributeDataVersionList::Parser::IsElementValid(void)
     }
 
 exit:
-    ChipLogFunctError(err);
 
     return result;
 }
@@ -142,7 +140,6 @@ AttributeDataVersionList::Builder & AttributeDataVersionList::Builder::AddVersio
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::AnonymousTag, aVersion);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -153,7 +150,6 @@ AttributeDataVersionList::Builder & AttributeDataVersionList::Builder::AddNull(v
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->PutNull(chip::TLV::AnonymousTag);
-        ChipLogFunctError(mError);
     }
     return *this;
 }

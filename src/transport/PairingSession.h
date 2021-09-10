@@ -40,13 +40,11 @@ public:
     // mPeerNodeId should be const and assigned at the construction, such that GetPeerNodeId will never return kUndefinedNodeId, and
     // SetPeerNodeId is not necessary.
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
-    void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
 
     // TODO: the local key id should be allocateed at start
     // mLocalKeyId should be const and assigned at the construction, such that GetLocalKeyId will always return a valid key id , and
     // SetLocalKeyId is not necessary.
     uint16_t GetLocalKeyId() const { return mLocalKeyId; }
-    void SetLocalKeyId(uint16_t id) { mLocalKeyId = id; }
     bool IsValidLocalKeyId() const { return mLocalKeyId != kInvalidKeyId; }
 
     uint16_t GetPeerKeyId() const
@@ -54,22 +52,11 @@ public:
         VerifyOrDie(mPeerKeyId.HasValue());
         return mPeerKeyId.Value();
     }
-    void SetPeerKeyId(uint16_t id) { mPeerKeyId.SetValue(id); }
     bool IsValidPeerKeyId() const { return mPeerKeyId.HasValue(); }
 
     // TODO: decouple peer address into transport, such that pairing session do not need to handle peer address
     const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
     Transport::PeerAddress & GetPeerAddress() { return mPeerAddress; }
-    void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
-
-    // TODO: remove Clear, we should create a new instance instead reset the old instance.
-    void Clear()
-    {
-        mPeerNodeId  = kUndefinedNodeId;
-        mPeerAddress = Transport::PeerAddress::Uninitialized();
-        mPeerKeyId.ClearValue();
-        mLocalKeyId = kInvalidKeyId;
-    }
 
     /**
      * @brief
@@ -96,6 +83,21 @@ public:
     virtual const char * GetI2RSessionInfo() const = 0;
 
     virtual const char * GetR2ISessionInfo() const = 0;
+
+protected:
+    void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
+    void SetPeerKeyId(uint16_t id) { mPeerKeyId.SetValue(id); }
+    void SetLocalKeyId(uint16_t id) { mLocalKeyId = id; }
+    void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
+
+    // TODO: remove Clear, we should create a new instance instead reset the old instance.
+    void Clear()
+    {
+        mPeerNodeId  = kUndefinedNodeId;
+        mPeerAddress = Transport::PeerAddress::Uninitialized();
+        mPeerKeyId.ClearValue();
+        mLocalKeyId = kInvalidKeyId;
+    }
 
 private:
     NodeId mPeerNodeId = kUndefinedNodeId;

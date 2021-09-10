@@ -79,6 +79,9 @@
         {{#if expectedConstraints.maxValue}}
         XCTAssertLessThanOrEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.maxValue}});
         {{/if}}
+        {{#if expectedConstraints.notValue}}
+        XCTAssertNotEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.notValue}});
+        {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}
         [expectation fulfill];

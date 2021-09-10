@@ -62,7 +62,6 @@ CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeC
     err = SendWriteResponse();
 
 exit:
-    ChipLogFunctError(err);
     Shutdown();
     return err;
 }
@@ -84,7 +83,6 @@ CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
     SuccessOrExit(err);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -105,7 +103,6 @@ CHIP_ERROR WriteHandler::SendWriteResponse()
     MoveToState(State::Sending);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -164,7 +161,6 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataList(TLV::TLVReader & aAttributeDat
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -203,7 +199,6 @@ CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayl
     err = ProcessAttributeDataList(attributeDataListReader);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -257,7 +252,6 @@ CHIP_ERROR WriteHandler::AddAttributeStatusCode(const AttributePathParams & aAtt
     MoveToState(State::AddAttributeStatusCode);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 

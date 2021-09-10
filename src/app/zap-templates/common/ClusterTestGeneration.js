@@ -24,7 +24,7 @@ const fs                = require('fs');
 const path              = require('path');
 
 // Import helpers from zap core
-const templateUtil = require(zapPath + 'src-electron/generator/template-util.js')
+const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
 const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
