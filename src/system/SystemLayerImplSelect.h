@@ -31,6 +31,7 @@
 
 #include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemLayer.h>
+#include <system/SystemTimer.h>
 #include <system/WakeEvent.h>
 
 namespace chip {

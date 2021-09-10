@@ -81,7 +81,7 @@ CHIP_ERROR LayerImplSelect::Shutdown()
         }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
-        timer->Release();
+        Timer::ReleaseTimer(timer);
     }
     mWakeEvent.Close(*this);
     mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
@@ -174,7 +174,7 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
     }
 #endif
 
-    timer->Release();
+    Timer::ReleaseTimer(timer);
     Signal();
 }
 

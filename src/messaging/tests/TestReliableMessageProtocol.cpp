@@ -24,6 +24,8 @@
 
 #include "TestMessagingLayer.h"
 
+#include <unistd.h>
+
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <messaging/ReliableMessageContext.h>

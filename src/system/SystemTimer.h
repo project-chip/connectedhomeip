@@ -31,12 +31,13 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
+#include <lib/core/ReferenceCounted.h>
 #include <lib/support/DLLUtil.h>
-
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
+#include <system/SystemLayer.h>
 #include <system/SystemMutex.h>
-#include <system/SystemObject.h>
+#include <system/SystemPool.h>
 #include <system/SystemStats.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -54,10 +55,17 @@ using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
 
 #if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
+class Timer;
+class TimerDeletor
+{
+public:
+    static void Release(Timer * obj);
+};
+
 /**
  * This is an Object-pool based class that System::Layer implementations can use to assist in providing timer functions.
  */
-class DLL_EXPORT Timer : public Object
+class DLL_EXPORT Timer : public AtomicReferenceCounted<Timer, TimerDeletor>
 {
 public:
     /**
@@ -219,8 +227,13 @@ public:
         sPool.GetStatistics(aNumInUse, aHighWatermark);
     }
 
+    static void ReleaseTimer(Timer * timer) { sPool.ReleaseObject(timer); }
+
+    void * AppState;
+
 private:
     friend class LayerImplLwIP;
+    friend class TimerDeletor;
     static ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
 
     TimerCompleteCallback mOnComplete;
@@ -238,6 +251,11 @@ private:
     Timer(const Timer &) = delete;
     Timer & operator=(const Timer &) = delete;
 };
+
+inline void TimerDeletor::Release(Timer * obj)
+{
+    Timer::sPool.ReleaseObject(obj);
+}
 
 #endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
