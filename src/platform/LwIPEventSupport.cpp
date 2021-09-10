@@ -25,6 +25,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <type_traits>
+
 #include <platform/PlatformManager.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -33,6 +35,15 @@ namespace chip {
 namespace System {
 
 using namespace ::chip::DeviceLayer;
+
+CHIP_ERROR PlatformEventing::ScheduleLambdaBridge(System::Layer & aLayer, const LambdaBridge & bridge)
+{
+    ChipDeviceEvent event;
+    event.Type        = DeviceEventType::kChipLambdaEvent;
+    event.LambdaEvent = bridge;
+
+    return PlatformMgr().PostEvent(&event);
+}
 
 CHIP_ERROR PlatformEventing::PostEvent(System::Layer & aLayer, System::Object & aTarget, System::EventType aType,
                                        uintptr_t aArgument)
