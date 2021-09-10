@@ -346,23 +346,12 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
         isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::Yes;
         err         = CHIP_NO_ERROR;
     }
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
+    VerifyOrDie(err == CHIP_NO_ERROR);
 
     mUnauthenticatedSessions.MarkSessionActive(*session);
 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
-
-    if (isDuplicate == SecureSessionMgrDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
-    {
-        // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
-        // cycles on further message processing.
-        return;
-    }
 
     session->GetPeerMessageCounter().Commit(packetHeader.GetMessageId());
 

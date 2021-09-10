@@ -41,9 +41,6 @@ public:
 /**
  * @brief
  *   An UnauthenticatedSession stores the binding of TransportAddress, and message counters.
- *
- *   The entries are rotated using LRU, but entry can be hold by using UnauthenticatedSessionHandle, which increase the reference
- * count by 1. If the reference count is not 0, the entry won't be pruned.
  */
 class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter>
 {
@@ -71,6 +68,14 @@ private:
     PeerMessageCounter mPeerMessageCounter;
 };
 
+/*
+ * @brief
+ *   An table which manages UnauthenticatedSessions
+ *
+ *   The UnauthenticatedSession entries are rotated using LRU, but entry can be
+ *   hold by using UnauthenticatedSessionHandle, which increase the reference
+ *   count by 1. If the reference count is not 0, the entry won't be pruned.
+ */
 template <size_t kMaxConnectionCount, Time::Source kTimeSource = Time::Source::kSystem>
 class UnauthenticatedSessionTable
 {
@@ -91,14 +96,6 @@ public:
         entry = FindLeastRecentUsedEntry();
         if (entry == nullptr)
         {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-
-        const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
-        if (currentTime - entry->GetLastActivityTimeMs() < kMinimalActivityTimeMs)
-        {
-            // Protect the entry for a short period to prevent from rotating too fast.
-            entry = nullptr;
             return CHIP_ERROR_NO_MEMORY;
         }
 
@@ -185,8 +182,8 @@ private:
         case Transport::Type::kUdp:
         case Transport::Type::kTcp:
             return a1.GetIPAddress() == a2.GetIPAddress() && a1.GetPort() == a2.GetPort() &&
-                (a1.GetInterface() == INET_NULL_INTERFACEID || a2.GetInterface() == INET_NULL_INTERFACEID ||
-                 a1.GetInterface() == a2.GetInterface());
+                // Enforce interface equal-ness if the address is link-local, otherwise ignore interface
+                (a1.GetIPAddress().IsIPv6LinkLocal() ? a1.GetInterface() == a2.GetInterface() : true);
         case Transport::Type::kBle:
             // TODO: complete BLE address comparation
             return true;
@@ -195,7 +192,6 @@ private:
         return false;
     }
 
-    static constexpr uint64_t kMinimalActivityTimeMs = 30000;
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
     BitMapObjectPool<UnauthenticatedSession, kMaxConnectionCount> mEntries;
 };
