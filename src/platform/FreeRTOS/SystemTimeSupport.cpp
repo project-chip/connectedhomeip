@@ -32,7 +32,9 @@
 namespace chip {
 namespace System {
 
-ClockImpl staticClock;
+namespace Internal {
+ClockImpl gClockImpl;
+} // namespace Internal
 
 namespace {
 
