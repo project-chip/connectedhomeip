@@ -17,7 +17,6 @@
 
 #include "ChipShellMbedCollection.h"
 #include "mbedtls/platform.h"
-#include "rtos/Thread.h"
 #include <ChipShellCollection.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>
@@ -31,15 +30,14 @@ using namespace ::chip::Shell;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging::Platform;
 
-rtos::Thread shellThread{ osPriorityNormal, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE,
-                          /* memory provided */ nullptr, "Shell" };
-
 int main()
 {
     int ret        = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mbed_logging_init();
+
+    ChipLogProgress(NotSpecified, "Mbed shell example application start");
 
     ret = mbedtls_platform_setup(NULL);
     if (ret)
@@ -56,7 +54,6 @@ int main()
         goto exit;
     }
 
-    ChipLogProgress(Shell, "Init CHIP Stack\r\n");
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -79,7 +76,6 @@ int main()
     ConnectivityManagerImpl().StartWiFiManagement();
 #endif
 
-    ChipLogProgress(NotSpecified, "Starting CHIP task");
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
@@ -102,15 +98,9 @@ int main()
     cmd_send_init();
     cmd_mbed_init();
 
-    auto error = shellThread.start([] { Engine::Root().RunMainLoop(); });
-    if (error != osOK)
-    {
-        ChipLogError(Shell, "Run shell thread failed [%d]", (int) error);
-        ret = EXIT_FAILURE;
-        goto exit;
-    }
-
     ChipLogProgress(NotSpecified, "Mbed shell example application run");
+
+    Engine::Root().RunMainLoop();
 
 exit:
     ChipLogProgress(NotSpecified, "Exited with code %d", ret);
