@@ -321,7 +321,7 @@ static int tls_verify_curve_info(const uint8_t ** p, const uint8_t * end, mbedtl
     {
         return (MBEDTLS_ERR_ECP_BAD_INPUT_DATA);
     }
-    curve_name_id = (((uint16_t) (*p)[1] << 8)) | (((uint16_t) (*p)[2]));
+    curve_name_id = (((uint16_t)(*p)[1] << 8)) | (((uint16_t)(*p)[2]));
     *p += 3;
 
     curve_info = mbedtls_ecp_curve_info_from_grp_id(group_id);
