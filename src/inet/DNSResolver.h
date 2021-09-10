@@ -28,6 +28,8 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayerBasis.h>
+#include <lib/core/ReferenceCounted.h>
+#include <system/SystemPool.h>
 
 #define NL_DNS_HOSTNAME_MAX_LEN (253)
 
@@ -61,6 +63,13 @@ enum DNSOptions
     kDNSOption_Default = kDNSOption_AddrFamily_Any
 };
 
+class DNSResolver;
+class DNSResolverDeletor
+{
+public:
+    static void Release(DNSResolver* obj);
+};
+
 /**
  *  @class DNSResolver
  *
@@ -70,7 +79,7 @@ enum DNSOptions
  *    interface available for the application layer.
  *
  */
-class DNSResolver : public InetLayerBasis
+class DNSResolver : public InetLayerBasis, public AtomicReferenceCounted<DNSResolver, DNSResolverDeletor>
 {
 private:
     friend class InetLayer;
@@ -103,6 +112,7 @@ private:
      */
     typedef void (*OnResolveCompleteFunct)(void * appState, CHIP_ERROR err, uint8_t addrCount, IPAddress * addrArray);
 
+    friend class DNSResolverDeletor;
     static chip::System::ObjectPool<DNSResolver, INET_CONFIG_NUM_DNS_RESOLVERS> sPool;
 
     /**
@@ -167,6 +177,11 @@ private:
 #endif // LWIP_VERSION_MAJOR <= 1
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 };
+
+inline void DNSResolverDeletor::Release(DNSResolver* obj)
+{
+    DNSResolver::sPool.ReleaseObject(obj);
+}
 
 } // namespace Inet
 } // namespace chip

@@ -29,8 +29,9 @@
 
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
-
+#include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/SystemPool.h>
 
 #include <utility>
 
@@ -48,6 +49,14 @@ namespace Inet {
 
 class InetLayer;
 
+class TCPEndPoint;
+class TCPEndPointDeletor
+{
+public:
+    static void Release(TCPEndPoint* obj);
+};
+
+
 /**
  * @brief   Objects of this class represent TCP transport endpoints.
  *
@@ -56,7 +65,7 @@ class InetLayer;
  *  endpoints (SOCK_STREAM sockets on Linux and BSD-derived systems) or LwIP
  *  TCP protocol control blocks, as the system is configured accordingly.
  */
-class DLL_EXPORT TCPEndPoint : public EndPointBasis
+class DLL_EXPORT TCPEndPoint : public EndPointBasis, public AtomicReferenceCounted<TCPEndPoint, TCPEndPointDeletor>
 {
     friend class InetLayer;
     friend class ::chip::Transport::TCPTest;
@@ -391,6 +400,14 @@ public:
      */
     void Free();
 
+    enum ReleaseDeferralErrorTactic
+    {
+        kReleaseDeferralErrorTactic_Ignore,  /**< No action. */
+        kReleaseDeferralErrorTactic_Release, /**< Release immediately. */
+        kReleaseDeferralErrorTactic_Die,     /**< Die with message. */
+    };
+    void DeferredFree(ReleaseDeferralErrorTactic aTactic);
+
     /**
      * @brief   Extract whether TCP connection is established.
      */
@@ -585,6 +602,7 @@ public:
     constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxSizeWithoutReserve;
 
 private:
+    friend class TCPEndPointDeletor;
     static chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
 
     chip::System::PacketBufferHandle mRcvQueue;
@@ -700,6 +718,11 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
+
+inline void TCPEndPointDeletor::Release(TCPEndPoint* obj)
+{
+    TCPEndPoint::sPool.ReleaseObject(obj);
+}
 
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS && INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 inline uint16_t TCPEndPoint::MaxTCPSendQueuePolls(void)

@@ -28,6 +28,7 @@
 
 #include <inet/EndPointBasis.h>
 
+#include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

@@ -1197,11 +1197,42 @@ void TCPEndPoint::Free()
     if (err != CHIP_NO_ERROR)
         Abort();
 
-    // Release the Retain() that happened when the end point was allocated
-    // [on LwIP, the object may still be alive if DoClose() used the
-    // EndPointBasis::DeferredFree() method.]
+    // Release the Retain() that happened when the end point was allocated [on
+    // LwIP, the object may still be alive if DoClose() used the DeferredFree()
+    // method.]
     Release();
 }
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+void TCPEndPoint::DeferredFree(ReleaseDeferralErrorTactic aTactic)
+{
+    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
+    {
+        System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
+        CHIP_ERROR err = lSystemLayer->PostLambda([this] { this->Release(); });
+        if (err != CHIP_NO_ERROR)
+        {
+            switch (aTactic)
+            {
+                case kReleaseDeferralErrorTactic_Ignore:
+                    break;
+
+                case kReleaseDeferralErrorTactic_Release:
+                    this->Release();
+                    break;
+
+                case kReleaseDeferralErrorTactic_Die:
+                    VerifyOrDie(false);
+                    break;
+            }
+        }
+    }
+    else
+    {
+        Release();
+    }
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
 void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)

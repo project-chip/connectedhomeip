@@ -188,9 +188,6 @@ CHIP_ERROR LayerImplLwIP::HandleEvent(Object & aTarget, EventType aEventType, ui
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    // Prevent the target object from being freed while dispatching the event.
-    aTarget.Retain();
-
     CHIP_ERROR lReturn                              = CHIP_ERROR_UNEXPECTED_EVENT;
     const LwIPEventHandlerDelegate * lEventDelegate = static_cast<const LwIPEventHandlerDelegate *>(mEventDelegateList);
 
@@ -204,12 +201,6 @@ CHIP_ERROR LayerImplLwIP::HandleEvent(Object & aTarget, EventType aEventType, ui
     {
         ChipLogError(chipSystemLayer, "Unexpected event type %d", aEventType);
     }
-
-    /*
-      Release the reference to the target object. When the object's lifetime finally comes to an end, in most cases this will be
-      the release call that decrements the ref count to zero.
-      */
-    aTarget.Release();
 
     return lReturn;
 }

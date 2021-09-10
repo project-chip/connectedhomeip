@@ -31,7 +31,7 @@
 #include <inet/InetError.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayerEvents.h>
-
+#include <lib/core/ReferenceCounted.h>
 #include <lib/support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -124,7 +124,6 @@ protected:
 
     uint8_t mLwIPEndPointType;
 
-    void DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = nullptr);

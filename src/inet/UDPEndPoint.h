@@ -30,8 +30,8 @@
 
 #include "inet/IPEndPointBasis.h"
 #include <inet/IPAddress.h>
-
 #include <system/SystemPacketBuffer.h>
+#include <system/SystemPool.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #include <dispatch/dispatch.h>
@@ -43,6 +43,13 @@ namespace Inet {
 class InetLayer;
 class IPPacketInfo;
 
+class UDPEndPoint;
+class UDPEndPointDeletor
+{
+public:
+    static void Release(UDPEndPoint* obj);
+};
+
 /**
  * @brief   Objects of this class represent UDP transport endpoints.
  *
@@ -51,7 +58,7 @@ class IPPacketInfo;
  *  endpoints (SOCK_DGRAM sockets on Linux and BSD-derived systems) or LwIP
  *  UDP protocol control blocks, as the system is configured accordingly.
  */
-class DLL_EXPORT UDPEndPoint : public IPEndPointBasis
+class DLL_EXPORT UDPEndPoint : public IPEndPointBasis, public AtomicReferenceCounted<UDPEndPoint, UDPEndPointDeletor>
 {
     friend class InetLayer;
 
@@ -70,9 +77,18 @@ public:
     void Close();
     void Free();
 
+    enum ReleaseDeferralErrorTactic
+    {
+        kReleaseDeferralErrorTactic_Ignore,  /**< No action. */
+        kReleaseDeferralErrorTactic_Release, /**< Release immediately. */
+        kReleaseDeferralErrorTactic_Die,     /**< Die with message. */
+    };
+    void DeferredFree(ReleaseDeferralErrorTactic aTactic);
+
 private:
     UDPEndPoint(const UDPEndPoint &) = delete;
 
+    friend class UDPEndPointDeletor;
     static chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
 
     void Init(InetLayer * inetLayer);
@@ -99,6 +115,11 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
+
+inline void UDPEndPointDeletor::Release(UDPEndPoint* obj)
+{
+    UDPEndPoint::sPool.ReleaseObject(obj);
+}
 
 } // namespace Inet
 } // namespace chip

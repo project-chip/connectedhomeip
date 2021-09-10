@@ -438,6 +438,37 @@ void UDPEndPoint::Free()
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+void UDPEndPoint::DeferredFree(ReleaseDeferralErrorTactic aTactic)
+{
+    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
+    {
+        System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(Layer().SystemLayer());
+        CHIP_ERROR err = lSystemLayer->PostLambda([this] { this->Release(); });
+        if (err != CHIP_NO_ERROR)
+        {
+            switch (aTactic)
+            {
+                case kReleaseDeferralErrorTactic_Ignore:
+                    break;
+
+                case kReleaseDeferralErrorTactic_Release:
+                    this->Release();
+                    break;
+
+                case kReleaseDeferralErrorTactic_Die:
+                    VerifyOrDie(false);
+                    break;
+            }
+        }
+    }
+    else
+    {
+        Release();
+    }
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
 /**
  *  A synonym for <tt>SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags)</tt>.
  */
