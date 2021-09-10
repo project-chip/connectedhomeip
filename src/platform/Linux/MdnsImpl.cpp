@@ -149,8 +149,6 @@ Poller::Poller()
     mAvahiPoller.timeout_new    = TimeoutNew;
     mAvahiPoller.timeout_update = TimeoutUpdate;
     mAvahiPoller.timeout_free   = TimeoutFree;
-
-    mWatchableEvents = &DeviceLayer::SystemLayer.WatchableEventsManager();
 }
 
 AvahiWatch * Poller::WatchNew(const struct AvahiPoll * poller, int fd, AvahiWatchEvent event, AvahiWatchCallback callback,
@@ -165,9 +163,9 @@ AvahiWatch * Poller::WatchNew(int fd, AvahiWatchEvent event, AvahiWatchCallback 
 
     auto watch     = std::make_unique<AvahiWatch>();
     watch->mSocket = fd;
-    LogErrorOnFailure(DeviceLayer::SystemLayer.StartWatchingSocket(fd, &watch->mSocketWatch));
-    LogErrorOnFailure(DeviceLayer::SystemLayer.SetCallback(watch->mSocketWatch, AvahiWatchCallbackTrampoline,
-                                                           reinterpret_cast<intptr_t>(watch.get())));
+    LogErrorOnFailure(DeviceLayer::SystemLayerSockets().StartWatchingSocket(fd, &watch->mSocketWatch));
+    LogErrorOnFailure(DeviceLayer::SystemLayerSockets().SetCallback(watch->mSocketWatch, AvahiWatchCallbackTrampoline,
+                                                                    reinterpret_cast<intptr_t>(watch.get())));
     WatchUpdate(watch.get(), event);
     watch->mCallback = callback;
     watch->mContext  = context;
@@ -181,19 +179,19 @@ void Poller::WatchUpdate(AvahiWatch * watch, AvahiWatchEvent event)
 {
     if (event & AVAHI_WATCH_IN)
     {
-        LogErrorOnFailure(DeviceLayer::SystemLayer.RequestCallbackOnPendingRead(watch->mSocketWatch));
+        LogErrorOnFailure(DeviceLayer::SystemLayerSockets().RequestCallbackOnPendingRead(watch->mSocketWatch));
     }
     else
     {
-        LogErrorOnFailure(DeviceLayer::SystemLayer.ClearCallbackOnPendingRead(watch->mSocketWatch));
+        LogErrorOnFailure(DeviceLayer::SystemLayerSockets().ClearCallbackOnPendingRead(watch->mSocketWatch));
     }
     if (event & AVAHI_WATCH_OUT)
     {
-        LogErrorOnFailure(DeviceLayer::SystemLayer.RequestCallbackOnPendingWrite(watch->mSocketWatch));
+        LogErrorOnFailure(DeviceLayer::SystemLayerSockets().RequestCallbackOnPendingWrite(watch->mSocketWatch));
     }
     else
     {
-        LogErrorOnFailure(DeviceLayer::SystemLayer.ClearCallbackOnPendingWrite(watch->mSocketWatch));
+        LogErrorOnFailure(DeviceLayer::SystemLayerSockets().ClearCallbackOnPendingWrite(watch->mSocketWatch));
     }
 }
 
@@ -209,7 +207,7 @@ void Poller::WatchFree(AvahiWatch * watch)
 
 void Poller::WatchFree(AvahiWatch & watch)
 {
-    DeviceLayer::SystemLayer.StopWatchingSocket(&watch.mSocketWatch);
+    DeviceLayer::SystemLayerSockets().StopWatchingSocket(&watch.mSocketWatch);
     mWatches.erase(std::remove_if(mWatches.begin(), mWatches.end(),
                                   [&watch](const std::unique_ptr<AvahiWatch> & aValue) { return aValue.get() == &watch; }),
                    mWatches.end());

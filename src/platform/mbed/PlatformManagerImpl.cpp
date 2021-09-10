@@ -24,6 +24,13 @@ using namespace ::chip::System;
 namespace chip {
 namespace DeviceLayer {
 
+namespace {
+System::LayerSocketsLoop & SystemLayerSocketsLoop()
+{
+    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+}
+} // anonymous namespace
+
 // TODO: Event and timer processing is not efficient from a memory perspective.
 // Both occupy at least 24 bytes when only 4 bytes is required.
 // An optimized designed could use a separate circular buffer to store events
@@ -47,7 +54,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         new (&mQueue) events::EventQueue(event_size * CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
 
         mQueue.background([&](int t) {
-            MbedEventTimeout::AttachTimeout([&] { SystemLayer.WatchableEventsManager().Signal(); }, std::chrono::milliseconds{ t });
+            MbedEventTimeout::AttachTimeout([&] { SystemLayerSocketsLoop().Signal(); }, std::chrono::milliseconds{ t });
         });
 
         // Reinitialize the Mutexes
@@ -148,21 +155,20 @@ void PlatformManagerImpl::_RunEventLoop()
     LockChipStack();
 
     ChipLogProgress(DeviceLayer, "CHIP Run event loop");
-    System::WatchableEventManager & watchState = SystemLayer.WatchableEventsManager();
-    watchState.EventLoopBegins();
+    SystemLayerSocketsLoop().EventLoopBegins();
     while (true)
     {
-        watchState.PrepareEvents();
+        SystemLayerSocketsLoop().PrepareEvents();
 
         UnlockChipStack();
-        watchState.WaitForEvents();
+        SystemLayerSocketsLoop().WaitForEvents();
         LockChipStack();
 
-        watchState.HandleEvents();
+        SystemLayerSocketsLoop().HandleEvents();
 
         ProcessDeviceEvents();
     }
-    watchState.EventLoopEnds();
+    SystemLayerSocketsLoop().EventLoopEnds();
 
     UnlockChipStack();
 
@@ -212,7 +218,7 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 
     // Wake from select so it unblocks processing
     LockChipStack();
-    SystemLayer.WatchableEventsManager().Signal();
+    SystemLayerSocketsLoop().Signal();
     UnlockChipStack();
 
     osStatus err = osOK;
@@ -238,7 +244,7 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 
 CHIP_ERROR PlatformManagerImpl::_StartChipTimer(int64_t durationMS)
 {
-    // Let SystemLayer.PrepareSelect() handle timers.
+    // Let LayerSocketsLoop::PrepareSelect() handle timers.
     return CHIP_NO_ERROR;
 }
 

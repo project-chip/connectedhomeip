@@ -24,7 +24,7 @@ const fs                = require('fs');
 const path              = require('path');
 
 // Import helpers from zap core
-const templateUtil = require(zapPath + 'src-electron/generator/template-util.js')
+const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
 const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
@@ -344,14 +344,14 @@ function chip_tests_item_response_parameters(options)
         }
       }
 
-      const unusedResponseValues = responseValues.filter(response => 'value' in response);
-      unusedResponseValues.forEach(unusedResponseValue => {
-        printErrorAndExit(this,
-            'Missing "' + unusedResponseValue.name + '" in response arguments list:\n\t* '
-                + responseArgs.map(response => response.name).join('\n\t* '));
-      });
-
       return responseArg;
+    });
+
+    const unusedResponseValues = responseValues.filter(response => 'value' in response);
+    unusedResponseValues.forEach(unusedResponseValue => {
+      printErrorAndExit(this,
+          'Missing "' + unusedResponseValue.name + '" in response arguments list:\n\t* '
+              + responseArgs.map(response => response.name).join('\n\t* '));
     });
 
     return responses;

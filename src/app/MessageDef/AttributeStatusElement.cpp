@@ -49,7 +49,6 @@ AttributePath::Builder & AttributeStatusElement::Builder::CreateAttributePathBui
     mError = mAttributePathBuilder.Init(mpWriter, kCsTag_AttributePath);
 
 exit:
-    ChipLogFunctError(mError);
     return mAttributePathBuilder;
 }
 
@@ -61,7 +60,6 @@ StatusElement::Builder & AttributeStatusElement::Builder::CreateStatusElementBui
     mError = mStatusElementBuilder.Init(mpWriter, kCsTag_StatusElement);
 
 exit:
-    ChipLogFunctError(mError);
     return mStatusElementBuilder;
 }
 
@@ -82,7 +80,6 @@ CHIP_ERROR AttributeStatusElement::Parser::Init(const chip::TLV::TLVReader & aRe
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -159,7 +156,6 @@ CHIP_ERROR AttributeStatusElement::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }

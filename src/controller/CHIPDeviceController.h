@@ -372,8 +372,8 @@ protected:
 
 private:
     //////////// ExchangeDelegate Implementation ///////////////
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && msgBuf) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
@@ -514,8 +514,13 @@ public:
                                        uint8_t option);
 
     /**
-     *  This function call indicates commissioning complete and sends commissioining complete
-     *  complete event to the application.
+     *  This function call causes the DeviceCommissioner to send a
+     *  CommissioningComplete command to the given node.  At least when
+     *  mIsIPRendezvous is false, which seems to be an incredibly broken
+     *  workaround for
+     *  <https://github.com/project-chip/connectedhomeip/issues/8010>.  Chances
+     *  are, this function and its callsites should just be removed when that
+     *  issue is fixed.
      */
     CHIP_ERROR CommissioningComplete(NodeId remoteDeviceId);
 

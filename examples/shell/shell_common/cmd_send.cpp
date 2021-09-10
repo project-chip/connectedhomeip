@@ -98,8 +98,8 @@ private:
 class MockAppDelegate : public Messaging::ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
     {
         uint32_t respTime    = System::Clock::GetMonotonicMilliseconds();
         uint32_t transitTime = respTime - gSendArguments.GetLastSendTime();
@@ -227,7 +227,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::TCP(gDestAddr, gSendArguments.GetPort());
 
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer, &gTCPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &fabrics, &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
@@ -235,7 +235,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), INET_NULL_INTERFACEID);
 
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer, &gUDPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &fabrics, &gMessageCounterManager);
         SuccessOrExit(err);
     }
 

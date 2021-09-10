@@ -326,9 +326,9 @@ int main(int argc, char ** args)
 
     BroadcastPacket(&mdnsServer);
 
-    CHIP_ERROR err = DeviceLayer::SystemLayer.StartTimer(
+    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(
         gOptions.runtimeMs,
-        [](System::Layer *, void *, CHIP_ERROR err) {
+        [](System::Layer *, void *) {
             DeviceLayer::PlatformMgr().StopEventLoopTask();
             DeviceLayer::PlatformMgr().Shutdown();
         },

@@ -48,7 +48,6 @@ CHIP_ERROR AttributeDataElement::Parser::Init(const chip::TLV::TLVReader & aRead
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -212,7 +211,6 @@ AttributeDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDep
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -345,7 +343,6 @@ CHIP_ERROR AttributeDataElement::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -412,7 +409,6 @@ AttributePath::Builder & AttributeDataElement::Builder::CreateAttributePathBuild
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributePathBuilder.ResetError(mError));
 
     mError = mAttributePathBuilder.Init(mpWriter, kCsTag_AttributePath);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mAttributePathBuilder would be un-/partial initialized and cannot be used to write anything
@@ -425,7 +421,6 @@ AttributeDataElement::Builder & AttributeDataElement::Builder::DataVersion(const
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_DataVersion), aDataVersion);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -436,7 +431,6 @@ AttributeDataElement::Builder & AttributeDataElement::Builder::MoreClusterData(c
     if ((mError == CHIP_NO_ERROR) && aMoreClusterData)
     {
         mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_MoreClusterDataFlag), true);
-        ChipLogFunctError(mError);
     }
     return *this;
 }

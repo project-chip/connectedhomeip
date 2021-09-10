@@ -369,7 +369,10 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _BasicCommissioningInfoType data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(4);
@@ -398,7 +401,10 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _FabricDescriptor data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -443,7 +449,10 @@ void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::ByteSpan data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));

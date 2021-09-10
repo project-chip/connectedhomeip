@@ -17,16 +17,13 @@
 
 /**
  *    @file
- *      This file declares an implementation of WatchableEventManager using libevent.
+ *      This file declares an implementation of System::Layer using libevent.
  */
 
 #pragma once
 
-#if !INCLUDING_CHIP_SYSTEM_WATCHABLE_EVENT_MANAGER_CONFIG_FILE
-#error "This file should only be included from <system/WatchableEventManager.h>"
-#include <system/WatchableEventManager.h>
-#endif //  !INCLUDING_CHIP_SYSTEM_WATCHABLE_EVENT_MANAGER_CONFIG_FILE
-
+#include <lib/support/ObjectLifeCycle.h>
+#include <system/SystemLayer.h>
 #include <system/WakeEvent.h>
 
 #include <event2/event.h>
@@ -43,43 +40,37 @@ namespace chip {
 
 namespace System {
 
-class WatchableEventManager
+class LayerImplLibevent : public LayerSocketsLoop
 {
 public:
-    WatchableEventManager() : mSystemLayer(nullptr), mEventBase(nullptr), mMdnsTimeoutEvent(nullptr) {}
+    LayerImplLibevent() : mEventBase(nullptr), mMdnsTimeoutEvent(nullptr) {}
+    ~LayerImplLibevent() { mLayerState.Destroy(); }
 
-private:
-    // Transitionally, ensure that these ‘overrides’ can only be called via the System::Layer equivalents.
-    friend class Layer;
+    // Layer overrides.
+    CHIP_ERROR Init() override;
+    CHIP_ERROR Shutdown() override;
+    bool IsInitialized() const override { return mLayerState.IsInitialized(); }
+    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState) override;
+    void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
+    CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
-    // Core ‘overrides’.
-    CHIP_ERROR Init(Layer & systemLayer);
-    CHIP_ERROR Shutdown();
+    // LayerSocket overrides.
+    CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut) override;
+    CHIP_ERROR SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data) override;
+    CHIP_ERROR RequestCallbackOnPendingRead(SocketWatchToken token) override;
+    CHIP_ERROR RequestCallbackOnPendingWrite(SocketWatchToken token) override;
+    CHIP_ERROR ClearCallbackOnPendingRead(SocketWatchToken token) override;
+    CHIP_ERROR ClearCallbackOnPendingWrite(SocketWatchToken token) override;
+    CHIP_ERROR StopWatchingSocket(SocketWatchToken * tokenInOut) override;
+    SocketWatchToken InvalidSocketWatchToken() override { return reinterpret_cast<SocketWatchToken>(nullptr); }
 
-    // Timer ‘overrides’.
-    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState);
-    void CancelTimer(TimerCompleteCallback onComplete, void * appState);
-    CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) { return StartTimer(0, onComplete, appState); }
-
-    // Socket watch ‘overrides’.
-    CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut);
-    CHIP_ERROR SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data);
-    CHIP_ERROR RequestCallbackOnPendingRead(SocketWatchToken token);
-    CHIP_ERROR RequestCallbackOnPendingWrite(SocketWatchToken token);
-    CHIP_ERROR ClearCallbackOnPendingRead(SocketWatchToken token);
-    CHIP_ERROR ClearCallbackOnPendingWrite(SocketWatchToken token);
-    CHIP_ERROR StopWatchingSocket(SocketWatchToken * tokenInOut);
-    SocketWatchToken InvalidSocketWatchToken() { return reinterpret_cast<SocketWatchToken>(nullptr); }
-
-public:
-    void Signal();
-
-    // Platform implementation.
-    void EventLoopBegins() {}
-    void PrepareEvents();
-    void WaitForEvents();
-    void HandleEvents();
-    void EventLoopEnds() {}
+    // LayerSocketLoop overrides.
+    void Signal() override;
+    void EventLoopBegins() override {}
+    void PrepareEvents() override;
+    void WaitForEvents() override;
+    void HandleEvents() override;
+    void EventLoopEnds() override {}
 
 private:
     /*
@@ -89,11 +80,11 @@ private:
      */
     struct LibeventTimer
     {
-        LibeventTimer(WatchableEventManager * layer, TimerCompleteCallback onComplete, void * data) :
+        LibeventTimer(LayerImplLibevent * layer, TimerCompleteCallback onComplete, void * data) :
             mEventManager(layer), mOnComplete(onComplete), mCallbackData(data), mEvent(nullptr)
         {}
         ~LibeventTimer();
-        WatchableEventManager * mEventManager;
+        LayerImplLibevent * mEventManager;
         TimerCompleteCallback mOnComplete;
         void * mCallbackData;
         event * mEvent;
@@ -102,11 +93,11 @@ private:
 
     struct SocketWatch
     {
-        SocketWatch(WatchableEventManager * layer, int fd) :
+        SocketWatch(LayerImplLibevent * layer, int fd) :
             mEventManager(layer), mFD(fd), mCallback(nullptr), mCallbackData(0), mEvent(nullptr)
         {}
         ~SocketWatch();
-        WatchableEventManager * mEventManager;
+        LayerImplLibevent * mEventManager;
         int mFD;
         SocketEvents mPendingIO;
         SocketWatchCallback mCallback;
@@ -118,7 +109,6 @@ private:
     CHIP_ERROR UpdateWatch(SocketWatch * watch, short eventFlags);
     static void SocketCallbackHandler(evutil_socket_t fd, short eventFlags, void * data);
 
-    Layer * mSystemLayer;
     event_base * mEventBase; ///< libevent shared state.
 
     std::list<std::unique_ptr<LibeventTimer>> mTimers;
@@ -128,6 +118,7 @@ private:
     std::list<std::unique_ptr<SocketWatch>> mSocketWatches;
     std::list<SocketWatch *> mActiveSocketWatches;
 
+    ObjectLifeCycle mLayerState;
     WakeEvent mWakeEvent;
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
@@ -140,6 +131,8 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
     event * mMdnsTimeoutEvent;
 };
+
+using LayerImpl = LayerImplLibevent;
 
 } // namespace System
 } // namespace chip

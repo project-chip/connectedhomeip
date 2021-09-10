@@ -202,4 +202,15 @@ using FixedByteSpan = FixedSpan<const uint8_t, N>;
 
 using MutableCharSpan = Span<char>;
 
+inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan & out_buf)
+{
+    VerifyOrReturnError(IsSpanUsable(span_to_copy), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_buf.size() >= span_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(out_buf.data(), span_to_copy.data(), span_to_copy.size());
+    out_buf.reduce_size(span_to_copy.size());
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip

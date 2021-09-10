@@ -335,8 +335,8 @@ void Device::OnConnectionExpired(SessionHandle session)
     mSecureSession.ClearValue();
 }
 
-CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
-                                     const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
+                                     System::PacketBufferHandle && msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -552,6 +552,7 @@ void Device::OperationalCertProvisioned()
 
     Persist();
     CloseSession();
+    mState = ConnectionState::NotConnected;
 }
 
 CHIP_ERROR Device::WarmupCASESession()
@@ -601,9 +602,6 @@ void Device::OnSessionEstablishmentError(CHIP_ERROR error)
 
 void Device::OnSessionEstablished()
 {
-    // TODO: the session should know which peer we are trying to connect to when started
-    mCASESession.SetPeerNodeId(mDeviceId);
-
     CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mCASESession,
                                                  SecureSession::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
