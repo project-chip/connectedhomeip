@@ -2476,7 +2476,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum size of the lambda which can be post into system event queue.
  */
 #ifndef CHIP_CONFIG_LAMBDA_EVENT_SIZE
-#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (16)
+#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (2 * sizeof(uintptr_t))
 #endif
 
 /**
@@ -2485,7 +2485,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum alignment of the lambda which can be post into system event queue.
  */
 #ifndef CHIP_CONFIG_LAMBDA_EVENT_ALIGN
-#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (sizeof(void *))
+#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (sizeof(uintptr_t))
 #endif
 
 /**

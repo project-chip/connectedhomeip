@@ -221,7 +221,7 @@ public:
 
         // memcpy is used to move the lambda into the event queue, so it must be trivially copyable
         static_assert(std::is_trivially_copyable<Lambda>::value);
-        static_assert(sizeof(Lambda) <= CHIP_CONFIG_LAMBDA_EVENT_SIZE);
+        static_assert(sizeof(Lambda) <= CHIP_CONFIG_LAMBDA_EVENT_SIZE, "Size of the lambda exceeds available space.");
         static_assert(alignof(Lambda) <= CHIP_CONFIG_LAMBDA_EVENT_ALIGN);
 
         // Implicit cast a capture-less lambda into a raw function pointer.
