@@ -26,6 +26,7 @@
 #pragma once
 
 #include <lib/support/BitFlags.h>
+#include <platform/ConfigurationManager.h>
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
 #include <lib/support/LifetimePersistedCounter.h>
@@ -47,60 +48,63 @@ namespace Internal {
  * parameter.
  */
 template <class ImplClass>
-class GenericConfigurationManagerImpl
+class GenericConfigurationManagerImpl : public ConfigurationManager
 {
 public:
     // ===== Methods that implement the ConfigurationManager abstract interface.
 
-    CHIP_ERROR _Init();
-    CHIP_ERROR _GetVendorName(char * buf, size_t bufSize);
-    CHIP_ERROR _GetVendorId(uint16_t & vendorId);
-    CHIP_ERROR _GetProductName(char * buf, size_t bufSize);
-    CHIP_ERROR _GetProductId(uint16_t & productId);
-    CHIP_ERROR _GetProductRevisionString(char * buf, size_t bufSize);
-    CHIP_ERROR _GetProductRevision(uint16_t & productRev);
-    CHIP_ERROR _StoreProductRevision(uint16_t productRev);
-    CHIP_ERROR _GetFirmwareRevisionString(char * buf, size_t bufSize);
-    CHIP_ERROR _GetFirmwareRevision(uint32_t & firmwareRev);
-    CHIP_ERROR _GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen);
-    CHIP_ERROR _StoreSerialNumber(const char * serialNum, size_t serialNumLen);
-    CHIP_ERROR _GetPrimaryMACAddress(MutableByteSpan buf);
-    CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
-    CHIP_ERROR _StorePrimaryWiFiMACAddress(const uint8_t * buf);
-    CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR _StorePrimary802154MACAddress(const uint8_t * buf);
-    CHIP_ERROR _GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
-    CHIP_ERROR _StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen);
-    CHIP_ERROR _GetSetupPinCode(uint32_t & setupPinCode);
-    CHIP_ERROR _StoreSetupPinCode(uint32_t setupPinCode);
-    CHIP_ERROR _GetSetupDiscriminator(uint16_t & setupDiscriminator);
-    CHIP_ERROR _StoreSetupDiscriminator(uint16_t setupDiscriminator);
+    CHIP_ERROR Init() override;
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetProductId(uint16_t & productId) override;
+    CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetProductRevision(uint16_t & productRev) override;
+    CHIP_ERROR StoreProductRevision(uint16_t productRev) override;
+    CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetFirmwareRevision(uint32_t & firmwareRev) override;
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen) override;
+    CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
+    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
+    CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
+    CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf) override;
+    CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override;
+    CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf) override;
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override;
+    CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override;
+    CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode) override;
+    CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) override;
+    CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
+    CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-    CHIP_ERROR _GetLifetimeCounter(uint16_t & lifetimeCounter);
+    CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
     CHIP_ERROR _IncrementLifetimeCounter();
 #endif
-    CHIP_ERROR _GetFailSafeArmed(bool & val);
-    CHIP_ERROR _SetFailSafeArmed(bool val);
-    CHIP_ERROR _GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
-    bool _IsCommissionableDeviceTypeEnabled();
-    CHIP_ERROR _GetDeviceType(uint16_t & deviceType);
-    bool _IsCommissionableDeviceNameEnabled();
-    CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
-    CHIP_ERROR _GetInitialPairingHint(uint16_t & pairingHint);
-    CHIP_ERROR _GetInitialPairingInstruction(char * buf, size_t bufSize);
-    CHIP_ERROR _GetSecondaryPairingHint(uint16_t & pairingHint);
-    CHIP_ERROR _GetSecondaryPairingInstruction(char * buf, size_t bufSize);
-    CHIP_ERROR _GetRegulatoryLocation(uint32_t & location);
-    CHIP_ERROR _StoreRegulatoryLocation(uint32_t location);
-    CHIP_ERROR _GetCountryCode(char * buf, size_t bufSize, size_t & codeLen);
-    CHIP_ERROR _StoreCountryCode(const char * code, size_t codeLen);
-    CHIP_ERROR _GetBreadcrumb(uint64_t & breadcrumb);
-    CHIP_ERROR _StoreBreadcrumb(uint64_t breadcrumb);
+    CHIP_ERROR GetFailSafeArmed(bool & val) override;
+    CHIP_ERROR SetFailSafeArmed(bool val) override;
+    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
+    bool IsCommissionableDeviceTypeEnabled() override;
+    CHIP_ERROR GetDeviceType(uint16_t & deviceType) override;
+    bool IsCommissionableDeviceNameEnabled() override;
+    CHIP_ERROR GetDeviceName(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override;
+    CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint) override;
+    CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetRegulatoryLocation(uint32_t & location) override;
+    CHIP_ERROR StoreRegulatoryLocation(uint32_t location) override;
+    CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override;
+    CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
+    CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override;
+    CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) override;
 #if !defined(NDEBUG)
-    CHIP_ERROR _RunUnitTests(void);
+    CHIP_ERROR RunUnitTests(void) override;
 #endif
-    bool _IsFullyProvisioned();
-    void _LogDeviceConfig();
+    bool IsFullyProvisioned() override;
+    void InitiateFactoryReset() override;
+    void LogDeviceConfig() override;
+
+    virtual ~GenericConfigurationManagerImpl() = default;
 
 protected:
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
@@ -116,42 +120,42 @@ private:
 extern template class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetVendorId(uint16_t & vendorId)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetVendorId(uint16_t & vendorId)
 {
     vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
     return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductId(uint16_t & productId)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetProductId(uint16_t & productId)
 {
     productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
     return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(uint32_t & firmwareRev)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetFirmwareRevision(uint32_t & firmwareRev)
 {
     firmwareRev = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
     return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceType(uint16_t & deviceType)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetDeviceType(uint16_t & deviceType)
 {
     deviceType = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
     return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetInitialPairingHint(uint16_t & pairingHint)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetInitialPairingHint(uint16_t & pairingHint)
 {
     pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT);
     return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSecondaryPairingHint(uint16_t & pairingHint)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSecondaryPairingHint(uint16_t & pairingHint)
 {
     pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT);
     return CHIP_NO_ERROR;
