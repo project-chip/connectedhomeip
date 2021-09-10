@@ -239,43 +239,57 @@ void emberAfPluginOperationalCredentialsServerInitCallback(void)
 }
 
 namespace {
-class OpCredsClusterExchangeDelegate : public Messaging::ExchangeDelegate
+class FabricCleanupExchangeDelegate : public Messaging::ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
     {
         return CHIP_NO_ERROR;
     }
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(Messaging::ExchangeContext * ec) override
     {
-        ec->GetExchangeMgr()->GetReliableMessageMgr()->ClearRetransTable(static_cast<Messaging::ReliableMessageContext *>(ec));
-        ec->GetExchangeMgr()->GetSessionMgr()->ExpireAllPairingsForFabric(mFabricIndex);
-        mFabricIndex = 0;
+        FabricIndex currentFabricIndex = ec->GetSecureSession().GetFabricIndex();
+        ec->GetExchangeMgr()->GetSessionMgr()->ExpireAllPairingsForFabric(currentFabricIndex);
     }
-
-    FabricIndex mFabricIndex = 0;
 };
 
-OpCredsClusterExchangeDelegate gFabricCleanupExchangeDelegate;
+FabricCleanupExchangeDelegate gFabricCleanupExchangeDelegate;
 
 } // namespace
 
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                              FabricIndex fabricIndex)
+                                                              FabricIndex fabricBeingRemoved)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
+    FabricIndex currentFabricIndex = emberAfCurrentCommand()->source->GetSecureSession().GetFabricIndex();
+
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    CHIP_ERROR err       = Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+    CHIP_ERROR err       = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
     writeFabricsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
-    gFabricCleanupExchangeDelegate.mFabricIndex = fabricIndex;
-    emberAfCurrentCommand()->source->SetDelegate(&gFabricCleanupExchangeDelegate);
+    if (err == CHIP_NO_ERROR)
+    {
+        Messaging::ExchangeContext * ec = emberAfCurrentCommand()->source;
+        if (currentFabricIndex == fabricBeingRemoved)
+        {
+            // If the current fabric is being removed, expiring all the secure sessions causes crashes as
+            // the message sent by emberAfSendImmediateDefaultResponse() is still in the queue. Also, RMP
+            // retries to send the message and runs into issues.
+            // We are hijacking the exchange delegate here (as no more messages should be received on this exchange),
+            // and wait for it to close, before expiring the secure sessions for the fabric.
+            ec->SetDelegate(&gFabricCleanupExchangeDelegate);
+        }
+        else
+        {
+            ec->GetExchangeMgr()->GetSessionMgr()->ExpireAllPairingsForFabric(fabricBeingRemoved);
+        }
+    }
     return true;
 }
 

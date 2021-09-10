@@ -210,12 +210,12 @@ void SecureSessionMgr::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
 void SecureSessionMgr::ExpireAllPairingsForFabric(FabricIndex fabric)
 {
     ChipLogDetail(Inet, "Expiring all connections for fabric %d!!", fabric);
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionStateByFabric(fabric, nullptr);
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionStateByFabric(fabric);
     while (state != nullptr)
     {
         mPeerConnections.MarkConnectionExpired(
             state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
-        state = mPeerConnections.FindPeerConnectionStateByFabric(fabric, nullptr);
+        state = mPeerConnections.FindPeerConnectionStateByFabric(fabric);
     }
 }
 

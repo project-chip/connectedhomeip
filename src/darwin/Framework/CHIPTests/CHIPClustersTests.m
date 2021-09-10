@@ -5246,25 +5246,6 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterOperationalCredentialsCluster_000002_RemoveFabric
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove fabric"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPOperationalCredentials * cluster = [[CHIPOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    uint8_t fabricIndexArgument = 1;
-    [cluster removeFabric:fabricIndexArgument
-          responseHandler:^(NSError * err, NSDictionary * values) {
-              NSLog(@"Remove fabric Error: %@", err);
-
-              XCTAssertEqual(err.code, 0);
-              [expectation fulfill];
-          }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
 
 - (void)testSendClusterAccountLoginReadAttributeClusterRevisionWithResponseHandler
 {

@@ -317,23 +317,17 @@ public:
     }
 
     /**
-     * Get a peer connection state that matches the given fabric index.
+     * Get the first peer connection state that matches the given fabric index.
      *
      * @param fabric The fabric index to match
-     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
      *
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    PeerConnectionState * FindPeerConnectionStateByFabric(FabricIndex fabric, PeerConnectionState * begin)
+    PeerConnectionState * FindPeerConnectionStateByFabric(FabricIndex fabric)
     {
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
-
-        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
-        {
-            iter = begin + 1;
-        }
 
         for (; iter < &mStates[kMaxConnectionCount]; iter++)
         {
