@@ -203,12 +203,13 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
     ByteSpan attestationNonceSpan;
     uint32_t timestampDeconstructed;
     ByteSpan firmwareInfoSpan;
-    std::vector<ByteSpan> vendorReservedDeconstructed;
+    ByteSpan vendorReservedDeconstructed[2];
     uint16_t vendorIdDeconstructed;
     uint16_t profileNumDeconstructed;
     VerifyOrReturnError(DeconstructAttestationElements(attestationInfoBuffer, certificationDeclarationSpan, attestationNonceSpan,
                                                        timestampDeconstructed, firmwareInfoSpan, vendorReservedDeconstructed,
-                                                       vendorIdDeconstructed, profileNumDeconstructed) == CHIP_NO_ERROR,
+                                                       ArraySize(vendorReservedDeconstructed), vendorIdDeconstructed,
+                                                       profileNumDeconstructed) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kAttestationElementsMalformed);
 
     // Verify that Nonce matches with what we sent
