@@ -201,8 +201,8 @@ ServerRendezvousAdvertisementDelegate gAdvDelegate;
 class ServerCallback : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         // as soon as a client connects, assume it is connected
