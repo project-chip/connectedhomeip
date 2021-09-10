@@ -423,7 +423,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-        PlatformMgr().PostEventLoggingErrors(&connEstEvent);
+        PlatformMgr().PostEventOrDie(&connEstEvent);
     }
     break;
 
@@ -881,7 +881,7 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
 
         ChipLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", connHandle, conn_evt->reason);
 
-        PlatformMgr().PostEventLoggingErrors(&event);
+        PlatformMgr().PostEventOrDie(&event);
 
         // Arrange to re-enable connectable advertising in case it was disabled due to the
         // maximum connection limit being reached.
@@ -996,7 +996,7 @@ void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
 
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;
-    PlatformMgr().PostEventLoggingErrors(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleSoftTimerEvent(volatile sl_bt_msg_t * evt)
@@ -1011,7 +1011,7 @@ void BLEManagerImpl::HandleSoftTimerEvent(volatile sl_bt_msg_t * evt)
         event.CHIPoBLEConnectionError.ConId                          = mIndConfId[evt->data.evt_system_soft_timer.handle];
         sInstance.mIndConfId[evt->data.evt_system_soft_timer.handle] = kUnusedIndex;
         event.CHIPoBLEConnectionError.Reason                         = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
-        PlatformMgr().PostEventLoggingErrors(&event);
+        PlatformMgr().PostEventOrDie(&event);
     }
 }
 

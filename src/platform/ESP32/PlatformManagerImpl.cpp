@@ -192,7 +192,7 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
         }
     }
 
-    sInstance.PostEventLoggingErrors(&event);
+    sInstance.PostEventOrDie(&event);
 }
 
 } // namespace DeviceLayer

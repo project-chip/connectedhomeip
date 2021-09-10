@@ -96,7 +96,7 @@ private:
     friend class Internal::CHIPService;
 
     using PlatformManager::PostEvent;
-    using PlatformManager::PostEventLoggingErrors;
+    using PlatformManager::PostEventOrDie;
     static PlatformManagerImpl sInstance;
 
     // ===== Members for internal use.

@@ -941,7 +941,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
                         ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName,
                                       event.InternetConnectivityChange.address);
 
-                        PlatformMgr().PostEventLoggingErrors(&event);
+                        PlatformMgr().PostEventOrDie(&event);
                     }
                 }
             }

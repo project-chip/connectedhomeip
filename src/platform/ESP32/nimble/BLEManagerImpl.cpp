@@ -277,7 +277,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChipDeviceEvent connectionEvent;
             connectionEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-            PlatformMgr().PostEventLoggingErrors(&connectionEvent);
+            PlatformMgr().PostEventOrDie(&connectionEvent);
         }
         break;
 

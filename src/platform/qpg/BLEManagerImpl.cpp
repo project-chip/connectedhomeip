@@ -199,7 +199,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-        PlatformMgr().PostEventLoggingErrors(&connEstEvent);
+        PlatformMgr().PostEventOrDie(&connEstEvent);
     }
     break;
 
@@ -706,7 +706,7 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
                 ChipDeviceEvent advChange;
                 advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
                 advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-                PlatformMgr().PostEventLoggingErrors(&advChange);
+                PlatformMgr().PostEventOrDie(&advChange);
             }
         }
         break;
@@ -764,7 +764,7 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
                 event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
                 break;
             }
-            PlatformMgr().PostEventLoggingErrors(&event);
+            PlatformMgr().PostEventOrDie(&event);
         }
 
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);
@@ -793,7 +793,7 @@ void BLEManagerImpl::HandleAttMsg(qvCHIP_Ble_AttEvt_t * pAttEvt)
 
         event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
         event.CHIPoBLEIndicateConfirm.ConId = pAttEvt->hdr.param;
-        PlatformMgr().PostEventLoggingErrors(&event);
+        PlatformMgr().PostEventOrDie(&event);
         break;
     }
     case QVCHIP_ATTC_FIND_BY_TYPE_VALUE_RSP:

@@ -403,7 +403,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-        PlatformMgr().PostEventLoggingErrors(&connEstEvent);
+        PlatformMgr().PostEventOrDie(&connEstEvent);
         break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe:
@@ -1075,7 +1075,7 @@ void BLEManagerImpl::HandleConnectionCloseEvent(blekw_msg_t * msg)
         event.CHIPoBLEConnectionError.ConId  = device_id_loc;
         event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
 
-        PlatformMgr().PostEventLoggingErrors(&event);
+        PlatformMgr().PostEventOrDie(&event);
         mFlags.Set(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);

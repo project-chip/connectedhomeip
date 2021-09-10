@@ -241,7 +241,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChipDeviceEvent _event;
             _event.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-            PlatformMgr().PostEventLoggingErrors(&_event);
+            PlatformMgr().PostEventOrDie(&_event);
         }
         break;
 
@@ -556,7 +556,7 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceWrite(uint16_t conn_id, 
                 event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
                 event.CHIPoBLEWriteReceived.ConId = conn_id;
                 event.CHIPoBLEWriteReceived.Data  = buf;
-                CHIP_ERROR status                 = PlatformMgr().PostEventLoggingErrors(&event);
+                CHIP_ERROR status                 = PlatformMgr().PostEventOrDie(&event);
                 if (status != CHIP_NO_ERROR)
                 {
                     result = WICED_BT_GATT_INTERNAL_ERROR;

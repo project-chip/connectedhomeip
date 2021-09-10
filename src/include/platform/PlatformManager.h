@@ -191,7 +191,7 @@ private:
      * thread) before PostEvent returns.
      */
     [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
-    CHIP_ERROR PostEventLoggingErrors(const ChipDeviceEvent * event);
+    void PostEventOrDie(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
     CHIP_ERROR StartChipTimer(uint32_t durationMS);
 
@@ -360,14 +360,11 @@ inline CHIP_ERROR PlatformManager::PostEvent(const ChipDeviceEvent * event)
     return static_cast<ImplClass *>(this)->_PostEvent(event);
 }
 
-inline CHIP_ERROR PlatformManager::PostEventLoggingErrors(const ChipDeviceEvent * event)
+inline void PlatformManager::PostEventOrDie(const ChipDeviceEvent * event)
 {
     CHIP_ERROR status = static_cast<ImplClass *>(this)->_PostEvent(event);
-    if (status != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to post event %d: %" CHIP_ERROR_FORMAT, static_cast<int>(event->Type), status.Format());
-    }
-    return status;
+    VerifyOrDieWithMsg(status == CHIP_NO_ERROR, DeviceLayer, "Failed to post event %d: %" CHIP_ERROR_FORMAT,
+                       static_cast<int>(event->Type), status.Format());
 }
 
 inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)

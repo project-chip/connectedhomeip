@@ -280,7 +280,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChipDeviceEvent connectionEvent;
             connectionEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-            PlatformMgr().PostEventLoggingErrors(&connectionEvent);
+            PlatformMgr().PostEventOrDie(&connectionEvent);
         }
         break;
 
@@ -1131,7 +1131,7 @@ void BLEManagerImpl::HandleTXCharConfirm(CHIPoBLEConState * conState, esp_ble_ga
         ChipDeviceEvent event;
         event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
         event.CHIPoBLEIndicateConfirm.ConId = param->conf.conn_id;
-        PlatformMgr().PostEventLoggingErrors(&event);
+        PlatformMgr().PostEventOrDie(&event);
     }
 
     else
@@ -1140,7 +1140,7 @@ void BLEManagerImpl::HandleTXCharConfirm(CHIPoBLEConState * conState, esp_ble_ga
         event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
         event.CHIPoBLEConnectionError.ConId  = param->disconnect.conn_id;
         event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
-        PlatformMgr().PostEventLoggingErrors(&event);
+        PlatformMgr().PostEventOrDie(&event);
     }
 }
 
@@ -1168,11 +1168,11 @@ void BLEManagerImpl::HandleDisconnect(esp_ble_gatts_cb_param_t * param)
             event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
             break;
         }
-        PlatformMgr().PostEventLoggingErrors(&event);
+        PlatformMgr().PostEventOrDie(&event);
 
         ChipDeviceEvent disconnectEvent;
         disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
-        PlatformMgr().PostEventLoggingErrors(&disconnectEvent);
+        PlatformMgr().PostEventOrDie(&disconnectEvent);
 
         // Force a refresh of the advertising state.
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);

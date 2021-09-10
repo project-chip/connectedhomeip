@@ -764,7 +764,7 @@ ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_ga
         event.Type = DeviceEventType::kPlatformZephyrBleOutOfBuffersEvent;
     }
 
-    PlatformMgr().PostEventLoggingErrors(&event);
+    PlatformMgr().PostEventOrDie(&event);
 
     return len;
 }
@@ -782,7 +782,7 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
     event.Platform.BleCCCWriteEvent.BtConn = bt_conn_ref(conId);
     event.Platform.BleCCCWriteEvent.Value  = value;
 
-    PlatformMgr().PostEventLoggingErrors(&event);
+    PlatformMgr().PostEventOrDie(&event);
 
     return sizeof(value);
 }
@@ -794,7 +794,7 @@ void BLEManagerImpl::HandleTXCompleted(struct bt_conn * conId, void * /* param *
     event.Type                               = DeviceEventType::kPlatformZephyrBleTXComplete;
     event.Platform.BleTXCompleteEvent.BtConn = bt_conn_ref(conId);
 
-    PlatformMgr().PostEventLoggingErrors(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleConnect(struct bt_conn * conId, uint8_t err)
@@ -810,7 +810,7 @@ void BLEManagerImpl::HandleConnect(struct bt_conn * conId, uint8_t err)
     event.Platform.BleConnEvent.BtConn    = bt_conn_ref(conId);
     event.Platform.BleConnEvent.HciResult = err;
 
-    PlatformMgr().PostEventLoggingErrors(&event);
+    PlatformMgr().PostEventOrDie(&event);
 
 exit:
     PlatformMgr().UnlockChipStack();
@@ -829,7 +829,7 @@ void BLEManagerImpl::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
     event.Platform.BleConnEvent.BtConn    = bt_conn_ref(conId);
     event.Platform.BleConnEvent.HciResult = reason;
 
-    PlatformMgr().PostEventLoggingErrors(&event);
+    PlatformMgr().PostEventOrDie(&event);
 
 exit:
     PlatformMgr().UnlockChipStack();
