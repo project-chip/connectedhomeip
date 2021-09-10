@@ -85,7 +85,7 @@ void PASESession::Clear()
     memset(&mPoint[0], 0, sizeof(mPoint));
     memset(&mPASEVerifier, 0, sizeof(mPASEVerifier));
     memset(&mKe[0], 0, sizeof(mKe));
-    mNextExpectedMsg = MsgType::StatusReport;
+    mNextExpectedMsg = MsgType::PASE_PakeError;
 
     // Note: we don't need to explicitly clear the state of mSpake2p object.
     //       Clearing the following state takes care of it.
@@ -349,12 +349,11 @@ CHIP_ERROR PASESession::DeriveSecureSession(SecureSession & session, SecureSessi
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
 {
-    uint8_t initiatorRandom[kPBKDFParamRandomNumberSize] = { 0 };
-    ReturnErrorOnFailure(DRBG_get_bytes(initiatorRandom, kPBKDFParamRandomNumberSize));
+    ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
-    size_t data_len =
+    const size_t max_msg_len =
         EstimateTLVStructOverhead(kPBKDFParamRandomNumberSize + sizeof(uint16_t) + sizeof(uint16_t) + sizeof(uint8_t), 4);
-    System::PacketBufferHandle req = System::PacketBufferHandle::New(data_len);
+    System::PacketBufferHandle req = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!req.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     System::PacketBufferTLVWriter tlvWriter;
@@ -362,10 +361,11 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
-    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), initiatorRandom, sizeof(initiatorRandom)));
+    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyId(), true));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mPasscodeID, true));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
+    // TODO - Add optional MRP parameter support to PASE
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&req));
 
@@ -411,7 +411,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(initiatorSessionId));
 
-    ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", initiatorSessionId);
+    ChipLogDetail(SecureChannel, "Peer assigned session ID %d", initiatorSessionId);
     SetPeerKeyId(initiatorSessionId);
 
     SuccessOrExit(err = tlvReader.Next());
@@ -421,6 +421,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(hasPBKDFParameters));
+
+    // TODO - Check if optional MRP parameters were sent. If so, cache them.
 
     err = SendPBKDFParamResponse(ByteSpan(initiatorRandom), hasPBKDFParameters);
     SuccessOrExit(err);
@@ -436,12 +438,11 @@ exit:
 
 CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool initiatorHasPBKDFParams)
 {
-    uint8_t responderRandom[kPBKDFParamRandomNumberSize] = { 0 };
-    ReturnErrorOnFailure(DRBG_get_bytes(responderRandom, kPBKDFParamRandomNumberSize));
+    ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
-    size_t data_len = EstimateTLVStructOverhead(
+    const size_t max_msg_len = EstimateTLVStructOverhead(
         kPBKDFParamRandomNumberSize + kPBKDFParamRandomNumberSize + sizeof(uint16_t) + sizeof(uint16_t) + sizeof(uint8_t), 5);
-    System::PacketBufferHandle resp = System::PacketBufferHandle::New(data_len);
+    System::PacketBufferHandle resp = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!resp.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     System::PacketBufferTLVWriter tlvWriter;
@@ -449,17 +450,18 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
 
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    // The initiator random value is being sent back in the response as required by the specifications
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), initiatorRandom));
-    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), responderRandom, sizeof(responderRandom)));
+    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalKeyId(), true));
 
     if (!initiatorHasPBKDFParams)
     {
-        TLV::TLVType outerContainer;
-        ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::ContextTag(4), TLV::kTLVType_Structure, outerContainer));
+        TLV::TLVType pbkdfParamContainer;
+        ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::ContextTag(4), TLV::kTLVType_Structure, pbkdfParamContainer));
         ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mIterationCount, true));
         ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), mSalt, mSaltLength));
-        ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainer));
+        ReturnErrorOnFailure(tlvWriter.EndContainer(pbkdfParamContainer));
     }
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
@@ -472,7 +474,7 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
     size_t sizeof_point = sizeof(mPoint);
     ReturnErrorOnFailure(mSpake2p.ComputeL(mPoint, &sizeof_point, mPASEVerifier.mL, kSpake2p_WS_Length));
 
-    mNextExpectedMsg = MsgType::PASE_Spake2p1;
+    mNextExpectedMsg = MsgType::PASE_Pake1;
 
     ReturnErrorOnFailure(
         mExchangeCtxt->SendMessage(MsgType::PBKDFParamResponse, std::move(resp), SendFlags(SendMessageFlags::kExpectResponse)));
@@ -509,6 +511,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     // Initiator's random value
     SuccessOrExit(err = tlvReader.GetBytes(random, sizeof(random)));
+    VerifyOrExit(ByteSpan(random).data_equal(ByteSpan(mPBKDFLocalRandomData)), err = CHIP_ERROR_INVALID_PASE_PARAMETER);
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
@@ -519,12 +522,12 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
-    ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", responderSessionId);
+    ChipLogDetail(SecureChannel, "Peer assigned session ID %d", responderSessionId);
     SetPeerKeyId(responderSessionId);
 
     if (mHavePBKDFParameters)
     {
-        err = SetupSpake2p(iterCount, ByteSpan(mSalt, mSaltLength));
+        err = SetupSpake2p(mIterationCount, ByteSpan(mSalt, mSaltLength));
         SuccessOrExit(err);
     }
     else
@@ -559,8 +562,8 @@ exit:
 
 CHIP_ERROR PASESession::SendMsg1()
 {
-    size_t data_len                = EstimateTLVStructOverhead(kMAX_Point_Length, 1);
-    System::PacketBufferHandle msg = System::PacketBufferHandle::New(data_len);
+    const size_t max_msg_len       = EstimateTLVStructOverhead(kMAX_Point_Length, 1);
+    System::PacketBufferHandle msg = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     System::PacketBufferTLVWriter tlvWriter;
@@ -572,24 +575,25 @@ CHIP_ERROR PASESession::SendMsg1()
     uint8_t X[kMAX_Point_Length];
     size_t X_len = sizeof(X);
 
+    constexpr uint8_t kPake1_pA = 1;
+
     ReturnErrorOnFailure(
         mSpake2p.BeginProver(nullptr, 0, nullptr, 0, mPASEVerifier.mW0, kSpake2p_WS_Length, mPASEVerifier.mL, kSpake2p_WS_Length));
     ReturnErrorOnFailure(mSpake2p.ComputeRoundOne(NULL, 0, X, &X_len));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), ByteSpan(X, X_len)));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kPake1_pA), ByteSpan(X, X_len)));
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg));
 
-    mNextExpectedMsg = MsgType::PASE_Spake2p2;
+    mNextExpectedMsg = MsgType::PASE_Pake2;
 
-    // Call delegate to send the Msg1 to peer
     ReturnErrorOnFailure(
-        mExchangeCtxt->SendMessage(MsgType::PASE_Spake2p1, std::move(msg), SendFlags(SendMessageFlags::kExpectResponse)));
+        mExchangeCtxt->SendMessage(MsgType::PASE_Pake1, std::move(msg), SendFlags(SendMessageFlags::kExpectResponse)));
     ChipLogDetail(SecureChannel, "Sent spake2p msg1");
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && msg)
+CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && msg1)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -607,7 +611,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
     const uint8_t * X;
     size_t X_len = 0;
 
-    tlvReader.Init(std::move(msg));
+    tlvReader.Init(std::move(msg1));
     SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag));
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
@@ -618,14 +622,16 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
     SuccessOrExit(
         err = mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, mPASEVerifier.mW0, kSpake2p_WS_Length, mPoint, sizeof(mPoint)));
 
-    // Pass Pa to check abort condition.
     SuccessOrExit(err = mSpake2p.ComputeRoundOne(X, X_len, Y, &Y_len));
     SuccessOrExit(err = mSpake2p.ComputeRoundTwo(X, X_len, verifier, &verifier_len));
+    msg1 = nullptr;
 
     {
-        size_t data_len = EstimateTLVStructOverhead(Y_len + verifier_len, 2);
+        const size_t max_msg_len    = EstimateTLVStructOverhead(Y_len + verifier_len, 2);
+        constexpr uint8_t kPake2_pB = 1;
+        constexpr uint8_t kPake2_cB = 2;
 
-        System::PacketBufferHandle msg2 = System::PacketBufferHandle::New(data_len);
+        System::PacketBufferHandle msg2 = System::PacketBufferHandle::New(max_msg_len);
         VerifyOrExit(!msg2.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
         System::PacketBufferTLVWriter tlvWriter;
@@ -633,15 +639,14 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
 
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(1), ByteSpan(Y, Y_len)));
-        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(2), ByteSpan(verifier, verifier_len)));
+        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kPake2_pB), ByteSpan(Y, Y_len)));
+        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kPake2_cB), ByteSpan(verifier, verifier_len)));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg2));
 
-        mNextExpectedMsg = MsgType::PASE_Spake2p3;
+        mNextExpectedMsg = MsgType::PASE_Pake3;
 
-        // Call delegate to send the Msg2 to peer
-        err = mExchangeCtxt->SendMessage(MsgType::PASE_Spake2p2, std::move(msg2), SendFlags(SendMessageFlags::kExpectResponse));
+        err = mExchangeCtxt->SendMessage(MsgType::PASE_Pake2, std::move(msg2), SendFlags(SendMessageFlags::kExpectResponse));
         SuccessOrExit(err);
     }
 
@@ -656,7 +661,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && msg)
+CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && msg2)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -680,7 +685,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
 
     uint32_t decodeTagIdSeq = 0;
 
-    tlvReader.Init(std::move(msg));
+    tlvReader.Init(std::move(msg2));
     SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag));
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
@@ -704,11 +709,13 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     }
 
     SuccessOrExit(err = mSpake2p.GetKeys(mKe, &mKeLen));
+    msg2 = nullptr;
 
     {
-        size_t data_len = EstimateTLVStructOverhead(verifier_len, 1);
+        const size_t max_msg_len    = EstimateTLVStructOverhead(verifier_len, 1);
+        constexpr uint8_t kPake3_cB = 1;
 
-        System::PacketBufferHandle msg3 = System::PacketBufferHandle::New(data_len);
+        System::PacketBufferHandle msg3 = System::PacketBufferHandle::New(max_msg_len);
         VerifyOrExit(!msg3.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
         System::PacketBufferTLVWriter tlvWriter;
@@ -716,14 +723,13 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
 
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(1), ByteSpan(verifier, verifier_len)));
+        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kPake3_cB), ByteSpan(verifier, verifier_len)));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg3));
 
         mNextExpectedMsg = MsgType::StatusReport;
 
-        // Call delegate to send the Msg3 to peer
-        err = mExchangeCtxt->SendMessage(MsgType::PASE_Spake2p3, std::move(msg3), SendFlags(SendMessageFlags::kExpectResponse));
+        err = mExchangeCtxt->SendMessage(MsgType::PASE_Pake3, std::move(msg3), SendFlags(SendMessageFlags::kExpectResponse));
         SuccessOrExit(err);
     }
 
@@ -745,9 +751,8 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
 
     ChipLogDetail(SecureChannel, "Received spake2p msg3");
 
-    // We will set NextExpectedMsg to StatusReport in all cases
-    // However, when we are using IP rendezvous, we might set it to PASE_Spake2p1.
-    mNextExpectedMsg = MsgType::StatusReport;
+    // We will set NextExpectedMsg to PASE_PakeError in all cases
+    mNextExpectedMsg = MsgType::PASE_PakeError;
 
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
@@ -775,6 +780,7 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
 
     SuccessOrExit(err = mSpake2p.GetKeys(mKe, &mKeLen));
 
+    // Send confirmation to peer that we succeeded so they can start using the session.
     SendStatusReport(kProtocolCodeSuccess);
 
     mPairingComplete = true;
@@ -898,15 +904,15 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Pack
         err = HandlePBKDFParamResponse(std::move(msg));
         break;
 
-    case MsgType::PASE_Spake2p1:
+    case MsgType::PASE_Pake1:
         err = HandleMsg1_and_SendMsg2(std::move(msg));
         break;
 
-    case MsgType::PASE_Spake2p2:
+    case MsgType::PASE_Pake2:
         err = HandleMsg2_and_SendMsg3(std::move(msg));
         break;
 
-    case MsgType::PASE_Spake2p3:
+    case MsgType::PASE_Pake3:
         err = HandleMsg3(std::move(msg));
         break;
 

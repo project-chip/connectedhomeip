@@ -57,10 +57,10 @@ enum class MsgType : uint8_t
     // Password-based session establishment Message Types
     PBKDFParamRequest  = 0x20,
     PBKDFParamResponse = 0x21,
-    PASE_Spake2p1      = 0x22,
-    PASE_Spake2p2      = 0x23,
-    PASE_Spake2p3      = 0x24,
-    PASE_Spake2pError  = 0x2F,
+    PASE_Pake1         = 0x22,
+    PASE_Pake2         = 0x23,
+    PASE_Pake3         = 0x24,
+    PASE_PakeError     = 0x2F,
 
     // Certificate-based session establishment Message Types
     CASE_SigmaR1  = 0x30,

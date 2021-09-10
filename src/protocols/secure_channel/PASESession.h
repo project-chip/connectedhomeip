@@ -276,7 +276,7 @@ private:
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
-    Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
+    Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_PakeError;
 
 #ifdef ENABLE_HSM_SPAKE
     Spake2pHSM_P256_SHA256_HKDF_HMAC mSpake2p;
@@ -295,6 +295,8 @@ private:
     bool mComputeVerifier = true;
 
     bool mHavePBKDFParameters = false;
+
+    uint8_t mPBKDFLocalRandomData[kPBKDFParamRandomNumberSize];
 
     Hash_SHA256_stream mCommissioningHash;
     uint32_t mIterationCount = 0;
