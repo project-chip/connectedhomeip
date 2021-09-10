@@ -555,9 +555,11 @@ static void TestAES_CCM_128DecryptInvalidCipherText(nlTestSuite * inSuite, void 
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            uint8_t out_pt[vector->pt_len];
+            Platform::ScopedMemoryBuffer<uint8_t> out_pt;
+            out_pt.Alloc(vector->pt_len);
+            NL_TEST_ASSERT(inSuite, out_pt);
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, 0, vector->aad, vector->aad_len, vector->tag, vector->tag_len, vector->key,
-                                             vector->key_len, vector->iv, vector->iv_len, out_pt);
+                                             vector->key_len, vector->iv, vector->iv_len, out_pt.Get());
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -575,9 +577,11 @@ static void TestAES_CCM_128DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            uint8_t out_pt[vector->pt_len];
+            Platform::ScopedMemoryBuffer<uint8_t> out_pt;
+            out_pt.Alloc(vector->pt_len);
+            NL_TEST_ASSERT(inSuite, out_pt);
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             nullptr, 0, vector->iv, vector->iv_len, out_pt);
+                                             nullptr, 0, vector->iv, vector->iv_len, out_pt.Get());
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }
@@ -595,9 +599,11 @@ static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
         if (vector->pt_len > 0)
         {
             numOfTestsRan++;
-            uint8_t out_pt[vector->pt_len];
+            Platform::ScopedMemoryBuffer<uint8_t> out_pt;
+            out_pt.Alloc(vector->pt_len);
+            NL_TEST_ASSERT(inSuite, out_pt);
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             vector->key, vector->key_len, vector->iv, 0, out_pt);
+                                             vector->key, vector->key_len, vector->iv, 0, out_pt.Get());
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
             break;
         }

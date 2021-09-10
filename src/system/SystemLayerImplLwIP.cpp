@@ -18,48 +18,55 @@
 
 /**
  *    @file
- *      This file implements WatchableEventManager using LwIP.
+ *      This file implements LayerImplLwIP using LwIP.
  */
 
 #include <lib/support/CodeUtils.h>
 #include <system/LwIPEventSupport.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
-#include <system/WatchableEventManager.h>
+#include <system/SystemLayerImplLwIP.h>
 
 namespace chip {
 namespace System {
 
-LwIPEventHandlerDelegate WatchableEventManager::sSystemEventHandlerDelegate;
+LayerLwIP::EventHandlerDelegate LayerImplLwIP::sSystemEventHandlerDelegate;
 
-WatchableEventManager::WatchableEventManager() : mHandlingTimerComplete(false), mEventDelegateList(nullptr)
+LayerImplLwIP::LayerImplLwIP() : mHandlingTimerComplete(false), mEventDelegateList(nullptr)
 {
     if (!sSystemEventHandlerDelegate.IsInitialized())
         sSystemEventHandlerDelegate.Init(HandleSystemLayerEvent);
 }
 
-CHIP_ERROR WatchableEventManager::Init(Layer & systemLayer)
+CHIP_ERROR LayerImplLwIP::Init()
 {
+    VerifyOrReturnError(!mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     RegisterLwIPErrorFormatter();
 
-    mSystemLayer = &systemLayer;
     AddEventHandlerDelegate(sSystemEventHandlerDelegate);
-    return mTimerList.Init();
-}
+    ReturnErrorOnFailure(mTimerList.Init());
 
-CHIP_ERROR WatchableEventManager::Shutdown()
-{
-    mSystemLayer = nullptr;
+    VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplLwIP::Shutdown()
 {
+    VerifyOrReturnError(mLayerState.Shutdown(), CHIP_ERROR_INCORRECT_STATE);
+    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LayerImplLwIP::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
+{
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delayMilliseconds = 0);
 
     CancelTimer(onComplete, appState);
 
-    Timer * timer = Timer::New(*mSystemLayer, delayMilliseconds, onComplete, appState);
+    Timer * timer = Timer::New(*this, delayMilliseconds, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (mTimerList.Add(timer) == timer)
@@ -75,8 +82,10 @@ CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, TimerCo
     return CHIP_NO_ERROR;
 }
 
-void WatchableEventManager::CancelTimer(TimerCompleteCallback onComplete, void * appState)
+void LayerImplLwIP::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
+    VerifyOrReturn(mLayerState.IsInitialized());
+
     Timer * timer = mTimerList.Remove(onComplete, appState);
     VerifyOrReturn(timer != nullptr);
 
@@ -84,26 +93,28 @@ void WatchableEventManager::CancelTimer(TimerCompleteCallback onComplete, void *
     timer->Release();
 }
 
-CHIP_ERROR WatchableEventManager::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
+CHIP_ERROR LayerImplLwIP::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
-    Timer * timer = Timer::New(*mSystemLayer, 0, onComplete, appState);
+    VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+    Timer * timer = Timer::New(*this, 0, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     return PostEvent(*timer, chip::System::kEvent_ScheduleWork, 0);
 }
 
-bool LwIPEventHandlerDelegate::IsInitialized() const
+bool LayerLwIP::EventHandlerDelegate::IsInitialized() const
 {
     return mFunction != nullptr;
 }
 
-void LwIPEventHandlerDelegate::Init(LwIPEventHandlerFunction aFunction)
+void LayerLwIP::EventHandlerDelegate::Init(EventHandlerFunction aFunction)
 {
     mFunction     = aFunction;
     mNextDelegate = nullptr;
 }
 
-void LwIPEventHandlerDelegate::Prepend(const LwIPEventHandlerDelegate *& aDelegateList)
+void LayerLwIP::EventHandlerDelegate::Prepend(const LayerLwIP::EventHandlerDelegate *& aDelegateList)
 {
     mNextDelegate = aDelegateList;
     aDelegateList = this;
@@ -116,7 +127,7 @@ void LwIPEventHandlerDelegate::Prepend(const LwIPEventHandlerDelegate *& aDelega
  *  @param[in]      aEventType  The type of event to post.
  *  @param[in,out]  aArgument   The argument associated with the event to post.
  */
-CHIP_ERROR WatchableEventManager::HandleSystemLayerEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
+CHIP_ERROR LayerImplLwIP::HandleSystemLayerEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
     // Dispatch logic specific to the event type
     switch (aEventType)
@@ -134,18 +145,19 @@ CHIP_ERROR WatchableEventManager::HandleSystemLayerEvent(Object & aTarget, Event
     }
 }
 
-CHIP_ERROR WatchableEventManager::AddEventHandlerDelegate(LwIPEventHandlerDelegate & aDelegate)
+CHIP_ERROR LayerImplLwIP::AddEventHandlerDelegate(EventHandlerDelegate & aDelegate)
 {
-    VerifyOrReturnError(aDelegate.mFunction != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    aDelegate.Prepend(mEventDelegateList);
+    LwIPEventHandlerDelegate lDelegate = static_cast<LwIPEventHandlerDelegate &>(aDelegate);
+    VerifyOrReturnError(lDelegate.GetFunction() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    lDelegate.Prepend(mEventDelegateList);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
+CHIP_ERROR LayerImplLwIP::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
-    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR lReturn = PlatformEventing::PostEvent(*mSystemLayer, aTarget, aEventType, aArgument);
+    CHIP_ERROR lReturn = PlatformEventing::PostEvent(*this, aTarget, aEventType, aArgument);
     if (lReturn != CHIP_NO_ERROR)
     {
         ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer event (type %d): %s", aEventType, ErrorStr(lReturn));
@@ -159,10 +171,10 @@ CHIP_ERROR WatchableEventManager::PostEvent(Object & aTarget, EventType aEventTy
  *
  *  @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  */
-CHIP_ERROR WatchableEventManager::DispatchEvents()
+CHIP_ERROR LayerImplLwIP::DispatchEvents()
 {
-    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    return PlatformEventing::DispatchEvents(*mSystemLayer);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    return PlatformEventing::DispatchEvents(*this);
 }
 
 /**
@@ -175,10 +187,10 @@ CHIP_ERROR WatchableEventManager::DispatchEvents()
  *
  * @return CHIP_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  */
-CHIP_ERROR WatchableEventManager::DispatchEvent(Event aEvent)
+CHIP_ERROR LayerImplLwIP::DispatchEvent(Event aEvent)
 {
-    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    return PlatformEventing::DispatchEvent(*mSystemLayer, aEvent);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    return PlatformEventing::DispatchEvent(*this, aEvent);
 }
 
 /**
@@ -192,20 +204,20 @@ CHIP_ERROR WatchableEventManager::DispatchEvent(Event aEvent)
  *  @retval   CHIP_ERROR_INCORRECT_STATE    If the state of the InetLayer object is incorrect.
  *  @retval   CHIP_ERROR_UNEXPECTED_EVENT   If the event type is unrecognized.
  */
-CHIP_ERROR WatchableEventManager::HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
+CHIP_ERROR LayerImplLwIP::HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
-    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     // Prevent the target object from being freed while dispatching the event.
     aTarget.Retain();
 
     CHIP_ERROR lReturn                              = CHIP_ERROR_UNEXPECTED_EVENT;
-    const LwIPEventHandlerDelegate * lEventDelegate = mEventDelegateList;
+    const LwIPEventHandlerDelegate * lEventDelegate = static_cast<const LwIPEventHandlerDelegate *>(mEventDelegateList);
 
     while (lReturn == CHIP_ERROR_UNEXPECTED_EVENT && lEventDelegate != nullptr)
     {
-        lReturn        = lEventDelegate->mFunction(aTarget, aEventType, aArgument);
-        lEventDelegate = lEventDelegate->mNextDelegate;
+        lReturn        = lEventDelegate->GetFunction()(aTarget, aEventType, aArgument);
+        lEventDelegate = lEventDelegate->GetNextDelegate();
     }
 
     if (lReturn == CHIP_ERROR_UNEXPECTED_EVENT)
@@ -234,10 +246,11 @@ CHIP_ERROR WatchableEventManager::HandleEvent(Object & aTarget, EventType aEvent
  *  @return CHIP_NO_ERROR on success, error code otherwise.
  *
  */
-CHIP_ERROR WatchableEventManager::StartPlatformTimer(uint32_t aDelayMilliseconds)
+CHIP_ERROR LayerImplLwIP::StartPlatformTimer(uint32_t aDelayMilliseconds)
 {
-    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    return PlatformEventing::StartTimer(*mSystemLayer, aDelayMilliseconds);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    CHIP_ERROR status = PlatformEventing::StartTimer(*this, aDelayMilliseconds);
+    return status;
 }
 
 /**
@@ -255,9 +268,9 @@ CHIP_ERROR WatchableEventManager::StartPlatformTimer(uint32_t aDelayMilliseconds
  *  @return CHIP_NO_ERROR on success, error code otherwise.
  *
  */
-CHIP_ERROR WatchableEventManager::HandlePlatformTimer()
+CHIP_ERROR LayerImplLwIP::HandlePlatformTimer()
 {
-    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     // Expire each timer in turn until an unexpired timer is reached or the timerlist is emptied.  We set the current expiration
     // time outside the loop; that way timers set after the current tick will not be executed within this expiration window

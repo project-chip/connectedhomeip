@@ -1,5 +1,5 @@
 {
-  "featureLevel": 45,
+  "featureLevel": 51,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -9958,6 +9958,5 @@
       "endpointVersion": null,
       "deviceIdentifier": null
     }
-  ],
-  "log": []
+  ]
 }

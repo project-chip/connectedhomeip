@@ -91,7 +91,6 @@ private:
     std::vector<std::unique_ptr<AvahiWatch>> mWatches;
     std::vector<std::unique_ptr<AvahiTimeout>> mTimers;
     AvahiPoll mAvahiPoller;
-    System::WatchableEventManager * mWatchableEvents;
 };
 
 class MdnsAvahi

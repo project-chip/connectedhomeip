@@ -369,7 +369,10 @@ void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::T
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     uint16_t data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -398,7 +401,10 @@ void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvDa
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _AudioOutputInfo data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -433,7 +439,10 @@ void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader *
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::ByteSpan data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));
@@ -464,7 +473,10 @@ void ContentLauncherClusterSupportedStreamingTypesListAttributeFilter(TLV::TLVRe
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     uint8_t data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -493,7 +505,10 @@ void DescriptorClusterDeviceListListAttributeFilter(TLV::TLVReader * tlvData, Ca
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _DeviceType data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(4);
@@ -525,7 +540,10 @@ void DescriptorClusterServerListListAttributeFilter(TLV::TLVReader * tlvData, Ca
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::ClusterId data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(4);
@@ -554,7 +572,10 @@ void DescriptorClusterClientListListAttributeFilter(TLV::TLVReader * tlvData, Ca
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::ClusterId data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(4);
@@ -583,7 +604,10 @@ void DescriptorClusterPartsListListAttributeFilter(TLV::TLVReader * tlvData, Cal
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::EndpointId data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -612,7 +636,10 @@ void FixedLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Cal
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _LabelStruct data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_STATUS_VOID(ReadByteSpan(message, 18, &data[i].label));
@@ -645,7 +672,10 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _BasicCommissioningInfoType data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(4);
@@ -675,7 +705,10 @@ void GeneralDiagnosticsClusterNetworkInterfacesListAttributeFilter(TLV::TLVReade
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _NetworkInterfaceType data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].Name));
@@ -719,7 +752,10 @@ void GroupKeyManagementClusterGroupsListAttributeFilter(TLV::TLVReader * tlvData
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _GroupState data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -754,7 +790,10 @@ void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvD
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _GroupKey data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -795,7 +834,10 @@ void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _MediaInputInfo data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -833,7 +875,10 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _FabricDescriptor data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -877,7 +922,10 @@ void TvChannelClusterTvChannelListListAttributeFilter(TLV::TLVReader * tlvData, 
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _TvChannelInfo data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -919,7 +967,10 @@ void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _NavigateTargetTargetInfo data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -951,7 +1002,10 @@ void TestClusterClusterListInt8uListAttributeFilter(TLV::TLVReader * tlvData, Ca
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     uint8_t data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -980,7 +1034,10 @@ void TestClusterClusterListOctetStringListAttributeFilter(TLV::TLVReader * tlvDa
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::ByteSpan data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));
@@ -1010,7 +1067,10 @@ void TestClusterClusterListStructOctetStringListAttributeFilter(TLV::TLVReader *
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _TestListStructOctet data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(8);
@@ -1043,7 +1103,10 @@ void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(TLV::TL
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _NeighborTable data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(8);
@@ -1112,7 +1175,10 @@ void ThreadNetworkDiagnosticsClusterRouteTableListListAttributeFilter(TLV::TLVRe
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _RouteTable data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(8);
@@ -1169,7 +1235,10 @@ void ThreadNetworkDiagnosticsClusterSecurityPolicyListAttributeFilter(TLV::TLVRe
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _SecurityPolicy data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -1202,7 +1271,10 @@ void ThreadNetworkDiagnosticsClusterOperationalDatasetComponentsListAttributeFil
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _OperationalDatasetComponents data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -1266,7 +1338,10 @@ void ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter(T
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     uint8_t data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);

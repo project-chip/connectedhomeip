@@ -1,9 +1,9 @@
 {{#if header}}
-class CHIP{{@partial-block}}Bridge : public CHIPCallbackBridge<{{@partial-block}}>
+class CHIP{{> @partial-block}}Bridge : public CHIPCallbackBridge<{{> @partial-block}}>
 {
 public:
-    CHIP{{@partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action, bool keepAlive = false)
-      : CHIPCallbackBridge<{{@partial-block}}>(queue, handler, action, OnSuccessFn, keepAlive)
+    CHIP{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action, bool keepAlive = false)
+      : CHIPCallbackBridge<{{> @partial-block}}>(queue, handler, action, OnSuccessFn, keepAlive)
       {};
     
     static void OnSuccessFn(void * context
@@ -18,7 +18,7 @@ public:
     );
 };
 {{else}}
-void CHIP{{@partial-block}}Bridge::OnSuccessFn(void * context
+void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
   {{#if (isStrEqual partial-type "Command")}}
   {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
   {{else if (isStrEqual partial-type "List")}}
@@ -45,11 +45,11 @@ void CHIP{{@partial-block}}Bridge::OnSuccessFn(void * context
       {{/chip_cluster_response_arguments}}
     });
     {{else if (isStrEqual partial-type "List")}}
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++)
     {
         {{#if isStruct}}
-        values[i] = @{
+        array[i] = @{
           {{#chip_attribute_list_entryTypes}}
           {{#if (isOctetString type)}}
           @"{{name}}" : [NSData dataWithBytes:entries[i].{{name}}.data() length:entries[i].{{name}}.size()],
@@ -61,15 +61,15 @@ void CHIP{{@partial-block}}Bridge::OnSuccessFn(void * context
           {{/chip_attribute_list_entryTypes}}
         };
         {{else if (isOctetString type)}}
-        values[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
+        array[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
         {{else if (isCharString type)}}
-        values[i] = [[NSString alloc] initWithBytes:entries[i]+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i]) encoding:NSUTF8StringEncoding];
+        array[i] = [[NSString alloc] initWithBytes:entries[i]+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i]) encoding:NSUTF8StringEncoding];
         {{else}}
-        values[i] = [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i]];
+        array[i] = [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i]];
         {{/if}}
     }
 
-    DispatchSuccess(context, @{ @"value": [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @{ @"value": array });
     {{else if (isOctetString partial-type)}}
     DispatchSuccess(context, @{ @"value": [NSData dataWithBytes: value.data() length: value.size()] });
     {{else if (isCharString partial-type)}}
