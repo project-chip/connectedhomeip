@@ -22,6 +22,7 @@ from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
 from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
+from builders.ameba import AmebaBuilder, AmebaBoard, AmebaApp
 
 from .targets import Application, Board, Platform
 
@@ -87,6 +88,7 @@ _MATCHERS = {
     Platform.ANDROID: Matcher(AndroidBuilder),
     Platform.INFINEON: Matcher(InfineonBuilder),
     Platform.TELINK: Matcher(TelinkBuilder),
+    Platform.AMEBA: Matcher(AmebaBuilder),
 }
 
 # Matrix of what can be compiled and what build options are required
@@ -147,6 +149,10 @@ _MATCHERS[Platform.INFINEON].AcceptApplication(
 _MATCHERS[Platform.INFINEON].AcceptBoard(
     Board.P6BOARD, board=InfineonBoard.P6BOARD)
 
+_MATCHERS[Platform.AMEBA].AcceptBoard(
+    Board.AMEBAD, board=AmebaBoard.AMEBAD)
+_MATCHERS[Platform.AMEBA].AcceptApplication(
+    Application.ALL_CLUSTERS, app=AmebaApp.ALL_CLUSTERS)
 
 class BuilderFactory:
     """Creates application builders."""
