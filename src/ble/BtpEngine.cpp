@@ -321,6 +321,10 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
 
         mRxBuf->AddToEnd(std::move(data));
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
+
+        // For now, limit BtpEngine message size to max length of 1 pbuf, as we do for chip messages sent via IP.
+        // TODO add support for BtpEngine messages longer than 1 pbuf
+        VerifyOrExit(!mRxBuf->HasChainedBuffer(), err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
     }
     else if (mRxState == kState_InProgress)
     {
