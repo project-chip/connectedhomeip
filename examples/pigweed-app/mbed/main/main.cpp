@@ -63,6 +63,8 @@ int main()
 
     mbed_logging_init();
 
+    ChipLogProgress(NotSpecified, "Mbed pigweed-app example application start");
+
     pw_sys_io_Init();
 
     sStatusLED.Set(true);
