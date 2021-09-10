@@ -78,6 +78,8 @@ public:
 
     CommissionManager & GetCommissionManager() { return mCommissionManager; }
 
+    void Shutdown();
+
     static Server & GetInstance() { return sServer; }
 
 private:

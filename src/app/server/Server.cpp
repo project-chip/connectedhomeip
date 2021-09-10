@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include "lib/support/CHIPMem.h"
+#include "platform/internal/CHIPDeviceLayerInternal.h"
 #include <app/server/Server.h>
 
 #include <app/InteractionModelEngine.h>
@@ -28,6 +30,7 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/mdns/Advertiser.h>
 #include <lib/mdns/ServiceNaming.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
@@ -98,6 +101,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SuccessOrExit(err);
 
     // Init transport before operations with secure session mgr.
+    printf("Init transports\n");
     err = mTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer)
                                .SetAddressType(IPAddressType::kIPAddressType_IPv6)
                                .SetListenPort(mSecuredServicePort)
@@ -113,6 +117,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                            BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
 #endif
     );
+    printf("Init transports done\n");
 
     SuccessOrExit(err);
 
@@ -186,6 +191,17 @@ exit:
         ChipLogProgress(AppServer, "Server Listening...");
     }
     return err;
+}
+
+void Server::Shutdown()
+{
+    chip::Mdns::ServiceAdvertiser::Instance().StopPublishDevice();
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    mExchangeMgr.Shutdown();
+    mSessions.Shutdown();
+    mTransports.Close();
+    mRendezvousServer.Cleanup();
+    chip::Platform::MemoryShutdown();
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT

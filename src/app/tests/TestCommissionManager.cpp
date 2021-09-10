@@ -16,6 +16,7 @@
  */
 
 #include "app/server/Mdns.h"
+#include "lib/support/CHIPMem.h"
 #include <app/server/CommissionManager.h>
 #include <app/server/Server.h>
 #include <lib/support/Span.h>
@@ -75,7 +76,6 @@ void CheckCommissionManagerWindowTimeout(nlTestSuite * suite, void *)
     NL_TEST_ASSERT(suite, commissionMgr.IsPairingWindowOpen());
     usleep(kTimeoutSeconds * kUsPerSecond + kSleepPadding);
     NL_TEST_ASSERT(suite, !commissionMgr.IsPairingWindowOpen());
-    commissionMgr.CloseCommissioningWindow();
 }
 
 void CheckCommissionManagerEnhancedWindow(nlTestSuite * suite, void *)
@@ -128,7 +128,10 @@ int TestCommissionManager()
 
     InitializeChip(&theSuite);
     nlTestRunner(&theSuite, nullptr);
+
+    chip::Server::GetInstance().Shutdown();
     chip::DeviceLayer::PlatformMgr().Shutdown();
+    // TODO: The platform memory was intentionally left not deinitialized so that minimal mdns can destruct
 
     return (nlTestRunnerStats(&theSuite));
 }

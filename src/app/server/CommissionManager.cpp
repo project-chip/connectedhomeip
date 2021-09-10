@@ -50,6 +50,8 @@ CHIP_ERROR CommissionManager::OpenBasicCommissioningWindow(ResetFabrics resetFab
     {
         params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
     }
+#else
+    SetBLE(false);
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     if (resetFabrics == ResetFabrics::kYes)
@@ -83,11 +85,12 @@ CHIP_ERROR CommissionManager::OpenEnhancedCommissioningWindow(uint16_t commissio
 
     ReturnErrorOnFailure(SetTemporaryDiscriminator(discriminator));
 
-    SetBLE(false);
     params.SetAdvertisementDelegate(this);
 #if CONFIG_NETWORK_LAYER_BLE
     SetBLE(true);
     params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
+#else
+    SetBLE(false);
 #endif
 
     params.SetPASEVerifier(verifier).SetAdvertisementDelegate(this);
