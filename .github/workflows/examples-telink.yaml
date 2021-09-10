@@ -50,7 +50,7 @@ jobs:
                   "./scripts/build/build_examples.py --no-log-timestamps --platform telink --app light build"
                 .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                   telink tlsr9518adk80d lighting-app \
-                  examples/lighting-app/telink/build/tlsr9518adk80d/zephyr/zephyr.elf \
+                  out/telink-tlsr9518adk80d-light/zephyr/zephyr.elf \
                   /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
