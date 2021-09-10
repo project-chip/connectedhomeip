@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "app/server/Mdns.h"
 #include <app/server/CommissionManager.h>
 #include <app/server/Server.h>
 #include <lib/support/Span.h>
@@ -106,9 +107,9 @@ void CheckCommissionManagerEnhancedWindow(nlTestSuite * suite, void *)
     NL_TEST_ASSERT(suite, currentDiscriminator == originDiscriminator);
 }
 
-const nlTest sTests[] = { NL_TEST_DEF("CheckCommissionManagerBasicWindowOpenClose", CheckCommissionManagerBasicWindowOpenClose),
+const nlTest sTests[] = { NL_TEST_DEF("CheckCommissionManagerEnhancedWindow", CheckCommissionManagerEnhancedWindow),
+                          NL_TEST_DEF("CheckCommissionManagerBasicWindowOpenClose", CheckCommissionManagerBasicWindowOpenClose),
                           NL_TEST_DEF("CheckCommissionManagerWindowTimeout", CheckCommissionManagerWindowTimeout),
-                          NL_TEST_DEF("CheckCommissionManagerEnhancedWindow", CheckCommissionManagerEnhancedWindow),
                           NL_TEST_SENTINEL() };
 
 } // namespace
