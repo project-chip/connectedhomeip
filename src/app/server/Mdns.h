@@ -19,45 +19,100 @@
 
 #include <core/CHIPError.h>
 #include <mdns/Advertiser.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <stddef.h>
+#include <system/TimeSource.h>
 
 namespace chip {
 namespace app {
-namespace Mdns {
 
-/// Sets the secure Matter port
-void SetSecuredPort(uint16_t port);
+#define TIMEOUT_CLEARED 0
+class DLL_EXPORT MdnsServer
+{
+public:
+    /// Provides the system-wide implementation of the service advertiser
+    static MdnsServer & Instance()
+    {
+        static MdnsServer instance;
+        return instance;
+    }
 
-/// Gets the secure Matter port
-uint16_t GetSecuredPort();
+    /// Sets the secure Matter port
+    void SetSecuredPort(uint16_t port) { mSecuredPort = port; }
 
-/// Sets the unsecure Matter port
-void SetUnsecuredPort(uint16_t port);
+    /// Gets the secure Matter port
+    uint16_t GetSecuredPort() { return mSecuredPort; }
 
-/// Gets the unsecure Matter port
-uint16_t GetUnsecuredPort();
+    /// Sets the unsecure Matter port
+    void SetUnsecuredPort(uint16_t port) { mUnsecuredPort = port; }
 
-/// Sets the factory-new state commissionable node discovery timeout
-void SetDiscoveryTimeoutSecs(int16_t secs);
+    /// Gets the unsecure Matter port
+    uint16_t GetUnsecuredPort() { return mUnsecuredPort; }
+
+    /// Sets the factory-new state commissionable node discovery timeout
+    void SetDiscoveryTimeoutSecs(int16_t secs) { mDiscoveryTimeoutSecs = secs; }
+
+    /// Gets the factory-new state commissionable node discovery timeout
+    int16_t GetDiscoveryTimeoutSecs() { return mDiscoveryTimeoutSecs; }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-/// Sets the extended discovery timeout
-void SetExtendedDiscoveryTimeoutSecs(int16_t secs);
+    /// Sets the extended discovery timeout. Value will be persisted across reboots
+    void SetExtendedDiscoveryTimeoutSecs(int16_t secs);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
-/// Start operational advertising
-CHIP_ERROR AdvertiseOperational();
+    /// Start operational advertising
+    CHIP_ERROR AdvertiseOperational();
 
-/// (Re-)starts the minmdns server
-/// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
-/// - if device has been commissioned, then commissioning mode will reflect the state of mode argument
-void StartServer(chip::Mdns::CommissioningMode mode = chip::Mdns::CommissioningMode::kDisabled);
+    /// (Re-)starts the minmdns server
+    /// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
+    /// - if device has been commissioned, then commissioning mode will reflect the state of mode argument
+    void StartServer(chip::Mdns::CommissioningMode mode = chip::Mdns::CommissioningMode::kDisabled);
 
-CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
+    CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
-/// Generates the (random) instance name that a CHIP device is to use for pre-commissioning DNS-SD
-CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen);
+    /// Generates the (random) instance name that a CHIP device is to use for pre-commissioning DNS-SD
+    CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen);
 
-} // namespace Mdns
+    /// Callback from Discovery Expiration timer
+    void OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    /// Callback from Extended Discovery Expiration timer
+    void OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
+private:
+    CHIP_ERROR Advertise(bool commissionableNode, chip::Mdns::CommissioningMode mode);
+    CHIP_ERROR AdvertiseCommissioner();
+    CHIP_ERROR AdvertiseCommissionableNode(chip::Mdns::CommissioningMode mode);
+
+    Time::TimeSource<Time::Source::kSystem> mTimeSource;
+
+    void ClearTimeouts()
+    {
+        mDiscoveryExpirationMs = TIMEOUT_CLEARED;
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+        mExtendedDiscoveryExpirationMs = TIMEOUT_CLEARED;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    }
+
+    uint16_t mSecuredPort   = CHIP_PORT;
+    uint16_t mUnsecuredPort = CHIP_UDC_PORT;
+
+    /// schedule next discovery expiration
+    CHIP_ERROR ScheduleDiscoveryExpiration();
+    int16_t mDiscoveryTimeoutSecs   = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
+    uint64_t mDiscoveryExpirationMs = TIMEOUT_CLEARED;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    /// get the current extended discovery timeout (from persistent storage)
+    int16_t GetExtendedDiscoveryTimeoutSecs();
+
+    /// schedule next extended discovery expiration
+    CHIP_ERROR ScheduleExtendedDiscoveryExpiration();
+
+    uint64_t mExtendedDiscoveryExpirationMs = TIMEOUT_CLEARED;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+};
+
 } // namespace app
 } // namespace chip

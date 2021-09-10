@@ -56,11 +56,11 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
                          event->CommissioningComplete.status.Format());
         }
         // reset all advertising
-        app::Mdns::StartServer(Mdns::CommissioningMode::kDisabled);
+        app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kDisabled);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
-        app::Mdns::AdvertiseOperational();
+        app::MdnsServer::Instance().AdvertiseOperational();
         ChipLogError(Discovery, "Operational advertising enabled");
 #if CONFIG_NETWORK_LAYER_BLE
         // Close all BLE connections now since the operational network is available.
@@ -105,8 +105,8 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
     // reset all advertising, indicating we are in commissioningMode
     // and we were put into this state via a command for additional commissioning
     // NOTE: when device has never been commissioned, Rendezvous will ensure AP is false
-    app::Mdns::StartServer(params.HasPASEVerifier() ? Mdns::CommissioningMode::kEnabledBasic
-                                                    : Mdns::CommissioningMode::kEnabledEnhanced);
+    app::MdnsServer::Instance().StartServer(params.HasPASEVerifier() ? Mdns::CommissioningMode::kEnabledBasic
+                                                                     : Mdns::CommissioningMode::kEnabledEnhanced);
 
     mSessionMgr      = sessionMgr;
     mExchangeManager = exchangeManager;
@@ -143,7 +143,7 @@ void RendezvousServer::Cleanup()
     }
 
     // reset all advertising
-    app::Mdns::StartServer(Mdns::CommissioningMode::kDisabled);
+    app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kDisabled);
 }
 
 void RendezvousServer::OnSessionEstablishmentError(CHIP_ERROR err)

@@ -419,13 +419,13 @@ void InitServer(AppDelegate * delegate)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    app::Mdns::SetSecuredPort(gSecuredServicePort);
-    app::Mdns::SetUnsecuredPort(gUnsecuredServicePort);
+    app::MdnsServer::Instance().SetSecuredPort(gSecuredServicePort);
+    app::MdnsServer::Instance().SetUnsecuredPort(gUnsecuredServicePort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED
     // StartServer only enables commissioning mode if device has not been commissioned
-    app::Mdns::StartServer();
+    app::MdnsServer::Instance().StartServer();
 #endif
 
     gCallbacks.SetSessionMgr(&gSessions);
@@ -464,7 +464,7 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress com
 
     CHIP_ERROR err;
     char nameBuffer[chip::Mdns::kMaxInstanceNameSize + 1];
-    err = app::Mdns::GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
+    err = app::MdnsServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to get mdns instance name error: %s", ErrorStr(err));

@@ -100,7 +100,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
     {
         char * eptr;
         int16_t timeout = (int16_t) strtol(argv[1], &eptr, 10);
-        chip::app::Mdns::SetDiscoveryTimeoutSecs(timeout);
+        chip::app::MdnsServer::Instance().SetDiscoveryTimeoutSecs(timeout);
         return CHIP_NO_ERROR;
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -108,7 +108,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
     {
         char * eptr;
         int16_t timeout = (int16_t) strtol(argv[1], &eptr, 10);
-        chip::app::Mdns::SetExtendedDiscoveryTimeoutSecs(timeout);
+        chip::app::MdnsServer::Instance().SetExtendedDiscoveryTimeoutSecs(timeout);
         return CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -120,17 +120,17 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         }
         if (strcmp(argv[1], "disabled") == 0)
         {
-            chip::app::Mdns::StartServer(chip::Mdns::CommissioningMode::kDisabled);
+            chip::app::MdnsServer::Instance().StartServer(chip::Mdns::CommissioningMode::kDisabled);
             return CHIP_NO_ERROR;
         }
         if (strcmp(argv[1], "enabled_basic") == 0)
         {
-            chip::app::Mdns::StartServer(chip::Mdns::CommissioningMode::kEnabledBasic);
+            chip::app::MdnsServer::Instance().StartServer(chip::Mdns::CommissioningMode::kEnabledBasic);
             return CHIP_NO_ERROR;
         }
         else if (strcmp(argv[1], "enabled_enhanced") == 0)
         {
-            chip::app::Mdns::StartServer(chip::Mdns::CommissioningMode::kEnabledEnhanced);
+            chip::app::MdnsServer::Instance().StartServer(chip::Mdns::CommissioningMode::kEnabledEnhanced);
             return CHIP_NO_ERROR;
         }
         return PrintAllCommands();
