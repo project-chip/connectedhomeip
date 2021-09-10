@@ -273,6 +273,21 @@ int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
         self->RemoveDevice(bluez_object_get_device1(&object));
     }
 
+    /* Search for LE only: Advertises */
+    GVariantBuilder filterBuilder;
+    GVariant * filter;
+
+    g_variant_builder_init(&filterBuilder, G_VARIANT_TYPE("a{sv}"));
+    g_variant_builder_add(&filterBuilder, "{sv}", "Transport", g_variant_new_string("le"));
+    filter = g_variant_builder_end(&filterBuilder);
+
+    if (!bluez_adapter1_call_set_discovery_filter_sync(self->mAdapter, filter, self->mCancellable, &error))
+    {
+        /* Not critical: ignore if fails */
+        ChipLogError(Ble, "Failed to set discovery filters: %s", error->message);
+        g_error_free(error);
+    }
+
     ChipLogProgress(Ble, "BLE initiating scan.");
     if (!bluez_adapter1_call_start_discovery_sync(self->mAdapter, self->mCancellable, &error))
     {
