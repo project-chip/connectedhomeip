@@ -23,9 +23,9 @@
 
 #include "ManualSetupPayloadParser.h"
 
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
-#include <support/verhoeff/Verhoeff.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/verhoeff/Verhoeff.h>
 
 #include <math.h>
 #include <string>

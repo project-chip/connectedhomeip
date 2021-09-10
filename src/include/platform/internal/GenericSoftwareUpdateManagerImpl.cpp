@@ -27,18 +27,18 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/PlatformManager.h>
 #include <platform/SoftwareUpdateManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericSoftwareUpdateManagerImpl.h>
 
-#include <support/FibonacciUtils.h>
-#include <support/RandUtils.h>
+#include <lib/support/FibonacciUtils.h>
+#include <lib/support/RandUtils.h>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -265,7 +265,7 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_CheckNow(void)
         if (mState == SoftwareUpdateManager::kState_ScheduledHoldoff)
         {
             // Cancel scheduled hold off and trigger software update prepare.
-            SystemLayer.CancelTimer(HandleHoldOffTimerExpired, NULL);
+            DeviceLayer::SystemLayer().CancelTimer(HandleHoldOffTimerExpired, NULL);
         }
 
         {
@@ -633,7 +633,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DriveState(SoftwareUpdateManag
             if (timeToNextQueryMS)
             {
                 mState = SoftwareUpdateManager::kState_ScheduledHoldoff;
-                SystemLayer.StartTimer(timeToNextQueryMS, HandleHoldOffTimerExpired, NULL);
+                DeviceLayer::SystemLayer().StartTimer(timeToNextQueryMS, HandleHoldOffTimerExpired, NULL);
             }
         }
     }

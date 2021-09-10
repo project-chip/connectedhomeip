@@ -30,13 +30,13 @@
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
+#include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMessageDispatch.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
-#include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PairingSession.h>
 #include <transport/SecureSession.h>
@@ -89,6 +89,10 @@ public:
     PASESession & operator=(PASESession &&) = default;
 
     virtual ~PASESession();
+
+    // TODO: The SetPeerNodeId method should not be exposed; we should not need
+    // to associate a node ID with a PASE session.
+    using PairingSession::SetPeerNodeId;
 
     /**
      * @brief
@@ -212,12 +216,11 @@ public:
      *         object ensures that the exchange will be closed on completion of the handshake.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override;
 
     /**
      * @brief
@@ -243,8 +246,8 @@ private:
 
     CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
-    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PacketHeader & packetHeader,
-                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg);
+    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
+                                       System::PacketBufferHandle && msg);
 
     static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt,
                                           PASEVerifier & verifier);

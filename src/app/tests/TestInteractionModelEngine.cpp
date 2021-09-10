@@ -23,18 +23,19 @@
  */
 
 #include <app/InteractionModelEngine.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVDebug.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <system/SystemLayerImpl.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
@@ -43,7 +44,7 @@
 #include <nlunit-test.h>
 
 namespace {
-static chip::System::Layer gSystemLayer;
+static chip::System::LayerImpl gSystemLayer;
 static chip::SecureSessionMgr gSessionManager;
 static chip::Messaging::ExchangeManager gExchangeManager;
 static chip::secure_channel::MessageCounterManager gMessageCounterManager;

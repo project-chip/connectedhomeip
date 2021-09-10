@@ -23,14 +23,14 @@
 
 #include "TestMessagingLayer.h"
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/Protocols.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -64,7 +64,7 @@ Test::IOContext gIOContext;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
@@ -79,7 +79,7 @@ public:
 class WaitForTimeoutDelegate : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
         return CHIP_NO_ERROR;

@@ -23,11 +23,11 @@
 #include <app/clusters/ota-provider/ota-provider.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
-#include <core/CHIPError.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/RandUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
@@ -139,7 +139,7 @@ int main(int argc, char * argv[])
 
     BitFlags<TransferControlFlags> bdxFlags;
     bdxFlags.Set(TransferControlFlags::kReceiverDrive);
-    err = bdxServer.PrepareForTransfer(&chip::DeviceLayer::SystemLayer, chip::bdx::TransferRole::kSender, bdxFlags,
+    err = bdxServer.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
                                        kMaxBdxBlockSize, kBdxTimeoutMs, kBdxPollFreqMs);
     if (err != CHIP_NO_ERROR)
     {

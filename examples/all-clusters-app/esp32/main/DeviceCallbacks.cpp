@@ -37,7 +37,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/mdns/Advertiser.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 static const char * TAG = "app-devicecallbacks";
 
@@ -60,6 +60,19 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     case DeviceEventType::kSessionEstablished:
         OnSessionEstablished(event);
         break;
+
+    case DeviceEventType::kCHIPoBLEConnectionEstablished:
+        ESP_LOGI(TAG, "CHIPoBLE connection established");
+        break;
+
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        ESP_LOGI(TAG, "CHIPoBLE disconnected");
+        break;
+
+    case DeviceEventType::kCommissioningComplete:
+        ESP_LOGI(TAG, "Commissioning complete");
+        break;
+
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
             (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
@@ -204,7 +217,7 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState)
 
     if (identifyTimerCount)
     {
-        SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
+        systemLayer->StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
         // Decrement the timer count.
         identifyTimerCount--;
     }
@@ -222,8 +235,8 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointI
     // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
     identifyTimerCount = (*value) * 4;
 
-    SystemLayer.CancelTimer(IdentifyTimerHandler, this);
-    SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, this);
+    DeviceLayer::SystemLayer().CancelTimer(IdentifyTimerHandler, this);
+    DeviceLayer::SystemLayer().StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, this);
 
 exit:
     return;

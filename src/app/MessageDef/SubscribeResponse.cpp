@@ -112,7 +112,6 @@ SubscribeResponse::Builder & SubscribeResponse::Builder::SubscriptionId(const ui
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_SubscriptionId), aSubscribeId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -122,7 +121,6 @@ SubscribeResponse::Builder & SubscribeResponse::Builder::FinalSyncIntervalSecond
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_FinalSyncIntervalSeconds), aFinalSyncIntervalSeconds);
-        ChipLogFunctError(mError);
     }
     return *this;
 }

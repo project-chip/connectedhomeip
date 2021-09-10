@@ -249,6 +249,9 @@ private:
     static void blekw_stop_connection_timeout(void);
 
     static void bleAppTask(void * p_arg);
+
+public:
+    static bool blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
 };
 
 /**

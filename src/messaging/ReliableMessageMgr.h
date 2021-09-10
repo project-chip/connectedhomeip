@@ -29,9 +29,9 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 
-#include <core/CHIPError.h>
-#include <support/BitFlags.h>
-#include <support/Pool.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/Pool.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>

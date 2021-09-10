@@ -24,8 +24,8 @@
 #include <cstdlib>
 #include <new>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
@@ -37,6 +37,10 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD
+#define CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD "dhclient -nw %s"
 #endif
 
 using namespace ::chip;
@@ -400,7 +404,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
         ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
         mWiFiAPMode = val;
 
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 
 exit:
@@ -413,7 +417,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP()
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand start WiFi AP");
         mLastAPDemandTime = System::Clock::GetMonotonicMilliseconds();
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
     {
@@ -427,7 +431,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP");
         mLastAPDemandTime = 0;
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
     {
@@ -449,7 +453,7 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
 void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
 {
     mWiFiAPIdleTimeoutMS = val;
-    SystemLayer.ScheduleWork(DriveAPState, NULL);
+    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
@@ -633,6 +637,11 @@ void ConnectivityManagerImpl::StartWiFiManagement()
                                                 kWpaSupplicantObjectPath, nullptr, _OnWpaProxyReady, nullptr);
 }
 
+bool ConnectivityManagerImpl::IsWiFiManagementStarted()
+{
+    return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
+}
+
 void ConnectivityManagerImpl::DriveAPState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -679,7 +688,7 @@ void ConnectivityManagerImpl::DriveAPState()
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
                 apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
-                err       = SystemLayer.StartTimer(apTimeout, DriveAPState, NULL);
+                err       = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
                 SuccessOrExit(err);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s", apTimeout / 1000);
             }
@@ -940,7 +949,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             // Run dhclient for IP on WiFi.
             // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
             char cmdBuffer[128];
-            sprintf(cmdBuffer, "dhclient -nw %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
+            sprintf(cmdBuffer, CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
             int dhclientSystemRet = system(cmdBuffer);
             if (dhclientSystemRet != 0)
             {

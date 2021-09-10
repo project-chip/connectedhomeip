@@ -1,5 +1,5 @@
 {
-  "featureLevel": 45,
+  "featureLevel": 51,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -3128,6 +3128,21 @@
               "reportableChange": 0
             },
             {
+              "name": "TrustedRootCertificates",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -5475,6 +5490,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 259
     }
-  ],
-  "log": []
+  ]
 }

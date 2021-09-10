@@ -22,8 +22,8 @@
  *
  */
 
-#include <support/SafeString.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/SafeString.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

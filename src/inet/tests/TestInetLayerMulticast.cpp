@@ -41,7 +41,7 @@
 
 #include <inet/IPAddress.h>
 #include <inet/InetArgParser.h>
-#include <support/CHIPArgParser.hpp>
+#include <lib/support/CHIPArgParser.hpp>
 
 #include "TestInetCommon.h"
 #include "TestInetCommonOptions.h"

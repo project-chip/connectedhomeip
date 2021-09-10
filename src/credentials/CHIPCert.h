@@ -27,16 +27,17 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string.h>
 
-#include <asn1/ASN1.h>
-#include <core/CHIPConfig.h>
-#include <core/CHIPTLV.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/asn1/ASN1.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/core/PeerId.h>
-#include <support/BitFlags.h>
-#include <support/DLLUtil.h>
-#include <support/Span.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace Credentials {

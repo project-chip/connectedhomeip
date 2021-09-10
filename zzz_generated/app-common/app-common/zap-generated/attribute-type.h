@@ -61,6 +61,8 @@ enum
     ZCL_EPOCH_US_ATTRIBUTE_TYPE          = 0xE3, // Epoch Microseconds
     ZCL_EPOCH_S_ATTRIBUTE_TYPE           = 0xE4, // Epoch Seconds
     ZCL_SYSTIME_US_ATTRIBUTE_TYPE        = 0xE5, // System Time Microseconds
+    ZCL_PERCENT_ATTRIBUTE_TYPE           = 0xE6, // Percentage units 1%
+    ZCL_PERCENT100THS_ATTRIBUTE_TYPE     = 0xE7, // Percentage units 0.01%
     ZCL_CLUSTER_ID_ATTRIBUTE_TYPE        = 0xE8, // Cluster ID
     ZCL_ATTRIB_ID_ATTRIBUTE_TYPE         = 0xE9, // Attribute ID
     ZCL_FIELD_ID_ATTRIBUTE_TYPE          = 0xEA, // Field ID

@@ -24,7 +24,7 @@
 
 #include <app/CommandHandler.h>
 #include <app/util/binding-table.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 

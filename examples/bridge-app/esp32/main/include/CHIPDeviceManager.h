@@ -24,11 +24,11 @@
  *      activities within the CHIP stack. This is a singleton object.
  */
 
-#include <core/CHIPCore.h>
-#include <core/CHIPError.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #include <stdarg.h>
 #include <stdlib.h>

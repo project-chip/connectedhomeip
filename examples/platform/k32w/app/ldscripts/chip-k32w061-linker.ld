@@ -81,6 +81,8 @@ __ram_vector_table__      = 1;
 vector_table_size         = 0x120;
 M_VECTOR_RAM_SIZE         = DEFINED(__ram_vector_table__) ? vector_table_size : 0x0;
 
+__base_RAM0               = 0x4000400;
+
 ENTRY(ResetISR)
 
 SECTIONS
@@ -298,6 +300,10 @@ SECTIONS
         _end_noinit = .;
     } > RAM0
 
+    /* end of firmware RAM to be retained in power down mode */
+    _end_fw_retention = .;
+
+    /* non retained RAM section */
     /* stack for rom boot during warm resume */
     .boot_resume_stack (NOLOAD): ALIGN(4)
     {
@@ -318,6 +324,8 @@ SECTIONS
     PROVIDE(pmc_reset_get_cause = 0x030046e9);
     PROVIDE(psector_ReadIeee802_15_4_MacId1 = 0x030053b1);
     PROVIDE(Chip_LOWPOWER_ChipSoftwareReset = 0x03003fa1);
+    PROVIDE(_pvHeapStart = _heap);
+    PROVIDE(_pvHeapLimit = _pvHeapStart + (HEAP_SIZE));
 
     __StackLimit = _vStackTop - STACK_SIZE;
    ASSERT (LENGTH(Flash640) >= (_etext + SIZEOF(.data)), "Application does not fit into flash!")

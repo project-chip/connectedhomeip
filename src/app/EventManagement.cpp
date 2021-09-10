@@ -18,12 +18,12 @@
 
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <core/CHIPEventLoggingConfig.h>
-#include <core/CHIPTLVUtilities.hpp>
 #include <inttypes.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPEventLoggingConfig.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::TLV;
 
@@ -268,7 +268,6 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace)
     mpEventBuffer->mAppData               = nullptr;
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -483,7 +482,6 @@ CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOpt
         err = LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
     }
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -555,7 +553,6 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
     mBytesWritten += writer.GetLengthWritten();
 
 exit:
-    ChipLogFunctError(err);
     if (err != CHIP_NO_ERROR)
     {
         *mpEventBuffer = checkpoint;
@@ -609,7 +606,6 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
     SuccessOrExit(err);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -915,7 +911,6 @@ CHIP_ERROR CircularEventBufferWrapper::GetNextBuffer(TLVReader & aReader, const 
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 } // namespace app

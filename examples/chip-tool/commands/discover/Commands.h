@@ -22,7 +22,7 @@
 #include "DiscoverCommissionablesCommand.h"
 #include "DiscoverCommissionersCommand.h"
 #include <controller/DeviceAddressUpdateDelegate.h>
-#include <mdns/Resolver.h>
+#include <lib/mdns/Resolver.h>
 
 constexpr uint16_t kMdnsPort = 5353;
 

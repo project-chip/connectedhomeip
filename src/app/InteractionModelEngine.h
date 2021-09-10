@@ -26,15 +26,15 @@
 #pragma once
 
 #include <app/MessageDef/ReportData.h>
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <app/ClusterInfo.h>
@@ -53,7 +53,6 @@ namespace chip {
 namespace app {
 
 static constexpr size_t kMaxSecureSduLengthBytes = 1024;
-static constexpr FieldId kRootFieldId            = 0;
 
 /**
  * @class InteractionModelEngine
@@ -104,16 +103,13 @@ public:
     CHIP_ERROR NewCommandSender(CommandSender ** const apCommandSender);
 
     /**
-     *  Creates a new read client and send ReadRequest message to the node using the read client. User should use this method since
-     * it takes care of the life cycle of ReadClient.
+     *  Creates a new read client and send ReadRequest message to the node using the read client,
+     *  shutdown if fail to send it out
      *
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
-                               EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
-                               AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                               EventNumber aEventNumber, uint64_t aAppIdentifier = 0);
+    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
 
     /**
      *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
@@ -148,33 +144,31 @@ public:
 
 private:
     friend class reporting::Engine;
-    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                      System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload);
     void OnResponseTimeout(Messaging::ExchangeContext * ec);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
      * the Read Request are handled entirely within this function.
      */
-    CHIP_ERROR OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                             const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                    System::PacketBufferHandle && aPayload);
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
      * the Write Request are handled entirely within this function.
      */
-    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                              const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                              System::PacketBufferHandle && aPayload);
 
     /**
      *  Retrieve a ReadClient that the SDK consumer can use to send do a read.  If the call succeeds, the consumer
      *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
-     *
-     *  @param[out]    apReadClient    A pointer to the ReadClient object.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.

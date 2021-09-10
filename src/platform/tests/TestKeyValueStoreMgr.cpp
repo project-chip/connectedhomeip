@@ -24,8 +24,8 @@
 
 #include <nlunit-test.h>
 
-#include <support/CHIPMem.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>

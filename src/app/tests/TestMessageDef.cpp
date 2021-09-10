@@ -33,10 +33,10 @@
 #include <app/MessageDef/TimedRequest.h>
 #include <app/MessageDef/WriteRequest.h>
 #include <app/MessageDef/WriteResponse.h>
-#include <core/CHIPError.h>
-#include <core/CHIPTLVDebug.hpp>
-#include <support/CHIPMem.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include <nlunit-test.h>

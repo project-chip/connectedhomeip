@@ -24,18 +24,18 @@
 #include <errno.h>
 #include <nlunit-test.h>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <stdarg.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ScopedBuffer.h>
-#include <support/UnitTestRegistration.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
@@ -349,7 +349,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     SessionIDAllocator idAllocator;
 
     NL_TEST_ASSERT(inSuite,
-                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &gTransportMgr,
+                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &gTransportMgr, nullptr,
                                                                 &ctx.GetSecureSessionManager(), &gDeviceFabrics,
                                                                 &idAllocator) == CHIP_NO_ERROR);
 

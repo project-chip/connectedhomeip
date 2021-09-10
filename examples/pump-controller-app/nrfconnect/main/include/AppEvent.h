@@ -29,7 +29,7 @@ struct AppEvent
     {
         kEventType_Button = 0,
         kEventType_Timer,
-        kEventType_Lock,
+        kEventType_Start,
         kEventType_Install,
 #ifdef CONFIG_MCUMGR_SMP_BT
         kEventType_StartSMPAdvertising,
@@ -53,7 +53,7 @@ struct AppEvent
         {
             uint8_t Action;
             int32_t Actor;
-        } LockEvent;
+        } StartEvent;
     };
 
     EventHandler Handler;

@@ -26,6 +26,21 @@
     ],
     "templates": [
         {
+            "path": "CHIPCallbackBridge_internal.zapt",
+            "name": "Objc CHIPCallbackBridge Internal header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCallbackBridge_internal.h"
+        },
+        {
+            "path": "CHIPCallbackBridge-src.zapt",
+            "name": "Objc CHIPCallbackBridge",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPCallbackBridge.mm"
+        },
+        {
+            "path": "CHIPClustersObjc_internal.zapt",
+            "name": "Objc ZCL API Internal Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc_internal.h"
+        },
+        {
             "path": "CHIPClustersObjc.zapt",
             "name": "Objc ZCL API Header",
             "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc.h"

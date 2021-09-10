@@ -20,10 +20,12 @@ function asBasicType(type)
   switch (type) {
   case 'chip::ActionId':
   case 'chip::FabricIndex':
+  case 'chip::Percent':
     return 'uint8_t';
   case 'chip::EndpointId':
   case 'chip::GroupId':
   case 'chip::VendorId':
+  case 'chip::Percent100ths':
     return 'uint16_t';
   case 'chip::ClusterId':
   case 'chip::AttributeId':

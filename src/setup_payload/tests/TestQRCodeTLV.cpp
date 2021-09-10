@@ -19,7 +19,7 @@
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
-#include <support/UnitTestRegistration.h>
+#include <lib/support/UnitTestRegistration.h>
 
 using namespace chip;
 using namespace std;

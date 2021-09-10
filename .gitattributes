@@ -3,9 +3,6 @@
 # Same for files in zap-generated folders
 **/zap-generated/** linguist-generated
 # And some specific generated files
-examples/chip-tool/commands/clusters/Commands.h  linguist-generated
-examples/chip-tool/commands/reporting/Commands.h linguist-generated
-examples/chip-tool/commands/tests/Commands.h linguist-generated
 src/controller/python/chip/clusters/CHIPClusters.cpp linguist-generated
 src/controller/python/chip/clusters/CHIPClusters.py linguist-generated
 src/darwin/Framework/CHIPTests/CHIPClustersTests.m linguist-generated

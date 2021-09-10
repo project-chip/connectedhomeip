@@ -21,7 +21,7 @@
  */
 
 #include "AppConfig.h"
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "LightingManager.h"
 
@@ -70,10 +70,6 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
                         ChipLogValueMEI(attributeId), type, *value, size);
 
         // WIP Apply attribute change to Light
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Unknown Cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
     }
 }
 

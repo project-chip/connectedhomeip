@@ -46,11 +46,11 @@
 
 using namespace chip;
 
-EmberAfTvChannelInfo tvChannelClusterChangeChannel(std::string match);
+TvChannelInfo tvChannelClusterChangeChannel(std::string match);
 bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumer, uint16_t minorNumber);
 bool tvChannelClusterSkipChannel(uint16_t count);
 
-void sendResponse(app::CommandHandler * command, EmberAfTvChannelInfo channelInfo)
+void sendResponse(app::CommandHandler * command, TvChannelInfo channelInfo)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
     app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TV_CHANNEL_CLUSTER_ID,
@@ -75,7 +75,7 @@ bool emberAfTvChannelClusterChangeChannelCallback(EndpointId endpoint, app::Comm
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string matchString(reinterpret_cast<char *>(match));
     // TODO: Enable this once struct as param is supported
-    // EmberAfTvChannelInfo channelInfo = tvChannelClusterChangeChannel(matchString);
+    // TvChannelInfo channelInfo = tvChannelClusterChangeChannel(matchString);
     // sendResponse(command, channelInfo);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     return true;

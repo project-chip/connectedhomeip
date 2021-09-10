@@ -28,14 +28,14 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include <core/CHIPEncoding.h>
-#include <core/CHIPSafeCasts.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
-#include <support/TypeTraits.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -358,15 +358,15 @@ CHIP_ERROR CASESession::SendSigmaR1()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle && msg)
 {
-    ReturnErrorOnFailure(HandleSigmaR1(msg));
+    ReturnErrorOnFailure(HandleSigmaR1(std::move(msg)));
     ReturnErrorOnFailure(SendSigmaR2());
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
@@ -588,15 +588,15 @@ exit:
     return err;
 }
 
-CHIP_ERROR CASESession::HandleSigmaR2_and_SendSigmaR3(System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR2_and_SendSigmaR3(System::PacketBufferHandle && msg)
 {
-    ReturnErrorOnFailure(HandleSigmaR2(msg));
+    ReturnErrorOnFailure(HandleSigmaR2(std::move(msg)));
     ReturnErrorOnFailure(SendSigmaR3());
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
@@ -890,7 +890,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     MutableByteSpan messageDigestSpan(mMessageDigest);
@@ -1184,8 +1184,8 @@ CHIP_ERROR CASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
     return err;
 }
 
-CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const PacketHeader & packetHeader,
-                                                const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                                System::PacketBufferHandle & msg)
 {
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1213,10 +1213,10 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader,
-                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
+CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                          System::PacketBufferHandle && msg)
 {
-    CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, msg);
+    CHIP_ERROR err = ValidateReceivedMessage(ec, payloadHeader, msg);
     SuccessOrExit(err);
 
     SetPeerAddress(mMessageDispatch.GetPeerAddress());
@@ -1224,19 +1224,19 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHead
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {
     case Protocols::SecureChannel::MsgType::CASE_SigmaR1:
-        err = HandleSigmaR1_and_SendSigmaR2(msg);
+        err = HandleSigmaR1_and_SendSigmaR2(std::move(msg));
         break;
 
     case Protocols::SecureChannel::MsgType::CASE_SigmaR2:
-        err = HandleSigmaR2_and_SendSigmaR3(msg);
+        err = HandleSigmaR2_and_SendSigmaR3(std::move(msg));
         break;
 
     case Protocols::SecureChannel::MsgType::CASE_SigmaR3:
-        err = HandleSigmaR3(msg);
+        err = HandleSigmaR3(std::move(msg));
         break;
 
     case Protocols::SecureChannel::MsgType::CASE_SigmaErr:
-        err = HandleErrorMsg(msg);
+        err = HandleErrorMsg(std::move(msg));
         break;
 
     default:

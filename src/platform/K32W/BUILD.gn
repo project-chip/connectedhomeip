@@ -53,8 +53,6 @@ static_library("K32W") {
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (chip_enable_openthread) {
-    public_deps += [ "${openthread_root}:libopenthread-ftd" ]
-
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
       "ThreadStackManagerImpl.cpp",

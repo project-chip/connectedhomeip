@@ -28,9 +28,9 @@
 #include <app/server/Server.h>
 #include <app/util/af-enums.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/CodeUtils.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000

@@ -24,10 +24,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <new>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
 
 #include <cassert>
 #include <type_traits>
@@ -75,7 +75,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
 
-    err = BleLayer::Init(this, this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
@@ -715,7 +715,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 void BLEManagerImpl::CleanScanConfig()
 {
     if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
-        DeviceLayer::SystemLayer.CancelTimer(HandleConnectTimeout, mpEndpoint);
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimeout, mpEndpoint);
 
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
 }
@@ -803,7 +803,7 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
     }
 
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
-    DeviceLayer::SystemLayer.StartTimer(kConnectTimeoutMs, HandleConnectTimeout, mpEndpoint);
+    DeviceLayer::SystemLayer().StartTimer(kConnectTimeoutMs, HandleConnectTimeout, mpEndpoint);
     mDeviceScanner->StopScan();
 
     ConnectDevice(device, mpEndpoint);

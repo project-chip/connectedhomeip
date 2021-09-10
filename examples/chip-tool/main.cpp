@@ -18,12 +18,13 @@
 
 #include "commands/common/Commands.h"
 
-#include "commands/clusters/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
-#include "commands/reporting/Commands.h"
-#include "commands/tests/Commands.h"
+
+#include <zap-generated/cluster/Commands.h>
+#include <zap-generated/reporting/Commands.h>
+#include <zap-generated/test/Commands.h>
 
 // ================================================================================
 // Main Code

@@ -2,7 +2,7 @@
 
 #include <platform/logging/LogV.h>
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

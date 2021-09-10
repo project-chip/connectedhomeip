@@ -19,7 +19,7 @@
 
 #include "LightingManager.h"
 #include "qvCHIP.h"
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 // initialization values for Blue in XY color space
 constexpr XyColor_t kBlueXY = { 9830, 3932 };

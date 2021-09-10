@@ -17,10 +17,10 @@
 
 #include <protocols/secure_channel/CASEServer.h>
 
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <transport/SecureSessionMgr.h>
 
 using namespace ::chip::Inet;
@@ -30,14 +30,15 @@ using namespace ::chip::Credentials;
 namespace chip {
 
 CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                                     SecureSessionMgr * sessionMgr, Transport::FabricTable * fabrics,
-                                                     SessionIDAllocator * idAllocator)
+                                                     Ble::BleLayer * bleLayer, SecureSessionMgr * sessionMgr,
+                                                     Transport::FabricTable * fabrics, SessionIDAllocator * idAllocator)
 {
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sessionMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    mBleLayer        = bleLayer;
     mSessionMgr      = sessionMgr;
     mFabrics         = fabrics;
     mExchangeManager = exchangeManager;
@@ -61,6 +62,15 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     //        for commissioning and drop it once commissioning is complete.
     mSessionMgr->ExpireAllPairings(kUndefinedNodeId, kUndefinedFabricIndex);
 
+#if CONFIG_NETWORK_LAYER_BLE
+    // Close all BLE connections now since a CASE handshake has been initiated.
+    if (mBleLayer != nullptr)
+    {
+        ChipLogProgress(Discovery, "CASE handshake initiated, closing all BLE Connections");
+        mBleLayer->CloseAllBleConnections();
+    }
+#endif
+
     ReturnErrorOnFailure(mIDAllocator->Allocate(mSessionKeyId));
 
     // Setup CASE state machine using the credentials for the current fabric.
@@ -72,8 +82,8 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
+CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                         System::PacketBufferHandle && payload)
 {
     ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
     CHIP_ERROR err = InitCASEHandshake(ec);
@@ -84,7 +94,7 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     ChipLogProgress(Inet, "CASE Server disabling CASE session setups");
     mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1);
 
-    err = GetSession().OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
+    err = GetSession().OnMessageReceived(ec, payloadHeader, std::move(payload));
     SuccessOrExit(err);
 
 exit:

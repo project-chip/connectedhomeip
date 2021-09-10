@@ -25,20 +25,20 @@
 #include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
-#include <core/CHIPPersistentStorageDelegate.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
-#include <mdns/ServiceNaming.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/mdns/ServiceNaming.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
@@ -201,8 +201,8 @@ ServerRendezvousAdvertisementDelegate gAdvDelegate;
 class ServerCallback : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         // as soon as a client connects, assume it is connected
@@ -286,7 +286,7 @@ CHIP_ERROR OpenBasicCommissioningWindow(ResetFabrics resetFabrics, uint16_t comm
     if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
         ReturnErrorOnFailure(
-            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
+            DeviceLayer::SystemLayer().StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
     }
 
     return CHIP_NO_ERROR;
@@ -299,7 +299,12 @@ CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds,
 
     ReturnErrorOnFailure(gDeviceDiscriminatorCache.UpdateDiscriminator(discriminator));
 
-    gAdvDelegate.SetBLE(false);
+// TODO: Do not turn on BLE when opening the Enhanced Commissioning Window.
+#if CONFIG_NETWORK_LAYER_BLE
+    gAdvDelegate.SetBLE(true);
+    params.SetAdvertisementDelegate(&gAdvDelegate);
+    params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
+#endif // CONFIG_NETWORK_LAYER_BLE
     params.SetPASEVerifier(verifier).SetAdvertisementDelegate(&gAdvDelegate);
 
     ReturnErrorOnFailure(
@@ -308,7 +313,7 @@ CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds,
     if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
         ReturnErrorOnFailure(
-            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
+            DeviceLayer::SystemLayer().StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
     }
 
     return CHIP_NO_ERROR;
@@ -379,7 +384,7 @@ void InitServer(AppDelegate * delegate)
 
     SuccessOrExit(err);
 
-    err = gSessions.Init(&DeviceLayer::SystemLayer, &gTransports, &gFabrics, &gMessageCounterManager);
+    err = gSessions.Init(&DeviceLayer::SystemLayer(), &gTransports, &gFabrics, &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeMgr.Init(&gSessions);
@@ -433,8 +438,8 @@ void InitServer(AppDelegate * delegate)
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
     SuccessOrExit(err);
 
-    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalFabricTable(),
-                                                    &gSessionIDAllocator);
+    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
+                                                    &gSessions, &GetGlobalFabricTable(), &gSessionIDAllocator);
     SuccessOrExit(err);
 
 exit:

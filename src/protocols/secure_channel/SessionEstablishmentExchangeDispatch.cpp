@@ -20,7 +20,7 @@
  *      This file provides implementation of Application Channel class.
  */
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 
@@ -47,15 +47,13 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SessionHand
     return mTransportMgr->SendMessage(mPeerAddress, preparedMessage.CastToWritable());
 }
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const Header::Flags & headerFlags,
-                                                                   const PayloadHeader & payloadHeader, uint32_t messageId,
+CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
                                                                    const Transport::PeerAddress & peerAddress,
                                                                    Messaging::MessageFlags msgFlags,
                                                                    ReliableMessageContext * reliableMessageContext)
 {
     mPeerAddress = peerAddress;
-    return ExchangeMessageDispatch::OnMessageReceived(headerFlags, payloadHeader, messageId, peerAddress, msgFlags,
-                                                      reliableMessageContext);
+    return ExchangeMessageDispatch::OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, reliableMessageContext);
 }
 
 bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)

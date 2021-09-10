@@ -20,7 +20,7 @@
 #include <errno.h>
 #include <utility>
 
-#include <mdns/minimal/core/DnsHeader.h>
+#include <lib/mdns/minimal/core/DnsHeader.h>
 
 namespace mdns {
 namespace Minimal {

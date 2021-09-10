@@ -26,8 +26,8 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -91,7 +91,7 @@ EmberAfStatus writeDeviceAttribute(EndpointId endpoint, uint16_t index)
     DeviceTypeId deviceTypeId = emberAfDeviceIdFromIndex(index);
     uint16_t revision         = emberAfDeviceVersionFromIndex(index);
 
-    EmberAfDeviceType deviceType;
+    DeviceType deviceType;
     deviceType.type     = deviceTypeId;
     deviceType.revision = revision;
 

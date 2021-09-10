@@ -25,7 +25,7 @@
 #include <memory>
 
 #include <ble/CHIPBleServiceData.h>
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 #include <system/SystemLayer.h>
 

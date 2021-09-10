@@ -29,9 +29,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 extern "C" {
 #include "app_platform_cfg.h"
@@ -93,7 +93,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     CHIP_ERROR err;
 
     // Initialize the CHIP BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
     // Configure platform specific settings for Bluetooth

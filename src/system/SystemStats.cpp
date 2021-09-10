@@ -31,7 +31,7 @@
 // Include module header
 #include <system/SystemStats.h>
 
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 #include <string.h>
 

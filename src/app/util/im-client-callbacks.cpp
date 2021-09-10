@@ -26,10 +26,10 @@
 #include <app/util/af.h>
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPEncoding.h>
-#include <support/SafeInt.h>
-#include <support/TypeTraits.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/TypeTraits.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::app::List;

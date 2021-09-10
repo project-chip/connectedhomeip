@@ -28,15 +28,16 @@
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequest.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLVDebug.hpp>
+#include <app/ReadPrepareParams.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -66,22 +67,16 @@ public:
     /**
      *  Send a Read Request.  There can be one Read Request outstanding on a given ReadClient.
      *  If SendReadRequest returns success, no more Read Requests can be sent on this ReadClient
-     *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReportError
-     *  call happens with guarantee.
-     *
-     *  Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
-     *  Default timeout value will be used otherwise.
+     *  until the corresponding InteractionModelDelegate::ReadDone call happens with guarantee.
      *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * aSecureSession,
-                               EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
-                               AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                               EventNumber aEventNumber, uint32_t timeout = kImMessageTimeoutMsec);
+    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
 
     uint64_t GetAppIdentifier() const { return mAppIdentifier; }
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+    CHIP_ERROR SendStatusReport(CHIP_ERROR aError);
 
 private:
     friend class TestReadInteraction;
@@ -89,9 +84,9 @@ private:
 
     enum class ClientState
     {
-        Uninitialized = 0, ///< The client has not been initialized
-        Initialized,       ///< The client has been initialized and is ready for a SendReadRequest
-        AwaitingResponse,  ///< The client has sent out the read request message
+        Uninitialized = 0,     ///< The client has not been initialized
+        Initialized,           ///< The client has been initialized and is ready for a SendReadRequest
+        AwaitingInitialReport, ///< The client is waiting for initial report
     };
 
     /**
@@ -111,21 +106,24 @@ private:
 
     virtual ~ReadClient() = default;
 
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     /**
      *  Check if current read client is being used
      *
      */
-    bool IsFree() const { return mState == ClientState::Uninitialized; };
-
-    CHIP_ERROR GenerateEventPathList(ReadRequest::Builder & aRequest, EventPathParams * apEventPathParamsList,
-                                     size_t aEventPathParamsListSize, EventNumber & aEventNumber);
-    CHIP_ERROR GenerateAttributePathList(ReadRequest::Builder & aRequest, AttributePathParams * apAttributePathParamsList,
-                                         size_t aAttributePathParamsListSize);
+    bool IsFree() const { return mState == ClientState::Uninitialized; }
+    bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
+    CHIP_ERROR GenerateEventPathList(EventPathList::Builder & aEventPathListBuilder, EventPathParams * apEventPathParamsList,
+                                     size_t aEventPathParamsListSize);
+    CHIP_ERROR GenerateAttributePathList(AttributePathList::Builder & aAttributeathListBuilder,
+                                         AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
+
+    void SetExchangeContext(Messaging::ExchangeContext * apExchangeContext) { mpExchangeCtx = apExchangeContext; }
+    void ClearExchangeContext() { mpExchangeCtx = nullptr; }
 
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
@@ -136,13 +134,14 @@ private:
      * Internal shutdown method that we use when we know what's going on with
      * our exchange and don't need to manually close it.
      */
-    void ShutdownInternal();
-
+    void ShutdownInternal(CHIP_ERROR aError);
+    bool IsInitialReport() { return mInitialReport; }
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
     uint64_t mAppIdentifier                    = 0;
+    bool mInitialReport                        = true;
 };
 
 }; // namespace app

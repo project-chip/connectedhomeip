@@ -21,8 +21,8 @@
 #include "controller/ExampleOperationalCredentialsIssuer.h"
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
-#include <support/Span.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <atomic>
 #include <condition_variable>

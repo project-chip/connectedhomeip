@@ -19,7 +19,7 @@
 // module header, comes first
 #include <controller/CHIPCommissionableNodeController.h>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace Controller {

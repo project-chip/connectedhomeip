@@ -30,7 +30,7 @@
 
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/netif.h>

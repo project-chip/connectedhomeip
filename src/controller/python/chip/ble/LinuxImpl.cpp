@@ -1,9 +1,9 @@
 
+#include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Linux/bluez/AdapterIterator.h>
 #include <platform/Linux/bluez/MainLoop.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CHIPMem.h>
 
 using namespace chip::DeviceLayer::Internal;
 

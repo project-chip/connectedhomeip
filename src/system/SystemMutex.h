@@ -30,7 +30,7 @@
 // Include dependent headers
 #include <system/SystemError.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>

@@ -32,9 +32,9 @@
 #if CONFIG_BT_BLUEDROID_ENABLED
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"
@@ -130,7 +130,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     CHIP_ERROR err;
 
     // Initialize the Chip BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
     memset(mCons, 0, sizeof(mCons));
@@ -176,8 +176,8 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (val)
     {
         mAdvertiseStartTime = System::Clock::GetMonotonicMilliseconds();
-        ReturnErrorOnFailure(SystemLayer.StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
-        ReturnErrorOnFailure(SystemLayer.StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
     mFlags.Set(Flags::kFastAdvertisingEnabled, val);
     mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
@@ -1169,6 +1169,10 @@ void BLEManagerImpl::HandleDisconnect(esp_ble_gatts_cb_param_t * param)
             break;
         }
         PlatformMgr().PostEvent(&event);
+
+        ChipDeviceEvent disconnectEvent;
+        disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
+        PlatformMgr().PostEvent(&disconnectEvent);
 
         // Force a refresh of the advertising state.
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);

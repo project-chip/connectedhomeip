@@ -32,7 +32,7 @@
 
 using namespace chip;
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data);
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(ApplicationLauncherApp application, std::string data);
 
 bool emberAfApplicationLauncherClusterLaunchAppCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t *, uint8_t *)
 {
@@ -59,18 +59,18 @@ exit:
     }
 }
 
-EmberAfApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, uint8_t * applicationId)
+ApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, uint8_t * applicationId)
 {
-    EmberAfApplicationLauncherApp application = {};
-    application.applicationId                 = applicationId;
-    application.catalogVendorId               = catalogVendorId;
+    ApplicationLauncherApp application = {};
+    application.applicationId          = applicationId;
+    application.catalogVendorId        = catalogVendorId;
     return application;
 }
 
 bool emberAfApplicationLauncherClusterLaunchAppCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t * requestData,
                                                         uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId)
 {
-    EmberAfApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
+    ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
     // TODO: Char is not null terminated, verify this code once #7963 gets merged.
     std::string reqestDataString(reinterpret_cast<char *>(requestData));
     ApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include "lib/mdns/platform/Mdns.h"
-#include <support/CHIPMemString.h>
+#include <lib/support/CHIPMemString.h>
 
 namespace chip {
 namespace Mdns {

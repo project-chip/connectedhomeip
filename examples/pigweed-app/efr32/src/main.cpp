@@ -18,6 +18,7 @@
 #include "AppConfig.h"
 #include "LEDWidget.h"
 #include "init_efrPlatform.h"
+#include "sl_system_kernel.h"
 
 #include "pw_rpc/echo_service_nanopb.h"
 #include "pw_sys_io/sys_io.h"
@@ -64,6 +65,5 @@ int main(void)
     sStatusLED.Set(true);
 
     xTaskCreate(RunRpcService, "RPC_Task", RPC_TASK_STACK_SIZE / sizeof(StackType_t), nullptr, RPC_TASK_PRIORITY, &sRpcTaskHandle);
-
-    vTaskStartScheduler();
+    sl_system_kernel_start();
 }

@@ -24,15 +24,15 @@
 #include <errno.h>
 #include <nlunit-test.h>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/UnitTestUtils.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <stdarg.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
-#include <support/UnitTestUtils.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 using namespace chip;
@@ -86,7 +86,7 @@ public:
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
         return CHIP_NO_ERROR;

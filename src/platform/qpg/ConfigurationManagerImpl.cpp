@@ -26,15 +26,15 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
-#include <core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/qpg/qpgConfig.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 #include <platform/internal/FactoryProvisioning.cpp>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

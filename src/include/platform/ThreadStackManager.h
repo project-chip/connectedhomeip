@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <support/Span.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 

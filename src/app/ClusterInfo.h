@@ -20,9 +20,13 @@
 
 #include <app/AttributePathParams.h>
 #include <app/util/basic-types.h>
+#include <assert.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {
+static constexpr AttributeId kRootAttributeId = 0xFFFFFFFF;
+
 struct ClusterInfo
 {
     enum class Flags : uint8_t
@@ -31,6 +35,61 @@ struct ClusterInfo
         kListIndexValid = 0x02,
         kEventIdValid   = 0x03,
     };
+
+    bool IsAttributePathSupersetOf(const ClusterInfo & other) const
+    {
+        if ((other.mEndpointId != mEndpointId) || (other.mClusterId != mClusterId))
+        {
+            return false;
+        }
+
+        Optional<AttributeId> myFieldId =
+            mFlags.Has(Flags::kFieldIdValid) ? Optional<AttributeId>::Value(mFieldId) : Optional<AttributeId>::Missing();
+
+        Optional<AttributeId> otherFieldId = other.mFlags.Has(Flags::kFieldIdValid) ? Optional<AttributeId>::Value(other.mFieldId)
+                                                                                    : Optional<AttributeId>::Missing();
+
+        Optional<ListIndex> myListIndex =
+            mFlags.Has(Flags::kListIndexValid) ? Optional<ListIndex>::Value(mListIndex) : Optional<ListIndex>::Missing();
+
+        Optional<ListIndex> otherListIndex = other.mFlags.Has(Flags::kListIndexValid) ? Optional<ListIndex>::Value(other.mListIndex)
+                                                                                      : Optional<ListIndex>::Missing();
+
+        // If list index exists, field index must exist
+        // Field 0xFFFFFFF (any) &  listindex set is invalid
+        assert(!(myListIndex.HasValue() && !myFieldId.HasValue()));
+        assert(!(otherListIndex.HasValue() && !otherFieldId.HasValue()));
+        assert(!(myFieldId == Optional<AttributeId>::Value(kRootAttributeId) && myListIndex.HasValue()));
+        assert(!(otherFieldId == Optional<AttributeId>::Value(kRootAttributeId) && otherListIndex.HasValue()));
+
+        if (myFieldId == Optional<AttributeId>::Value(kRootAttributeId))
+        {
+            return true;
+        }
+
+        if (myFieldId != otherFieldId)
+        {
+            return false;
+        }
+
+        // We only support top layer for attribute representation, either FieldId or FieldId + ListIndex
+        // Combination: if myFieldId == otherFieldId, ListIndex cannot exist without FieldId
+        // 1. myListIndex and otherListIndex both missing or both exactly the same, then current is superset of other
+        // 2. myListIndex is missing, no matter if otherListIndex is missing or not, then current is superset of other
+        if (myListIndex == otherListIndex)
+        {
+            // either both missing or both exactly the same
+            return true;
+        }
+
+        if (!myListIndex.HasValue())
+        {
+            // difference is ok only if myListIndex is missing
+            return true;
+        }
+
+        return false;
+    }
 
     ClusterInfo() {}
     bool IsDirty() { return mDirty; }

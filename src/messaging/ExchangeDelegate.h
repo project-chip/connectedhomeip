@@ -23,9 +23,9 @@
 
 #pragma once
 
+#include <lib/support/CHIPMem.h>
 #include <messaging/ApplicationExchangeDispatch.h>
 #include <messaging/ExchangeMessageDispatch.h>
-#include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -63,12 +63,11 @@ public:
      *   to the exchange.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
-    virtual CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader,
-                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) = 0;
+    virtual CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                         System::PacketBufferHandle && payload) = 0;
 
     /**
      * @brief

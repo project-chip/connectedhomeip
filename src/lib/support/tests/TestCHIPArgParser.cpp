@@ -22,12 +22,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <core/CHIPCore.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
-#include <support/ScopedBuffer.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 

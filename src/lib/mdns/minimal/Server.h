@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
 #include <inet/UDPEndPoint.h>
+#include <lib/core/CHIPError.h>
 
-#include <mdns/minimal/core/BytesRange.h>
+#include <lib/mdns/minimal/core/BytesRange.h>
 
 namespace mdns {
 namespace Minimal {

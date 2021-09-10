@@ -23,9 +23,9 @@
 #include <mdns.h>
 
 #include "platform/CHIPDeviceLayer.h"
-#include "support/CHIPMem.h"
-#include "support/CodeUtils.h"
-#include "support/logging/CHIPLogging.h"
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace {
 

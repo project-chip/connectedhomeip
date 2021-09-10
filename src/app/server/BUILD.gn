@@ -37,8 +37,6 @@ static_library("server") {
     "RendezvousServer.h",
     "Server.cpp",
     "Server.h",
-    "StorablePeerConnection.cpp",
-    "StorablePeerConnection.h",
   ]
 
   public_configs = [ ":server_config" ]
