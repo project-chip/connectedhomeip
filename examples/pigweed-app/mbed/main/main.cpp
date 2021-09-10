@@ -24,8 +24,8 @@
 #include "pw_sys_io/sys_io.h"
 #include "pw_sys_io_mbed/init.h"
 
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/mbed/Logging.h>
-#include <support/logging/CHIPLogging.h>
 
 #include "rtos/Mutex.h"
 #include "rtos/Thread.h"
@@ -59,23 +59,27 @@ void RunRpcService()
 
 int main()
 {
-    pw_sys_io_Init();
+    int ret = 0;
 
     mbed_logging_init();
 
-    ChipLogProgress(NotSpecified, "==================================================\r\n");
-    ChipLogProgress(NotSpecified, "CHIP Mbed Pigweed application example starting\r\n");
-    ChipLogProgress(NotSpecified, "==================================================\r\n");
+    pw_sys_io_Init();
 
     sStatusLED.Set(true);
 
     auto error = rpcThread.start(RunRpcService);
     if (error != osOK)
     {
-        ChipLogError(NotSpecified, "Run RPC service failed[%d]", error);
-        return 1;
+        ChipLogError(NotSpecified, "Run RPC thread failed [%d]", (int) error);
+        ret = EXIT_FAILURE;
+        goto exit;
     }
 
+    ChipLogProgress(NotSpecified, "Mbed pigweed-app example application run");
+
     rpcThread.join();
-    return 0;
+
+exit:
+    ChipLogProgress(NotSpecified, "Exited with code %d", ret);
+    return ret;
 }

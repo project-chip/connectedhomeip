@@ -18,15 +18,17 @@ set(MBED_CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "")
 set(APP_TARGET chip-mbed-pigweed-app-example)
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
+
+project(${APP_TARGET})
+
 add_subdirectory(${MBED_PATH} ./mbed_build)
-
-add_subdirectory(mbed-os-posix-socket)
-
-if(MBED_TARGET STREQUAL "DISCO_L475VG_IOT01A")
-    add_subdirectory(wifi-ism43362)
-endif()
+add_subdirectory($ENV{MBED_OS_POSIX_SOCKET_PATH} ./mbed_os_posix_socket_build)
 
 add_executable(${APP_TARGET})
+
+add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)
+
+mbed_configure_app_target(${APP_TARGET})
 
 target_include_directories(${APP_TARGET} PRIVATE
                         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -40,36 +42,11 @@ target_sources(${APP_TARGET} PRIVATE
     ${MBED_COMMON}/util/LEDWidget.cpp
 )
 
-add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)
-
-mbed_configure_app_target(${APP_TARGET})
-
-mbed_set_mbed_target_linker_script(${APP_TARGET})
-
-project(${APP_TARGET})
-
-target_link_libraries(${APP_TARGET} 
-    mbed-os-posix-socket
-    mbed-os 
-    mbed-ble 
-    mbed-events 
-    mbed-netsocket 
-    mbed-storage 
-    mbed-storage-kv-global-api 
-    mbed-mbedtls 
-    mbed-mbedtls-cryptocell310 
-    chip
-)
-
-if(MBED_TARGET STREQUAL "DISCO_L475VG_IOT01A")
-    target_link_libraries(${APP_TARGET} wifi-ism43362 mbed-ble-blue_nrg)
-endif()
+target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)
 
 if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W")
-    target_link_libraries(${APP_TARGET} mbed-cy_psoc6_common_network mbed-emac mbed-cy_psoc6_whd)
+    target_link_libraries(${APP_TARGET} mbed-cy-psoc6-common-network)
 endif()
-
-
 
 mbed_set_post_build(${APP_TARGET})
 

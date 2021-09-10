@@ -1,4 +1,2 @@
-cmake_build/
+config/
 build-*/
-mbed-os
-wifi-ism43362
