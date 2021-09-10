@@ -65,7 +65,7 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug chip-tool \
                     out/chip_tool_debug/chip-tool \
-                    /tmp/bloat_reports/ --collect-method readelf --by=region
+                    /tmp/bloat_reports/
             - name: Build example Standalone Shell
               timeout-minutes: 5
               run: |
@@ -73,7 +73,7 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug shell \
                     out/shell_debug/chip-shell \
-                    /tmp/bloat_reports/ --collect-method readelf --by=region
+                    /tmp/bloat_reports/
             - name: Build example Standalone All Clusters Server
               timeout-minutes: 5
               run: |
@@ -82,7 +82,7 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug all-clusters-app \
                     out/all_clusters_debug/chip-all-clusters-app \
-                    /tmp/bloat_reports/ --collect-method readelf --by=region
+                    /tmp/bloat_reports/
             - name: Build example TV app
               timeout-minutes: 5
               run: |
@@ -90,7 +90,7 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug tv-app \
                     out/tv_app_debug/chip-tv-app \
-                    /tmp/bloat_reports/ --collect-method readelf --by=region
+                    /tmp/bloat_reports/
             - name: Build example lighting app with RPCs
               timeout-minutes: 5
               run: |
@@ -99,7 +99,7 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug+rpc lighting-app \
                     out/lighting_app_debug_rpc/chip-lighting-app \
-                    /tmp/bloat_reports/ --collect-method readelf --by=region
+                    /tmp/bloat_reports/
             - name: Build example Standalone Bridge
               timeout-minutes: 5
               run: |
@@ -107,7 +107,7 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug+rpc bridge-app \
                     out/bridge_debug/chip-bridge-app \
-                    /tmp/bloat_reports/ --collect-method readelf --by=region
+                    /tmp/bloat_reports/
             - name: Build example OTA Provider
               timeout-minutes: 5
               run: |
@@ -115,7 +115,7 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug ota-provider-app \
                     out/ota_provider_debug/chip-ota-provider-app \
-                    /tmp/bloat_reports/ --collect-method readelf --by=region
+                    /tmp/bloat_reports/
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
