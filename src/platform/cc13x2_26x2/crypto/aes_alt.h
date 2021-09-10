@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef MBEDTLS_AES_ALT_H
-#define MBEDTLS_AES_ALT_H
+#pragma once
 
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls-config.h"
@@ -34,69 +33,14 @@
 extern "C" {
 #endif
 
-/**
- * \brief          AES context structure
- *
- * \note
- */
 typedef struct
 {
-    CryptoKey cryptoKey;      /*!<  input to the crypto driver   */
-    uint32_t keyMaterial[16]; /*!<  storage for the key   */
+    CryptoKey cryptoKey;      /*!<  structure for the AES driver */
+    uint32_t keyMaterial[16]; /*!<  memory for the key bytes used by cryptoKey */
 } mbedtls_aes_context;
-
-/**
- * @brief Initialize AES context
- *
- * @param [in,out] ctx AES context to be initialized
- */
-void mbedtls_aes_init(mbedtls_aes_context * ctx);
-
-/**
- * @brief          Clear AES context
- *
- * \param ctx      AES context to be cleared
- */
-void mbedtls_aes_free(mbedtls_aes_context * ctx);
-
-/**
- * \brief          AES key schedule (encryption)
- *
- * \param ctx      AES context to be initialized
- * \param key      encryption key
- * \param keybits  must be 128, 192 or 256
- *
- * \return         0 if successful, or MBEDTLS_ERR_AES_INVALID_KEY_LENGTH
- */
-int mbedtls_aes_setkey_enc(mbedtls_aes_context * ctx, const unsigned char * key, unsigned int keybits);
-
-/**
- * \brief          AES key schedule (decryption)
- *
- * \param ctx      AES context to be initialized
- * \param key      decryption key
- * \param keybits  must be 128, 192 or 256
- *
- * \return         0 if successful, or MBEDTLS_ERR_AES_INVALID_KEY_LENGTH
- */
-int mbedtls_aes_setkey_dec(mbedtls_aes_context * ctx, const unsigned char * key, unsigned int keybits);
-
-/**
- * \brief          AES-ECB block encryption/decryption
- *
- * \param ctx      AES context
- * \param mode     MBEDTLS_AES_ENCRYPT or MBEDTLS_AES_DECRYPT
- * \param input    16-byte input block
- * \param output   16-byte output block
- *
- * \return         0 if successful
- */
-int mbedtls_aes_crypt_ecb(mbedtls_aes_context * ctx, int mode, const unsigned char input[16], unsigned char output[16]);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* MBEDTLS_AES_ALT */
-
-#endif /* MBEDTLS_AES_ALT_H */

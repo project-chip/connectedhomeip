@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef MBEDTLS_SHA256_ALT_H
-#define MBEDTLS_SHA256_ALT_H
+#pragma once
 
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls-config.h"
@@ -32,9 +31,7 @@ extern "C" {
 
 #include <ti/drivers/SHA2.h>
 #include <ti/drivers/sha2/SHA2CC26X2.h>
-/**
- * \brief          SHA-256 context structure
- */
+
 typedef struct
 {
     SHA2_Handle hndl;         /*!< A handle that is returned by the SHA driver  */
@@ -46,5 +43,3 @@ typedef struct
 }
 #endif
 #endif /* MBEDTLS_SHA256_ALT */
-
-#endif /* MBEDTLS_SHA256_ALT_H */

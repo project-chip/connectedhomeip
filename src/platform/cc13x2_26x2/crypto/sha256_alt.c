@@ -33,19 +33,13 @@
 #include <ti/drivers/sha2/SHA2CC26X2.h>
 
 /*!
- *  @brief Hardware-specific configuration attributes
- *
- *  SHA2CC26X2 hardware attributes are used by the SHA2_Config struct.
+ *  Hardware-specific configuration attributes, may be replaced with SysConfig
+ *  ti_drivers.h structure.
  */
 const SHA2CC26X2_HWAttrs sha2CC26X2HWAttrs_sha = {
     .intPriority = ~0,
 };
 
-/**
- * \brief          Initialize SHA-256 context
- *
- * \param ctx      SHA-256 context to be initialized
- */
 void mbedtls_sha256_init(mbedtls_sha256_context * ctx)
 {
     SHA2_Params sha2Params;
@@ -61,11 +55,6 @@ void mbedtls_sha256_init(mbedtls_sha256_context * ctx)
     ctx->hndl = SHA2_construct(&ctx->config, &sha2Params);
 }
 
-/**
- * \brief          Clear SHA-256 context
- *
- * \param ctx      SHA-256 context to be cleared
- */
 void mbedtls_sha256_free(mbedtls_sha256_context * ctx)
 {
     if (NULL == ctx)
@@ -81,14 +70,15 @@ void mbedtls_sha256_free(mbedtls_sha256_context * ctx)
     }
 }
 
-/**
- * \brief          SHA-256 context setup
+/*
+ * Deviation from documentation in sha256.h.
  *
- * \param ctx      context to be initialized
- * \param is224    0 = use SHA256, 1 = use SHA224
- *
- * \retval         0                                  on success
- * \retval         MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED on failure to open driver
+ * It has been noticed that some code using mbedtls does not call `init` before
+ * starting a SHA operation. Rather these implementations assume the `ctx`
+ * structure may be zero'ed out as initialization. To support this usage the
+ * driver instance is assumed to be uninitialized if the context's `hndl` is a
+ * NULL pointer. Start will initialize the driver and assign the handle to the
+ * context in this case.
  */
 int mbedtls_sha256_starts_ret(mbedtls_sha256_context * ctx, int is224)
 {
@@ -133,17 +123,13 @@ int mbedtls_sha256_starts_ret(mbedtls_sha256_context * ctx, int is224)
 }
 
 /**
- * \brief          Clone (the state of) a SHA-256 context
+ * Deviation from documentation in sha256.h.
  *
- * \param dst      The destination context
- * \param src      The context to be cloned
- *
- * \note This does not make any assumption on the state of the context being
- * passed into it. The destination context should be initialized before this
- * function is called. However, it has been noted that some uses of this
- * function do not initialize the context to avoid allocating hardware
- * resources. While this is undefined behavior, only internal buffers to the
- * SHA2 structure are copied.
+ * It has been noticed that some code using mbedtls does not call `init` on the
+ * contexts being passed into this function. This seems to be done to avoid
+ * allocating hardware to cloned context instances. To support this use-case,
+ * only internal buffers to the SHA2 structure are copied without checking the
+ * driver handles.
  */
 void mbedtls_sha256_clone(mbedtls_sha256_context * dst, const mbedtls_sha256_context * src)
 {
@@ -155,15 +141,6 @@ void mbedtls_sha256_clone(mbedtls_sha256_context * dst, const mbedtls_sha256_con
     memcpy(dst->object.buffer, src->object.buffer, sizeof(dst->object.buffer));
 }
 
-/**
- * \brief          SHA-256 final digest
- *
- * \param ctx      SHA-256 context
- * \param output   SHA-224/256 checksum result
- *
- * \retval         0                                  on success
- * \retval         MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED on driver failure
- */
 int mbedtls_sha256_finish_ret(mbedtls_sha256_context * ctx, unsigned char output[32])
 {
     int_fast16_t result;
@@ -180,16 +157,6 @@ int mbedtls_sha256_finish_ret(mbedtls_sha256_context * ctx, unsigned char output
     }
 }
 
-/**
- * \brief          SHA-256 process buffer
- *
- * \param ctx      SHA-256 context
- * \param input    buffer holding the  data
- * \param ilen     length of the input data
- *
- * \retval         0                                  on success
- * \retval         MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED on driver failure
- */
 int mbedtls_sha256_update_ret(mbedtls_sha256_context * ctx, const unsigned char * input, size_t ilen)
 {
     int_fast16_t result;
@@ -207,15 +174,6 @@ int mbedtls_sha256_update_ret(mbedtls_sha256_context * ctx, const unsigned char 
     }
 }
 
-/**
- * \brief          SHA-256 start/intermediate blocks
- *
- * \param ctx      SHA-256 context
- * \param data     64-byte input data block
- *
- * \retval         0                                  on success
- * \retval         MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED on driver failure
- */
 int mbedtls_internal_sha256_process(mbedtls_sha256_context * ctx, const unsigned char data[64])
 {
     int_fast16_t result;

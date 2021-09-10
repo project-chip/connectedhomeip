@@ -30,18 +30,13 @@
 #include <ti/drivers/AESECB.h>
 #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
 
-/**
+/*
  * number of active contexts, used for power on/off of the crypto core
  */
 static unsigned int ref_num = 0;
 
 static AESECB_Handle AESECB_handle = NULL;
 
-/**
- * @brief Initialize AES context
- *
- * @param [in,out] ctx AES context to be initialized
- */
 void mbedtls_aes_init(mbedtls_aes_context * ctx)
 {
     AESECB_Params AESECBParams;
@@ -55,11 +50,6 @@ void mbedtls_aes_init(mbedtls_aes_context * ctx)
     }
 }
 
-/**
- * @brief          Clear AES context
- *
- * \param ctx      AES context to be cleared
- */
 void mbedtls_aes_free(mbedtls_aes_context * ctx)
 {
     if (--ref_num == 0)
@@ -72,15 +62,6 @@ void mbedtls_aes_free(mbedtls_aes_context * ctx)
     memset((void *) ctx, 0x00, sizeof(ctx));
 }
 
-/**
- * \brief          AES key schedule (encryption)
- *
- * \param ctx      AES context to be initialized
- * \param key      encryption key
- * \param keybits  must be 128, 192 or 256
- *
- * \return         0 if successful
- */
 int mbedtls_aes_setkey_enc(mbedtls_aes_context * ctx, const unsigned char * key, unsigned int keybits)
 {
     int_fast16_t statusCrypto = 0;
@@ -93,15 +74,6 @@ int mbedtls_aes_setkey_enc(mbedtls_aes_context * ctx, const unsigned char * key,
     return (int) statusCrypto;
 }
 
-/**
- * \brief          AES key schedule (decryption)
- *
- * \param ctx      AES context to be initialized
- * \param key      decryption key
- * \param keybits  must be 128, 192 or 256
- *
- * \return         0 if successful
- */
 int mbedtls_aes_setkey_dec(mbedtls_aes_context * ctx, const unsigned char * key, unsigned int keybits)
 {
     int_fast16_t statusCrypto;
@@ -112,17 +84,6 @@ int mbedtls_aes_setkey_dec(mbedtls_aes_context * ctx, const unsigned char * key,
 
     return (int) statusCrypto;
 }
-
-/**
- * \brief          AES-ECB block encryption/decryption
- *
- * \param ctx      AES context
- * \param mode     MBEDTLS_AES_ENCRYPT or MBEDTLS_AES_DECRYPT
- * \param input    16-byte input block
- * \param output   16-byte output block
- *
- * \return         0 if successful
- */
 
 int mbedtls_aes_crypt_ecb(mbedtls_aes_context * ctx, int mode, const unsigned char input[16], unsigned char output[16])
 {
