@@ -42,8 +42,9 @@ chip::System::SocketWatchToken token;
 void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommissioner = nullptr)
 {
     // Enter commissioning mode, open commissioning window
-    InitServer();
-    ReturnOnFailure(OpenBasicCommissioningWindow(ResetFabrics::kYes, commissioningWindowTimeoutInSec));
+    Server::GetInstance().Init();
+    ReturnOnFailure(Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(ResetFabrics::kYes,
+                                                                                              commissioningWindowTimeoutInSec));
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();

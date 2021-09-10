@@ -87,7 +87,7 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Init ZCL Data Model and start server
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -528,7 +528,8 @@ void AppTask::BleHandler(void * aGenericEvent)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
-        if (OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
+        if (chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) ==
+            CHIP_NO_ERROR)
         {
             K32W_LOG("Started BLE Advertising!");
         }

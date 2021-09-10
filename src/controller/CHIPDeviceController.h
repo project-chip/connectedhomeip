@@ -397,13 +397,13 @@ public:
      * @brief
      *   Starts advertisement of the device for rendezvous availability.
      */
-    CHIP_ERROR StartAdvertisement() const override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StartAdvertisement() override { return CHIP_NO_ERROR; }
 
     /**
      * @brief
      *   Stops advertisement of the device for rendezvous availability.
      */
-    CHIP_ERROR StopAdvertisement() const override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StopAdvertisement() override { return CHIP_NO_ERROR; }
 };
 
 /**
