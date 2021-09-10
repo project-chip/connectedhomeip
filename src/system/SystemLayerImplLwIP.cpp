@@ -30,13 +30,7 @@
 namespace chip {
 namespace System {
 
-LayerLwIP::EventHandlerDelegate LayerImplLwIP::sSystemEventHandlerDelegate;
-
-LayerImplLwIP::LayerImplLwIP() : mHandlingTimerComplete(false), mEventDelegateList(nullptr)
-{
-    if (!sSystemEventHandlerDelegate.IsInitialized())
-        sSystemEventHandlerDelegate.Init(HandleSystemLayerEvent);
-}
+LayerImplLwIP::LayerImplLwIP() : mHandlingTimerComplete(false), mEventDelegateList(nullptr) {}
 
 CHIP_ERROR LayerImplLwIP::Init()
 {
@@ -44,7 +38,6 @@ CHIP_ERROR LayerImplLwIP::Init()
 
     RegisterLwIPErrorFormatter();
 
-    AddEventHandlerDelegate(sSystemEventHandlerDelegate);
     ReturnErrorOnFailure(mTimerList.Init());
 
     VerifyOrReturnError(mLayerState.Init(), CHIP_ERROR_INCORRECT_STATE);
@@ -100,7 +93,7 @@ CHIP_ERROR LayerImplLwIP::ScheduleWork(TimerCompleteCallback onComplete, void * 
     Timer * timer = Timer::New(*this, 0, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    return PostEvent(*timer, chip::System::kEvent_ScheduleWork, 0);
+    return PostLambda([timer] { timer->HandleComplete(); });
 }
 
 bool LayerLwIP::EventHandlerDelegate::IsInitialized() const
@@ -120,37 +113,24 @@ void LayerLwIP::EventHandlerDelegate::Prepend(const LayerLwIP::EventHandlerDeleg
     aDelegateList = this;
 }
 
-/**
- * This is the dispatch handler for system layer events.
- *
- *  @param[in,out]  aTarget     A pointer to the CHIP System Layer object making the post request.
- *  @param[in]      aEventType  The type of event to post.
- *  @param[in,out]  aArgument   The argument associated with the event to post.
- */
-CHIP_ERROR LayerImplLwIP::HandleSystemLayerEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
-{
-    // Dispatch logic specific to the event type
-    switch (aEventType)
-    {
-    case kEvent_ReleaseObj:
-        aTarget.Release();
-        return CHIP_NO_ERROR;
-
-    case kEvent_ScheduleWork:
-        static_cast<Timer &>(aTarget).HandleComplete();
-        return CHIP_NO_ERROR;
-
-    default:
-        return CHIP_ERROR_UNEXPECTED_EVENT;
-    }
-}
-
 CHIP_ERROR LayerImplLwIP::AddEventHandlerDelegate(EventHandlerDelegate & aDelegate)
 {
     LwIPEventHandlerDelegate & lDelegate = static_cast<LwIPEventHandlerDelegate &>(aDelegate);
     VerifyOrReturnError(lDelegate.GetFunction() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     lDelegate.Prepend(mEventDelegateList);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LayerImplLwIP::PostEvent(const LambdaBridge & bridge)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+    CHIP_ERROR lReturn = PlatformEventing::PostEvent(*this, bridge);
+    if (lReturn != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer event (type %d): %s", -1, ErrorStr(lReturn));
+    }
+    return lReturn;
 }
 
 CHIP_ERROR LayerImplLwIP::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)

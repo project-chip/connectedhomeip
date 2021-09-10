@@ -228,6 +228,7 @@ enum InternalEventTypes
     kEventTypeNotSet = kRange_Internal,
     kNoOp,
     kCallWorkFunct,
+    kChipLambdaEvent,
     kChipSystemLayerEvent,
     kCHIPoBLESubscribe,
     kCHIPoBLEUnsubscribe,
@@ -302,6 +303,7 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #include <ble/BleConfig.h>
 #include <inet/InetLayer.h>
 #include <system/SystemEvent.h>
+#include <system/SystemLayer.h>
 #include <system/SystemObject.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -318,6 +320,7 @@ struct ChipDeviceEvent final
     union
     {
         ChipDevicePlatformEvent Platform;
+        System::LambdaBridge LambdaEvent;
         struct
         {
             ::chip::System::EventType Type;
