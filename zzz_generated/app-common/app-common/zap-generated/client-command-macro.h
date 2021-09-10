@@ -1807,16 +1807,16 @@
 /** @brief Command description for AnnounceOtaProvider
  *
  * Command: AnnounceOtaProvider
- * @param serverLocation OCTET_STRING
+ * @param providerLocation OCTET_STRING
  * @param vendorId INT16U
  * @param announcementReason OTAAnnouncementReason
  * @param metadataForNode OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update RequestorClusterAnnounceOtaProvider(serverLocation, vendorId, announcementReason, metadataForNode)             \
+    Software Update RequestorClusterAnnounceOtaProvider(providerLocation, vendorId, announcementReason, metadataForNode)           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ANNOUNCE_OTA_PROVIDER_COMMAND_ID, "uuuu", serverLocation, vendorId, announcementReason,      \
+                                  ZCL_ANNOUNCE_OTA_PROVIDER_COMMAND_ID, "uuuu", providerLocation, vendorId, announcementReason,    \
                                   metadataForNode);
 
 /** @brief Command description for ArmFailSafe

@@ -15554,7 +15554,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(c
  */
 bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(chip::EndpointId endpoint,
                                                                          chip::app::CommandHandler * commandObj,
-                                                                         chip::ByteSpan serverLocation, uint16_t vendorId,
+                                                                         chip::ByteSpan providerLocation, uint16_t vendorId,
                                                                          uint8_t announcementReason,
                                                                          chip::ByteSpan metadataForNode);
 /**

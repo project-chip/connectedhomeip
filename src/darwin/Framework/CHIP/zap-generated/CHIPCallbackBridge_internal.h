@@ -1050,8 +1050,8 @@ public:
                                                                                        keepAlive){};
 
     static void OnSuccessFn(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI,
-                            uint32_t softwareVersion, chip::ByteSpan updateToken, bool userConsentNeeded,
-                            chip::ByteSpan metadataForRequestor);
+                            uint32_t softwareVersion, uint8_t * softwareVersionString, chip::ByteSpan updateToken,
+                            bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 };
 
 class CHIPOperationalCredentialsClusterNOCResponseCallbackBridge

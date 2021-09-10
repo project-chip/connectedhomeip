@@ -908,14 +908,15 @@ void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbackBridg
 };
 
 void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuccessFn(void * context, uint8_t status,
-    uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion, chip::ByteSpan updateToken, bool userConsentNeeded,
-    chip::ByteSpan metadataForRequestor)
+    uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion, uint8_t * softwareVersionString,
+    chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
 {
     DispatchSuccess(context, @ {
         @"status" : [NSNumber numberWithUnsignedChar:status],
         @"delayedActionTime" : [NSNumber numberWithUnsignedLong:delayedActionTime],
         @"imageURI" : [NSString stringWithFormat:@"%s", imageURI],
         @"softwareVersion" : [NSNumber numberWithUnsignedLong:softwareVersion],
+        @"softwareVersionString" : [NSString stringWithFormat:@"%s", softwareVersionString],
         @"updateToken" : [NSData dataWithBytes:updateToken.data() length:updateToken.size()],
         @"userConsentNeeded" : [NSNumber numberWithBool:userConsentNeeded],
         @"metadataForRequestor" : [NSData dataWithBytes:metadataForRequestor.data() length:metadataForRequestor.size()],
