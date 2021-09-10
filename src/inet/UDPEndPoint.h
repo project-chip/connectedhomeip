@@ -31,7 +31,8 @@
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
-
+#include <lib/core/ReferenceCounted.h>
+#include <lib/support/Pool.h>
 #include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -44,6 +45,13 @@ namespace Inet {
 class InetLayer;
 class IPPacketInfo;
 
+class UDPEndPoint;
+class UDPEndPointDeletor
+{
+public:
+    static void Release(UDPEndPoint * obj);
+};
+
 /**
  * @brief   Objects of this class represent UDP transport endpoints.
  *
@@ -52,7 +60,7 @@ class IPPacketInfo;
  *  endpoints (SOCK_DGRAM sockets on Linux and BSD-derived systems) or LwIP
  *  UDP protocol control blocks, as the system is configured accordingly.
  */
-class DLL_EXPORT UDPEndPoint : public EndPointBasis
+class DLL_EXPORT UDPEndPoint : public EndPointBasis, public AtomicReferenceCounted<UDPEndPoint, UDPEndPointDeletor>
 {
 public:
     UDPEndPoint() = default;
@@ -280,7 +288,8 @@ private:
     CHIP_ERROR IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join);
     CHIP_ERROR IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join);
 
-    static chip::System::ObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
+    friend class UDPEndPointDeletor;
+    static BitMapObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
 
     CHIP_ERROR BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port, InterfaceId interfaceId);
     CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId);
@@ -370,6 +379,11 @@ private:
     void ReleaseAll();
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 };
+
+inline void UDPEndPointDeletor::Release(UDPEndPoint * obj)
+{
+    UDPEndPoint::sPool.ReleaseObject(obj);
+}
 
 } // namespace Inet
 } // namespace chip

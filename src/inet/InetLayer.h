@@ -55,7 +55,6 @@
 #include <inet/IPPrefix.h>
 #include <inet/InetError.h>
 #include <inet/InetInterface.h>
-#include <inet/InetLayerEvents.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>
@@ -151,16 +150,10 @@ public:
     CHIP_ERROR GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr);
     bool MatchLocalIPv6Subnet(const IPAddress & addr);
 
-    static void UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot);
-
     void * GetPlatformData();
     void SetPlatformData(void * aPlatformData);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static CHIP_ERROR HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType, uintptr_t aArgument);
-
-    static chip::System::LayerLwIP::EventHandlerDelegate sInetEventHandlerDelegate;
-
     // In some implementations, there may be a shared event / message
     // queue for the InetLayer used by other system events / messages.
     //

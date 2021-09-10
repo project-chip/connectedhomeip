@@ -248,7 +248,7 @@ exit:
     }
 
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-
+    gTransportManager.Close();
     ShutdownChip();
 
     return EXIT_SUCCESS;
