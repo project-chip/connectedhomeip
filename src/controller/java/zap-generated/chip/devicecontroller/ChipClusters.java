@@ -3837,11 +3837,12 @@ public class ChipClusters {
 
     public void addNOC(
         NOCResponseCallback callback,
-        byte[] nOCArray,
+        byte[] nOCValue,
+        byte[] iCACValue,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId) {
-      addNOC(chipClusterPtr, callback, nOCArray, iPKValue, caseAdminNode, adminVendorId);
+      addNOC(chipClusterPtr, callback, nOCValue, iCACValue, iPKValue, caseAdminNode, adminVendorId);
     }
 
     public void addTrustedRootCertificate(DefaultClusterCallback callback, byte[] rootCertificate) {
@@ -3865,14 +3866,15 @@ public class ChipClusters {
       updateFabricLabel(chipClusterPtr, callback, label);
     }
 
-    public void updateNOC(NOCResponseCallback callback, byte[] nOCArray) {
-      updateNOC(chipClusterPtr, callback, nOCArray);
+    public void updateNOC(NOCResponseCallback callback, byte[] nOCValue, byte[] iCACValue) {
+      updateNOC(chipClusterPtr, callback, nOCValue, iCACValue);
     }
 
     private native void addNOC(
         long chipClusterPtr,
         NOCResponseCallback callback,
-        byte[] nOCArray,
+        byte[] nOCValue,
+        byte[] iCACValue,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId);
@@ -3893,7 +3895,7 @@ public class ChipClusters {
         long chipClusterPtr, NOCResponseCallback callback, String label);
 
     private native void updateNOC(
-        long chipClusterPtr, NOCResponseCallback callback, byte[] nOCArray);
+        long chipClusterPtr, NOCResponseCallback callback, byte[] nOCValue, byte[] iCACValue);
 
     public interface NOCResponseCallback {
       void onSuccess(int StatusCode, int FabricIndex, byte[] DebugText);

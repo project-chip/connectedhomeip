@@ -122,13 +122,8 @@ static CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(commissionerFabric.SetEphemeralKey(&opKey));
 
     ReturnErrorOnFailure(commissionerFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
-
-    uint8_t certChainBuf[kMaxCHIPCertLength * 2];
-    MutableByteSpan certChain(certChainBuf);
-
-    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
-                                                         ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len), certChain));
-    ReturnErrorOnFailure(commissionerFabric.SetOperationalCertsFromCertArray(certChain));
+    ReturnErrorOnFailure(commissionerFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));
+    ReturnErrorOnFailure(commissionerFabric.SetNOCCert(ByteSpan(sTestCert_Node01_01_Chip, sTestCert_Node01_01_Chip_Len)));
 
     ReturnErrorOnFailure(gCommissionerFabrics.AddNewFabric(commissionerFabric, &gCommissionerFabricIndex));
 
@@ -144,10 +139,8 @@ static CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(deviceFabric.SetEphemeralKey(&opKey));
 
     ReturnErrorOnFailure(deviceFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
-
-    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
-                                                         ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len), certChain));
-    ReturnErrorOnFailure(deviceFabric.SetOperationalCertsFromCertArray(certChain));
+    ReturnErrorOnFailure(deviceFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));
+    ReturnErrorOnFailure(deviceFabric.SetNOCCert(ByteSpan(sTestCert_Node01_01_Chip, sTestCert_Node01_01_Chip_Len)));
 
     ReturnErrorOnFailure(gDeviceFabrics.AddNewFabric(deviceFabric, &gDeviceFabricIndex));
 

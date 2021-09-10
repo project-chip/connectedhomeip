@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -752,10 +752,17 @@ Device::~Device()
     }
 }
 
-CHIP_ERROR Device::ReduceNOCChainBufferSize(size_t new_size)
+CHIP_ERROR Device::SetNOCCertBufferSize(size_t new_size)
 {
-    ReturnErrorCodeIf(new_size > sizeof(mNOCChainBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    mNOCChainBufferSize = new_size;
+    ReturnErrorCodeIf(new_size > sizeof(mNOCCertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+    mNOCCertBufferSize = new_size;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::SetICACertBufferSize(size_t new_size)
+{
+    ReturnErrorCodeIf(new_size > sizeof(mICACertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+    mICACertBufferSize = new_size;
     return CHIP_NO_ERROR;
 }
 

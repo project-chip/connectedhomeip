@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -411,11 +411,17 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
-    MutableByteSpan GetMutableNOCChain() { return MutableByteSpan(mNOCChainBuffer, sizeof(mNOCChainBuffer)); }
+    MutableByteSpan GetMutableNOCCert() { return MutableByteSpan(mNOCCertBuffer, sizeof(mNOCCertBuffer)); }
 
-    CHIP_ERROR ReduceNOCChainBufferSize(size_t new_size);
+    CHIP_ERROR SetNOCCertBufferSize(size_t new_size);
 
-    ByteSpan GetNOCChain() const { return ByteSpan(mNOCChainBuffer, mNOCChainBufferSize); }
+    ByteSpan GetNOCCert() const { return ByteSpan(mNOCCertBuffer, mNOCCertBufferSize); }
+
+    MutableByteSpan GetMutableICACert() { return MutableByteSpan(mICACertBuffer, sizeof(mICACertBuffer)); }
+
+    CHIP_ERROR SetICACertBufferSize(size_t new_size);
+
+    ByteSpan GetICACert() const { return ByteSpan(mICACertBuffer, mICACertBufferSize); }
 
     /*
      * This function can be called to establish a secure session with the device.
@@ -525,9 +531,11 @@ private:
 
     uint8_t mCSRNonce[kOpCSRNonceLength];
 
-    // The chain can contain ICAC and OpCert
-    uint8_t mNOCChainBuffer[Credentials::kMaxCHIPCertLength * 2];
-    size_t mNOCChainBufferSize = 0;
+    uint8_t mNOCCertBuffer[Credentials::kMaxCHIPCertLength];
+    size_t mNOCCertBufferSize = 0;
+
+    uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
+    size_t mICACertBufferSize = 0;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 

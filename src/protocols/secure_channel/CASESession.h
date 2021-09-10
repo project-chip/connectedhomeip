@@ -198,10 +198,11 @@ private:
 
     CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                     MutableByteSpan & salt);
-    CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);
+    CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderNOC, const ByteSpan & responderICAC,
+                                                Crypto::P256PublicKey & responderID);
     CHIP_ERROR ConstructSaltSigmaR3(const ByteSpan & ipk, MutableByteSpan & salt);
-    CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
-    CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
+    CHIP_ERROR ConstructTBSData(const ByteSpan & senderNOC, const ByteSpan & senderICAC, const ByteSpan & senderPubKey,
+                                const ByteSpan & receiverPubKey, uint8_t * tbsData, size_t & tbsDataLen);
     CHIP_ERROR RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk);
 
     static constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields)

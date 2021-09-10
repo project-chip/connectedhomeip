@@ -214,7 +214,7 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     ReturnErrorCodeIf(params.ephemeralKeypair == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     newFabric.SetEphemeralKey(params.ephemeralKeypair);
 
-    constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
+    constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
 
     ReturnErrorCodeIf(!chipCert.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
@@ -227,11 +227,18 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     {
         ChipLogProgress(Controller, "Intermediate CA is not needed");
     }
+    else
+    {
+        chipCertSpan = MutableByteSpan(chipCert.Get(), chipCertAllocatedLen);
+
+        ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerICAC, chipCertSpan));
+        ReturnErrorOnFailure(newFabric.SetICACert(chipCertSpan));
+    }
 
     chipCertSpan = MutableByteSpan(chipCert.Get(), chipCertAllocatedLen);
 
-    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(params.controllerNOC, params.controllerICAC, chipCertSpan));
-    ReturnErrorOnFailure(newFabric.SetOperationalCertsFromCertArray(chipCertSpan));
+    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerNOC, chipCertSpan));
+    ReturnErrorOnFailure(newFabric.SetNOCCert(chipCertSpan));
     newFabric.SetVendorId(params.controllerVendorId);
 
     Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
@@ -1254,7 +1261,8 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
 
     {
-        MutableByteSpan rootCert = device->GetMutableNOCChain();
+        // Reuse NOC Cert buffer for temporary store Root Cert.
+        MutableByteSpan rootCert = device->GetMutableNOCCert();
 
         err = ConvertX509CertToChipCert(rcac, rootCert);
         SuccessOrExit(err);
@@ -1263,13 +1271,24 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
         SuccessOrExit(err);
     }
 
+    if (!icac.empty())
     {
-        MutableByteSpan certChain = device->GetMutableNOCChain();
+        MutableByteSpan icaCert = device->GetMutableICACert();
 
-        err = ConvertX509CertsToChipCertArray(noc, icac, certChain);
+        err = ConvertX509CertToChipCert(icac, icaCert);
         SuccessOrExit(err);
 
-        err = device->ReduceNOCChainBufferSize(certChain.size());
+        err = device->SetICACertBufferSize(icaCert.size());
+        SuccessOrExit(err);
+    }
+
+    {
+        MutableByteSpan nocCert = device->GetMutableNOCCert();
+
+        err = ConvertX509CertToChipCert(noc, nocCert);
+        SuccessOrExit(err);
+
+        err = device->SetNOCCertBufferSize(nocCert.size());
         SuccessOrExit(err);
     }
 
@@ -1297,7 +1316,7 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & NOCSRElements, cons
                                                              ByteSpan(), &mDeviceNOCChainCallback);
 }
 
-CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf)
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const ByteSpan & nocCertBuf, const ByteSpan & icaCertBuf)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OperationalCredentialsCluster cluster;
@@ -1306,8 +1325,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     Callback::Cancelable * successCallback = mNOCResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(
-        cluster.AddNOC(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0), mLocalId.GetNodeId(), mVendorId));
+    ReturnErrorOnFailure(cluster.AddNOC(successCallback, failureCallback, nocCertBuf, icaCertBuf, ByteSpan(nullptr, 0),
+                                        mLocalId.GetNodeId(), mVendorId));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
@@ -1419,7 +1438,7 @@ void DeviceCommissioner::OnRootCertSuccessResponse(void * context)
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
 
     ChipLogProgress(Controller, "Sending operational certificate chain to the device");
-    err = commissioner->SendOperationalCertificate(device, device->GetNOCChain());
+    err = commissioner->SendOperationalCertificate(device, device->GetNOCCert(), device->GetICACert());
     SuccessOrExit(err);
 
 exit:
