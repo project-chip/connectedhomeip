@@ -20,9 +20,9 @@
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
-#include <support/SafeInt.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
 
