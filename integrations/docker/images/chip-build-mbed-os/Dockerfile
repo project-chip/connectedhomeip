@@ -34,5 +34,6 @@ RUN set -x \
 # ------------------------------------------------------------------------------
 # Configure environment variables
 ENV OPENOCD_PATH=/opt/openocd/
+ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 
 ENV PATH="${PATH}:${OPENOCD_PATH}/bin"
