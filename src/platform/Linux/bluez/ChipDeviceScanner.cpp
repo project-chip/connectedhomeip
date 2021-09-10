@@ -262,7 +262,9 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 * device)
 int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 {
     GVariantBuilder filterBuilder;
+    GVariantBuilder uuidsBuilder;
     GVariant *filter;
+    GVariant *uuids;
     GError * error = nullptr;
 
     self->mObjectAddedSignal = g_signal_connect(self->mManager, "object-added", G_CALLBACK(SignalObjectAdded), self);
@@ -275,9 +277,15 @@ int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
         self->RemoveDevice(bluez_object_get_device1(&object));
     }
 
+    /* Search for matter/chip UUID only */
+    g_variant_builder_init(&uuidsBuilder, G_VARIANT_TYPE("as"));
+    g_variant_builder_add(&uuidsBuilder, "s", CHIP_BLE_UUID_SERVICE_STRING);
+    uuids = g_variant_builder_end(&uuidsBuilder);
+
     /* Search for LE only: Advertises */
     g_variant_builder_init(&filterBuilder, G_VARIANT_TYPE("a{sv}"));
     g_variant_builder_add(&filterBuilder, "{sv}", "Transport", g_variant_new_string("le"));
+    g_variant_builder_add(&filterBuilder, "{sv}", "UUIDs", uuids);
     filter = g_variant_builder_end(&filterBuilder);
 
     if (!bluez_adapter1_call_set_discovery_filter_sync(self->mAdapter, filter, self->mCancellable, &error))
