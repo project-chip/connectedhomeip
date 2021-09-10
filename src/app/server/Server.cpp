@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#include "lib/support/CHIPMem.h"
-#include "platform/internal/CHIPDeviceLayerInternal.h"
 #include <app/server/Server.h>
 
 #include <app/InteractionModelEngine.h>
@@ -101,7 +99,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SuccessOrExit(err);
 
     // Init transport before operations with secure session mgr.
-    printf("Init transports\n");
     err = mTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer)
                                .SetAddressType(IPAddressType::kIPAddressType_IPv6)
                                .SetListenPort(mSecuredServicePort)
@@ -117,7 +114,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                            BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
 #endif
     );
-    printf("Init transports done\n");
 
     SuccessOrExit(err);
 

@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#include "app/server/Mdns.h"
-#include "lib/support/CHIPMem.h"
 #include <app/server/CommissionManager.h>
 #include <app/server/Server.h>
 #include <lib/support/Span.h>
@@ -41,6 +39,8 @@ void HandleDataModelMessage(chip::Messaging::ExchangeContext * exchange, chip::S
 
 namespace {
 
+static constexpr int kTestTaskWaitSeconds = 2;
+
 void InitializeChip(nlTestSuite * suite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -48,13 +48,14 @@ void InitializeChip(nlTestSuite * suite)
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
-    err = chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
     err = Server::GetInstance().Init();
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
 }
 
-void CheckCommissionManagerBasicWindowOpenClose(nlTestSuite * suite, void *)
+void CheckCommissionManagerBasicWindowOpenCloseTask(intptr_t context)
 {
+    nlTestSuite * suite               = reinterpret_cast<nlTestSuite *>(context);
     CommissionManager & commissionMgr = Server::GetInstance().GetCommissionManager();
     CHIP_ERROR err                    = commissionMgr.OpenBasicCommissioningWindow(ResetFabrics::kNo, kNoCommissioningTimeout,
                                                                 CommissioningWindowAdvertisement::kMdns);
@@ -64,22 +65,43 @@ void CheckCommissionManagerBasicWindowOpenClose(nlTestSuite * suite, void *)
     NL_TEST_ASSERT(suite, !commissionMgr.IsPairingWindowOpen());
 }
 
-void CheckCommissionManagerWindowTimeout(nlTestSuite * suite, void *)
+void CheckCommissionManagerBasicWindowOpenClose(nlTestSuite * suite, void *)
 {
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissionManagerBasicWindowOpenCloseTask,
+                                                  reinterpret_cast<intptr_t>(suite));
+    sleep(kTestTaskWaitSeconds);
+}
+
+void CheckCommissionManagerWindowClosedTask(chip::System::Layer *, void * context)
+{
+    nlTestSuite * suite               = static_cast<nlTestSuite *>(context);
+    CommissionManager & commissionMgr = Server::GetInstance().GetCommissionManager();
+    NL_TEST_ASSERT(suite, !commissionMgr.IsPairingWindowOpen());
+}
+
+void CheckCommissionManagerWindowTimeoutTask(intptr_t context)
+{
+    nlTestSuite * suite                = reinterpret_cast<nlTestSuite *>(context);
     CommissionManager & commissionMgr  = Server::GetInstance().GetCommissionManager();
     constexpr uint16_t kTimeoutSeconds = 1;
-    constexpr unsigned kUsPerSecond    = 1000 * 1000;
-    constexpr unsigned kSleepPadding   = 1000 * 10;
+    constexpr uint16_t kTimeoutMs      = 1000;
+    constexpr unsigned kSleepPadding   = 100;
     CHIP_ERROR err =
         commissionMgr.OpenBasicCommissioningWindow(ResetFabrics::kNo, kTimeoutSeconds, CommissioningWindowAdvertisement::kMdns);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite, commissionMgr.IsPairingWindowOpen());
-    usleep(kTimeoutSeconds * kUsPerSecond + kSleepPadding);
-    NL_TEST_ASSERT(suite, !commissionMgr.IsPairingWindowOpen());
+    chip::DeviceLayer::SystemLayer.StartTimer(kTimeoutMs + kSleepPadding, CheckCommissionManagerWindowClosedTask, suite);
 }
 
-void CheckCommissionManagerEnhancedWindow(nlTestSuite * suite, void *)
+void CheckCommissionManagerWindowTimeout(nlTestSuite * suite, void *)
 {
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissionManagerWindowTimeoutTask, reinterpret_cast<intptr_t>(suite));
+    sleep(kTestTaskWaitSeconds);
+}
+
+void CheckCommissionManagerEnhancedWindowTask(intptr_t context)
+{
+    nlTestSuite * suite               = reinterpret_cast<nlTestSuite *>(context);
     CommissionManager & commissionMgr = Server::GetInstance().GetCommissionManager();
     uint16_t originDiscriminator;
     CHIP_ERROR err = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(originDiscriminator);
@@ -107,6 +129,18 @@ void CheckCommissionManagerEnhancedWindow(nlTestSuite * suite, void *)
     NL_TEST_ASSERT(suite, currentDiscriminator == originDiscriminator);
 }
 
+void CheckCommissionManagerEnhancedWindow(nlTestSuite * suite, void *)
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissionManagerEnhancedWindowTask, reinterpret_cast<intptr_t>(suite));
+    sleep(kTestTaskWaitSeconds);
+}
+
+void TearDownTask(intptr_t context)
+{
+    chip::Server::GetInstance().Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+}
+
 const nlTest sTests[] = { NL_TEST_DEF("CheckCommissionManagerEnhancedWindow", CheckCommissionManagerEnhancedWindow),
                           NL_TEST_DEF("CheckCommissionManagerBasicWindowOpenClose", CheckCommissionManagerBasicWindowOpenClose),
                           NL_TEST_DEF("CheckCommissionManagerWindowTimeout", CheckCommissionManagerWindowTimeout),
@@ -129,9 +163,9 @@ int TestCommissionManager()
     InitializeChip(&theSuite);
     nlTestRunner(&theSuite, nullptr);
 
-    chip::Server::GetInstance().Shutdown();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
     // TODO: The platform memory was intentionally left not deinitialized so that minimal mdns can destruct
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(TearDownTask, 0);
+    sleep(kTestTaskWaitSeconds);
 
     return (nlTestRunnerStats(&theSuite));
 }
