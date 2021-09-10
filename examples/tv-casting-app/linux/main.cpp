@@ -62,7 +62,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         return false;
     default:
-        ChipLogError(Zcl, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
+        ChipLogError(AppServer, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         return false;
     }
 }
@@ -127,7 +127,7 @@ void RequestUserDirectedCommissioning(System::SocketEvents events, intptr_t data
 
     const Mdns::DiscoveredNodeData * selectedCommissioner =
         gCommissionableNodeController.GetDiscoveredCommissioner(selectedCommissionerNumber - 1);
-    VerifyOrReturn(selectedCommissioner != nullptr, ChipLogError(Zcl, "No such commissioner!"));
+    VerifyOrReturn(selectedCommissioner != nullptr, ChipLogError(AppServer, "No such commissioner!"));
     PrepareForCommissioning(selectedCommissioner);
 }
 
@@ -141,20 +141,20 @@ void InitCommissioningFlow(intptr_t commandArg)
         const Mdns::DiscoveredNodeData * commissioner = gCommissionableNodeController.GetDiscoveredCommissioner(i);
         if (commissioner != nullptr)
         {
-            ChipLogProgress(Zcl, "Discovered Commissioner #%d", ++commissionerCount);
+            ChipLogProgress(AppServer, "Discovered Commissioner #%d", ++commissionerCount);
             commissioner->LogDetail();
         }
     }
 
     if (commissionerCount > 0)
     {
-        ChipLogProgress(
-            Zcl, "%d commissioner(s) discovered. Select one (by number# above) to request commissioning from: ", commissionerCount);
+        ChipLogProgress(AppServer, "%d commissioner(s) discovered. Select one (by number# above) to request commissioning from: ",
+                        commissionerCount);
 
         // Setup for async/non-blocking user input from stdin
         int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         VerifyOrReturn(fcntl(0, F_SETFL, flags | O_NONBLOCK) == 0,
-                       ChipLogError(Zcl, "Could not set non-blocking mode for user input!"));
+                       ChipLogError(AppServer, "Could not set non-blocking mode for user input!"));
         ReturnOnFailure(chip::DeviceLayer::SystemLayerSockets().StartWatchingSocket(STDIN_FILENO, &token));
         ReturnOnFailure(
             chip::DeviceLayer::SystemLayerSockets().SetCallback(token, RequestUserDirectedCommissioning, (intptr_t) NULL));
@@ -162,7 +162,7 @@ void InitCommissioningFlow(intptr_t commandArg)
     }
     else
     {
-        ChipLogError(Zcl, "No commissioner discovered, commissioning must be initiated manually!");
+        ChipLogError(AppServer, "No commissioner discovered, commissioning must be initiated manually!");
         PrepareForCommissioning();
     }
 }
@@ -193,7 +193,7 @@ int main(int argc, char * argv[])
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to run TV Casting App: %s", ErrorStr(err));
+        ChipLogError(AppServer, "Failed to run TV Casting App: %s", ErrorStr(err));
         // End the program with non zero error code to indicate an error.
         return 1;
     }
