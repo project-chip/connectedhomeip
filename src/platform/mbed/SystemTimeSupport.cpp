@@ -35,7 +35,9 @@
 namespace chip {
 namespace System {
 
-ClockImpl staticClock;
+namespace Internal {
+ClockImpl gClockImpl;
+} // namespace Internal
 
 // Platform-specific function for getting monotonic system time in microseconds.
 // Returns elapsed time in microseconds since an arbitrary, platform-defined epoch.
