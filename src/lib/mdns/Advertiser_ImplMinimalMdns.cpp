@@ -525,8 +525,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
 FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertisingParameters & params)
 {
-    // Max number of TXT fields from the spec is 9: D, VP, CM, DT, DN, RI, PI, PH.
-    constexpr size_t kMaxTxtFields = 9;
+    // Max number of TXT fields from the spec is 8: D, VP, CM, DT, DN, RI, PI, PH.
+    constexpr size_t kMaxTxtFields = 8;
     const char * txtFields[kMaxTxtFields];
     size_t numTxtFields = 0;
 

@@ -104,11 +104,14 @@ int16_t MdnsServer::GetExtendedDiscoveryTimeoutSecs()
     return secs;
 }
 
+/// Callback from Extended Discovery Expiration timer
 void HandleExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 {
     MdnsServer::Instance().OnExtendedDiscoveryExpiration(aSystemLayer, aAppState);
 }
 
+/// Checks if extended discovery has expired and if so,
+/// stops commissionable node advertising
 void MdnsServer::OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 {
     if (mExtendedDiscoveryExpirationMs == TIMEOUT_CLEARED)
@@ -157,11 +160,15 @@ void MdnsServer::OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, voi
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
+/// Callback from Discovery Expiration timer
 void HandleDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 {
     MdnsServer::Instance().OnDiscoveryExpiration(aSystemLayer, aAppState);
 }
 
+/// Checks if discovery has expired and if so,
+/// kicks off extend discovery (when enabled)
+/// otherwise, stops commissionable node advertising
 void MdnsServer::OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 {
     if (mDiscoveryExpirationMs == TIMEOUT_CLEARED)
