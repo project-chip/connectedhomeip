@@ -112,6 +112,7 @@ void HandleExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aApp
 
 /// Checks if extended discovery has expired and if so,
 /// stops commissionable node advertising
+/// Extended Discovery Expiration refers here to commissionable node advertising when NOT in commissioning mode
 void MdnsServer::OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 {
     if (mExtendedDiscoveryExpirationMs == TIMEOUT_CLEARED)
@@ -169,6 +170,7 @@ void HandleDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 /// Checks if discovery has expired and if so,
 /// kicks off extend discovery (when enabled)
 /// otherwise, stops commissionable node advertising
+/// Discovery Expiration refers here to commissionable node advertising when in commissioning mode
 void MdnsServer::OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 {
     if (mDiscoveryExpirationMs == TIMEOUT_CLEARED)
