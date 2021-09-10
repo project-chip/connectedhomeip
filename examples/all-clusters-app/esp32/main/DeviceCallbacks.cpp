@@ -217,7 +217,7 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState)
 
     if (identifyTimerCount)
     {
-        SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
+        systemLayer->StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
         // Decrement the timer count.
         identifyTimerCount--;
     }
@@ -235,8 +235,8 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointI
     // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
     identifyTimerCount = (*value) * 4;
 
-    SystemLayer.CancelTimer(IdentifyTimerHandler, this);
-    SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, this);
+    DeviceLayer::SystemLayer().CancelTimer(IdentifyTimerHandler, this);
+    DeviceLayer::SystemLayer().StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, this);
 
 exit:
     return;

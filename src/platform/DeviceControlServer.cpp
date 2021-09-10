@@ -52,13 +52,13 @@ void DeviceControlServer::CommissioningFailedTimerComplete()
 CHIP_ERROR DeviceControlServer::ArmFailSafe(uint16_t expiryLengthSeconds)
 {
     uint32_t timerMs = expiryLengthSeconds * 1000;
-    SystemLayer.StartTimer(timerMs, HandleArmFailSafe, this);
+    DeviceLayer::SystemLayer().StartTimer(timerMs, HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControlServer::DisarmFailSafe()
 {
-    SystemLayer.CancelTimer(HandleArmFailSafe, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
 
