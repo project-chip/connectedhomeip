@@ -404,7 +404,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
         ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
         mWiFiAPMode = val;
 
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 
 exit:
@@ -417,7 +417,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP()
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand start WiFi AP");
         mLastAPDemandTime = System::Clock::GetMonotonicMilliseconds();
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
     {
@@ -431,7 +431,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP");
         mLastAPDemandTime = 0;
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
     {
@@ -453,7 +453,7 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
 void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
 {
     mWiFiAPIdleTimeoutMS = val;
-    SystemLayer.ScheduleWork(DriveAPState, NULL);
+    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
@@ -688,7 +688,7 @@ void ConnectivityManagerImpl::DriveAPState()
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
                 apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
-                err       = SystemLayer.StartTimer(apTimeout, DriveAPState, NULL);
+                err       = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
                 SuccessOrExit(err);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s", apTimeout / 1000);
             }

@@ -627,7 +627,7 @@ void BLEManagerImpl::HandleInitComplete(bool no_error)
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
     security_mgr.setSecurityManagerEventHandler(&sSecurityManagerEventHandler);
 
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 #if _BLEMGRIMPL_USE_LEDS

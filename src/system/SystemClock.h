@@ -89,8 +89,11 @@ public:
     MonotonicMilliseconds GetMonotonicMilliseconds() override;
 };
 
-extern ClockImpl staticClock;
-extern ClockBase * globalClock;
+namespace Internal {
+// These should only be used via the public Clock:: functions below.
+extern ClockImpl gClockImpl;
+extern ClockBase * gClockBase;
+} // namespace Internal
 
 namespace Clock {
 using MonotonicMicroseconds = ClockBase::MonotonicMicroseconds;
@@ -99,12 +102,12 @@ using UnixTimeMicroseconds  = ClockBase::MonotonicMicroseconds;
 
 inline MonotonicMicroseconds GetMonotonicMicroseconds()
 {
-    return globalClock->GetMonotonicMicroseconds();
+    return Internal::gClockBase->GetMonotonicMicroseconds();
 }
 
 inline MonotonicMilliseconds GetMonotonicMilliseconds()
 {
-    return globalClock->GetMonotonicMilliseconds();
+    return Internal::gClockBase->GetMonotonicMilliseconds();
 }
 
 /**

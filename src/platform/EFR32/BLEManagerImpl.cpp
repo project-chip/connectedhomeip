@@ -159,7 +159,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     sl_status_t ret;
 
     // Initialize the CHIP BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
     memset(mBleConnections, 0, sizeof(mBleConnections));

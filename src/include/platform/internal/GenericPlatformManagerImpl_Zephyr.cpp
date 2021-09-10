@@ -41,6 +41,13 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+namespace {
+System::LayerSocketsLoop & SystemLayerSocketsLoop()
+{
+    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+}
+} // anonymous namespace
+
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
 
@@ -112,7 +119,7 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDe
         ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
         return System::MapErrorZephyr(status);
     }
-    SystemLayer.Signal(); // Trigger wake on CHIP thread
+    SystemLayerSocketsLoop().Signal(); // Trigger wake on CHIP thread
     return CHIP_NO_ERROR;
 }
 
@@ -130,20 +137,20 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
 {
     Impl()->LockChipStack();
 
-    SystemLayer.EventLoopBegins();
+    SystemLayerSocketsLoop().EventLoopBegins();
     while (true)
     {
-        SystemLayer.PrepareEvents();
+        SystemLayerSocketsLoop().PrepareEvents();
 
         Impl()->UnlockChipStack();
-        SystemLayer.WaitForEvents();
+        SystemLayerSocketsLoop().WaitForEvents();
         Impl()->LockChipStack();
 
-        SystemLayer.HandleEvents();
+        SystemLayerSocketsLoop().HandleEvents();
 
         ProcessDeviceEvents();
     }
-    SystemLayer.EventLoopEnds();
+    SystemLayerSocketsLoop().EventLoopEnds();
 
     Impl()->UnlockChipStack();
 }

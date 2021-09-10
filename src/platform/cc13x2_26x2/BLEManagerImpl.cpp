@@ -106,7 +106,7 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
 
     BLEMGR_LOG("BLEMGR: BLE Initialization Start");
     // Initialize the CHIP BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     if (err != CHIP_NO_ERROR)
     {
         return err;

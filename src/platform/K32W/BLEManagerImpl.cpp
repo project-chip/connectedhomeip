@@ -155,7 +155,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(!mFlags.Has(Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
     // Initialize the Chip BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
     (void) RNG_Init();

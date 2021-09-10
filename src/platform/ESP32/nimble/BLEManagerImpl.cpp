@@ -126,7 +126,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     CHIP_ERROR err;
 
     // Initialize the Chip BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
     mRXCharAttrHandle     = 0;
@@ -170,8 +170,8 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (val)
     {
         mAdvertiseStartTime = System::Clock::GetMonotonicMilliseconds();
-        ReturnErrorOnFailure(SystemLayer.StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
-        ReturnErrorOnFailure(SystemLayer.StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
 
     mFlags.Set(Flags::kFastAdvertisingEnabled, val);

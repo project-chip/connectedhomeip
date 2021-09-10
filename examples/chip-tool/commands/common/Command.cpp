@@ -423,7 +423,7 @@ static void OnResponseTimeout(chip::System::Layer *, void *)
 
 CHIP_ERROR Command::ScheduleWaitForResponse(uint16_t seconds)
 {
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer.StartTimer(seconds * 1000, OnResponseTimeout, this);
+    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(seconds * 1000, OnResponseTimeout, this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "Failed to allocate timer %" CHIP_ERROR_FORMAT, err.Format());

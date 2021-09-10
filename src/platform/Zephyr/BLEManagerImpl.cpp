@@ -127,7 +127,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     bt_conn_cb_register(&mConnCallbacks);
 
     // Initialize the CHIP BleLayer.
-    ReturnErrorOnFailure(BleLayer::Init(this, this, &SystemLayer));
+    ReturnErrorOnFailure(BleLayer::Init(this, this, &DeviceLayer::SystemLayer()));
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
@@ -291,15 +291,15 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         if (mFlags.Has(Flags::kFastAdvertisingEnabled))
         {
             // Start timer to change advertising interval.
-            SystemLayer.StartTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME, HandleBLEAdvertisementIntervalChange,
-                                   this);
+            DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME,
+                                                  HandleBLEAdvertisementIntervalChange, this);
         }
 
         // Start timer to disable CHIPoBLE advertisement after timeout expiration only if it isn't advertising rerun (in that case
         // timer is already running).
         if (!isAdvertisingRerun)
         {
-            SystemLayer.StartTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT, HandleBLEAdvertisementTimeout, this);
+            DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT, HandleBLEAdvertisementTimeout, this);
         }
     }
 
@@ -328,10 +328,10 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         }
 
         // Cancel timer event disabling CHIPoBLE advertisement after timeout expiration
-        SystemLayer.CancelTimer(HandleBLEAdvertisementTimeout, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleBLEAdvertisementTimeout, this);
 
         // Cancel timer event changing CHIPoBLE advertisement interval
-        SystemLayer.CancelTimer(HandleBLEAdvertisementIntervalChange, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleBLEAdvertisementIntervalChange, this);
     }
 
     return CHIP_NO_ERROR;
