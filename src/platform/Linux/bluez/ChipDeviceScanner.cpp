@@ -261,6 +261,8 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 * device)
 
 int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 {
+    GVariantBuilder filterBuilder;
+    GVariant *filter;
     GError * error = nullptr;
 
     self->mObjectAddedSignal = g_signal_connect(self->mManager, "object-added", G_CALLBACK(SignalObjectAdded), self);
@@ -271,6 +273,18 @@ int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     for (BluezObject & object : BluezObjectList(self->mManager))
     {
         self->RemoveDevice(bluez_object_get_device1(&object));
+    }
+
+    /* Search for LE only: Advertises */
+    g_variant_builder_init(&filterBuilder, G_VARIANT_TYPE("a{sv}"));
+    g_variant_builder_add(&filterBuilder, "{sv}", "Transport", g_variant_new_string("le"));
+    filter = g_variant_builder_end(&filterBuilder);
+
+    if (!bluez_adapter1_call_set_discovery_filter_sync(self->mAdapter, filter, self->mCancellable, &error))
+    {
+        /* Not critical: ignore if fails */
+        ChipLogError(Ble, "Failed to set discovery filters: %s", error->message);
+        g_error_free(error);
     }
 
     ChipLogProgress(Ble, "BLE initiating scan.");
