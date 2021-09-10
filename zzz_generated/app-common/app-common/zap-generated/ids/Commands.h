@@ -345,6 +345,10 @@ static constexpr CommandId RevokeCommissioning          = 0x00000002;
 namespace OperationalCredentials {
 namespace Commands {
 namespace Ids {
+static constexpr CommandId AttestationRequest           = 0x00000000;
+static constexpr CommandId AttestationResponse          = 0x00000001;
+static constexpr CommandId CertChainRequest             = 0x00000002;
+static constexpr CommandId CertChainResponse            = 0x00000003;
 static constexpr CommandId OpCSRRequest                 = 0x00000004;
 static constexpr CommandId OpCSRResponse                = 0x00000005;
 static constexpr CommandId AddNOC                       = 0x00000006;

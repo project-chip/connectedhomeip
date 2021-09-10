@@ -15752,6 +15752,28 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(chip::EndpointId endpoint,
                                                                          chip::app::CommandHandler * commandObj);
 /**
+ * @brief  Cluster AttestationRequest Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterAttestationRequestCallback(chip::EndpointId endpoint,
+                                                                    chip::app::CommandHandler * commandObj,
+                                                                    chip::ByteSpan AttestationNonce);
+/**
+ * @brief  Cluster AttestationResponse Command callback (from server)
+ */
+bool emberAfOperationalCredentialsClusterAttestationResponseCallback(chip::EndpointId endpoint,
+                                                                     chip::app::CommandSender * commandObj,
+                                                                     chip::ByteSpan AttestationElements, chip::ByteSpan Signature);
+/**
+ * @brief  Cluster CertChainRequest Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterCertChainRequestCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                                  uint16_t CertChainType);
+/**
+ * @brief  Cluster CertChainResponse Command callback (from server)
+ */
+bool emberAfOperationalCredentialsClusterCertChainResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                                   chip::ByteSpan Certificate);
+/**
  * @brief  Cluster OpCSRRequest Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,

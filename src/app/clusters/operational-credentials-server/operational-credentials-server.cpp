@@ -502,9 +502,6 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(EndpointId e
     VerifyOrExit(attestationNonce.size() == 32, status = EMBER_ZCL_STATUS_FAILURE);
 
     {
-        uint16_t vendorId   = 0xFFF1;
-        uint16_t profileNum = 0x003E;
-        std::vector<ByteSpan> vendorReserved;
         uint8_t certDeclBuf[512];
         MutableByteSpan certDeclSpan(certDeclBuf);
 
@@ -514,8 +511,8 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(EndpointId e
         VerifyOrExit(attestationElements.Alloc(attestationElementsLen), err = CHIP_ERROR_NO_MEMORY);
 
         MutableByteSpan attestationElementsSpan(attestationElements.Get(), attestationElementsLen);
-        SuccessOrExit(err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, 0, ByteSpan(), vendorReserved,
-                                                                      vendorId, profileNum, attestationElementsSpan));
+        SuccessOrExit(err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, 0, ByteSpan(), nullptr, 0, 0,
+                                                                      0, attestationElementsSpan));
         attestationElementsLen = attestationElementsSpan.size();
     }
 
