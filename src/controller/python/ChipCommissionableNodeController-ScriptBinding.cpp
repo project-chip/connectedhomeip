@@ -25,8 +25,8 @@
 
 #include <controller/CHIPCommissionableNodeController.h>
 #include <inet/IPAddress.h>
-#include <support/BytesToHex.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <type_traits>
 

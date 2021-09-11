@@ -24,10 +24,10 @@
 #include <controller/java/JniReferences.h>
 #include <controller/java/JniTypeWrappers.h>
 #include <controller/java/StackLock.h>
-#include <core/CHIPSafeCasts.h>
 #include <jni.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
-#include <support/CodeUtils.h>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
@@ -6885,18 +6885,23 @@ public:
             ChipLogError(
                 Zcl, "Could not find class chip/devicecontroller/ChipClusters$OperationalCredentialsCluster$FabricsListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(JIJ[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(I[BIJJ[B)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find FabricsListAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
-            jlong fabricId   = entries[i].FabricId;
+            jint fabricIndex         = entries[i].FabricIndex;
+            jbyteArray rootPublicKey = env->NewByteArray(entries[i].RootPublicKey.size());
+            env->SetByteArrayRegion(rootPublicKey, 0, entries[i].RootPublicKey.size(),
+                                    reinterpret_cast<const jbyte *>(entries[i].RootPublicKey.data()));
             jint vendorId    = entries[i].VendorId;
+            jlong fabricId   = entries[i].FabricId;
             jlong nodeId     = entries[i].NodeId;
             jbyteArray label = env->NewByteArray(entries[i].Label.size());
             env->SetByteArrayRegion(label, 0, entries[i].Label.size(), reinterpret_cast<const jbyte *>(entries[i].Label.data()));
 
-            jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricId, vendorId, nodeId, label);
+            jobject attributeObj =
+                env->NewObject(attributeClass, attributeCtor, fabricIndex, rootPublicKey, vendorId, fabricId, nodeId, label);
             VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create FabricsListAttribute object"));
 
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);

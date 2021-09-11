@@ -51,7 +51,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
-    SystemLayer.SetDispatchQueue(GetWorkQueue());
+    static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
 exit:
     return err;

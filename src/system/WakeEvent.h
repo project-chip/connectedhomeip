@@ -27,26 +27,26 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <system/SocketEvents.h>
 
 namespace chip {
 namespace System {
 
-class Layer;
+class LayerSockets;
 class WakeEventTest;
 
 /**
  * @class WakeEvent
  *
- * An instance of this type can be used by a WatchableEventManager to allow other threads
- * to wake its event loop thread via WatchableEventManager::Signal().
+ * An instance of this type can be used by a System::Layer to allow other threads
+ * to wake its event loop thread via System::Layer::Signal().
  */
 class WakeEvent
 {
 public:
-    CHIP_ERROR Open(Layer & systemLayer); /**< Initialize the pipeline */
-    void Close(Layer & systemLayer);      /**< Close both ends of the pipeline. */
+    CHIP_ERROR Open(LayerSockets & systemLayer); /**< Initialize the pipeline */
+    void Close(LayerSockets & systemLayer);      /**< Close both ends of the pipeline. */
 
     CHIP_ERROR Notify(); /**< Set the event. */
     void Confirm();      /**< Clear the event. */

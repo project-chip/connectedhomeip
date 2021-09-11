@@ -48,7 +48,6 @@ CHIP_ERROR CommandDataElement::Parser::Init(const chip::TLV::TLVReader & aReader
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -220,7 +219,6 @@ CommandDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -321,7 +319,6 @@ CHIP_ERROR CommandDataElement::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -388,7 +385,6 @@ CommandPath::Builder & CommandDataElement::Builder::CreateCommandPathBuilder()
     VerifyOrExit(CHIP_NO_ERROR == mError, mCommandPathBuilder.ResetError(mError));
 
     mError = mCommandPathBuilder.Init(mpWriter, kCsTag_CommandPath);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mAttributePathBuilder would be un-/partial initialized and cannot be used to write anything
@@ -401,7 +397,6 @@ StatusElement::Builder & CommandDataElement::Builder::CreateStatusElementBuilder
     VerifyOrExit(CHIP_NO_ERROR == mError, mStatusElementBuilder.ResetError(mError));
 
     mError = mStatusElementBuilder.Init(mpWriter, kCsTag_StatusElement);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mStatusElementBuilder would be un-/partial initialized and cannot be used to write anything

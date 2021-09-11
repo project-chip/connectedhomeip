@@ -25,10 +25,10 @@
 
 #pragma once
 
-#include <support/BitFlags.h>
+#include <lib/support/BitFlags.h>
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-#include <support/LifetimePersistedCounter.h>
+#include <lib/support/LifetimePersistedCounter.h>
 #endif
 
 namespace chip {

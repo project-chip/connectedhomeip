@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include <core/CHIPCore.h>
-#include <core/PeerId.h>
 #include <inet/IPAddress.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/PeerId.h>
 #include <lib/mdns/Advertiser.h>
 #include <lib/mdns/Resolver.h>
 #include <lib/mdns/platform/Mdns.h>

@@ -20,7 +20,7 @@
 #include "LightingManager.h"
 #include "AppTask.h"
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 // mbed-os headers
 #include "platform/Callback.h"

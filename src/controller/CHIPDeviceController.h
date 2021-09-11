@@ -33,18 +33,18 @@
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
 #include <controller/OperationalCredentialsDelegate.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPPersistentStorageDelegate.h>
-#include <core/CHIPTLV.h>
 #include <credentials/CHIPOperationalCredentials.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/SerializableIntegerSet.h>
 #include <lib/support/Span.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
-#include <support/DLLUtil.h>
-#include <support/SerializableIntegerSet.h>
 #include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -59,7 +59,7 @@
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <controller/DeviceAddressUpdateDelegate.h>
-#include <mdns/Resolver.h>
+#include <lib/mdns/Resolver.h>
 #endif
 
 namespace chip {
@@ -372,8 +372,8 @@ protected:
 
 private:
     //////////// ExchangeDelegate Implementation ///////////////
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && msgBuf) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
@@ -397,13 +397,13 @@ public:
      * @brief
      *   Starts advertisement of the device for rendezvous availability.
      */
-    CHIP_ERROR StartAdvertisement() const override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StartAdvertisement() override { return CHIP_NO_ERROR; }
 
     /**
      * @brief
      *   Stops advertisement of the device for rendezvous availability.
      */
-    CHIP_ERROR StopAdvertisement() const override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StopAdvertisement() override { return CHIP_NO_ERROR; }
 };
 
 /**
@@ -496,15 +496,15 @@ public:
 
     /**
      * @brief
-     *   Trigger a paired device to re-enter the pairing mode. The device will exit the pairing mode
-     *   after a successful pairing, or after the given `timeout` time.
+     *   Trigger a paired device to re-enter the commissioning mode. The device will exit the commissioning mode
+     *   after a successful commissioning, or after the given `timeout` time.
      *
      * @param[in] deviceId        The device Id.
-     * @param[in] timeout         The pairing mode should terminate after this much time.
+     * @param[in] timeout         The commissioning mode should terminate after this much time.
      * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
      *                            PAKE passcode verifier to be used for this commissioning.
      * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
-     * @param[in] option          The pairing window can be opened using the original setup code, or an
+     * @param[in] option          The commissioning window can be opened using the original setup code, or an
      *                            onboarding token can be generated using a random setup PIN code (or with
      *                            the PIN code provied in the setupPayload).
      *
@@ -514,8 +514,13 @@ public:
                                        uint8_t option);
 
     /**
-     *  This function call indicates commissioning complete and sends commissioining complete
-     *  complete event to the application.
+     *  This function call causes the DeviceCommissioner to send a
+     *  CommissioningComplete command to the given node.  At least when
+     *  mIsIPRendezvous is false, which seems to be an incredibly broken
+     *  workaround for
+     *  <https://github.com/project-chip/connectedhomeip/issues/8010>.  Chances
+     *  are, this function and its callsites should just be removed when that
+     *  issue is fixed.
      */
     CHIP_ERROR CommissioningComplete(NodeId remoteDeviceId);
 

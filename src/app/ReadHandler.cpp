@@ -88,7 +88,6 @@ CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayl
     err = ProcessReadRequest(std::move(aPayload));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogFunctError(err);
         Shutdown();
     }
 
@@ -132,7 +131,6 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
     if (IsInitialReport())
     {
         VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mSecureHandle = mpExchangeCtx->GetSecureSession();
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     MoveToState(HandlerState::Reporting);
@@ -140,8 +138,8 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
                                       Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
 }
 
-CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                          System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -151,13 +149,13 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
     }
     else
     {
-        err = OnUnknownMsgType(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+        err = OnUnknownMsgType(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
     return err;
 }
 
-CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                         const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                         System::PacketBufferHandle && aPayload)
 {
     ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
     Shutdown();
@@ -237,7 +235,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     // this method to return a failure.
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -284,10 +281,17 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         }
         SuccessOrExit(err);
 
-        err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
-        SuccessOrExit(err);
-        mpAttributeClusterInfoList->SetDirty();
-        SetInitialReport();
+        if (MergeOverlappedAttributePath(clusterInfo))
+        {
+            continue;
+        }
+        else
+        {
+            err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
+            SuccessOrExit(err);
+            mpAttributeClusterInfoList->SetDirty();
+            mInitialReport = true;
+        }
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -296,8 +300,32 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
+}
+
+bool ReadHandler::MergeOverlappedAttributePath(ClusterInfo & aAttributePath)
+{
+    ClusterInfo * runner = mpAttributeClusterInfoList;
+    while (runner != nullptr)
+    {
+        // If overlapped, we would skip this target path,
+        // --If targetPath is part of previous path, return true
+        // --If previous path is part of target path, update filedid and listindex and mflags with target path, return true
+        if (runner->IsAttributePathSupersetOf(aAttributePath))
+        {
+            return true;
+        }
+        if (aAttributePath.IsAttributePathSupersetOf(*runner))
+        {
+            runner->mListIndex = aAttributePath.mListIndex;
+            runner->mFieldId   = aAttributePath.mFieldId;
+            runner->mFlags     = aAttributePath.mFlags;
+            runner->SetDirty();
+            return true;
+        }
+        runner = runner->mpNext;
+    }
+    return false;
 }
 
 CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathListParser)
@@ -341,7 +369,6 @@ CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathL
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 

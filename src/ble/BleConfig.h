@@ -208,4 +208,4 @@
 
 // clang-format on
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>

@@ -156,6 +156,12 @@ list(APPEND CHIP_CFLAGS
     \"-D__LINUX_ERRNO_EXTENSIONS__=1\"
 )
 
+if (CONFIG_MBED_BSD_SOCKET_TRACE)
+    list(APPEND CHIP_CFLAGS 
+        \"-DMBED_BSD_SOCKET_TRACE=1\"
+    )
+endif()
+
 # CFLAGS are put in random order, sort them before converting them to a string
 list(SORT CHIP_CFLAGS)
 list(SORT CHIP_CFLAGS_C)
@@ -267,6 +273,12 @@ list(APPEND CHIP_INCLUDES
 list(APPEND CHIP_DEFINES 
     __LINUX_ERRNO_EXTENSIONS__=1
 )
+
+if (CONFIG_MBED_BSD_SOCKET_TRACE)
+    list(APPEND CHIP_DEFINES 
+        MBED_BSD_SOCKET_TRACE=1
+    )
+endif()
 
 target_include_directories(${APP_TARGET} PRIVATE 
                            ${CHIP_INCLUDES}

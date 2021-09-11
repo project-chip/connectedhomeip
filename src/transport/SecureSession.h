@@ -25,9 +25,9 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <support/Span.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {

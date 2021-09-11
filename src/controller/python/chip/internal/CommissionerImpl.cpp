@@ -18,12 +18,12 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CodeUtils.h>
-#include <support/ScopedBuffer.h>
-#include <support/ThreadOperationalDataset.h>
-#include <support/logging/CHIPLogging.h>
 
 #include "ChipThreadWork.h"
 
@@ -98,7 +98,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         chip::Controller::CommissionerInitParams params;
 
         params.storageDelegate = &gServerStorage;
-        params.systemLayer     = &chip::DeviceLayer::SystemLayer;
+        params.systemLayer     = &chip::DeviceLayer::SystemLayer();
         params.inetLayer       = &chip::DeviceLayer::InetLayer;
         params.pairingDelegate = &gPairingDelegate;
 

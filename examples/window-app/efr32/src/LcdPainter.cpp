@@ -18,7 +18,6 @@
  */
 
 #include <LcdPainter.h>
-#include <display.h>
 #include <lcd.h>
 
 constexpr uint32_t sTiltIcon[] = {

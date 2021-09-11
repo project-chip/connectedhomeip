@@ -23,12 +23,12 @@
 
 #include <lib/shell/Engine.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <lib/shell/Commands.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <assert.h>
 #include <ctype.h>

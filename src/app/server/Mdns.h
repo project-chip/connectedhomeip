@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
-#include <mdns/Advertiser.h>
+#include <lib/core/CHIPError.h>
+#include <lib/mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <stddef.h>
 #include <system/TimeSource.h>

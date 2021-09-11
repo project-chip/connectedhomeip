@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPTLV.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <utility>

@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <mdns/minimal/records/ResourceRecord.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/mdns/minimal/records/ResourceRecord.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

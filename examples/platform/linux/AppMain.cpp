@@ -24,23 +24,23 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <core/CHIPError.h>
-#include <core/NodeId.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/NodeId.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/ScopedBuffer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/CHIPMem.h>
-#include <support/RandUtils.h>
-#include <support/ScopedBuffer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <ControllerShellCommands.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/KeyValueStoreManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
@@ -265,17 +265,17 @@ void ChipLinuxAppMainLoop()
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     chip::Shell::RegisterCommissioneeCommands();
 #endif
+    uint16_t securePort   = CHIP_PORT;
+    uint16_t unsecurePort = CHIP_UDC_PORT;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     // use a different service port to make testing possible with other sample devices running on same host
-    ServerConfigParams params;
-    params.securedServicePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
-    params.unsecuredServicePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
-    SetServerConfig(params);
+    securePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
+    unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     // Init ZCL Data Model and CHIP App Server
-    InitServer();
+    chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

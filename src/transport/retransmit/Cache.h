@@ -20,7 +20,7 @@
 #include <cstddef>
 #include <type_traits>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace Retransmit {

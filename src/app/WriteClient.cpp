@@ -131,7 +131,6 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -145,7 +144,6 @@ CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePa
     err = ConstructAttributePath(attributePathParams, attributeDataElement);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -163,7 +161,6 @@ CHIP_ERROR WriteClient::FinishAttribute()
     MoveToState(State::AddAttribute);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -211,7 +208,6 @@ CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
     SuccessOrExit(err);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -247,7 +243,7 @@ void WriteClient::ClearState()
     MoveToState(State::Uninitialized);
 }
 
-CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
+CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
                                          uint32_t timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -263,14 +259,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricInde
     ClearExistingExchangeContext();
 
     // Create a new exchange context.
-    if (apSecureSession == nullptr)
-    {
-        mpExchangeCtx = mpExchangeMgr->NewContext(SessionHandle(aNodeId, 0, 0, aFabricIndex), this);
-    }
-    else
-    {
-        mpExchangeCtx = mpExchangeMgr->NewContext(*apSecureSession, this);
-    }
+    mpExchangeCtx = mpExchangeMgr->NewContext(apSecureSession.ValueOr(SessionHandle(aNodeId, 0, 0, aFabricIndex)), this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(timeout);
 
@@ -284,13 +273,12 @@ exit:
     {
         ClearExistingExchangeContext();
     }
-    ChipLogFunctError(err);
 
     return err;
 }
 
-CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                          System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Assert that the exchange context matches the client's current context.
@@ -389,7 +377,6 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusElement(AttributeStatusElement::Pa
     }
 
 exit:
-    ChipLogFunctError(err);
     if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
     {
         mpDelegate->WriteResponseProtocolError(this, mAttributeStatusIndex);
@@ -397,7 +384,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClientHandle::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
+CHIP_ERROR WriteClientHandle::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
                                                uint32_t timeout)
 {
     CHIP_ERROR err = mpWriteClient->SendWriteRequest(aNodeId, aFabricIndex, apSecureSession, timeout);

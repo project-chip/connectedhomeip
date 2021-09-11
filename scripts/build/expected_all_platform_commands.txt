@@ -72,12 +72,12 @@ west build --cmake-only -d {out}/nrf-nrf52840-shell -b nrf52840dk_nrf52840 {root
 # Generating nrf-nrf52840-pump
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d /OUTPUT/DIR/nrf-nrf52840-pump -b nrf52840dk_nrf52840 /TEST/BUILD/ROOT/examples/pump-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840-pump -b nrf52840dk_nrf52840 {root}/examples/pump-app/nrfconnect'
 
 # Generating nrf-nrf52840-pump_controller
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d /OUTPUT/DIR/nrf-nrf52840-pump_controller -b nrf52840dk_nrf52840 /TEST/BUILD/ROOT/examples/pump-controller-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840-pump_controller -b nrf52840dk_nrf52840 {root}/examples/pump-controller-app/nrfconnect'
 
 # Generating nrf-nrf5340-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
@@ -97,12 +97,12 @@ west build --cmake-only -d {out}/nrf-nrf5340-shell -b nrf5340dk_nrf5340_cpuapp {
 # Generating nrf-nrf5340-pump
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d /OUTPUT/DIR/nrf-nrf5340-pump -b nrf5340dk_nrf5340_cpuapp /TEST/BUILD/ROOT/examples/pump-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf5340-pump -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-app/nrfconnect'
 
 # Generating nrf-nrf5340-pump_controller
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d /OUTPUT/DIR/nrf-nrf5340-pump_controller -b nrf5340dk_nrf5340_cpuapp /TEST/BUILD/ROOT/examples/pump-controller-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf5340-pump_controller -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-controller-app/nrfconnect'
 
 # Generating android-arm-chip_tool
 gn gen --check --fail-on-unused-args {out}/android-arm-chip_tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
@@ -123,13 +123,14 @@ gn gen --check --fail-on-unused-args {out}/android-x64-chip_tool '--args=target_
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating infineon-p6board-lock
-gn gen --check --fail-on-unused-args --root=/TEST/BUILD/ROOT/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' /OUTPUT/DIR/infineon-p6board-lock
+gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6board-lock
 
 # Generating telink-tlsr9518adk80d-light
-bash -c 'source "$TELINK_ZEPHYR_BASE/zephyr-env.sh";
-export ZEPHYR_TOOLCHAIN_VARIANT=cross-compile;
-export CROSS_COMPILE=$TELINK_TOOLCHAIN_PATH/riscv32-elf-;
-west build -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {root}/examples/lighting-app/telink'
+bash -c 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_BASE/../../zephyr-sdk-0.13.0"
+source "$ZEPHYR_BASE/zephyr-env.sh";
+west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {root}/examples/lighting-app/telink'
 
 # Building {real_platform}-native-all_clusters
 ninja -C {out}/{real_platform}-native-all_clusters
@@ -183,10 +184,10 @@ ninja -C {out}/nrf-nrf52840-lock
 ninja -C {out}/nrf-nrf52840-shell
 
 # Building nrf-nrf52840-pump
-ninja -C /OUTPUT/DIR/nrf-nrf52840-pump
+ninja -C {out}/nrf-nrf52840-pump
 
 # Building nrf-nrf52840-pump_controller
-ninja -C /OUTPUT/DIR/nrf-nrf52840-pump_controller
+ninja -C {out}/nrf-nrf52840-pump_controller
 
 # Building nrf-nrf5340-light
 ninja -C {out}/nrf-nrf5340-light
@@ -198,10 +199,10 @@ ninja -C {out}/nrf-nrf5340-lock
 ninja -C {out}/nrf-nrf5340-shell
 
 # Building nrf-nrf5340-pump
-ninja -C /OUTPUT/DIR/nrf-nrf5340-pump
+ninja -C {out}/nrf-nrf5340-pump
 
 # Building nrf-nrf5340-pump_controller
-ninja -C /OUTPUT/DIR/nrf-nrf5340-pump_controller
+ninja -C {out}/nrf-nrf5340-pump_controller
 
 # Building JNI android-arm-chip_tool
 ninja -C {out}/android-arm-chip_tool
@@ -249,7 +250,7 @@ cp {out}/android-x64-chip_tool/lib/jni/x86_64/libc++_shared.so {root}/src/androi
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-x64-chip_tool/lib -PbuildDir={out}/android-x64-chip_tool build
 
 # Building infineon-p6board-lock
-ninja -C /OUTPUT/DIR/infineon-p6board-lock
+ninja -C {out}/infineon-p6board-lock
 
 # Building telink-tlsr9518adk80d-light
 ninja -C {out}/telink-tlsr9518adk80d-light

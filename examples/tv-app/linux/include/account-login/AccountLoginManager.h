@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/util/af-types.h>
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <map>
 #include <string>
 

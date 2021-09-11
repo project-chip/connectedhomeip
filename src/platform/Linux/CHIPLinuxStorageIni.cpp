@@ -27,12 +27,12 @@
 #include <string>
 #include <unistd.h>
 
+#include <lib/support/Base64.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/CHIPLinuxStorageIni.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/Base64.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -88,20 +88,20 @@ CHIP_ERROR ChipLinuxStorageIni::AddConfig(const std::string & configFile)
 // 3. Using rename() to overwrite the existing file
 CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
 {
-    CHIP_ERROR retval = CHIP_NO_ERROR;
-    std::ofstream ofs;
-    std::string tmpPath = configFile;
+    CHIP_ERROR retval   = CHIP_NO_ERROR;
+    std::string tmpPath = configFile + "-XXXXXX";
 
-    tmpPath.append(".tmp");
-
-    ofs.open(tmpPath, std::ofstream::out | std::ofstream::trunc);
-
-    if (ofs.is_open())
+    int fd = mkstemp(&tmpPath[0]);
+    if (fd != -1)
     {
+        std::ofstream ofs;
+
         ChipLogProgress(DeviceLayer, "writing settings to file (%s)", tmpPath.c_str());
 
+        ofs.open(tmpPath, std::ofstream::out | std::ofstream::trunc);
         mConfigStore.generate(ofs);
-        ofs.close();
+
+        close(fd);
 
         if (rename(tmpPath.c_str(), configFile.c_str()) == 0)
         {

@@ -21,18 +21,18 @@
  *
  */
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPKeyIds.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPKeyIds.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace secure_channel {
@@ -86,16 +86,16 @@ CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketH
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+CHIP_ERROR MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * exchangeContext,
                                                     const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq))
     {
-        return HandleMsgCounterSyncReq(exchangeContext, packetHeader, std::move(msgBuf));
+        return HandleMsgCounterSyncReq(exchangeContext, std::move(msgBuf));
     }
     else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
     {
-        return HandleMsgCounterSyncResp(exchangeContext, packetHeader, std::move(msgBuf));
+        return HandleMsgCounterSyncResp(exchangeContext, std::move(msgBuf));
     }
     return CHIP_NO_ERROR;
 }
@@ -258,7 +258,7 @@ exit:
 }
 
 CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext,
-                                                          const PacketHeader & packetHeader, System::PacketBufferHandle && msgBuf)
+                                                          System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -267,7 +267,6 @@ CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeCon
 
     ChipLogDetail(SecureChannel, "Received MsgCounterSyncReq request");
 
-    VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(req != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(reqlen == kChallengeSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
@@ -284,12 +283,11 @@ exit:
 }
 
 CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext,
-                                                           const PacketHeader & packetHeader, System::PacketBufferHandle && msgBuf)
+                                                           System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     Transport::PeerConnectionState * state = nullptr;
-    NodeId peerNodeId                      = 0;
     uint32_t syncCounter                   = 0;
 
     const uint8_t * resp = msgBuf->Start();
@@ -314,11 +312,8 @@ CHIP_ERROR MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeCo
         state->GetSessionMessageCounter().GetPeerMessageCounter().VerifyChallenge(syncCounter, FixedByteSpan<kChallengeSize>(resp));
     SuccessOrExit(err);
 
-    VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
-    peerNodeId = packetHeader.GetSourceNodeId().Value();
-
     // Process all queued incoming messages after message counter synchronization is completed.
-    ProcessPendingMessages(peerNodeId);
+    ProcessPendingMessages(exchangeContext->GetSecureSession().GetPeerNodeId());
 
 exit:
     if (err != CHIP_NO_ERROR)

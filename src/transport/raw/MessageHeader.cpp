@@ -29,9 +29,9 @@
 
 #include <type_traits>
 
-#include <core/CHIPError.h>
-#include <support/BufferReader.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BufferReader.h>
+#include <lib/support/CodeUtils.h>
 
 /**********************************************
  * Header format (little endian):

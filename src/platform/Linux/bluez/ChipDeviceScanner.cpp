@@ -24,8 +24,8 @@
 #include "Types.h"
 
 #include <errno.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <pthread.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -78,7 +78,7 @@ ChipDeviceScanner::~ChipDeviceScanner()
     StopScan();
 
     // In case the timeout timer is still active
-    chip::DeviceLayer::SystemLayer.CancelTimer(TimerExpiredCallback, this);
+    chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
 
     g_object_unref(mManager);
     g_object_unref(mCancellable);
@@ -131,7 +131,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(unsigned timeoutMs)
         return CHIP_ERROR_INTERNAL;
     }
 
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer.StartTimer(timeoutMs, TimerExpiredCallback, static_cast<void *>(this));
+    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeoutMs, TimerExpiredCallback, static_cast<void *>(this));
 
     if (err != CHIP_NO_ERROR)
     {

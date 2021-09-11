@@ -21,11 +21,11 @@
  *  This file defines interfaces for connecting the BDX state machine (TransferSession) to the messaging layer.
  */
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <protocols/bdx/BdxTransferSession.h>
-#include <support/BitFlags.h>
 #include <system/SystemLayer.h>
 
 #pragma once
@@ -49,8 +49,8 @@ public:
 
 private:
     // Inherited from ExchangeContext
-    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PacketHeader & packetHeader,
-                                 const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                 chip::System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     /**

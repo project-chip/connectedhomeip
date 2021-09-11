@@ -17,7 +17,7 @@
 
 #include <protocols/secure_channel/SessionIDAllocator.h>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 

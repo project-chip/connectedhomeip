@@ -23,14 +23,14 @@
 #include <memory>
 
 #include "JniReferences.h"
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/PersistentStorageMacros.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/PersistentStorageMacros.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
-#include <support/ThreadOperationalDataset.h>
 
 using namespace chip;
 using namespace chip::Controller;

@@ -28,9 +28,9 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
-#include <core/CHIPError.h>
-#include <support/CHIPMem.h>
-#include <support/RandUtils.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/RandUtils.h>
 
 #include "AppMain.h"
 

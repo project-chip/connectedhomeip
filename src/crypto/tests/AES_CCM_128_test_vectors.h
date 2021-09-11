@@ -23,7 +23,7 @@
 
 #include <stddef.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 struct ccm_128_test_vector
 {

@@ -14,21 +14,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <mdns/Advertiser.h>
+#include <lib/mdns/Advertiser.h>
 
 #include <string>
 #include <utility>
 
-#include <mdns/Advertiser.h>
-#include <mdns/MinimalMdnsServer.h>
-#include <mdns/minimal/Query.h>
-#include <mdns/minimal/QueryBuilder.h>
-#include <mdns/minimal/core/QName.h>
-#include <mdns/minimal/records/Ptr.h>
-#include <mdns/minimal/records/Srv.h>
-#include <mdns/minimal/records/Txt.h>
-#include <mdns/minimal/tests/CheckOnlyServer.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/mdns/Advertiser.h>
+#include <lib/mdns/MinimalMdnsServer.h>
+#include <lib/mdns/minimal/Query.h>
+#include <lib/mdns/minimal/QueryBuilder.h>
+#include <lib/mdns/minimal/core/QName.h>
+#include <lib/mdns/minimal/records/Ptr.h>
+#include <lib/mdns/minimal/records/Srv.h>
+#include <lib/mdns/minimal/records/Txt.h>
+#include <lib/mdns/minimal/tests/CheckOnlyServer.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <nlunit-test.h>

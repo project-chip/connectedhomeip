@@ -24,11 +24,11 @@
 
 #include <assert.h>
 #include <inet/InetLayer.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/temp_zcl/TempZCL.h>
-#include <support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
 using namespace chip;
@@ -43,8 +43,8 @@ namespace chip {
 //       Delete this class when Device::SendMessage() is obsoleted.
 class DeviceExchangeDelegate : public Messaging::ExchangeDelegate
 {
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
     {
         return CHIP_NO_ERROR;
     }

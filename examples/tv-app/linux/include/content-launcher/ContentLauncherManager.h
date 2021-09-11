@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/af-structs.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <list>
 #include <string>
 #include <vector>
@@ -36,8 +36,8 @@ public:
     CHIP_ERROR Init();
     std::vector<chip::ByteSpan> proxyGetAcceptsHeader();
     std::vector<EmberAfContentLaunchStreamingType> proxyGetSupportedStreamingTypes();
-    ContentLaunchResponse proxyLaunchContentRequest(std::list<EmberAfContentLaunchParamater> parameterList, bool autoplay,
+    ContentLaunchResponse proxyLaunchContentRequest(std::list<ContentLaunchParamater> parameterList, bool autoplay,
                                                     std::string data);
     ContentLaunchResponse proxyLaunchUrlRequest(std::string contentUrl, std::string displayString,
-                                                EmberAfContentLaunchBrandingInformation brandingInformation);
+                                                ContentLaunchBrandingInformation brandingInformation);
 };

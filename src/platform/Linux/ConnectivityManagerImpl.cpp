@@ -24,8 +24,12 @@
 #include <cstdlib>
 #include <new>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <arpa/inet.h>
+#include <ifaddrs.h>
+#include <linux/if_link.h>
+
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
@@ -39,12 +43,26 @@
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
 #endif
 
+#ifndef CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD
+#define CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD "dhclient -nw %s"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
+
+enum class EthernetStatsCountType
+{
+    kEthPacketRxCount,
+    kEthPacketTxCount,
+    kEthTxErrCount,
+    kEthCollisionCount,
+    kEthOverrunCount
+};
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 const char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
 const char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
 
@@ -220,8 +238,70 @@ static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
 
     return frequency;
 }
-} // namespace
 #endif
+
+CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
+{
+    CHIP_ERROR ret          = CHIP_ERROR_READ_FAILED;
+    struct ifaddrs * ifaddr = nullptr;
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+    }
+    else
+    {
+        struct ifaddrs * ifa = nullptr;
+
+        /* Walk through linked list, maintaining head pointer so we
+          can free list later */
+        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (strcmp(ifa->ifa_name, CHIP_DEVICE_CONFIG_ETHERNET_IF_NAME) == 0)
+                break;
+        }
+
+        if (ifa != nullptr)
+        {
+            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
+            {
+                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
+                switch (type)
+                {
+                case EthernetStatsCountType::kEthPacketRxCount:
+                    count = stats->rx_packets;
+                    ret   = CHIP_NO_ERROR;
+                    break;
+                case EthernetStatsCountType::kEthPacketTxCount:
+                    count = stats->tx_packets;
+                    ret   = CHIP_NO_ERROR;
+                    break;
+                case EthernetStatsCountType::kEthTxErrCount:
+                    count = stats->tx_errors;
+                    ret   = CHIP_NO_ERROR;
+                    break;
+                case EthernetStatsCountType::kEthCollisionCount:
+                    count = stats->collisions;
+                    ret   = CHIP_NO_ERROR;
+                    break;
+                case EthernetStatsCountType::kEthOverrunCount:
+                    count = stats->rx_over_errors;
+                    ret   = CHIP_NO_ERROR;
+                    break;
+                default:
+                    ChipLogError(DeviceLayer, "Unknown Ethernet statistic metric type");
+                    break;
+                }
+            }
+        }
+
+        freeifaddrs(ifaddr);
+    }
+
+    return ret;
+}
+
+} // namespace
 
 namespace chip {
 namespace DeviceLayer {
@@ -400,7 +480,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
         ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
         mWiFiAPMode = val;
 
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 
 exit:
@@ -413,7 +493,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP()
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand start WiFi AP");
         mLastAPDemandTime = System::Clock::GetMonotonicMilliseconds();
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
     {
@@ -427,7 +507,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP");
         mLastAPDemandTime = 0;
-        SystemLayer.ScheduleWork(DriveAPState, NULL);
+        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
     {
@@ -449,7 +529,32 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
 void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
 {
     mWiFiAPIdleTimeoutMS = val;
-    SystemLayer.ScheduleWork(DriveAPState, NULL);
+    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthPacketRxCount(uint64_t & packetRxCount)
+{
+    return GetEthernetStatsCount(EthernetStatsCountType::kEthPacketRxCount, packetRxCount);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthPacketTxCount(uint64_t & packetTxCount)
+{
+    return GetEthernetStatsCount(EthernetStatsCountType::kEthPacketTxCount, packetTxCount);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthTxErrCount(uint64_t & txErrCount)
+{
+    return GetEthernetStatsCount(EthernetStatsCountType::kEthTxErrCount, txErrCount);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthCollisionCount(uint64_t & collisionCount)
+{
+    return GetEthernetStatsCount(EthernetStatsCountType::kEthCollisionCount, collisionCount);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetEthOverrunCount(uint64_t & overrunCount)
+{
+    return GetEthernetStatsCount(EthernetStatsCountType::kEthOverrunCount, overrunCount);
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
@@ -684,7 +789,7 @@ void ConnectivityManagerImpl::DriveAPState()
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
                 apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
-                err       = SystemLayer.StartTimer(apTimeout, DriveAPState, NULL);
+                err       = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
                 SuccessOrExit(err);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s", apTimeout / 1000);
             }
@@ -945,7 +1050,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             // Run dhclient for IP on WiFi.
             // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
             char cmdBuffer[128];
-            sprintf(cmdBuffer, "dhclient -nw %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
+            sprintf(cmdBuffer, CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
             int dhclientSystemRet = system(cmdBuffer);
             if (dhclientSystemRet != 0)
             {

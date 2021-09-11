@@ -59,6 +59,7 @@
     <string name="rendezvous_over_ble_pairing_failure_text">Pairing failed</string>
     <string name="rendezvous_over_ble_commissioning_success_text">Network commissioning completed</string>
     <string name="rendezvous_over_ble_commissioning_failure_text">Network commissioning failed</string>
+    <string name="commissioning_completed">Commissioning completed with result: %1$d</string>
 
     <string name="attestation_test_btn_text">Attestation Test</string>
     <string name="attestation_fetching_status">Fetching…</string>

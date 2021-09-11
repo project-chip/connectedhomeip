@@ -32,7 +32,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #undef sleep
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 // ZAP -- ZCL Advanced Platform
 #include <app-common/zap-generated/attribute-id.h>
@@ -120,7 +120,7 @@ int AppTask::Init()
     chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

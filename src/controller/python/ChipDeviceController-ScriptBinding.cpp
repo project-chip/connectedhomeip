@@ -52,15 +52,15 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <inet/IPAddress.h>
-#include <mdns/Resolver.h>
+#include <lib/mdns/Resolver.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
-#include <support/BytesToHex.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/ScopedBuffer.h>
-#include <support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::Ble;
@@ -98,8 +98,8 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
                                                                  uint16_t * outPort);
 ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl,
                                                                      uint64_t * outFabricId);
-ChipError::StorageType pychip_DeviceController_CommissioiningComplete(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                      chip::NodeId nodeId);
+ChipError::StorageType pychip_DeviceController_CommissioningComplete(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                     chip::NodeId nodeId);
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 
 // Rendezvous
@@ -255,8 +255,8 @@ ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Contr
     return CHIP_NO_ERROR.AsInteger();
 }
 
-ChipError::StorageType pychip_DeviceController_CommissioiningComplete(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                      chip::NodeId nodeId)
+ChipError::StorageType pychip_DeviceController_CommissioningComplete(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                     chip::NodeId nodeId)
 {
     return devCtrl->CommissioningComplete(nodeId).AsInteger();
 }

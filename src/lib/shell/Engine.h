@@ -25,7 +25,7 @@
 
 #include "streamer.h"
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 #include <stdarg.h>
 #include <stddef.h>

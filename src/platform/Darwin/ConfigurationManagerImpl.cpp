@@ -25,13 +25,13 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <TargetConditionals.h>
 #if TARGET_OS_OSX

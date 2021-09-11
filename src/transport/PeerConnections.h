@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <system/TimeSource.h>
 #include <transport/FabricTable.h>
 #include <transport/PeerConnectionState.h>

@@ -29,15 +29,15 @@
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequest.h>
 #include <app/ReadPrepareParams.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -67,11 +67,7 @@ public:
     /**
      *  Send a Read Request.  There can be one Read Request outstanding on a given ReadClient.
      *  If SendReadRequest returns success, no more Read Requests can be sent on this ReadClient
-     *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReadError
-     *  call happens with guarantee.
-     *
-     *  Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
-     *  Default timeout value will be used otherwise.
+     *  until the corresponding InteractionModelDelegate::ReadDone call happens with guarantee.
      *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
@@ -110,8 +106,8 @@ private:
 
     virtual ~ReadClient() = default;
 
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     /**
@@ -139,7 +135,6 @@ private:
      * our exchange and don't need to manually close it.
      */
     void ShutdownInternal(CHIP_ERROR aError);
-    void ClearInitialReport() { mInitialReport = false; }
     bool IsInitialReport() { return mInitialReport; }
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;

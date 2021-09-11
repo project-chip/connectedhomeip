@@ -18,15 +18,15 @@
 #include <app/server/RendezvousServer.h>
 
 #include <app/server/Mdns.h>
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
 #endif
-#include <mdns/Advertiser.h>
+#include <lib/mdns/Advertiser.h>
 
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -62,15 +62,6 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
     {
         app::MdnsServer::Instance().AdvertiseOperational();
         ChipLogError(Discovery, "Operational advertising enabled");
-#if CONFIG_NETWORK_LAYER_BLE
-        // Close all BLE connections now since the operational network is available.
-        Ble::BleLayer * bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
-        if (bleLayer != nullptr)
-        {
-            ChipLogProgress(Discovery, "Closing all BLE Connections");
-            bleLayer->CloseAllBleConnections();
-        }
-#endif
     }
 }
 

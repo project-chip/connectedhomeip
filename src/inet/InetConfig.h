@@ -44,7 +44,7 @@
 
 /*
  * If the CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION option is not applicable, then the "InetProjectConfig.h"
- * header was not included by <SystemLayer/SystemConfig.h> and therefore it must be included here.
+ * header was not included by <system/SystemConfig.h> and therefore it must be included here.
  */
 #if !CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
 

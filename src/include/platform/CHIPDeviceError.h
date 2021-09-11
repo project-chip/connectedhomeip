@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 #define CHIP_DEVICE_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kDevice, (e))
 

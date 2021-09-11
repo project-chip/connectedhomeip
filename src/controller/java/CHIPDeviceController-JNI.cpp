@@ -38,16 +38,17 @@
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
 #include <jni.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
 #include <protocols/temp_zcl/TempZCL.h>
 #include <pthread.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/SafeInt.h>
-#include <support/ThreadOperationalDataset.h>
-#include <support/logging/CHIPLogging.h>
+#include <system/SystemLayerImpl.h>
 
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
 #ifndef PTHREAD_NULL
@@ -83,7 +84,7 @@ static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
 namespace {
 
 JavaVM * sJVM;
-System::Layer sSystemLayer;
+System::LayerImpl sSystemLayer;
 Inet::InetLayer sInetLayer;
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -200,7 +201,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     if (sIOThread != PTHREAD_NULL)
     {
         sShutdown = true;
-        sSystemLayer.WatchableEventsManager().Signal();
+        sSystemLayer.Signal();
 
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         pthread_join(sIOThread, NULL);
@@ -549,7 +550,8 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
 
-    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
+    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::CommissioningWindowOption::kOriginalSetupCode,
+                                        setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -962,18 +964,17 @@ void * IOThreadMain(void * arg)
     // Lock the stack to prevent collisions with Java threads.
     pthread_mutex_lock(JniReferences::GetInstance().GetStackLock());
 
-    System::WatchableEventManager & watchState = sSystemLayer.WatchableEventsManager();
-    watchState.EventLoopBegins();
+    sSystemLayer.EventLoopBegins();
 
     // Loop until we are told to exit.
     while (!quit.load(std::memory_order_relaxed))
     {
-        watchState.PrepareEvents();
+        sSystemLayer.PrepareEvents();
 
         // Unlock the stack so that Java threads can make API calls.
         pthread_mutex_unlock(JniReferences::GetInstance().GetStackLock());
 
-        watchState.WaitForEvents();
+        sSystemLayer.WaitForEvents();
 
         // Break the loop if requested to shutdown.
         // if (sShutdown)
@@ -982,9 +983,9 @@ void * IOThreadMain(void * arg)
         // Re-lock the stack.
         pthread_mutex_lock(JniReferences::GetInstance().GetStackLock());
 
-        watchState.HandleEvents();
+        sSystemLayer.HandleEvents();
     }
-    watchState.EventLoopEnds();
+    sSystemLayer.EventLoopEnds();
 
     // Detach the thread from the JVM.
     sJVM->DetachCurrentThread();

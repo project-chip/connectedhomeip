@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <support/UnitTestUtils.h>
+#include <lib/support/UnitTestUtils.h>
 
 // Platform specific includes for test_utils
 #include <platform/CHIPDeviceBuildConfig.h>

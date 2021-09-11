@@ -51,7 +51,6 @@ static_library("asn1") {
 
   public_configs = [
     "${chip_root}/src:includes",
-    "${chip_root}/src/lib:includes",
     "${chip_root}/src/system:system_config",
   ]
 }

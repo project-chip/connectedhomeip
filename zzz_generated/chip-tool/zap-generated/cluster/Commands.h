@@ -23,7 +23,7 @@
 
 #include <commands/clusters/ModelCommand.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/BytesToHex.h>
+#include <lib/support/BytesToHex.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
@@ -929,8 +929,10 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(void * cont
     for (uint16_t i = 0; i < count; i++)
     {
         ChipLogProgress(chipTool, "FabricDescriptor[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  FabricId: %" PRIu64 "", entries[i].FabricId);
+        ChipLogProgress(chipTool, "  FabricIndex: %" PRIu8 "", entries[i].FabricIndex);
+        ChipLogProgress(Zcl, "  RootPublicKey: %zu", entries[i].RootPublicKey.size());
         ChipLogProgress(chipTool, "  VendorId: %" PRIu16 "", entries[i].VendorId);
+        ChipLogProgress(chipTool, "  FabricId: %" PRIu64 "", entries[i].FabricId);
         ChipLogProgress(chipTool, "  NodeId: %" PRIu64 "", entries[i].NodeId);
         ChipLogProgress(Zcl, "  Label: %zu", entries[i].Label.size());
     }

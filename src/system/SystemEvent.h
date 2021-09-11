@@ -62,7 +62,7 @@ typedef CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE Event;
  */
 enum
 {
-    kEvent_ReleaseObj   = _CHIP_SYSTEM_CONFIG_LWIP_EVENT(0), /**< The event for the drop of a SystemLayer object */
+    kEvent_ReleaseObj   = _CHIP_SYSTEM_CONFIG_LWIP_EVENT(0), /**< The event for the drop of a System::Layer object */
     kEvent_ScheduleWork = _CHIP_SYSTEM_CONFIG_LWIP_EVENT(1), /**< The event for scheduling work on the System Layer's thread. */
 };
 

@@ -24,12 +24,12 @@
 
 #include "TestMessagingLayer.h"
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
-#include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
@@ -65,7 +65,7 @@ chip::Test::IOContext gIOContext;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
@@ -158,7 +158,7 @@ public:
 class MockSessionEstablishmentDelegate : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;

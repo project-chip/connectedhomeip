@@ -19,17 +19,17 @@
 
 #include <inttypes.h>
 
-#include <core/Optional.h>
-#include <mdns/Advertiser.h>
-#include <mdns/ServiceNaming.h>
+#include <lib/core/Optional.h>
+#include <lib/mdns/Advertiser.h>
+#include <lib/mdns/ServiceNaming.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
-#include <support/Span.h>
-#include <support/logging/CHIPLogging.h>
 #include <system/TimeSource.h>
 #include <transport/FabricTable.h>
 
@@ -42,7 +42,7 @@ namespace {
 bool HaveOperationalCredentials()
 {
     // Look for any fabric info that has a useful operational identity.
-    for (const Transport::FabricInfo & fabricInfo : GetGlobalFabricTable())
+    for (const Transport::FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
     {
         if (fabricInfo.IsInitialized())
         {
@@ -242,8 +242,8 @@ CHIP_ERROR MdnsServer::ScheduleDiscoveryExpiration()
 
     mDiscoveryExpirationMs = mTimeSource.GetCurrentMonotonicTimeMs() + static_cast<uint64_t>(mDiscoveryTimeoutSecs) * 1000;
 
-    ReturnErrorOnFailure(DeviceLayer::SystemLayer.StartTimer(static_cast<uint32_t>(mDiscoveryTimeoutSecs) * 1000,
-                                                             HandleDiscoveryExpiration, nullptr));
+    ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(static_cast<uint32_t>(mDiscoveryTimeoutSecs) * 1000,
+                                                               HandleDiscoveryExpiration, nullptr));
 
     return CHIP_NO_ERROR;
 }
@@ -261,8 +261,8 @@ CHIP_ERROR MdnsServer::ScheduleExtendedDiscoveryExpiration()
     mExtendedDiscoveryExpirationMs =
         mTimeSource.GetCurrentMonotonicTimeMs() + static_cast<uint64_t>(extendedDiscoveryTimeoutSecs) * 1000;
 
-    ReturnErrorOnFailure(DeviceLayer::SystemLayer.StartTimer(static_cast<uint32_t>(extendedDiscoveryTimeoutSecs) * 1000,
-                                                             HandleExtendedDiscoveryExpiration, nullptr));
+    ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(static_cast<uint32_t>(extendedDiscoveryTimeoutSecs) * 1000,
+                                                               HandleExtendedDiscoveryExpiration, nullptr));
 
     return CHIP_NO_ERROR;
 }
@@ -277,7 +277,7 @@ CHIP_ERROR MdnsServer::GetCommissionableInstanceName(char * buffer, size_t buffe
 /// Set MDNS operational advertisement
 CHIP_ERROR MdnsServer::AdvertiseOperational()
 {
-    for (const Transport::FabricInfo & fabricInfo : GetGlobalFabricTable())
+    for (const Transport::FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
     {
         if (fabricInfo.IsInitialized())
         {
@@ -299,10 +299,6 @@ CHIP_ERROR MdnsServer::AdvertiseOperational()
             // Should we keep trying to advertise the other operational
             // identities on failure?
             ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
-        }
-        else
-        {
-            ChipLogProgress(Discovery, "Advertise operational node - fabric not initialized");
         }
     }
     return CHIP_NO_ERROR;

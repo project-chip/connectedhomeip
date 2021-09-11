@@ -21,15 +21,16 @@
 #include <PigweedLoggerMutex.h>
 #include <cstring>
 #include <init_efrPlatform.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <mbedtls/platform.h>
 #include <nl_test_service/nl_test.rpc.pb.h>
 #include <nlunit-test.h>
 #include <pigweed/RpcService.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
-#include <support/UnitTestRegistration.h>
+#include <sl_system_kernel.h>
 #include <task.h>
 
 extern "C" int printf(const char * format, ...)
@@ -195,7 +196,7 @@ int main(void)
     sTestTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TEST_TASK", ArraySize(sTestTaskStack), nullptr, TEST_TASK_PRIORITY,
                                         sTestTaskStack, &sTestTaskBuffer);
     EFR32_LOG("Starting FreeRTOS scheduler");
-    vTaskStartScheduler();
+    sl_system_kernel_start();
 
     // Should never get here.
     EFR32_LOG("vTaskStartScheduler() failed");

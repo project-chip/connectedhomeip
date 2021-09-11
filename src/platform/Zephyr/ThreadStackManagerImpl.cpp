@@ -28,9 +28,9 @@
 #include <platform/Zephyr/ThreadStackManagerImpl.h>
 
 #include <inet/IPEndPointBasis.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

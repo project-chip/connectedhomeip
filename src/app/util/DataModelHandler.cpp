@@ -27,7 +27,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #endif
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #ifdef EMBER_AF_PLUGIN_REPORTING_SERVER
 void emberAfPluginReportingStackStatusCallback(EmberStatus status);

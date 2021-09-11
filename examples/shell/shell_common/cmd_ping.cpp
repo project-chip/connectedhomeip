@@ -151,7 +151,7 @@ Transport::PeerAddress GetEchoPeerAddress()
 
 void Shutdown()
 {
-    chip::DeviceLayer::SystemLayer.CancelTimer(EchoTimerHandler, NULL);
+    chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
@@ -212,7 +212,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     }
 
     gPingArguments.SetLastEchoTime(System::Clock::GetMonotonicMilliseconds());
-    SuccessOrExit(chip::DeviceLayer::SystemLayer.StartTimer(gPingArguments.GetEchoInterval(), EchoTimerHandler, NULL));
+    SuccessOrExit(chip::DeviceLayer::SystemLayer().StartTimer(gPingArguments.GetEchoInterval(), EchoTimerHandler, NULL));
 
     streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
@@ -226,7 +226,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     }
     else
     {
-        chip::DeviceLayer::SystemLayer.CancelTimer(EchoTimerHandler, NULL);
+        chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
     }
 
 exit:
@@ -306,7 +306,7 @@ void StartPinging(streamer_t * stream, char * destination)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer, &gTCPManager, &gFabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gFabrics, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
@@ -315,7 +315,7 @@ void StartPinging(streamer_t * stream, char * destination)
     else
 #endif
     {
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer, &gUDPManager, &gFabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gFabrics, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);

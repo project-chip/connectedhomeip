@@ -28,7 +28,7 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 #endif
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 /* Include a project-specific configuration file, if defined.
  *
@@ -824,6 +824,18 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEFAULT_TELEMETRY_INTERVAL_MS
 #define CHIP_DEVICE_CONFIG_DEFAULT_TELEMETRY_INTERVAL_MS 90000
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONFIG_ETHERNET_IF_NAME
+ *
+ * @brief
+ *   Default ethernet network interface name used to centralize all metrics that are
+ *   relevant to a potential Ethernet connection to a Node.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_ETHERNET_IF_NAME
+#define CHIP_DEVICE_CONFIG_ETHERNET_IF_NAME "enp0s25"
 #endif
 
 // -------------------- Event Logging Configuration --------------------

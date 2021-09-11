@@ -19,7 +19,7 @@
 
 #include <app-common/zap-generated/af-structs.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <string>
 #include <vector>
 
@@ -27,5 +27,5 @@ class TargetNavigatorManager
 {
 public:
     CHIP_ERROR Init();
-    std::vector<EmberAfNavigateTargetTargetInfo> proxyGetTargetInfoList();
+    std::vector<NavigateTargetTargetInfo> proxyGetTargetInfoList();
 };

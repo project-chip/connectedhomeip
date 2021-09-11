@@ -29,14 +29,14 @@
 #include <inttypes.h>
 #include <stddef.h>
 
-#include <asn1/ASN1.h>
-#include <asn1/ASN1Macros.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
 #include <credentials/CHIPCert.h>
+#include <lib/asn1/ASN1.h>
+#include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
 
 namespace chip {
 namespace Credentials {
@@ -415,15 +415,14 @@ CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, Certific
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ASN1Writer writer;
-    uint32_t size = static_cast<uint32_t>(std::min(static_cast<size_t>(UINT32_MAX), x509Cert.size()));
-    writer.Init(x509Cert.data(), size);
+    writer.Init(x509Cert);
 
     ReturnErrorOnFailure(EncodeTBSCert(requestParams, issuerLevel, subject, subjectPubkey, issuerKeypair.Pubkey(), writer));
 
     Crypto::P256ECDSASignature signature;
     ReturnErrorOnFailure(issuerKeypair.ECDSA_sign_msg(x509Cert.data(), writer.GetLengthWritten(), signature));
 
-    writer.Init(x509Cert.data(), size);
+    writer.Init(x509Cert);
 
     ASN1_START_SEQUENCE
     {

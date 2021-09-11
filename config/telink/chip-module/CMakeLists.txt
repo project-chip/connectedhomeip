@@ -105,7 +105,7 @@ if (CONFIG_POSIX_API)
     )
 endif()
 
-zephyr_include_directories(${ZEPHYR_BASE}/../modules/crypto/mbedtls/include)
+zephyr_include_directories(${ZEPHYR_BASE}/../modules/crypto/mbedtls/mbedtls/include)
 zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/)
 
 zephyr_get_compile_flags(CHIP_CFLAGS_C C)

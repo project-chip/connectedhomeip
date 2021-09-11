@@ -19,7 +19,7 @@
 
 #include <app-common/zap-generated/af-structs.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <string>
 #include <vector>
 
@@ -27,5 +27,5 @@ class TvChannelManager
 {
 public:
     CHIP_ERROR Init();
-    std::vector<EmberAfTvChannelInfo> proxyGetTvChannelList();
+    std::vector<TvChannelInfo> proxyGetTvChannelList();
 };

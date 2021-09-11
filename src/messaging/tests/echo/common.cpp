@@ -25,10 +25,10 @@
 #include <errno.h>
 
 #include "common.h"
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
-#include <support/ErrorStr.h>
 
 chip::SecureSessionMgr gSessionManager;
 chip::Messaging::ExchangeManager gExchangeManager;

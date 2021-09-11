@@ -43,9 +43,9 @@
 #include <string.h>
 #include <sys/types.h>
 
-#include <support/CHIPMem.h>
-#include <support/ErrorStr.h>
-#include <support/ScopedBuffer.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/ScopedBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <arpa/inet.h>
@@ -55,7 +55,7 @@
 using namespace chip;
 using namespace chip::Inet;
 
-System::Layer gSystemLayer;
+System::LayerImpl gSystemLayer;
 
 Inet::InetLayer gInet;
 

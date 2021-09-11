@@ -30,8 +30,8 @@
 #include <stdint.h>
 #include <type_traits>
 
-#include <core/CHIPCore.h>
-#include <support/SafeInt.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/SafeInt.h>
 
 #include "TimeUtils.h"
 

@@ -17,7 +17,7 @@
  */
 #include "EndpointConfigurationStorage.h"
 #include <fstream>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 constexpr const char kEndpointConfigurationPath[] = "/tmp/chip_tv_config.ini";
 

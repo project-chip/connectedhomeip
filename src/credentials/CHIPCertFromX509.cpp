@@ -30,16 +30,16 @@
 
 #include <stddef.h>
 
-#include <asn1/ASN1.h>
-#include <asn1/ASN1Macros.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
-#include <core/CHIPTLV.h>
-#include <core/Optional.h>
 #include <credentials/CHIPCert.h>
+#include <lib/asn1/ASN1.h>
+#include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
 
 namespace chip {
 namespace Credentials {
@@ -711,7 +711,7 @@ CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & 
     VerifyOrReturnError(!x509Cert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(CanCastTo<uint32_t>(x509Cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
-    reader.Init(x509Cert.data(), static_cast<uint32_t>(x509Cert.size()));
+    reader.Init(x509Cert);
 
     writer.Init(chipCert);
 
@@ -737,8 +737,8 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Array, outerContainer));
 
     ASN1Reader reader;
-    VerifyOrReturnError(CanCastTo<uint32_t>(x509NOC.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    reader.Init(x509NOC.data(), static_cast<uint32_t>(x509NOC.size()));
+    reader.Init(x509NOC);
+
     uint64_t nocIssuer, nocSubject;
     Optional<uint64_t> nocFabric;
     ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, nocIssuer, nocSubject, nocFabric));

@@ -29,11 +29,11 @@
 
 #include "common.h"
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
@@ -89,7 +89,7 @@ int main(int argc, char * argv[])
             chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer, &gTCPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &fabrics, &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
@@ -98,7 +98,7 @@ int main(int argc, char * argv[])
             chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer, &gUDPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &fabrics, &gMessageCounterManager);
         SuccessOrExit(err);
     }
 

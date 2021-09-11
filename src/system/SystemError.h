@@ -32,7 +32,7 @@
 #pragma once
 
 // Include headers
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <system/SystemConfig.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
