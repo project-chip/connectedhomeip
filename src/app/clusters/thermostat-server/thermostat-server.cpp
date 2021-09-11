@@ -244,6 +244,7 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
                 break;
             }
         }
+        break;
     }
     default:
         break;

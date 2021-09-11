@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
+import("${build_root}/config/sysroot.gni")
 import("${build_root}/config/target.gni")
 
 if (current_os == "mac") {
@@ -273,6 +274,10 @@ config("runtime_default") {
       "pthread",
       "rt",
     ]
+  }
+  if (sysroot != "") {
+    cflags = [ "--sysroot=${sysroot}" ]
+    ldflags = [ "--sysroot=${sysroot}" ]
   }
 }
 
