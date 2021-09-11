@@ -92,9 +92,9 @@ if (chip_build_tests) {
       deps += [ "${chip_root}/src/ble/tests" ]
     }
 
-    if (!is_clang && chip_device_platform != "darwin" &&
-        chip_device_platform != "nrfconnect" &&
-        chip_device_platform != "efr32") {
+    # On nrfconnect, the controller tests run into
+    # https://github.com/project-chip/connectedhomeip/issues/9630
+    if (chip_device_platform != "nrfconnect") {
       deps += [ "${chip_root}/src/controller/tests" ]
     }
 

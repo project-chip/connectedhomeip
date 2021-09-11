@@ -115,7 +115,7 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t mDispatchQueue;
+    dispatch_queue_t mDispatchQueue = nullptr;
 #endif
 };
 
