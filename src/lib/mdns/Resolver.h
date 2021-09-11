@@ -260,6 +260,7 @@ public:
     ///
     /// Unsual name to allow base MDNS classes to implement both Advertiser and Resolver interfaces.
     virtual CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) = 0;
+    virtual void ShutdownResolver() = 0;
 
     /// Registers a resolver delegate if none has been registered before
     virtual CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) = 0;
