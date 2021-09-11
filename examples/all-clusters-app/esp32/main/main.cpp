@@ -354,7 +354,7 @@ public:
         }
         else if (i == 2)
         {
-            app::Mdns::StartServer(Mdns::CommissioningMode::kEnabledBasic);
+            app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledBasic);
 
             chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(
                 ResetFabrics::kYes, kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdns);

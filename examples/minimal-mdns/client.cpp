@@ -327,22 +327,7 @@ int main(int argc, char ** args)
 
     BroadcastPacket(&mdnsServer);
 
-    // the below does not compile so commented out and added "No shutdown timer" printout below
-    //
-    // err = DeviceLayer::SystemLayer.StartTimer(
-    //     gOptions.runtimeMs,
-    //     [](System::Layer *, void *, CHIP_ERROR err2) {
-    //         DeviceLayer::PlatformMgr().StopEventLoopTask();
-    //         DeviceLayer::PlatformMgr().Shutdown();
-    //     },
-    //     nullptr);
-    // if (err != CHIP_NO_ERROR)
-    // {
-    //     printf("Failed to create the shutdown timer. Kill with ^C. %" CHIP_ERROR_FORMAT "\n", err.Format());
-    // }
-
-    // printf("No shutdown timer. Kill with ^C.\n");
-    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(
+    err = DeviceLayer::SystemLayer().StartTimer(
         gOptions.runtimeMs,
         [](System::Layer *, void *) {
             DeviceLayer::PlatformMgr().StopEventLoopTask();

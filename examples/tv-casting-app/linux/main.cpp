@@ -53,10 +53,10 @@ void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommission
     if (selectedCommissioner != nullptr)
     {
         // Advertise self as Commissionable Node over mDNS
-        ReturnOnFailure(app::Mdns::StartServer(Mdns::CommissioningMode::kEnabledBasic));
+        app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledBasic);
 
         // Send User Directed commissioning request
-        ReturnOnFailure(SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
+        ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
             selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId[0])));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
