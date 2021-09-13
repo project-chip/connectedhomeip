@@ -1037,7 +1037,7 @@ void CASESession::SendErrorMsg(SigmaErrorType errorCode)
 
     if (mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_SigmaErr, std::move(msg)) != CHIP_NO_ERROR)
     {
-        ChipLogError(SecureChannel, "Failed to send error message"));
+        ChipLogError(SecureChannel, "Failed to send error message");
     }
 }
 
