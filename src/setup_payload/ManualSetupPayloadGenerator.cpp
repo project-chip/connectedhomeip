@@ -89,7 +89,7 @@ static uint32_t chunk3PayloadRepresentation(const PayloadContents & payload)
 
 static CHIP_ERROR decimalStringWithPadding(MutableCharSpan buffer, uint32_t number)
 {
-    int len = static_cast<int>(buffer.size() - 1);
+    int len    = static_cast<int>(buffer.size() - 1);
     int retval = snprintf(buffer.data(), buffer.size(), "%0*" PRIu32, len, number);
 
     return (retval >= static_cast<int>(buffer.size())) ? CHIP_ERROR_BUFFER_TOO_SMALL : CHIP_NO_ERROR;
@@ -142,9 +142,11 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(Mutab
 
     if (useLongCode)
     {
-        ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.SubSpan(offset, kManualSetupVendorIdCharLength + 1), mPayloadContents.vendorID));
+        ReturnErrorOnFailure(
+            decimalStringWithPadding(outBuffer.SubSpan(offset, kManualSetupVendorIdCharLength + 1), mPayloadContents.vendorID));
         offset += kManualSetupVendorIdCharLength;
-        ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.SubSpan(offset, kManualSetupProductIdCharLength + 1), mPayloadContents.productID));
+        ReturnErrorOnFailure(
+            decimalStringWithPadding(outBuffer.SubSpan(offset, kManualSetupProductIdCharLength + 1), mPayloadContents.productID));
         offset += kManualSetupProductIdCharLength;
     }
 
