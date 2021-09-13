@@ -97,7 +97,8 @@ public:
      * @param serialNumberBufferSize size of the serial number buffer supplied.
      * @param rotatingDeviceIdBuffer rotating device id buffer
      * @param rotatingDeviceIdBufferSize the current size of the supplied buffer
-     * @param rotatingDeviceIdValueOutputSize the number of chars making up the actual value of the returned rotating device id excluding the null terminator
+     * @param rotatingDeviceIdValueOutputSize the number of chars making up the actual value of the returned rotating device id
+     * excluding the null terminator
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise.
      *
