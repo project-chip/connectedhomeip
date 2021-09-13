@@ -264,10 +264,6 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoin
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
-    // We are extracting the current fabric index here, even though it's used after sending the response.
-    // This is done to prevent accidental update of emberAfCurrentCommand()->source while sending the command's response.
-    FabricIndex currentFabricIndex = emberAfCurrentCommand()->source->GetSecureSession().GetFabricIndex();
-
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     CHIP_ERROR err       = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
@@ -277,7 +273,8 @@ exit:
     emberAfSendImmediateDefaultResponse(status);
     if (err == CHIP_NO_ERROR)
     {
-        Messaging::ExchangeContext * ec = emberAfCurrentCommand()->source;
+        Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
+        FabricIndex currentFabricIndex  = ec->GetSecureSession().GetFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
         {
             // If the current fabric is being removed, expiring all the secure sessions causes crashes as
