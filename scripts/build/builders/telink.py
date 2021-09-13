@@ -61,7 +61,7 @@ class TelinkBuilder(Builder):
 
     def generate(self):
         if os.path.exists(self.output_dir):
-           return
+            return
 
         if not self._runner.dry_run:
             # Zephyr base
@@ -78,12 +78,13 @@ export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {outdir} -b {board} {sourcedir}
         '''.format(
-                outdir=shlex.quote(
-                    self.output_dir), board=self.board.GnArgName(), sourcedir=shlex.quote(
-                    os.path.join(
-                        self.root, 'examples', self.app.ExampleName(), 'telink'))).strip()
+            outdir=shlex.quote(
+                self.output_dir), board=self.board.GnArgName(), sourcedir=shlex.quote(
+                os.path.join(
+                    self.root, 'examples', self.app.ExampleName(), 'telink'))).strip()
 
-        self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
+        self._Execute(['bash', '-c', cmd],
+                      title='Generating ' + self.identifier)
 
     def _build(self):
         logging.info('Compiling Telink at %s', self.output_dir)
