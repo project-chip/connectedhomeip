@@ -33,7 +33,6 @@ class MockResolver : public Resolver
 public:
     CHIP_ERROR SetResolverDelegate(ResolverDelegate *) override { return SetResolverDelegateStatus; }
     CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) override { return StartResolverStatus; }
-    void ShutdownResolver() override {}
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override { return ResolveNodeIdStatus; }
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return FindCommissionersStatus; }
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
