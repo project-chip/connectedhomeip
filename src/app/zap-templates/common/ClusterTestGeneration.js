@@ -64,27 +64,32 @@ function setDefaultType(test)
   const type = test[kCommandName];
   switch (type) {
   case 'readAttribute':
+    test.commandName     = 'Read';
     test.isAttribute     = true;
     test.isReadAttribute = true;
     break;
 
   case 'writeAttribute':
+    test.commandName      = 'Write';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
     break;
 
   case 'subscribeAttribute':
+    test.commandName          = 'Configure';
     test.isAttribute          = true;
     test.isSubscribeAttribute = true;
     break;
 
   case 'waitForReport':
+    test.commandName     = 'Report';
     test.isAttribute     = true;
     test.isWaitForReport = true;
     break;
 
   default:
-    test.isCommand = true;
+    test.commandName = test.command;
+    test.isCommand   = true;
     break;
   }
 }
@@ -236,9 +241,7 @@ function parse(filename)
 
   // Filter disabled tests
   yaml.tests = yaml.tests.filter(test => !test.disabled);
-  yaml.tests.forEach((test, index) => {
-    setDefault(test, kIndexName, index);
-  });
+  yaml.tests.forEach((test, index) => { setDefault(test, kIndexName, index); });
 
   yaml.filename   = filename;
   yaml.totalTests = yaml.tests.length;
@@ -339,9 +342,7 @@ function isTestOnlyCluster(name)
 
 function chip_tests_with_command_attribute_info(options)
 {
-  const promise = assertCommandOrAttribute(this).then(item => {
-    return [ item ];
-  });
+  const promise = assertCommandOrAttribute(this).then(item => { return [ item ]; });
   return asBlocks.call(this, promise, options);
 }
 
@@ -351,6 +352,11 @@ function chip_tests_item_parameters(options)
 
   const promise = assertCommandOrAttribute(this).then(item => {
     if (this.isAttribute && !this.isWriteAttribute) {
+      if (this.isSubscribeAttribute) {
+        const minInterval = { name : 'minInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.minInterval };
+        const maxInterval = { name : 'maxInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.maxInterval };
+        return [ minInterval, maxInterval ];
+      }
       return [];
     }
 
@@ -361,13 +367,13 @@ function chip_tests_item_parameters(options)
       const expected = commandValues.find(value => value.name.toLowerCase() == commandArg.name.toLowerCase());
       if (!expected) {
         printErrorAndExit(this,
-            'Missing "' + commandArg.name + '" in arguments list: \n\t* '
-                + commandValues.map(command => command.name).join('\n\t* '));
+               'Missing "' + commandArg.name + '" in arguments list: \n\t* '
+                   + commandValues.map(command => command.name).join('\n\t* '));
       }
       commandArg.definedValue = expected.value;
 
       return commandArg;
-    });
+       });
 
     return commands;
   });
