@@ -59,7 +59,5 @@ static_library("telink") {
     }
   }
 
-  public_deps += [
-    "${chip_root}/src/crypto"
-  ]
+  public_deps += [ "${chip_root}/src/crypto" ]
 }
