@@ -60,35 +60,31 @@ class TelinkBuilder(Builder):
         self.board = board
 
     def generate(self):
+        if os.path.exists(self.output_dir):
+            return
 
-        if not os.path.exists(self.output_dir):
-            cmd = 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"\n'
+        if not self._runner.dry_run:
+            # Zephyr base
+            if 'TELINK_ZEPHYR_BASE' not in os.environ:
+                raise Exception("Telink builds require TELINK_ZEPHYR_BASE")
 
-            if not self._runner.dry_run:
+        cmd = 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"\n'
 
-                # Zephyr base
-                if 'TELINK_ZEPHYR_BASE' not in os.environ:
-                    # TODO: remove once variable in all images
-                    cmd = ''
-                    if 'ZEPHYR_BASE' not in os.environ:
-                        raise Exception(
-                            "Telink builds require TELINK_ZEPHYR_BASE or ZEPHYR_BASE to be set")
+        if 'TELINK_ZEPHYR_SDK_DIR' in os.environ:
+            cmd += 'export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"\n'
 
-            # TODO: TELINK_ZEPHYR_SDK_DIR should be used for compilation and
-            # NOT hardcoding of zephyr-sdk-0.13.0
-            cmd += '''
+        cmd += '''
 export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
-export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_BASE/../../zephyr-sdk-0.13.0"
 source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {outdir} -b {board} {sourcedir}
         '''.format(
-                outdir=shlex.quote(
-                    self.output_dir), board=self.board.GnArgName(), sourcedir=shlex.quote(
-                    os.path.join(
-                        self.root, 'examples', self.app.ExampleName(), 'telink'))).strip()
+            outdir=shlex.quote(
+                self.output_dir), board=self.board.GnArgName(), sourcedir=shlex.quote(
+                os.path.join(
+                    self.root, 'examples', self.app.ExampleName(), 'telink'))).strip()
 
-            self._Execute(['bash', '-c', cmd],
-                          title='Generating ' + self.identifier)
+        self._Execute(['bash', '-c', cmd],
+                      title='Generating ' + self.identifier)
 
     def _build(self):
         logging.info('Compiling Telink at %s', self.output_dir)
