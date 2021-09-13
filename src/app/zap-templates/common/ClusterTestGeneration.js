@@ -193,7 +193,9 @@ function parse(filename)
 
   // Filter disabled tests
   yaml.tests = yaml.tests.filter(test => !test.disabled);
-  yaml.tests.forEach((test, index) => { setDefault(test, kIndexName, index); });
+  yaml.tests.forEach((test, index) => {
+    setDefault(test, kIndexName, index);
+  });
 
   yaml.filename   = filename;
   yaml.totalTests = yaml.tests.length;
@@ -305,13 +307,13 @@ function chip_tests_item_parameters(options)
       const expected = commandValues.find(value => value.name.toLowerCase() == commandArg.name.toLowerCase());
       if (!expected) {
         printErrorAndExit(this,
-               'Missing "' + commandArg.name + '" in arguments list: \n\t* '
-                   + commandValues.map(command => command.name).join('\n\t* '));
+            'Missing "' + commandArg.name + '" in arguments list: \n\t* '
+                + commandValues.map(command => command.name).join('\n\t* '));
       }
       commandArg.definedValue = expected.value;
 
       return commandArg;
-       });
+    });
 
     return commands;
   });
