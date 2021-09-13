@@ -10426,7 +10426,7 @@ public:
         switch (mTestIndex++)
         {
         case 0:
-            err = TestSendClusterDelayCommandsCommandWaitForMs_0();
+            err = TestSendClusterSimulatedClusterCommandWaitForMs_0();
             break;
         }
 
@@ -10445,9 +10445,9 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestSendClusterDelayCommandsCommandWaitForMs_0()
+    CHIP_ERROR TestSendClusterSimulatedClusterCommandWaitForMs_0()
     {
-        ChipLogProgress(chipTool, "DelayCommands - Wait 100ms");
+        ChipLogProgress(chipTool, "SimulatedCluster - WaitForMs - Wait 100ms");
 
         return WaitForMs(100);
     }
