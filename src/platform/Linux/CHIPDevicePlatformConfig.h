@@ -86,3 +86,15 @@
 
 // TODO: CHIP has redesigned the crypto interface, pending on the final version of CHIP HASH APIs
 #define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
+
+/**
+ * @def CHIP_DEVICE_CONFIG_ETHERNET_IF_NAME
+ *
+ * @brief
+ *   Default ethernet network interface name used to centralize all metrics that are
+ *   relevant to a potential Ethernet connection to a Node.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_ETHERNET_IF_NAME
+#define CHIP_DEVICE_CONFIG_ETHERNET_IF_NAME "enp0s25"
+#endif
