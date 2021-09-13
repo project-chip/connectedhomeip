@@ -148,6 +148,8 @@ void emberAfEndpointConfigure(void)
 #ifdef DYNAMIC_ENDPOINT_COUNT
     if (MAX_ENDPOINT_COUNT > FIXED_ENDPOINT_COUNT)
     {
+        // This is assuming that EMBER_AF_ENDPOINT_DISABLED is 0
+        static_assert(EMBER_AF_ENDPOINT_DISABLED == 0, "We are creating enabled dynamic endpoints!");
         memset(&emAfEndpoints[FIXED_ENDPOINT_COUNT], 0,
                sizeof(EmberAfDefinedEndpoint) * (MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT));
     }
@@ -196,15 +198,14 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     emAfEndpoints[index].deviceVersion = deviceVersion;
     emAfEndpoints[index].endpointType  = ep;
     emAfEndpoints[index].networkIndex  = 0;
-    emAfEndpoints[index].bitmask       = EMBER_AF_ENDPOINT_ENABLED;
+    // Start the endpoint off as disabled.
+    emAfEndpoints[index].bitmask = EMBER_AF_ENDPOINT_DISABLED;
 
     emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
-    emberAfSetDeviceEnabled(id, true);
 
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-    // Rebuild descriptor attributes on all endpoints
-    emberAfPluginDescriptorServerInitCallback();
-#endif
+    // Now enable the endpoint.
+    emberAfEndpointEnableDisable(id, true);
+    emberAfSetDeviceEnabled(id, true);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -221,14 +222,9 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
         if (ep)
         {
             emberAfSetDeviceEnabled(ep, false);
+            emberAfEndpointEnableDisable(ep, false);
             emAfEndpoints[index].endpoint = 0;
-            emAfEndpoints[index].bitmask  = 0;
         }
-
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-        // Rebuild descriptor attributes on all endpoints
-        emberAfPluginDescriptorServerInitCallback();
-#endif
     }
 
     return ep;
@@ -981,6 +977,11 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                     (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
             }
         }
+
+#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
+        // Rebuild descriptor attributes on all endpoints
+        emberAfPluginDescriptorServerInitCallback();
+#endif
     }
 
     return true;
