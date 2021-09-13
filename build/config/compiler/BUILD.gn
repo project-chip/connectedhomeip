@@ -191,7 +191,7 @@ config("warnings_common") {
   }
 
   if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
-      current_os != "win") {
+      current_os != "win" && current_os != "tizen") {
     cflags += [ "-Wstack-usage=8192" ]
   }
 }
@@ -268,7 +268,7 @@ config("runtime_default") {
       "$dir_pw_toolchain/host_clang:xcode_sysroot",
     ]
   }
-  if (current_os == "linux") {
+  if (current_os == "linux" || current_os == "tizen") {
     libs = [
       "dl",
       "pthread",
