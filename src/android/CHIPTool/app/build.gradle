@@ -81,7 +81,7 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
-    if(rootProject.ext.matterBuildSrcDir == null) {
+    if (rootProject.ext.matterBuildSrcDir == null) {
          // local in-source-tree copy of the dependencies. Useful for IDE compilation
         implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
 

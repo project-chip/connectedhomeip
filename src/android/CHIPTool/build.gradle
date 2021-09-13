@@ -22,9 +22,9 @@ allprojects {
 }
 
 ext {
-    // point to the SDK build dir ("../../../../out/android_arm64" for example) to build SDK from
-    // source code and debug in Android Studio, use scripts/examples/android_app.sh to prepare it
-    // null to use SDK prebuilt by scripts/examples/android_app.sh
+    // Point to the SDK build dir ("../../../../out/android_arm64" for example) to build SDK from
+    // source code and debug in Android Studio.
+    // Set to null to use the SDK prebuilt by scripts/build/build_examples.py.
     matterBuildSrcDir = null
 }
 
