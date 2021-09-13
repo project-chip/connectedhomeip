@@ -55,9 +55,15 @@ public:
     /// Gets the factory-new state commissionable node discovery timeout
     int16_t GetDiscoveryTimeoutSecs() { return mDiscoveryTimeoutSecs; }
 
+    /// Callback from Discovery Expiration timer
+    void OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
+
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// Sets the extended discovery timeout. Value will be persisted across reboots
     void SetExtendedDiscoveryTimeoutSecs(int16_t secs);
+
+    /// Callback from Extended Discovery Expiration timer
+    void OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
     /// Start operational advertising
@@ -72,13 +78,6 @@ public:
 
     /// Generates the (random) instance name that a CHIP device is to use for pre-commissioning DNS-SD
     CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen);
-
-    /// Callback from Discovery Expiration timer
-    void OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    /// Callback from Extended Discovery Expiration timer
-    void OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
 private:
     CHIP_ERROR Advertise(bool commissionableNode, chip::Mdns::CommissioningMode mode);
