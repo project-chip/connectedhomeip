@@ -199,7 +199,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     emAfEndpoints[index].endpointType  = ep;
     emAfEndpoints[index].networkIndex  = 0;
     // Start the endpoint off as disabled.
-    emAfEndpoints[index].bitmask       = EMBER_AF_ENDPOINT_DISABLED;
+    emAfEndpoints[index].bitmask = EMBER_AF_ENDPOINT_DISABLED;
 
     emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
 
