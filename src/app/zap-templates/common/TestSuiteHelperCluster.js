@@ -30,9 +30,18 @@ const WaitForMs = {
   response : { arguments : [] }
 };
 
+const WaitForAttributeRepor = {
+  name : 'WaitForAttributeReport',
+  arguments : [],
+  response : { arguments : [ { name : 'value' } ] }
+  /*
+   * 'WaitForAttributeResponse' will take "attribute" parameter for detailed attribute path.
+   */
+};
+
 const TestSuiteHelperCluster = {
   name : 'TestSuite',
-  commands : [ WaitForMs ],
+  commands : [ WaitForMs, WaitForAttributeRepor ],
 };
 
 //

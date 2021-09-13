@@ -142,47 +142,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTestCluster_Reporting_0000_BindOnOff_Test
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Binding to OnOff Cluster complete"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPBinding * bindingCluster = [[CHIPBinding alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(bindingCluster);
-    [bindingCluster bind:kDeviceId groupId:0
-              endpointId:1
-               clusterId:6
-         responseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Reporting Test Binding status : %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterTestCluster_Reporting_0001_ConfigureOnOff_Test
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reporting OnOff configured"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPOnOff * onOffCluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(onOffCluster);
-    [onOffCluster configureAttributeOnOffWithMinInterval:0
-                                             maxInterval:1
-                                         responseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Reporting Test Configure status: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-// Spec compliant reporting Tests goes into test suite now.
-
-{{>test_cluster tests="TestCluster, TestConstraints, TestDelayCommands, Test_TC_OO_1_1, Test_TC_OO_2_1, Test_TC_OO_2_2, Test_TC_DM_1_1, Test_TC_DM_3_1, Test_TC_CC_3_4, Test_TC_CC_5, Test_TC_CC_6, Test_TC_CC_7, Test_TC_CC_8, Test_TC_WNCV_1_1, Test_TC_WNCV_2_1, Test_TC_BI_1_1, Test_TC_FLW_1_1, Test_TC_TM_1_1, Test_TC_OCC_1_1, OperationalCredentialsCluster"}}
+{{>test_cluster tests="TestCluster, TestConstraints, TestDelayCommands, TestSubscribe_OnOff, Test_TC_OO_1_1, Test_TC_OO_2_1, Test_TC_OO_2_2, Test_TC_DM_1_1, Test_TC_DM_3_1, Test_TC_CC_3_4, Test_TC_CC_5, Test_TC_CC_6, Test_TC_CC_7, Test_TC_CC_8, Test_TC_WNCV_1_1, Test_TC_WNCV_2_1, Test_TC_BI_1_1, Test_TC_FLW_1_1, Test_TC_TM_1_1, Test_TC_OCC_1_1, OperationalCredentialsCluster"}}
 
 {{#chip_client_clusters}}
 {{#unless (isStrEqual "Test Cluster" name)}}
