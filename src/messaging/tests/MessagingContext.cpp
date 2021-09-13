@@ -37,10 +37,10 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
+    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mAddress, GetAliceNodeId(), &mPairingBobToAlice,
                                                       SecureSession::SessionRole::kInitiator, mSrcFabricIndex));
 
-    return mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal, SecureSession::SessionRole::kResponder,
+    return mSecureSessionMgr.NewPairing(mAddress, GetBobNodeId(), &mPairingAliceToBob, SecureSession::SessionRole::kResponder,
                                         mDestFabricIndex);
 }
 
@@ -55,28 +55,28 @@ CHIP_ERROR MessagingContext::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-SessionHandle MessagingContext::GetSessionLocalToPeer()
+SessionHandle MessagingContext::GetSessionBobToAlice()
 {
     // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
-    return SessionHandle(GetDestinationNodeId(), GetLocalKeyId(), GetPeerKeyId(), GetFabricIndex());
+    return SessionHandle(GetAliceNodeId(), GetBobKeyId(), GetAliceKeyId(), GetFabricIndex());
 }
 
-SessionHandle MessagingContext::GetSessionPeerToLocal()
+SessionHandle MessagingContext::GetSessionAliceToBob()
 {
     // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
-    return SessionHandle(GetSourceNodeId(), GetPeerKeyId(), GetLocalKeyId(), mDestFabricIndex);
+    return SessionHandle(GetBobNodeId(), GetAliceKeyId(), GetBobKeyId(), mDestFabricIndex);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext(GetSessionLocalToPeer(), delegate);
+    return mExchangeManager.NewContext(GetSessionBobToAlice(), delegate);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext(GetSessionPeerToLocal(), delegate);
+    return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate);
 }
 
 } // namespace Test

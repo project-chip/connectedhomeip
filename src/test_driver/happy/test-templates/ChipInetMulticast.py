@@ -55,7 +55,7 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
     """
     Note:
         Supports two networks: IPv4 and IPv6
-        Supports two transports: raw IP and UDP
+        Supports one transport: UDP
     return:
         0   success
         1   failure
@@ -97,8 +97,8 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
     def __pre_check(self):
         """Sanity check the instantiated options and configuration"""
         # Sanity check the transport
-        if self.transport != "udp" and self.transport != "raw":
-            emsg = "Transport type must be one of 'raw' or 'udp'."
+        if self.transport != "udp":
+            emsg = "Transport type must be 'udp'."
             self.__log_error_and_exit(emsg)
 
         # Sanity check the IP version

@@ -87,25 +87,24 @@ protected:
     bool mUseChainedBuffers;
 };
 
-class DLL_EXPORT PacketBufferTLVReader : public chip::TLV::TLVReader
+class DLL_EXPORT PacketBufferTLVReader : public TLV::ContiguousBufferTLVReader
 {
 public:
     /**
      * Initializes a TLVReader object to read from a PacketBuffer.
      *
-     * @param[in]    buffer  A handle to PacketBuffer, to be used as backing store for a TLV class.
-     * @param[in]    useChainedBuffers
-     *                       If true, advance to the next buffer in the chain once all data
-     *                       in the current buffer has been consumed.
+     * @param[in]    buffer  A handle to PacketBuffer, to be used as backing
+     *                       store for a TLV class.  If the buffer is chained,
+     *                       only the head of the chain will be used.
      */
-    void Init(chip::System::PacketBufferHandle && buffer, bool useChainedBuffers = false)
+    void Init(chip::System::PacketBufferHandle && buffer)
     {
-        mBackingStore.Init(std::move(buffer), useChainedBuffers);
-        chip::TLV::TLVReader::Init(mBackingStore);
+        mBuffer = std::move(buffer);
+        TLV::ContiguousBufferTLVReader::Init(mBuffer->Start(), mBuffer->DataLength());
     }
 
 private:
-    TLVPacketBufferBackingStore mBackingStore;
+    PacketBufferHandle mBuffer;
 };
 
 class DLL_EXPORT PacketBufferTLVWriter : public chip::TLV::TLVWriter
