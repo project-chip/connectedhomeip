@@ -107,10 +107,5 @@ CHIP_ERROR GlobalMinimalMdnsServer::StartServer(chip::Inet::InetLayer * inetLaye
     return GlobalMinimalMdnsServer::Server().Listen(inetLayer, &allInterfaces, port);
 }
 
-void GlobalMinimalMdnsServer::ShutdownServer()
-{
-    GlobalMinimalMdnsServer::Server().Shutdown();
-}
-
 } // namespace Mdns
 } // namespace chip
