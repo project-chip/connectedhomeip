@@ -266,10 +266,6 @@ CHIP_ERROR DeviceController::Shutdown()
     // manager.
     app::InteractionModelEngine::GetInstance()->Shutdown();
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    Mdns::Resolver::Instance().ShutdownResolver();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
-
     // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
     // if (mExchangeMgr != nullptr)
     // {
