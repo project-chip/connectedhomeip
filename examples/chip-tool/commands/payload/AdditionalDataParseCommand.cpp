@@ -31,11 +31,12 @@ CHIP_ERROR AdditionalDataParseCommand::Run()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     size_t additionalDataPayloadBytesLength = static_cast<size_t>(ceil(strlen(mPayload) / 2));
-    uint8_t additionalDataPayloadBytes[additionalDataPayloadBytesLength];
-    size_t bufferSize =
-        chip::Encoding::HexToBytes(mPayload, strlen(mPayload), additionalDataPayloadBytes, additionalDataPayloadBytesLength);
+    std::unique_ptr<uint8_t[]> additionalDataPayloadBytes(new uint8_t[additionalDataPayloadBytesLength]);
 
-    err = AdditionalDataPayloadParser(additionalDataPayloadBytes, bufferSize).populatePayload(resultPayload);
+    size_t bufferSize =
+        chip::Encoding::HexToBytes(mPayload, strlen(mPayload), additionalDataPayloadBytes.get(), additionalDataPayloadBytesLength);
+
+    err = AdditionalDataPayloadParser(additionalDataPayloadBytes.get(), bufferSize).populatePayload(resultPayload);
     SuccessOrExit(err);
 
     ChipLogProgress(chipTool, "AdditionalDataParseCommand, RotatingDeviceId=%s", resultPayload.rotatingDeviceId.c_str());

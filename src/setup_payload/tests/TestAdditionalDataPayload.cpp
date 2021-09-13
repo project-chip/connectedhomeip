@@ -83,10 +83,10 @@ CHIP_ERROR ParseAdditionalDataPayload(const char * additionalDataPayload, size_t
                                       chip::SetupPayloadData::AdditionalDataPayload & outPayload)
 {
     size_t additionalDataPayloadBytesLength = static_cast<size_t>(ceil(additionalDataPayloadLength / 2));
-    uint8_t additionalDataPayloadBytes[additionalDataPayloadBytesLength];
-    size_t bufferSize = chip::Encoding::HexToBytes(additionalDataPayload, additionalDataPayloadLength, additionalDataPayloadBytes,
+    std::unique_ptr<uint8_t[]> additionalDataPayloadBytes(new uint8_t[additionalDataPayloadBytesLength]);
+    size_t bufferSize = chip::Encoding::HexToBytes(additionalDataPayload, additionalDataPayloadLength, additionalDataPayloadBytes.get(),
                                                    additionalDataPayloadBytesLength);
-    return AdditionalDataPayloadParser(additionalDataPayloadBytes, bufferSize).populatePayload(outPayload);
+    return AdditionalDataPayloadParser(additionalDataPayloadBytes.get(), bufferSize).populatePayload(outPayload);
 }
 
 void TestGeneratingAdditionalDataPayloadWithRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
