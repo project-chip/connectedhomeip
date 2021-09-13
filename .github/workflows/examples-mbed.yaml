@@ -85,7 +85,7 @@ jobs:
                   if_false: "pull-${{ github.event.pull_request.number }}"
 
             - name: Uploading binaries as artifacts
-              uses: actions/upload-artifact@v1
+              uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
                   name:

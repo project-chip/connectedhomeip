@@ -107,7 +107,7 @@ jobs:
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v1
+              uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
                   name:

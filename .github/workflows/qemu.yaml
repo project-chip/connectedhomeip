@@ -61,7 +61,7 @@ jobs:
               timeout-minutes: 35
               run: scripts/tests/esp32_qemu_tests.sh /tmp/test_logs
             - name: Uploading Logs
-              uses: actions/upload-artifact@v1
+              uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
                   name: qemu-esp32-logs

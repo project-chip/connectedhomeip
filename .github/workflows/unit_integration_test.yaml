@@ -90,7 +90,7 @@ jobs:
               timeout-minutes: 5
               run: RUN_HAPPY_TESTS=1 scripts/tests/gn_tests.sh
             - name: Uploading Happy Test Log
-              uses: actions/upload-artifact@v1
+              uses: actions/upload-artifact@v2
               if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name:

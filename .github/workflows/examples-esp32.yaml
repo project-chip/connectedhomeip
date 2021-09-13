@@ -139,7 +139,7 @@ jobs:
               run: |
                   cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v1
+              uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
                   name:
