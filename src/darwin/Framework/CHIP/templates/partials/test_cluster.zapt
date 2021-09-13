@@ -4,8 +4,7 @@
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"{{label}}"];
 {{#if (isTestOnlyCluster cluster)}}
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{definedValue}}{{/chip_tests_item_parameters}});
+{{> (asTestSuiteSimulatedClusterCommandPartial command)}}
 {{else}}
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -29,6 +28,18 @@
     {{/if}}
     {{#if isCommand}}
     [cluster {{asLowerCamelCase command}}:{{#chip_tests_item_parameters}}{{#not_first}}{{asLowerCamelCase name}}:{{/not_first}}{{asLowerCamelCase name}}Argument {{#last}}responseHandler:{{/last}}{{/chip_tests_item_parameters}}^(NSError * err, NSDictionary * values) {
+    {{else if isSubscribeAttribute}}
+    __block bool initialReportReceived = false;
+    [cluster reportAttribute{{asUpperCamelCase attribute}}WithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reporting Test Report: %@", err);
+        XCTAssertEqual(err.code, 0);
+        {{> process_response_value}}
+        initialReportReceived = true;
+    }];
+
+    [cluster configureAttribute{{asUpperCamelCase attribute}}WithMinInterval:{{minInterval}}
+                                                                 maxInterval:{{maxInterval}}
+                                                             responseHandler:^(NSError * err, NSDictionary * values) {
     {{else if isReadAttribute}}
     [cluster readAttribute{{asUpperCamelCase attribute}}WithResponseHandler:^(NSError * err, NSDictionary * values) {
     {{else if isWriteAttribute}}
@@ -47,45 +58,12 @@
         {{#unless (isStrEqual "0" response.error)}}
         [expectation fulfill];
         {{else}}
-        {{#chip_tests_item_response_parameters}}
-        {{#if hasExpectedValue}}
-        {{#if isList}}
-        XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
+        {{#unless isSubscribeAttribute}}
+        {{> process_response_value}}
         {{else}}
-        {{#if (isString type)}}
-        {{#if (isOctetString type)}}
-        NSString * {{asLowerCamelCase name}}ArgumentString= @"{{expectedValue}}";
-        NSData * {{asLowerCamelCase name}}Argument = [{{asLowerCamelCase name}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
-        XCTAssertTrue([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToData:{{asLowerCamelCase name}}Argument]);
-        {{else}}
-        NSString * {{asLowerCamelCase name}}Argument= @"{{expectedValue}}";
-        XCTAssertTrue([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToString:{{asLowerCamelCase name}}Argument]);
-        {{/if}}
-        {{else}}
-        XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix}});
-        {{/if}}
-        {{/if}}
-        {{/if}}
-        {{#if hasExpectedConstraints}}
-        {{#if expectedConstraints.minLength}}
-        XCTAssertGreaterThanOrEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] length], {{expectedConstraints.minLength}});
-        {{/if}}
-        {{#if expectedConstraints.maxLength}}
-        XCTAssertLessThanOrEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] length], {{expectedConstraints.maxLength}});
-        {{/if}}
-        {{#if expectedConstraints.minValue}}
-        XCTAssertGreaterThanOrEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.minValue}});
-        {{/if}}
-        {{#if expectedConstraints.maxValue}}
-        XCTAssertLessThanOrEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.maxValue}});
-        {{/if}}
-        {{#if expectedConstraints.notValue}}
-        XCTAssertNotEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.notValue}});
-        {{/if}}
-        {{/if}}
-        {{/chip_tests_item_response_parameters}}
+        XCTAssertEqual(initialReportReceived, true);
+        {{/unless}}
         [expectation fulfill];
-
         {{/unless}}
     }];
 

@@ -365,9 +365,12 @@ void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::T
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -404,9 +407,12 @@ void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvDa
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -449,9 +455,12 @@ void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader *
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -490,9 +499,12 @@ void ContentLauncherClusterSupportedStreamingTypesListAttributeFilter(TLV::TLVRe
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -529,9 +541,12 @@ void DescriptorClusterDeviceListListAttributeFilter(TLV::TLVReader * tlvData, Ca
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -571,9 +586,12 @@ void DescriptorClusterServerListListAttributeFilter(TLV::TLVReader * tlvData, Ca
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -610,9 +628,12 @@ void DescriptorClusterClientListListAttributeFilter(TLV::TLVReader * tlvData, Ca
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -649,9 +670,12 @@ void DescriptorClusterPartsListListAttributeFilter(TLV::TLVReader * tlvData, Cal
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -688,9 +712,12 @@ void FixedLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Cal
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -731,9 +758,12 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -771,9 +801,12 @@ void GeneralDiagnosticsClusterNetworkInterfacesListAttributeFilter(TLV::TLVReade
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -825,9 +858,12 @@ void GroupKeyManagementClusterGroupsListAttributeFilter(TLV::TLVReader * tlvData
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -870,9 +906,12 @@ void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvD
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -921,9 +960,12 @@ void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -969,9 +1011,12 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -1023,9 +1068,12 @@ void TvChannelClusterTvChannelListListAttributeFilter(TLV::TLVReader * tlvData, 
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -1075,9 +1123,12 @@ void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -1117,9 +1168,12 @@ void TestClusterClusterListInt8uListAttributeFilter(TLV::TLVReader * tlvData, Ca
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -1156,9 +1210,12 @@ void TestClusterClusterListOctetStringListAttributeFilter(TLV::TLVReader * tlvDa
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -1196,9 +1253,12 @@ void TestClusterClusterListStructOctetStringListAttributeFilter(TLV::TLVReader *
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -1239,9 +1299,12 @@ void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(TLV::TL
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -1318,9 +1381,12 @@ void ThreadNetworkDiagnosticsClusterRouteTableListListAttributeFilter(TLV::TLVRe
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -1385,9 +1451,12 @@ void ThreadNetworkDiagnosticsClusterSecurityPolicyListAttributeFilter(TLV::TLVRe
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -1428,9 +1497,12 @@ void ThreadNetworkDiagnosticsClusterOperationalDatasetComponentsListAttributeFil
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -1502,9 +1574,12 @@ void ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter(T
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
@@ -2590,254 +2665,5 @@ bool emberAfTestClusterClusterTestSpecificResponseCallback(EndpointId endpoint, 
     Callback::Callback<TestClusterClusterTestSpecificResponseCallback> * cb =
         Callback::Callback<TestClusterClusterTestSpecificResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, returnValue);
-    return true;
-}
-
-bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
-{
-    ChipLogProgress(Zcl, "emberAfReportAttributeCallback:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    NodeId sourceId = emberAfCurrentCommand()->SourceNodeId();
-    ChipLogProgress(Zcl, "  Source NodeId: %" PRIu64, sourceId);
-
-    EndpointId endpointId = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
-    ChipLogProgress(Zcl, "  Source EndpointId: 0x%04x", endpointId);
-
-    // TODO onFailureCallback is just here because of the CHECK_MESSAGE_LENGTH macro. It needs to be removed.
-    Callback::Cancelable * onFailureCallback = nullptr;
-
-    while (messageLen)
-    {
-        CHECK_MESSAGE_LENGTH(4);
-        AttributeId attributeId = Encoding::LittleEndian::Read32(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-
-        GET_REPORT_CALLBACK("emberAfReportAttributesCallback");
-
-        CHECK_MESSAGE_LENGTH(1);
-        uint8_t attributeType = Encoding::Read8(message);
-        ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
-
-        switch (attributeType)
-        {
-        case 0x00: // nodata / No data
-        case 0x0A: // data24 / 24-bit data
-        case 0x0C: // data40 / 40-bit data
-        case 0x0D: // data48 / 48-bit data
-        case 0x0E: // data56 / 56-bit data
-        case 0x1A: // map24 / 24-bit bitmap
-        case 0x1C: // map40 / 40-bit bitmap
-        case 0x1D: // map48 / 48-bit bitmap
-        case 0x1E: // map56 / 56-bit bitmap
-        case 0x22: // uint24 / Unsigned 24-bit integer
-        case 0x24: // uint40 / Unsigned 40-bit integer
-        case 0x25: // uint48 / Unsigned 48-bit integer
-        case 0x26: // uint56 / Unsigned 56-bit integer
-        case 0x2A: // int24 / Signed 24-bit integer
-        case 0x2C: // int40 / Signed 40-bit integer
-        case 0x2D: // int48 / Signed 48-bit integer
-        case 0x2E: // int56 / Signed 56-bit integer
-        case 0x38: // semi / Semi-precision
-        case 0x39: // single / Single precision
-        case 0x3A: // double / Double precision
-        case 0x48: // array / Array
-        case 0x49: // struct / Structure
-        case 0x50: // set / Set
-        case 0x51: // bag / Bag
-        case 0xE0: // ToD / Time of day
-        {
-            ChipLogError(Zcl, "attributeType 0x%02x is not supported", attributeType);
-            return true;
-        }
-
-        case 0x41: // octstr / Octet string
-        case 0x42: // string / Character string
-        {
-            // Short Strings must contains at least one byte for the length
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t length = Encoding::Read8(message);
-            ChipLogProgress(Zcl, "  length: 0x%02x", length);
-
-            // When the length is set to 0xFF, it represents a non-value. In this case the data field is zero length.
-            if (length == 0xFF)
-            {
-                length = 0;
-            }
-
-            CHECK_MESSAGE_LENGTH(length);
-            if (attributeType == 0x41)
-            {
-                Callback::Callback<OctetStringAttributeCallback> * cb =
-                    Callback::Callback<OctetStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            else
-            {
-                Callback::Callback<CharStringAttributeCallback> * cb =
-                    Callback::Callback<CharStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            break;
-        }
-
-        case 0x43: // octstr16 / Long octet string
-        case 0x44: // string16 / Long character string
-        {
-            // Long Strings must contains at least two bytes for the length
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t length = Encoding::LittleEndian::Read16(message);
-            ChipLogProgress(Zcl, "  length: 0x%02x", length);
-
-            // When the length is set to 0xFFFF, it represents a non-value. In this case the data field is zero length.
-            if (length == 0xFFFF)
-            {
-                length = 0;
-            }
-
-            CHECK_MESSAGE_LENGTH(length);
-            if (attributeType == 0x43)
-            {
-                Callback::Callback<OctetStringAttributeCallback> * cb =
-                    Callback::Callback<OctetStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            else
-            {
-                Callback::Callback<CharStringAttributeCallback> * cb =
-                    Callback::Callback<CharStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            break;
-        }
-
-        case 0x08: // data8 / 8-bit data
-        case 0x18: // map8 / 8-bit bitmap
-        case 0x20: // uint8 / Unsigned  8-bit integer
-        case 0x30: // enum8 / 8-bit enumeration
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t value = Encoding::Read8(message);
-            ChipLogProgress(Zcl, "  value: 0x%02x", value);
-
-            Callback::Callback<Int8uAttributeCallback> * cb =
-                Callback::Callback<Int8uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x09: // data16 / 16-bit data
-        case 0x19: // map16 / 16-bit bitmap
-        case 0x21: // uint16 / Unsigned 16-bit integer
-        case 0x31: // enum16 / 16-bit enumeration
-        case 0xE8: // clusterId / Cluster ID
-        case 0xE9: // attribId / Attribute ID
-        case 0xEA: // bacOID / BACnet OID
-        case 0xF1: // key128 / 128-bit security key
-        case 0xFF: // unk / Unknown
-        {
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t value = Encoding::LittleEndian::Read16(message);
-            ChipLogProgress(Zcl, "  value: 0x%04x", value);
-
-            Callback::Callback<Int16uAttributeCallback> * cb =
-                Callback::Callback<Int16uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x0B: // data32 / 32-bit data
-        case 0x1B: // map32 / 32-bit bitmap
-        case 0x23: // uint32 / Unsigned 32-bit integer
-        case 0xE1: // date / Date
-        case 0xE2: // UTC / UTCTime
-        {
-            CHECK_MESSAGE_LENGTH(4);
-            uint32_t value = Encoding::LittleEndian::Read32(message);
-            ChipLogProgress(Zcl, "  value: 0x%08x", value);
-
-            Callback::Callback<Int32uAttributeCallback> * cb =
-                Callback::Callback<Int32uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x0F: // data64 / 64-bit data
-        case 0x1F: // map64 / 64-bit bitmap
-        case 0x27: // uint64 / Unsigned 64-bit integer
-        case 0xF0: // EUI64 / IEEE address
-        {
-            CHECK_MESSAGE_LENGTH(8);
-            uint64_t value = Encoding::LittleEndian::Read64(message);
-            ChipLogProgress(Zcl, "  value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
-
-            Callback::Callback<Int64uAttributeCallback> * cb =
-                Callback::Callback<Int64uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x10: // bool / Boolean
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t value = Encoding::Read8(message);
-            ChipLogProgress(Zcl, "  value: %d", value);
-
-            Callback::Callback<BooleanAttributeCallback> * cb =
-                Callback::Callback<BooleanAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x28: // int8 / Signed 8-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            int8_t value = CastToSigned(Encoding::Read8(message));
-            ChipLogProgress(Zcl, "  value: %" PRId8, value);
-
-            Callback::Callback<Int8sAttributeCallback> * cb =
-                Callback::Callback<Int8sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x29: // int16 / Signed 16-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(2);
-            int16_t value = CastToSigned(Encoding::LittleEndian::Read16(message));
-            ChipLogProgress(Zcl, "  value: %" PRId16, value);
-
-            Callback::Callback<Int16sAttributeCallback> * cb =
-                Callback::Callback<Int16sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x2B: // int32 / Signed 32-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(4);
-            int32_t value = CastToSigned(Encoding::LittleEndian::Read32(message));
-            ChipLogProgress(Zcl, "  value: %" PRId32, value);
-
-            Callback::Callback<Int32sAttributeCallback> * cb =
-                Callback::Callback<Int32sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x2F: // int64 / Signed 64-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(8);
-            int64_t value = CastToSigned(Encoding::LittleEndian::Read64(message));
-            ChipLogProgress(Zcl, "  value: %" PRId64, value);
-
-            Callback::Callback<Int64sAttributeCallback> * cb =
-                Callback::Callback<Int64sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-        }
-    }
-
     return true;
 }

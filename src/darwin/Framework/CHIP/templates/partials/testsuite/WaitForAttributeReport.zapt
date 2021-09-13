@@ -1,0 +1,14 @@
+{{#chip_tests_WaitForAttributeReport_attribute_info}}
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIP{{asUpperCamelCase cluster}} * cluster = [[CHIP{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster reportAttribute{{asUpperCamelCase attribute}}WithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reporting Test Report: %@", err);
+        XCTAssertEqual(err.code, 0);
+
+        {{> process_response_value}}
+        [expectation fulfill];
+    }];
+{{/chip_tests_WaitForAttributeReport_attribute_info}}
