@@ -24,6 +24,7 @@ class AndroidBoard(Enum):
     ARM = auto()
     ARM64 = auto()
     X64 = auto()
+    X86 = auto()
 
     def TargetCpuName(self):
         if self == AndroidBoard.ARM:
@@ -32,6 +33,8 @@ class AndroidBoard(Enum):
             return 'arm64'
         elif self == AndroidBoard.X64:
             return 'x64'
+        elif self == AndroidBoard.X86:
+            return 'x86'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -42,6 +45,8 @@ class AndroidBoard(Enum):
             return 'arm64-v8a'
         elif self == AndroidBoard.X64:
             return 'x86_64'
+        elif self == AndroidBoard.X86:
+            return 'x86'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -149,7 +154,7 @@ class AndroidBuilder(Builder):
             '%s/src/android/CHIPTool/gradlew' % self.root, '-p',
             '%s/src/android/CHIPTool' % self.root,
             '-PchipSdkJarDir=%s' % os.path.join(self.output_dir, 'lib'),
-            '-PbuildDir=%s' % self.output_dir, 'build'
+            '-PbuildDir=%s' % self.output_dir, 'assembleDebug'
         ],
             title='Building APP ' + self.identifier)
 
@@ -162,9 +167,6 @@ class AndroidBuilder(Builder):
             'ChipTool-debug.apk':
                 os.path.join(self.output_dir, 'outputs', 'apk', 'debug',
                              'app-debug.apk'),
-            'ChipTool-release-unsigned.apk':
-                os.path.join(self.output_dir, 'outputs', 'apk', 'release',
-                             'app-release-unsigned.apk'),
 
             'jni/%s/libSetupPayloadParser.so' % self.board.AbiName():
                 os.path.join(self.output_dir, 'lib', 'jni',
