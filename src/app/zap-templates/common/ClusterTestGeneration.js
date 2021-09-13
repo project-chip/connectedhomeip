@@ -26,7 +26,7 @@ const path              = require('path');
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
-const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
+const { TestSuiteHelperCluster }        = require('./TestSuiteHelperCluster.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
 
 const kClusterName       = 'cluster';
@@ -193,9 +193,7 @@ function parse(filename)
 
   // Filter disabled tests
   yaml.tests = yaml.tests.filter(test => !test.disabled);
-  yaml.tests.forEach((test, index) => {
-    setDefault(test, kIndexName, index);
-  });
+  yaml.tests.forEach((test, index) => { setDefault(test, kIndexName, index); });
 
   yaml.filename   = filename;
   yaml.totalTests = yaml.tests.length;
@@ -214,18 +212,19 @@ function getClusters()
 {
   // Create a new array to merge the configured clusters list and test
   // simulated clusters.
-  return Clusters.getClusters().then(clusters => clusters.concat(DelayCommands));
+  return Clusters.getClusters().then(clusters => clusters.concat(TestSuiteHelperCluster));
 }
 
 function getCommands(clusterName)
 {
-  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.commands) : Clusters.getClientCommands(clusterName);
+  return (clusterName == TestSuiteHelperCluster.name) ? Promise.resolve(TestSuiteHelperCluster.commands)
+                                                      : Clusters.getClientCommands(clusterName);
 }
 
 function getAttributes(clusterName)
 {
-  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.attributes)
-                                             : Clusters.getServerAttributes(clusterName);
+  return (clusterName == TestSuiteHelperCluster.name) ? Promise.resolve(TestSuiteHelperCluster.attributes)
+                                                      : Clusters.getServerAttributes(clusterName);
 }
 
 function assertCommandOrAttribute(context)
@@ -291,7 +290,7 @@ function chip_tests_items(options)
 
 function isTestOnlyCluster(name)
 {
-  return name == DelayCommands.name;
+  return name == TestSuiteHelperCluster.name;
 }
 
 function chip_tests_item_parameters(options)
@@ -306,13 +305,13 @@ function chip_tests_item_parameters(options)
       const expected = commandValues.find(value => value.name.toLowerCase() == commandArg.name.toLowerCase());
       if (!expected) {
         printErrorAndExit(this,
-            'Missing "' + commandArg.name + '" in arguments list: \n\t* '
-                + commandValues.map(command => command.name).join('\n\t* '));
+               'Missing "' + commandArg.name + '" in arguments list: \n\t* '
+                   + commandValues.map(command => command.name).join('\n\t* '));
       }
       commandArg.definedValue = expected.value;
 
       return commandArg;
-    });
+       });
 
     return commands;
   });

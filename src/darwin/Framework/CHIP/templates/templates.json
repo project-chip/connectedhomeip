@@ -22,6 +22,10 @@
         {
             "name": "CHIPCallbackBridge",
             "path": "partials/CHIPCallbackBridge.zapt"
+        },
+        {
+            "name": "TestSuiteHelper_WaitForMs",
+            "path": "partials/testsuite/WaitForMs.zapt"
         }
     ],
     "templates": [

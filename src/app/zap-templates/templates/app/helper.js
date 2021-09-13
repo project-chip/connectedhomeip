@@ -52,15 +52,15 @@ function asReadTypeLength(type)
     const defaultResolver = zclQuery.selectAtomicType(db, pkgId, type);
 
     const enumResolver = zclHelper.isEnum(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectEnumByName(db, type, pkgId).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
+      return result == 'unknown'
+          ? null
+          : zclQuery.selectEnumByName(db, type, pkgId).then(rec => { return zclQuery.selectAtomicType(db, pkgId, rec.type); });
     });
 
     const bitmapResolver = zclHelper.isBitmap(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectBitmapByName(db, pkgId, type).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
+      return result == 'unknown'
+          ? null
+          : zclQuery.selectBitmapByName(db, pkgId, type).then(rec => { return zclQuery.selectAtomicType(db, pkgId, rec.type); });
     });
 
     const typeResolver = Promise.all([ defaultResolver, enumResolver, bitmapResolver ]);
@@ -162,25 +162,25 @@ function chip_endpoint_generated_functions()
       {
         hasFunctionArray = true
         functionList     = functionList.concat(
-            `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
+                `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
             cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
-        hasFunctionArray = true
+            hasFunctionArray = true
       }
 
       if (endpointClusterWithMessageSent.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
             cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
-        hasFunctionArray = true
+            hasFunctionArray = true
       }
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
             cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
-        hasFunctionArray = true
+            hasFunctionArray = true
       }
 
       if (hasFunctionArray) {
@@ -335,16 +335,22 @@ function asMEI(prefix, suffix)
   return cHelper.asHex((prefix << 16) + suffix, 8);
 }
 
+function asTestSuiteSimulatedClusterCommandPartial(label)
+{
+  return "TestSuiteHelper_" + asUpperCamelCase(label)
+}
+
 //
 // Module exports
 //
-exports.asPrintFormat                     = asPrintFormat;
-exports.asReadType                        = asReadType;
-exports.asReadTypeLength                  = asReadTypeLength;
-exports.chip_endpoint_generated_functions = chip_endpoint_generated_functions
-exports.chip_endpoint_cluster_list        = chip_endpoint_cluster_list
-exports.asTypeLiteralSuffix               = asTypeLiteralSuffix;
-exports.asLowerCamelCase                  = asLowerCamelCase;
-exports.asUpperCamelCase                  = asUpperCamelCase;
-exports.hasSpecificAttributes             = hasSpecificAttributes;
-exports.asMEI                             = asMEI;
+exports.asPrintFormat                             = asPrintFormat;
+exports.asReadType                                = asReadType;
+exports.asReadTypeLength                          = asReadTypeLength;
+exports.chip_endpoint_generated_functions         = chip_endpoint_generated_functions
+exports.chip_endpoint_cluster_list                = chip_endpoint_cluster_list
+exports.asTypeLiteralSuffix                       = asTypeLiteralSuffix;
+exports.asLowerCamelCase                          = asLowerCamelCase;
+exports.asUpperCamelCase                          = asUpperCamelCase;
+exports.hasSpecificAttributes                     = hasSpecificAttributes;
+exports.asMEI                                     = asMEI;
+exports.asTestSuiteSimulatedClusterCommandPartial = asTestSuiteSimulatedClusterCommandPartial;
