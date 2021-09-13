@@ -1035,8 +1035,10 @@ void CASESession::SendErrorMsg(SigmaErrorType errorCode)
 
     msg->SetDataLength(msglen);
 
-    VerifyOrReturn(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_SigmaErr, std::move(msg)) == CHIP_NO_ERROR,
-                   ChipLogError(SecureChannel, "Failed to send error message"));
+    if (mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_SigmaErr, std::move(msg)) != CHIP_NO_ERROR)
+    {
+        ChipLogError(SecureChannel, "Failed to send error message"));
+    }
 }
 
 CHIP_ERROR CASESession::ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
