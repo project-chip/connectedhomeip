@@ -50,6 +50,7 @@ constexpr char kAdditionalDataPayloadWithRotatingDeviceIdAndMaxLifetimeCounter[]
 constexpr char kRotatingDeviceId[]                                               = "0A001998AB7130E38B7E9A401CFE9F7B79AF";
 constexpr uint16_t kLifetimeCounter                                              = 10;
 constexpr uint16_t kAdditionalDataPayloadLength                                  = 51;
+constexpr uint16_t kShortRotatingIdLength                                        = 5;
 
 CHIP_ERROR GenerateAdditionalDataPayload(nlTestSuite * inSuite, uint16_t lifetimeCounter, const char * serialNumberBuffer,
                                          size_t serialNumberBufferSize, BitFlags<AdditionalDataFields> additionalDataFields,
@@ -167,6 +168,17 @@ void TestGeneratingRotatingDeviceIdAsStringWithNullInputs(nlTestSuite * inSuite,
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+void TestGeneratingRotatingDeviceIdWithSmallBuffer(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    char rotatingDeviceIdHexBuffer[kShortRotatingIdLength];
+    size_t rotatingDeviceIdValueOutputSize = 0;
+    err                                    = AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
+        kLifetimeCounter, kSerialNumber, strlen(kSerialNumber), rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer),
+        rotatingDeviceIdValueOutputSize);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
+}
+
 void TestParsingAdditionalDataPayloadWithRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
 {
     chip::SetupPayloadData::AdditionalDataPayload resultPayload;
@@ -216,6 +228,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test Generating Additional Data Payload without Rotatin gDevice Id", TestGeneratingAdditionalDataPayloadWithoutRotatingDeviceId),
     NL_TEST_DEF("Test Generating Rotating Device Id as string", TestGeneratingRotatingDeviceIdAsString),
     NL_TEST_DEF("Test Generating Rotating Device Id as string with null/invalid inputs", TestGeneratingRotatingDeviceIdAsStringWithNullInputs),
+    NL_TEST_DEF("Test Generating Rotating Device Id as string with small buffer", TestGeneratingRotatingDeviceIdWithSmallBuffer),
     NL_TEST_DEF("Test Parsing Additional Data Payload with Rotating Device Id", TestParsingAdditionalDataPayloadWithRotatingDeviceId),
     NL_TEST_DEF("Test Parsing Additional Data Payload without Rotating Device Id", TestParsingAdditionalDataPayloadWithoutRotatingDeviceId),
     NL_TEST_DEF("Test Parsing Additional Data Payload with Invalid Rotating Device Id Length", TestParsingAdditionalDataPayloadWithInvalidRotatingDeviceIdLength),

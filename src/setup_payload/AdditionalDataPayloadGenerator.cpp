@@ -125,6 +125,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsHexString(
                                                           rotatingDeviceIdBufferTemp, ArraySize(rotatingDeviceIdBufferTemp),
                                                           rotatingDeviceIdBufferSizeTemp));
 
+    VerifyOrReturnError(rotatingDeviceIdBufferSize >= RotatingDeviceId::kHexMaxLength, CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorOnFailure(BytesToUppercaseHexString(rotatingDeviceIdBufferTemp, rotatingDeviceIdBufferSizeTemp,
                                                    rotatingDeviceIdBuffer, rotatingDeviceIdBufferSize));
     rotatingDeviceIdValueOutputSize = rotatingDeviceIdBufferSizeTemp * 2;
