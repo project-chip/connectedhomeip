@@ -5217,7 +5217,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterOperationalCredentialsCluster_000000_ReadAttribute
+- (void)testSendClusterTestOperationalCredentialsCluster_000000_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read number of supported fabrics"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -5235,7 +5235,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterOperationalCredentialsCluster_000001_ReadAttribute
+- (void)testSendClusterTestOperationalCredentialsCluster_000001_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read number of commissioned fabrics"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
