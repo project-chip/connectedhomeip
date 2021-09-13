@@ -264,6 +264,8 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoin
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
+    // We are extracting the current fabric index here, even though it's used after sending the response.
+    // This is done to prevent accidental update of emberAfCurrentCommand()->source while sending the command's response.
     FabricIndex currentFabricIndex = emberAfCurrentCommand()->source->GetSecureSession().GetFabricIndex();
 
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -283,6 +285,7 @@ exit:
             // retries to send the message and runs into issues.
             // We are hijacking the exchange delegate here (as no more messages should be received on this exchange),
             // and wait for it to close, before expiring the secure sessions for the fabric.
+            // TODO: https://github.com/project-chip/connectedhomeip/issues/9642
             ec->SetDelegate(&gFabricCleanupExchangeDelegate);
         }
         else

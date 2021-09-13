@@ -326,22 +326,18 @@ public:
     CHECK_RETURN_VALUE
     PeerConnectionState * FindPeerConnectionStateByFabric(FabricIndex fabric)
     {
-        PeerConnectionState * state = nullptr;
-        PeerConnectionState * iter  = &mStates[0];
-
-        for (; iter < &mStates[kMaxConnectionCount]; iter++)
+        for (auto & state : mStates)
         {
-            if (!iter->IsInitialized())
+            if (!state.IsInitialized())
             {
                 continue;
             }
-            if (iter->GetFabricIndex() == fabric)
+            if (state.GetFabricIndex() == fabric)
             {
-                state = iter;
-                break;
+                return &state;
             }
         }
-        return state;
+        return nullptr;
     }
 
     /// Convenience method to mark a peer connection state as active
