@@ -16,11 +16,37 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <lib/core/Optional.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
+
+namespace {
+
+class EthernetDiagosticsAttrAccess : public AttributeAccessInterface
+{
+public:
+    // Register for the EthernetNetworkDiagnostics cluster on all endpoints.
+    EthernetDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), EthernetNetworkDiagnostics::Id) {}
+
+    CHIP_ERROR Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead) override;
+};
+
+EthernetDiagosticsAttrAccess gAttrAccess;
+
+CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead)
+{
+    *aDataRead = false;
+    return CHIP_NO_ERROR;
+}
+
+} // anonymous namespace
 
 bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
@@ -42,4 +68,14 @@ bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(EndpointId endp
 exit:
     emberAfSendImmediateDefaultResponse(status);
     return true;
+}
+
+void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpoint)
+{
+    static bool attrAccessRegistered = false;
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gAttrAccess);
+        attrAccessRegistered = true;
+    }
 }
