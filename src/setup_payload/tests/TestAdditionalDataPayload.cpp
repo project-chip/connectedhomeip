@@ -85,8 +85,8 @@ CHIP_ERROR ParseAdditionalDataPayload(const char * additionalDataPayload, size_t
 {
     size_t additionalDataPayloadBytesLength = static_cast<size_t>(ceil(additionalDataPayloadLength / 2));
     std::unique_ptr<uint8_t[]> additionalDataPayloadBytes(new uint8_t[additionalDataPayloadBytesLength]);
-    size_t bufferSize = chip::Encoding::HexToBytes(additionalDataPayload, additionalDataPayloadLength, additionalDataPayloadBytes.get(),
-                                                   additionalDataPayloadBytesLength);
+    size_t bufferSize = chip::Encoding::HexToBytes(additionalDataPayload, additionalDataPayloadLength,
+                                                   additionalDataPayloadBytes.get(), additionalDataPayloadBytesLength);
     return AdditionalDataPayloadParser(additionalDataPayloadBytes.get(), bufferSize).populatePayload(outPayload);
 }
 
