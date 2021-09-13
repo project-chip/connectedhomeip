@@ -201,6 +201,23 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
                   ChipLogValueMEI(aClusterInfo.mClusterId), ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId,
                   aClusterInfo.mFieldId, aClusterInfo.mListIndex);
 
+    AttributeAccessInterceptor * interceptor = findAttributeAccessInterceptor(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
+    if (interceptor != nullptr)
+    {
+        bool dataRead;
+        // TODO: We should probably clone the writer and convert failures here
+        // into status responses, unless our caller already does that.
+        ReturnErrorOnFailure(interceptor->ReadAttributeData(aClusterInfo, apWriter, &dataRead));
+
+        if (dataRead)
+        {
+            // TODO: Add DataVersion support
+            ReturnErrorOnFailure(
+                apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), kTemporaryDataVersion));
+            return CHIP_NO_ERROR;
+        }
+    }
+
     EmberAfAttributeType attributeType;
     EmberAfStatus status;
     status = emberAfReadAttribute(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId, CLUSTER_MASK_SERVER,

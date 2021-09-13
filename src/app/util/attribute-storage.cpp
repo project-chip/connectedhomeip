@@ -109,6 +109,10 @@ const uint16_t attributeManufacturerCodeCount                   = GENERATED_ATTR
 #define endpointNetworkIndex(x) fixedNetworks[x]
 #endif
 
+namespace {
+app::AttributeAccessInterceptor * gAttributeAccessInterceptors = nullptr;
+} // anonymous namespace
+
 //------------------------------------------------------------------------------
 // Forward declarations
 
@@ -980,6 +984,34 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                     endpoint, cluster->clusterId,
                     (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
             }
+
+            // Clear out any attribute access interceptors registered for this
+            // endpoint.
+            app::AttributeAccessInterceptor * prev = nullptr;
+            app::AttributeAccessInterceptor * cur  = gAttributeAccessInterceptors;
+            while (cur)
+            {
+                app::AttributeAccessInterceptor * next = cur->GetNext();
+                if (cur->MatchesExactly(endpoint))
+                {
+                    // Remove it from the list
+                    if (prev)
+                    {
+                        prev->SetNext(next);
+                    }
+                    else
+                    {
+                        gAttributeAccessInterceptors = next;
+                    }
+
+                    // Do not change prev in this case.
+                }
+                else
+                {
+                    prev = cur;
+                }
+                cur = next;
+            }
         }
     }
 
@@ -1411,3 +1443,22 @@ bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, Cluste
     return true;
 }
 #endif
+
+void registerAttributeAccessInterceptor(app::AttributeAccessInterceptor * interceptor)
+{
+    interceptor->SetNext(gAttributeAccessInterceptors);
+    gAttributeAccessInterceptors = interceptor;
+}
+
+app::AttributeAccessInterceptor * findAttributeAccessInterceptor(EndpointId endpointId, ClusterId clusterId)
+{
+    for (app::AttributeAccessInterceptor * cur = gAttributeAccessInterceptors; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(endpointId, clusterId))
+        {
+            return cur;
+        }
+    }
+
+    return nullptr;
+}

@@ -42,6 +42,7 @@
 #pragma once
 
 //#include PLATFORM_HEADER
+#include <app/AttributeAccessInterceptor.h>
 #include <app/util/af.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
@@ -254,3 +255,11 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, Emb
                                         uint8_t deviceVersion);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
+
+/**
+ * Register an attribute access interceptor.  It will remain registered until
+ * the endpoint it's registered for is disabled (or until shutdown if it's
+ * registered for all endpoints).
+ */
+void registerAttributeAccessInterceptor(chip::app::AttributeAccessInterceptor * interceptor);
+chip::app::AttributeAccessInterceptor * findAttributeAccessInterceptor(chip::EndpointId endpointId, chip::ClusterId clusterId);
