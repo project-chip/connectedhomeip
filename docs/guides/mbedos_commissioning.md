@@ -1,0 +1,326 @@
+<p align="center">
+    <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
+</p>
+
+<h1> Matter Arm Mbed OS provisioning guide </h1>
+
+-   [Overview](#overview)
+-   [Prerequisites](#prerequisites)
+-   [CHIPTool for Android](#chiptool-for-android)
+    -   [Device commisioning setup for Android](#device-commisioning-setup-for-android)
+    -   [Device commisioning for Android](#device-commisioning-for-android)
+    -   [Sending Application packets for Android](#sending-application-packets-for-android)
+-   [POSIX CLI CHIPTool](#posix-cli-chiptool)
+    -   [Building](#building)
+    -   [Device commisioning for CLI](#device-commisioning-for-cli)
+    -   [Sending ZCL commands](#sending-zcl-commands)
+        -   [ZCL commands details](#zcl-commands-details)
+-   [Python Device Controller](#python-device-controller)
+    -   [Building and installing](#building-and-installing)
+    -   [Device commisioning for Python Device Controller](#device-commisioning-for-python-device-controller)
+    -   [Sending ZCL commands](#sending-zcl-commands-1)
+        -   [ZCL commands details](#zcl-commands-details-1)
+
+<hr>
+
+# Overview
+
+This document provides a step-by-step guide how to commission any Matter
+application. For demonstration purposes the Lighting app is used.
+
+The provisioning process is composed of the following stages:
+
+-   CHIPTool discovers a Matter accessory device over Bluetooth Low Energy
+    (BLE).
+
+-   CHIPTool establishes a secure channel to the device over BLE, and sends
+    network credentials data.
+
+BLE is only used during first phase. Afterwards, only the IP connectivity
+between the smartphone and the accessory device is needed to send messages.
+
+# Prerequisites
+
+To complete all the steps in the tutorial, you need:
+
+-   A smartphone with Android 8+ or PC with Ubuntu 20.04 and Bluetooth
+    connectivity
+
+-   A WiFi Access Point (smartphone router, standalone AP, wireless router or
+    PC)
+
+-   Any currently supported target device (for example, a Cypress PSoC6
+    CY8CPROTO-062-4343W board)
+
+# CHIPTool for Android
+
+To make provisioning possible and to control the Matter device from your Android
+based smartphone, you must first build and install the CHIPTool application.
+
+To build the CHIPTool application for your smartphone, read
+[Android CHIPTool README](../../src/android/CHIPTool/README.md).
+
+After building, install the application by completing the following steps:
+
+1.  Install the Android Debug Bridge (adb) package by running the following
+    command:
+
+        $ sudo apt install android-tools-adb
+
+2.  Enable **USB debugging** on your smartphone. See the
+    [Configure on-device developer options](https://developer.android.com/studio/debug/dev-options)
+    guide on the Android Studio hub for detailed information.
+3.  If the **Install via USB** option is supported for your Android version,
+    turn it on.
+4.  Plug your smartphone into a USB port on your PC.
+5.  Run the following command to install the application, with _matter-dir_
+    replaced with the path to the Matter source directory:
+
+        $ adb install -r matter-dir/src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
+
+6.  Navigate to settings on your smartphone and grant **Camera** and
+    **Location** permissions to CHIPTool.
+
+CHIPTool is now ready to be used for commissioning.
+
+After completing the app installation main screen should appear. It's presented
+in the image below.
+
+<p align="center">
+    <img src="../images/CHIPTool_main.jpg">
+</p>
+
+## Device commisioning setup for Android
+
+To prepare the accessory Matter device for commissioning (called rendezvous),
+complete the following steps:
+
+-   Open a serial terminal session to connect to the UART console of the
+    accessory device. You can use **mbed-tools** for this purpose
+    ([mbed-tools](https://github.com/ARMmbed/mbed-tools)):
+
+        mbed-tools sterm -p /dev/ttyACM0 -b 115200 -e off
+
+To start the rendezvous, CHIPTool must get the commissioning information from
+the Matter device. The data payload is encoded within a QR code and is printed
+to the UART console.
+
+-   Reset the device.
+
+-   Find a message similar to the following one in the application logs:
+
+        [SVR] Copy/paste the following URL in a browser to see the QR Code:
+        https://dhrishi.github.io/connectedhomeip/qrcode.html?data=CH%3AI34DV%2A-00%200C9SS0
+        Open the URL in a web browser to have the commissioning QR code generated.
+
+-   Open URL from the console to display the QR in a web browser.
+
+<p align="center">
+    <img src="../images/qr.png">
+</p>
+
+## Device commisioning for Android
+
+To commission Matter device onto the network created complete the following
+steps:
+
+-   Enable Bluetooth and Location services on your smartphone.
+
+-   Connect the smartphone to the WiFi Network
+
+-   Open the CHIPTool application on your smartphone.
+
+-   Tap the 'PROVISION CHIP DEVICE WITH WIFI' button and scan the commissioning
+    QR code.
+
+You will see a few pop-up messages appear as the commissioning progresses.
+Finally, the network settings screen appears.
+
+<p align="center">
+    <img src="../images/scanning.jpg">
+    <img src="../images/pairing.jpg">
+    <img src="../images/wifi_network.jpg">
+</p>
+
+In the new screen enter the WiFi credentials and tap the Save Network button to
+send a WiFi provisioning message to the accessory device.
+
+Screen with WiFi password will disappear and the application returns to main
+screen.
+
+## Sending Application packets for Android
+
+After the accessory device has been successfully commissioned to the network, it
+is possible to communicate with it using IP. Matter uses Zigbee Cluster Library
+(ZCL) protocol which defines common means for applications to communicate.
+
+From main CHIPTool screen select 'LIGHT ON/OFF & LEVEL CLUSTER'
+
+<p align="center">
+    <img src="../images/app.jpg">
+</p>
+
+The presented screen allows control the light dimming.
+
+Tap either the ON or the OFF button to toggle between min and max brightness.
+Use the slider to modify the brightness between 0-255.
+
+If **Lighting LED** is available then brightness change can be observed.
+
+> For more details about Android CHIPTool please visit
+> [CHIPTool](../../src/android/CHIPTool/README.md)
+
+# POSIX CLI CHIPTool
+
+## Building
+
+    cd examples/chip-tool
+    git submodule update --init
+    source third_party/connectedhomeip/scripts/activate.sh
+    gn gen out/debug
+    ninja -C out/debug
+
+After the application is built, it can be found in the build directory as
+'out/debug/chip-tool'
+
+## Device commisioning for CLI
+
+In order to send commands to a device, it must be paired with the client and
+connected to the network.
+
+To run the commisioning process via BLE, run the built executable and pass it
+the network ssid and password, discriminator and pairing code of the remote
+device.
+
+Example:
+
+    $ chip-tool pairing ble network_ssid network_password 20202021 3840
+
+## Sending ZCL commands
+
+If the commissioning process was successful, it is possible to send a ZCL
+command to the device which initiate a certain action.
+
+To send a ZCL commands, run the executable and pass it the target cluster name,
+the target command name as well as an endpoint id.
+
+The endpoint id must be between 1 and 240.
+
+For example:
+
+    $ chip-tool onoff on 1
+
+The client will send a single command packet and then exit.
+
+### ZCL commands details
+
+To get the list of supported clusters, run the built executable without any
+arguments.
+
+    $ chip-tool
+
+Supported clusters list is shown below.
+
+-   [barriercontrol](#barriercontrol)
+-   [basic](#basic)
+-   [colorcontrol](#colorcontrol)
+-   [doorlock](#doorlock)
+-   [groups](#groups)
+-   [iaszone](#iaszone)
+-   [identify](#identify)
+-   [levelcontrol](#levelcontrol)
+-   [onoff](#onoff)
+-   [pairing](#pairing)
+-   [payload](#payload)
+-   [scenes](#scenes)
+-   [temperaturemeasurement](#temperaturemeasurement)
+
+To get the list of commands for a specific cluster, run the executable with the
+target cluster name.
+
+    $ chip-tool onoff
+
+To the the list of attributes for a specific cluster, run the executable with
+the target cluster name and the `read` command name.
+
+    $ chip-tool onoff read
+
+To get the list of parameters for a specific command, run the executable with
+the target cluster name and the target command name
+
+    $ chip-tool onoff on
+
+> For more details about POSIX CLI CHIPTool please visit
+> [CHIPTool](../../examples/chip-tool/README.md)
+
+# Python Device Controller
+
+## Building and installing
+
+For building and installing Python Device Controller use specific script
+
+    $ scripts/build_python.sh
+
+This script builds python device controller (WHL files are created), sets up a
+separate virtual python environment and installs the WHL file.
+
+The WHL files installation will:
+
+-   Install the 'chip' module.
+-   Create a ENV/bin/chip-device-ctrl script that provides an interactive shell
+    for the chip library.
+
+## Device commisioning for Python Device Controller
+
+In order to send commands to a device, it must be paired with the client and
+connected to the network.
+
+To run the commisioning process via BLE:
+
+-   Run Device Controller:
+
+         chip-device-ctrl
+
+-   Scan BLE devices:
+
+         chip-device-ctrl > ble-scan
+
+-   Set WiFi credential:
+
+         chip-device-ctrl > set-pairing-wifi-credential NetworkSsid NetworkPassword
+
+-   Connect to device using setup pin code and discriminator:
+
+         chip-device-ctrl > connect -ble 1383 12345678
+
+## Sending ZCL commands
+
+If the commissioning process was successful, it is possible to send a ZCL
+command to the device which initiates a certain action.
+
+`zcl <Cluster> <Command> <NodeId> <EndpointId> <GroupId> [arguments]`
+
+Example:
+
+    chip-device-ctrl > zcl LevelControl MoveWithOnOff 12344321 1 0 moveMode=1 rate=2
+
+### ZCL commands details
+
+To get the list of supported clusters run:
+
+    chip-device-ctrl > zcl ?
+
+To get the list of available commands in cluster run:
+
+    chip-device-ctrl > zcl ? <Cluster>
+
+**Format of arguments**
+
+For any integer and char string (null terminated) types, just use `key=value`,
+for example: `rate=2`, `string=123`, `string_2="123 456"`
+
+For byte string type, use `key=encoding:value`, currectly, we support `str` and
+`hex` encoding, the `str` encoding will encode a NULL terminated string. For
+example, `networkId=hex:0123456789abcdef` (for
+`[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]`), `ssid=str:Test` (for
+`['T', 'e', 's', 't', 0x00]`).
