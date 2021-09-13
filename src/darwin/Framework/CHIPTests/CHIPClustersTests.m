@@ -160,47 +160,6 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTestCluster_Reporting_0000_BindOnOff_Test
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Binding to OnOff Cluster complete"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPBinding * bindingCluster = [[CHIPBinding alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(bindingCluster);
-    [bindingCluster bind:kDeviceId
-                 groupId:0
-              endpointId:1
-               clusterId:6
-         responseHandler:^(NSError * err, NSDictionary * values) {
-             NSLog(@"Reporting Test Binding status : %@", err);
-             XCTAssertEqual(err.code, 0);
-             [expectation fulfill];
-         }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterTestCluster_Reporting_0001_ConfigureOnOff_Test
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reporting OnOff configured"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPOnOff * onOffCluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(onOffCluster);
-    [onOffCluster configureAttributeOnOffWithMinInterval:0
-                                             maxInterval:1
-                                         responseHandler:^(NSError * err, NSDictionary * values) {
-                                             NSLog(@"Reporting Test Configure status: %@", err);
-
-                                             XCTAssertEqual(err.code, 0);
-                                             [expectation fulfill];
-                                         }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-// Spec compliant reporting Tests goes into test suite now.
-
 - (void)testSendClusterTestCluster_000000_Test
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command"];
@@ -2386,6 +2345,86 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 100ms"];
     dispatch_queue_t queue = dispatch_get_main_queue();
     WaitForMs(expectation, queue, 100);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestSubscribe_OnOff_000000_Off
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Set OnOff Attribute to false"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster off:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Set OnOff Attribute to false Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestSubscribe_OnOff_000001_SubscribeAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Subscribe OnOff Attribute"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __block bool initialReportReceived = false;
+    [cluster reportAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reporting Test Report: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] boolValue], false);
+        initialReportReceived = true;
+    }];
+
+    [cluster configureAttributeOnOffWithMinInterval:2
+                                        maxInterval:10
+                                    responseHandler:^(NSError * err, NSDictionary * values) {
+                                        NSLog(@"Subscribe OnOff Attribute Error: %@", err);
+
+                                        XCTAssertEqual(err.code, 0);
+                                        XCTAssertEqual(initialReportReceived, true);
+                                        [expectation fulfill];
+                                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestSubscribe_OnOff_000002_On
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Turn On the light to see attribute change"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster on:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Turn On the light to see attribute change Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestSubscribe_OnOff_000003_WaitForAttributeReport
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check for attribute report"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster reportAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Reporting Test Report: %@", err);
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] boolValue], true);
+        [expectation fulfill];
+    }];
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
