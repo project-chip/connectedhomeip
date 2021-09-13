@@ -255,25 +255,28 @@ private:
     CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const ByteSpan & salt);
 
     CHIP_ERROR SendPBKDFParamRequest();
-    CHIP_ERROR HandlePBKDFParamRequest(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandlePBKDFParamRequest(System::PacketBufferHandle && msg);
 
-    CHIP_ERROR SendPBKDFParamResponse();
-    CHIP_ERROR HandlePBKDFParamResponse(const System::PacketBufferHandle & msg);
+    CHIP_ERROR SendPBKDFParamResponse(ByteSpan initiatorRandom, bool initiatorHasPBKDFParams);
+    CHIP_ERROR HandlePBKDFParamResponse(System::PacketBufferHandle && msg);
 
     CHIP_ERROR SendMsg1();
 
-    CHIP_ERROR HandleMsg1_and_SendMsg2(const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleMsg2_and_SendMsg3(const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleMsg3(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleMsg1_and_SendMsg2(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleMsg2_and_SendMsg3(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleMsg3(System::PacketBufferHandle && msg);
 
-    void SendErrorMsg(Spake2pErrorType errorCode);
-    CHIP_ERROR HandleErrorMsg(const System::PacketBufferHandle & msg);
+    void SendStatusReport(uint16_t protocolCode);
+    CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg);
+
+    // TODO - Move EstimateTLVStructOverhead to CHIPTLV header file
+    constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }
 
     void CloseExchange();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
-    Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
+    Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_PakeError;
 
 #ifdef ENABLE_HSM_SPAKE
     Spake2pHSM_P256_SHA256_HKDF_HMAC mSpake2p;
@@ -290,6 +293,10 @@ private:
     uint32_t mSetupPINCode;
 
     bool mComputeVerifier = true;
+
+    bool mHavePBKDFParameters = false;
+
+    uint8_t mPBKDFLocalRandomData[kPBKDFParamRandomNumberSize];
 
     Hash_SHA256_stream mCommissioningHash;
     uint32_t mIterationCount = 0;
