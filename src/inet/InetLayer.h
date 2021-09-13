@@ -61,10 +61,6 @@
 #include <inet/DNSResolver.h>
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-#include <inet/RawEndPoint.h>
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -149,10 +145,6 @@ class DLL_EXPORT InetLayer
     friend class DNSResolver;
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    friend class RawEndPoint;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     friend class TCPEndPoint;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -188,10 +180,6 @@ public:
     chip::System::Layer * SystemLayer() const { return mSystemLayer; }
 
     // End Points
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    CHIP_ERROR NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEndPoint ** retEndPoint);
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR NewTCPEndPoint(TCPEndPoint ** retEndPoint);
@@ -253,9 +241,6 @@ public:
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
             type == kInetEvent_UDPDataReceived ||
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-            type == kInetEvent_RawDataReceived ||
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
             false;
     }
 

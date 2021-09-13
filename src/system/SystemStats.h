@@ -58,9 +58,6 @@ enum
     kSystemLayer_NumPacketBufs,
 #endif
     kSystemLayer_NumTimers,
-#if INET_CONFIG_NUM_RAW_ENDPOINTS
-    kInetLayer_NumRawEps,
-#endif
 #if INET_CONFIG_NUM_TCP_ENDPOINTS
     kInetLayer_NumTCPEps,
 #endif
