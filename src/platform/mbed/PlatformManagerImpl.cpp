@@ -60,7 +60,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
             }
             else
             {
-                MbedEventTimeout::AttachTimeout([&] { SystemLayerSocketsLoop.Signal(); }, std::chrono::milliseconds{ t });
+                MbedEventTimeout::AttachTimeout([&] { SystemLayerSocketsLoop().Signal(); }, std::chrono::milliseconds{ t });
             }
         });
 
