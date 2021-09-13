@@ -101,12 +101,12 @@ public:
      * @param mySetUpPINCode  Setup PIN code of the local device
      * @param pbkdf2IterCount Iteration count for PBKDF2 function
      * @param salt            Salt to be used for SPAKE2P operation
-     * @param myKeyId         Key ID to be assigned to the secure session on the peer node
+     * @param mySessionId     Session ID to be assigned to the secure session on the peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t myKeyId,
+    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t mySessionId,
                               SessionEstablishmentDelegate * delegate);
 
     /**
@@ -117,13 +117,13 @@ public:
      * @param pbkdf2IterCount Iteration count for PBKDF2 function
      * @param salt            Salt to be used for SPAKE2P operation
      * @param passcodeID      Passcode ID assigned by the administrator to this PASE verifier
-     * @param myKeyId         Key ID to be assigned to the secure session on the peer node
+     * @param mySessionId     Session ID to be assigned to the secure session on the peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t passcodeID,
-                              uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+                              uint16_t mySessionId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -131,7 +131,7 @@ public:
      *
      * @param peerAddress      Address of peer to pair
      * @param peerSetUpPINCode Setup PIN code of the peer device
-     * @param myKeyId          Key ID to be assigned to the secure session on the peer node
+     * @param mySessionId      Session ID to be assigned to the secure session on the peer node
      * @param exchangeCtxt     The exchange context to send and receive messages with the peer
      *                         Note: It's expected that the caller of this API hands over the
      *                         ownership of the exchangeCtxt to PASESession object. PASESession
@@ -140,7 +140,7 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t myKeyId,
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
                     Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
 
     /**
@@ -244,7 +244,7 @@ private:
         kUnexpected             = 0xff,
     };
 
-    CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(uint16_t mySessionId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
                                        System::PacketBufferHandle && msg);
@@ -266,8 +266,8 @@ private:
     CHIP_ERROR HandleMsg2_and_SendMsg3(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleMsg3(System::PacketBufferHandle && msg);
 
-    void SendStatusReport(uint16_t protocolCode);
-    CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg);
+    void OnSuccessStatusReport() override;
+    CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
     // TODO - Move EstimateTLVStructOverhead to CHIPTLV header file
     constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }

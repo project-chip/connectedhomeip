@@ -63,9 +63,9 @@ bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, u
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_Pake2):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_Pake3):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_PakeError):
-        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaR1):
-        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaR2):
-        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaR3):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_Sigma1):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_Sigma2):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_Sigma3):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaErr):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StatusReport):
             return true;
