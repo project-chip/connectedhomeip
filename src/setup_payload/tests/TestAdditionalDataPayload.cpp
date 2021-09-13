@@ -25,7 +25,7 @@
 #include <math.h>
 #include <nlunit-test.h>
 #include <stdio.h>
-#include <memory.h>
+#include <memory>
 
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
