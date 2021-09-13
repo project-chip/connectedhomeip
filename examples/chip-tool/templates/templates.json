@@ -26,6 +26,10 @@
         {
             "name": "test_cluster",
             "path": "partials/test_cluster.zapt"
+        },
+        {
+            "name": "SimulatedCluster_WaitForMs",
+            "path": "partials/simulated_cluster/WaitForMs.zapt"
         }
     ],
     "templates": [

@@ -22,6 +22,10 @@
         {
             "name": "CHIPCallbackBridge",
             "path": "partials/CHIPCallbackBridge.zapt"
+        },
+        {
+            "name": "SimulatedCluster_WaitForMs",
+            "path": "partials/simulated_cluster/WaitForMs.zapt"
         }
     ],
     "templates": [

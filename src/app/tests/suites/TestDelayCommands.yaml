@@ -20,7 +20,7 @@ config:
 
 tests:
     - label: "Wait 100ms"
-      cluster: "DelayCommands"
+      cluster: "SimulatedCluster"
       command: "WaitForMs"
       arguments:
           values:

@@ -26,7 +26,9 @@ const path              = require('path');
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
-const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
+const chipTemplateHelper = require(basePath + 'src/app/zap-templates/templates/app/helper.js')
+
+const { SimulatedCluster }              = require('./SimulatedCluster.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
 
 const kClusterName       = 'cluster';
@@ -214,18 +216,19 @@ function getClusters()
 {
   // Create a new array to merge the configured clusters list and test
   // simulated clusters.
-  return Clusters.getClusters().then(clusters => clusters.concat(DelayCommands));
+  return Clusters.getClusters().then(clusters => clusters.concat(SimulatedCluster));
 }
 
 function getCommands(clusterName)
 {
-  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.commands) : Clusters.getClientCommands(clusterName);
+  return (clusterName == SimulatedCluster.name) ? Promise.resolve(SimulatedCluster.commands)
+                                                : Clusters.getClientCommands(clusterName);
 }
 
 function getAttributes(clusterName)
 {
-  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.attributes)
-                                             : Clusters.getServerAttributes(clusterName);
+  return (clusterName == SimulatedCluster.name) ? Promise.resolve(SimulatedCluster.attributes)
+                                                : Clusters.getServerAttributes(clusterName);
 }
 
 function assertCommandOrAttribute(context)
@@ -291,7 +294,7 @@ function chip_tests_items(options)
 
 function isTestOnlyCluster(name)
 {
-  return name == DelayCommands.name;
+  return name == SimulatedCluster.name;
 }
 
 function chip_tests_item_parameters(options)
@@ -360,6 +363,11 @@ function chip_tests_item_response_parameters(options)
   return asBlocks.call(this, promise, options);
 }
 
+function asSimulatedClusterCommandPartial(label)
+{
+  return "SimulatedCluster_" + chipTemplateHelper.asUpperCamelCase(label)
+}
+
 //
 // Module exports
 //
@@ -368,3 +376,4 @@ exports.chip_tests_items                    = chip_tests_items;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
+exports.asSimulatedClusterCommandPartial    = asSimulatedClusterCommandPartial;
