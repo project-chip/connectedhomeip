@@ -65,7 +65,7 @@ chip::Test::IOContext gIOContext;
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
@@ -158,7 +158,7 @@ public:
 class MockSessionEstablishmentDelegate : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
@@ -192,7 +192,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -215,7 +215,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -243,7 +243,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockSender;
     // TODO: temporarily create a SessionHandle from node id, will be fix in PR 3602
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -308,7 +308,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 
     MockAppDelegate mockSender;
     // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -367,7 +367,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockSessionEstablishmentDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -421,7 +421,7 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     mockReceiver.mMessageDispatch.mRequireEncryption = true;
 
     MockSessionEstablishmentDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -463,7 +463,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -525,7 +525,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -584,10 +584,10 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     CHIP_ERROR err = ctx.Init(inSuite, &gTransportMgr, &gIOContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.SetSourceNodeId(kPlaceholderNodeId);
-    ctx.SetDestinationNodeId(kPlaceholderNodeId);
-    ctx.SetLocalKeyId(0);
-    ctx.SetPeerKeyId(0);
+    ctx.SetBobNodeId(kPlaceholderNodeId);
+    ctx.SetAliceNodeId(kPlaceholderNodeId);
+    ctx.SetBobKeyId(0);
+    ctx.SetAliceKeyId(0);
     ctx.SetFabricIndex(kUndefinedFabricIndex);
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
@@ -600,7 +600,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     mockReceiver.mTestSuite = inSuite;
 
     MockSessionEstablishmentDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -676,7 +676,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -746,7 +746,7 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     mockSender.mTestSuite = inSuite;
@@ -831,7 +831,7 @@ void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     mockSender.mTestSuite = inSuite;
@@ -958,7 +958,7 @@ void CheckSendUnsolicitedStandaloneAckMessage(nlTestSuite * inSuite, void * inCo
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     mockSender.mTestSuite = inSuite;
@@ -994,7 +994,7 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -1038,7 +1038,7 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mTestSuite = inSuite;
 
     MockAppDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     mockSender.mTestSuite = inSuite;

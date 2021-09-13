@@ -82,7 +82,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     }
 
     // Initialize the CHIP BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
     appCbacks.stackCback    = ExternalCbHandler;

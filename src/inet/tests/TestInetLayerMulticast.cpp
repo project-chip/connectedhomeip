@@ -21,8 +21,7 @@
  *    @file
  *      This file implements a process to effect a functional test for
  *      the InetLayer Internet Protocol stack abstraction interfaces
- *      for handling IP (v4 or v6) multicast on either bare IP (i.e.,
- *      "raw") or UDP endpoints.
+ *      for handling IP (v4 or v6) multicast on UDP endpoints.
  *
  */
 
@@ -108,9 +107,8 @@ static void CleanupTest();
 /* Global Variables */
 
 // clang-format off
-static const uint32_t    kOptFlagsDefault       = (kOptFlagUseIPv6 | kOptFlagUseRawIP);
+static const uint32_t    kOptFlagsDefault       = (kOptFlagUseIPv6 | kOptFlagUseUDPIP);
 
-static RawEndPoint *     sRawIPEndPoint         = nullptr;
 static UDPEndPoint *     sUDPIPEndPoint         = nullptr;
 
 static GroupAddresses<4> sGroupAddresses;
@@ -136,7 +134,6 @@ static OptionDef         sToolOptionDefs[] =
     { "ipv6",                      kNoArgument,        kToolOptIPv6Only               },
     { "listen",                    kNoArgument,        kToolOptListen                 },
     { "no-loopback",               kNoArgument,        kToolOptNoLoopback             },
-    { "raw",                       kNoArgument,        kToolOptRawIP                  },
     { "send-size",                 kArgumentRequired,  kToolOptSendSize               },
     { "udp",                       kNoArgument,        kToolOptUDPIP                  },
     { }
@@ -174,9 +171,6 @@ static const char *      sToolOptionHelp =
     "\n"
     "  -s, --send-size <size>\n"
     "       Send size bytes of user data (default: 59 bytes)\n"
-    "\n"
-    "  -r, --raw\n"
-    "       Use raw IP (default).\n"
     "\n"
     "  -u, --udp\n"
     "       Use UDP over IP.\n"
@@ -429,15 +423,6 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
         gInterfaceName = aValue;
         break;
 
-    case kToolOptRawIP:
-        if (gOptFlags & kOptFlagUseUDPIP)
-        {
-            PrintArgError("%s: the use of --raw is exclusive with --udp. Please select only one of the two options.\n", aProgram);
-            retval = false;
-        }
-        gOptFlags |= kOptFlagUseRawIP;
-        break;
-
     case kToolOptSendSize:
         if (!ParseInt(aValue, gSendSize))
         {
@@ -447,11 +432,6 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
         break;
 
     case kToolOptUDPIP:
-        if (gOptFlags & kOptFlagUseRawIP)
-        {
-            PrintArgError("%s: the use of --udp is exclusive with --raw. Please select only one of the two options.\n", aProgram);
-            retval = false;
-        }
         gOptFlags |= kOptFlagUseUDPIP;
         break;
 
@@ -483,7 +463,7 @@ bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
 
     // If no IP version or transport flags were specified, use the defaults.
 
-    if (!(gOptFlags & (kOptFlagUseIPv4 | kOptFlagUseIPv6 | kOptFlagUseRawIP | kOptFlagUseUDPIP)))
+    if (!(gOptFlags & (kOptFlagUseIPv4 | kOptFlagUseIPv6 | kOptFlagUseUDPIP)))
     {
         gOptFlags |= kOptFlagsDefault;
     }
@@ -609,65 +589,6 @@ static bool HandleDataReceived(const PacketBufferHandle & aBuffer, const IPPacke
     return true;
 }
 
-// Raw Endpoint Callbacks
-
-static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
-{
-    const bool lCheckBuffer   = true;
-    const bool lStatsByPacket = true;
-    IPAddressType lAddressType;
-    bool lStatus = true;
-    GroupAddress * lGroupAddress;
-
-    VerifyOrExit(aEndPoint != nullptr, lStatus = false);
-    VerifyOrExit(!aBuffer.IsNull(), lStatus = false);
-    VerifyOrExit(aPacketInfo != nullptr, lStatus = false);
-
-    Common::HandleRawMessageReceived(aEndPoint, aBuffer, aPacketInfo);
-
-    lGroupAddress = FindGroupAddress(aPacketInfo->DestAddress);
-
-    if (lGroupAddress != nullptr)
-    {
-        lAddressType = aPacketInfo->DestAddress.Type();
-
-        if (lAddressType == kIPAddressType_IPv4)
-        {
-            const uint16_t kIPv4HeaderSize = 20;
-
-            aBuffer->ConsumeHead(kIPv4HeaderSize);
-
-            lStatus = Common::HandleICMPv4DataReceived(std::move(aBuffer), lGroupAddress->mStats, lStatsByPacket, lCheckBuffer);
-        }
-        else if (lAddressType == kIPAddressType_IPv6)
-        {
-            lStatus = Common::HandleICMPv6DataReceived(std::move(aBuffer), lGroupAddress->mStats, lStatsByPacket, lCheckBuffer);
-        }
-        else
-        {
-            lStatus = false;
-        }
-
-        if (lStatus)
-        {
-            PrintReceivedStats(*lGroupAddress);
-        }
-    }
-
-exit:
-    if (!lStatus)
-    {
-        SetStatusFailed(sTestState.mStatus);
-    }
-}
-
-static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
-{
-    Common::HandleRawReceiveError(aEndPoint, aError, aPacketInfo);
-
-    SetStatusFailed(sTestState.mStatus);
-}
-
 // UDP Endpoint Callbacks
 
 static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle && aBuffer, const IPPacketInfo * aPacketInfo)
@@ -701,11 +622,7 @@ static bool IsTransportReadyForSend()
 {
     bool lStatus = false;
 
-    if ((gOptFlags & (kOptFlagUseRawIP)) == (kOptFlagUseRawIP))
-    {
-        lStatus = (sRawIPEndPoint != nullptr);
-    }
-    else if ((gOptFlags & kOptFlagUseUDPIP) == kOptFlagUseUDPIP)
+    if ((gOptFlags & kOptFlagUseUDPIP) == kOptFlagUseUDPIP)
     {
         lStatus = (sUDPIPEndPoint != nullptr);
     }
@@ -723,29 +640,6 @@ static CHIP_ERROR PrepareTransportForSend()
 static CHIP_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
 {
     PacketBufferHandle lBuffer;
-
-    if ((gOptFlags & (kOptFlagUseRawIP)) == (kOptFlagUseRawIP))
-    {
-        // For ICMP (v4 or v6), we'll send n aSize or smaller
-        // datagrams (with overhead for the ICMP header), each
-        // patterned from zero to aSize - 1, following the ICMP
-        // header.
-
-        if ((gOptFlags & kOptFlagUseIPv6) == (kOptFlagUseIPv6))
-        {
-            lBuffer = Common::MakeICMPv6DataBuffer(aSize);
-            VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
-        }
-#if INET_CONFIG_ENABLE_IPV4
-        else if ((gOptFlags & kOptFlagUseIPv4) == (kOptFlagUseIPv4))
-        {
-            lBuffer = Common::MakeICMPv4DataBuffer(aSize);
-            VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
-        }
-#endif // INET_CONFIG_ENABLE_IPV4
-
-        return sRawIPEndPoint->SendTo(aAddress, std::move(lBuffer));
-    }
 
     if ((gOptFlags & kOptFlagUseUDPIP) == kOptFlagUseUDPIP)
     {
@@ -825,7 +719,6 @@ exit:
 static void StartTest()
 {
     IPAddressType lIPAddressType = kIPAddressType_IPv6;
-    IPProtocol lIPProtocol       = kIPProtocol_ICMPv6;
     IPVersion lIPVersion         = kIPVersion_6;
     IPAddress lAddress           = IPAddress::Any;
     IPEndPointBasis * lEndPoint  = nullptr;
@@ -836,14 +729,13 @@ static void StartTest()
     if (gOptFlags & kOptFlagUseIPv4)
     {
         lIPAddressType = kIPAddressType_IPv4;
-        lIPProtocol    = kIPProtocol_ICMPv4;
         lIPVersion     = kIPVersion_4;
     }
 #endif // INET_CONFIG_ENABLE_IPV4
 
     // clang-format off
     printf("Using %sIP%s, device interface: %s (w/%c LwIP)\n",
-           ((gOptFlags & kOptFlagUseRawIP) ? "" : "UDP/"),
+           "UDP/",
            ((gOptFlags & kOptFlagUseIPv4) ? "v4" : "v6"),
            ((gInterfaceName) ? gInterfaceName : "<none>"),
            (CHIP_SYSTEM_CONFIG_USE_LWIP ? '\0' : 'o'));
@@ -851,32 +743,7 @@ static void StartTest()
 
     // Allocate the endpoints for sending or receiving.
 
-    if (gOptFlags & kOptFlagUseRawIP)
-    {
-        lStatus = gInet.NewRawEndPoint(lIPVersion, lIPProtocol, &sRawIPEndPoint);
-        INET_FAIL_ERROR(lStatus, "InetLayer::NewRawEndPoint failed");
-
-        lStatus = sRawIPEndPoint->Bind(lIPAddressType, lAddress);
-        INET_FAIL_ERROR(lStatus, "RawEndPoint::Bind failed");
-
-        if (gOptFlags & kOptFlagUseIPv6)
-        {
-            lStatus = sRawIPEndPoint->SetICMPFilter(kICMPv6_FilterTypes, gICMPv6Types);
-            INET_FAIL_ERROR(lStatus, "RawEndPoint::SetICMPFilter (IPv6) failed");
-        }
-
-        if (IsInterfaceIdPresent(gInterfaceId))
-        {
-            lStatus = sRawIPEndPoint->BindInterface(lIPAddressType, gInterfaceId);
-            INET_FAIL_ERROR(lStatus, "RawEndPoint::BindInterface failed");
-        }
-
-        lStatus = sRawIPEndPoint->Listen(HandleRawMessageReceived, HandleRawReceiveError);
-        INET_FAIL_ERROR(lStatus, "RawEndPoint::Listen failed");
-
-        lEndPoint = sRawIPEndPoint;
-    }
-    else if (gOptFlags & kOptFlagUseUDPIP)
+    if (gOptFlags & kOptFlagUseUDPIP)
     {
         lStatus = gInet.NewUDPEndPoint(&sUDPIPEndPoint);
         INET_FAIL_ERROR(lStatus, "InetLayer::NewUDPEndPoint failed");
@@ -946,11 +813,7 @@ static void CleanupTest()
 
     //  Leave the multicast groups
 
-    if (gOptFlags & kOptFlagUseRawIP)
-    {
-        lEndPoint = sRawIPEndPoint;
-    }
-    else if (gOptFlags & kOptFlagUseUDPIP)
+    if (gOptFlags & kOptFlagUseUDPIP)
     {
         lEndPoint = sUDPIPEndPoint;
     }
@@ -973,11 +836,6 @@ static void CleanupTest()
     }
 
     // Release the resources associated with the allocated end points.
-
-    if (sRawIPEndPoint != nullptr)
-    {
-        sRawIPEndPoint->Free();
-    }
 
     if (sUDPIPEndPoint != nullptr)
     {

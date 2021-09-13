@@ -33,7 +33,6 @@
 
 #include <inet/InetError.h>
 #include <inet/InetInterface.h>
-#include <inet/RawEndPoint.h>
 #include <inet/UDPEndPoint.h>
 
 #include <system/SystemPacketBuffer.h>
@@ -54,7 +53,6 @@
 #define kToolOptIPv6Only '6'
 #define kToolOptInterval 'i'
 #define kToolOptListen 'l'
-#define kToolOptRawIP 'r'
 #define kToolOptSendSize 's'
 #define kToolOptUDPIP 'u'
 
@@ -65,7 +63,6 @@ enum OptFlagsCommon
     kOptFlagUseIPv4 = 0x00000001,
     kOptFlagUseIPv6 = 0x00000002,
 
-    kOptFlagUseRawIP = 0x00000004,
     kOptFlagUseUDPIP = 0x00000008,
 
     kOptFlagListen = 0x00000010,
@@ -146,14 +143,6 @@ extern bool HandleICMPv6DataReceived(chip::System::PacketBufferHandle && aBuffer
 // Timer Callback Handler
 
 extern void HandleSendTimerComplete(chip::System::Layer * aSystemLayer, void * aAppState);
-
-// Raw Endpoint Callback Handlers
-
-extern void HandleRawMessageReceived(const chip::Inet::IPEndPointBasis * aEndPoint,
-                                     const chip::System::PacketBufferHandle & aBuffer,
-                                     const chip::Inet::IPPacketInfo * aPacketInfo);
-extern void HandleRawReceiveError(const chip::Inet::IPEndPointBasis * aEndPoint, const CHIP_ERROR & aError,
-                                  const chip::Inet::IPPacketInfo * aPacketInfo);
 
 // UDP Endpoint Callback Handlers
 

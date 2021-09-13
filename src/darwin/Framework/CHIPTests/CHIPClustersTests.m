@@ -2339,6 +2339,80 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTestConstraints_000000_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT32U Value"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint32_t int32uArgument = 5UL;
+    [cluster writeAttributeInt32uWithValue:int32uArgument
+                           responseHandler:^(NSError * err, NSDictionary * values) {
+                               NSLog(@"Write attribute INT32U Value Error: %@", err);
+
+                               XCTAssertEqual(err.code, 0);
+                               [expectation fulfill];
+                           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestConstraints_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32U Value MinValue Constraints"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeInt32uWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read attribute INT32U Value MinValue Constraints Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertGreaterThanOrEqual([values[@"value"] unsignedLongValue], 5);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestConstraints_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32U Value MaxValue Constraints"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeInt32uWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read attribute INT32U Value MaxValue Constraints Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedLongValue], 5);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestConstraints_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32U Value NotValue Constraints"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeInt32uWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read attribute INT32U Value NotValue Constraints Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertNotEqual([values[@"value"] unsignedLongValue], 6);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTestDelayCommands_000000_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 100ms"];
@@ -4799,7 +4873,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 3);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 5);
         [expectation fulfill];
     }];
 
@@ -4817,7 +4891,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 3);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 5);
         [expectation fulfill];
     }];
 

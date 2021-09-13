@@ -73,6 +73,11 @@ public:
     uint32_t _GetWiFiAPIdleTimeoutMS();
     void _SetWiFiAPIdleTimeoutMS(uint32_t val);
     CHIP_ERROR _GetAndLogWifiStatsCounters();
+    CHIP_ERROR _GetEthPacketRxCount(uint64_t & packetRxCount);
+    CHIP_ERROR _GetEthPacketTxCount(uint64_t & packetTxCount);
+    CHIP_ERROR _GetEthTxErrCount(uint64_t & txErrCount);
+    CHIP_ERROR _GetEthCollisionCount(uint64_t & collisionCount);
+    CHIP_ERROR _GetEthOverrunCount(uint64_t & overrunCount);
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
@@ -180,6 +185,36 @@ inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiScanDone()
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiStationProvisionChange()
 {}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetEthPacketRxCount(uint64_t & packetRxCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetEthPacketTxCount(uint64_t & packetTxCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetEthTxErrCount(uint64_t & txErrCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetEthCollisionCount(uint64_t & collisionCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetEthOverrunCount(uint64_t & overrunCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
 
 } // namespace Internal
 } // namespace DeviceLayer

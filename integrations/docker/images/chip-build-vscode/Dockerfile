@@ -56,5 +56,6 @@ ENV MBED_OS_PATH=/opt/mbed-os/
 ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
+ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.0
 ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"
 ENV TIZEN_HOME /opt/tizen_sdk

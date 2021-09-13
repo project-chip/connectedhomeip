@@ -338,6 +338,11 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
 {{#if (chip_server_has_list_attributes)}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
+{{! TODO: This stack usage bit is not OK.  See https://github.com/project-chip/connectedhomeip/issues/8558 }}
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     // TODO: Add actual support for array and lists.
@@ -387,6 +392,10 @@ void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttribu
     Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback> * cb = Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+{{! TODO: This stack usage bit is not OK.  See https://github.com/project-chip/connectedhomeip/issues/8558 }}
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
 {{/if}}
 {{/chip_server_cluster_attributes}}

@@ -351,6 +351,10 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                               Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback)
@@ -383,7 +387,14 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
         Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
@@ -430,7 +441,14 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
         Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV::TLVReader * tlvData,
                                                                              Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback)
@@ -464,6 +482,9 @@ void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV
         Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
 bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                                    uint8_t errorCode, uint8_t * debugText)

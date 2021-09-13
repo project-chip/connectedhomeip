@@ -257,7 +257,7 @@ bool ReadFileIntoMem(const char * fileName, uint8_t * data, uint32_t & dataLen)
         ExitNow(res = false);
     }
 
-    VerifyOrExit(fileLen <= UINT32_MAX, res = false);
+    VerifyOrExit(chip::CanCastTo<uint32_t>(fileLen), res = false);
 
     dataLen = static_cast<uint32_t>(fileLen);
 

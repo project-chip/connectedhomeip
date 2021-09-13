@@ -330,14 +330,12 @@ class SetupListModel : public ListScreen::Model
 public:
     SetupListModel()
     {
-        std::string resetWiFi                      = "Reset WiFi";
-        std::string resetToFactory                 = "Reset to factory";
-        std::string forceWifiCommissioningBasic    = "Force WiFi commissioning (basic)";
-        std::string forceWifiCommissioningEnhanced = "Force WiFi commissioning (enhanced)";
+        std::string resetWiFi                   = "Reset WiFi";
+        std::string resetToFactory              = "Reset to factory";
+        std::string forceWifiCommissioningBasic = "Force WiFi commissioning (basic)";
         options.emplace_back(resetWiFi);
         options.emplace_back(resetToFactory);
         options.emplace_back(forceWifiCommissioningBasic);
-        options.emplace_back(forceWifiCommissioningEnhanced);
     }
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }
@@ -348,7 +346,7 @@ public:
         if (i == 0)
         {
             ConnectivityMgr().ClearWiFiStationProvision();
-            OpenBasicCommissioningWindow(ResetFabrics::kYes);
+            chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(ResetFabrics::kYes);
         }
         else if (i == 1)
         {
@@ -357,12 +355,8 @@ public:
         else if (i == 2)
         {
             app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledBasic);
-            OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
-        }
-        else if (i == 3)
-        {
-            app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledEnhanced);
-            OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
+            chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(
+                ResetFabrics::kYes, kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdns);
         }
     }
 
@@ -634,7 +628,7 @@ extern "C" void app_main()
 
     // Init ZCL Data Model and CHIP App Server
     AppCallbacks callbacks;
-    InitServer(&callbacks);
+    chip::Server::GetInstance().Init(&callbacks);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
