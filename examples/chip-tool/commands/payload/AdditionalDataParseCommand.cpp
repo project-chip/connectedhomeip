@@ -17,10 +17,10 @@
  */
 
 #include "AdditionalDataParseCommand.h"
+#include <math.h>
 #include <setup_payload/AdditionalDataPayload.h>
 #include <setup_payload/AdditionalDataPayloadParser.h>
 #include <string>
-#include <math.h>
 
 using namespace ::chip;
 using namespace ::chip::SetupPayloadData;
@@ -30,9 +30,10 @@ CHIP_ERROR AdditionalDataParseCommand::Run()
     AdditionalDataPayload resultPayload;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    size_t additionalDataPayloadBytesLength = static_cast<size_t>(ceil(strlen(mPayload)/2));
+    size_t additionalDataPayloadBytesLength = static_cast<size_t>(ceil(strlen(mPayload) / 2));
     uint8_t additionalDataPayloadBytes[additionalDataPayloadBytesLength];
-    size_t bufferSize = chip::Encoding::HexToBytes(mPayload, strlen(mPayload), additionalDataPayloadBytes, additionalDataPayloadBytesLength);
+    size_t bufferSize =
+        chip::Encoding::HexToBytes(mPayload, strlen(mPayload), additionalDataPayloadBytes, additionalDataPayloadBytesLength);
 
     err = AdditionalDataPayloadParser(additionalDataPayloadBytes, bufferSize).populatePayload(resultPayload);
     SuccessOrExit(err);

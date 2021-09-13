@@ -22,9 +22,9 @@
  *
  */
 
+#include <math.h>
 #include <nlunit-test.h>
 #include <stdio.h>
-#include <math.h>
 
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
@@ -79,13 +79,13 @@ CHIP_ERROR GenerateAdditionalDataPayload(nlTestSuite * inSuite, uint16_t lifetim
     return err;
 }
 
-CHIP_ERROR ParseAdditionalDataPayload(const char * additionalDataPayload,
-                                      size_t additionalDataPayloadLength,
+CHIP_ERROR ParseAdditionalDataPayload(const char * additionalDataPayload, size_t additionalDataPayloadLength,
                                       chip::SetupPayloadData::AdditionalDataPayload & outPayload)
 {
-    size_t additionalDataPayloadBytesLength = static_cast<size_t>(ceil(additionalDataPayloadLength/2));
+    size_t additionalDataPayloadBytesLength = static_cast<size_t>(ceil(additionalDataPayloadLength / 2));
     uint8_t additionalDataPayloadBytes[additionalDataPayloadBytesLength];
-    size_t bufferSize = chip::Encoding::HexToBytes(additionalDataPayload, additionalDataPayloadLength, additionalDataPayloadBytes, additionalDataPayloadBytesLength);
+    size_t bufferSize = chip::Encoding::HexToBytes(additionalDataPayload, additionalDataPayloadLength, additionalDataPayloadBytes,
+                                                   additionalDataPayloadBytesLength);
     return AdditionalDataPayloadParser(additionalDataPayloadBytes, bufferSize).populatePayload(outPayload);
 }
 
@@ -182,9 +182,9 @@ void TestGeneratingRotatingDeviceIdWithSmallBuffer(nlTestSuite * inSuite, void *
 void TestParsingAdditionalDataPayloadWithRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
 {
     chip::SetupPayloadData::AdditionalDataPayload resultPayload;
-    NL_TEST_ASSERT(inSuite, ParseAdditionalDataPayload(kAdditionalDataPayloadWithRotatingDeviceId,
-                                                       strlen(kAdditionalDataPayloadWithRotatingDeviceId),
-                                                       resultPayload) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   ParseAdditionalDataPayload(kAdditionalDataPayloadWithRotatingDeviceId,
+                                              strlen(kAdditionalDataPayloadWithRotatingDeviceId), resultPayload) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(resultPayload.rotatingDeviceId.c_str(), kRotatingDeviceId) == 0);
 }
 
