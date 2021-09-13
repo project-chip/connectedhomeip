@@ -16,13 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a unit test suite for CHIP Memory Management
- *      code functionality.
- *
- */
-
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -44,33 +37,36 @@ using namespace chip::Platform;
 // =================================
 
 namespace {
-template <size_t testStrLen>
+template <size_t kTestBufLen>
 struct TestBuffers
 {
-    char correctSizeBuf[testStrLen + 1];
-    char tooSmallBuf[testStrLen];
+    char correctSizeBuf[kTestBufLen];
+    char tooSmallBuf[kTestBufLen - 1];
     char wayTooSmallBuf[1];
-    char tooBigBuf[testStrLen + 10];
+    char tooBigBuf[kTestBufLen + 10];
     void Reset()
     {
-        memset(correctSizeBuf, 0, sizeof(correctSizeBuf));
-        memset(tooSmallBuf, 0, sizeof(tooSmallBuf));
-        memset(wayTooSmallBuf, 0, sizeof(wayTooSmallBuf));
-        memset(tooBigBuf, 0, sizeof(tooBigBuf));
+        memset(correctSizeBuf, 1, sizeof(correctSizeBuf));
+        memset(tooSmallBuf, 1, sizeof(tooSmallBuf));
+        memset(wayTooSmallBuf, 1, sizeof(wayTooSmallBuf));
+        memset(tooBigBuf, 1, sizeof(tooBigBuf));
     }
     void CheckCorrectness(nlTestSuite * inSuite, const char * testStr)
     {
         // correctSizeBuf and tooBigBuf should have the complete string.
-        NL_TEST_ASSERT(inSuite, correctSizeBuf[testStrLen] == '\0');
-        NL_TEST_ASSERT(inSuite, tooBigBuf[testStrLen] == '\0');
+        NL_TEST_ASSERT(inSuite, correctSizeBuf[kTestBufLen - 1] == '\0');
+        NL_TEST_ASSERT(inSuite, tooBigBuf[kTestBufLen - 1] == '\0');
         NL_TEST_ASSERT(inSuite, strcmp(correctSizeBuf, testStr) == 0);
         NL_TEST_ASSERT(inSuite, strcmp(tooBigBuf, testStr) == 0);
+        NL_TEST_ASSERT(inSuite, strlen(correctSizeBuf) == strlen(testStr));
+        NL_TEST_ASSERT(inSuite, strlen(tooBigBuf) == strlen(testStr));
 
         // wayTooSmallBuf is tiny and thus will only have the null terminator
         NL_TEST_ASSERT(inSuite, wayTooSmallBuf[0] == '\0');
 
         // tooSmallBuf should still have a null terminator on the end
-        NL_TEST_ASSERT(inSuite, tooSmallBuf[testStrLen - 1] == '\0');
+        NL_TEST_ASSERT(inSuite, tooSmallBuf[kTestBufLen - 2] == '\0');
+        NL_TEST_ASSERT(inSuite, memcmp(tooSmallBuf, testStr, kTestBufLen - 2) == 0);
     }
 };
 
