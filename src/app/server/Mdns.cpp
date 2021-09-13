@@ -251,13 +251,15 @@ CHIP_ERROR MdnsServer::AdvertiseOperational()
         {
             uint8_t mac[8];
 
-            const auto advertiseParameters = chip::Mdns::OperationalAdvertisingParameters()
-                                                 .SetPeerId(fabricInfo.GetPeerId())
-                                                 .SetMac(FillMAC(mac))
-                                                 .SetPort(GetSecuredPort())
-                                                 .SetMRPRetryIntervals(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL,
-                                                                       CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)
-                                                 .EnableIpV4(true);
+            const auto advertiseParameters =
+                chip::Mdns::OperationalAdvertisingParameters()
+                    .SetPeerId(fabricInfo.GetPeerId())
+                    .SetMac(FillMAC(mac))
+                    .SetPort(GetSecuredPort())
+                    // TODO: This uses active twice, but we don't have an idle default. Is this as-intended?
+                    .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL),
+                                          Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
+                    .EnableIpV4(true);
 
             auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
@@ -331,6 +333,10 @@ CHIP_ERROR MdnsServer::Advertise(bool commissionableNode, chip::Mdns::Commission
     ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
     advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
+
+    // TODO: Set same as operational - this uses active twice, but we don't have an idle default. Is this as-intended?
+    advertiseParameters.SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL),
+                                             Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL));
 
     if (mode != chip::Mdns::CommissioningMode::kEnabledEnhanced)
     {

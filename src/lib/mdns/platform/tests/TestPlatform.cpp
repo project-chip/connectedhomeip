@@ -37,25 +37,19 @@ const char host[]               = "0102030405060708";
 
 const PeerId kPeerId1 = PeerId().SetCompressedFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
 const PeerId kPeerId2 = PeerId().SetCompressedFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
-OperationalAdvertisingParameters operationalParams1 = OperationalAdvertisingParameters()
-                                                          .SetPeerId(kPeerId1)
-                                                          .SetMac(ByteSpan(kMac))
-                                                          .SetPort(CHIP_PORT)
-                                                          .EnableIpV4(true)
-                                                          .SetMRPRetryIntervals(32, 33);
+OperationalAdvertisingParameters operationalParams1 =
+    OperationalAdvertisingParameters().SetPeerId(kPeerId1).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 test::ExpectedCall operationalCall1 = test::ExpectedCall()
                                           .SetProtocol(MdnsServiceProtocol::kMdnsProtocolTcp)
                                           .SetServiceName("_matter")
                                           .SetInstanceName("BEEFBEEFF00DF00D-1111222233334444")
-                                          .SetHostName(host)
-                                          .AddTxt("CRI", "32")
-                                          .AddTxt("CRA", "33");
+                                          .SetHostName(host);
 OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingParameters()
                                                           .SetPeerId(kPeerId2)
                                                           .SetMac(ByteSpan(kMac))
                                                           .SetPort(CHIP_PORT)
                                                           .EnableIpV4(true)
-                                                          .SetMRPRetryIntervals(32, 33);
+                                                          .SetMRPRetryIntervals(Optional<uint32_t>(32), Optional<uint32_t>(33));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(MdnsServiceProtocol::kMdnsProtocolTcp)
                                           .SetServiceName("_matter")
