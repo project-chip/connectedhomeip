@@ -95,6 +95,11 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCal
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ChipMdnsShutdown()
+{
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
     return test::CheckExpected(test::CallType::kStart, service);
