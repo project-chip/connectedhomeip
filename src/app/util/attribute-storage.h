@@ -42,6 +42,7 @@
 #pragma once
 
 //#include PLATFORM_HEADER
+#include <app/AttributeAccessInterface.h>
 #include <app/util/af.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
@@ -254,3 +255,17 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, Emb
                                         uint8_t deviceVersion);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
+
+/**
+ * Register an attribute access override.  It will remain registered until
+ * the endpoint it's registered for is disabled (or until shutdown if it's
+ * registered for all endpoints).
+ */
+void registerAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);
+
+/**
+ * Find an attribute access override, if any, that is registered for the given
+ * endpoint and cluster id.  This might be an override specific to the given
+ * endpoint, or might be one registered for all endpoints.
+ */
+chip::app::AttributeAccessInterface * findAttributeAccessOverride(chip::EndpointId endpointId, chip::ClusterId clusterId);
