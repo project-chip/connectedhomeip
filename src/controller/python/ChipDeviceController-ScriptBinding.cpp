@@ -122,12 +122,8 @@ ChipError::StorageType pychip_DeviceController_DiscoverCommissionableNodesVendor
 ChipError::StorageType pychip_DeviceController_DiscoverCommissionableNodesDeviceType(chip::Controller::DeviceCommissioner * devCtrl,
                                                                                      uint16_t device_type);
 ChipError::StorageType
-pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                        uint16_t enabled);
+pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl);
 ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext);
-
-ChipError::StorageType
-pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand(chip::Controller::DeviceCommissioner * devCtrl);
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
                                                                        chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
