@@ -21,6 +21,7 @@
  *          for Zephyr platforms.
  */
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/PlatformManager.h>
@@ -37,19 +38,29 @@ static K_THREAD_STACK_DEFINE(sChipThreadStack, CHIP_DEVICE_CONFIG_CHIP_TASK_STAC
 
 PlatformManagerImpl PlatformManagerImpl::sInstance{ sChipThreadStack };
 
+static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
+{
+    const struct device * entropy = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
+
+    SuccessOrExit(entropy_get_entropy(entropy, output, len));
+
+    *olen = len;
+
+exit:
+    return 0;
+}
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
-    const struct device * entropy = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
-    unsigned int seed;
 
     // Initialize the configuration system.
     err = Internal::ZephyrConfig::Init();
     SuccessOrExit(err);
 
-    // Get entropy to initialize seed for pseudorandom operations.
-    SuccessOrExit(entropy_get_entropy(entropy, reinterpret_cast<uint8_t *>(&seed), sizeof(seed)));
-    srand(seed);
+    // Add entropy source based on Zephyr entropy driver
+    err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
+    SuccessOrExit(err);
 
     // Call _InitChipStack() on the generic implementation base class to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>::_InitChipStack();

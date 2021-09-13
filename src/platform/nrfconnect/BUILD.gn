@@ -46,7 +46,10 @@ static_library("nrfconnect") {
 
   deps = []
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  public_deps = [ 
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/crypto"
+  ]
 
   if (chip_enable_openthread) {
     sources += [
