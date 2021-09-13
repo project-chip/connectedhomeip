@@ -79,7 +79,7 @@ struct TestBuffers
 static void TestCopyString(nlTestSuite * inSuite, void * inContext)
 {
     constexpr char testWord[] = "testytest";
-    ByteSpan testWordSpan     = ByteSpan(reinterpret_cast<const uint8_t *>(testWord), sizeof(testWord));
+    ByteSpan testWordSpan     = ByteSpan(reinterpret_cast<const uint8_t *>(testWord), sizeof(testWord) - 1);
     TestBuffers<sizeof(testWord)> testBuffers;
 
     // CopyString with explicit size
