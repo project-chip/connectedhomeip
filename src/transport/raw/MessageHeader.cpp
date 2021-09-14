@@ -156,6 +156,9 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     mFlags.SetRaw(header);
     mSessionType = static_cast<Header::SessionType>((header & kSessionTypeMask) >> kSessionTypeShift);
 
+    err = reader.Read16(&mSessionId).StatusCode();
+    SuccessOrExit(err);
+
     err = reader.Read32(&mMessageCounter).StatusCode();
     SuccessOrExit(err);
 
@@ -182,9 +185,6 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     {
         mDestinationNodeId.ClearValue();
     }
-
-    err = reader.Read16(&mSessionId).StatusCode();
-    SuccessOrExit(err);
 
     octets_read = static_cast<uint16_t>(reader.OctetsRead());
     VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
@@ -276,6 +276,7 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
 
     uint8_t * p = data;
     LittleEndian::Write16(p, header);
+    LittleEndian::Write16(p, mSessionId);
     LittleEndian::Write32(p, mMessageCounter);
     if (mSourceNodeId.HasValue())
     {
@@ -285,8 +286,6 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     {
         LittleEndian::Write64(p, mDestinationNodeId.Value());
     }
-
-    LittleEndian::Write16(p, mSessionId);
 
     // Written data size provided to caller on success
     VerifyOrReturnError(p - data == EncodeSizeBytes(), CHIP_ERROR_INTERNAL);
