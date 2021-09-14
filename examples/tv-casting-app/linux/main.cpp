@@ -32,37 +32,50 @@ using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
 
-constexpr int kVideoPlayerDeviceType                 = 35;
+struct DeviceType
+{
+    const char * name;
+    uint16_t id;
+};
+
+constexpr DeviceType kKnownDeviceTypes[]             = { { "video-player", 35 }, { "dimmable-light", 257 } };
+constexpr int kKnownDeviceTypesCount                 = sizeof kKnownDeviceTypes / sizeof *kKnownDeviceTypes;
 constexpr uint16_t kOptionDeviceType                 = 't';
 constexpr uint16_t kCommissioningWindowTimeoutInSec  = 3 * 60;
-constexpr uint32_t kcommissionerDiscoveryTimeoutInMs = 5 * 1000;
+constexpr uint32_t kCommissionerDiscoveryTimeoutInMs = 5 * 1000;
 
 CommissionableNodeController gCommissionableNodeController;
 chip::System::SocketWatchToken gToken;
-Mdns::DiscoveryFilter gDiscoveryFilter = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, kVideoPlayerDeviceType);
+Mdns::DiscoveryFilter gDiscoveryFilter = Mdns::DiscoveryFilter();
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
     switch (aIdentifier)
     {
-    case kOptionDeviceType:
-        if (strcasecmp(aValue, "all") == 0)
+    case kOptionDeviceType: {
+        char * endPtr;
+        long deviceType = strtol(aValue, &endPtr, 10);
+        if (*endPtr == '\0' && deviceType > 0 && CanCastTo<uint16_t>(deviceType))
         {
-            gDiscoveryFilter = Mdns::DiscoveryFilter();
+            gDiscoveryFilter = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(deviceType));
             return true;
         }
         else
         {
-            long deviceType = strtol(aValue, nullptr, 10);
-            if (CanCastTo<uint16_t>(deviceType))
+            for (int i = 0; i < kKnownDeviceTypesCount; i++)
             {
-                gDiscoveryFilter = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(deviceType));
-                return true;
+                if (strcasecmp(aValue, kKnownDeviceTypes[i].name) == 0)
+                {
+                    gDiscoveryFilter = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, kKnownDeviceTypes[i].id);
+                    return true;
+                }
             }
         }
+        ChipLogError(AppServer, "%s: INTERNAL ERROR: Unhandled option value: %s %s", aProgram, aName, aValue);
         return false;
+    }
     default:
-        ChipLogError(AppServer, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
+        ChipLogError(AppServer, "%s: INTERNAL ERROR: Unhandled option: %s", aProgram, aName);
         return false;
     }
 }
@@ -72,13 +85,11 @@ OptionDef cmdLineOptionsDef[] = {
     {},
 };
 
-OptionSet cmdLineOptions = {
-    HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-    "  -t <commissioner device type>\n"
-    "  --device-type <commissioner device type>\n"
-    "        Device type of the commissioner to discover and request commissioning from. Specify value "
-    "'all' to allow all commissioner device types or the device type as a decimal integer. Defaults to 35 (Video Player)\n"
-};
+OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
+                             "  -t <commissioner device type>\n"
+                             "  --device-type <commissioner device type>\n"
+                             "        Device type of the commissioner to discover and request commissioning from. Specify value as "
+                             "a decimal integer or a known text representation. Defaults to all device types\n" };
 
 HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.0");
 
@@ -184,7 +195,7 @@ int main(int argc, char * argv[])
 
     // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
     DeviceLayer::SystemLayer().StartTimer(
-        kcommissionerDiscoveryTimeoutInMs,
+        kCommissionerDiscoveryTimeoutInMs,
         [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
 
     // TBD: Content casting commands
