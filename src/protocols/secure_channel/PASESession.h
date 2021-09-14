@@ -364,7 +364,7 @@ public:
         serializable.mKeLen           = static_cast<uint16_t>(secretLen);
         serializable.mPairingComplete = 1;
         serializable.mLocalKeyId      = GetLocalKeyId();
-        serializable.mPeerSessionId       = GetPeerSessionId();
+        serializable.mPeerSessionId   = GetPeerSessionId();
 
         memcpy(serializable.mKe, kTestSecret, secretLen);
         return CHIP_NO_ERROR;

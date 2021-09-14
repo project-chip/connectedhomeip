@@ -159,7 +159,7 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
     serializable.mPeerNodeId       = peerNodeId;
     serializable.mLocalKeyId       = GetLocalKeyId();
-    serializable.mPeerSessionId        = GetPeerSessionId();
+    serializable.mPeerSessionId    = GetPeerSessionId();
 
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
     memcpy(serializable.mMessageDigest, mMessageDigest, sizeof(mMessageDigest));
