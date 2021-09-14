@@ -159,7 +159,7 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
     serializable.mPeerNodeId       = peerNodeId;
     serializable.mLocalKeyId       = GetLocalKeyId();
-    serializable.mPeerKeyId        = GetPeerKeyId();
+    serializable.mPeerSessionId        = GetPeerSessionId();
 
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
     memcpy(serializable.mMessageDigest, mMessageDigest, sizeof(mMessageDigest));
@@ -183,7 +183,7 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
 
     SetPeerNodeId(serializable.mPeerNodeId);
     SetLocalKeyId(serializable.mLocalKeyId);
-    SetPeerKeyId(serializable.mPeerKeyId);
+    SetPeerSessionId(serializable.mPeerSessionId);
 
     return CHIP_NO_ERROR;
 }
@@ -395,7 +395,7 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle && msg)
     SuccessOrExit(err = tlvReader.Get(initiatorSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", initiatorSessionId);
-    SetPeerKeyId(initiatorSessionId);
+    SetPeerSessionId(initiatorSessionId);
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
@@ -649,7 +649,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle && msg)
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", responderSessionId);
-    SetPeerKeyId(responderSessionId);
+    SetPeerSessionId(responderSessionId);
 
     // Retrieve Responder's Ephemeral Pubkey
     SuccessOrExit(err = tlvReader.Next());

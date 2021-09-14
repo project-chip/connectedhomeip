@@ -26,11 +26,11 @@ class SessionHandle
 public:
     SessionHandle(NodeId peerNodeId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric) {}
 
-    SessionHandle(NodeId peerNodeId, uint16_t localKeyId, uint16_t peerKeyId, FabricIndex fabric) :
+    SessionHandle(NodeId peerNodeId, uint16_t localKeyId, uint16_t PeerSessionId, FabricIndex fabric) :
         mPeerNodeId(peerNodeId), mFabric(fabric)
     {
         mLocalKeyId.SetValue(localKeyId);
-        mPeerKeyId.SetValue(peerKeyId);
+        mPeerSessionId.SetValue(PeerSessionId);
     }
 
     bool HasFabricIndex() const { return (mFabric != Transport::kUndefinedFabricIndex); }
@@ -40,7 +40,7 @@ public:
     bool operator==(const SessionHandle & that) const
     {
         // TODO: Temporarily keep the old logic, check why only those two fields are used in comparison.
-        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
+        return mPeerNodeId == that.mPeerNodeId && mPeerSessionId == that.mPeerSessionId;
     }
 
     bool MatchIncomingSession(const SessionHandle & that) const
@@ -59,7 +59,7 @@ public:
     }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
-    const Optional<uint16_t> & GetPeerKeyId() const { return mPeerKeyId; }
+    const Optional<uint16_t> & GetPeerSessionId() const { return mPeerSessionId; }
     const Optional<uint16_t> & GetLocalKeyId() const { return mLocalKeyId; }
 
     // TODO: currently SessionHandle is not able to identify a unauthenticated session, create an empty handle for it
@@ -72,7 +72,7 @@ private:
     friend class SecureSessionMgr;
     NodeId mPeerNodeId;
     Optional<uint16_t> mLocalKeyId;
-    Optional<uint16_t> mPeerKeyId;
+    Optional<uint16_t> mPeerSessionId;
     // TODO: Re-evaluate the storing of Fabric ID in SessionHandle
     //       The Fabric ID will not be available for PASE and group sessions. So need
     //       to identify an approach that'll allow looking up the corresponding information for

@@ -131,7 +131,7 @@ bool ChannelContext::MatchesSession(SessionHandle session, SecureSessionMgr * ss
         case PrepareState::kCasePairing: {
             auto state = ssm->GetPeerConnectionState(session);
             return (state->GetPeerNodeId() == GetPrepareVars().mBuilder.GetPeerNodeId() &&
-                    state->GetPeerKeyID() == GetPrepareVars().mBuilder.GetPeerKeyID());
+                    state->GetPeerSessionId() == GetPrepareVars().mBuilder.GetPeerSessionId());
         }
         default:
             return false;

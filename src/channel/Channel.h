@@ -90,10 +90,10 @@ public:
     }
     TransportPreference GetTransportPreference() const { return mTransportPreference; }
 
-    uint16_t GetPeerKeyID() const { return mCaseParameters.mPeerKeyId; }
-    ChannelBuilder & SetPeerKeyID(uint16_t keyId)
+    uint16_t GetPeerSessionId() const { return mCaseParameters.mPeerSessionId; }
+    ChannelBuilder & SetPeerSessionId(uint16_t keyId)
     {
-        mCaseParameters.mPeerKeyId = keyId;
+        mCaseParameters.mPeerSessionId = keyId;
         return *this;
     }
 
@@ -126,7 +126,7 @@ private:
     TransportPreference mTransportPreference = TransportPreference::kDefault;
     struct
     {
-        uint16_t mPeerKeyId;
+        uint16_t mPeerSessionId;
         Credentials::OperationalCredentialSet * mOperationalCredentialSet;
         uint8_t mOperationalCredentialSetIndex;
     } mCaseParameters;

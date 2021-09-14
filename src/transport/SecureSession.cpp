@@ -127,9 +127,9 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
                                   MessageAuthenticationCode & mac) const
 {
 
-    constexpr Header::EncryptionType encType = Header::EncryptionType::kAESCCMTagLen16;
+    constexpr Header::SessionType encType = Header::SessionType::kAESCCMTagLen16;
 
-    const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(encType);
+    const size_t taglen = MessageAuthenticationCode::TagLenForSessionType(encType);
     VerifyOrDie(taglen <= kMaxTagLen);
 
     VerifyOrReturnError(mKeyAvailable, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
@@ -166,7 +166,7 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
 CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                                   const MessageAuthenticationCode & mac) const
 {
-    const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(header.GetEncryptionType());
+    const size_t taglen = MessageAuthenticationCode::TagLenForSessionType(header.GetSessionType());
     const uint8_t * tag = mac.GetTag();
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];

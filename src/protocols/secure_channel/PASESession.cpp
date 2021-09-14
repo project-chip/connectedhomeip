@@ -158,7 +158,7 @@ CHIP_ERROR PASESession::ToSerializable(PASESessionSerializable & serializable)
     serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
     serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
     serializable.mLocalKeyId      = GetLocalKeyId();
-    serializable.mPeerKeyId       = GetPeerKeyId();
+    serializable.mPeerSessionId       = GetPeerSessionId();
 
     memcpy(serializable.mKe, mKe, mKeLen);
 
@@ -175,7 +175,7 @@ CHIP_ERROR PASESession::FromSerializable(const PASESessionSerializable & seriali
     memcpy(mKe, serializable.mKe, mKeLen);
 
     SetLocalKeyId(serializable.mLocalKeyId);
-    SetPeerKeyId(serializable.mPeerKeyId);
+    SetPeerSessionId(serializable.mPeerSessionId);
 
     return CHIP_NO_ERROR;
 }
@@ -413,7 +413,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
 
     ChipLogDetail(SecureChannel, "Peer assigned session ID %d", initiatorSessionId);
     // TODO - Update <Set/Get><Local/Peer>KeyId() functions to <Set/Get><Local/Peer>SessionId()
-    SetPeerKeyId(initiatorSessionId);
+    SetPeerSessionId(initiatorSessionId);
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
@@ -524,7 +524,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session ID %d", responderSessionId);
-    SetPeerKeyId(responderSessionId);
+    SetPeerSessionId(responderSessionId);
 
     if (mHavePBKDFParameters)
     {
