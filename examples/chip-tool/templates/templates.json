@@ -24,10 +24,6 @@
             "path": "../../../src/app/zap-templates/partials/cluster_header.zapt"
         },
         {
-            "name": "process_response_value",
-            "path": "partials/process_response_value.zapt"
-        },
-        {
             "name": "test_cluster",
             "path": "partials/test_cluster.zapt"
         }

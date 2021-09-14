@@ -21,6 +21,7 @@ config:
 tests:
     - label: "Set OnOff Attribute to false"
       command: "Off"
+
     - label: "Subscribe OnOff Attribute"
       command: "subscribeAttribute"
       attribute: "OnOff"
@@ -28,15 +29,19 @@ tests:
       maxInterval: 10
       response:
           value: false
+
     - label: "Turn On the light to see attribute change"
       command: "On"
+
     - label: "Check for attribute report"
       command: "waitForReport"
       attribute: "OnOff"
       response:
           value: true
+
     - label: "Turn Off the light to see attribute change"
       command: "Off"
+
     - label: "Check for attribute report"
       command: "waitForReport"
       attribute: "OnOff"
