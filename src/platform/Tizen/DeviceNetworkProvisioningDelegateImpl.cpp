@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,10 +15,18 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-#include <transport/SecureSessionMgr.h>
+#include "DeviceNetworkProvisioningDelegateImpl.h"
 
 namespace chip {
-SecureSessionMgr & SessionManager();
+namespace DeviceLayer {
+
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+} // namespace DeviceLayer
 } // namespace chip

@@ -170,6 +170,13 @@ public:
     // Service connectivity methods
     bool HaveServiceConnectivity();
 
+    // Ethernet network diagnostics methods
+    CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount);
+    CHIP_ERROR GetEthPacketTxCount(uint64_t & packetTxCount);
+    CHIP_ERROR GetEthTxErrCount(uint64_t & txErrCount);
+    CHIP_ERROR GetEthCollisionCount(uint64_t & collisionCount);
+    CHIP_ERROR GetEthOverrunCount(uint64_t & overrunCount);
+
     // CHIPoBLE service methods
     Ble::BleLayer * GetBleLayer();
     CHIPoBLEServiceMode GetCHIPoBLEServiceMode();
@@ -379,6 +386,31 @@ inline bool ConnectivityManager::HaveIPv6InternetConnectivity()
 inline bool ConnectivityManager::HaveServiceConnectivity()
 {
     return static_cast<ImplClass *>(this)->_HaveServiceConnectivity();
+}
+
+inline CHIP_ERROR ConnectivityManager::GetEthPacketRxCount(uint64_t & packetRxCount)
+{
+    return static_cast<ImplClass *>(this)->_GetEthPacketRxCount(packetRxCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetEthPacketTxCount(uint64_t & packetTxCount)
+{
+    return static_cast<ImplClass *>(this)->_GetEthPacketTxCount(packetTxCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetEthTxErrCount(uint64_t & txErrCount)
+{
+    return static_cast<ImplClass *>(this)->_GetEthTxErrCount(txErrCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetEthCollisionCount(uint64_t & collisionCount)
+{
+    return static_cast<ImplClass *>(this)->_GetEthCollisionCount(collisionCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetEthOverrunCount(uint64_t & overrunCount)
+{
+    return static_cast<ImplClass *>(this)->_GetEthOverrunCount(overrunCount);
 }
 
 inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode()

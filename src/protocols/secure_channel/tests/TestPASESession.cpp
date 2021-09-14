@@ -86,7 +86,7 @@ public:
 class MockAppDelegate : public ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
         return CHIP_NO_ERROR;
@@ -123,7 +123,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     gLoopback.Reset();
 
     NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    ExchangeContext * context = ctx.NewExchangeToLocal(&pairing);
+    ExchangeContext * context = ctx.NewExchangeToBob(&pairing);
 
     NL_TEST_ASSERT(inSuite,
                    pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, nullptr, nullptr) != CHIP_NO_ERROR);
@@ -140,7 +140,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     PASESession pairing1;
     NL_TEST_ASSERT(inSuite, pairing1.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    ExchangeContext * context1 = ctx.NewExchangeToLocal(&pairing1);
+    ExchangeContext * context1 = ctx.NewExchangeToBob(&pairing1);
     NL_TEST_ASSERT(inSuite,
                    pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, context1, &delegate) ==
                        CHIP_ERROR_BAD_REQUEST);
@@ -160,7 +160,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
     NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
 
-    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
+    ExchangeContext * contextCommissioner = ctx.NewExchangeToBob(&pairingCommissioner);
 
     if (gLoopback.mNumMessagesToDrop != 0)
     {
@@ -234,7 +234,7 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
 
     TestContext & ctx                     = *reinterpret_cast<TestContext *>(inContext);
-    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
+    ExchangeContext * contextCommissioner = ctx.NewExchangeToBob(&pairingCommissioner);
 
     pairingCommissioner.MessageDispatch().SetPeerAddress(PeerAddress(Type::kUdp));
     pairingAccessory.MessageDispatch().SetPeerAddress(PeerAddress(Type::kUdp));
@@ -376,10 +376,10 @@ int TestSecurePairing_Setup(void * inContext)
     auto & ctx = *static_cast<TestContext *>(inContext);
     VerifyOrReturnError(ctx.Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
-    ctx.SetSourceNodeId(kPlaceholderNodeId);
-    ctx.SetDestinationNodeId(kPlaceholderNodeId);
-    ctx.SetLocalKeyId(0);
-    ctx.SetPeerKeyId(0);
+    ctx.SetBobNodeId(kPlaceholderNodeId);
+    ctx.SetAliceNodeId(kPlaceholderNodeId);
+    ctx.SetBobKeyId(0);
+    ctx.SetAliceKeyId(0);
     ctx.SetFabricIndex(kUndefinedFabricIndex);
 
     gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());

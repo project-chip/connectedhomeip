@@ -52,7 +52,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     BleApplicationDelegateImpl * appDelegate   = new BleApplicationDelegateImpl();
     BleConnectionDelegateImpl * connDelegate   = new BleConnectionDelegateImpl();
     BlePlatformDelegateImpl * platformDelegate = new BlePlatformDelegateImpl();
-    err                                        = BleLayer::Init(platformDelegate, connDelegate, appDelegate, &SystemLayer);
+    err = BleLayer::Init(platformDelegate, connDelegate, appDelegate, &DeviceLayer::SystemLayer());
     return err;
 }
 

@@ -127,24 +127,17 @@ public:
      * @note
      *   This function could, in principle, be implemented as `StartTimer`. The specification for `SystemTimer` however
      *   permits certain optimizations that might make that implementation impossible. Specifically, `SystemTimer`
-     *   API may only be called from the thread owning the particular `SystemLayer`, whereas the `ScheduleWork` may be
+     *   API may only be called from the thread owning the particular `System::Layer`, whereas the `ScheduleWork` may be
      *   called from any thread. Additionally, whereas the `SystemTimer` API permits the invocation of the already
      *   expired handler in line, `ScheduleWork` guarantees that the handler function will be called only after the
      *   current CHIP event completes.
      *
-     * @param[in] aComplete A pointer to a callback function to be called
-     *                      when this timer fires.
+     * @param[in] aComplete     A pointer to a callback function to be called when this timer fires.
+     * @param[in] aAppState     A pointer to an application state object to be passed to the callback function as argument.
      *
-     * @param[in] aAppState A pointer to an application state object to be
-     *                      passed to the callback function as argument.
-     *
-     * @retval CHIP_ERROR_INCORRECT_STATE If the SystemLayer has
-     *                      not been initialized.
-     *
-     * @retval CHIP_ERROR_NO_MEMORY If the SystemLayer cannot
-     *                      allocate a new timer.
-     *
-     * @retval CHIP_NO_ERROR On success.
+     * @retval CHIP_ERROR_INCORRECT_STATE   If the System::Layer has not been initialized.
+     * @retval CHIP_ERROR_NO_MEMORY         If the SystemLayer cannot allocate a new timer.
+     * @retval CHIP_NO_ERROR                On success.
      */
     virtual CHIP_ERROR ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) = 0;
 
