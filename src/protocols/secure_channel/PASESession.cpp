@@ -157,7 +157,7 @@ CHIP_ERROR PASESession::ToSerializable(PASESessionSerializable & serializable)
     memset(&serializable, 0, sizeof(serializable));
     serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
     serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
-    serializable.mLocalSessionId      = GetLocalSessionId();
+    serializable.mLocalSessionId  = GetLocalSessionId();
     serializable.mPeerSessionId   = GetPeerSessionId();
 
     memcpy(serializable.mKe, mKe, mKeLen);

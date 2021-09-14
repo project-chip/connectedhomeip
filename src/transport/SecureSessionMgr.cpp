@@ -247,8 +247,8 @@ void SecureSessionMgr::ExpireAllPairingsForFabric(FabricIndex fabric)
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
                                         PairingSession * pairing, SecureSession::SessionRole direction, FabricIndex fabric)
 {
-    uint16_t PeerSessionId = pairing->GetPeerSessionId();
-    uint16_t LocalSessionId    = pairing->GetLocalSessionId();
+    uint16_t PeerSessionId  = pairing->GetPeerSessionId();
+    uint16_t LocalSessionId = pairing->GetLocalSessionId();
     PeerConnectionState * state =
         mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(peerNodeId), LocalSessionId, nullptr);
 
@@ -393,7 +393,8 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
             // Queue and start message sync procedure
             err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
                 packetHeader,
-                SessionHandle(state->GetPeerNodeId(), state->GetLocalSessionId(), state->GetPeerSessionId(), state->GetFabricIndex()),
+                SessionHandle(state->GetPeerNodeId(), state->GetLocalSessionId(), state->GetPeerSessionId(),
+                              state->GetFabricIndex()),
                 state, peerAddress, std::move(msg));
 
             if (err != CHIP_NO_ERROR)
@@ -457,7 +458,8 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
 
     if (mCB != nullptr)
     {
-        SessionHandle session(state->GetPeerNodeId(), state->GetLocalSessionId(), state->GetPeerSessionId(), state->GetFabricIndex());
+        SessionHandle session(state->GetPeerNodeId(), state->GetLocalSessionId(), state->GetPeerSessionId(),
+                              state->GetFabricIndex());
         mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, isDuplicate, std::move(msg));
     }
 

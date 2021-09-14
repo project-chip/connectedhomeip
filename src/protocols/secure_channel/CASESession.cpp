@@ -158,7 +158,7 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mIPKLen           = static_cast<uint16_t>(sizeof(mIPK));
     serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
     serializable.mPeerNodeId       = peerNodeId;
-    serializable.mLocalSessionId       = GetLocalSessionId();
+    serializable.mLocalSessionId   = GetLocalSessionId();
     serializable.mPeerSessionId    = GetPeerSessionId();
 
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
