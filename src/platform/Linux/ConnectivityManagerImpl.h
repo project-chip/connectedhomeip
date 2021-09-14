@@ -66,7 +66,7 @@ struct GDBusWpaSupplicant
         WPA_GOT_INTERFACE_PATH,
         WPA_INTERFACE_CONNECTED,
     } WpaSupplicantState;
-    std::atomic<WpaSupplicantState> state {INIT};
+    std::atomic<WpaSupplicantState> state{ INIT };
 
     enum
     {
