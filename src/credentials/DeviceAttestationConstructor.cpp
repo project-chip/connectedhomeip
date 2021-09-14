@@ -20,13 +20,14 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <cstdint>
 #include <iostream>
 
 namespace chip {
 namespace Credentials {
 
 // context tag positions
-enum : int
+enum : uint32_t
 {
     kCertificationDeclarationTagId = 1,
     kAttestationNonceTagId         = 2,
@@ -44,7 +45,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
     bool timestampExists                = false;
     bool firmwareInfoExists             = false;
     size_t vendorReservedIdx            = 0;
-    int lastContextTagId                = -1;
+    uint32_t lastContextTagId           = UINT32_MAX;
     TLV::ContiguousBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
@@ -64,7 +65,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
             switch (TLV::TagNumFromTag(tag))
             {
             case kCertificationDeclarationTagId:
-                VerifyOrReturnError(lastContextTagId == -1, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
+                VerifyOrReturnError(lastContextTagId == UINT32_MAX, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
                 VerifyOrReturnError(certificationDeclarationExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
                 ReturnErrorOnFailure(tlvReader.GetByteView(certificationDeclaration));
                 certificationDeclarationExists = true;
@@ -131,7 +132,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
     vendorReservedArraySize = vendorReservedIdx;
 
     VerifyOrReturnError(error == CHIP_END_OF_TLV, error);
-    VerifyOrReturnError(lastContextTagId != -1, CHIP_ERROR_MISSING_TLV_ELEMENT);
+    VerifyOrReturnError(lastContextTagId != UINT32_MAX, CHIP_ERROR_MISSING_TLV_ELEMENT);
     VerifyOrReturnError(certificationDeclarationExists && attestationNonceExists && timestampExists,
                         CHIP_ERROR_MISSING_TLV_ELEMENT);
 
