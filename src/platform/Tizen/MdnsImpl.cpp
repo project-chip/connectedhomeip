@@ -31,6 +31,11 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback successCallback, MdnsAsyncReturn
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ChipMdnsShutdown()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
