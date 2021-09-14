@@ -335,6 +335,7 @@ public:
 
     ///// Resolver implementation
     CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
+    void ShutdownResolver() override;
     CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
@@ -392,6 +393,11 @@ CHIP_ERROR MinMdnsResolver::StartResolver(chip::Inet::InetLayer * inetLayer, uin
     }
 
     return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, port);
+}
+
+void MinMdnsResolver::ShutdownResolver()
+{
+    GlobalMinimalMdnsServer::Instance().ShutdownServer();
 }
 
 CHIP_ERROR MinMdnsResolver::SetResolverDelegate(ResolverDelegate * delegate)

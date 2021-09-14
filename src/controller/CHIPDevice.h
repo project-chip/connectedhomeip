@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,7 @@
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
+#include <controller/DeviceControllerInteractionModelDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
@@ -87,7 +88,8 @@ struct ControllerDeviceInitParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
-    Transport::FabricTable * fabricsTable = nullptr;
+    Transport::FabricTable * fabricsTable                 = nullptr;
+    DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 };
 
 class Device;
@@ -150,6 +152,10 @@ public:
     CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
                                         Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
 
+    CHIP_ERROR SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalFloorSeconds,
+                                             uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
+                                             Callback::Cancelable * onFailureCallback);
+
     CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
                                          Callback::Cancelable * onFailureCallback);
 
@@ -196,6 +202,7 @@ public:
         mStorageDelegate = params.storageDelegate;
         mIDAllocator     = params.idAllocator;
         mFabricsTable    = params.fabricsTable;
+        mpIMDelegate     = params.imDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -277,12 +284,11 @@ public:
      *                          on.  The Device guarantees that it will call
      *                          Close() on exchange when it's done processing
      *                          the message.
-     * @param[in] header        Reference to common packet header of the received message
      * @param[in] payloadHeader Reference to payload header in the message
      * @param[in] msgBuf        The message buffer
      */
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && msgBuf) override;
 
     /**
      * @brief ExchangeDelegate implementation of OnResponseTimeout.
@@ -378,10 +384,11 @@ public:
     void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             app::TLVDataFilter tlvDataFilter = nullptr);
     void CancelResponseHandler(uint8_t seqNum);
-    void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
+    void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback,
+                          app::TLVDataFilter tlvDataFilter);
 
-    // This two functions are pretty tricky, it is used to bridge the response, we need to implement interaction model delegate on
-    // the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
+    // This two functions are pretty tricky, it is used to bridge the response, we need to implement interaction model delegate
+    // on the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
     // type-safe.
     // TODO: Implement interaction model delegate in the application.
     void AddIMResponseHandler(app::CommandSender * commandObj, Callback::Cancelable * onSuccessCallback,
@@ -412,11 +419,17 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
-    MutableByteSpan GetMutableNOCChain() { return MutableByteSpan(mNOCChainBuffer, sizeof(mNOCChainBuffer)); }
+    MutableByteSpan GetMutableNOCCert() { return MutableByteSpan(mNOCCertBuffer, sizeof(mNOCCertBuffer)); }
 
-    CHIP_ERROR ReduceNOCChainBufferSize(size_t new_size);
+    CHIP_ERROR SetNOCCertBufferSize(size_t new_size);
 
-    ByteSpan GetNOCChain() const { return ByteSpan(mNOCChainBuffer, mNOCChainBufferSize); }
+    ByteSpan GetNOCCert() const { return ByteSpan(mNOCCertBuffer, mNOCCertBufferSize); }
+
+    MutableByteSpan GetMutableICACert() { return MutableByteSpan(mICACertBuffer, sizeof(mICACertBuffer)); }
+
+    CHIP_ERROR SetICACertBufferSize(size_t new_size);
+
+    ByteSpan GetICACert() const { return ByteSpan(mICACertBuffer, mICACertBufferSize); }
 
     /*
      * This function can be called to establish a secure session with the device.
@@ -476,6 +489,8 @@ private:
 
     Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
 
+    DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
+
     uint8_t mSequenceNumber = 0;
 
     uint32_t mLocalMessageCounter = 0;
@@ -526,9 +541,11 @@ private:
 
     uint8_t mCSRNonce[kOpCSRNonceLength];
 
-    // The chain can contain ICAC and OpCert
-    uint8_t mNOCChainBuffer[Credentials::kMaxCHIPCertLength * 2];
-    size_t mNOCChainBufferSize = 0;
+    uint8_t mNOCCertBuffer[Credentials::kMaxCHIPCertLength];
+    size_t mNOCCertBufferSize = 0;
+
+    uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
+    size_t mICACertBufferSize = 0;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 

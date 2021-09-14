@@ -617,8 +617,7 @@ class DeviceMgrCmd(Cmd):
         discover -s short_discriminator
         discover -v vendor_id
         discover -t device_type
-        discover -c commissioning_enabled
-        discover -a
+        discover -c
 
         discover command is used to discover available devices.
         """
@@ -643,9 +642,7 @@ class DeviceMgrCmd(Cmd):
             group.add_argument(
                 '-t', help='discover commissionable nodes with given device type', type=int)
             group.add_argument(
-                '-c', help='discover commissionable nodes with given commissioning mode', type=int)
-            group.add_argument(
-                '-a', help='discover commissionable nodes put in commissioning mode from command', action='store_true')
+                '-c', help='discover commissionable nodes in commissioning mode', action='store_true')
             args = parser.parse_args(arglist)
             if args.all:
                 self.commissionableNodeCtrl.DiscoverCommissioners()
@@ -677,11 +674,7 @@ class DeviceMgrCmd(Cmd):
                     ctypes.c_uint16(args.t))
                 self.wait_for_many_discovered_devices()
             elif args.c is not None:
-                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled(
-                    ctypes.c_uint16(args.c))
-                self.wait_for_many_discovered_devices()
-            elif args.a is not None:
-                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabledFromCommand()
+                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled()
                 self.wait_for_many_discovered_devices()
             else:
                 self.do_help("discover")

@@ -23,10 +23,14 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestCommissionableNodeController.cpp" ]
 
+  test_sources += [ "TestDevice.cpp" ]
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/controller",
     "${nlunit_test_root}:nlunit-test",
   ]
+
+  public_deps += [ "${chip_root}/src/controller/data_model" ]
 }

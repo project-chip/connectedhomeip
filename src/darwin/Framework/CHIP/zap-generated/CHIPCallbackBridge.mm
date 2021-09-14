@@ -80,126 +80,126 @@ void CHIPInt64sAttributeCallbackBridge::OnSuccessFn(void * context, int64_t valu
 void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, uint16_t * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
+        array[i] = [NSNumber numberWithUnsignedShort:entries[i]];
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, _AudioOutputInfo * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"index" : [NSNumber numberWithUnsignedChar:entries[i].index],
             @"outputType" : [NSNumber numberWithUnsignedChar:entries[i].outputType],
             @"name" : [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()],
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, chip::ByteSpan * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
+        array[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, uint8_t * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = [NSNumber numberWithUnsignedChar:entries[i]];
+        array[i] = [NSNumber numberWithUnsignedChar:entries[i]];
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, _DeviceType * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"type" : [NSNumber numberWithUnsignedLong:entries[i].type],
             @"revision" : [NSNumber numberWithUnsignedShort:entries[i].revision],
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, chip::ClusterId * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = [NSNumber numberWithUnsignedLong:entries[i]];
+        array[i] = [NSNumber numberWithUnsignedLong:entries[i]];
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, chip::ClusterId * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = [NSNumber numberWithUnsignedLong:entries[i]];
+        array[i] = [NSNumber numberWithUnsignedLong:entries[i]];
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, chip::EndpointId * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
+        array[i] = [NSNumber numberWithUnsignedShort:entries[i]];
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, _LabelStruct * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"label" : [NSData dataWithBytes:entries[i].label.data() length:entries[i].label.size()],
             @"value" : [NSData dataWithBytes:entries[i].value.data() length:entries[i].value.size()],
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, _BasicCommissioningInfoType * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"FailSafeExpiryLengthMs" : [NSNumber numberWithUnsignedLong:entries[i].FailSafeExpiryLengthMs],
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, _NetworkInterfaceType * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"Name" : [NSData dataWithBytes:entries[i].Name.data() length:entries[i].Name.size()],
             @"FabricConnected" : [NSNumber numberWithBool:entries[i].FabricConnected],
             @"OffPremiseServicesReachableIPv4" : [NSNumber numberWithBool:entries[i].OffPremiseServicesReachableIPv4],
@@ -209,28 +209,28 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, _GroupState * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"VendorId" : [NSNumber numberWithUnsignedShort:entries[i].VendorId],
             @"VendorGroupId" : [NSNumber numberWithUnsignedShort:entries[i].VendorGroupId],
             @"GroupKeySetIndex" : [NSNumber numberWithUnsignedShort:entries[i].GroupKeySetIndex],
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, _GroupKey * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"VendorId" : [NSNumber numberWithUnsignedShort:entries[i].VendorId],
             @"GroupKeyIndex" : [NSNumber numberWithUnsignedShort:entries[i].GroupKeyIndex],
             @"GroupKeyRoot" : [NSData dataWithBytes:entries[i].GroupKeyRoot.data() length:entries[i].GroupKeyRoot.size()],
@@ -239,14 +239,14 @@ void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(voi
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, _MediaInputInfo * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"index" : [NSNumber numberWithUnsignedChar:entries[i].index],
             @"inputType" : [NSNumber numberWithUnsignedChar:entries[i].inputType],
             @"name" : [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()],
@@ -254,15 +254,15 @@ void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void *
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, _FabricDescriptor * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"FabricIndex" : [NSNumber numberWithUnsignedChar:entries[i].FabricIndex],
             @"RootPublicKey" : [NSData dataWithBytes:entries[i].RootPublicKey.data() length:entries[i].RootPublicKey.size()],
             @"VendorId" : [NSNumber numberWithUnsignedShort:entries[i].VendorId],
@@ -272,14 +272,14 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, _TvChannelInfo * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"majorNumber" : [NSNumber numberWithUnsignedShort:entries[i].majorNumber],
             @"minorNumber" : [NSNumber numberWithUnsignedShort:entries[i].minorNumber],
             @"name" : [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()],
@@ -289,64 +289,64 @@ void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * c
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, _NavigateTargetTargetInfo * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"identifier" : [NSNumber numberWithUnsignedChar:entries[i].identifier],
             @"name" : [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()],
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, uint8_t * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = [NSNumber numberWithUnsignedChar:entries[i]];
+        array[i] = [NSNumber numberWithUnsignedChar:entries[i]];
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPTestClusterListOctetStringListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, chip::ByteSpan * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
+        array[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, _TestListStructOctet * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"fabricIndex" : [NSNumber numberWithUnsignedLongLong:entries[i].fabricIndex],
             @"operationalCert" : [NSData dataWithBytes:entries[i].operationalCert.data() length:entries[i].operationalCert.size()],
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, _NeighborTable * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"ExtAddress" : [NSNumber numberWithUnsignedLongLong:entries[i].ExtAddress],
             @"Age" : [NSNumber numberWithUnsignedLong:entries[i].Age],
             @"Rloc16" : [NSNumber numberWithUnsignedShort:entries[i].Rloc16],
@@ -364,15 +364,15 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::O
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, _RouteTable * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"ExtAddress" : [NSNumber numberWithUnsignedLongLong:entries[i].ExtAddress],
             @"Rloc16" : [NSNumber numberWithUnsignedShort:entries[i].Rloc16],
             @"RouterId" : [NSNumber numberWithUnsignedChar:entries[i].RouterId],
@@ -386,29 +386,29 @@ void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSu
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, _SecurityPolicy * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"RotationTime" : [NSNumber numberWithUnsignedShort:entries[i].RotationTime],
             @"Flags" : [NSNumber numberWithUnsignedChar:entries[i].Flags],
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, _OperationalDatasetComponents * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = @ {
+        array[i] = @ {
             @"ActiveTimestampPresent" : [NSNumber numberWithBool:entries[i].ActiveTimestampPresent],
             @"PendingTimestampPresent" : [NSNumber numberWithBool:entries[i].PendingTimestampPresent],
             @"MasterKeyPresent" : [NSNumber numberWithBool:entries[i].MasterKeyPresent],
@@ -424,18 +424,18 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallba
         };
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(
     void * context, uint16_t count, uint8_t * entries)
 {
-    id values[count];
+    id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
-        values[i] = [NSNumber numberWithUnsignedChar:entries[i]];
+        array[i] = [NSNumber numberWithUnsignedChar:entries[i]];
     }
 
-    DispatchSuccess(context, @ { @"value" : [NSArray arrayWithObjects:values count:count] });
+    DispatchSuccess(context, @ { @"value" : array });
 };
 
 void CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(void * context, uint8_t * setupPIN)

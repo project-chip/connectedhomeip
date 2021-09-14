@@ -186,7 +186,7 @@ class test_chip_inet_multicast_five_nodes_on_wifi(unittest.TestCase):
 
         # Topology-independent test parameters:
 
-        transports = ["udp", "raw"]
+        transports = ["udp"]
         networks = ["6", "4"]
 
         for network in networks:

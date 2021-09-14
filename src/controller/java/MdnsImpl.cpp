@@ -103,11 +103,6 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, Inet::InterfaceId interface, M
     return CHIP_NO_ERROR;
 }
 
-// Implementation of other methods required by the CHIP stack
-
-void GetMdnsTimeout(timeval & timeout) {}
-void HandleMdnsTimeout() {}
-
 // Implemention of Java-specific functions
 
 void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)

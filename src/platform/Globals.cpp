@@ -20,15 +20,17 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/internal/BLEManager.h>
+#include <system/SystemLayerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-chip::System::Layer SystemLayer;
 chip::Inet::InetLayer InetLayer;
 
 namespace Internal {
 
+chip::System::Layer * gSystemLayer = nullptr;
+chip::System::LayerImpl gSystemLayerImpl;
 const char * const TAG = "CHIP[DL]";
 
 } // namespace Internal

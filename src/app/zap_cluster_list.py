@@ -111,7 +111,7 @@ CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'OPERATIONAL_CREDENTIALS_CLUSTER': [],
     'OTA_BOOTLOAD_CLUSTER': [],
     'OTA_PROVIDER_CLUSTER': [],
-    'OTA_REQUESTOR_CLUSTER': ['ota-provider'],
+    'OTA_REQUESTOR_CLUSTER': [],
     'POWER_CONFIG_CLUSTER': [],
     'PRESSURE_MEASUREMENT_CLUSTER': [],
     'PUMP_CONFIG_CONTROL_CLUSTER': ['pump-configuration-and-control-client'],

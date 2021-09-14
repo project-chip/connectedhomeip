@@ -48,7 +48,7 @@ void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErrorTacti
 {
     if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
     {
-        DeferredRelease(Layer().SystemLayer(), aTactic);
+        DeferredRelease(static_cast<System::LayerLwIP *>(Layer().SystemLayer()), aTactic);
     }
     else
     {

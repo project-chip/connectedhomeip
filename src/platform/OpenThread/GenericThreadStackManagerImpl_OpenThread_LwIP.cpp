@@ -153,7 +153,11 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
             event.Clear();
             event.Type                            = DeviceEventType::kThreadConnectivityChange;
             event.ThreadConnectivityChange.Result = (isInterfaceUp) ? kConnectivity_Established : kConnectivity_Lost;
-            PlatformMgr().PostEvent(&event);
+            CHIP_ERROR status                     = PlatformMgr().PostEvent(&event);
+            if (status != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+            }
         }
 
         // Presume the interface addresses are also changing.

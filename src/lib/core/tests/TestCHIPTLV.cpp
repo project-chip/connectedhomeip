@@ -1967,7 +1967,7 @@ void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
 
     ReadEncoding1(inSuite, reader);
 
-    reader.Init(buf.Retain(), buf->MaxDataLength());
+    reader.Init(buf.Retain());
     reader.ImplicitProfileId = TestProfile_2;
 
     ReadEncoding1(inSuite, reader);
@@ -2477,7 +2477,6 @@ void CheckCHIPTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
  */
 void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
 {
-    System::PacketBufferTLVWriter writer;
     System::PacketBufferTLVReader reader;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
@@ -2485,25 +2484,34 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
     uint16_t reserve = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
 
     // Repeatedly write and read a TLV encoding to a chain of PacketBuffers. Use progressively larger
-    // and larger amounts of space in the first buffer to force the encoding/decoding to overlap the
+    // and larger amounts of space in the first buffer to force the encoding to overlap the
     // end of the buffer and the beginning of the next.
     for (; reserve < maxDataLen; reserve++)
     {
         buf->SetStart(buf->Start() + reserve);
 
-        writer.Init(buf.Retain(), /* useChainedBuffers = */ true);
-        writer.ImplicitProfileId = TestProfile_2;
+        {
+            System::PacketBufferTLVWriter writer;
+            // Scope for writer because we want it to go out of scope before we
+            // mess with the chain after writing is done.
+            writer.Init(buf.Retain(), /* useChainedBuffers = */ true);
+            writer.ImplicitProfileId = TestProfile_2;
 
-        WriteEncoding1(inSuite, writer);
+            WriteEncoding1(inSuite, writer);
+        }
 
         TestBufferContents(inSuite, buf, Encoding1, sizeof(Encoding1));
 
-        reader.Init(buf.Retain(), /* useChainedBuffers = */ true);
+        // Compact the buffer, since we don't allow reading from chained
+        // buffers.
+        buf->CompactHead();
+
+        reader.Init(buf.Retain());
         reader.ImplicitProfileId = TestProfile_2;
 
         ReadEncoding1(inSuite, reader);
 
-        buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+        buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
     }
 }
 
@@ -3013,7 +3021,7 @@ void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
 void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
 {
     CHIP_ERROR err;
-    uint8_t buf[2048];
+    uint8_t buf[2048] = { 0 };
     TLVReader reader;
 
     reader.Init(buf);

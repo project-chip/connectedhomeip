@@ -62,13 +62,13 @@ void IOContext::DriveIO()
 
 void IOContext::DriveIOUntil(unsigned maxWaitMs, std::function<bool(void)> completionFunction)
 {
-    uint64_t mStartTime = mSystemLayer->GetClock().GetMonotonicMilliseconds();
+    uint64_t mStartTime = System::Clock::GetMonotonicMilliseconds();
 
     while (true)
     {
         DriveIO(); // at least one IO loop is guaranteed
 
-        if (completionFunction() || ((mSystemLayer->GetClock().GetMonotonicMilliseconds() - mStartTime) >= maxWaitMs))
+        if (completionFunction() || ((System::Clock::GetMonotonicMilliseconds() - mStartTime) >= maxWaitMs))
         {
             break;
         }

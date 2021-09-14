@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <transport/UnauthenticatedSessionTable.h>
+
 namespace chip {
 
 class SecureSessionMgr;
@@ -26,12 +28,18 @@ class SessionHandle
 public:
     SessionHandle(NodeId peerNodeId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric) {}
 
+    SessionHandle(Transport::UnauthenticatedSessionHandle session) :
+        mPeerNodeId(kPlaceholderNodeId), mFabric(Transport::kUndefinedFabricIndex), mUnauthenticatedSessionHandle(session)
+    {}
+
     SessionHandle(NodeId peerNodeId, uint16_t localKeyId, uint16_t peerKeyId, FabricIndex fabric) :
         mPeerNodeId(peerNodeId), mFabric(fabric)
     {
         mLocalKeyId.SetValue(localKeyId);
         mPeerKeyId.SetValue(peerKeyId);
     }
+
+    bool IsSecure() const { return !mUnauthenticatedSessionHandle.HasValue(); }
 
     bool HasFabricIndex() const { return (mFabric != Transport::kUndefinedFabricIndex); }
     FabricIndex GetFabricIndex() const { return mFabric; }
@@ -45,16 +53,13 @@ public:
 
     bool MatchIncomingSession(const SessionHandle & that) const
     {
-
-        if (that.GetLocalKeyId().HasValue())
+        if (IsSecure())
         {
-            return mLocalKeyId == that.mLocalKeyId;
+            return that.IsSecure() && mLocalKeyId.Value() == that.mLocalKeyId.Value();
         }
         else
         {
-            // TODO: For unencrypted session, temporarily still rely on the old match logic in MatchExchange, need to update to
-            // match peer’s HW address (BLE) or peer’s IP/Port (for IP).
-            return true;
+            return !that.IsSecure() && mUnauthenticatedSessionHandle.Value() == that.mUnauthenticatedSessionHandle.Value();
         }
     }
 
@@ -62,14 +67,12 @@ public:
     const Optional<uint16_t> & GetPeerKeyId() const { return mPeerKeyId; }
     const Optional<uint16_t> & GetLocalKeyId() const { return mLocalKeyId; }
 
-    // TODO: currently SessionHandle is not able to identify a unauthenticated session, create an empty handle for it
-    static SessionHandle TemporaryUnauthenticatedSession()
-    {
-        return SessionHandle(kPlaceholderNodeId, Transport::kUndefinedFabricIndex);
-    }
+    Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession() { return mUnauthenticatedSessionHandle.Value(); }
 
 private:
     friend class SecureSessionMgr;
+
+    // Fields for secure session
     NodeId mPeerNodeId;
     Optional<uint16_t> mLocalKeyId;
     Optional<uint16_t> mPeerKeyId;
@@ -78,6 +81,9 @@ private:
     //       to identify an approach that'll allow looking up the corresponding information for
     //       such sessions.
     FabricIndex mFabric;
+
+    // Fields for unauthenticated session
+    Optional<Transport::UnauthenticatedSessionHandle> mUnauthenticatedSessionHandle;
 };
 
 } // namespace chip

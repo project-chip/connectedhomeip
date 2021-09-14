@@ -265,7 +265,7 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_CheckNow(void)
         if (mState == SoftwareUpdateManager::kState_ScheduledHoldoff)
         {
             // Cancel scheduled hold off and trigger software update prepare.
-            SystemLayer.CancelTimer(HandleHoldOffTimerExpired, NULL);
+            DeviceLayer::SystemLayer().CancelTimer(HandleHoldOffTimerExpired, NULL);
         }
 
         {
@@ -633,7 +633,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DriveState(SoftwareUpdateManag
             if (timeToNextQueryMS)
             {
                 mState = SoftwareUpdateManager::kState_ScheduledHoldoff;
-                SystemLayer.StartTimer(timeToNextQueryMS, HandleHoldOffTimerExpired, NULL);
+                DeviceLayer::SystemLayer().StartTimer(timeToNextQueryMS, HandleHoldOffTimerExpired, NULL);
             }
         }
     }

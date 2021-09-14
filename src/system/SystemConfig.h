@@ -68,7 +68,7 @@
 #include CHIP_PLATFORM_CONFIG_INCLUDE
 #endif
 
-/* Include a SystemLayer project-specific configuration file, if defined.
+/* Include a System::Layer project-specific configuration file, if defined.
  *
  * An application or module that incorporates CHIP can define a project configuration
  * file to override standard System Layer configuration with application-specific values.
@@ -79,7 +79,7 @@
 #include SYSTEM_PROJECT_CONFIG_INCLUDE
 #endif // SYSTEM_PROJECT_CONFIG_INCLUDE
 
-/* Include a SystemLayer platform-specific configuration file, if defined.
+/* Include a System::Layer platform-specific configuration file, if defined.
  *
  * A platform configuration file contains overrides to standard System Layer configuration
  * that are specific to the platform or OS on which CHIP is running.  It is typically

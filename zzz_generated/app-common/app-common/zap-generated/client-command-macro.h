@@ -2270,26 +2270,29 @@
 /** @brief Command description for AddNOC
  *
  * Command: AddNOC
- * @param NOCArray OCTET_STRING
+ * @param NOCValue OCTET_STRING
+ * @param ICACValue OCTET_STRING
  * @param IPKValue OCTET_STRING
  * @param CaseAdminNode NODE_ID
  * @param AdminVendorId INT16U
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterAddNOC(NOCArray, IPKValue, CaseAdminNode, AdminVendorId)                                                     \
+    CredentialsClusterAddNOC(NOCValue, ICACValue, IPKValue, CaseAdminNode, AdminVendorId)                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ADD_NOC_COMMAND_ID, "uuuu", NOCArray, IPKValue, CaseAdminNode, AdminVendorId);
+                                  ZCL_ADD_NOC_COMMAND_ID, "uuuuu", NOCValue, ICACValue, IPKValue, CaseAdminNode, AdminVendorId);
 
 /** @brief Command description for UpdateNOC
  *
  * Command: UpdateNOC
- * @param NOCArray OCTET_STRING
+ * @param NOCValue OCTET_STRING
+ * @param ICACValue OCTET_STRING
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterUpdateNOC(NOCArray) emberAfFillExternalBuffer(mask,                                                          \
+    CredentialsClusterUpdateNOC(NOCValue, ICACValue)                                                                               \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                                    ZCL_UPDATE_NOC_COMMAND_ID, "u", NOCArray);
+                                  ZCL_UPDATE_NOC_COMMAND_ID, "uu", NOCValue, ICACValue);
 
 /** @brief Command description for NOCResponse
  *

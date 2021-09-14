@@ -258,13 +258,22 @@ void ChannelContext::EnterCasePairingState()
     auto & prepare              = GetPrepareVars();
     prepare.mCasePairingSession = Platform::New<CASESession>();
 
-    ExchangeContext * ctxt =
-        mExchangeManager->NewContext(SessionHandle::TemporaryUnauthenticatedSession(), prepare.mCasePairingSession);
-    VerifyOrReturn(ctxt != nullptr);
-
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
     addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(prepare.mAddress);
+
+    auto session = mExchangeManager->GetSessionMgr()->CreateUnauthenticatedSession(addr);
+    if (!session.HasValue())
+    {
+        ExitCasePairingState();
+        ExitPreparingState();
+        EnterFailedState(CHIP_ERROR_NO_MEMORY);
+        return;
+    }
+
+    ExchangeContext * ctxt = mExchangeManager->NewContext(session.Value(), prepare.mCasePairingSession);
+    VerifyOrReturn(ctxt != nullptr);
+
     Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
     VerifyOrReturn(fabric != nullptr);
     CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(addr, fabric, prepare.mBuilder.GetPeerNodeId(),

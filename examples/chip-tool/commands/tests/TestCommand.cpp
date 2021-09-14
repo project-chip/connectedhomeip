@@ -54,5 +54,5 @@ void TestCommand::OnWaitForMsFn(chip::System::Layer * systemLayer, void * contex
 
 CHIP_ERROR TestCommand::WaitForMs(uint32_t ms)
 {
-    return chip::DeviceLayer::SystemLayer.StartTimer(ms, OnWaitForMsFn, this);
+    return chip::DeviceLayer::SystemLayer().StartTimer(ms, OnWaitForMsFn, this);
 }

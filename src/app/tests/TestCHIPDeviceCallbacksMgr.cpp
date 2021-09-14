@@ -313,42 +313,54 @@ void ShouldGetSingleReportCallback(nlTestSuite * testSuite, void * apContext)
         NL_TEST_ASSERT(context.testSuite, false);
     };
 
+    const auto reportFilter = [](TLV::TLVReader * reader, Callback::Cancelable * callback, Callback::Cancelable * failureCallback) {
+        IgnoreUnusedVariable(reader);
+        IgnoreUnusedVariable(callback);
+        IgnoreUnusedVariable(failureCallback);
+    };
+
     Callback::Callback<SuccessCallback> reportCallback{ onReport, &callbackContext };
 
     {
         Callback::Cancelable * reportCancelable = nullptr;
+        TLVDataFilter filter                    = nullptr;
         CHIP_ERROR error =
-            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable);
+            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable, &filter);
         NL_TEST_ASSERT(testSuite, error == CHIP_ERROR_KEY_NOT_FOUND);
         NL_TEST_ASSERT(testSuite, reportCancelable == nullptr);
+        NL_TEST_ASSERT(testSuite, filter == nullptr);
     }
 
     {
-        CHIP_ERROR error =
-            callbacks.AddReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, reportCallback.Cancel());
+        CHIP_ERROR error = callbacks.AddReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId,
+                                                       reportCallback.Cancel(), reportFilter);
         NL_TEST_ASSERT(testSuite, error == CHIP_NO_ERROR);
     }
 
     {
         Callback::Cancelable * reportCancelable = nullptr;
+        TLVDataFilter filter                    = nullptr;
         CHIP_ERROR error =
-            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable);
+            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable, &filter);
         NL_TEST_ASSERT(testSuite, error == CHIP_NO_ERROR);
 
         auto outReportCallback = decltype(reportCallback)::FromCancelable(reportCancelable);
 
         NL_TEST_ASSERT(testSuite, outReportCallback == &reportCallback);
+        NL_TEST_ASSERT(testSuite, filter == reportFilter);
     }
 
     {
         Callback::Cancelable * reportCancelable = nullptr;
+        TLVDataFilter filter                    = nullptr;
         CHIP_ERROR error =
-            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable);
+            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable, &filter);
         NL_TEST_ASSERT(testSuite, error == CHIP_NO_ERROR);
 
         auto outReportCallback = decltype(reportCallback)::FromCancelable(reportCancelable);
 
         NL_TEST_ASSERT(testSuite, outReportCallback == &reportCallback);
+        NL_TEST_ASSERT(testSuite, filter == reportFilter);
     }
 }
 
@@ -373,41 +385,53 @@ void ShouldFailGetCanceledReportCallback(nlTestSuite * testSuite, void * apConte
         NL_TEST_ASSERT(context.testSuite, false);
     };
 
+    const auto reportFilter = [](TLV::TLVReader * reader, Callback::Cancelable * callback, Callback::Cancelable * failureCallback) {
+        IgnoreUnusedVariable(reader);
+        IgnoreUnusedVariable(callback);
+        IgnoreUnusedVariable(failureCallback);
+    };
+
     Callback::Callback<SuccessCallback> reportCallback{ onReport, &callbackContext };
 
     {
         Callback::Cancelable * reportCancelable = nullptr;
+        TLVDataFilter filter                    = nullptr;
         CHIP_ERROR error =
-            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable);
+            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable, &filter);
         NL_TEST_ASSERT(testSuite, error == CHIP_ERROR_KEY_NOT_FOUND);
         NL_TEST_ASSERT(testSuite, reportCancelable == nullptr);
+        NL_TEST_ASSERT(testSuite, filter == nullptr);
     }
 
     {
-        CHIP_ERROR error =
-            callbacks.AddReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, reportCallback.Cancel());
+        CHIP_ERROR error = callbacks.AddReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId,
+                                                       reportCallback.Cancel(), reportFilter);
         NL_TEST_ASSERT(testSuite, error == CHIP_NO_ERROR);
     }
 
     {
         Callback::Cancelable * reportCancelable = nullptr;
+        TLVDataFilter filter                    = nullptr;
         CHIP_ERROR error =
-            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable);
+            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable, &filter);
         NL_TEST_ASSERT(testSuite, error == CHIP_NO_ERROR);
 
         auto outReportCallback = decltype(reportCallback)::FromCancelable(reportCancelable);
 
         NL_TEST_ASSERT(testSuite, outReportCallback == &reportCallback);
+        NL_TEST_ASSERT(testSuite, filter == reportFilter);
     }
 
     reportCallback.Cancel();
 
     {
         Callback::Cancelable * reportCancelable = nullptr;
+        TLVDataFilter filter                    = nullptr;
         CHIP_ERROR error =
-            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable);
+            callbacks.GetReportCallback(kTestNodeId, kTestEndpointId, kTestClusterId, kTestAttributeId, &reportCancelable, &filter);
         NL_TEST_ASSERT(testSuite, error == CHIP_ERROR_KEY_NOT_FOUND);
         NL_TEST_ASSERT(testSuite, reportCancelable == nullptr);
+        NL_TEST_ASSERT(testSuite, filter == nullptr);
     }
 }
 

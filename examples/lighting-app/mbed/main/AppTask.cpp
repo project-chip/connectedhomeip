@@ -87,7 +87,7 @@ int AppTask::Init()
                 if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
                     event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
                 {
-                    chip::app::Mdns::StartServer();
+                    chip::app::MdnsServer::Instance().StartServer();
                 }
             }
         },
@@ -116,7 +116,7 @@ int AppTask::Init()
     chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
