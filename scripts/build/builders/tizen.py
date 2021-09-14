@@ -29,9 +29,9 @@ class TizenApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
-    def AppNamePrefix(self):
+    def AppName(self):
         if self == TizenApp.LIGHT:
-            return 'chip-tizen-lighting-example'
+            return 'chip-lighting-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -91,12 +91,10 @@ gn gen --check --fail-on-unused-args --root=%s '--args=''' % self.root
 
     def build_outputs(self):
         items = {
-            '%s.out' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir, '%s.out' %
-                             self.app.AppNamePrefix()),
-            '%s.out.map' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir,
-                             '%s.out.map' % self.app.AppNamePrefix()),
+            '%s' % self.app.AppName():
+                os.path.join(self.output_dir, self.app.AppName()),
+            '%s.map' % self.app.AppName():
+                os.path.join(self.output_dir, '%s.map' % self.app.AppName()),
         }
 
         return items
