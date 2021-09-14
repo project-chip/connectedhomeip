@@ -58,7 +58,7 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
     uint64_t tlvTag;
     uint32_t tlvTagNum;
     OID attrOID;
-    uint32_t asn1Tag;
+    uint8_t asn1Tag;
     const uint8_t * asn1AttrVal;
     uint32_t asn1AttrValLen;
     uint8_t chipAttrStr[17];
