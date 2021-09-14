@@ -15004,7 +15004,8 @@ class OperationalCredentialsAddNOC : public ModelCommand
 public:
     OperationalCredentialsAddNOC() : ModelCommand("add-noc")
     {
-        AddArgument("NOCArray", &mNOCArray);
+        AddArgument("NOCValue", &mNOCValue);
+        AddArgument("ICACValue", &mICACValue);
         AddArgument("IPKValue", &mIPKValue);
         AddArgument("CaseAdminNode", 0, UINT64_MAX, &mCaseAdminNode);
         AddArgument("AdminVendorId", 0, UINT16_MAX, &mAdminVendorId);
@@ -15022,8 +15023,8 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddNOC(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNOCArray, mIPKValue, mCaseAdminNode,
-                              mAdminVendorId);
+        return cluster.AddNOC(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNOCValue, mICACValue, mIPKValue,
+                              mCaseAdminNode, mAdminVendorId);
     }
 
 private:
@@ -15032,7 +15033,8 @@ private:
                                                                                        this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mNOCArray;
+    chip::ByteSpan mNOCValue;
+    chip::ByteSpan mICACValue;
     chip::ByteSpan mIPKValue;
     chip::NodeId mCaseAdminNode;
     uint16_t mAdminVendorId;
@@ -15221,7 +15223,8 @@ class OperationalCredentialsUpdateNOC : public ModelCommand
 public:
     OperationalCredentialsUpdateNOC() : ModelCommand("update-noc")
     {
-        AddArgument("NOCArray", &mNOCArray);
+        AddArgument("NOCValue", &mNOCValue);
+        AddArgument("ICACValue", &mICACValue);
         ModelCommand::AddArguments();
     }
     ~OperationalCredentialsUpdateNOC()
@@ -15236,7 +15239,7 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.UpdateNOC(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNOCArray);
+        return cluster.UpdateNOC(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNOCValue, mICACValue);
     }
 
 private:
@@ -15245,7 +15248,8 @@ private:
                                                                                        this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mNOCArray;
+    chip::ByteSpan mNOCValue;
+    chip::ByteSpan mICACValue;
 };
 
 /*

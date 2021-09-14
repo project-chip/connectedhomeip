@@ -3936,16 +3936,18 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OnOffSwitchConfiguration_Clu
 // End of Cluster OnOffSwitchConfiguration
 // Cluster OperationalCredentials
 
-chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_AddNOC(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * nOCArray,
-    uint32_t nOCArray_Len, const uint8_t * iPKValue, uint32_t iPKValue_Len, chip::NodeId caseAdminNode, uint16_t adminVendorId)
+chip::ChipError::StorageType
+chip_ime_AppendCommand_OperationalCredentials_AddNOC(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                     chip::GroupId, const uint8_t * nOCValue, uint32_t nOCValue_Len,
+                                                     const uint8_t * iCACValue, uint32_t iCACValue_Len, const uint8_t * iPKValue,
+                                                     uint32_t iPKValue_Len, chip::NodeId caseAdminNode, uint16_t adminVendorId)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .AddNOC(nullptr, nullptr, chip::ByteSpan(nOCArray, nOCArray_Len), chip::ByteSpan(iPKValue, iPKValue_Len), caseAdminNode,
-                adminVendorId)
+        .AddNOC(nullptr, nullptr, chip::ByteSpan(nOCValue, nOCValue_Len), chip::ByteSpan(iCACValue, iCACValue_Len),
+                chip::ByteSpan(iPKValue, iPKValue_Len), caseAdminNode, adminVendorId)
         .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate(
@@ -3996,15 +3998,16 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_Updat
     cluster.Associate(device, ZCLendpointId);
     return cluster.UpdateFabricLabel(nullptr, nullptr, chip::ByteSpan(label, label_Len)).AsInteger();
 }
-chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_UpdateNOC(chip::Controller::Device * device,
-                                                                                     chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                                     const uint8_t * nOCArray,
-                                                                                     uint32_t nOCArray_Len)
+chip::ChipError::StorageType
+chip_ime_AppendCommand_OperationalCredentials_UpdateNOC(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                        chip::GroupId, const uint8_t * nOCValue, uint32_t nOCValue_Len,
+                                                        const uint8_t * iCACValue, uint32_t iCACValue_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.UpdateNOC(nullptr, nullptr, chip::ByteSpan(nOCArray, nOCArray_Len)).AsInteger();
+    return cluster.UpdateNOC(nullptr, nullptr, chip::ByteSpan(nOCValue, nOCValue_Len), chip::ByteSpan(iCACValue, iCACValue_Len))
+        .AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_FabricsList(chip::Controller::Device * device,

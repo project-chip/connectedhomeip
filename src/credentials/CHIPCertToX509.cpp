@@ -790,7 +790,6 @@ exit:
 static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
     CHIP_ERROR err;
-    uint64_t tag;
     TLVType containerType;
 
     if (reader.GetType() == kTLVType_NotSpecified)
@@ -799,8 +798,7 @@ static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, Chi
         SuccessOrExit(err);
     }
     VerifyOrExit(reader.GetType() == kTLVType_Structure, err = CHIP_ERROR_WRONG_TLV_TYPE);
-    tag = reader.GetTag();
-    VerifyOrExit(tag == AnonymousTag, err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrExit(reader.GetTag() == AnonymousTag, err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     err = reader.EnterContainer(containerType);
     SuccessOrExit(err);
