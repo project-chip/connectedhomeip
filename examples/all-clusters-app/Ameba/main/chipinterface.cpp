@@ -35,7 +35,7 @@ extern "C" void ChipTest(void)
         printf("DeviceManagerInit() - OK\r\n");
     }
 
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     while (true)
         vTaskDelay(pdMS_TO_TICKS(50));
