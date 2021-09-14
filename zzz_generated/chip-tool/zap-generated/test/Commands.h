@@ -20325,10 +20325,10 @@ private:
     }
 };
 
-class OperationalCredentialsCluster : public TestCommand
+class TestOperationalCredentialsCluster : public TestCommand
 {
 public:
-    OperationalCredentialsCluster() : TestCommand("OperationalCredentialsCluster"), mTestIndex(0) {}
+    TestOperationalCredentialsCluster() : TestCommand("TestOperationalCredentialsCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -20337,7 +20337,7 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "OperationalCredentialsCluster: Test complete");
+            ChipLogProgress(chipTool, "TestOperationalCredentialsCluster: Test complete");
             SetCommandExitStatus(CHIP_NO_ERROR);
         }
 
@@ -20357,7 +20357,7 @@ public:
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "OperationalCredentialsCluster: %s", chip::ErrorStr(err));
+            ChipLogProgress(chipTool, "TestOperationalCredentialsCluster: %s", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -20399,7 +20399,7 @@ private:
     {
         ChipLogProgress(chipTool, "Operational Credentials - Read number of supported fabrics: Failure Response");
 
-        OperationalCredentialsCluster * runner = reinterpret_cast<OperationalCredentialsCluster *>(context);
+        TestOperationalCredentialsCluster * runner = reinterpret_cast<TestOperationalCredentialsCluster *>(context);
 
         if (runner->mIsFailureExpected_0 == false)
         {
@@ -20416,7 +20416,7 @@ private:
     {
         ChipLogProgress(chipTool, "Operational Credentials - Read number of supported fabrics: Success Response");
 
-        OperationalCredentialsCluster * runner = reinterpret_cast<OperationalCredentialsCluster *>(context);
+        TestOperationalCredentialsCluster * runner = reinterpret_cast<TestOperationalCredentialsCluster *>(context);
 
         if (runner->mIsFailureExpected_0 == true)
         {
@@ -20466,7 +20466,7 @@ private:
     {
         ChipLogProgress(chipTool, "Operational Credentials - Read number of commissioned fabrics: Failure Response");
 
-        OperationalCredentialsCluster * runner = reinterpret_cast<OperationalCredentialsCluster *>(context);
+        TestOperationalCredentialsCluster * runner = reinterpret_cast<TestOperationalCredentialsCluster *>(context);
 
         if (runner->mIsFailureExpected_1 == false)
         {
@@ -20483,7 +20483,7 @@ private:
     {
         ChipLogProgress(chipTool, "Operational Credentials - Read number of commissioned fabrics: Success Response");
 
-        OperationalCredentialsCluster * runner = reinterpret_cast<OperationalCredentialsCluster *>(context);
+        TestOperationalCredentialsCluster * runner = reinterpret_cast<TestOperationalCredentialsCluster *>(context);
 
         if (runner->mIsFailureExpected_1 == true)
         {
@@ -20542,7 +20542,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_FLW_1_1>(),
         make_unique<Test_TC_TM_1_1>(),
         make_unique<Test_TC_OCC_1_1>(),
-        make_unique<OperationalCredentialsCluster>(),
+        make_unique<TestOperationalCredentialsCluster>(),
     };
 
     commands.Register(clusterName, clusterCommands);
