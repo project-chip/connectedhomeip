@@ -87,7 +87,7 @@ int AppTask::Init()
                 if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
                     event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
                 {
-                    chip::app::Mdns::StartServer();
+                    chip::app::MdnsServer::Instance().StartServer();
                 }
             }
         },

@@ -406,7 +406,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.
-    chip::app::Mdns::AdvertiseOperational();
+    app::MdnsServer::Instance().AdvertiseOperational();
 
 exit:
 
@@ -443,7 +443,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(EndpointId endpoint, 
     // can't just wait until we get network configuration commands, because we
     // might be on the operational network already, in which case we are
     // expected to be live with our new identity at this point.
-    app::Mdns::AdvertiseOperational();
+    app::MdnsServer::Instance().AdvertiseOperational();
 
 exit:
 

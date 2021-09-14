@@ -309,6 +309,7 @@ int main(int argc, char ** args)
 
     mdns::Minimal::Server<20> mdnsServer;
     ReportDelegate reporter;
+    CHIP_ERROR err;
 
     mdnsServer.SetDelegate(&reporter);
 
@@ -316,7 +317,7 @@ int main(int argc, char ** args)
 
         MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
 
-        CHIP_ERROR err = mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort);
+        err = mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort);
         if (err != CHIP_NO_ERROR)
         {
             printf("Server failed to listen on all interfaces: %s\n", chip::ErrorStr(err));
@@ -326,7 +327,7 @@ int main(int argc, char ** args)
 
     BroadcastPacket(&mdnsServer);
 
-    CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(
+    err = DeviceLayer::SystemLayer().StartTimer(
         gOptions.runtimeMs,
         [](System::Layer *, void *) {
             DeviceLayer::PlatformMgr().StopEventLoopTask();
