@@ -42,6 +42,7 @@
 #include "app/util/common.h"
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
@@ -1444,10 +1445,19 @@ bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, Cluste
 }
 #endif
 
-void registerAttributeAccessInterceptor(app::AttributeAccessInterceptor * interceptor)
+bool registerAttributeAccessInterceptor(app::AttributeAccessInterceptor * interceptor)
 {
+    for (auto * cur = gAttributeAccessInterceptors;
+         cur;
+         cur = cur->GetNext()) {
+        if (cur->Matches(*interceptor)) {
+            ChipLogError(Zcl, "Duplicate interceptor registration failed");
+            return false;
+        }
+    }
     interceptor->SetNext(gAttributeAccessInterceptors);
     gAttributeAccessInterceptors = interceptor;
+    return true;
 }
 
 app::AttributeAccessInterceptor * findAttributeAccessInterceptor(EndpointId endpointId, ClusterId clusterId)

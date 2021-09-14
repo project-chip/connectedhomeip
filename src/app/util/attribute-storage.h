@@ -259,7 +259,12 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**
  * Register an attribute access interceptor.  It will remain registered until
  * the endpoint it's registered for is disabled (or until shutdown if it's
- * registered for all endpoints).
+ * registered for all endpoints).  Registration will fail if there is an
+ * already-registered interceptor for the same set of attributes.
+ *
+ * @return false if there is an existing interceptor that the new one would
+ *               conflict with.  In this case the interceptor is not registered.
+ * @return true if registration was successful.
  */
-void registerAttributeAccessInterceptor(chip::app::AttributeAccessInterceptor * interceptor);
+bool registerAttributeAccessInterceptor(chip::app::AttributeAccessInterceptor * interceptor);
 chip::app::AttributeAccessInterceptor * findAttributeAccessInterceptor(chip::EndpointId endpointId, chip::ClusterId clusterId);
