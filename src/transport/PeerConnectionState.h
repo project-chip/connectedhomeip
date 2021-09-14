@@ -104,7 +104,7 @@ private:
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId           = kUndefinedNodeId;
     uint16_t mPeerSessionId      = UINT16_MAX;
-    uint16_t mLocalSessionId         = UINT16_MAX;
+    uint16_t mLocalSessionId     = UINT16_MAX;
     uint64_t mLastActivityTimeMs = 0;
     SecureSession mSecureSession;
     SessionMessageCounter mSessionMessageCounter;

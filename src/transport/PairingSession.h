@@ -42,8 +42,8 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
 
     // TODO: the local key id should be allocateed at start
-    // mLocalSessionId should be const and assigned at the construction, such that GetLocalSessionId will always return a valid key id , and
-    // SetLocalSessionId is not necessary.
+    // mLocalSessionId should be const and assigned at the construction, such that GetLocalSessionId will always return a valid key
+    // id , and SetLocalSessionId is not necessary.
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     bool IsValidLocalSessionId() const { return mLocalSessionId != kInvalidKeyId; }
 
@@ -105,7 +105,7 @@ private:
     // TODO: the local key id should be allocateed at start
     // then we can remove kInvalidKeyId
     static constexpr uint16_t kInvalidKeyId = UINT16_MAX;
-    uint16_t mLocalSessionId                    = kInvalidKeyId;
+    uint16_t mLocalSessionId                = kInvalidKeyId;
 
     // TODO: decouple peer address into transport, such that pairing session do not need to handle peer address
     Transport::PeerAddress mPeerAddress = Transport::PeerAddress::Uninitialized();

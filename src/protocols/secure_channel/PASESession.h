@@ -363,7 +363,7 @@ public:
         memset(&serializable, 0, sizeof(serializable));
         serializable.mKeLen           = static_cast<uint16_t>(secretLen);
         serializable.mPairingComplete = 1;
-        serializable.mLocalSessionId      = GetLocalSessionId();
+        serializable.mLocalSessionId  = GetLocalSessionId();
         serializable.mPeerSessionId   = GetPeerSessionId();
 
         memcpy(serializable.mKe, kTestSecret, secretLen);
