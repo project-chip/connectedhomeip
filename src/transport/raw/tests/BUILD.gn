@@ -41,7 +41,6 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestMessageHeader.cpp",
-    "TestUDP.cpp",
   ]
 
   if (current_os != "mac") {

@@ -65,8 +65,8 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
 
-    uint16_t GetPeerKeyID() const { return mPeerKeyID; }
-    void SetPeerKeyID(uint16_t id) { mPeerKeyID = id; }
+    uint16_t GetPeerSessionId() const { return mPeerSessionId; }
+    void SetPeerSessionId(uint16_t id) { mPeerSessionId = id; }
 
     // TODO: Rename KeyID to SessionID
     uint16_t GetLocalKeyID() const { return mLocalKeyID; }
@@ -82,7 +82,7 @@ public:
 
     bool IsInitialized()
     {
-        return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerKeyID != UINT16_MAX ||
+        return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerSessionId != UINT16_MAX ||
                 mLocalKeyID != UINT16_MAX);
     }
 
@@ -103,7 +103,7 @@ public:
 private:
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId           = kUndefinedNodeId;
-    uint16_t mPeerKeyID          = UINT16_MAX;
+    uint16_t mPeerSessionId          = UINT16_MAX;
     uint16_t mLocalKeyID         = UINT16_MAX;
     uint64_t mLastActivityTimeMs = 0;
     SecureSession mSecureSession;

@@ -49,8 +49,8 @@ CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloa
                   "Addition to generate payloadLength might overflow");
 
     packetHeader
-        .SetMessageCounter(messageCounter) //
-        .SetEncryptionKeyID(state->GetPeerKeyID());
+        .SetMessageId(messageCounter) //
+        .SetSessionId(state->GetPeerSessionId());
 
     packetHeader.GetFlags().Set(Header::FlagValues::kEncryptedMessage);
 

@@ -47,12 +47,12 @@ public:
     uint16_t GetLocalKeyId() const { return mLocalKeyId; }
     bool IsValidLocalKeyId() const { return mLocalKeyId != kInvalidKeyId; }
 
-    uint16_t GetPeerKeyId() const
+    uint16_t GetPeerSessionId() const
     {
-        VerifyOrDie(mPeerKeyId.HasValue());
-        return mPeerKeyId.Value();
+        VerifyOrDie(mPeerSessionId.HasValue());
+        return mPeerSessionId.Value();
     }
-    bool IsValidPeerKeyId() const { return mPeerKeyId.HasValue(); }
+    bool IsValidPeerSessionId() const { return mPeerSessionId.HasValue(); }
 
     // TODO: decouple peer address into transport, such that pairing session do not need to handle peer address
     const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
@@ -86,7 +86,7 @@ public:
 
 protected:
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
-    void SetPeerKeyId(uint16_t id) { mPeerKeyId.SetValue(id); }
+    void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
     void SetLocalKeyId(uint16_t id) { mLocalKeyId = id; }
     void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
 
@@ -95,7 +95,7 @@ protected:
     {
         mPeerNodeId  = kUndefinedNodeId;
         mPeerAddress = Transport::PeerAddress::Uninitialized();
-        mPeerKeyId.ClearValue();
+        mPeerSessionId.ClearValue();
         mLocalKeyId = kInvalidKeyId;
     }
 
@@ -110,7 +110,7 @@ private:
     // TODO: decouple peer address into transport, such that pairing session do not need to handle peer address
     Transport::PeerAddress mPeerAddress = Transport::PeerAddress::Uninitialized();
 
-    Optional<uint16_t> mPeerKeyId;
+    Optional<uint16_t> mPeerSessionId;
 };
 
 } // namespace chip

@@ -86,7 +86,7 @@ public:
      * Allocates a new peer connection state state object out of the internal resource pool.
      *
      * @param peerNode represents optional peer Node's ID
-     * @param peerKeyId represents the encryption key ID assigned by peer node
+     * @param PeerSessionId represents the encryption key ID assigned by peer node
      * @param localKeyId represents the encryption key ID assigned by local node
      * @param state [out] will contain the connection state if one was available. May be null if no return value is desired.
      *
@@ -96,7 +96,7 @@ public:
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR CreateNewPeerConnectionState(const Optional<NodeId> & peerNode, uint16_t peerKeyId, uint16_t localKeyId,
+    CHIP_ERROR CreateNewPeerConnectionState(const Optional<NodeId> & peerNode, uint16_t PeerSessionId, uint16_t localKeyId,
                                             PeerConnectionState ** state)
     {
         CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
@@ -111,7 +111,7 @@ public:
             if (!mStates[i].IsInitialized())
             {
                 mStates[i] = PeerConnectionState();
-                mStates[i].SetPeerKeyID(peerKeyId);
+                mStates[i].SetPeerSessionId(PeerSessionId);
                 mStates[i].SetLocalKeyID(localKeyId);
                 mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
 
@@ -203,13 +203,13 @@ public:
      *
      * @param nodeId is the connection to find (based on nodeId). Note that initial connections
      *        do not have a node id set. Use this if you know the node id should be set.
-     * @param peerKeyId Encryption key ID used by the peer node.
+     * @param PeerSessionId Encryption key ID used by the peer node.
      * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
      *
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    PeerConnectionState * FindPeerConnectionState(Optional<NodeId> nodeId, uint16_t peerKeyId, PeerConnectionState * begin)
+    PeerConnectionState * FindPeerConnectionState(Optional<NodeId> nodeId, uint16_t PeerSessionId, PeerConnectionState * begin)
     {
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
@@ -225,7 +225,7 @@ public:
             {
                 continue;
             }
-            if (peerKeyId == kAnyKeyId || iter->GetPeerKeyID() == peerKeyId)
+            if (PeerSessionId == kAnyKeyId || iter->GetPeerSessionId() == PeerSessionId)
             {
                 if (nodeId.ValueOr(kUndefinedNodeId) == kUndefinedNodeId || iter->GetPeerNodeId() == kUndefinedNodeId ||
                     iter->GetPeerNodeId() == nodeId.Value())
