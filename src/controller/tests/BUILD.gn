@@ -32,5 +32,8 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  public_deps += [ "${chip_root}/src/controller/data_model" ]
+  if (chip_device_platform != "mbed")
+  {
+    public_deps += [ "${chip_root}/src/controller/data_model" ]
+  }
 }
