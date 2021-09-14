@@ -1013,6 +1013,27 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster OTA Software Update Requestor
+ *
+ */
+@interface CHIPOtaSoftwareUpdateRequestor : CHIPCluster
+
+- (void)announceOtaProvider:(NSData *)serverLocation
+                   vendorId:(uint16_t)vendorId
+         announcementReason:(uint8_t)announcementReason
+            metadataForNode:(NSData *)metadataForNode
+            responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDefaultOtaProviderWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeDefaultOtaProviderWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeUpdatePossibleWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Occupancy Sensing
  *
  */

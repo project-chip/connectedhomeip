@@ -1157,6 +1157,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
+| OtaSoftwareUpdateRequestor                                          | 0x002A |
 | OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
 | OnOffSwitchConfiguration                                            | 0x0007 |
@@ -1210,6 +1211,7 @@ constexpr chip::ClusterId kMediaInputClusterId                           = 0x050
 constexpr chip::ClusterId kMediaPlaybackClusterId                        = 0x0506;
 constexpr chip::ClusterId kNetworkCommissioningClusterId                 = 0x0031;
 constexpr chip::ClusterId kOtaSoftwareUpdateProviderClusterId            = 0x0029;
+constexpr chip::ClusterId kOtaSoftwareUpdateRequestorClusterId           = 0x002A;
 constexpr chip::ClusterId kOccupancySensingClusterId                     = 0x0406;
 constexpr chip::ClusterId kOnOffClusterId                                = 0x0006;
 constexpr chip::ClusterId kOnOffSwitchConfigurationClusterId             = 0x0007;
@@ -13733,6 +13735,224 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster OtaSoftwareUpdateRequestor                                  | 0x002A |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AnnounceOtaProvider                                               |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * DefaultOtaProvider                                                | 0x0001 |
+| * UpdatePossible                                                    | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command AnnounceOtaProvider
+ */
+class OtaSoftwareUpdateRequestorAnnounceOtaProvider : public ModelCommand
+{
+public:
+    OtaSoftwareUpdateRequestorAnnounceOtaProvider() : ModelCommand("announce-ota-provider")
+    {
+        AddArgument("ServerLocation", &mServerLocation);
+        AddArgument("VendorId", 0, UINT16_MAX, &mVendorId);
+        AddArgument("AnnouncementReason", 0, UINT8_MAX, &mAnnouncementReason);
+        AddArgument("MetadataForNode", &mMetadataForNode);
+        ModelCommand::AddArguments();
+    }
+    ~OtaSoftwareUpdateRequestorAnnounceOtaProvider()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.AnnounceOtaProvider(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mServerLocation, mVendorId,
+                                           mAnnouncementReason, mMetadataForNode);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::ByteSpan mServerLocation;
+    uint16_t mVendorId;
+    uint8_t mAnnouncementReason;
+    chip::ByteSpan mMetadataForNode;
+};
+
+/*
+ * Discover Attributes
+ */
+class DiscoverOtaSoftwareUpdateRequestorAttributes : public ModelCommand
+{
+public:
+    DiscoverOtaSoftwareUpdateRequestorAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverOtaSoftwareUpdateRequestorAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute DefaultOtaProvider
+ */
+class ReadOtaSoftwareUpdateRequestorDefaultOtaProvider : public ModelCommand
+{
+public:
+    ReadOtaSoftwareUpdateRequestorDefaultOtaProvider() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "default-ota-provider");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOtaSoftwareUpdateRequestorDefaultOtaProvider()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeDefaultOtaProvider(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteOtaSoftwareUpdateRequestorDefaultOtaProvider : public ModelCommand
+{
+public:
+    WriteOtaSoftwareUpdateRequestorDefaultOtaProvider() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "default-ota-provider");
+        AddArgument("attr-value", &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteOtaSoftwareUpdateRequestorDefaultOtaProvider()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeDefaultOtaProvider(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::ByteSpan mValue;
+};
+
+/*
+ * Attribute UpdatePossible
+ */
+class ReadOtaSoftwareUpdateRequestorUpdatePossible : public ModelCommand
+{
+public:
+    ReadOtaSoftwareUpdateRequestorUpdatePossible() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "update-possible");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOtaSoftwareUpdateRequestorUpdatePossible()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeUpdatePossible(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadOtaSoftwareUpdateRequestorClusterRevision : public ModelCommand
+{
+public:
+    ReadOtaSoftwareUpdateRequestorClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOtaSoftwareUpdateRequestorClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster OccupancySensing                                            | 0x0406 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -25260,6 +25480,21 @@ void registerClusterOtaSoftwareUpdateProvider(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterOtaSoftwareUpdateRequestor(Commands & commands)
+{
+    const char * clusterName = "OtaSoftwareUpdateRequestor";
+
+    commands_list clusterCommands = {
+        make_unique<OtaSoftwareUpdateRequestorAnnounceOtaProvider>(),     //
+        make_unique<DiscoverOtaSoftwareUpdateRequestorAttributes>(),      //
+        make_unique<ReadOtaSoftwareUpdateRequestorDefaultOtaProvider>(),  //
+        make_unique<WriteOtaSoftwareUpdateRequestorDefaultOtaProvider>(), //
+        make_unique<ReadOtaSoftwareUpdateRequestorUpdatePossible>(),      //
+        make_unique<ReadOtaSoftwareUpdateRequestorClusterRevision>(),     //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterOccupancySensing(Commands & commands)
 {
     const char * clusterName = "OccupancySensing";
@@ -25780,6 +26015,7 @@ void registerClusters(Commands & commands)
     registerClusterMediaPlayback(commands);
     registerClusterNetworkCommissioning(commands);
     registerClusterOtaSoftwareUpdateProvider(commands);
+    registerClusterOtaSoftwareUpdateRequestor(commands);
     registerClusterOccupancySensing(commands);
     registerClusterOnOff(commands);
     registerClusterOnOffSwitchConfiguration(commands);
