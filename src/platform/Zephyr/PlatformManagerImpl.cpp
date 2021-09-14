@@ -22,7 +22,7 @@
  */
 
 #if !CONFIG_NORDIC_SECURITY_BACKEND
-#include <crypto/CHIPCryptoPAL.h>
+#include <crypto/CHIPCryptoPAL.h> // nogncheck
 #endif // !CONFIG_NORDIC_SECURITY_BACKEND
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
