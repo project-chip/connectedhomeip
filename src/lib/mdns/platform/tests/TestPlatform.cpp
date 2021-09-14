@@ -191,7 +191,7 @@ void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
     // TODO: Right now, platform impl doesn't stop commissionable node before starting a new one. Add stop call here once that is
     // fixed.
     test::Reset();
-    commissionableLarge.callType = test::CallType::kStart;
+    commissionableLargeBasic.callType = test::CallType::kStart;
     NL_TEST_ASSERT(inSuite,
                    mdnsPlatform.GetCommissionableInstanceName(commissionableLargeBasic.instanceName,
                                                               sizeof(commissionableLargeBasic.instanceName)) == CHIP_NO_ERROR);
@@ -199,7 +199,7 @@ void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(commissionableNodeParamsLargeBasic) == CHIP_NO_ERROR);
 
     test::Reset();
-    commissionableLarge.callType = test::CallType::kStart;
+    commissionableLargeEnhanced.callType = test::CallType::kStart;
     NL_TEST_ASSERT(inSuite,
                    mdnsPlatform.GetCommissionableInstanceName(commissionableLargeEnhanced.instanceName,
                                                               sizeof(commissionableLargeEnhanced.instanceName)) == CHIP_NO_ERROR);

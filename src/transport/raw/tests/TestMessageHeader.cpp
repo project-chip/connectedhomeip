@@ -126,7 +126,7 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 234);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(88ull));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
-    NL_TEST_ASSERT(inSuite, header.GetEncryptionKeyID() == 2);
+    NL_TEST_ASSERT(inSuite, header.GetSessionId() == 2);
 
     header.SetMessageCounter(234).SetSourceNodeId(77).SetDestinationNodeId(88);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);

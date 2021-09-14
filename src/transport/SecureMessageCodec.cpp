@@ -49,7 +49,7 @@ CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloa
                   "Addition to generate payloadLength might overflow");
 
     packetHeader
-        .SetMessageId(messageCounter) //
+        .SetMessageCounter(messageCounter) //
         .SetSessionId(state->GetPeerSessionId());
 
     packetHeader.GetFlags().Set(Header::FlagValues::kEncryptedMessage);
@@ -92,7 +92,7 @@ CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     msg->SetDataLength(len);
 #endif
 
-    uint16_t footerLen = MessageAuthenticationCode::TagLenForEncryptionType(packetHeader.GetEncryptionType());
+    uint16_t footerLen = MessageAuthenticationCode::TagLenForSessionType(packetHeader.GetSessionType());
     VerifyOrReturnError(footerLen <= len, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     uint16_t taglen = 0;
