@@ -89,6 +89,16 @@ public:
      */
     bool MatchesExactly(EndpointId aEndpointId) const { return mEndpointId.HasValue() && mEndpointId.Value() == aEndpointId; }
 
+    /**
+     * Check whether another AttributeAccessInterface wants to handle the same set of
+     * attributes as we do.
+     */
+    bool Matches(const AttributeAccessInterface & aOther) const
+    {
+        return mClusterId == aOther.mClusterId &&
+            (!mEndpointId.HasValue() || !aOther.mEndpointId.HasValue() || mEndpointId.Value() == aOther.mEndpointId.Value());
+    }
+
 private:
     Optional<EndpointId> mEndpointId;
     ClusterId mClusterId;

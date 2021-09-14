@@ -42,6 +42,7 @@
 #include "app/util/common.h"
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
@@ -1444,10 +1445,19 @@ bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, Cluste
 }
 #endif
 
-void registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverride)
+bool registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverride)
 {
+    for (auto * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(*attrOverride))
+        {
+            ChipLogError(Zcl, "Duplicate attribute override registration failed");
+            return false;
+        }
+    }
     attrOverride->SetNext(gAttributeAccessOverrides);
     gAttributeAccessOverrides = attrOverride;
+    return true;
 }
 
 app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
