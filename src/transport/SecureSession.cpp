@@ -102,7 +102,7 @@ CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_
     Encoding::LittleEndian::BufferWriter bbuf(iv, len);
 
     bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
-    bbuf.Put32(header.GetMessageId());
+    bbuf.Put32(header.GetMessageCounter());
 
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }

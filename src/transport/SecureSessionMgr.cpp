@@ -48,7 +48,7 @@ using System::PacketBufferHandle;
 using Transport::PeerAddress;
 using Transport::PeerConnectionState;
 
-uint32_t EncryptedPacketBufferHandle::GetMsgId() const
+uint32_t EncryptedPacketBufferHandle::GetMessageCounter() const
 {
     PacketHeader header;
     uint16_t headerSize = 0;
@@ -56,7 +56,7 @@ uint32_t EncryptedPacketBufferHandle::GetMsgId() const
 
     if (err == CHIP_NO_ERROR)
     {
-        return header.GetMessageId();
+        return header.GetMessageCounter();
     }
 
     ChipLogError(Inet, "Failed to decode EncryptedPacketBufferHandle header with error: %s", ErrorStr(err));
@@ -124,27 +124,27 @@ CHIP_ERROR SecureSessionMgr::PrepareMessage(SessionHandle session, PayloadHeader
 
         ChipLogProgress(Inet,
                         "Build %s message %p to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
-                        " on exchange %d with MessageId %" PRIu32 ".",
+                        " on exchange %d with MessageCounter %" PRIu32 ".",
                         "encrypted", &preparedMessage, ChipLogValueX64(state->GetPeerNodeId()), payloadHeader.GetMessageType(),
                         payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), payloadHeader.GetExchangeID(),
-                        packetHeader.GetMessageId());
+                        packetHeader.GetMessageCounter());
     }
     else
     {
         ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
 
         MessageCounter & counter = session.GetUnauthenticatedSession()->GetLocalMessageCounter();
-        uint32_t messageId       = counter.Value();
+        uint32_t messageCounter  = counter.Value();
         ReturnErrorOnFailure(counter.Advance());
 
-        packetHeader.SetMessageId(messageId);
+        packetHeader.SetMessageCounter(messageCounter);
 
         ChipLogProgress(Inet,
                         "Build %s message %p to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
-                        " on exchange %d with MessageId %" PRIu32 ".",
+                        " on exchange %d with MessageCounter %" PRIu32 ".",
                         "plaintext", &preparedMessage, ChipLogValueX64(kUndefinedNodeId), payloadHeader.GetMessageType(),
                         payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), payloadHeader.GetExchangeID(),
-                        packetHeader.GetMessageId());
+                        packetHeader.GetMessageCounter());
     }
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
@@ -339,10 +339,10 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
     SecureSessionMgrDelegate::DuplicateMessage isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::No;
 
     // Verify message counter
-    CHIP_ERROR err = session->GetPeerMessageCounter().VerifyOrTrustFirst(packetHeader.GetMessageId());
+    CHIP_ERROR err = session->GetPeerMessageCounter().VerifyOrTrustFirst(packetHeader.GetMessageCounter());
     if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
-        ChipLogDetail(Inet, "Received a duplicate message with MessageId: %" PRIu32, packetHeader.GetMessageId());
+        ChipLogDetail(Inet, "Received a duplicate message with MessageCounter: %" PRIu32, packetHeader.GetMessageCounter());
         isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::Yes;
         err         = CHIP_NO_ERROR;
     }
@@ -353,7 +353,7 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
-    session->GetPeerMessageCounter().Commit(packetHeader.GetMessageId());
+    session->GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
 
     if (mCB != nullptr)
     {
@@ -411,10 +411,10 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
             return;
         }
 
-        err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageId());
+        err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
         if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
         {
-            ChipLogDetail(Inet, "Received a duplicate message with MessageId: %" PRIu32, packetHeader.GetMessageId());
+            ChipLogDetail(Inet, "Received a duplicate message with MessageCounter: %" PRIu32, packetHeader.GetMessageCounter());
             isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::Yes;
             err         = CHIP_NO_ERROR;
         }
@@ -444,7 +444,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     }
     else
     {
-        state->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageId());
+        state->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
     }
 
     // TODO: once mDNS address resolution is available reconsider if this is required

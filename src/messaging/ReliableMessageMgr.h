@@ -151,11 +151,11 @@ public:
      *
      *  @param[in]    rc        A pointer to the ExchangeContext object.
      *
-     *  @param[in]    msgId     message ID which has been acked.
+     *  @param[in]    messageCounter     message ID which has been acked.
      *
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t msgId);
+    bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t messageCounter);
 
     /**
      *  Send the specified entry from the retransmission table.

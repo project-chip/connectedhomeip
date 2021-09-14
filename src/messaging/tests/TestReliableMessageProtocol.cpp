@@ -78,7 +78,7 @@ public:
             auto * rc = ec->GetReliableMessageContext();
             if (rc->IsAckPending())
             {
-                (void) rc->TakePendingPeerAckId();
+                (void) rc->TakePendingPeerAckMessageCounter();
             }
         }
 

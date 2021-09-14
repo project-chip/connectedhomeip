@@ -67,7 +67,7 @@ public:
     // exposing operator->
     bool HasChainedBuffer() const { return (*this)->HasChainedBuffer(); }
 
-    uint32_t GetMsgId() const;
+    uint32_t GetMessageCounter() const;
 
     /**
      * Creates a copy of the data in this packet.

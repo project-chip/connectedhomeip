@@ -1316,13 +1316,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_RETRANS_TABLE_FULL                          CHIP_CORE_ERROR(0x64)
 
 /**
- *  @def CHIP_ERROR_INVALID_ACK_ID
+ *  @def CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER
  *
  *  @brief
  *    An acknowledgment id is invalid.
  *
  */
-#define CHIP_ERROR_INVALID_ACK_ID                              CHIP_CORE_ERROR(0x65)
+#define CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER                              CHIP_CORE_ERROR(0x65)
 
 /**
  *  @def CHIP_ERROR_SEND_THROTTLED
@@ -2177,7 +2177,7 @@ using CHIP_ERROR = ::chip::ChipError;
  * @def CHIP_ERROR_MESSAGE_ID_OUT_OF_WINDOW
  *
  * @brief
- *   The message id of the received message is out of receiving window
+ *   The message counter of the received message is out of receiving window
  */
 #define CHIP_ERROR_MESSAGE_ID_OUT_OF_WINDOW                        CHIP_CORE_ERROR(0xc7)
 
