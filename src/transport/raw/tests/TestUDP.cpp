@@ -90,7 +90,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     Transport::UDP udp;
 
-    CHIP_ERROR err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
+    CHIP_ERROR err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(type).SetListenPort(0));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -122,7 +122,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     Transport::UDP udp;
 
-    err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()));
+    err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()).SetListenPort(0));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite);
@@ -139,7 +139,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Should be able to send a message to itself by just calling send.
-    err = udp.SendMessage(Transport::PeerAddress::UDP(addr), std::move(buffer));
+    err = udp.SendMessage(Transport::PeerAddress::UDP(addr, udp.GetBoundPort()), std::move(buffer));
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO(#2698): the underlying system does not support IPV6. This early return
