@@ -586,7 +586,7 @@ CHIP_ERROR Device::WarmupCASESession()
 void Device::OnSessionEstablishmentError(CHIP_ERROR error)
 {
     mState = ConnectionState::NotConnected;
-    mIDAllocator->Free(mCASESession.GetLocalKeyId());
+    mIDAllocator->Free(mCASESession.GetLocalSessionId());
 
     Cancelable ready;
     mConnectionFailure.DequeueAll(ready);

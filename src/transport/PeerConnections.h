@@ -87,7 +87,7 @@ public:
      *
      * @param peerNode represents optional peer Node's ID
      * @param PeerSessionId represents the encryption key ID assigned by peer node
-     * @param localKeyId represents the encryption key ID assigned by local node
+     * @param LocalSessionId represents the encryption key ID assigned by local node
      * @param state [out] will contain the connection state if one was available. May be null if no return value is desired.
      *
      * @note the newly created state will have an 'active' time set based on the current time source.
@@ -96,7 +96,7 @@ public:
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR CreateNewPeerConnectionState(const Optional<NodeId> & peerNode, uint16_t PeerSessionId, uint16_t localKeyId,
+    CHIP_ERROR CreateNewPeerConnectionState(const Optional<NodeId> & peerNode, uint16_t PeerSessionId, uint16_t LocalSessionId,
                                             PeerConnectionState ** state)
     {
         CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
@@ -112,7 +112,7 @@ public:
             {
                 mStates[i] = PeerConnectionState();
                 mStates[i].SetPeerSessionId(PeerSessionId);
-                mStates[i].SetLocalKeyID(localKeyId);
+                mStates[i].SetLocalSessionId(LocalSessionId);
                 mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
 
                 if (peerNode.ValueOr(kUndefinedNodeId) != kUndefinedNodeId)
@@ -266,7 +266,7 @@ public:
                 continue;
             }
 
-            if (iter->GetLocalKeyID() == keyId)
+            if (iter->GetLocalSessionId() == keyId)
             {
                 state = iter;
                 break;
@@ -280,13 +280,13 @@ public:
      *
      * @param nodeId is the connection to find (based on peer nodeId). Note that initial connections
      *        do not have a node id set. Use this if you know the node id should be set.
-     * @param localKeyId Encryption key ID used by the local node.
+     * @param LocalSessionId Encryption key ID used by the local node.
      * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
      *
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    PeerConnectionState * FindPeerConnectionStateByLocalKey(Optional<NodeId> nodeId, uint16_t localKeyId,
+    PeerConnectionState * FindPeerConnectionStateByLocalKey(Optional<NodeId> nodeId, uint16_t LocalSessionId,
                                                             PeerConnectionState * begin)
     {
         PeerConnectionState * state = nullptr;
@@ -303,7 +303,7 @@ public:
             {
                 continue;
             }
-            if (iter->GetLocalKeyID() == localKeyId)
+            if (iter->GetLocalSessionId() == LocalSessionId)
             {
                 if (nodeId.ValueOr(kUndefinedNodeId) == kUndefinedNodeId || iter->GetPeerNodeId() == kUndefinedNodeId ||
                     iter->GetPeerNodeId() == nodeId.Value())

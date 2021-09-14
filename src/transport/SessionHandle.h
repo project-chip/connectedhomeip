@@ -26,10 +26,10 @@ class SessionHandle
 public:
     SessionHandle(NodeId peerNodeId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric) {}
 
-    SessionHandle(NodeId peerNodeId, uint16_t localKeyId, uint16_t PeerSessionId, FabricIndex fabric) :
+    SessionHandle(NodeId peerNodeId, uint16_t LocalSessionId, uint16_t PeerSessionId, FabricIndex fabric) :
         mPeerNodeId(peerNodeId), mFabric(fabric)
     {
-        mLocalKeyId.SetValue(localKeyId);
+        mLocalSessionId.SetValue(LocalSessionId);
         mPeerSessionId.SetValue(PeerSessionId);
     }
 
@@ -46,9 +46,9 @@ public:
     bool MatchIncomingSession(const SessionHandle & that) const
     {
 
-        if (that.GetLocalKeyId().HasValue())
+        if (that.GetLocalSessionId().HasValue())
         {
-            return mLocalKeyId == that.mLocalKeyId;
+            return mLocalSessionId == that.mLocalSessionId;
         }
         else
         {
@@ -60,7 +60,7 @@ public:
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     const Optional<uint16_t> & GetPeerSessionId() const { return mPeerSessionId; }
-    const Optional<uint16_t> & GetLocalKeyId() const { return mLocalKeyId; }
+    const Optional<uint16_t> & GetLocalSessionId() const { return mLocalSessionId; }
 
     // TODO: currently SessionHandle is not able to identify a unauthenticated session, create an empty handle for it
     static SessionHandle TemporaryUnauthenticatedSession()
@@ -71,7 +71,7 @@ public:
 private:
     friend class SecureSessionMgr;
     NodeId mPeerNodeId;
-    Optional<uint16_t> mLocalKeyId;
+    Optional<uint16_t> mLocalSessionId;
     Optional<uint16_t> mPeerSessionId;
     // TODO: Re-evaluate the storing of Fabric ID in SessionHandle
     //       The Fabric ID will not be available for PASE and group sessions. So need

@@ -157,7 +157,7 @@ CHIP_ERROR PASESession::ToSerializable(PASESessionSerializable & serializable)
     memset(&serializable, 0, sizeof(serializable));
     serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
     serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
-    serializable.mLocalKeyId      = GetLocalKeyId();
+    serializable.mLocalSessionId      = GetLocalSessionId();
     serializable.mPeerSessionId   = GetPeerSessionId();
 
     memcpy(serializable.mKe, mKe, mKeLen);
@@ -174,7 +174,7 @@ CHIP_ERROR PASESession::FromSerializable(const PASESessionSerializable & seriali
     memset(mKe, 0, sizeof(mKe));
     memcpy(mKe, serializable.mKe, mKeLen);
 
-    SetLocalKeyId(serializable.mLocalKeyId);
+    SetLocalSessionId(serializable.mLocalSessionId);
     SetPeerSessionId(serializable.mPeerSessionId);
 
     return CHIP_NO_ERROR;
@@ -193,7 +193,7 @@ CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, SessionEstabl
     mDelegate = delegate;
 
     ChipLogDetail(SecureChannel, "Assigned local session key ID %d", myKeyId);
-    SetLocalKeyId(myKeyId);
+    SetLocalSessionId(myKeyId);
     mSetupPINCode    = setupCode;
     mComputeVerifier = true;
 
@@ -362,7 +362,7 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyId(), true));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId(), true));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mPasscodeID, true));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
     // TODO - Add optional MRP parameter support to PASE
@@ -454,7 +454,7 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
     // The initiator random value is being sent back in the response as required by the specifications
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), initiatorRandom));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalKeyId(), true));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId(), true));
 
     if (!initiatorHasPBKDFParams)
     {

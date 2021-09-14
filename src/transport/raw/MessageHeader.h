@@ -550,12 +550,12 @@ public:
     const uint8_t * GetTag() const { return &mTag[0]; }
 
     /** Set the message auth tag for this header. */
-    MessageAuthenticationCode & SetTag(PacketHeader * header, Header::SessionType encType, uint8_t * tag, size_t len)
+    MessageAuthenticationCode & SetTag(PacketHeader * header, Header::SessionType sessionType, uint8_t * tag, size_t len)
     {
-        const size_t tagLen = TagLenForSessionType(encType);
+        const size_t tagLen = TagLenForSessionType(sessionType);
         if (tagLen > 0 && tagLen <= kMaxTagLen && len == tagLen)
         {
-            header->SetSessionType(encType);
+            header->SetSessionType(sessionType);
             memcpy(&mTag, tag, tagLen);
         }
 
@@ -594,7 +594,7 @@ public:
      */
     CHIP_ERROR Encode(const PacketHeader & packetHeader, uint8_t * data, uint16_t size, uint16_t * encode_size) const;
 
-    static uint16_t TagLenForSessionType(Header::SessionType encType);
+    static uint16_t TagLenForSessionType(Header::SessionType sessionType);
 
 private:
     /// Message authentication tag generated at encryption of the message.
