@@ -61,6 +61,8 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
 
     mState = State::kInitialized;
 
+    ChipLogDetail(Inet, "UDP::Init bound to port=%d", mUDPEndPoint->GetBoundPort());
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -73,6 +75,12 @@ exit:
     }
 
     return err;
+}
+
+uint16_t UDP::GetBoundPort()
+{
+    VerifyOrDie(mUDPEndPoint != nullptr);
+    return mUDPEndPoint->GetBoundPort();
 }
 
 void UDP::Close()
