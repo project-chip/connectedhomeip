@@ -76,7 +76,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::ConfigureChipStack()
     static char sPairingCodeBuf[ConfigurationManager::kMaxPairingCodeLength + 1];
 
     // Configure the CHIP FabricState object with the local node id.
-    err = Impl()->GetDeviceId(FabricState.LocalNodeId);
+    err = GetDeviceId(FabricState.LocalNodeId);
     SuccessOrExit(err);
 
     // Configure the FabricState object with the pairing code string, if present.
@@ -88,7 +88,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::ConfigureChipStack()
     }
 
     // If the device is a member of a CHIP fabric, configure the FabricState object with the fabric id.
-    err = Impl()->GetFabricId(FabricState.FabricId);
+    err = GetFabricId(FabricState.FabricId);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         FabricState.FabricId = kFabricIdNotSpecified;
@@ -99,13 +99,13 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::ConfigureChipStack()
 
 #if CHIP_PROGRESS_LOGGING
 
-    Impl()->LogDeviceConfig();
+    LogDeviceConfig();
 
 #if CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
     {
         uint8_t provHash[chip::Crypto::kSHA256_Hash_Length];
         char provHashBase64[BASE64_ENCODED_LEN(sizeof(provHash)) + 1];
-        err = Impl()->ComputeProvisioningHash(provHash, sizeof(provHash));
+        err = ComputeProvisioningHash(provHash, sizeof(provHash));
         if (err == CHIP_NO_ERROR)
         {
             Base64Encode(provHash, sizeof(provHash), provHashBase64);
@@ -429,35 +429,35 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreManufacturerDevicePr
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetDeviceId(uint64_t & deviceId)
 {
-    return Impl()->GetManufacturerDeviceId(deviceId);
+    return GetManufacturerDeviceId(deviceId);
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
 {
-    return Impl()->GetManufacturerDeviceCertificate(buf, bufSize, certLen);
+    return GetManufacturerDeviceCertificate(buf, bufSize, certLen);
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize,
                                                                                     size_t & certsLen)
 {
-    return Impl()->GetManufacturerDeviceIntermediateCACerts(buf, bufSize, certsLen);
+    return GetManufacturerDeviceIntermediateCACerts(buf, bufSize, certsLen);
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
 {
-    return Impl()->GetManufacturerDevicePrivateKey(buf, bufSize, keyLen);
+    return GetManufacturerDevicePrivateKey(buf, bufSize, keyLen);
 }
 
 template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::InitiateFactoryReset()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-    Impl()->_IncrementLifetimeCounter();
+    _IncrementLifetimeCounter();
 #endif
-    Impl()->InitiateFactoryReset();
+    // Inheriting classes should call this method so the lifetime counter is updated if necessary.
 }
 
 template <class ImplClass>
@@ -746,7 +746,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetWiFiAPSSID(char * buf,
 
     VerifyOrExit(bufSize >= sizeof(CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX) + 4, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    err = Impl()->GetPrimaryWiFiMACAddress(mac);
+    err = GetPrimaryWiFiMACAddress(mac);
     SuccessOrExit(err);
 
     snprintf(buf, bufSize, "%s%02X%02X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, mac[4], mac[5]);
@@ -772,15 +772,15 @@ GenericConfigurationManagerImpl<ImplClass>::GetBLEDeviceIdentificationInfo(Ble::
 
     deviceIdInfo.Init();
 
-    err = Impl()->GetVendorId(id);
+    err = GetVendorId(id);
     SuccessOrExit(err);
     deviceIdInfo.SetVendorId(id);
 
-    err = Impl()->GetProductId(id);
+    err = GetProductId(id);
     SuccessOrExit(err);
     deviceIdInfo.SetProductId(id);
 
-    err = Impl()->GetSetupDiscriminator(discriminator);
+    err = GetSetupDiscriminator(discriminator);
     SuccessOrExit(err);
     deviceIdInfo.SetDeviceDiscriminator(discriminator);
 
@@ -905,7 +905,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::ComputeProvisioningHash(u
         constexpr uint16_t kDeviceIdLen = 16;           // 16 hex characters
         char inputBuf[kLenFieldLen + kDeviceIdLen + 1]; // +1 for terminator
 
-        err = Impl()->GetManufacturerDeviceId(deviceId);
+        err = GetManufacturerDeviceId(deviceId);
         SuccessOrExit(err);
 
         snprintf(inputBuf, sizeof(inputBuf), "0010" ChipLogFormatX64, ChipLogValueX64(deviceId));
@@ -918,7 +918,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::ComputeProvisioningHash(u
         size_t certLen;
 
         // Determine the length of the device certificate.
-        err = Impl()->GetManufacturerDeviceCertificate((uint8_t *) NULL, 0, certLen);
+        err = GetManufacturerDeviceCertificate((uint8_t *) NULL, 0, certLen);
         SuccessOrExit(err);
 
         // Create a temporary buffer to hold the certificate.  (This will also be used for
@@ -927,7 +927,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::ComputeProvisioningHash(u
         VerifyOrExit(dataBuf.Alloc(dataBufSize), err = CHIP_ERROR_NO_MEMORY);
 
         // Read the certificate.
-        err = Impl()->GetManufacturerDeviceCertificate(dataBuf.Ptr<uint8_t>(), certLen, certLen);
+        err = GetManufacturerDeviceCertificate(dataBuf.Ptr<uint8_t>(), certLen, certLen);
         SuccessOrExit(err);
     }
 
@@ -937,7 +937,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::ComputeProvisioningHash(u
         size_t certsLen;
 
         // Determine the length of the device intermediate CA certificates.
-        err = Impl()->GetManufacturerDeviceIntermediateCACerts((uint8_t *) NULL, 0, certsLen);
+        err = GetManufacturerDeviceIntermediateCACerts((uint8_t *) NULL, 0, certsLen);
         SuccessOrExit(err);
 
         // Allocate larger buffer to hold the intermediate CA certificates.
@@ -949,7 +949,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::ComputeProvisioningHash(u
         }
 
         // Read the device intermediate CA certificates.
-        err = Impl()->GetManufacturerDeviceIntermediateCACerts(dataBuf.Ptr<uint8_t>(), certsLen, certsLen);
+        err = GetManufacturerDeviceIntermediateCACerts(dataBuf.Ptr<uint8_t>(), certsLen, certsLen);
         SuccessOrExit(err);
     }
 
@@ -958,13 +958,13 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::ComputeProvisioningHash(u
         size_t keyLen;
 
         // Determine the length of the device private key.
-        err = Impl()->GetManufacturerDevicePrivateKey((uint8_t *) NULL, 0, keyLen);
+        err = GetManufacturerDevicePrivateKey((uint8_t *) NULL, 0, keyLen);
         SuccessOrExit(err);
 
         // Read the private key.  (Note that we presume the buffer allocated to hold the certificate
         // is big enough to hold the private key.  GetManufacturerDevicePrivateKey() will return an
         // error in the unlikely event that this is not the case.)
-        err = Impl()->GetManufacturerDevicePrivateKey(dataBuf.Ptr<uint8_t>(), dataBufSize, keyLen);
+        err = GetManufacturerDevicePrivateKey(dataBuf.Ptr<uint8_t>(), dataBufSize, keyLen);
         SuccessOrExit(err);
     }
 
@@ -1025,13 +1025,13 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
     {
         char serialNum[ConfigurationManager::kMaxSerialNumberLength + 1];
         size_t serialNumLen;
-        err = Impl()->GetSerialNumber(serialNum, sizeof(serialNum), serialNumLen);
+        err = GetSerialNumber(serialNum, sizeof(serialNum), serialNumLen);
         ChipLogProgress(DeviceLayer, "  Serial Number: %s", (err == CHIP_NO_ERROR) ? serialNum : "(not set)");
     }
 
     {
         uint16_t vendorId;
-        if (Impl()->GetVendorId(vendorId) != CHIP_NO_ERROR)
+        if (GetVendorId(vendorId) != CHIP_NO_ERROR)
         {
             vendorId = 0;
         }
@@ -1040,7 +1040,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         uint16_t productId;
-        if (Impl()->GetProductId(productId) != CHIP_NO_ERROR)
+        if (GetProductId(productId) != CHIP_NO_ERROR)
         {
             productId = 0;
         }
@@ -1049,7 +1049,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         uint16_t productRev;
-        if (Impl()->GetProductRevision(productRev) != CHIP_NO_ERROR)
+        if (GetProductRevision(productRev) != CHIP_NO_ERROR)
         {
             productRev = 0;
         }
@@ -1058,7 +1058,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         uint32_t setupPINCode;
-        if (Impl()->GetSetupPinCode(setupPINCode) != CHIP_NO_ERROR)
+        if (GetSetupPinCode(setupPINCode) != CHIP_NO_ERROR)
         {
             setupPINCode = 0;
         }
@@ -1067,7 +1067,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         uint16_t setupDiscriminator;
-        if (Impl()->GetSetupDiscriminator(setupDiscriminator) != CHIP_NO_ERROR)
+        if (GetSetupDiscriminator(setupDiscriminator) != CHIP_NO_ERROR)
         {
             setupDiscriminator = 0;
         }
@@ -1077,7 +1077,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
     {
         uint16_t year;
         uint8_t month, dayOfMonth;
-        err = Impl()->GetManufacturingDate(year, month, dayOfMonth);
+        err = GetManufacturingDate(year, month, dayOfMonth);
         if (err == CHIP_NO_ERROR)
         {
             ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02" PRIu8 "/%02" PRIu8, year, month, dayOfMonth);
@@ -1103,7 +1103,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         uint16_t deviceType;
-        if (Impl()->GetDeviceType(deviceType) != CHIP_NO_ERROR)
+        if (GetDeviceType(deviceType) != CHIP_NO_ERROR)
         {
             deviceType = 0;
         }

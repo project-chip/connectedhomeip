@@ -70,7 +70,6 @@ public:
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf) override;
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override;
-    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf) override;
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override;
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override;
