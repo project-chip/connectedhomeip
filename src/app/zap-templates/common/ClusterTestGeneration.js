@@ -26,7 +26,7 @@ const path              = require('path');
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
-const { TestSuiteHelperCluster }        = require('./TestSuiteHelperCluster.js');
+const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
 
 const kClusterName       = 'cluster';
@@ -221,19 +221,18 @@ function getClusters()
 {
   // Create a new array to merge the configured clusters list and test
   // simulated clusters.
-  return Clusters.getClusters().then(clusters => clusters.concat(TestSuiteHelperCluster));
+  return Clusters.getClusters().then(clusters => clusters.concat(DelayCommands));
 }
 
 function getCommands(clusterName)
 {
-  return (clusterName == TestSuiteHelperCluster.name) ? Promise.resolve(TestSuiteHelperCluster.commands)
-                                                      : Clusters.getClientCommands(clusterName);
+  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.commands) : Clusters.getClientCommands(clusterName);
 }
 
 function getAttributes(clusterName)
 {
-  return (clusterName == TestSuiteHelperCluster.name) ? Promise.resolve(TestSuiteHelperCluster.attributes)
-                                                      : Clusters.getServerAttributes(clusterName);
+  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.attributes)
+                                             : Clusters.getServerAttributes(clusterName);
 }
 
 function assertCommandOrAttribute(context)
@@ -299,7 +298,7 @@ function chip_tests_items(options)
 
 function isTestOnlyCluster(name)
 {
-  return name == TestSuiteHelperCluster.name;
+  return name == DelayCommands.name;
 }
 
 function chip_tests_with_command_attribute_info(options)

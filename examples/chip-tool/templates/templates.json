@@ -30,14 +30,6 @@
         {
             "name": "test_cluster",
             "path": "partials/test_cluster.zapt"
-        },
-        {
-            "name": "TestSuiteHelper_WaitForMs",
-            "path": "partials/testsuite/WaitForMs.zapt"
-        },
-        {
-            "name": "TestSuiteHelper_WaitForAttributeReport",
-            "path": "partials/testsuite/WaitForAttributeReport.zapt"
         }
     ],
     "templates": [

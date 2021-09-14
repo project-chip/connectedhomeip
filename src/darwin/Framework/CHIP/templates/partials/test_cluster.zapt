@@ -4,7 +4,8 @@
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"{{label}}"];
 {{#if (isTestOnlyCluster cluster)}}
-{{> (asTestSuiteSimulatedClusterCommandPartial command)}}
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{definedValue}}{{/chip_tests_item_parameters}});
 {{else}}
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
