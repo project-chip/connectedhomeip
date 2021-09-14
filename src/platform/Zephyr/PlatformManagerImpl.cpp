@@ -21,7 +21,10 @@
  *          for Zephyr platforms.
  */
 
+#if !CONFIG_NORDIC_SECURITY_BACKEND
 #include <crypto/CHIPCryptoPAL.h>
+#endif // !CONFIG_NORDIC_SECURITY_BACKEND
+
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/PlatformManager.h>
