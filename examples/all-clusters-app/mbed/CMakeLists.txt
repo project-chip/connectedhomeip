@@ -62,7 +62,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
                ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
                ${CHIP_ROOT}/src/app/server/Server.cpp
-               ${CHIP_ROOT}/src/app/server/StorablePeerConnection.cpp
+               ${CHIP_ROOT}/src/app/server/CommissionManager.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${APP_UTIL}/DataModelHandler.cpp

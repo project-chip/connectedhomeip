@@ -31,6 +31,15 @@
 
 #include <support/logging/CHIPLogging.h>
 
+// ZAP -- ZCL Advanced Platform
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app/util/attribute-storage.h>
+
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 // mbed-os headers
 #include "platform/Callback.h"
 
@@ -47,6 +56,7 @@ static bool sHaveServiceConnectivity  = false;
 static events::EventQueue sAppEventQueue;
 
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Credentials;
 
 AppTask AppTask::sAppTask;
 
@@ -77,7 +87,10 @@ int AppTask::Init()
     chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
-    InitServer();
+    chip::Server::GetInstance().Init();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
