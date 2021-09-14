@@ -59,7 +59,7 @@ class Timer;
 class TimerDeletor
 {
 public:
-    static void Release(Timer* obj);
+    static void Release(Timer * obj);
 };
 
 /**
@@ -227,10 +227,7 @@ public:
         sPool.GetStatistics(aNumInUse, aHighWatermark);
     }
 
-    static void ReleaseTimer(Timer * timer)
-    {
-        sPool.ReleaseObject(timer);
-    }
+    static void ReleaseTimer(Timer * timer) { sPool.ReleaseObject(timer); }
 
     void * AppState;
 
@@ -255,7 +252,7 @@ private:
     Timer & operator=(const Timer &) = delete;
 };
 
-inline void TimerDeletor::Release(Timer* obj)
+inline void TimerDeletor::Release(Timer * obj)
 {
     Timer::sPool.ReleaseObject(obj);
 }

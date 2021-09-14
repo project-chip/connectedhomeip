@@ -22,7 +22,10 @@
 namespace chip {
 namespace System {
 
-StaticAllocatorBitmap::StaticAllocatorBitmap(void * storage, std::atomic<tBitChunkType> * usage, size_t capacity, size_t elementSize) : mCapacity(capacity), mElements(storage), mElementSize(elementSize), mUsage(usage)
+StaticAllocatorBitmap::StaticAllocatorBitmap(void * storage, std::atomic<tBitChunkType> * usage, size_t capacity,
+                                             size_t elementSize) :
+    mCapacity(capacity),
+    mElements(storage), mElementSize(elementSize), mUsage(usage)
 {
     for (size_t word = 0; word * kBitChunkSize < mCapacity; ++word)
     {

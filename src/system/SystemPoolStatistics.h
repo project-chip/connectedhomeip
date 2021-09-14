@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <atomic>
 #include <algorithm>
+#include <atomic>
 
 #include <system/SystemStats.h>
 
@@ -30,29 +30,26 @@ namespace System {
 class ObjectPoolStatistics
 {
 public:
-    void ResetStatistics()
-    {
-        mHighWatermark.store(mUsage.load());
-    }
+    void ResetStatistics() { mHighWatermark.store(mUsage.load()); }
 
     void GetStatistics(Stats::count_t & aNumInUse, Stats::count_t & aHighWatermark)
     {
-        aNumInUse      = static_cast<Stats::count_t>(std::min<unsigned int>(Stats::CHIP_SYS_STATS_COUNT_MAX, mUsage.load()));
-        aHighWatermark = static_cast<Stats::count_t>(std::min<unsigned int>(Stats::CHIP_SYS_STATS_COUNT_MAX, mHighWatermark.load()));
+        aNumInUse = static_cast<Stats::count_t>(std::min<unsigned int>(Stats::CHIP_SYS_STATS_COUNT_MAX, mUsage.load()));
+        aHighWatermark =
+            static_cast<Stats::count_t>(std::min<unsigned int>(Stats::CHIP_SYS_STATS_COUNT_MAX, mHighWatermark.load()));
     }
 
 protected:
     void IncreaseUsage()
     {
         unsigned int usage = ++mUsage;
-        unsigned int prev = mHighWatermark;
-        while(prev < usage && !mHighWatermark.compare_exchange_weak(prev, usage)) {}
+        unsigned int prev  = mHighWatermark;
+        while (prev < usage && !mHighWatermark.compare_exchange_weak(prev, usage))
+        {
+        }
     }
 
-    void DecreaseUsage()
-    {
-        --mUsage;
-    }
+    void DecreaseUsage() { --mUsage; }
 
 private:
     std::atomic<unsigned int> mUsage;
@@ -73,7 +70,6 @@ protected:
 };
 
 #endif
-
 
 } // namespace System
 } // namespace chip

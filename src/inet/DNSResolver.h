@@ -67,7 +67,7 @@ class DNSResolver;
 class DNSResolverDeletor
 {
 public:
-    static void Release(DNSResolver* obj);
+    static void Release(DNSResolver * obj);
 };
 
 /**
@@ -178,7 +178,7 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 };
 
-inline void DNSResolverDeletor::Release(DNSResolver* obj)
+inline void DNSResolverDeletor::Release(DNSResolver * obj)
 {
     DNSResolver::sPool.ReleaseObject(obj);
 }

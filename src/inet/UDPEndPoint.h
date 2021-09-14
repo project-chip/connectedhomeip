@@ -47,7 +47,7 @@ class UDPEndPoint;
 class UDPEndPointDeletor
 {
 public:
-    static void Release(UDPEndPoint* obj);
+    static void Release(UDPEndPoint * obj);
 };
 
 /**
@@ -116,7 +116,7 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 
-inline void UDPEndPointDeletor::Release(UDPEndPoint* obj)
+inline void UDPEndPointDeletor::Release(UDPEndPoint * obj)
 {
     UDPEndPoint::sPool.ReleaseObject(obj);
 }

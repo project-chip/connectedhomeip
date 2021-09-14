@@ -75,7 +75,7 @@ class TestObject;
 class TestObjectDeletor
 {
 public:
-    static void Release(TestObject* obj);
+    static void Release(TestObject * obj);
 };
 
 class TestObject : public AtomicReferenceCounted<TestObject, TestObjectDeletor>
@@ -113,7 +113,7 @@ private:
     TestObject & operator=(const TestObject &) = delete;
 };
 
-void TestObjectDeletor::Release(TestObject* obj)
+void TestObjectDeletor::Release(TestObject * obj)
 {
     TestObject::sPool.ReleaseObject(obj);
 }
@@ -349,8 +349,8 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     });
     sPool.ResetStatistics();
 
-    const int kNumObjects  = kPoolSize;
-    TestObject * lObject   = nullptr;
+    const int kNumObjects = kPoolSize;
+    TestObject * lObject  = nullptr;
     chip::System::Stats::count_t lNumInUse;
     chip::System::Stats::count_t lHighWatermark;
 

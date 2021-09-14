@@ -53,9 +53,8 @@ class TCPEndPoint;
 class TCPEndPointDeletor
 {
 public:
-    static void Release(TCPEndPoint* obj);
+    static void Release(TCPEndPoint * obj);
 };
-
 
 /**
  * @brief   Objects of this class represent TCP transport endpoints.
@@ -719,7 +718,7 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
 
-inline void TCPEndPointDeletor::Release(TCPEndPoint* obj)
+inline void TCPEndPointDeletor::Release(TCPEndPoint * obj)
 {
     TCPEndPoint::sPool.ReleaseObject(obj);
 }

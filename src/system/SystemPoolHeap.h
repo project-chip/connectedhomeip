@@ -19,8 +19,8 @@
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
-#include <set>
 #include <mutex>
+#include <set>
 
 #include <lib/support/CodeUtils.h>
 #include <system/SystemPoolStatistics.h>
@@ -39,12 +39,15 @@ template <class T, unsigned int N>
 class ObjectPoolHeap : public ObjectPoolStatistics
 {
 public:
-    template<typename... Args>
-    T * CreateObject(Args&&... args)
+    template <typename... Args>
+    T * CreateObject(Args &&... args)
     {
         std::lock_guard<std::recursive_mutex> lock(mutex);
         T * object = new T(std::forward<Args>(args)...);
-        if (object == nullptr) { return nullptr; }
+        if (object == nullptr)
+        {
+            return nullptr;
+        }
 
         mObjects.insert(object);
         IncreaseUsage();
@@ -73,7 +76,7 @@ public:
     {
         std::lock_guard<std::recursive_mutex> lock(mutex);
         // Create a new copy of original set, allowing add/remove elements while iterating in the same thread.
-        for (auto object: std::set<T*>(mObjects))
+        for (auto object : std::set<T *>(mObjects))
         {
             if (!function(object))
                 return false;
@@ -83,9 +86,8 @@ public:
 
 private:
     std::recursive_mutex mutex;
-    std::set<T*> mObjects;
+    std::set<T *> mObjects;
 };
-
 
 } // namespace System
 } // namespace chip

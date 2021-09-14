@@ -23,7 +23,9 @@ namespace chip {
 namespace System {
 
 // An empty object, all its functionality is decoupled, but we still need for the type system.
-class DLL_EXPORT Object {};
+class DLL_EXPORT Object
+{
+};
 
 } // namespace System
 } // namespace chip

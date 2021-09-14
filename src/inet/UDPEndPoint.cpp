@@ -444,21 +444,21 @@ void UDPEndPoint::DeferredFree(ReleaseDeferralErrorTactic aTactic)
     if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
     {
         System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(Layer().SystemLayer());
-        CHIP_ERROR err = lSystemLayer->PostLambda([this] { this->Release(); });
+        CHIP_ERROR err                   = lSystemLayer->PostLambda([this] { this->Release(); });
         if (err != CHIP_NO_ERROR)
         {
             switch (aTactic)
             {
-                case kReleaseDeferralErrorTactic_Ignore:
-                    break;
+            case kReleaseDeferralErrorTactic_Ignore:
+                break;
 
-                case kReleaseDeferralErrorTactic_Release:
-                    this->Release();
-                    break;
+            case kReleaseDeferralErrorTactic_Release:
+                this->Release();
+                break;
 
-                case kReleaseDeferralErrorTactic_Die:
-                    VerifyOrDie(false);
-                    break;
+            case kReleaseDeferralErrorTactic_Die:
+                VerifyOrDie(false);
+                break;
             }
         }
     }
