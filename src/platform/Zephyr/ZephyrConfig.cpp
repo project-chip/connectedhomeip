@@ -41,10 +41,10 @@ namespace Internal {
     (key);                                                                                                                         \
     static_assert(sizeof(key) <= SETTINGS_MAX_NAME_LEN, "Config key too long: " key)
 
-// Define configuration and counter keys as part of the CHIP_DEVICE_CONFIG_SETTINGS_KEY subtree
+// Define the configuration keys to be part of the CHIP_DEVICE_CONFIG_SETTINGS_KEY subtree
 // so that they get erased when KeyValueStoreManagerImpl::DoFactoryReset() is called.
 // clang-format off
-#define NAMESPACE_FACTORY  CHIP_DEVICE_CONFIG_SETTINGS_KEY "-fct/"
+#define NAMESPACE_FACTORY  CHIP_DEVICE_CONFIG_SETTINGS_KEY "/fct/"
 #define NAMESPACE_CONFIG   CHIP_DEVICE_CONFIG_SETTINGS_KEY "/cfg/"
 #define NAMESPACE_COUNTERS CHIP_DEVICE_CONFIG_SETTINGS_KEY "/ctr/"
 // clang-format on
