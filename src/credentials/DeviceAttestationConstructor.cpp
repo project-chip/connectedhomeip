@@ -26,7 +26,7 @@ namespace chip {
 namespace Credentials {
 
 // context tag positions
-enum
+enum : int
 {
     kCertificationDeclarationTagId = 1,
     kAttestationNonceTagId         = 2,
@@ -36,7 +36,7 @@ enum
 
 CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, ByteSpan & certificationDeclaration,
                                           ByteSpan & attestationNonce, uint32_t & timestamp, ByteSpan & firmwareInfo,
-                                          ByteSpan * vendorReservedArray, size_t vendorReservedArraySize, uint16_t & vendorId,
+                                          ByteSpan * vendorReservedArray, size_t & vendorReservedArraySize, uint16_t & vendorId,
                                           uint16_t & profileNum)
 {
     bool certificationDeclarationExists = false;
@@ -44,10 +44,13 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
     bool timestampExists                = false;
     bool firmwareInfoExists             = false;
     size_t vendorReservedIdx            = 0;
-    TLV::TLVReader tlvReader;
+    int lastContextTagId                = -1;
+    TLV::ContiguousBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
-    tlvReader.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
+    firmwareInfo = ByteSpan();
+
+    tlvReader.Init(attestationElements);
     ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
@@ -61,28 +64,35 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
             switch (TLV::TagNumFromTag(tag))
             {
             case kCertificationDeclarationTagId:
+                VerifyOrReturnError(lastContextTagId == -1, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
                 VerifyOrReturnError(certificationDeclarationExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-                ReturnErrorOnFailure(tlvReader.Get(certificationDeclaration));
+                ReturnErrorOnFailure(tlvReader.GetByteView(certificationDeclaration));
                 certificationDeclarationExists = true;
                 break;
             case kAttestationNonceTagId:
+                VerifyOrReturnError(lastContextTagId == kCertificationDeclarationTagId,
+                                    CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
                 VerifyOrReturnError(attestationNonceExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-                ReturnErrorOnFailure(tlvReader.Get(attestationNonce));
+                ReturnErrorOnFailure(tlvReader.GetByteView(attestationNonce));
                 attestationNonceExists = true;
                 break;
             case kTimestampTagId:
+                VerifyOrReturnError(lastContextTagId == kAttestationNonceTagId, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
                 VerifyOrReturnError(timestampExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
                 ReturnErrorOnFailure(tlvReader.Get(timestamp));
                 timestampExists = true;
                 break;
             case kFirmwareInfoTagId:
+                VerifyOrReturnError(lastContextTagId == kTimestampTagId, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
                 VerifyOrReturnError(firmwareInfoExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-                ReturnErrorOnFailure(tlvReader.Get(firmwareInfo));
+                ReturnErrorOnFailure(tlvReader.GetByteView(firmwareInfo));
                 firmwareInfoExists = true;
                 break;
             default:
                 return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
             }
+
+            lastContextTagId = TLV::TagNumFromTag(tag);
         }
         else if (TLV::IsProfileTag(tag))
         {
@@ -101,13 +111,14 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
             }
             else
             {
+                // TODO: do not check for this - map vendorId and profileNum to each Vendor Reserved entry
                 // check that vendorId and profileNum match in every Vendor Reserved entry
                 VerifyOrReturnError(currentVendorId == vendorId && currentProfileNum == profileNum,
                                     CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
             }
 
             ByteSpan vendorReservedEntry;
-            ReturnErrorOnFailure(tlvReader.Get(vendorReservedEntry));
+            ReturnErrorOnFailure(tlvReader.GetByteView(vendorReservedEntry));
             VerifyOrReturnError(vendorReservedIdx < vendorReservedArraySize, CHIP_ERROR_NO_MEMORY);
             vendorReservedArray[vendorReservedIdx++] = vendorReservedEntry;
         }
@@ -117,13 +128,17 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
         }
     }
 
+    vendorReservedArraySize = vendorReservedIdx;
+
     VerifyOrReturnError(error == CHIP_END_OF_TLV, error);
+    VerifyOrReturnError(lastContextTagId != -1, CHIP_ERROR_MISSING_TLV_ELEMENT);
     VerifyOrReturnError(certificationDeclarationExists && attestationNonceExists && timestampExists,
                         CHIP_ERROR_MISSING_TLV_ELEMENT);
 
     return CHIP_NO_ERROR;
 }
 
+// TODO: have independent vendorId and profileNum entries map to each vendor Reserved entry
 CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaration, const ByteSpan & attestationNonce,
                                         uint32_t timestamp, const ByteSpan & firmwareInfo, ByteSpan * vendorReservedArray,
                                         size_t vendorReservedArraySize, uint16_t vendorId, uint16_t profileNum,
@@ -133,7 +148,7 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
     VerifyOrReturnError(!certificationDeclaration.empty() && !attestationNonce.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(attestationNonce.size() == 32, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrReturnError(attestationNonce.size() == 32, CHIP_ERROR_INVALID_ARGUMENT);
     if (vendorReservedArraySize != 0)
     {
         VerifyOrReturnError(vendorReservedArray != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
