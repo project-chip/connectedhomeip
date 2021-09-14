@@ -389,7 +389,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
-    uint16_t initiatorSessionId = 0;
+    uint16_t initiatorSessionId;
     uint8_t initiatorRandom[kPBKDFParamRandomNumberSize];
 
     uint32_t decodeTagIdSeq = 0;
@@ -492,7 +492,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
-    uint16_t responderSessionId = 0;
+    uint16_t responderSessionId;
     uint8_t random[kPBKDFParamRandomNumberSize];
 
     uint32_t decodeTagIdSeq = 0;

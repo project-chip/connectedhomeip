@@ -247,10 +247,10 @@ void SecureSessionMgr::ExpireAllPairingsForFabric(FabricIndex fabric)
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
                                         PairingSession * pairing, SecureSession::SessionRole direction, FabricIndex fabric)
 {
-    uint16_t PeerSessionId  = pairing->GetPeerSessionId();
-    uint16_t LocalSessionId = pairing->GetLocalSessionId();
+    uint16_t peerSessionId  = pairing->GetPeerSessionId();
+    uint16_t localSessionId = pairing->GetLocalSessionId();
     PeerConnectionState * state =
-        mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(peerNodeId), LocalSessionId, nullptr);
+        mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(peerNodeId), localSessionId, nullptr);
 
     // Find any existing connection with the same local key ID
     if (state)
@@ -260,10 +260,10 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     }
 
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", key %d!!", ChipLogValueX64(peerNodeId),
-                  PeerSessionId);
+                  peerSessionId);
     state = nullptr;
     ReturnErrorOnFailure(
-        mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), PeerSessionId, LocalSessionId, &state));
+        mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerSessionId, localSessionId, &state));
     ReturnErrorCodeIf(state == nullptr, CHIP_ERROR_NO_MEMORY);
 
     state->SetFabricIndex(fabric);

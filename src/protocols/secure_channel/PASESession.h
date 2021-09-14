@@ -343,10 +343,10 @@ public:
         SetPeerSessionId(0);
     }
 
-    SecurePairingUsingTestSecret(uint16_t PeerSessionId, uint16_t LocalSessionId)
+    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId)
     {
-        SetLocalSessionId(LocalSessionId);
-        SetPeerSessionId(PeerSessionId);
+        SetLocalSessionId(localSessionId);
+        SetPeerSessionId(peerSessionId);
     }
 
     CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override

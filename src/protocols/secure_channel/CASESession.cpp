@@ -372,7 +372,7 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle && msg)
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
-    uint16_t initiatorSessionId = 0;
+    uint16_t initiatorSessionId;
     uint8_t destinationIdentifier[kSHA256_Hash_Length];
     uint8_t initiatorRandom[kSigmaParamRandomNumberSize];
 
@@ -626,7 +626,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle && msg)
     uint8_t responderOpCert[EstimateTLVStructOverhead(kMaxCHIPOpCertArrayLength, 2)];
     size_t responderOpCertLen;
 
-    uint16_t responderSessionId = 0;
+    uint16_t responderSessionId;
 
     uint32_t decodeTagIdSeq = 0;
 

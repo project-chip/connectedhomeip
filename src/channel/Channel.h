@@ -91,9 +91,9 @@ public:
     TransportPreference GetTransportPreference() const { return mTransportPreference; }
 
     uint16_t GetPeerSessionId() const { return mCaseParameters.mPeerSessionId; }
-    ChannelBuilder & SetPeerSessionId(uint16_t keyId)
+    ChannelBuilder & SetPeerSessionId(uint16_t sessionId)
     {
-        mCaseParameters.mPeerSessionId = keyId;
+        mCaseParameters.mPeerSessionId = sessionId;
         return *this;
     }
 

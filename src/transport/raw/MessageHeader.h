@@ -42,6 +42,8 @@ static constexpr size_t kMaxTagLen = 16;
 
 static constexpr size_t kMaxAppMessageLen = 1200;
 
+static constexpr size_t kMsgSessionIdUnsecured = 0x0000;
+
 typedef int PacketHeaderFlags;
 
 namespace Header {
@@ -303,13 +305,13 @@ private:
     /// Intended recipient of the message.
     Optional<NodeId> mDestinationNodeId;
 
-    /// Encryption Key ID
-    uint16_t mSessionId = 0;
+    /// Session ID
+    uint16_t mSessionId = kMsgSessionIdUnsecured;
 
     /// Message flags read from the message.
     Header::Flags mFlags;
 
-    /// Represents encryption type used for encrypting current packet
+    /// Represents session type used for encrypting current packet
     Header::SessionType mSessionType = Header::SessionType::kAESCCMTagLen16;
 };
 
