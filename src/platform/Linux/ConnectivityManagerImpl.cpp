@@ -399,7 +399,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
     bool ret            = false;
     const gchar * state = nullptr;
 
-    if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
+    if (mWpaSupplicant.state.load(std::memory_order_relaxed) != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationConnected: interface not connected");
         return false;
@@ -426,7 +426,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
     bool ret          = false;
     const gchar * bss = nullptr;
 
-    if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
+    if (mWpaSupplicant.state.load(std::memory_order_relaxed) != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationProvisioned: interface not connected");
         return false;
@@ -443,7 +443,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 {
-    if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
+    if (mWpaSupplicant.state.load(std::memory_order_relaxed) != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _ClearWiFiStationProvision: interface not connected");
         return;
@@ -465,7 +465,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {
-    return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
+    return mWpaSupplicant.state.load(std::memory_order_relaxed) == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
         mWpaSupplicant.scanState == GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
 }
 
@@ -571,7 +571,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
     if (iface != nullptr && err == nullptr)
     {
         mWpaSupplicant.iface = iface;
-        mWpaSupplicant.state = GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
+        mWpaSupplicant.state.store(GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED, std::memory_order_relaxed);
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant interface proxy");
     }
     else
@@ -579,7 +579,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant1 interface proxy %s: %s",
                         mWpaSupplicant.interfacePath, err ? err->message : "unknown error");
 
-        mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
+        mWpaSupplicant.state.store(GDBusWpaSupplicant::WPA_NOT_CONNECTED, std::memory_order_relaxed);
     }
 
     if (err != nullptr)
@@ -594,7 +594,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
         wpa_fi_w1_wpa_supplicant1_call_get_interface_finish(mWpaSupplicant.proxy, &mWpaSupplicant.interfacePath, res, &err);
     if (result)
     {
-        mWpaSupplicant.state = GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH;
+        mWpaSupplicant.state.store(GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH, std::memory_order_relaxed);
         ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface: %s", mWpaSupplicant.interfacePath);
 
         wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
@@ -621,7 +621,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
 
         if (result)
         {
-            mWpaSupplicant.state = GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH;
+            mWpaSupplicant.state.store(GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH, std::memory_order_relaxed);
             ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface: %s", mWpaSupplicant.interfacePath);
 
             wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
@@ -633,7 +633,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create interface %s: %s",
                             CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, error ? error->message : "unknown error");
 
-            mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NO_INTERFACE_PATH;
+            mWpaSupplicant.state.store(GDBusWpaSupplicant::WPA_NO_INTERFACE_PATH, std::memory_order_relaxed);
 
             if (mWpaSupplicant.interfacePath)
             {
@@ -659,7 +659,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * prox
     mWpaSupplicant.interfacePath = const_cast<gchar *>(path);
     if (mWpaSupplicant.interfacePath)
     {
-        mWpaSupplicant.state = GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH;
+        mWpaSupplicant.state.store(GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH, std::memory_order_relaxed);
         ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface added: %s", mWpaSupplicant.interfacePath);
 
         wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
@@ -678,7 +678,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * pr
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface removed: %s", path);
 
-        mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NO_INTERFACE_PATH;
+        mWpaSupplicant.state.store(GDBusWpaSupplicant::WPA_NO_INTERFACE_PATH, std::memory_order_relaxed);
 
         if (mWpaSupplicant.interfacePath)
         {
@@ -703,7 +703,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
     mWpaSupplicant.proxy = wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus_finish(res, &err);
     if (mWpaSupplicant.proxy != nullptr && err == nullptr)
     {
-        mWpaSupplicant.state = GDBusWpaSupplicant::WPA_CONNECTED;
+        mWpaSupplicant.state.store(GDBusWpaSupplicant::WPA_CONNECTED, std::memory_order_relaxed);
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant proxy");
 
         g_signal_connect(mWpaSupplicant.proxy, "interface-added", G_CALLBACK(_OnWpaInterfaceAdded), NULL);
@@ -717,7 +717,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant proxy %s",
                         err ? err->message : "unknown error");
-        mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NOT_CONNECTED;
+        mWpaSupplicant.state.store(GDBusWpaSupplicant::WPA_NOT_CONNECTED, std::memory_order_relaxed);
     }
 
     if (err != nullptr)
@@ -727,7 +727,6 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
     mConnectivityFlag.ClearAll();
-    mWpaSupplicant.state         = GDBusWpaSupplicant::INIT;
     mWpaSupplicant.scanState     = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
     mWpaSupplicant.proxy         = nullptr;
     mWpaSupplicant.iface         = nullptr;
@@ -740,7 +739,7 @@ void ConnectivityManagerImpl::StartWiFiManagement()
 
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 {
-    return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
+    return mWpaSupplicant.state.load(std::memory_order_relaxed) == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
 }
 
 void ConnectivityManagerImpl::DriveAPState()

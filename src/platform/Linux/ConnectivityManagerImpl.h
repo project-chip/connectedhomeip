@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -52,9 +53,10 @@ namespace chip {
 namespace DeviceLayer {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+
 struct GDBusWpaSupplicant
 {
-    enum
+    typedef enum
     {
         INIT,
         WPA_CONNECTING,
@@ -63,7 +65,8 @@ struct GDBusWpaSupplicant
         WPA_NO_INTERFACE_PATH,
         WPA_GOT_INTERFACE_PATH,
         WPA_INTERFACE_CONNECTED,
-    } state;
+    } WpaSupplicantState;
+    std::atomic<WpaSupplicantState> state {INIT};
 
     enum
     {
