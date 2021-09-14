@@ -89,7 +89,11 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChang
     event.ThreadStateChange.ChildNodesChanged = (flags & (OT_CHANGED_THREAD_CHILD_ADDED | OT_CHANGED_THREAD_CHILD_REMOVED)) != 0;
     event.ThreadStateChange.OpenThread.Flags  = flags;
 
-    PlatformMgr().PostEvent(&event);
+    CHIP_ERROR status = PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post Thread state change: %" CHIP_ERROR_FORMAT, status.Format());
+    }
 }
 
 template <class ImplClass>
@@ -240,14 +244,16 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
     Impl()->LockThreadStack();
     otErr = otDatasetSetActiveTlvs(mOTInst, &tlvs);
     Impl()->UnlockThreadStack();
+    if (otErr != OT_ERROR_NONE)
+    {
+        return MapOpenThreadError(otErr);
+    }
 
     // post an event alerting other subsystems about change in provisioning state
     ChipDeviceEvent event;
     event.Type                                           = DeviceEventType::kServiceProvisioningChange;
     event.ServiceProvisioningChange.IsServiceProvisioned = true;
-    PlatformMgr().PostEvent(&event);
-
-    return MapOpenThreadError(otErr);
+    return PlatformMgr().PostEvent(&event);
 }
 
 template <class ImplClass>

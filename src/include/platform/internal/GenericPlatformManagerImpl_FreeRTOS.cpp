@@ -98,15 +98,19 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_UnlockChipStack(void)
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
-    if (mChipEventQueue != NULL)
+    if (mChipEventQueue == NULL)
     {
-        if (!xQueueSend(mChipEventQueue, event, 1))
-        {
-            ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
-        }
+        return CHIP_ERROR_INTERNAL;
     }
+    BaseType_t status = xQueueSend(mChipEventQueue, event, 1);
+    if (status != pdTRUE)
+    {
+        ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
+        return CHIP_ERROR(chip::ChipError::Range::kOS, status);
+    }
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -218,7 +222,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StartChipTimer(uint3
     {
         ChipDeviceEvent event;
         event.Type = DeviceEventType::kNoOp;
-        Impl()->PostEvent(&event);
+        ReturnErrorOnFailure(Impl()->PostEvent(&event));
     }
 
     return CHIP_NO_ERROR;

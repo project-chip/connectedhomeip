@@ -114,12 +114,13 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
-void PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
 {
     const ChipDeviceEvent eventCopy = *event;
     dispatch_async(mWorkQueue, ^{
         Impl()->DispatchEvent(&eventCopy);
     });
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer
