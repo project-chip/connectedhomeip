@@ -35,7 +35,6 @@ extern "C" void ChipTest(void)
         printf("DeviceManagerInit() - OK\r\n");
     }
 
-
     chip::Server::GetInstance().Init();
 
     while (true)
