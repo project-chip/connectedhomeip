@@ -292,7 +292,7 @@ public:
 
 private:
     /// Represents the current encode/decode header version
-    static constexpr int kHeaderVersion = 2;
+    static constexpr int kMsgHeaderVersion = 0;
 
     /// Value expected to be incremented for each message sent.
     uint32_t mMessageId = 0;

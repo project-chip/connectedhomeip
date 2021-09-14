@@ -151,7 +151,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     err = reader.Read16(&header).StatusCode();
     SuccessOrExit(err);
     version = ((header & kVersionMask) >> kVersionShift);
-    VerifyOrExit(version == kHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
+    VerifyOrExit(version == kMsgHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
 
     mFlags.SetRaw(header);
     mEncryptionType = static_cast<Header::EncryptionType>((header & kEncryptionTypeMask) >> kEncryptionTypeShift);
@@ -271,7 +271,7 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     encodeFlags.Set(Header::FlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
         .Set(Header::FlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue());
 
-    uint16_t header = (kHeaderVersion << kVersionShift) | encodeFlags.Raw();
+    uint16_t header = (kMsgHeaderVersion << kVersionShift) | encodeFlags.Raw();
     header |= (static_cast<uint16_t>(static_cast<uint16_t>(mEncryptionType) << kEncryptionTypeShift) & kEncryptionTypeMask);
 
     uint8_t * p = data;
