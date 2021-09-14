@@ -78,8 +78,8 @@ void MessageCounterSyncProcess(nlTestSuite * inSuite, void * inContext)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    SessionHandle localSession = ctx.GetSessionLocalToPeer();
-    SessionHandle peerSession  = ctx.GetSessionPeerToLocal();
+    SessionHandle localSession = ctx.GetSessionBobToAlice();
+    SessionHandle peerSession  = ctx.GetSessionAliceToBob();
 
     Transport::PeerConnectionState * localState = ctx.GetSecureSessionManager().GetPeerConnectionState(localSession);
     Transport::PeerConnectionState * peerState  = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
@@ -99,7 +99,7 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
 
-    SessionHandle peerSession                  = ctx.GetSessionPeerToLocal();
+    SessionHandle peerSession                  = ctx.GetSessionAliceToBob();
     Transport::PeerConnectionState * peerState = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
     peerState->GetSessionMessageCounter().GetPeerMessageCounter().Reset();
 
@@ -110,7 +110,7 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle msgBuf = MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
 
-    Messaging::ExchangeContext * ec = ctx.NewExchangeToPeer(nullptr);
+    Messaging::ExchangeContext * ec = ctx.NewExchangeToAlice(nullptr);
     NL_TEST_ASSERT(inSuite, ec != nullptr);
 
     err = ec->SendMessage(chip::Protocols::Echo::MsgType::EchoRequest, std::move(msgBuf),

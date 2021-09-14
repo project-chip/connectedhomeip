@@ -278,7 +278,8 @@
                 "nrf",
                 "qpg",
                 "infineon",
-                "telink"
+                "telink",
+                "tizen"
             ],
             "default": "build"
         },

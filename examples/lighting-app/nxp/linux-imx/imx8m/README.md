@@ -155,7 +155,7 @@ The generated executable file supports to work with below commandline argument:
 -   Prerequisites
 
     By following the [Building](#building) section of this document, the Yocto
-    image is cross-compiled and programed to a microSD card.
+    image is cross-compiled and programmed to a microSD card.
 
     Follow the steps below to setup the environment needed to run the example on
     the i.MX 8M Mini EVK:

@@ -103,8 +103,9 @@ OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommissioner = nullptr)
 {
     // Enter commissioning mode, open commissioning window
-    InitServer();
-    ReturnOnFailure(OpenBasicCommissioningWindow(ResetFabrics::kYes, kCommissioningWindowTimeoutInSec));
+    Server::GetInstance().Init();
+    ReturnOnFailure(Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(ResetFabrics::kYes,
+                                                                                              commissioningWindowTimeoutInSec));
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
@@ -113,10 +114,10 @@ void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommission
     if (selectedCommissioner != nullptr)
     {
         // Advertise self as Commissionable Node over mDNS
-        ReturnOnFailure(app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledBasic));
+        app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledBasic);
 
         // Send User Directed commissioning request
-        ReturnOnFailure(SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
+        ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
             selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId[0])));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT

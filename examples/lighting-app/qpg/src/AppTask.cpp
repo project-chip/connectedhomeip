@@ -100,7 +100,7 @@ CHIP_ERROR AppTask::Init()
     qvCHIP_SetBtnCallback(ButtonEventHandler);
 
     // Init ZCL Data Model
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -111,7 +111,7 @@ CHIP_ERROR AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     // Enable BLE advertisements
-    OpenBasicCommissioningWindow(chip::ResetFabrics::kNo);
+    chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(chip::ResetFabrics::kNo);
     ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
 
     return err;

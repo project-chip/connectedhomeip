@@ -92,15 +92,11 @@ struct ClusterInfo
     }
 
     ClusterInfo() {}
-    bool IsDirty() { return mDirty; }
-    void SetDirty() { mDirty = true; }
-    void ClearDirty() { mDirty = false; }
     NodeId mNodeId         = 0;
     ClusterId mClusterId   = 0;
     ListIndex mListIndex   = 0;
     AttributeId mFieldId   = 0;
     EndpointId mEndpointId = 0;
-    bool mDirty            = false;
     BitFlags<Flags> mFlags;
     ClusterInfo * mpNext = nullptr;
     EventId mEventId     = 0;

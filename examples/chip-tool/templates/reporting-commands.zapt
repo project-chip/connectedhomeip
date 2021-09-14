@@ -31,7 +31,7 @@ public:
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isReportableAttribute}}
-        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, {{asHex parent.code 4}}, {{asHex code 4}}, onReport{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Callback->Cancel());
+        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, {{asHex parent.code 4}}, {{asHex code 4}}, onReport{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Callback->Cancel(), BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>);
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

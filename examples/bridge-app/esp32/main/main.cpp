@@ -314,25 +314,25 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     if (itemChangedMask & Device::kChanged_Reachable)
     {
         uint8_t reachable = dev->IsReachable() ? 1 : 0;
-        emberAfReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                                ZCL_REACHABLE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                                &reachable);
+        InteractionModelReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
+                                                         ZCL_REACHABLE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0,
+                                                         ZCL_BOOLEAN_ATTRIBUTE_TYPE, &reachable);
     }
 
     if (itemChangedMask & Device::kChanged_State)
     {
         uint8_t isOn = dev->IsOn() ? 1 : 0;
-        emberAfReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
-                                                CLUSTER_MASK_SERVER, 0, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
+        InteractionModelReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
+                                                         CLUSTER_MASK_SERVER, 0, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
     }
 
     if (itemChangedMask & Device::kChanged_Name)
     {
         uint8_t zclName[kUserLabelSize];
         ToZclCharString(zclName, dev->GetName(), kUserLabelSize - 1);
-        emberAfReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                                ZCL_USER_LABEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                zclName);
+        InteractionModelReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
+                                                         ZCL_USER_LABEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0,
+                                                         ZCL_CHAR_STRING_ATTRIBUTE_TYPE, zclName);
     }
     if (itemChangedMask & Device::kChanged_Location)
     {
@@ -343,8 +343,9 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 
         EncodeFixedLabel("room", dev->GetLocation(), buffer, sizeof(buffer), &am);
 
-        emberAfReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_FIXED_LABEL_CLUSTER_ID, ZCL_LABEL_LIST_ATTRIBUTE_ID,
-                                                CLUSTER_MASK_SERVER, 0, ZCL_ARRAY_ATTRIBUTE_TYPE, buffer);
+        InteractionModelReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_FIXED_LABEL_CLUSTER_ID,
+                                                         ZCL_LABEL_LIST_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0,
+                                                         ZCL_ARRAY_ATTRIBUTE_TYPE, buffer);
     }
 }
 
@@ -390,7 +391,7 @@ extern "C" void app_main()
         return;
     }
 
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

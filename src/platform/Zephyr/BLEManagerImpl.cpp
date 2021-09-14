@@ -285,7 +285,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             ChipDeviceEvent advChange;
             advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
             advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-            PlatformMgr().PostEvent(&advChange);
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&advChange));
         }
 
         if (mFlags.Has(Flags::kFastAdvertisingEnabled))
@@ -324,7 +324,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
             ChipDeviceEvent advChange;
             advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
             advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-            PlatformMgr().PostEvent(&advChange);
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&advChange));
         }
 
         // Cancel timer event disabling CHIPoBLE advertisement after timeout expiration
@@ -469,7 +469,7 @@ exit:
 
     ChipDeviceEvent disconnectEvent;
     disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
-    PlatformMgr().PostEvent(&disconnectEvent);
+    ReturnErrorOnFailure(PlatformMgr().PostEvent(&disconnectEvent));
 
     // Force a reconfiguration of advertising in case we switched to non-connectable mode when
     // the BLE connection was established.
@@ -499,7 +499,7 @@ CHIP_ERROR BLEManagerImpl::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
         {
             ChipDeviceEvent conEstEvent;
             conEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-            PlatformMgr().PostEvent(&conEstEvent);
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&conEstEvent));
         }
     }
     else
@@ -764,7 +764,7 @@ ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_ga
         event.Type = DeviceEventType::kPlatformZephyrBleOutOfBuffersEvent;
     }
 
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 
     return len;
 }
@@ -782,7 +782,7 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
     event.Platform.BleCCCWriteEvent.BtConn = bt_conn_ref(conId);
     event.Platform.BleCCCWriteEvent.Value  = value;
 
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 
     return sizeof(value);
 }
@@ -794,7 +794,7 @@ void BLEManagerImpl::HandleTXCompleted(struct bt_conn * conId, void * /* param *
     event.Type                               = DeviceEventType::kPlatformZephyrBleTXComplete;
     event.Platform.BleTXCompleteEvent.BtConn = bt_conn_ref(conId);
 
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleConnect(struct bt_conn * conId, uint8_t err)
@@ -810,7 +810,7 @@ void BLEManagerImpl::HandleConnect(struct bt_conn * conId, uint8_t err)
     event.Platform.BleConnEvent.BtConn    = bt_conn_ref(conId);
     event.Platform.BleConnEvent.HciResult = err;
 
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 
 exit:
     PlatformMgr().UnlockChipStack();
@@ -829,7 +829,7 @@ void BLEManagerImpl::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
     event.Platform.BleConnEvent.BtConn    = bt_conn_ref(conId);
     event.Platform.BleConnEvent.HciResult = reason;
 
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 
 exit:
     PlatformMgr().UnlockChipStack();

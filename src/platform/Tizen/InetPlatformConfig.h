@@ -15,27 +15,25 @@
  *    limitations under the License.
  */
 
-/*
- * This file declare test suites utilities methods for delayed commands.
- *
- * Each method declared in this file needs to be implemented on a per-language
- * basis and permits to exposes methods to the test suites that are not part
- * of the regular cluster set of APIs.
+/**
+ *    @file
+ *          Platform-specific configuration overrides for the CHIP Inet
+ *          Layer on Tizen platforms.
  *
  */
 
-const WaitForMs = {
-  name : 'WaitForMs',
-  arguments : [ { name : 'ms' } ],
-  response : { arguments : [] }
-};
+#pragma once
 
-const DelayCommands = {
-  name : 'DelayCommands',
-  commands : [ WaitForMs ],
-};
+// ==================== Platform Adaptations ====================
 
-//
-// Module exports
-//
-exports.DelayCommands = DelayCommands;
+#define INET_CONFIG_ENABLE_IPV4 1
+
+// ========== Platform-specific Configuration Overrides =========
+
+#ifndef INET_CONFIG_NUM_TCP_ENDPOINTS
+#define INET_CONFIG_NUM_TCP_ENDPOINTS 32
+#endif // INET_CONFIG_NUM_TCP_ENDPOINTS
+
+#ifndef INET_CONFIG_NUM_UDP_ENDPOINTS
+#define INET_CONFIG_NUM_UDP_ENDPOINTS 32
+#endif // INET_CONFIG_NUM_UDP_ENDPOINTS

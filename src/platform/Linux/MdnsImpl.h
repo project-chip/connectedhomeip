@@ -62,7 +62,6 @@ class Poller
 public:
     Poller(void);
 
-    void GetTimeout(timeval & timeout);
     void HandleTimeout();
 
     const AvahiPoll * GetAvahiPoll(void) const { return &mAvahiPoller; }
@@ -88,8 +87,13 @@ private:
     static void TimeoutFree(AvahiTimeout * timer);
     void TimeoutFree(AvahiTimeout & timer);
 
+    void SystemTimerUpdate(AvahiTimeout * timer);
+    static void SystemTimerCallback(System::Layer * layer, void * data);
+
     std::vector<std::unique_ptr<AvahiWatch>> mWatches;
     std::vector<std::unique_ptr<AvahiTimeout>> mTimers;
+    std::chrono::steady_clock::time_point mEarliestTimeout;
+
     AvahiPoll mAvahiPoller;
 };
 

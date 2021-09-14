@@ -2079,6 +2079,40 @@ class ChipClusters:
                 },
             },
     }
+    _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO = {
+            "clusterName": "OtaSoftwareUpdateRequestor",
+            "clusterId": 0x0000002A,
+            "commands": {
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "AnnounceOtaProvider",
+                    "args": {
+                        "serverLocation": "bytes",
+                        "vendorId": "int",
+                        "announcementReason": "int",
+                        "metadataForNode": "bytes",
+                    },
+                },
+            },
+            "attributes": {
+                0x00000001: {
+                    "attributeName": "DefaultOtaProvider",
+                    "attributeId": 0x00000001,
+                    "type": "bytes",
+                    "writable": True,
+                },
+                0x00000002: {
+                    "attributeName": "UpdatePossible",
+                    "attributeId": 0x00000002,
+                    "type": "bool",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
     _OCCUPANCY_SENSING_CLUSTER_INFO = {
             "clusterName": "OccupancySensing",
             "clusterId": 0x00000406,
@@ -3589,6 +3623,7 @@ class ChipClusters:
     0x00000506: _MEDIA_PLAYBACK_CLUSTER_INFO,
     0x00000031: _NETWORK_COMMISSIONING_CLUSTER_INFO,
     0x00000029: _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
+    0x0000002A: _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
     0x00000406: _OCCUPANCY_SENSING_CLUSTER_INFO,
     0x00000006: _ON_OFF_CLUSTER_INFO,
     0x00000007: _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
@@ -3643,6 +3678,7 @@ class ChipClusters:
         "MediaPlayback": _MEDIA_PLAYBACK_CLUSTER_INFO,
         "NetworkCommissioning": _NETWORK_COMMISSIONING_CLUSTER_INFO,
         "OtaSoftwareUpdateProvider": _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
+        "OtaSoftwareUpdateRequestor": _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
         "OccupancySensing": _OCCUPANCY_SENSING_CLUSTER_INFO,
         "OnOff": _ON_OFF_CLUSTER_INFO,
         "OnOffSwitchConfiguration": _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
@@ -4171,6 +4207,10 @@ class ChipClusters:
         location = location.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
                 device, ZCLendpoint, ZCLgroupid, vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported, location, len(location), requestorCanConsent, metadataForProvider, len(metadataForProvider)
+        )
+    def ClusterOtaSoftwareUpdateRequestor_CommandAnnounceOtaProvider(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, serverLocation: bytes, vendorId: int, announcementReason: int, metadataForNode: bytes):
+        return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider(
+                device, ZCLendpoint, ZCLgroupid, serverLocation, len(serverLocation), vendorId, announcementReason, metadataForNode, len(metadataForNode)
         )
     def ClusterOnOff_CommandOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_Off(
@@ -4766,6 +4806,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOtaSoftwareUpdateProvider_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOtaSoftwareUpdateRequestor_ReadAttributeDefaultOtaProvider(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOtaSoftwareUpdateRequestor_WriteAttributeDefaultOtaProvider(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+        return self._chipLib.chip_ime_WriteAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider(device, ZCLendpoint, ZCLgroupid, value, len(value))
+    def ClusterOtaSoftwareUpdateRequestor_ReadAttributeUpdatePossible(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_UpdatePossible(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOtaSoftwareUpdateRequestor_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOccupancySensing_ReadAttributeOccupancy(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OccupancySensing_Occupancy(device, ZCLendpoint, ZCLgroupid)
     def ClusterOccupancySensing_ConfigureAttributeOccupancy(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
@@ -6229,6 +6277,22 @@ class ChipClusters:
         # Cluster OtaSoftwareUpdateProvider ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateRequestor
+        # Cluster OtaSoftwareUpdateRequestor Command AnnounceOtaProvider
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateRequestor ReadAttribute DefaultOtaProvider
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateRequestor WriteAttribute DefaultOtaProvider
+        self._chipLib.chip_ime_WriteAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateRequestor ReadAttribute UpdatePossible
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_UpdatePossible.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_UpdatePossible.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateRequestor ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OccupancySensing
         # Cluster OccupancySensing ReadAttribute Occupancy
         self._chipLib.chip_ime_ReadAttribute_OccupancySensing_Occupancy.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

@@ -80,7 +80,10 @@ wiced_result_t BLEManagerImpl::BLEManagerCallback(wiced_bt_management_evt_t even
 
             ChipDeviceEvent bleEvent;
             bleEvent.Type = DeviceEventType::kP6BLEEnabledEvt;
-            PlatformMgr().PostEvent(&bleEvent);
+            if (PlatformMgr().PostEvent(&bleEvent) != CHIP_NO_ERROR)
+            {
+                return WICED_BT_ERROR;
+            }
         }
         break;
     }
@@ -238,7 +241,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChipDeviceEvent _event;
             _event.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-            PlatformMgr().PostEvent(&_event);
+            PlatformMgr().PostEventOrDie(&_event);
         }
         break;
 
@@ -428,7 +431,7 @@ void BLEManagerImpl::DriveBLEState(void)
                 ChipDeviceEvent advChange;
                 advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
                 advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-                PlatformMgr().PostEvent(&advChange);
+                err                                        = PlatformMgr().PostEvent(&advChange);
             }
         }
     }
@@ -553,13 +556,18 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceWrite(uint16_t conn_id, 
                 event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
                 event.CHIPoBLEWriteReceived.ConId = conn_id;
                 event.CHIPoBLEWriteReceived.Data  = buf;
-                PlatformMgr().PostEvent(&event);
+                CHIP_ERROR status                 = PlatformMgr().PostEvent(&event);
+                if (status != CHIP_NO_ERROR)
+                {
+                    result = WICED_BT_GATT_INTERNAL_ERROR;
+                }
                 buf = NULL;
             }
         }
         else
         {
             ChipLogError(DeviceLayer, "BLEManagerImpl: Out of buffers during CHIPoBLE RX");
+            result = WICED_BT_GATT_NO_RESOURCES;
         }
     }
     else
@@ -584,7 +592,10 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceWrite(uint16_t conn_id, 
             event.Type = (app_chip_service_char_tx_client_char_config[0] != 0) ? DeviceEventType::kCHIPoBLESubscribe
                                                                                : DeviceEventType::kCHIPoBLEUnsubscribe;
             event.CHIPoBLESubscribe.ConId = conn_id;
-            PlatformMgr().PostEvent(&event);
+            if (PlatformMgr().PostEvent(&event) != CHIP_NO_ERROR)
+            {
+                return WICED_BT_GATT_INTERNAL_ERROR;
+            }
         }
 
         ChipLogProgress(DeviceLayer, "CHIPoBLE %s received",
@@ -617,7 +628,10 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceIndCfm(uint16_t conn_id,
         ChipDeviceEvent event;
         event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
         event.CHIPoBLEIndicateConfirm.ConId = conn_id;
-        PlatformMgr().PostEvent(&event);
+        if (PlatformMgr().PostEvent(&event) != CHIP_NO_ERROR)
+        {
+            return WICED_BT_GATT_INTERNAL_ERROR;
+        }
     }
     return WICED_BT_GATT_SUCCESS;
 }
@@ -691,7 +705,10 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattConnectEvent(wiced_bt_gatt_conn
         ChipLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", p_conn_status->conn_id,
                         p_conn_status->reason);
 
-        PlatformMgr().PostEvent(&event);
+        if (PlatformMgr().PostEvent(&event) != CHIP_NO_ERROR)
+        {
+            return WICED_BT_GATT_INTERNAL_ERROR;
+        }
 
         // Arrange to re-enable connectable advertising in case it was disabled due to the
         // maximum connection limit being reached.

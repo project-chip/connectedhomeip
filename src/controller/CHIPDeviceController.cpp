@@ -177,13 +177,14 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     if (params.imDelegate != nullptr)
     {
-        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate));
+        mInteractionModelDelegate = params.imDelegate;
     }
     else
     {
-        mDefaultIMDelegate = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
-        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, mDefaultIMDelegate));
+        mDefaultIMDelegate        = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
+        mInteractionModelDelegate = mDefaultIMDelegate;
     }
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, mInteractionModelDelegate));
 
     mExchangeMgr->SetDelegate(this);
 
@@ -265,6 +266,10 @@ CHIP_ERROR DeviceController::Shutdown()
     // Shut down the interaction model before we try shuttting down the exchange
     // manager.
     app::InteractionModelEngine::GetInstance()->Shutdown();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    Mdns::Resolver::Instance().ShutdownResolver();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
     // if (mExchangeMgr != nullptr)
@@ -711,6 +716,7 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
         .storageDelegate = mStorageDelegate,
         .idAllocator     = &mIDAllocator,
         .fabricsTable    = &mFabrics,
+        .imDelegate      = mInteractionModelDelegate,
     };
 }
 
@@ -803,6 +809,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
     Messaging::ExchangeContext * exchangeCtxt = nullptr;
+    Optional<SessionHandle> session;
 
     uint16_t keyID = 0;
 
@@ -855,9 +862,8 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
-    err = mPairingSession.MessageDispatch().Init(mTransportMgr);
+    err = mPairingSession.MessageDispatch().Init(mSessionMgr);
     SuccessOrExit(err);
-    mPairingSession.MessageDispatch().SetPeerAddress(params.GetPeerAddress());
 
     device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, fabric->GetFabricIndex());
 
@@ -883,7 +889,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         }
     }
 #endif
-    exchangeCtxt = mExchangeMgr->NewContext(SessionHandle::TemporaryUnauthenticatedSession(), &mPairingSession);
+    session = mSessionMgr->CreateUnauthenticatedSession(params.GetPeerAddress());
+    VerifyOrExit(session.HasValue(), CHIP_ERROR_NO_MEMORY);
+
+    exchangeCtxt = mExchangeMgr->NewContext(session.Value(), &mPairingSession);
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     err = mIDAllocator.Allocate(keyID);
@@ -1637,6 +1646,16 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(const app::ReadCl
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(const app::ReadClient * apReadClient)
+{
+    // Release the object for subscription
+    if (apReadClient->IsSubscriptionType())
+    {
+        FreeAttributePathParam(apReadClient->GetAppIdentifier());
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseStatus(
     const app::WriteClient * apWriteClient, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
     const uint32_t aProtocolId, const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
@@ -1658,6 +1677,15 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseError(const ap
 {
     // When WriteResponseError occurred, it means we failed to receive the response from server.
     IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::SubscribeResponseProcessed(const app::ReadClient * apSubscribeClient)
+{
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
+    // When WriteResponseError occurred, it means we failed to receive the response from server.
+    IMSubscribeResponseCallback(apSubscribeClient, EMBER_ZCL_STATUS_SUCCESS);
+#endif
     return CHIP_NO_ERROR;
 }
 

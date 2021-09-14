@@ -3614,6 +3614,65 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_Cl
 }
 
 // End of Cluster OtaSoftwareUpdateProvider
+// Cluster OtaSoftwareUpdateRequestor
+
+chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * serverLocation,
+    uint32_t serverLocation_Len, uint16_t vendorId, uint8_t announcementReason, const uint8_t * metadataForNode,
+    uint32_t metadataForNode_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .AnnounceOtaProvider(nullptr, nullptr, chip::ByteSpan(serverLocation, serverLocation_Len), vendorId, announcementReason,
+                             chip::ByteSpan(metadataForNode, metadataForNode_Len))
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider(chip::Controller::Device * device,
+                                                                                                  chip::EndpointId ZCLendpointId,
+                                                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeDefaultOtaProvider(gOctetStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint8_t * value, size_t len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .WriteAttributeDefaultOtaProvider(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                          chip::ByteSpan(value, len))
+        .AsInteger();
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_UpdatePossible(chip::Controller::Device * device,
+                                                                                              chip::EndpointId ZCLendpointId,
+                                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeUpdatePossible(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_ClusterRevision(chip::Controller::Device * device,
+                                                                                               chip::EndpointId ZCLendpointId,
+                                                                                               chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+// End of Cluster OtaSoftwareUpdateRequestor
 // Cluster OccupancySensing
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_OccupancySensing_Occupancy(chip::Controller::Device * device,

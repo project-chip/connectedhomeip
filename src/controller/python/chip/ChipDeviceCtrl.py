@@ -241,15 +241,9 @@ class ChipDeviceController(object):
                 self.devCtrl, device_type)
         )
 
-    def DiscoverCommissionableNodesCommissioningEnabled(self, enabled):
+    def DiscoverCommissionableNodesCommissioningEnabled(self):
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(
-                self.devCtrl, enabled)
-        )
-
-    def DiscoverCommissionableNodesCommissioningEnabledFromCommand(self):
-        return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand(
                 self.devCtrl)
         )
 
@@ -441,12 +435,8 @@ class ChipDeviceController(object):
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesDeviceType.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled.argtypes = [
-                c_void_p, c_uint16]
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled.restype = c_uint32
-
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand.argtypes = [
                 c_void_p]
-            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand.restype = c_uint32
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [
                 c_void_p]

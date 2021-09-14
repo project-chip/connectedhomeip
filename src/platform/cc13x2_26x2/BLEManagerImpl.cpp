@@ -241,7 +241,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
 
-        PlatformMgr().PostEvent(&connEstEvent);
+        PlatformMgr().PostEventOrDie(&connEstEvent);
     }
     break;
 
@@ -900,7 +900,7 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 
         event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
         event.CHIPoBLEIndicateConfirm.ConId = connHandle;
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
 
         dealloc = TRUE;
     }
@@ -984,7 +984,7 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
             // Post event to CHIP
             event.CHIPoBLESubscribe.ConId = (void *) connHandle;
         }
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
     }
     break;
 
@@ -1144,7 +1144,7 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
         event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
         event.CHIPoBLEConnectionError.ConId  = (void *) &pPkt->connectionHandle;
         event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
 
         DriveBLEState();
 
@@ -1248,7 +1248,7 @@ uint8_t BLEManagerImpl::ProcessGATTMsg(gattMsgEvent_t * pMsg)
 
         event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
         event.CHIPoBLEIndicateConfirm.ConId = connHandle;
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
 
         BLEMGR_LOG("BLEMGR: ProcessGATTMsg, ATT_HANDLE_VALUE_CFM:");
     }

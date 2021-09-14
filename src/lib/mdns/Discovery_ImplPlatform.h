@@ -43,6 +43,7 @@ public:
 
     /// Starts the service resolver if not yet started
     CHIP_ERROR StartResolver(Inet::InetLayer * inetLayer, uint16_t port) override { return Init(); }
+    void ShutdownResolver() override { ChipMdnsShutdown(); }
 
     /// Advertises the CHIP node as an operational node
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;

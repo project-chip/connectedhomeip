@@ -70,8 +70,7 @@ CommissionAdvertisingParameters commissionableNodeParamsSmall =
         .SetMac(ByteSpan(kMac))
         .SetLongDiscriminator(0xFFE)
         .SetShortDiscriminator(0xF)
-        .SetCommissioningMode(false)
-        .SetAdditionalCommissioning(false);
+        .SetCommissioningMode(CommissioningMode::kDisabled);
 // Instance names need to be obtained from the advertiser, so they are not set here.
 test::ExpectedCall commissionableSmall = test::ExpectedCall()
                                              .SetProtocol(MdnsServiceProtocol::kMdnsProtocolUdp)
@@ -80,9 +79,8 @@ test::ExpectedCall commissionableSmall = test::ExpectedCall()
                                              .AddTxt("CM", "0")
                                              .AddTxt("D", "4094")
                                              .AddSubtype("_S15")
-                                             .AddSubtype("_L4094")
-                                             .AddSubtype("_C0");
-CommissionAdvertisingParameters commissionableNodeParamsLarge =
+                                             .AddSubtype("_L4094");
+CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
     CommissionAdvertisingParameters()
         .SetCommissionAdvertiseMode(CommssionAdvertiseMode::kCommissionableNode)
         .SetMac(ByteSpan(kMac, sizeof(kMac)))
@@ -90,33 +88,62 @@ CommissionAdvertisingParameters commissionableNodeParamsLarge =
         .SetShortDiscriminator(2)
         .SetVendorId(chip::Optional<uint16_t>(555))
         .SetDeviceType(chip::Optional<uint16_t>(25))
-        .SetCommissioningMode(true)
-        .SetAdditionalCommissioning(true)
+        .SetCommissioningMode(CommissioningMode::kEnabledBasic)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
         .SetPairingInstr(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
         .SetRotatingId(chip::Optional<const char *>("id_that_spins"));
 
-test::ExpectedCall commissionableLarge = test::ExpectedCall()
-                                             .SetProtocol(MdnsServiceProtocol::kMdnsProtocolUdp)
-                                             .SetServiceName("_matterc")
-                                             .SetHostName(host)
-                                             .AddTxt("D", "22")
-                                             .AddTxt("VP", "555+897")
-                                             .AddTxt("AP", "1")
-                                             .AddTxt("CM", "1")
-                                             .AddTxt("DT", "25")
-                                             .AddTxt("DN", "testy-test")
-                                             .AddTxt("RI", "id_that_spins")
-                                             .AddTxt("PI", "Pair me")
-                                             .AddTxt("PH", "3")
-                                             .AddSubtype("_S2")
-                                             .AddSubtype("_L22")
-                                             .AddSubtype("_V555")
-                                             .AddSubtype("_T25")
-                                             .AddSubtype("_C1")
-                                             .AddSubtype("_A1");
+test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
+                                                  .SetProtocol(MdnsServiceProtocol::kMdnsProtocolUdp)
+                                                  .SetServiceName("_matterc")
+                                                  .SetHostName(host)
+                                                  .AddTxt("D", "22")
+                                                  .AddTxt("VP", "555+897")
+                                                  .AddTxt("CM", "1")
+                                                  .AddTxt("DT", "25")
+                                                  .AddTxt("DN", "testy-test")
+                                                  .AddTxt("RI", "id_that_spins")
+                                                  .AddTxt("PI", "Pair me")
+                                                  .AddTxt("PH", "3")
+                                                  .AddSubtype("_S2")
+                                                  .AddSubtype("_L22")
+                                                  .AddSubtype("_V555")
+                                                  .AddSubtype("_T25")
+                                                  .AddSubtype("_CM");
+CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
+    CommissionAdvertisingParameters()
+        .SetCommissionAdvertiseMode(CommssionAdvertiseMode::kCommissionableNode)
+        .SetMac(ByteSpan(kMac, sizeof(kMac)))
+        .SetLongDiscriminator(22)
+        .SetShortDiscriminator(2)
+        .SetVendorId(chip::Optional<uint16_t>(555))
+        .SetDeviceType(chip::Optional<uint16_t>(25))
+        .SetCommissioningMode(CommissioningMode::kEnabledEnhanced)
+        .SetDeviceName(chip::Optional<const char *>("testy-test"))
+        .SetPairingHint(chip::Optional<uint16_t>(3))
+        .SetPairingInstr(chip::Optional<const char *>("Pair me"))
+        .SetProductId(chip::Optional<uint16_t>(897))
+        .SetRotatingId(chip::Optional<const char *>("id_that_spins"));
+
+test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
+                                                     .SetProtocol(MdnsServiceProtocol::kMdnsProtocolUdp)
+                                                     .SetServiceName("_matterc")
+                                                     .SetHostName(host)
+                                                     .AddTxt("D", "22")
+                                                     .AddTxt("VP", "555+897")
+                                                     .AddTxt("CM", "2")
+                                                     .AddTxt("DT", "25")
+                                                     .AddTxt("DN", "testy-test")
+                                                     .AddTxt("RI", "id_that_spins")
+                                                     .AddTxt("PI", "Pair me")
+                                                     .AddTxt("PH", "3")
+                                                     .AddSubtype("_S2")
+                                                     .AddSubtype("_L22")
+                                                     .AddSubtype("_V555")
+                                                     .AddSubtype("_T25")
+                                                     .AddSubtype("_CM");
 void TestStub(nlTestSuite * inSuite, void * inContext)
 {
     // This is a test of the fake platform impl. We want
@@ -166,10 +193,18 @@ void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
     test::Reset();
     commissionableLarge.callType = test::CallType::kStart;
     NL_TEST_ASSERT(inSuite,
-                   mdnsPlatform.GetCommissionableInstanceName(commissionableLarge.instanceName,
-                                                              sizeof(commissionableLarge.instanceName)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, test::AddExpectedCall(commissionableLarge) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(commissionableNodeParamsLarge) == CHIP_NO_ERROR);
+                   mdnsPlatform.GetCommissionableInstanceName(commissionableLargeBasic.instanceName,
+                                                              sizeof(commissionableLargeBasic.instanceName)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test::AddExpectedCall(commissionableLargeBasic) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(commissionableNodeParamsLargeBasic) == CHIP_NO_ERROR);
+
+    test::Reset();
+    commissionableLarge.callType = test::CallType::kStart;
+    NL_TEST_ASSERT(inSuite,
+                   mdnsPlatform.GetCommissionableInstanceName(commissionableLargeEnhanced.instanceName,
+                                                              sizeof(commissionableLargeEnhanced.instanceName)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, test::AddExpectedCall(commissionableLargeEnhanced) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(commissionableNodeParamsLargeEnhanced) == CHIP_NO_ERROR);
 }
 
 const nlTest sTests[] = {

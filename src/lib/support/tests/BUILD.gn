@@ -29,6 +29,7 @@ chip_test_suite("tests") {
     "TestCHIPArgParser.cpp",
     "TestCHIPCounter.cpp",
     "TestCHIPMem.cpp",
+    "TestCHIPMemString.cpp",
     "TestDefer.cpp",
     "TestErrorStr.cpp",
     "TestFixedBufferAllocator.cpp",

@@ -68,8 +68,10 @@ protected:
      *                              The reporting handler continues to be called as long as the callback
      *                              is active. The user can stop the reporting by cancelling the callback.
      *                              Reference: chip::Callback::Cancel()
+     * @param[in] tlvDataFilter     Filter interface for processing data from TLV
      */
-    CHIP_ERROR RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * reportHandler);
+    CHIP_ERROR RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * reportHandler,
+                                         app::TLVDataFilter tlvDataFilter);
 
     const ClusterId mClusterId;
     Device * mDevice;

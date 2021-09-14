@@ -17,6 +17,7 @@
 
 from dataclasses import dataclass
 from typing import Any
+import typing
 from chip import ChipDeviceCtrl
 import chip.interaction_model as IM
 import threading
@@ -234,6 +235,60 @@ class BaseTestHelper:
         if failed_zcl:
             self.logger.exception(f"Following attributes failed: {failed_zcl}")
             return False
+        return True
+
+    def TestSubscription(self, nodeid: int, endpoint: int):
+        class _subscriptionHandler(IM.OnSubscriptionReport):
+            def __init__(self, path: IM.AttributePath, logger: logging.Logger):
+                super(_subscriptionHandler, self).__init__()
+                self.subscriptionReceived = 0
+                self.path = path
+                self.countLock = threading.Lock()
+                self.cv = threading.Condition(self.countLock)
+                self.logger = logger
+
+            def OnData(self, path: IM.AttributePath, subscriptionId: int, data: typing.Any) -> None:
+                if path != self.path:
+                    return
+                logger.info(
+                    f"Received report from server: path: {path}, value: {data}, subscriptionId: {subscriptionId}")
+                with self.countLock:
+                    self.subscriptionReceived += 1
+                    self.cv.notify_all()
+
+        class _conductAttributeChange(threading.Thread):
+            def __init__(self, devCtrl: ChipDeviceCtrl.ChipDeviceController, nodeid: int, endpoint: int):
+                super(_conductAttributeChange, self).__init__()
+                self.nodeid = nodeid
+                self.endpoint = endpoint
+                self.devCtrl = devCtrl
+
+            def run(self):
+                for i in range(5):
+                    time.sleep(3)
+                    self.devCtrl.ZCLSend(
+                        "OnOff", "Toggle", self.nodeid, self.endpoint, 0, {})
+
+        try:
+            subscribedPath = IM.AttributePath(
+                nodeId=nodeid, endpointId=endpoint, clusterId=6, attributeId=0)
+            # OnOff Cluster, OnOff Attribute
+            handler = _subscriptionHandler(subscribedPath, self.logger)
+            IM.SetAttributeReportCallback(subscribedPath, handler)
+            self.devCtrl.ZCLConfigureAttribute(
+                "OnOff", "OnOff", nodeid, endpoint, 1, 10, 0)
+            changeThread = _conductAttributeChange(
+                self.devCtrl, nodeid, endpoint)
+            changeThread.start()
+            with handler.cv:
+                while handler.subscriptionReceived < 5:
+                    # We should observe 10 attribute changes
+                    handler.cv.wait()
+            return True
+        except Exception as ex:
+            self.logger.exception(f"Failed to finish API test: {ex}")
+            return False
+
         return True
 
     def TestNonControllerAPIs(self):
