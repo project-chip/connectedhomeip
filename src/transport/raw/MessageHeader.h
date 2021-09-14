@@ -49,7 +49,7 @@ namespace Header {
 enum class SessionType
 {
     kSessionTypeNone = 0,
-    kAESCCMTagLen16     = 1,
+    kAESCCMTagLen16  = 1,
 };
 
 /**

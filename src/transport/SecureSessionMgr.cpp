@@ -247,8 +247,8 @@ void SecureSessionMgr::ExpireAllPairingsForFabric(FabricIndex fabric)
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
                                         PairingSession * pairing, SecureSession::SessionRole direction, FabricIndex fabric)
 {
-    uint16_t PeerSessionId  = pairing->GetPeerSessionId();
-    uint16_t localKeyId = pairing->GetLocalKeyId();
+    uint16_t PeerSessionId = pairing->GetPeerSessionId();
+    uint16_t localKeyId    = pairing->GetLocalKeyId();
     PeerConnectionState * state =
         mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(peerNodeId), localKeyId, nullptr);
 
