@@ -42,12 +42,14 @@
  *  16 bit: | Session ID                                                           |
  *  32 bit: | Message Counter                                                      |
  *  64 bit: | SOURCE_NODE_ID (iff source node flag is set)                         |
- *  64 bit: | DEST_NODE_ID (iff destination node flag is set)                      | |
+ *  64 bit: | DEST_NODE_ID (iff destination node flag is set)                      |
  * -------- Encrypted header -------------------------------------------------------
- *  8 bit:  | Exchange Flags: RESERVED: 3 bit | V: 1 bit | SX: 1 bit | R: 1 bit | A: 1 bit | I: 1 bit | | 8 bit:  | Protocol Opcode
- *| 16 bit: | Exchange ID                                                          | 16 bit: | Protocol ID 16 bit: | Optional Vendor
- *ID                                                   |                                                        | 32 bit: |
- *Acknowledged Message Counter (if A flag in the Header is set)        |
+ *  8 bit:  | Exchange Flags: RESERVED: 3 bit | V: 1 bit | SX: 1 bit | R: 1 bit | A: 1 bit | I: 1 bit |
+ *  8 bit:  | Protocol Opcode                                                      |
+ * 16 bit:  | Exchange ID                                                          |
+ * 16 bit:  | Protocol ID                                                          |
+ * 16 bit:  | Optional Vendor ID                                                   |
+ * 32 bit:  | Acknowledged Message Counter (if A flag in the Header is set)        |
  * -------- Encrypted Application Data Start ---------------------------------------
  *  <var>:  | Encrypted Data                                                       |
  * -------- Encrypted Application Data End -----------------------------------------
@@ -125,9 +127,9 @@ uint16_t PayloadHeader::EncodeSizeBytes() const
     return static_cast<uint16_t>(size);
 }
 
-uint16_t MessageAuthenticationCode::TagLenForSessionType(Header::SessionType encType)
+uint16_t MessageAuthenticationCode::TagLenForSessionType(Header::SessionType sessionType)
 {
-    switch (encType)
+    switch (sessionType)
     {
     case Header::SessionType::kAESCCMTagLen16:
         return 16;

@@ -158,7 +158,7 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mIPKLen           = static_cast<uint16_t>(sizeof(mIPK));
     serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
     serializable.mPeerNodeId       = peerNodeId;
-    serializable.mLocalKeyId       = GetLocalKeyId();
+    serializable.mLocalSessionId       = GetLocalSessionId();
     serializable.mPeerSessionId    = GetPeerSessionId();
 
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
@@ -182,7 +182,7 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     memcpy(mIPK, serializable.mIPK, serializable.mIPKLen);
 
     SetPeerNodeId(serializable.mPeerNodeId);
-    SetLocalKeyId(serializable.mLocalKeyId);
+    SetLocalSessionId(serializable.mLocalSessionId);
     SetPeerSessionId(serializable.mPeerSessionId);
 
     return CHIP_NO_ERROR;
@@ -197,7 +197,7 @@ CHIP_ERROR CASESession::Init(uint16_t myKeyId, SessionEstablishmentDelegate * de
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     mDelegate = delegate;
-    SetLocalKeyId(myKeyId);
+    SetLocalSessionId(myKeyId);
 
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
@@ -329,7 +329,7 @@ CHIP_ERROR CASESession::SendSigmaR1()
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), initiatorRandom, sizeof(initiatorRandom)));
     // Retrieve Session Identifier
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyId(), true));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId(), true));
     // Generate a Destination Identifier
     {
         MutableByteSpan destinationIdSpan(destinationIdentifier);
@@ -558,7 +558,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
         tlvWriter.Init(std::move(msg_R2));
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), &msg_rand[0], sizeof(msg_rand)));
-        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyId(), true));
+        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId(), true));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(3), mEphemeralKey.Pubkey(),
                                                static_cast<uint32_t>(mEphemeralKey.Pubkey().Length())));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(4), msg_R2_Encrypted.Get(),

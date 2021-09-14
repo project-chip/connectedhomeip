@@ -379,7 +379,7 @@ struct ChipDeviceEvent final
         {
             uint64_t PeerNodeId;
             uint16_t SessionKeyId;
-            uint8_t EncType;
+            uint8_t SessionType;
             bool IsCommissioner;
         } SessionEstablished;
         struct

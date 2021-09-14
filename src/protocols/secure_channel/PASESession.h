@@ -69,7 +69,7 @@ struct PASESessionSerializable
     uint16_t mKeLen;
     uint8_t mKe[kMAX_Hash_Length];
     uint8_t mPairingComplete;
-    uint16_t mLocalKeyId;
+    uint16_t mLocalSessionId;
     uint16_t mPeerSessionId;
 };
 
@@ -339,13 +339,13 @@ class SecurePairingUsingTestSecret : public PairingSession
 public:
     SecurePairingUsingTestSecret()
     {
-        SetLocalKeyId(0);
+        SetLocalSessionId(0);
         SetPeerSessionId(0);
     }
 
-    SecurePairingUsingTestSecret(uint16_t PeerSessionId, uint16_t localKeyId)
+    SecurePairingUsingTestSecret(uint16_t PeerSessionId, uint16_t LocalSessionId)
     {
-        SetLocalKeyId(localKeyId);
+        SetLocalSessionId(LocalSessionId);
         SetPeerSessionId(PeerSessionId);
     }
 
@@ -363,7 +363,7 @@ public:
         memset(&serializable, 0, sizeof(serializable));
         serializable.mKeLen           = static_cast<uint16_t>(secretLen);
         serializable.mPairingComplete = 1;
-        serializable.mLocalKeyId      = GetLocalKeyId();
+        serializable.mLocalSessionId      = GetLocalSessionId();
         serializable.mPeerSessionId   = GetPeerSessionId();
 
         memcpy(serializable.mKe, kTestSecret, secretLen);
