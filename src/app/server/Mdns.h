@@ -56,6 +56,10 @@ public:
     int16_t GetDiscoveryTimeoutSecs() { return mDiscoveryTimeoutSecs; }
 
     /// Callback from Discovery Expiration timer
+    /// Checks if discovery has expired and if so,
+    /// kicks off extend discovery (when enabled)
+    /// otherwise, stops commissionable node advertising
+    /// Discovery Expiration refers here to commissionable node advertising when in commissioning mode
     void OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -63,6 +67,9 @@ public:
     void SetExtendedDiscoveryTimeoutSecs(int16_t secs);
 
     /// Callback from Extended Discovery Expiration timer
+    /// Checks if extended discovery has expired and if so,
+    /// stops commissionable node advertising
+    /// Extended Discovery Expiration refers here to commissionable node advertising when NOT in commissioning mode
     void OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
@@ -80,8 +87,17 @@ public:
     CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen);
 
 private:
+    /// Overloaded utility method for commissioner and commissionable advertisement
+    /// This method is used for both commissioner discovery and commissionable node discovery since
+    /// they share many fields.
+    ///   commissionableNode = true : advertise commissionable node
+    ///   commissionableNode = false : advertise commissioner
     CHIP_ERROR Advertise(bool commissionableNode, chip::Mdns::CommissioningMode mode);
+
+    /// Set MDNS commissioner advertisement
     CHIP_ERROR AdvertiseCommissioner();
+
+    /// Set MDNS commissionable node advertisement
     CHIP_ERROR AdvertiseCommissionableNode(chip::Mdns::CommissioningMode mode);
 
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
@@ -101,6 +117,9 @@ private:
     CHIP_ERROR ScheduleDiscoveryExpiration();
     int16_t mDiscoveryTimeoutSecs   = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
     uint64_t mDiscoveryExpirationMs = TIMEOUT_CLEARED;
+
+    /// return true if expirationMs is valid (not cleared and not in the future)
+    bool OnExpiration(uint64_t expirationMs);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// get the current extended discovery timeout (from persistent storage)
