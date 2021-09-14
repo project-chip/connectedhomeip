@@ -30,6 +30,9 @@ jobs:
 
         env:
             BUILD_TYPE: esp32
+            GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
+            GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+            GH_EVENT_PARENT: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -64,6 +67,10 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/all-clusters-app/esp32/build/chip-all-clusters-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 m5stack all-clusters-app \
+                     example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf \
+                     /tmp/bloat_reports/
             - name: Build example All Clusters App C3
               timeout-minutes: 10
               run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_c3devkit.defaults
@@ -72,6 +79,10 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/all-clusters-app/esp32/build/chip-all-clusters-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 c3devkit all-clusters-app \
+                     example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf \
+                     /tmp/bloat_reports/
             - name: Build example Pigweed App
               timeout-minutes: 5
               run: scripts/examples/esp_example.sh pigweed-app sdkconfig.defaults
@@ -80,6 +91,10 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/pigweed-app/esp32/build/chip-pigweed-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-pigweed-app.elf
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 default pigweed-app \
+                     example_binaries/$BUILD_TYPE-build/chip-pigweed-app.elf \
+                     /tmp/bloat_reports/
             - name: Build example Lock App
               timeout-minutes: 5
               run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults
@@ -88,6 +103,10 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/lock-app/esp32/build/chip-lock-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-lock-app.elf
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 default lock-app \
+                     example_binaries/$BUILD_TYPE-build/chip-lock-app.elf \
+                     /tmp/bloat_reports/
             - name: Build example Bridge App
               timeout-minutes: 5
               run: scripts/examples/esp_example.sh bridge-app
@@ -96,6 +115,10 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/bridge-app/esp32/build/chip-bridge-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-bridge-app.elf
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 default bridge-app \
+                     example_binaries/$BUILD_TYPE-build/chip-bridge-app.elf \
+                     /tmp/bloat_reports/
             - name: Build example Persistent Storage App
               timeout-minutes: 5
               run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults
@@ -104,6 +127,10 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/persistent-storage/esp32/build/chip-persistent-storage.elf \
                      example_binaries/$BUILD_TYPE-build/chip-persistent-storage.elf
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 default persistent-storage \
+                     example_binaries/$BUILD_TYPE-build/chip-persistent-storage.elf \
+                     /tmp/bloat_reports/
             - name: Build example Shell App
               timeout-minutes: 5
               run: scripts/examples/esp_example.sh shell sdkconfig.defaults
@@ -112,6 +139,10 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/shell/esp32/build/chip-shell.elf \
                      example_binaries/$BUILD_TYPE-build/chip-shell.elf
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 default shell \
+                     example_binaries/$BUILD_TYPE-build/chip-shell.elf \
+                     /tmp/bloat_reports/
             - name: Build example Temperature Measurement App
               timeout-minutes: 5
               run: scripts/examples/esp_example.sh temperature-measurement-app sdkconfig.optimize.defaults
@@ -120,6 +151,10 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/temperature-measurement-app/esp32/build/chip-temperature-measurement-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-temperature-measurement-app.elf
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 optimize temperature-measurement-app \
+                     example_binaries/$BUILD_TYPE-build/chip-temperature-measurement-app.elf \
+                     /tmp/bloat_reports/
             - name: Build example IPv6 Only App
               timeout-minutes: 5
               run: scripts/examples/esp_example.sh ipv6only-app sdkconfig.defaults
@@ -128,6 +163,10 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/ipv6only-app/esp32/build/chip-ipv6only-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-ipv6only-app.elf
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 default ipv6only-app \
+                     example_binaries/$BUILD_TYPE-build/chip-ipv6only-app.elf \
+                     /tmp/bloat_reports/
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -145,3 +184,8 @@ jobs:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
+            - name: Uploading Size Reports
+              uses: actions/upload-artifact@v2
+              with:
+                  name: Size,ESP32-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
+                  path: /tmp/bloat_reports/

@@ -165,6 +165,7 @@ public:
     }
 
     SessionHandle GetSecureSession() { return mSecureSession.Value(); }
+    bool HasSecureSession() const { return mSecureSession.HasValue(); }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 

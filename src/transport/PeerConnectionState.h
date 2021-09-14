@@ -86,18 +86,6 @@ public:
                 mLocalKeyID != UINT16_MAX);
     }
 
-    /**
-     *  Reset the connection state to a completely uninitialized status.
-     */
-    void Reset()
-    {
-        mPeerAddress        = PeerAddress::Uninitialized();
-        mPeerNodeId         = kUndefinedNodeId;
-        mLastActivityTimeMs = 0;
-        mSecureSession.Reset();
-        mSessionMessageCounter.Reset();
-    }
-
     CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
                                  MessageAuthenticationCode & mac) const
     {

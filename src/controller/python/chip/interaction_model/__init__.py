@@ -22,6 +22,8 @@
 
 """Provides Python APIs for CHIP."""
 from construct.core import EnumInteger
+
+from .delegate import OnSubscriptionReport, SetAttributeReportCallback, AttributePath
 __all__ = ["IMDelegate", "ProtocolCode"]
 
 

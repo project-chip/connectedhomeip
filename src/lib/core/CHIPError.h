@@ -146,9 +146,10 @@ public:
      * (In C++20 this could be replaced by a consteval constructor.)
      */
 #if CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(chip::ChipError::SdkErrorConstant<(part), (code)>::value, __FILE__, __LINE__))
+#define CHIP_SDK_ERROR(part, code)                                                                                                 \
+    (::chip::ChipError(::chip::ChipError::SdkErrorConstant<(part), (code)>::value, __FILE__, __LINE__))
 #else // CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(chip::ChipError::SdkErrorConstant<(part), (code)>::value))
+#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(::chip::ChipError::SdkErrorConstant<(part), (code)>::value))
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
     /**

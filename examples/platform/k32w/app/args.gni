@@ -28,5 +28,4 @@ chip_inet_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = "<CHIPProjectConfig.h>"
 
 chip_system_config_provide_statistics = false
-chip_inet_config_enable_raw_endpoint = false
 chip_with_nlfaultinjection = true

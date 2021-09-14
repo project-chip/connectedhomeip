@@ -2428,7 +2428,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 4
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 8
 #endif
 
 /**
@@ -2447,6 +2447,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+ *
+ * @brief Defines the object pool for allocating attribute path for subscription in device controller.
+ */
+#ifndef CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+#define CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE CHIP_IM_MAX_NUM_READ_CLIENT
 #endif
 
 /**
