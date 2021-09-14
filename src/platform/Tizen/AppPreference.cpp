@@ -113,17 +113,7 @@ CHIP_ERROR AppPreference::SaveData(const char * key, const uint8_t * data, size_
     err = __IsKeyExist(key);
     if (err == CHIP_NO_ERROR)
     {
-        preErr = preference_remove(key);
-        if (preErr == PREFERENCE_ERROR_NONE)
-        {
-            ChipLogProgress(DeviceLayer, "Remove data [%s]", key);
-        }
-        else
-        {
-            ChipLogProgress(DeviceLayer, "FAIL: remove preference [%s]", get_error_message(preErr));
-            err = CHIP_ERROR_INCORRECT_STATE;
-            return err;
-        }
+        VerifyOrExit(RemoveData(key) == CHIP_NO_ERROR, err = CHIP_ERROR_INCORRECT_STATE);
     }
     err = CHIP_NO_ERROR;
 
