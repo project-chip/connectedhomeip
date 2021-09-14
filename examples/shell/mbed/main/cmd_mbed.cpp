@@ -51,11 +51,10 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::secure_channel;
 using namespace chip::Protocols::Echo;
-using namespace chip::System::Platform::Clock;
+using namespace chip::System::Clock;
 using namespace mbed;
 using namespace rtos;
 
-static Engine sShellDateSubcommands;
 static Engine sShellNetworkSubcommands;
 static Engine sShellServerSubcommands;
 
@@ -69,79 +68,22 @@ CHIP_ERROR cmd_common_help_iterator(shell_command_t * command, void * arg)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR cmd_date_help(int argc, char ** argv)
+CHIP_ERROR cmd_date(int argc, char ** argv)
 {
-    sShellDateSubcommands.ForEachCommand(cmd_common_help_iterator, nullptr);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR cmd_date_dispatch(int argc, char ** argv)
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
     uint16_t year;
     uint8_t month, dayOfMonth;
     uint8_t hour, minute, second;
 
-    uint64_t currTimeMS = 0;
+    MonotonicMicroseconds currTimeMS = 0;
 
     streamer_t * sout = streamer_get();
 
-    if (0 == argc)
-    {
-        error = GetUnixTimeMicroseconds(currTimeMS);
-        if (error != CHIP_NO_ERROR)
-        {
-            streamer_printf(sout, "ERROR: Get unix time ms failed\r\n");
-            return error;
-        }
+    currTimeMS = chip::System::Clock::GetMonotonicMicroseconds();
 
-        SecondsSinceUnixEpochToCalendarTime(currTimeMS / kMicrosecondsPerSecond, year, month, dayOfMonth, hour, minute, second);
-        streamer_printf(sout, "%04" PRIu16 "-%02" PRIu8 "-%02" PRIu8 " %02" PRIu8 ":%02" PRIu8 ":%02" PRIu8 "\r\n", year, month,
-                        dayOfMonth, hour, minute, second);
-        return CHIP_NO_ERROR;
-    }
-
-    return sShellDateSubcommands.ExecCommand(argc, argv);
-}
-
-CHIP_ERROR cmd_date_set(int argc, char ** argv)
-{
-    uint16_t year;
-    uint8_t month, dayOfMonth;
-    uint8_t hour, minute, seconds;
-
-    uint32_t newCurrTime = 0;
-    streamer_t * sout    = streamer_get();
-
-    int ret          = 0;
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    VerifyOrExit(argc == 2, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    ret = sscanf(argv[0], "%4" SCNu16 "-%2" SCNu8 "-%2" SCNu8, &year, &month, &dayOfMonth);
-    if (3 != ret)
-    {
-        streamer_printf(sout, "ERROR: Date is in wrong format! Please use 'YYYY-MM-DD HH:MM:SS' format.\r\n");
-        ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT;);
-    }
-
-    ret = sscanf(argv[1], "%2" SCNu8 ":%2" SCNu8 ":%2" SCNu8, &hour, &minute, &seconds);
-    if (3 != ret)
-    {
-        streamer_printf(sout, "ERROR: Time is in wrong format! Please use 'YYYY-MM-DD HH:MM:SS' format.\r\n");
-        ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT;);
-    }
-
-    if (!CalendarTimeToSecondsSinceUnixEpoch(year, month, dayOfMonth, hour, minute, seconds, newCurrTime))
-    {
-        streamer_printf(sout, "ERROR: Wrong date and/or time values\r\n");
-        ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT;);
-    }
-
-    error = SetUnixTimeMicroseconds(static_cast<uint64_t>(newCurrTime) * static_cast<uint64_t>(kMicrosecondsPerSecond));
-
-exit:
-    return error;
+    SecondsSinceUnixEpochToCalendarTime(currTimeMS / kMicrosecondsPerSecond, year, month, dayOfMonth, hour, minute, second);
+    streamer_printf(sout, "%04" PRIu16 "-%02" PRIu8 "-%02" PRIu8 " %02" PRIu8 ":%02" PRIu8 ":%02" PRIu8 "\r\n", year, month,
+                    dayOfMonth, hour, minute, second);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR cmd_device_test_config(int argc, char ** argv)
@@ -356,7 +298,7 @@ void HandleDNSResolveComplete(void * appState, CHIP_ERROR error, uint8_t addrCou
 
 CHIP_ERROR OnTcpMessageReceived(TCPEndPoint * endPoint, System::PacketBufferHandle && buffer)
 {
-    DeviceLayer::SystemLayer.CancelTimer(HandleResponseTimerComplete, nullptr);
+    DeviceLayer::SystemLayer().CancelTimer(HandleResponseTimerComplete, nullptr);
 
     streamer_printf(streamer_get(), "INFO: TCP message received\r\n");
     HandleMessageReceived(std::move(buffer));
@@ -381,7 +323,7 @@ void OnTcpConnectionCompleted(TCPEndPoint * endPoint, CHIP_ERROR error)
 
         if (gChipClient.response)
         {
-            DeviceLayer::SystemLayer.StartTimer(gResponseReceivedTimeoutlMs, HandleResponseTimerComplete, nullptr);
+            DeviceLayer::SystemLayer().StartTimer(gResponseReceivedTimeoutlMs, HandleResponseTimerComplete, nullptr);
         }
         else
         {
@@ -397,7 +339,7 @@ void OnTcpConnectionCompleted(TCPEndPoint * endPoint, CHIP_ERROR error)
 
 void OnUdpMessageReceived(IPEndPointBasis * endPoint, System::PacketBufferHandle && buffer, const IPPacketInfo * pktInfo)
 {
-    DeviceLayer::SystemLayer.CancelTimer(HandleResponseTimerComplete, nullptr);
+    DeviceLayer::SystemLayer().CancelTimer(HandleResponseTimerComplete, nullptr);
 
     char peerAddrStr[PeerAddress::kMaxToStringSize];
     streamer_t * sout       = streamer_get();
@@ -411,7 +353,7 @@ void OnUdpMessageReceived(IPEndPointBasis * endPoint, System::PacketBufferHandle
 
 void OnUdpMReceiveError(IPEndPointBasis * endPoint, CHIP_ERROR error, const IPPacketInfo * pktInfo)
 {
-    DeviceLayer::SystemLayer.CancelTimer(HandleResponseTimerComplete, nullptr);
+    DeviceLayer::SystemLayer().CancelTimer(HandleResponseTimerComplete, nullptr);
 
     streamer_printf(streamer_get(), "ERROR: UDP receive failed: %s\r\n", ErrorStr(error));
     gChipClient.Free();
@@ -549,7 +491,7 @@ CHIP_ERROR cmd_network_client(int argc, char ** argv)
 
         if (gChipClient.response)
         {
-            DeviceLayer::SystemLayer.StartTimer(gResponseReceivedTimeoutlMs, HandleResponseTimerComplete, nullptr);
+            DeviceLayer::SystemLayer().StartTimer(gResponseReceivedTimeoutlMs, HandleResponseTimerComplete, nullptr);
         }
         else
         {
@@ -761,7 +703,7 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
                                           .SetListenPort(gChipServer.port));
         SuccessOrExit(error);
 
-        error = gChipServer.sessionManager.Init(&DeviceLayer::SystemLayer, gChipServer.udp, &fabrics,
+        error = gChipServer.sessionManager.Init(&DeviceLayer::SystemLayer(), gChipServer.udp, &fabrics,
                                                 &gChipServer.messageCounterManager);
         SuccessOrExit(error);
     }
@@ -778,7 +720,7 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
                                           .SetListenPort(gChipServer.port));
         SuccessOrExit(error);
 
-        error = gChipServer.sessionManager.Init(&DeviceLayer::SystemLayer, gChipServer.tcp, &fabrics,
+        error = gChipServer.sessionManager.Init(&DeviceLayer::SystemLayer(), gChipServer.tcp, &fabrics,
                                                 &gChipServer.messageCounterManager);
         SuccessOrExit(error);
     }
@@ -853,10 +795,7 @@ CHIP_ERROR cmd_server_off(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-static const shell_command_t cmds_date_root = { &cmd_date_dispatch, "date", "Display the current time, or set the system date." };
-
-static const shell_command_t cmds_date[] = { { &cmd_date_set, "set", "Set date/time using 'YYYY-MM-DD HH:MM:SS' format" },
-                                             { &cmd_date_help, "help", "Display help for each subcommand" } };
+static const shell_command_t cmds_date_root = { &cmd_date, "date", "Display the current time." };
 
 static const shell_command_t cmds_test_config = { &cmd_device_test_config, "testconfig",
                                                   "Test the configuration implementation. Usage: device testconfig" };
@@ -890,7 +829,6 @@ static const shell_command_t cmds_server[] = { { &cmd_server_on, "on",
 
 void cmd_mbed_init()
 {
-    sShellDateSubcommands.RegisterCommands(cmds_date, ArraySize(cmds_date));
     sShellNetworkSubcommands.RegisterCommands(cmds_network, ArraySize(cmds_network));
     sShellServerSubcommands.RegisterCommands(cmds_server, ArraySize(cmds_server));
     Engine::Root().RegisterCommands(&cmds_date_root, 1);
