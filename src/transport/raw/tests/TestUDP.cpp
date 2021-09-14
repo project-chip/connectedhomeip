@@ -44,7 +44,7 @@ namespace {
 
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
-constexpr uint32_t kMessageId       = 18;
+constexpr uint32_t kMessageCounter  = 18;
 
 using TestContext = chip::Test::IOContext;
 TestContext sContext;
@@ -67,7 +67,7 @@ public:
 
         NL_TEST_ASSERT(mSuite, packetHeader.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, packetHeader.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
-        NL_TEST_ASSERT(mSuite, packetHeader.GetMessageId() == kMessageId);
+        NL_TEST_ASSERT(mSuite, packetHeader.GetMessageCounter() == kMessageCounter);
 
         size_t data_len = msgBuf->DataLength();
         int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
@@ -133,7 +133,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     ReceiveHandlerCallCount = 0;
 
     PacketHeader header;
-    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
+    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
 
     err = header.EncodeBeforeData(buffer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

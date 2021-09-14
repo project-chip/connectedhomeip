@@ -74,8 +74,8 @@ constexpr size_t kNodeIdSizeBytes = 8;
 /// size of a serialized vendor id inside a header
 constexpr size_t kVendorIdSizeBytes = 2;
 
-/// size of a serialized ack id inside a header
-constexpr size_t kAckIdSizeBytes = 4;
+/// size of a serialized ack message counter inside a header
+constexpr size_t kAckMessageCounterSizeBytes = 4;
 
 /// Mask to extract just the version part from a 16bit header prefix.
 constexpr uint16_t kVersionMask = 0x00F0;
@@ -117,12 +117,12 @@ uint16_t PayloadHeader::EncodeSizeBytes() const
         size += kVendorIdSizeBytes;
     }
 
-    if (mAckId.HasValue())
+    if (mAckMessageCounter.HasValue())
     {
-        size += kAckIdSizeBytes;
+        size += kAckMessageCounterSizeBytes;
     }
 
-    static_assert(kEncryptedHeaderSizeBytes + kVendorIdSizeBytes + kAckIdSizeBytes <= UINT16_MAX,
+    static_assert(kEncryptedHeaderSizeBytes + kVendorIdSizeBytes + kAckMessageCounterSizeBytes <= UINT16_MAX,
                   "Header size does not fit in uint16_t");
     return static_cast<uint16_t>(size);
 }
@@ -156,7 +156,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     mFlags.SetRaw(header);
     mEncryptionType = static_cast<Header::EncryptionType>((header & kEncryptionTypeMask) >> kEncryptionTypeShift);
 
-    err = reader.Read32(&mMessageId).StatusCode();
+    err = reader.Read32(&mMessageCounter).StatusCode();
     SuccessOrExit(err);
 
     if (mFlags.Has(Header::FlagValues::kSourceNodeIdPresent))
@@ -236,14 +236,14 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
 
     if (mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_AckMsg))
     {
-        uint32_t ack_id;
-        err = reader.Read32(&ack_id).StatusCode();
+        uint32_t ack_message_counter;
+        err = reader.Read32(&ack_message_counter).StatusCode();
         SuccessOrExit(err);
-        mAckId.SetValue(ack_id);
+        mAckMessageCounter.SetValue(ack_message_counter);
     }
     else
     {
-        mAckId.ClearValue();
+        mAckMessageCounter.ClearValue();
     }
 
     octets_read = static_cast<uint16_t>(reader.OctetsRead());
@@ -276,7 +276,7 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
 
     uint8_t * p = data;
     LittleEndian::Write16(p, header);
-    LittleEndian::Write32(p, mMessageId);
+    LittleEndian::Write32(p, mMessageCounter);
     if (mSourceNodeId.HasValue())
     {
         LittleEndian::Write64(p, mSourceNodeId.Value());
@@ -323,9 +323,9 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
         LittleEndian::Write16(p, to_underlying(mProtocolID.GetVendorId()));
     }
     LittleEndian::Write16(p, mProtocolID.GetProtocolId());
-    if (mAckId.HasValue())
+    if (mAckMessageCounter.HasValue())
     {
-        LittleEndian::Write32(p, mAckId.Value());
+        LittleEndian::Write32(p, mAckMessageCounter.Value());
     }
 
     // Written data size provided to caller on success

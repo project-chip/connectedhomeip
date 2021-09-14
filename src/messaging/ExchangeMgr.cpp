@@ -224,7 +224,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             }
 
             // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader.GetMessageId(), payloadHeader, source, msgFlags, std::move(msgBuf));
+            ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
             found = true;
             return false;
         }
@@ -297,7 +297,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
 
-        CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageId(), payloadHeader, source, msgFlags, std::move(msgBuf));
+        CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.

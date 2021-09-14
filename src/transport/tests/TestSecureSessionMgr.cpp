@@ -362,14 +362,14 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     // Change Message ID
-    EncryptedPacketBufferHandle badMessageIdMsg = preparedMessage.CloneData();
-    NL_TEST_ASSERT(inSuite, badMessageIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
+    EncryptedPacketBufferHandle badMessageCounterMsg = preparedMessage.CloneData();
+    NL_TEST_ASSERT(inSuite, badMessageCounterMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
-    uint32_t msgID = packetHeader.GetMessageId();
-    packetHeader.SetMessageId(msgID + 1);
-    NL_TEST_ASSERT(inSuite, badMessageIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
+    uint32_t messageCounter = packetHeader.GetMessageCounter();
+    packetHeader.SetMessageCounter(messageCounter + 1);
+    NL_TEST_ASSERT(inSuite, badMessageCounterMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badMessageIdMsg);
+    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badMessageCounterMsg);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
