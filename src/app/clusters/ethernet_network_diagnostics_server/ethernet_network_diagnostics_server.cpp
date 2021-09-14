@@ -128,7 +128,8 @@ exit:
 void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpoint)
 {
     static bool interceptorRegistered = false;
-    if (!interceptorRegistered) {
+    if (!interceptorRegistered)
+    {
         registerAttributeAccessInterceptor(&gAttrInterceptor);
         interceptorRegistered = true;
     }

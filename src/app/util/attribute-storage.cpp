@@ -1447,10 +1447,10 @@ bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, Cluste
 
 bool registerAttributeAccessInterceptor(app::AttributeAccessInterceptor * interceptor)
 {
-    for (auto * cur = gAttributeAccessInterceptors;
-         cur;
-         cur = cur->GetNext()) {
-        if (cur->Matches(*interceptor)) {
+    for (auto * cur = gAttributeAccessInterceptors; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(*interceptor))
+        {
             ChipLogError(Zcl, "Duplicate interceptor registration failed");
             return false;
         }

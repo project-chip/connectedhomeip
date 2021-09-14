@@ -91,7 +91,8 @@ public:
      * Check whether another interceptor wants to handle the same set of
      * attributes as we do.
      */
-    bool Matches(const AttributeAccessInterceptor & aOther) const {
+    bool Matches(const AttributeAccessInterceptor & aOther) const
+    {
         return mClusterId == aOther.mClusterId &&
             (!mEndpointId.HasValue() || !aOther.mEndpointId.HasValue() || mEndpointId.Value() == aOther.mEndpointId.Value());
     }
