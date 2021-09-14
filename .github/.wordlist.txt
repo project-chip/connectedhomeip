@@ -111,6 +111,7 @@ CAfile
 cancelled
 CBB
 cbd
+CMD
 CCMP
 CCS
 CCSTUDIO
@@ -249,6 +250,7 @@ DevKitM
 df
 dfu
 DHCP
+DHCPC
 DHCPv
 dhrishi
 dialout
@@ -430,6 +432,7 @@ Impl
 ImplClass
 implementers
 imx
+imxlinux
 indexhtml
 Inet
 InetLayer
@@ -670,6 +673,7 @@ PinCode
 pkgconfig
 PlatformManager
 PlatformManagerImpl
+plaintext
 plt
 png
 polymorphism
@@ -787,6 +791,7 @@ SerialNumber
 ServiceId
 SetDns
 SetUpPINCode
+SetpointRaiseLower
 SetupQRCode
 sexualized
 SIGINT
@@ -895,6 +900,7 @@ ttyUSB
 TvChannel
 txt
 uart
+udhcpc
 UART
 UDP
 UDPEndPoint
