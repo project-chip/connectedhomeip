@@ -244,9 +244,9 @@ template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::InitiateFactoryReset()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-    Impl()->_IncrementLifetimeCounter();
+    _IncrementLifetimeCounter();
 #endif
-    Impl()->InitiateFactoryReset();
+    // Inheriting classes should call this method so the lifetime counter is updated if necessary.
 }
 
 template <class ImplClass>
@@ -375,15 +375,15 @@ GenericConfigurationManagerImpl<ImplClass>::GetBLEDeviceIdentificationInfo(Ble::
 
     deviceIdInfo.Init();
 
-    err = Impl()->GetVendorId(id);
+    err = GetVendorId(id);
     SuccessOrExit(err);
     deviceIdInfo.SetVendorId(id);
 
-    err = Impl()->GetProductId(id);
+    err = GetProductId(id);
     SuccessOrExit(err);
     deviceIdInfo.SetProductId(id);
 
-    err = Impl()->GetSetupDiscriminator(discriminator);
+    err = GetSetupDiscriminator(discriminator);
     SuccessOrExit(err);
     deviceIdInfo.SetDeviceDiscriminator(discriminator);
 
@@ -470,13 +470,13 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
     {
         char serialNum[ConfigurationManager::kMaxSerialNumberLength + 1];
         size_t serialNumLen;
-        err = Impl()->GetSerialNumber(serialNum, sizeof(serialNum), serialNumLen);
+        err = GetSerialNumber(serialNum, sizeof(serialNum), serialNumLen);
         ChipLogProgress(DeviceLayer, "  Serial Number: %s", (err == CHIP_NO_ERROR) ? serialNum : "(not set)");
     }
 
     {
         uint16_t vendorId;
-        if (Impl()->GetVendorId(vendorId) != CHIP_NO_ERROR)
+        if (GetVendorId(vendorId) != CHIP_NO_ERROR)
         {
             vendorId = 0;
         }
@@ -485,7 +485,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         uint16_t productId;
-        if (Impl()->GetProductId(productId) != CHIP_NO_ERROR)
+        if (GetProductId(productId) != CHIP_NO_ERROR)
         {
             productId = 0;
         }
@@ -494,7 +494,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         uint16_t productRev;
-        if (Impl()->GetProductRevision(productRev) != CHIP_NO_ERROR)
+        if (GetProductRevision(productRev) != CHIP_NO_ERROR)
         {
             productRev = 0;
         }
@@ -503,7 +503,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         uint32_t setupPINCode;
-        if (Impl()->GetSetupPinCode(setupPINCode) != CHIP_NO_ERROR)
+        if (GetSetupPinCode(setupPINCode) != CHIP_NO_ERROR)
         {
             setupPINCode = 0;
         }
@@ -512,7 +512,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         uint16_t setupDiscriminator;
-        if (Impl()->GetSetupDiscriminator(setupDiscriminator) != CHIP_NO_ERROR)
+        if (GetSetupDiscriminator(setupDiscriminator) != CHIP_NO_ERROR)
         {
             setupDiscriminator = 0;
         }
@@ -522,7 +522,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
     {
         uint16_t year;
         uint8_t month, dayOfMonth;
-        err = Impl()->GetManufacturingDate(year, month, dayOfMonth);
+        err = GetManufacturingDate(year, month, dayOfMonth);
         if (err == CHIP_NO_ERROR)
         {
             ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02" PRIu8 "/%02" PRIu8, year, month, dayOfMonth);
@@ -535,7 +535,7 @@ void GenericConfigurationManagerImpl<ImplClass>::LogDeviceConfig()
 
     {
         uint16_t deviceType;
-        if (Impl()->GetDeviceType(deviceType) != CHIP_NO_ERROR)
+        if (GetDeviceType(deviceType) != CHIP_NO_ERROR)
         {
             deviceType = 0;
         }
