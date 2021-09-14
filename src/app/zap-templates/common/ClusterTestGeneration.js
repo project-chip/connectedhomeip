@@ -64,8 +64,10 @@ function setDefaultType(test)
   const type = test[kCommandName];
   switch (type) {
   case 'readAttribute':
-    test.isAttribute     = true;
-    test.isReadAttribute = true;
+    test.isAttribute                       = true;
+    test.isReadAttribute                   = true;
+    test.noCommandSpecificRequestArguments = true;
+    test.useReadAttributeCallback          = true;
     break;
 
   case 'writeAttribute':
@@ -74,9 +76,18 @@ function setDefaultType(test)
     break;
 
   case 'subscribeAttribute':
-    test.isAttribute          = true;
-    test.isReadAttribute      = true;
-    test.isSubscribeAttribute = true;
+    test.isAttribute                       = true;
+    test.isSubscribeAttribute              = true;
+    test.noCommandSpecificRequestArguments = true;
+    test.useReadAttributeCallback          = true;
+    break;
+
+  case 'waitForReport':
+    test.isAttribute                       = true;
+    test.isWaitForReport                   = true;
+    test.useReadAttributeCallback          = true;
+    test.noCommandSpecificRequestArguments = true;
+    test.noFailureCallback                 = true;
     break;
 
   default:
@@ -142,7 +153,7 @@ function setDefaultResponse(test)
     throwError(test, errorStr);
   }
 
-  if (!test.isReadAttribute) {
+  if (!test.useReadAttributeCallback) {
     return;
   }
 

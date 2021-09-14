@@ -31,11 +31,14 @@ tests:
     - label: "Turn On the light to see attribute change"
       command: "On"
     - label: "Check for attribute report"
-      cluster: "TestSuite"
-      command: "WaitForAttributeReport"
-      waitfor:
-          endpoint: 1
-          cluster: "On/Off"
-          attribute: "OnOff"
-          response:
-              value: true
+      command: "waitForReport"
+      attribute: "OnOff"
+      response:
+          value: true
+    - label: "Turn Off the light to see attribute change"
+      command: "Off"
+    - label: "Check for attribute report"
+      command: "waitForReport"
+      attribute: "OnOff"
+      response:
+          value: false

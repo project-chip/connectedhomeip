@@ -1,38 +1,37 @@
- {{#chip_tests_item_response_parameters}}
- {{#if hasExpectedValue}}
- {{#if isList}}
- XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
- {{else}}
- {{#if (isString type)}}
- {{#if (isOctetString type)}}
- NSString * {{asLowerCamelCase name}}ArgumentString= @"{{expectedValue}}";
- NSData * {{asLowerCamelCase name}}Argument = [{{asLowerCamelCase name}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
- XCTAssertTrue([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToData:{{asLowerCamelCase name}}Argument]);
- {{else}}
- NSString * {{asLowerCamelCase name}}Argument= @"{{expectedValue}}";
- XCTAssertTrue([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToString:{{asLowerCamelCase name}}Argument]);
- {{/if}}
- {{else}}
- XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix}});
- {{/if}}
- {{/if}}
- {{/if}}
- {{#if hasExpectedConstraints}}
- {{#if expectedConstraints.minLength}}
- XCTAssertGreaterThanOrEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] length], {{expectedConstraints.minLength}});
- {{/if}}
- {{#if expectedConstraints.maxLength}}
- XCTAssertLessThanOrEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] length], {{expectedConstraints.maxLength}});
- {{/if}}
- {{#if expectedConstraints.minValue}}
- XCTAssertGreaterThanOrEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.minValue}});
- {{/if}}
- {{#if expectedConstraints.maxValue}}
- XCTAssertLessThanOrEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.maxValue}});
- {{/if}}
- {{#if expectedConstraints.notValue}}
- XCTAssertNotEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.notValue}});
- {{/if}}
- {{/if}}
- {{/chip_tests_item_response_parameters}}
- 
+{{#chip_tests_item_response_parameters}}
+{{#if hasExpectedValue}}
+{{#if isList}}
+XCTAssertEqual([values[@"{{#if parent.useReadAttributeCallback}}value{{else}}{{name}}{{/if}}"] count], {{expectedValue.length}});
+{{else}}
+{{#if (isString type)}}
+{{#if (isOctetString type)}}
+NSString * {{asLowerCamelCase name}}ArgumentString= @"{{expectedValue}}";
+NSData * {{asLowerCamelCase name}}Argument = [{{asLowerCamelCase name}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+XCTAssertTrue([values[@"{{#if parent.useReadAttributeCallback}}value{{else}}{{name}}{{/if}}"] isEqualToData:{{asLowerCamelCase name}}Argument]);
+{{else}}
+NSString * {{asLowerCamelCase name}}Argument= @"{{expectedValue}}";
+XCTAssertTrue([values[@"{{#if parent.useReadAttributeCallback}}value{{else}}{{name}}{{/if}}"] isEqualToString:{{asLowerCamelCase name}}Argument]);
+{{/if}}
+{{else}}
+XCTAssertEqual([values[@"{{#if parent.useReadAttributeCallback}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix}});
+{{/if}}
+{{/if}}
+{{/if}}
+{{#if hasExpectedConstraints}}
+{{#if expectedConstraints.minLength}}
+XCTAssertGreaterThanOrEqual([values[@"{{#if parent.useReadAttributeCallback}}value{{else}}{{name}}{{/if}}"] length], {{expectedConstraints.minLength}});
+{{/if}}
+{{#if expectedConstraints.maxLength}}
+XCTAssertLessThanOrEqual([values[@"{{#if parent.useReadAttributeCallback}}value{{else}}{{name}}{{/if}}"] length], {{expectedConstraints.maxLength}});
+{{/if}}
+{{#if expectedConstraints.minValue}}
+XCTAssertGreaterThanOrEqual([values[@"{{#if parent.useReadAttributeCallback}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.minValue}});
+{{/if}}
+{{#if expectedConstraints.maxValue}}
+XCTAssertLessThanOrEqual([values[@"{{#if parent.useReadAttributeCallback}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.maxValue}});
+{{/if}}
+{{#if expectedConstraints.notValue}}
+XCTAssertNotEqual([values[@"{{#if parent.useReadAttributeCallback}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.notValue}});
+{{/if}}
+{{/if}}
+{{/chip_tests_item_response_parameters}}

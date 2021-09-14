@@ -26,17 +26,6 @@
         {
             "name": "CHIPCallbackBridge",
             "path": "partials/CHIPCallbackBridge.zapt"
-<<<<<<< HEAD
-        },
-        {
-            "name": "TestSuiteHelper_WaitForMs",
-            "path": "partials/testsuite/WaitForMs.zapt"
-        },
-        {
-            "name": "TestSuiteHelper_WaitForAttributeReport",
-            "path": "partials/testsuite/WaitForAttributeReport.zapt"
-=======
->>>>>>> parent of 8390956ec ([testsuite] Refactor test suite simulated cluster command)
         }
     ],
     "templates": [

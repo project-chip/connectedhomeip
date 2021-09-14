@@ -56,7 +56,9 @@ class {{filename}}: public TestCommand
     // Test {{label}}
     using SuccessCallback_{{index}} = void (*)(void * context{{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
     chip::Callback::Callback<SuccessCallback_{{index}}> mOnSuccessCallback_{{index}} { OnTestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}_SuccessResponse, this };
+    {{#unless noFailureCallback}}
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_{{index}} { OnTestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}_FailureResponse, this };
+    {{/unless}}
     {{#if isSubscribeAttribute}}
     chip::Callback::Callback<DefaultSuccessCallback> mOnSubscriptionEstablishedCallback_{{index}} { SubscribeAttribute_{{ index }}_OnSubscriptionEstablishedCallback, this };
     {{/if}}
@@ -64,6 +66,9 @@ class {{filename}}: public TestCommand
     bool mIsFailureExpected_{{index}} = {{response.error}};
 
     {{#if isSubscribeAttribute}}
+    bool mReceivedReport_{{index}} = false;
+    {{/if}}
+    {{#if isWaitForReport}}
     bool mReceivedReport_{{index}} = false;
     {{/if}}
 
@@ -88,6 +93,8 @@ class {{filename}}: public TestCommand
         {{else if isSubscribeAttribute}}
         cluster.ReportAttribute{{asUpperCamelCase attribute}}(mOnSuccessCallback_{{index}}.Cancel());
         err = cluster.ConfigureAttribute{{asUpperCamelCase attribute}}(mOnSubscriptionEstablishedCallback_{{index}}.Cancel(), mOnFailureCallback_{{index}}.Cancel(), {{minInterval}}, {{maxInterval}});
+        {{else if isWaitForReport}}
+        err = cluster.ReportAttribute{{asUpperCamelCase attribute}}(mOnSuccessCallback_{{index}}.Cancel());
         {{else if isReadAttribute}}
         err = cluster.ReadAttribute{{asUpperCamelCase attribute}}(mOnSuccessCallback_{{index}}.Cancel(), mOnFailureCallback_{{index}}.Cancel());
         {{else if isWriteAttribute}}
@@ -119,6 +126,7 @@ class {{filename}}: public TestCommand
     }
     {{/if}}
 
+    {{#unless noFailureCallback}}
     static void OnTestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}_FailureResponse(void * context, uint8_t status)
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Failure Response");
@@ -140,6 +148,7 @@ class {{filename}}: public TestCommand
 
         runner->NextTest();
     }
+    {{/unless}}
 
     static void OnTestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}_SuccessResponse(void * context {{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}})
     {
@@ -153,6 +162,15 @@ class {{filename}}: public TestCommand
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
+
+        {{#if isWaitForReport }}
+        if (runner->mReceivedReport_{{index}}) {
+            // Receiving report more than once is not an error since the subscription may be alive for a long time.
+            ChipLogProgress(chipTool, "Note: on report called more than once.");
+            return;
+        }
+        runner->mReceivedReport_{{index}} = true;
+        {{/if}}
 
         {{> process_response_value}}
 
