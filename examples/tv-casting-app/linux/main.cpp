@@ -104,8 +104,8 @@ void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommission
 {
     // Enter commissioning mode, open commissioning window
     Server::GetInstance().Init();
-    ReturnOnFailure(Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(ResetFabrics::kYes,
-                                                                                              kCommissioningWindowTimeoutInSec));
+    ReturnOnFailure(Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
+        ResetFabrics::kYes, kCommissioningWindowTimeoutInSec));
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
