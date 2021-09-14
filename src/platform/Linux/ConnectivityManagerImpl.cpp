@@ -26,7 +26,18 @@
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>
+#include <linux/ethtool.h>
 #include <linux/if_link.h>
+#include <linux/sockios.h>
+#include <linux/wireless.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -52,6 +63,13 @@ using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
+
+enum class ConnectionType
+{
+    kConnectionUnknown,
+    kConnectionEthernet,
+    kConnectionWiFi
+};
 
 enum class EthernetStatsCountType
 {
@@ -240,6 +258,36 @@ static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
 }
 #endif
 
+ConnectionType GetInterfaceConnectionType(const char * ifname)
+{
+    int sock = -1;
+
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to open socket");
+        return ConnectionType::kConnectionUnknown;
+    }
+
+    // Test wireless extensions for CONNECTION_WIFI
+    struct iwreq pwrq = {};
+    strncpy(pwrq.ifr_name, ifname, IFNAMSIZ - 1);
+
+    if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1)
+        return ConnectionType::kConnectionWiFi;
+
+    // Test ethtool for CONNECTION_ETHERNET
+    struct ethtool_cmd ecmd = {};
+    ecmd.cmd                = ETHTOOL_GSET;
+    struct ifreq ifr        = {};
+    ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
+    strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+
+    if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
+        return ConnectionType::kConnectionEthernet;
+
+    return ConnectionType::kConnectionUnknown;
+}
+
 CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
 {
     CHIP_ERROR ret          = CHIP_ERROR_READ_FAILED;
@@ -257,8 +305,11 @@ CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (strcmp(ifa->ifa_name, CHIP_DEVICE_CONFIG_ETHERNET_IF_NAME) == 0)
+            if (GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            {
+                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
                 break;
+            }
         }
 
         if (ifa != nullptr)
