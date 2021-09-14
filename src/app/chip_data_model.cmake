@@ -61,9 +61,8 @@ function(chip_configure_data_model APP_TARGET)
             ${CHIP_APP_BASE_DIR}/server/EchoHandler.cpp
             ${CHIP_APP_BASE_DIR}/server/Mdns.cpp
             ${CHIP_APP_BASE_DIR}/server/OnboardingCodesUtil.cpp
-            ${CHIP_APP_BASE_DIR}/server/RendezvousServer.cpp
             ${CHIP_APP_BASE_DIR}/server/Server.cpp
-            ${CHIP_APP_BASE_DIR}/server/CommissionManager.cpp
+            ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
         )
     endif()
 

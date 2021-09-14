@@ -20,7 +20,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/Mdns.h>
-#include <app/server/RendezvousServer.h>
 #include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
@@ -82,7 +81,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     chip::Platform::MemoryInit();
 
-    mCommissionManager.SetAppDelegate(delegate);
+    mCommissioningWindowManager.SetAppDelegate(delegate);
+    mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
     InitDataModelHandler(&mExchangeMgr);
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -91,9 +91,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #elif CHIP_DEVICE_LAYER_TARGET_LINUX
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 #endif
-
-    err = mRendezvousServer.Init(mAppDelegate, &mSessionIDAllocator);
-    SuccessOrExit(err);
 
     err = mFabrics.Init(&mServerStorage);
     SuccessOrExit(err);
@@ -147,7 +144,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     else
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
-        SuccessOrExit(err = mCommissionManager.OpenBasicCommissioningWindow(ResetFabrics::kYes));
+        SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow(ResetFabrics::kYes));
 #endif
     }
 
@@ -196,7 +193,7 @@ void Server::Shutdown()
     mExchangeMgr.Shutdown();
     mSessions.Shutdown();
     mTransports.Close();
-    mRendezvousServer.Cleanup();
+    mCommissioningWindowManager.Cleanup();
     chip::Platform::MemoryShutdown();
 }
 

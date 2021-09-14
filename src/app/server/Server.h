@@ -18,8 +18,7 @@
 #pragma once
 
 #include <app/server/AppDelegate.h>
-#include <app/server/CommissionManager.h>
-#include <app/server/RendezvousServer.h>
+#include <app/server/CommissioningWindowManager.h>
 #include <inet/InetConfig.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
@@ -62,8 +61,6 @@ public:
 
     CHIP_ERROR AddTestCommissioning();
 
-    void SetFabricIndex(FabricIndex id) { mFabricIndex = id; }
-
     Transport::FabricTable & GetFabricTable() { return mFabrics; }
 
     Messaging::ExchangeManager & GetExchangManager() { return mExchangeMgr; }
@@ -72,18 +69,16 @@ public:
 
     SecureSessionMgr & GetSecureSessionManager() { return mSessions; }
 
-    RendezvousServer & GetRendezvousServer() { return mRendezvousServer; }
-
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
-    CommissionManager & GetCommissionManager() { return mCommissionManager; }
+    CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
     void Shutdown();
 
     static Server & GetInstance() { return sServer; }
 
 private:
-    Server() : mCommissionManager(this) {}
+    Server() : mCommissioningWindowManager(this) {}
 
     static Server sServer;
 
@@ -117,7 +112,6 @@ private:
 
     ServerTransportMgr mTransports;
     SecureSessionMgr mSessions;
-    RendezvousServer mRendezvousServer;
     CASEServer mCASEServer;
     Messaging::ExchangeManager mExchangeMgr;
     Transport::FabricTable mFabrics;
@@ -129,12 +123,11 @@ private:
     SecurePairingUsingTestSecret mTestPairing;
 
     ServerStorageDelegate mServerStorage;
-    CommissionManager mCommissionManager;
+    CommissioningWindowManager mCommissioningWindowManager;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;
     uint16_t mUnsecuredServicePort;
-    FabricIndex mFabricIndex;
 };
 
 } // namespace chip

@@ -386,7 +386,8 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
         return;
     }
 
-    if (chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) != CHIP_NO_ERROR)
+    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) !=
+        CHIP_NO_ERROR)
     {
         LOG_ERR("OpenBasicCommissioningWindow() failed");
     }
