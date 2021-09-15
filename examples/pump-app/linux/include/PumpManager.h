@@ -78,12 +78,10 @@ private:
     bool mAutoRestart;
     uint32_t mAutoStartDuration;
     bool mAutoStartTimerArmed;
-    // TimerHandle_t mTimerHandle;
 
     void CancelTimer(void);
     void PumpTimer(uint32_t aTimeoutMs);
 
-    // static void TimerEventHandler(TimerHandle_t aTimer);
     static void AutoRestartTimerEventHandler(AppEvent * aEvent);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 

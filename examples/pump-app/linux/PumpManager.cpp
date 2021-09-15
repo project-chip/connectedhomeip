@@ -111,29 +111,6 @@ void PumpManager::PumpTimer(uint32_t aTimeoutMs) {}
 
 void PumpManager::CancelTimer(void) {}
 
-#if 0
-void PumpManager::TimerEventHandler(TimerHandle_t aTimer)
-{
-    PumpManager * pump = NULL;//static_cast<PumpManager *>(pvTimerGetTimerID(aTimer));
-
-    // The timer event handler will be called in the context of the timer task
-    // once sPumpTimer expires. Post an event to apptask queue with the actual handler
-    // so that the event can be handled in the context of the apptask.
-    AppEvent event;
-    event.Type                   = AppEvent::kEventType_AppEvent;
-    event.PumpStateEvent.Context = static_cast<PumpManager *>(pump);
-    if (pump->mAutoStartTimerArmed)
-    {
-        event.Handler = AutoRestartTimerEventHandler;
-    }
-    else
-    {
-        event.Handler = ActuatorMovementTimerEventHandler;
-    }
-    GetAppTask().PostEvent(&event);
-}
-#endif
-
 void PumpManager::AutoRestartTimerEventHandler(AppEvent * aEvent)
 {
     PumpManager * pump = static_cast<PumpManager *>(aEvent->PumpStateEvent.Context);
