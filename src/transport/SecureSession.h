@@ -124,11 +124,6 @@ public:
      */
     size_t EncryptionOverhead();
 
-    /**
-     * Clears the internal state of secure session back to the state of a new object.
-     */
-    void Reset();
-
 private:
     static constexpr size_t kAES_CCM128_Key_Length = 16;
 

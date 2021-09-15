@@ -133,7 +133,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 #if CONFIG_DEVICE_LAYER
         ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
-        mSystemLayer = &DeviceLayer::SystemLayer;
+        mSystemLayer = &DeviceLayer::SystemLayer();
         mInetLayer   = &DeviceLayer::InetLayer;
 #endif // CONFIG_DEVICE_LAYER
     }
@@ -182,13 +182,14 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     if (params.imDelegate != nullptr)
     {
-        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate));
+        mInteractionModelDelegate = params.imDelegate;
     }
     else
     {
-        mDefaultIMDelegate = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
-        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, mDefaultIMDelegate));
+        mDefaultIMDelegate        = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
+        mInteractionModelDelegate = mDefaultIMDelegate;
     }
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, mInteractionModelDelegate));
 
     mExchangeMgr->SetDelegate(this);
 
@@ -477,8 +478,8 @@ CHIP_ERROR DeviceController::ServiceEvents()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                               const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                               System::PacketBufferHandle && msgBuf)
 {
     uint16_t index;
 
@@ -488,7 +489,7 @@ CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, 
     index = FindDeviceIndex(ec->GetSecureSession().GetPeerNodeId());
     VerifyOrExit(index < kNumMaxActiveDevices, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
-    mActiveDevices[index].OnMessageReceived(ec, packetHeader, payloadHeader, std::move(msgBuf));
+    mActiveDevices[index].OnMessageReceived(ec, payloadHeader, std::move(msgBuf));
 
 exit:
     return CHIP_NO_ERROR;
@@ -716,6 +717,7 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
         .storageDelegate = mStorageDelegate,
         .idAllocator     = &mIDAllocator,
         .fabricsTable    = &mFabrics,
+        .imDelegate      = mInteractionModelDelegate,
     };
 }
 
@@ -1820,6 +1822,16 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(const app::ReadCl
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadDone(const app::ReadClient * apReadClient)
+{
+    // Release the object for subscription
+    if (apReadClient->IsSubscriptionType())
+    {
+        FreeAttributePathParam(apReadClient->GetAppIdentifier());
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseStatus(
     const app::WriteClient * apWriteClient, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
     const uint32_t aProtocolId, const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
@@ -1841,6 +1853,15 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseError(const ap
 {
     // When WriteResponseError occurred, it means we failed to receive the response from server.
     IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::SubscribeResponseProcessed(const app::ReadClient * apSubscribeClient)
+{
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
+    // When WriteResponseError occurred, it means we failed to receive the response from server.
+    IMSubscribeResponseCallback(apSubscribeClient, EMBER_ZCL_STATUS_SUCCESS);
+#endif
     return CHIP_NO_ERROR;
 }
 

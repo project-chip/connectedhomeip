@@ -225,6 +225,7 @@ public:
 
     void ExpirePairing(SessionHandle session);
     void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
+    void ExpireAllPairingsForFabric(FabricIndex fabric);
 
     /**
      * @brief

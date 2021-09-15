@@ -128,7 +128,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
 
     // Loop through fabrics
     uint8_t fabricIndex = 0;
-    for (auto & fabricInfo : GetGlobalFabricTable())
+    for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
     {
         NodeId nodeId               = fabricInfo.GetPeerId().GetNodeId();
         uint64_t fabricId           = fabricInfo.GetFabricId();
@@ -194,7 +194,7 @@ static FabricInfo * retrieveCurrentFabric()
 
     FabricIndex index = emberAfCurrentCommand()->source->GetSecureSession().GetFabricIndex();
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
-    return GetGlobalFabricTable().FindFabricWithIndex(index);
+    return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
 
 // TODO: The code currently has two sources of truths for fabrics, the fabricInfo table + the attributes. There should only be one,
@@ -241,22 +241,62 @@ OpCredsFabricTableDelegate gFabricDelegate;
 void emberAfPluginOperationalCredentialsServerInitCallback(void)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.");
-    GetGlobalFabricTable().SetFabricDelegate(&gFabricDelegate);
+    Server::GetInstance().GetFabricTable().SetFabricDelegate(&gFabricDelegate);
     writeFabricsIntoFabricsListAttribute();
 }
 
+namespace {
+class FabricCleanupExchangeDelegate : public Messaging::ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+    void OnExchangeClosing(Messaging::ExchangeContext * ec) override
+    {
+        FabricIndex currentFabricIndex = ec->GetSecureSession().GetFabricIndex();
+        ec->GetExchangeMgr()->GetSessionMgr()->ExpireAllPairingsForFabric(currentFabricIndex);
+    }
+};
+
+FabricCleanupExchangeDelegate gFabricCleanupExchangeDelegate;
+
+} // namespace
+
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                              FabricIndex fabricIndex)
+                                                              FabricIndex fabricBeingRemoved)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    CHIP_ERROR err       = GetGlobalFabricTable().Delete(fabricIndex);
+    CHIP_ERROR err       = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
     writeFabricsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
+    if (err == CHIP_NO_ERROR)
+    {
+        Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
+        FabricIndex currentFabricIndex  = ec->GetSecureSession().GetFabricIndex();
+        if (currentFabricIndex == fabricBeingRemoved)
+        {
+            // If the current fabric is being removed, expiring all the secure sessions causes crashes as
+            // the message sent by emberAfSendImmediateDefaultResponse() is still in the queue. Also, RMP
+            // retries to send the message and runs into issues.
+            // We are hijacking the exchange delegate here (as no more messages should be received on this exchange),
+            // and wait for it to close, before expiring the secure sessions for the fabric.
+            // TODO: https://github.com/project-chip/connectedhomeip/issues/9642
+            ec->SetDelegate(&gFabricCleanupExchangeDelegate);
+        }
+        else
+        {
+            ec->GetExchangeMgr()->GetSessionMgr()->ExpireAllPairingsForFabric(fabricBeingRemoved);
+        }
+    }
     return true;
 }
 
@@ -277,7 +317,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(EndpointId en
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
     // Persist updated fabric
-    err = GetGlobalFabricTable().Store(fabric->GetFabricIndex());
+    err = Server::GetInstance().GetFabricTable().Store(fabric->GetFabricIndex());
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
@@ -366,10 +406,10 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app
 
     gFabricBeingCommissioned.SetVendorId(adminVendorId);
 
-    err = GetGlobalFabricTable().AddNewFabric(gFabricBeingCommissioned, &fabricIndex);
+    err = Server::GetInstance().GetFabricTable().AddNewFabric(gFabricBeingCommissioned, &fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    err = GetGlobalFabricTable().Store(fabricIndex);
+    err = Server::GetInstance().GetFabricTable().Store(fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.

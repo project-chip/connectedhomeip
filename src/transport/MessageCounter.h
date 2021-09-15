@@ -48,7 +48,6 @@ public:
     virtual ~MessageCounter() = 0;
 
     virtual Type GetType()                        = 0;
-    virtual void Reset()                          = 0;
     virtual uint32_t Value()                      = 0; /** Get current value */
     virtual CHIP_ERROR Advance()                  = 0; /** Advance the counter */
     virtual CHIP_ERROR SetCounter(uint32_t count) = 0; /** Set the counter to the specified value */
@@ -63,9 +62,6 @@ public:
     ~GlobalUnencryptedMessageCounter() override {}
 
     Type GetType() override { return GlobalUnencrypted; }
-    void Reset() override
-    { /* null op */
-    }
     uint32_t Value() override { return value; }
     CHIP_ERROR Advance() override
     {
@@ -74,7 +70,6 @@ public:
     }
     CHIP_ERROR SetCounter(uint32_t count) override
     {
-        Reset();
         value = count;
         return CHIP_NO_ERROR;
     }
@@ -91,9 +86,6 @@ public:
 
     CHIP_ERROR Init();
     Type GetType() override { return GlobalEncrypted; }
-    void Reset() override
-    { /* null op */
-    }
     uint32_t Value() override { return persisted.GetValue(); }
     CHIP_ERROR Advance() override { return persisted.Advance(); }
     CHIP_ERROR SetCounter(uint32_t count) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -128,7 +120,6 @@ public:
     ~LocalSessionMessageCounter() override {}
 
     Type GetType() override { return Session; }
-    void Reset() override { value = kInitialValue; }
     uint32_t Value() override { return value; }
     CHIP_ERROR Advance() override
     {
@@ -137,7 +128,6 @@ public:
     }
     CHIP_ERROR SetCounter(uint32_t count) override
     {
-        Reset();
         value = count;
         return CHIP_NO_ERROR;
     }
