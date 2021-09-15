@@ -278,11 +278,6 @@ int main(int argc, char * argv[])
 
     err = providerDevice->EstablishConnectivity(&mConnectionCallback, &mConnectFailCallback);
 
-    /*
-    err = providerDevice->LoadSecureSessionParametersIfNeeded();
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogError(SoftwareUpdate, "LoadSecureSessionParametersIfNeeded() failed: %s", chip::ErrorStr(err)));*/
-
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:

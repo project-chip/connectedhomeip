@@ -32,17 +32,14 @@ In a second terminal:
 
 -   Code for running a full BDX download exists in BDX
 -   Sends QueryImage command
+-   Takes a peer Node ID as an argument
 
 ### Limitations
 
 -   needs chip-tool to pair to the Provider device first, so it can steal the
     CASE session from persisted memory
 -   uses Controller class to load the CASE session
--   Controller does not provide any way to access a new ExchangeContext for the
-    BDX exchange
--   doesn't wait for QueryImageResponse to begin the BDX exchange
 -   does not verify QueryImageResponse message contents
 -   stores the downloaded file at a hardcoded filepath
 -   doesn't close the BDX ExchangeContext when the exchange is over
--   only uses hardcoded node IDs
 -   does not support AnnounceOTAProvider command or OTA Requestor attributes

@@ -26,7 +26,8 @@
 
 using namespace chip::bdx;
 
-uint32_t numBlocksRead = 0;
+uint32_t numBlocksRead   = 0;
+const char outFilePath[] = "test-ota-out.txt";
 
 void BdxDownloader::SetInitialExchange(chip::Messaging::ExchangeContext * ec)
 {
@@ -47,7 +48,7 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
     case TransferSession::OutputEventType::kNone:
         if (mIsTransferComplete)
         {
-            ChipLogDetail(BDX, "Transfer complete!");
+            ChipLogDetail(BDX, "Transfer complete! Contents written/appended to %s", outFilePath);
             mTransfer.Reset();
             mIsTransferComplete = false;
         }
@@ -77,7 +78,7 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
 
         // TODO: something more elegant than appending to a local file
         // TODO: while convenient, we should not do a synchronous block write in our example application - this is bad practice
-        std::ofstream otaFile("test-ota-out.txt", std::ifstream::out | std::ifstream::ate | std::ifstream::app);
+        std::ofstream otaFile(outFilePath, std::ifstream::out | std::ifstream::ate | std::ifstream::app);
         otaFile.write(reinterpret_cast<const char *>(event.blockdata.Data), event.blockdata.Length);
 
         if (event.blockdata.IsEof)
