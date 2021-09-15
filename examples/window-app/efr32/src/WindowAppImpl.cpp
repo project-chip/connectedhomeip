@@ -20,7 +20,6 @@
 #include <WindowAppImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
-#include <app/common/gen/attributes/Accessors.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <lcd.h>
 #include <lib/core/CHIPError.h>

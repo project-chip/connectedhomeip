@@ -20378,6 +20378,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterOperationalCredentialsCommandReadAttribute_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterOperationalCredentialsCommandReadAttribute_0()
@@ -20444,6 +20445,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterOperationalCredentialsCommandReadAttribute_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterOperationalCredentialsCommandReadAttribute_1()

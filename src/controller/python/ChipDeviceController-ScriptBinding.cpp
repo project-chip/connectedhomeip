@@ -129,10 +129,6 @@ ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Con
                                                                        chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
                                                                        uint16_t discriminator, uint8_t option);
 
-ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                       chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
-                                                                       uint16_t discriminator, uint8_t option);
-
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len);
@@ -370,13 +366,6 @@ pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Co
 {
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kCommissioningMode);
     return devCtrl->DiscoverCommissionableNodes(filter).AsInteger();
-}
-
-ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                       chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
-                                                                       uint16_t discriminator, uint8_t option)
-{
-    return devCtrl->OpenCommissioningWindow(nodeid, timeout, iteration, discriminator, option).AsInteger();
 }
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,

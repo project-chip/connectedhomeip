@@ -128,26 +128,6 @@ static OperationalState ValueToOperationalState(uint8_t value)
         return OperationalState::Reserved;
     }
 }
-static uint8_t OperationalStateToValue(const OperationalState & state)
-{
-    switch (state)
-    {
-    case OperationalState::Stall:
-        return 0x00;
-    case OperationalState::MovingUpOrOpen:
-        return 0x01;
-    case OperationalState::MovingDownOrClose:
-        return 0x02;
-    case OperationalState::Reserved:
-    default:
-        return 0x03;
-    }
-}
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace WindowCovering {
 
 bool IsOpen(chip::EndpointId endpoint)
 {
