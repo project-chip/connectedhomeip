@@ -137,10 +137,10 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(uint16_t com
 {
     RestoreDiscriminator();
 
-    // TODO: Verify that the device supports BLE if the advertisementMode is kBLE
-    // If not, then return an error.
 #if CONFIG_NETWORK_LAYER_BLE
-    SetBLE(advertisementMode == chip::CommissioningWindowAdvertisement::kBle);
+    // Enable BLE advertisements if commissioning window is to be opened on all supported
+    // transports, and BLE is supported on the current device.
+    SetBLE(advertisementMode == chip::CommissioningWindowAdvertisement::kAllSupported);
 #else
     SetBLE(false);
 #endif // CONFIG_NETWORK_LAYER_BLE

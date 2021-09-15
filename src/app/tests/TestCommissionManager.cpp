@@ -30,7 +30,6 @@
 using chip::CommissioningWindowAdvertisement;
 using chip::CommissioningWindowManager;
 using chip::kNoCommissioningTimeout;
-using chip::ResetFabrics;
 using chip::Server;
 
 // Mock function for linking

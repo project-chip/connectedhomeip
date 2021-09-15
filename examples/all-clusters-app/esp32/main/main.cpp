@@ -358,7 +358,7 @@ public:
             app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledBasic);
             chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
             chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
-                kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdns);
+                kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdnsOnly);
         }
     }
 

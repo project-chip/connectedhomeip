@@ -27,8 +27,8 @@ constexpr uint16_t kNoCommissioningTimeout = UINT16_MAX;
 
 enum class CommissioningWindowAdvertisement
 {
-    kBle,
-    kMdns,
+    kAllSupported,
+    kMdnsOnly,
 };
 
 class Server;
@@ -48,8 +48,9 @@ public:
      * Open the pairing window using default configured parameters.
      */
     CHIP_ERROR
-    OpenBasicCommissioningWindow(uint16_t commissioningTimeoutSeconds               = kNoCommissioningTimeout,
-                                 CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kBle);
+    OpenBasicCommissioningWindow(
+        uint16_t commissioningTimeoutSeconds               = kNoCommissioningTimeout,
+        CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
 
     CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
                                                PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
