@@ -79,8 +79,8 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
     VerifyOrExit(!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen(),
                  status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
-                     ResetFabrics::kNo, commissioningTimeout) == CHIP_NO_ERROR,
+    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(commissioningTimeout) ==
+                     CHIP_NO_ERROR,
                  status = EMBER_ZCL_STATUS_FAILURE);
     ChipLogProgress(Zcl, "Commissioning window is now open");
 

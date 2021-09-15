@@ -23,12 +23,6 @@
 
 namespace chip {
 
-enum class ResetFabrics
-{
-    kYes,
-    kNo,
-};
-
 constexpr uint16_t kNoCommissioningTimeout = UINT16_MAX;
 
 enum class CommissioningWindowAdvertisement
@@ -54,7 +48,7 @@ public:
      * Open the pairing window using default configured parameters.
      */
     CHIP_ERROR
-    OpenBasicCommissioningWindow(ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds = kNoCommissioningTimeout,
+    OpenBasicCommissioningWindow(uint16_t commissioningTimeoutSeconds               = kNoCommissioningTimeout,
                                  CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kBle);
 
     CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,

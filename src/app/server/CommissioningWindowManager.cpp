@@ -81,8 +81,7 @@ void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     Cleanup();
 
-    ChipLogProgress(AppServer, "OnSessionEstablishmentError: %s", ErrorStr(err));
-    ChipLogProgress(AppServer, "Failed in SPAKE2+ handshake");
+    ChipLogError(AppServer, "Commissioning failed during session establishment: %s", ErrorStr(err));
 
     if (mAppDelegate != nullptr)
     {
@@ -97,12 +96,12 @@ void CommissioningWindowManager::OnSessionEstablished()
         &mPairingSession, SecureSession::SessionRole::kResponder, 0);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Failed in setting up secure channel: err %s", ErrorStr(err));
+        ChipLogError(AppServer, "Commissioning failed while setting up secure channel: err %s", ErrorStr(err));
         OnSessionEstablishmentError(err);
         return;
     }
 
-    ChipLogProgress(AppServer, "Device completed SPAKE2+ handshake");
+    ChipLogProgress(AppServer, "Commissioning completed session establishment step");
     if (mAppDelegate != nullptr)
     {
         mAppDelegate->OnRendezvousStarted();
@@ -133,7 +132,7 @@ CHIP_ERROR CommissioningWindowManager::PrepareCommissioningWindow(uint16_t commi
     return StartAdvertisement();
 }
 
-CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds,
+CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(uint16_t commissioningTimeoutSeconds,
                                                                     CommissioningWindowAdvertisement advertisementMode)
 {
     RestoreDiscriminator();
@@ -145,15 +144,6 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(ResetFabrics
 #else
     SetBLE(false);
 #endif // CONFIG_NETWORK_LAYER_BLE
-
-    if (resetFabrics == ResetFabrics::kYes)
-    {
-        mServer->GetFabricTable().DeleteAllFabrics();
-        // Only resetting gNextAvailableFabricIndex at reboot otherwise previously paired device with fabricID 0
-        // can continue sending messages to accessory as next available fabric will also be 0.
-        // This logic is not up to spec, will be implemented up to spec once AddOptCert is implemented.
-        mServer->GetFabricTable().Reset();
-    }
 
     uint16_t keyID = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
