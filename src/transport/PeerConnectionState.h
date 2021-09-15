@@ -65,12 +65,12 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
 
-    uint16_t GetPeerKeyID() const { return mPeerKeyID; }
-    void SetPeerKeyID(uint16_t id) { mPeerKeyID = id; }
+    uint16_t GetPeerSessionId() const { return mPeerSessionId; }
+    void SetPeerSessionId(uint16_t id) { mPeerSessionId = id; }
 
     // TODO: Rename KeyID to SessionID
-    uint16_t GetLocalKeyID() const { return mLocalKeyID; }
-    void SetLocalKeyID(uint16_t id) { mLocalKeyID = id; }
+    uint16_t GetLocalSessionId() const { return mLocalSessionId; }
+    void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }
 
     uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
     void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
@@ -82,8 +82,8 @@ public:
 
     bool IsInitialized()
     {
-        return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerKeyID != UINT16_MAX ||
-                mLocalKeyID != UINT16_MAX);
+        return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerSessionId != UINT16_MAX ||
+                mLocalSessionId != UINT16_MAX);
     }
 
     CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
@@ -103,8 +103,8 @@ public:
 private:
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId           = kUndefinedNodeId;
-    uint16_t mPeerKeyID          = UINT16_MAX;
-    uint16_t mLocalKeyID         = UINT16_MAX;
+    uint16_t mPeerSessionId      = UINT16_MAX;
+    uint16_t mLocalSessionId     = UINT16_MAX;
     uint64_t mLastActivityTimeMs = 0;
     SecureSession mSecureSession;
     SessionMessageCounter mSessionMessageCounter;
