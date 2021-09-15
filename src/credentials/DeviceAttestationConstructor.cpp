@@ -21,7 +21,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <cstdint>
-#include <iostream>
 
 namespace chip {
 namespace Credentials {
