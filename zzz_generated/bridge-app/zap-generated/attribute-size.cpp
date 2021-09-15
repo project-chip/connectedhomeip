@@ -50,7 +50,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
 {
     if (index == -1)
     {
-        memmove(dest, src, am->size);
+        (src == NULL) ? memset(dest, 0, am->size) : memmove(dest, src, am->size);
         return am->size;
     }
 
