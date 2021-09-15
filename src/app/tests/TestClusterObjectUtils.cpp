@@ -22,33 +22,32 @@
  *
  */
 
-#include "transport/FabricTable.h"
 #include <app/InteractionModelEngine.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVData.hpp>
-#include <core/CHIPTLVDebug.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVData.hpp>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <nlunit-test.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/PrivateHeap.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
-#include <support/PrivateHeap.h>
-#include <nlunit-test.h>
 
-#include <app/common/gen/cluster-objects.h>
 #include <app/ClusterObjectUtils.h>
+#include <cluster-objects.h>
 
 namespace chip {
-static System::Layer gSystemLayer;
+static System::LayerImpl gSystemLayer;
 static SecureSessionMgr gSessionManager;
 static Messaging::ExchangeManager gExchangeManager;
 static secure_channel::MessageCounterManager gMessageCounterManager;
@@ -78,7 +77,7 @@ private:
     chip::System::TLVPacketBufferBackingStore mStore;
     chip::TLV::TLVWriter mWriter;
     chip::TLV::TLVReader mReader;
-    nlTestSuite *mpSuite;
+    nlTestSuite * mpSuite;
 };
 
 using namespace chip::TLV;
@@ -88,7 +87,7 @@ TestClusterObjectUtils gTestClusterObjectUtils;
 void TestClusterObjectUtils::SetupBuf()
 {
     chip::System::PacketBufferHandle buf;
-   
+
     buf = System::PacketBufferHandle::New(1024);
     mStore.Init(std::move(buf));
 
@@ -104,7 +103,7 @@ void TestClusterObjectUtils::DumpBuf()
     //
     // TODO: Check-in TLV Text pretty printer in separate PR
     //
-    //chip::TLV::Utilities::Print(reader);
+    // chip::TLV::Utilities::Print(reader);
 }
 
 void TestClusterObjectUtils::SetupReader()
@@ -118,32 +117,35 @@ void TestClusterObjectUtils::SetupReader()
 }
 
 template <typename T>
-struct TagValuePair {
+struct TagValuePair
+{
     uint64_t tag;
-    T& value;
+    T & value;
 };
 
 template <typename T>
-TagValuePair<T> MakeTagValuePair(uint64_t tag, T &value) {
-    return TagValuePair<T>{tag, value};
+TagValuePair<T> MakeTagValuePair(uint64_t tag, T & value)
+{
+    return TagValuePair<T>{ tag, value };
 }
 
-template<typename... ArgTypes> CHIP_ERROR EncodeStruct(TLV::TLVWriter &writer, uint64_t tag, ArgTypes... Args)
+template <typename... ArgTypes>
+CHIP_ERROR EncodeStruct(TLV::TLVWriter & writer, uint64_t tag, ArgTypes... Args)
 {
-  using expand_type = int[];
-  TLV::TLVType type;
+    using expand_type = int[];
+    TLV::TLVType type;
 
-  ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, type));
-  (void)(expand_type{ (ClusterObjectUtils::Encode(writer, Args.tag, Args.value), 0)... });
-  ReturnErrorOnFailure(writer.EndContainer(type));
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, type));
+    (void) (expand_type{ (ClusterObjectUtils::Encode(writer, Args.tag, Args.value), 0)... });
+    ReturnErrorOnFailure(writer.EndContainer(type));
 
-  return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecSimpleStruct(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    chip::app::TestClusterObjectUtils *_this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
+    chip::app::TestClusterObjectUtils * _this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -153,17 +155,17 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecSimpleStruct(nlTest
     //
     {
         chip::app::clusters::TestCluster::SimpleStruct::Type t;
-        uint8_t buf[4] = {0, 1, 2, 3};
+        uint8_t buf[4]  = { 0, 1, 2, 3 };
         char strbuf[10] = "chip";
-        
+
         t.a = 20;
         t.b = true;
         t.c = chip::app::clusters::TestCluster::SimpleEnum::VALUEA;
         t.d = buf;
 
         // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
-        t.e = chip::Span<char>{strbuf, strlen(strbuf)};
-        
+        t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
+
         err = chip::app::ClusterObjectUtils::Encode(_this->mWriter, TLV::AnonymousTag, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -188,7 +190,8 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecSimpleStruct(nlTest
         NL_TEST_ASSERT(apSuite, t.b == true);
         NL_TEST_ASSERT(apSuite, t.c == chip::app::clusters::TestCluster::SimpleEnum::VALUEA);
 
-        for (uint32_t i = 0; i < t.d.size(); i++) {
+        for (uint32_t i = 0; i < t.d.size(); i++)
+        {
             NL_TEST_ASSERT(apSuite, t.d.data()[i] == i);
         }
 
@@ -199,7 +202,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecSimpleStruct(nlTest
 void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    chip::app::TestClusterObjectUtils *_this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
+    chip::app::TestClusterObjectUtils * _this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -209,18 +212,18 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTest
     //
     {
         chip::app::clusters::TestCluster::NestedStruct::Type t;
-        uint8_t buf[4] = {0, 1, 2, 3};
+        uint8_t buf[4]  = { 0, 1, 2, 3 };
         char strbuf[10] = "chip";
 
-        t.a = 20;
-        t.b = true;
+        t.a   = 20;
+        t.b   = true;
         t.c.a = 11;
         t.c.b = true;
         t.c.c = chip::app::clusters::TestCluster::SimpleEnum::VALUEB;
         t.c.d = buf;
 
         // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
-        t.c.e = chip::Span<char>{strbuf, strlen(strbuf)};
+        t.c.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
         err = chip::app::ClusterObjectUtils::Encode(_this->mWriter, TLV::AnonymousTag, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -236,7 +239,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTest
     //
     {
         chip::app::clusters::TestCluster::NestedStruct::Type t;
-        
+
         _this->SetupReader();
 
         err = chip::app::ClusterObjectUtils::Decode(_this->mReader, t);
@@ -248,7 +251,8 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTest
         NL_TEST_ASSERT(apSuite, t.c.b == true);
         NL_TEST_ASSERT(apSuite, t.c.c == chip::app::clusters::TestCluster::SimpleEnum::VALUEB);
 
-        for (uint32_t i = 0; i < t.c.d.size(); i++) {
+        for (uint32_t i = 0; i < t.c.d.size(); i++)
+        {
             NL_TEST_ASSERT(apSuite, t.c.d.data()[i] == i);
         }
 
@@ -259,7 +263,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTest
 void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStructList(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    chip::app::TestClusterObjectUtils *_this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
+    chip::app::TestClusterObjectUtils * _this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -269,23 +273,24 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStruc
     //
     {
         chip::app::clusters::TestCluster::NestedStructList::Type t;
-        uint8_t buf[4] = {0, 1, 2, 3};
-        uint32_t intBuf[4] = {10000, 10001, 10002, 10003};
-        char strbuf[10] = "chip";
+        uint8_t buf[4]     = { 0, 1, 2, 3 };
+        uint32_t intBuf[4] = { 10000, 10001, 10002, 10003 };
+        char strbuf[10]    = "chip";
         chip::app::clusters::TestCluster::SimpleStruct::Type structList[4];
         int i = 0;
         chip::ByteSpan spanList[4];
 
-        t.a = 20;
-        t.b = true;
+        t.a   = 20;
+        t.b   = true;
         t.c.a = 11;
         t.c.b = true;
         t.c.c = chip::app::clusters::TestCluster::SimpleEnum::VALUEB;
         t.c.d = buf;
-        t.e = intBuf;
+        t.e   = intBuf;
 
-        for (auto &item : structList) {
-            item.a = (uint8_t)i;
+        for (auto & item : structList)
+        {
+            item.a = (uint8_t) i;
             item.b = true;
             i++;
         }
@@ -298,8 +303,8 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStruc
         spanList[3] = buf;
 
         // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
-        t.c.e = chip::Span<char>{strbuf, strlen(strbuf)};
-        t.d = structList;
+        t.c.e = chip::Span<char>{ strbuf, strlen(strbuf) };
+        t.d   = structList;
 
         err = chip::app::ClusterObjectUtils::Encode(_this->mWriter, TLV::AnonymousTag, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -328,27 +333,30 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStruc
         NL_TEST_ASSERT(apSuite, t.c.b == true);
         NL_TEST_ASSERT(apSuite, t.c.c == chip::app::clusters::TestCluster::SimpleEnum::VALUEB);
         NL_TEST_ASSERT(apSuite, strncmp(t.c.e.data(), "chip", strlen("chip")) == 0);
-        
+
         i = 0;
-        for (auto iter = t.d.begin(); iter != t.d.end(); ++iter) {
+        for (auto iter = t.d.begin(); iter != t.d.end(); ++iter)
+        {
             NL_TEST_ASSERT(apSuite, !iter->HasError());
-            NL_TEST_ASSERT(apSuite, iter->value.a == (uint8_t)i);
+            NL_TEST_ASSERT(apSuite, iter->value.a == (uint8_t) i);
             NL_TEST_ASSERT(apSuite, iter->value.b == true);
             i++;
         }
 
-        i = 0;
-        for (auto iter = t.e.begin(); iter != t.e.end(); ++iter) {
+        for (auto iter = t.e.begin(); iter != t.e.end(); ++iter)
+        {
             NL_TEST_ASSERT(apSuite, !iter->HasError());
             NL_TEST_ASSERT(apSuite, iter->value == (i + 10000));
             i++;
         }
 
         i = 0;
-        for (auto iter = t.f.begin(); iter != t.f.end(); ++iter) {
+        for (auto iter = t.f.begin(); iter != t.f.end(); ++iter)
+        {
             NL_TEST_ASSERT(apSuite, !iter->HasError());
 
-            for (unsigned int j = 0; j < iter->value.size(); j++) {
+            for (unsigned int j = 0; j < iter->value.size(); j++)
+            {
                 NL_TEST_ASSERT(apSuite, iter->value.data()[j] == j);
             }
 
@@ -360,7 +368,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStruc
 void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNestedStructList(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    chip::app::TestClusterObjectUtils *_this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
+    chip::app::TestClusterObjectUtils * _this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -377,15 +385,17 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNeste
         t.a = n;
 
         i = 0;
-        for (auto& item : structList) {
-            item.a = 35 + (uint8_t)i;
+        for (auto & item : structList)
+        {
+            item.a = 35 + (uint8_t) i;
             i++;
         }
-       
-        for (auto& item : n) {
+
+        for (auto & item : n)
+        {
             item.d = structList;
         }
-        
+
         err = chip::app::ClusterObjectUtils::Encode(_this->mWriter, TLV::AnonymousTag, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -408,13 +418,15 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNeste
         err = chip::app::ClusterObjectUtils::Decode(_this->mReader, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        for (auto iter = t.a.begin(); iter != t.a.end(); ++iter) {
+        for (auto iter = t.a.begin(); iter != t.a.end(); ++iter)
+        {
             NL_TEST_ASSERT(apSuite, !iter->HasError());
 
             i = 0;
-            for (auto nestedIter = iter->value.d.begin(); nestedIter != iter->value.d.end(); ++nestedIter) {
+            for (auto nestedIter = iter->value.d.begin(); nestedIter != iter->value.d.end(); ++nestedIter)
+            {
                 NL_TEST_ASSERT(apSuite, !nestedIter->HasError());
-                NL_TEST_ASSERT(apSuite, nestedIter->value.a == (35 + (uint8_t)i));
+                NL_TEST_ASSERT(apSuite, nestedIter->value.a == (35 + (uint8_t) i));
                 i++;
             }
         }
@@ -424,7 +436,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNeste
 void TestClusterObjectUtils::TestClusterObjectUtils_OptionalFields(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    chip::app::TestClusterObjectUtils *_this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
+    chip::app::TestClusterObjectUtils * _this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -434,16 +446,16 @@ void TestClusterObjectUtils::TestClusterObjectUtils_OptionalFields(nlTestSuite *
     //
     {
         chip::app::clusters::TestCluster::SimpleStruct::Type t;
-        uint8_t buf[4] = {0, 1, 2, 3};
+        uint8_t buf[4]  = { 0, 1, 2, 3 };
         char strbuf[10] = "chip";
-        
+
         t.a = 20;
         t.b = true;
         t.c = chip::app::clusters::TestCluster::SimpleEnum::VALUEA;
         t.d = buf;
 
         // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
-        t.e = chip::Span<char>{strbuf, strlen(strbuf)};
+        t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
         // Encode every field manually except a.
         {
@@ -481,7 +493,8 @@ void TestClusterObjectUtils::TestClusterObjectUtils_OptionalFields(nlTestSuite *
         NL_TEST_ASSERT(apSuite, t.b == true);
         NL_TEST_ASSERT(apSuite, t.c == chip::app::clusters::TestCluster::SimpleEnum::VALUEA);
 
-        for (uint32_t i = 0; i < t.d.size(); i++) {
+        for (uint32_t i = 0; i < t.d.size(); i++)
+        {
             NL_TEST_ASSERT(apSuite, t.d.data()[i] == i);
         }
 
@@ -492,7 +505,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_OptionalFields(nlTestSuite *
 void TestClusterObjectUtils::TestClusterObjectUtils_ExtraField(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    chip::app::TestClusterObjectUtils *_this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
+    chip::app::TestClusterObjectUtils * _this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -502,16 +515,16 @@ void TestClusterObjectUtils::TestClusterObjectUtils_ExtraField(nlTestSuite * apS
     //
     {
         chip::app::clusters::TestCluster::SimpleStruct::Type t;
-        uint8_t buf[4] = {0, 1, 2, 3};
+        uint8_t buf[4]  = { 0, 1, 2, 3 };
         char strbuf[10] = "chip";
-        
+
         t.a = 20;
         t.b = true;
         t.c = chip::app::clusters::TestCluster::SimpleEnum::VALUEA;
         t.d = buf;
 
         // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
-        t.e = chip::Span<char>{strbuf, strlen(strbuf)};
+        t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
         // Encode every field + an extra field.
         {
@@ -547,7 +560,8 @@ void TestClusterObjectUtils::TestClusterObjectUtils_ExtraField(nlTestSuite * apS
         NL_TEST_ASSERT(apSuite, t.b == true);
         NL_TEST_ASSERT(apSuite, t.c == chip::app::clusters::TestCluster::SimpleEnum::VALUEA);
 
-        for (uint32_t i = 0; i < t.d.size(); i++) {
+        for (uint32_t i = 0; i < t.d.size(); i++)
+        {
             NL_TEST_ASSERT(apSuite, t.d.data()[i] == i);
         }
 
@@ -558,7 +572,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_ExtraField(nlTestSuite * apS
 void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    chip::app::TestClusterObjectUtils *_this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
+    chip::app::TestClusterObjectUtils * _this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -572,7 +586,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTe
         //
         {
             chip::app::clusters::TestCluster::SimpleStruct::Type t;
-            uint8_t buf[4] = {0, 1, 2, 3};
+            uint8_t buf[4]  = { 0, 1, 2, 3 };
             char strbuf[10] = "chip";
 
             t.a = 20;
@@ -581,7 +595,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTe
             t.d = buf;
 
             // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
-            t.e = chip::Span<char>{strbuf, strlen(strbuf)};
+            t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
             // Encode every field manually except a.
             {
@@ -624,7 +638,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTe
         //
         {
             chip::app::clusters::TestCluster::SimpleStruct::Type t;
-            uint8_t buf[4] = {0, 1, 2, 3};
+            uint8_t buf[4]  = { 0, 1, 2, 3 };
             char strbuf[10] = "chip";
 
             t.a = 20;
@@ -633,7 +647,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTe
             t.d = buf;
 
             // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
-            t.e = chip::Span<char>{strbuf, strlen(strbuf)};
+            t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
             // Encode every field manually except a.
             {
@@ -669,7 +683,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTe
 void TestClusterObjectUtils::TestClusterObjectUtils_InvalidListType(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    chip::app::TestClusterObjectUtils *_this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
+    chip::app::TestClusterObjectUtils * _this = static_cast<chip::app::TestClusterObjectUtils *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -679,7 +693,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidListType(nlTestSuite 
     //
     {
         chip::app::clusters::TestCluster::NestedStructList::Type t;
-        uint32_t intBuf[4] = {10000, 10001, 10002, 10003};
+        uint32_t intBuf[4] = { 10000, 10001, 10002, 10003 };
 
         t.e = intBuf;
 
@@ -709,13 +723,13 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidListType(nlTestSuite 
 
         auto iter = t.d.begin();
 
-        while (iter != t.d.end()) {
+        while (iter != t.d.end())
+        {
             NL_TEST_ASSERT(apSuite, iter->HasError());
             break;
         }
     }
 }
-
 
 } // namespace app
 } // namespace chip

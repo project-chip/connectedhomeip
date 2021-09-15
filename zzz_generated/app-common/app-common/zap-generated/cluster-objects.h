@@ -1,156 +1,171 @@
 #pragma once
 
+#include <app/ClusterObjectUtils.h>
+#include <app/util/basic-types.h>
 #include <array>
+#include <lib/core/CHIPTLV.h>
+#include <string>
 #include <type_traits>
 #include <vector>
-#include <string>
-#include <app/util/basic-types.h>
-#include <core/CHIPTLV.h>
-#include <app/ClusterObjectUtils.h>
 
 namespace chip {
 namespace app {
-namespace clusters { 
+namespace clusters {
 namespace TestCluster {
-    constexpr chip::ClusterId kClusterId = 0x0000050F;
+constexpr chip::ClusterId kClusterId = 0x0000050F;
 
-    enum class SimpleEnum : uint8_t {
-        UNSPECIFIED = 0x00,
-        VALUEA = 0x01,
-        VALUEB = 0x02,
-        VALUEC = 0x03
-    };
+enum class SimpleEnum : uint8_t
+{
+    UNSPECIFIED = 0x00,
+    VALUEA      = 0x01,
+    VALUEB      = 0x02,
+    VALUEC      = 0x03
+};
 
-    namespace TestListStructOctet {
-        enum FieldId {
-            kFabricIndexFieldId = 0,
-            kOperationalCertFieldId = 1,
-        };
-        
-        struct Type {
-            int64_t fabricIndex;
-            chip::ByteSpan operationalCert;
+namespace TestListStructOctet {
+enum FieldId
+{
+    kFabricIndexFieldId     = 0,
+    kOperationalCertFieldId = 1,
+};
 
-            CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag);
-            CHIP_ERROR Decode(TLV::TLVReader &reader);
-        };
-    }
+struct Type
+{
+    int64_t fabricIndex;
+    chip::ByteSpan operationalCert;
 
-    namespace SimpleStruct {
-        enum FieldId {
-            kAFieldId = 0,
-            kBFieldId = 1,
-            kCFieldId = 2,
-            kDFieldId = 3,
-            kEFieldId = 4
-        };
-        
-        struct Type {
-            uint8_t a = 0;
-            bool b = false;
-            SimpleEnum c = SimpleEnum::UNSPECIFIED;
-            chip::ByteSpan d;
-            chip::Span<char> e;
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace TestListStructOctet
 
-            CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag);
-            CHIP_ERROR Decode(TLV::TLVReader &reader);
-        };
-    }
+namespace SimpleStruct {
+enum FieldId
+{
+    kAFieldId = 0,
+    kBFieldId = 1,
+    kCFieldId = 2,
+    kDFieldId = 3,
+    kEFieldId = 4
+};
 
-    namespace NestedStruct {
-        enum FieldId {
-            kAFieldId = 0,
-            kBFieldId = 1,
-            kCFieldId = 2
-        };
-        
-        class Type {
-        public:
-            uint8_t a = 0;
-            bool b = false;
-            SimpleStruct::Type c;
+struct Type
+{
+    uint8_t a    = 0;
+    bool b       = false;
+    SimpleEnum c = SimpleEnum::UNSPECIFIED;
+    chip::ByteSpan d;
+    chip::Span<const char> e;
 
-            CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag);
-            CHIP_ERROR Decode(TLV::TLVReader &reader);
-        };
-    }
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SimpleStruct
 
-    namespace NestedStructList {
-        enum FieldId {
-            kAFieldId = 0,
-            kBFieldId = 1,
-            kCFieldId = 2,
-            kDFieldId = 3,
-            kEFieldId = 4,
-            kFFieldId = 5,
-        };
-        
-        struct Type {
-            public:
-                uint8_t a = 0;
-                bool b = false;
-                SimpleStruct::Type c;
-                chip::Span<SimpleStruct::Type> d;
-                chip::Span<uint32_t> e;
-                chip::Span<chip::ByteSpan> f;
+namespace NestedStruct {
+enum FieldId
+{
+    kAFieldId = 0,
+    kBFieldId = 1,
+    kCFieldId = 2
+};
 
-                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag);
-                CHIP_ERROR Decode(TLV::TLVReader &reader);
-        };
-    }
+class Type
+{
+public:
+    uint8_t a = 0;
+    bool b    = false;
+    SimpleStruct::Type c;
 
-    namespace IteratableNestedStructList {
-        enum FieldId {
-            kAFieldId = 0,
-            kBFieldId = 1,
-            kCFieldId = 2,
-            kDFieldId = 3,
-            kEFieldId = 4,
-            kFFieldId = 5
-        };
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace NestedStruct
 
-        struct Type {
-            public:
-                uint8_t a = 0;
-                bool b = false;
-                SimpleStruct::Type c;
-                ClusterObjectUtils::IteratableList<SimpleStruct::Type> d;
-                ClusterObjectUtils::IteratableList<uint32_t> e;
-                ClusterObjectUtils::IteratableList<chip::ByteSpan> f;
+namespace NestedStructList {
+enum FieldId
+{
+    kAFieldId = 0,
+    kBFieldId = 1,
+    kCFieldId = 2,
+    kDFieldId = 3,
+    kEFieldId = 4,
+    kFFieldId = 5,
+};
 
-                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag);
-                CHIP_ERROR Decode(TLV::TLVReader &reader);
-        };
-    }
+struct Type
+{
+public:
+    uint8_t a = 0;
+    bool b    = false;
+    SimpleStruct::Type c;
+    chip::Span<SimpleStruct::Type> d;
+    chip::Span<uint32_t> e;
+    chip::Span<chip::ByteSpan> f;
 
-    namespace DoubleNestedStructList {
-        enum FieldId {
-            kAFieldId = 0,
-        };
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace NestedStructList
 
-        struct Type {
-            public:
-                chip::Span<NestedStructList::Type> a;
+namespace IteratableNestedStructList {
+enum FieldId
+{
+    kAFieldId = 0,
+    kBFieldId = 1,
+    kCFieldId = 2,
+    kDFieldId = 3,
+    kEFieldId = 4,
+    kFFieldId = 5
+};
 
-                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag);
-                CHIP_ERROR Decode(TLV::TLVReader &reader);
-        };
-    }
+struct Type
+{
+public:
+    uint8_t a = 0;
+    bool b    = false;
+    SimpleStruct::Type c;
+    ClusterObjectUtils::IteratableList<SimpleStruct::Type> d;
+    ClusterObjectUtils::IteratableList<uint32_t> e;
+    ClusterObjectUtils::IteratableList<chip::ByteSpan> f;
 
-    namespace IteratableDoubleNestedStructList {
-        enum FieldId {
-            kAFieldId = 0,
-        };
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace IteratableNestedStructList
 
-        struct Type {
-            public:
-                ClusterObjectUtils::IteratableList<IteratableNestedStructList::Type> a;
+namespace DoubleNestedStructList {
+enum FieldId
+{
+    kAFieldId = 0,
+};
 
-                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag);
-                CHIP_ERROR Decode(TLV::TLVReader &reader);
-        };
-    }
-}
-}
-}
-}
+struct Type
+{
+public:
+    chip::Span<NestedStructList::Type> a;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace DoubleNestedStructList
+
+namespace IteratableDoubleNestedStructList {
+enum FieldId
+{
+    kAFieldId = 0,
+};
+
+struct Type
+{
+public:
+    ClusterObjectUtils::IteratableList<IteratableNestedStructList::Type> a;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace IteratableDoubleNestedStructList
+} // namespace TestCluster
+} // namespace clusters
+} // namespace app
+} // namespace chip

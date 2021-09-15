@@ -47,7 +47,8 @@ public:
     {}
 
     template <size_t N>
-    constexpr Span& operator=(T (&databuf)[N]) {
+    constexpr Span & operator=(T (&databuf)[N])
+    {
         mDataBuf = databuf;
         mDataLen = N;
         return (*this);

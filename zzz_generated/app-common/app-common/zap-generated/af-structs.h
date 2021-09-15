@@ -384,7 +384,6 @@ typedef struct _SecurityPolicy
     uint8_t Flags;
 } SecurityPolicy;
 
-
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
 {
