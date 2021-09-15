@@ -26,16 +26,26 @@
 #if BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
+                                                                                                                                   \
+        /* Endpoint: 1, Cluster: OTA Software Update Requestor (server), big-endian */                                             \
+                                                                                                                                   \
+        /* 0 - default ota provider, */                                                                                            \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                      \
     }
 
 #else // !BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
+                                                                                                                                   \
+        /* Endpoint: 1, Cluster: OTA Software Update Requestor (server), little-endian */                                          \
+                                                                                                                                   \
+        /* 0 - default ota provider, */                                                                                            \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                      \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (0)
+#define GENERATED_DEFAULTS_COUNT (1)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -63,7 +73,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 2
+#define GENERATED_ATTRIBUTE_COUNT 4
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -71,6 +81,9 @@
         { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                  \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: OTA Software Update Requestor (server) */                                                     \
+            { 0x0001, ZAP_TYPE(OCTET_STRING), 17, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                    \
+              ZAP_LONG_DEFAULTS_INDEX(0) },                            /* default ota provider */                                  \
+            { 0x0002, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_EMPTY_DEFAULT() },  /* update possible */                                       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                       \
     }
 
@@ -88,7 +101,7 @@
             0x0029, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                                   \
         }, /* Endpoint: 1, Cluster: OTA Software Update Provider (client) */                                                       \
             {                                                                                                                      \
-                0x002A, ZAP_ATTRIBUTE_INDEX(1), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
+                0x002A, ZAP_ATTRIBUTE_INDEX(1), 3, 20, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: OTA Software Update Requestor (server) */                                                  \
     }
 
@@ -97,17 +110,17 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 2, 4 },                                                                                            \
+        { ZAP_CLUSTER_INDEX(0), 2, 22 },                                                                                           \
     }
 
 // Largest attribute size is needed for various buffers
-#define ATTRIBUTE_LARGEST (3)
+#define ATTRIBUTE_LARGEST (18)
 
 // Total size of singleton attributes
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (4)
+#define ATTRIBUTE_MAX_SIZE (22)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
