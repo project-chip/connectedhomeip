@@ -43,6 +43,7 @@
 
 // this file contains all the common includes for clusters in the util
 #include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -53,6 +54,10 @@
 #include <app/util/af.h>
 
 #include <app/reporting/reporting.h>
+
+#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL
+#include <app/clusters/color-control-server/color-control-server.h>
+#endif // EMBER_AF_PLUGIN_COLOR_CONTROL
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>

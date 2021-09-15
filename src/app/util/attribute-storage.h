@@ -75,6 +75,8 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 
+#define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
+
 #define DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)                                                                        \
     EmberAfEndpointType endpointName = { clusterList, sizeof(clusterList) / sizeof(EmberAfCluster), 0 }
 
@@ -82,7 +84,7 @@
 
 #define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs)                                                                           \
     {                                                                                                                              \
-        clusterId, clusterAttrs, sizeof(clusterAttrs) / sizeof(EmberAfAttributeMetadata), 0, ZAP_CLUSTER_MASK(SERVER), NULL        \
+        clusterId, clusterAttrs, sizeof(clusterAttrs) / sizeof(EmberAfAttributeMetadata), 0, CLUSTER_MASK_SERVER, NULL             \
     }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
@@ -90,12 +92,12 @@
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(attrListName) EmberAfAttributeMetadata attrListName[] = {
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(clusterRevision)                                                                        \
-    , { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(clusterRevision) } /* cluster revision */                               \
+    , { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, (uint16_t) clusterRevision } /* cluster revision */                                        \
     }
 
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
-        attId, ZAP_TYPE(attType), attSizeBytes, attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT()               \
+        attId, ZAP_TYPE(attType), attSizeBytes, attrMask | ATTRIBUTE_MASK_EXTERNAL_STORAGE, { (uint16_t) 0 }                       \
     }
 
 #define CLUSTER_TICK_FREQ_ALL (0x00)
