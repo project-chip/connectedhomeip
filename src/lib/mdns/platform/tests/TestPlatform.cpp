@@ -87,7 +87,8 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetPairingHint(chip::Optional<uint16_t>(3))
         .SetPairingInstr(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingId(chip::Optional<const char *>("id_that_spins"));
+        .SetRotatingId(chip::Optional<const char *>("id_that_spins"))
+        .SetMRPRetryIntervals(chip::Optional<uint32_t>(32), chip::Optional<uint32_t>(33));
 
 test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .SetProtocol(MdnsServiceProtocol::kMdnsProtocolUdp)
@@ -101,6 +102,8 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddTxt("RI", "id_that_spins")
                                                   .AddTxt("PI", "Pair me")
                                                   .AddTxt("PH", "3")
+                                                  .AddTxt("CRI", "32")
+                                                  .AddTxt("CRA", "33")
                                                   .AddSubtype("_S2")
                                                   .AddSubtype("_L22")
                                                   .AddSubtype("_V555")

@@ -123,6 +123,60 @@ CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceN
     return CHIP_NO_ERROR;
 }
 
+template <class Derived, size_t N_idle, size_t N_active>
+CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, char (&mrpRetryIdleStorage)[N_idle],
+                                char (&mrpRetryActiveStorage)[N_active], TextEntry txtEntryStorage[], size_t & txtEntryIdx)
+{
+    Optional<uint32_t> mrpRetryIntervalIdle, mrpRetryIntervalActive;
+    params.GetMRPRetryIntervals(mrpRetryIntervalIdle, mrpRetryIntervalActive);
+
+    // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value
+    // change or device type change.
+    // TODO: Is this really the best place to set these? Seems like it should be passed
+    // in with the correct values and set one level up from here.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (chip::DeviceLayer::ConnectivityMgr().GetThreadDeviceType() ==
+        chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_SleepyEndDevice)
+    {
+        uint32_t sedPollPeriod;
+        ReturnErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().GetPollPeriod(sedPollPeriod));
+        // Increment default MRP retry intervals by SED poll period to be on the safe side
+        // and avoid unnecessary retransmissions.
+        mrpRetryIntervalIdle.SetValue(mrpRetryIntervalIdle.Value() + sedPollPeriod);
+        mrpRetryIntervalActive.SetValue(mrpRetryIntervalActive.Value() + sedPollPeriod);
+    }
+#endif
+    if (mrpRetryIntervalIdle.HasValue())
+    {
+        if (mrpRetryIntervalIdle.Value() > kMaxRetryInterval)
+        {
+            ChipLogProgress(Discovery, "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
+            mrpRetryIntervalIdle.SetValue(kMaxRetryInterval);
+        }
+        size_t writtenCharactersNumber =
+            snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32, mrpRetryIntervalIdle.Value());
+        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kTxtRetryIntervalIdleMaxLength),
+                            CHIP_ERROR_INVALID_STRING_LENGTH);
+        txtEntryStorage[txtEntryIdx++] = { "CRI", reinterpret_cast<const uint8_t *>(mrpRetryIdleStorage),
+                                           strlen(mrpRetryIdleStorage) };
+    }
+    if (mrpRetryIntervalActive.HasValue())
+    {
+        if (mrpRetryIntervalActive.Value() > kMaxRetryInterval)
+        {
+            ChipLogProgress(Discovery, "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
+            mrpRetryIntervalActive.SetValue(kMaxRetryInterval);
+        }
+        size_t writtenCharactersNumber =
+            snprintf(mrpRetryActiveStorage, sizeof(mrpRetryActiveStorage), "%" PRIu32, mrpRetryIntervalActive.Value());
+        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kTxtRetryIntervalActiveMaxLength),
+                            CHIP_ERROR_INVALID_STRING_LENGTH);
+        txtEntryStorage[txtEntryIdx++] = { "CRA", reinterpret_cast<const uint8_t *>(mrpRetryActiveStorage),
+                                           strlen(mrpRetryActiveStorage) };
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -136,6 +190,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char rotatingIdBuf[kKeyRotatingIdMaxLength + 1];
     char pairingHintBuf[kKeyPairingHintMaxLength + 1];
     char pairingInstrBuf[kKeyPairingInstructionMaxLength + 1];
+    char mrpRetryIntervalIdleBuf[kTxtRetryIntervalIdleMaxLength + 1];
+    char mrpRetryIntervalActiveBuf[kTxtRetryIntervalActiveMaxLength + 1];
     // size of textEntries array should be count of Bufs above
     TextEntry textEntries[CommissionAdvertisingParameters::kTxtMaxNumber];
     size_t textEntrySize = 0;
@@ -201,6 +257,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         textEntries[textEntrySize++] = { "DN", reinterpret_cast<const uint8_t *>(deviceNameBuf),
                                          strnlen(deviceNameBuf, sizeof(deviceNameBuf)) };
     }
+    AddCommonTxtElements<CommissionAdvertisingParameters>(params, mrpRetryIntervalIdleBuf, mrpRetryIntervalActiveBuf, textEntries,
+                                                          textEntrySize);
 
     // Following fields are for nodes and not for commissioners
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
@@ -314,60 +372,6 @@ void DiscoveryImplPlatform::PrintEntries(const MdnsService * service)
     }
 }
 #endif
-
-template <class Derived, size_t N_idle, size_t N_active>
-CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, char (&mrpRetryIdleStorage)[N_idle],
-                                char (&mrpRetryActiveStorage)[N_active], TextEntry txtEntryStorage[], size_t & txtEntryIdx)
-{
-    Optional<uint32_t> mrpRetryIntervalIdle, mrpRetryIntervalActive;
-    params.GetMRPRetryIntervals(mrpRetryIntervalIdle, mrpRetryIntervalActive);
-
-    // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value
-    // change or device type change.
-    // TODO: Is this really the best place to set these? Seems like it should be passed
-    // in with the correct values and set one level up from here.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (chip::DeviceLayer::ConnectivityMgr().GetThreadDeviceType() ==
-        chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_SleepyEndDevice)
-    {
-        uint32_t sedPollPeriod;
-        ReturnErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().GetPollPeriod(sedPollPeriod));
-        // Increment default MRP retry intervals by SED poll period to be on the safe side
-        // and avoid unnecessary retransmissions.
-        mrpRetryIntervalIdle.SetValue(mrpRetryIntervalIdle.Value() + sedPollPeriod);
-        mrpRetryIntervalActive.SetValue(mrpRetryIntervalActive.Value() + sedPollPeriod);
-    }
-#endif
-    if (mrpRetryIntervalIdle.HasValue())
-    {
-        if (mrpRetryIntervalIdle.Value() > kMaxRetryInterval)
-        {
-            ChipLogProgress(Discovery, "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
-            mrpRetryIntervalIdle.SetValue(kMaxRetryInterval);
-        }
-        size_t writtenCharactersNumber =
-            snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32, mrpRetryIntervalIdle.Value());
-        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kTxtRetryIntervalIdleMaxLength),
-                            CHIP_ERROR_INVALID_STRING_LENGTH);
-        txtEntryStorage[txtEntryIdx++] = { "CRI", reinterpret_cast<const uint8_t *>(mrpRetryIdleStorage),
-                                           strlen(mrpRetryIdleStorage) };
-    }
-    if (mrpRetryIntervalActive.HasValue())
-    {
-        if (mrpRetryIntervalActive.Value() > kMaxRetryInterval)
-        {
-            ChipLogProgress(Discovery, "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
-            mrpRetryIntervalActive.SetValue(kMaxRetryInterval);
-        }
-        size_t writtenCharactersNumber =
-            snprintf(mrpRetryActiveStorage, sizeof(mrpRetryActiveStorage), "%" PRIu32, mrpRetryIntervalActive.Value());
-        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kTxtRetryIntervalActiveMaxLength),
-                            CHIP_ERROR_INVALID_STRING_LENGTH);
-        txtEntryStorage[txtEntryIdx++] = { "CRA", reinterpret_cast<const uint8_t *>(mrpRetryActiveStorage),
-                                           strlen(mrpRetryActiveStorage) };
-    }
-    return CHIP_NO_ERROR;
-}
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParameters & params)
 {
