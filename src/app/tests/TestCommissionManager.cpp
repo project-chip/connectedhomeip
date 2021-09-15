@@ -56,7 +56,8 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
 {
     nlTestSuite * suite                        = reinterpret_cast<nlTestSuite *>(context);
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdns);
+    CHIP_ERROR err =
+        commissionMgr.OpenBasicCommissioningWindow(kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdnsOnly);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     commissionMgr.CloseCommissioningWindow();
@@ -84,7 +85,7 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
     constexpr uint16_t kTimeoutSeconds         = 1;
     constexpr uint16_t kTimeoutMs              = 1000;
     constexpr unsigned kSleepPadding           = 100;
-    CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kMdns);
+    CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kMdnsOnly);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     chip::DeviceLayer::SystemLayer().StartTimer(kTimeoutMs + kSleepPadding, CheckCommissioningWindowManagerWindowClosedTask, suite);
