@@ -144,8 +144,9 @@ private:
 
     struct CommonTxtEntryStorage
     {
-        char mrpRetryIntervalIdleBuf[kTxtRetryIntervalIdleMaxLength + 1];
-        char mrpRetryIntervalActiveBuf[kTxtRetryIntervalActiveMaxLength + 1];
+        // CRA and CRI are both 3 chars + '=' = 4 + 1 for nullchar
+        char mrpRetryIntervalIdleBuf[kTxtRetryIntervalIdleMaxLength + 4 + 1];
+        char mrpRetryIntervalActiveBuf[kTxtRetryIntervalActiveMaxLength + 4 + 1];
     };
     template <class Derived>
     CHIP_ERROR AddCommonTxtEntries(const BaseAdvertisingParams<Derived> & params, CommonTxtEntryStorage & storage,

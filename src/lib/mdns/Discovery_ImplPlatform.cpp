@@ -155,7 +155,7 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
         }
         size_t writtenCharactersNumber =
             snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32, mrpRetryIntervalIdle.Value());
-        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kTxtRetryIntervalIdleMaxLength),
+        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalIdleMaxLength),
                             CHIP_ERROR_INVALID_STRING_LENGTH);
         txtEntryStorage[txtEntryIdx++] = { "CRI", reinterpret_cast<const uint8_t *>(mrpRetryIdleStorage),
                                            strlen(mrpRetryIdleStorage) };
@@ -169,7 +169,7 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
         }
         size_t writtenCharactersNumber =
             snprintf(mrpRetryActiveStorage, sizeof(mrpRetryActiveStorage), "%" PRIu32, mrpRetryIntervalActive.Value());
-        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kTxtRetryIntervalActiveMaxLength),
+        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalActiveMaxLength),
                             CHIP_ERROR_INVALID_STRING_LENGTH);
         txtEntryStorage[txtEntryIdx++] = { "CRA", reinterpret_cast<const uint8_t *>(mrpRetryActiveStorage),
                                            strlen(mrpRetryActiveStorage) };
