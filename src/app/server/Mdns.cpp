@@ -252,6 +252,11 @@ CHIP_ERROR MdnsServer::AdvertiseOperational()
         if (fabricInfo.IsInitialized())
         {
             uint8_t mac[8];
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+            bool tcpSupported = true;
+#else
+            bool tcpSupported = false;
+#endif
 
             const auto advertiseParameters =
                 chip::Mdns::OperationalAdvertisingParameters()
@@ -260,6 +265,7 @@ CHIP_ERROR MdnsServer::AdvertiseOperational()
                     .SetPort(GetSecuredPort())
                     .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
                                           Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
+                    .SetTcpSupported(Optional<bool>(tcpSupported))
                     .EnableIpV4(true);
 
             auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
@@ -334,9 +340,16 @@ CHIP_ERROR MdnsServer::Advertise(bool commissionableNode, chip::Mdns::Commission
     ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
     advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    bool tcpSupported = true;
+#else
+    bool tcpSupported = false;
+#endif
 
-    advertiseParameters.SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
-                                             Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL));
+    advertiseParameters
+        .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
+                              Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
+        .SetTcpSupported(Optional<bool>(tcpSupported));
 
     if (mode != chip::Mdns::CommissioningMode::kEnabledEnhanced)
     {

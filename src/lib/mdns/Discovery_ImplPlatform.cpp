@@ -123,9 +123,10 @@ CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceN
     return CHIP_NO_ERROR;
 }
 
-template <class Derived, size_t N_idle, size_t N_active>
+template <class Derived, size_t N_idle, size_t N_active, size_t N_tcp>
 CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, char (&mrpRetryIdleStorage)[N_idle],
-                                char (&mrpRetryActiveStorage)[N_active], TextEntry txtEntryStorage[], size_t & txtEntryIdx)
+                                char (&mrpRetryActiveStorage)[N_active], char (&tcpSupportedStorage)[N_tcp],
+                                TextEntry txtEntryStorage[], size_t & txtEntryIdx)
 {
     Optional<uint32_t> mrpRetryIntervalIdle, mrpRetryIntervalActive;
     params.GetMRPRetryIntervals(mrpRetryIntervalIdle, mrpRetryIntervalActive);
@@ -178,6 +179,15 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
                             CHIP_ERROR_INVALID_STRING_LENGTH);
         txtEntryStorage[txtEntryIdx++] = { "CRA", Uint8::from_const_char(mrpRetryActiveStorage), strlen(mrpRetryActiveStorage) };
     }
+    if (params.GetTcpSupported().HasValue())
+    {
+        size_t writtenCharactersNumber =
+            snprintf(tcpSupportedStorage, sizeof(tcpSupportedStorage), "%d", params.GetTcpSupported().Value());
+        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kKeyTcpSupportMaxLength),
+                            CHIP_ERROR_INVALID_STRING_LENGTH);
+        txtEntryStorage[txtEntryIdx++] = { "T", reinterpret_cast<const uint8_t *>(tcpSupportedStorage),
+                                           strlen(tcpSupportedStorage) };
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -196,6 +206,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char pairingInstrBuf[kKeyPairingInstructionMaxLength + 1];
     char mrpRetryIntervalIdleBuf[kTxtRetryIntervalIdleMaxLength + 1];
     char mrpRetryIntervalActiveBuf[kTxtRetryIntervalActiveMaxLength + 1];
+    char tcpSupportedBuf[kKeyTcpSupportMaxLength + 1];
     // size of textEntries array should be count of Bufs above
     TextEntry textEntries[CommissionAdvertisingParameters::kTxtMaxNumber];
     size_t textEntrySize = 0;
@@ -261,8 +272,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         textEntries[textEntrySize++] = { "DN", reinterpret_cast<const uint8_t *>(deviceNameBuf),
                                          strnlen(deviceNameBuf, sizeof(deviceNameBuf)) };
     }
-    AddCommonTxtElements<CommissionAdvertisingParameters>(params, mrpRetryIntervalIdleBuf, mrpRetryIntervalActiveBuf, textEntries,
-                                                          textEntrySize);
+    AddCommonTxtElements<CommissionAdvertisingParameters>(params, mrpRetryIntervalIdleBuf, mrpRetryIntervalActiveBuf,
+                                                          tcpSupportedBuf, textEntries, textEntrySize);
 
     // Following fields are for nodes and not for commissioners
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
@@ -387,11 +398,12 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 
     char mrpRetryIntervalIdleBuf[kTxtRetryIntervalIdleMaxLength + 1];
     char mrpRetryIntervalActiveBuf[kTxtRetryIntervalActiveMaxLength + 1];
+    char tcpSupportedBuf[kKeyTcpSupportMaxLength + 1];
     TextEntry txtEntries[OperationalAdvertisingParameters::kTxtMaxNumber];
     size_t textEntrySize = 0;
 
-    ReturnLogErrorOnFailure(
-        AddCommonTxtElements(params, mrpRetryIntervalIdleBuf, mrpRetryIntervalActiveBuf, txtEntries, textEntrySize));
+    ReturnLogErrorOnFailure(AddCommonTxtElements(params, mrpRetryIntervalIdleBuf, mrpRetryIntervalActiveBuf, tcpSupportedBuf,
+                                                 txtEntries, textEntrySize));
 
     error = MakeHostName(service.mHostName, sizeof(service.mHostName), params.GetMac());
     if (error != CHIP_NO_ERROR)

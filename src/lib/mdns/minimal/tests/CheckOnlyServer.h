@@ -299,7 +299,7 @@ private:
             found = false;
         }
     };
-    static constexpr size_t kMaxExpectedTxt = 10;
+    static constexpr size_t kMaxExpectedTxt = 11;
     KV mExpectedTxt[kMaxExpectedTxt];
     size_t mNumExpectedTxtRecords = 0;
     size_t mNumReceivedTxtRecords = 0;

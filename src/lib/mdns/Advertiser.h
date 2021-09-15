@@ -104,6 +104,12 @@ public:
         intervalIdle   = mMrpRetryIntervalIdle;
         intervalActive = mMrpRetryIntervalActive;
     }
+    Derived & SetTcpSupported(Optional<bool> tcpSupported)
+    {
+        mTcpSupported = tcpSupported;
+        return *reinterpret_cast<Derived *>(this);
+    }
+    Optional<bool> GetTcpSupported() const { return mTcpSupported; }
 
 private:
     uint16_t mPort                   = CHIP_PORT;
@@ -112,7 +118,8 @@ private:
     size_t mMacLength                = 0;
     Optional<uint32_t> mMrpRetryIntervalIdle;
     Optional<uint32_t> mMrpRetryIntervalActive;
-}; // namespace Mdns
+    Optional<bool> mTcpSupported;
+};
 
 /// Defines parameters required for advertising a CHIP node
 /// over mDNS as an 'operationally ready' node.

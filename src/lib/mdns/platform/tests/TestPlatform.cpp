@@ -49,14 +49,16 @@ OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingPara
                                                           .SetMac(ByteSpan(kMac))
                                                           .SetPort(CHIP_PORT)
                                                           .EnableIpV4(true)
-                                                          .SetMRPRetryIntervals(Optional<uint32_t>(32), Optional<uint32_t>(33));
+                                                          .SetMRPRetryIntervals(Optional<uint32_t>(32), Optional<uint32_t>(33))
+                                                          .SetTcpSupported(Optional<bool>(true));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(MdnsServiceProtocol::kMdnsProtocolTcp)
                                           .SetServiceName("_matter")
                                           .SetInstanceName("5555666677778888-1212343456567878")
                                           .SetHostName(host)
                                           .AddTxt("CRI", "32")
-                                          .AddTxt("CRA", "33");
+                                          .AddTxt("CRA", "33")
+                                          .AddTxt("T", "1");
 
 CommissionAdvertisingParameters commissionableNodeParamsSmall =
     CommissionAdvertisingParameters()
@@ -88,6 +90,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetPairingInstr(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
         .SetRotatingId(chip::Optional<const char *>("id_that_spins"))
+        .SetTcpSupported(chip::Optional<bool>(true))
         .SetMRPRetryIntervals(
             chip::Optional<uint32_t>(3600000),
             chip::Optional<uint32_t>(3600005)); // 3600005 is over the max, so this should be adjusted by the platform
@@ -104,6 +107,7 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddTxt("RI", "id_that_spins")
                                                   .AddTxt("PI", "Pair me")
                                                   .AddTxt("PH", "3")
+                                                  .AddTxt("T", "1")
                                                   .AddTxt("CRI", "3600000")
                                                   .AddTxt("CRA", "3600000")
                                                   .AddSubtype("_S2")
