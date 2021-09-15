@@ -1,6 +1,7 @@
 #pragma once
 
-#include <app/ClusterObjectUtils.h>
+#include <app/DataModelSerialization.h>
+#include <app/DataModelTypes.h>
 #include <app/util/basic-types.h>
 #include <array>
 #include <lib/core/CHIPTLV.h>
@@ -125,9 +126,9 @@ public:
     uint8_t a = 0;
     bool b    = false;
     SimpleStruct::Type c;
-    ClusterObjectUtils::IteratableList<SimpleStruct::Type> d;
-    ClusterObjectUtils::IteratableList<uint32_t> e;
-    ClusterObjectUtils::IteratableList<chip::ByteSpan> f;
+    DataModel::IteratableList<SimpleStruct::Type> d;
+    DataModel::IteratableList<uint32_t> e;
+    DataModel::IteratableList<chip::ByteSpan> f;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -159,7 +160,7 @@ enum FieldId
 struct Type
 {
 public:
-    ClusterObjectUtils::IteratableList<IteratableNestedStructList::Type> a;
+    DataModel::IteratableList<IteratableNestedStructList::Type> a;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
     CHIP_ERROR Decode(TLV::TLVReader & reader);

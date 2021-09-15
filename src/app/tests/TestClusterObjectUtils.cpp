@@ -43,7 +43,6 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
-#include <app/ClusterObjectUtils.h>
 #include <cluster-objects.h>
 
 namespace chip {
@@ -136,7 +135,7 @@ CHIP_ERROR EncodeStruct(TLV::TLVWriter & writer, uint64_t tag, ArgTypes... Args)
     TLV::TLVType type;
 
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, type));
-    (void) (expand_type{ (ClusterObjectUtils::Encode(writer, Args.tag, Args.value), 0)... });
+    (void) (expand_type{ (DataModel::Encode(writer, Args.tag, Args.value), 0)... });
     ReturnErrorOnFailure(writer.EndContainer(type));
 
     return CHIP_NO_ERROR;
@@ -185,7 +184,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecSimpleStruct(nlTest
         // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
         t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
-        err = ClusterObjectUtils::Encode(_this->mWriter, TLV::AnonymousTag, t);
+        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = _this->mWriter.Finalize();
@@ -202,7 +201,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecSimpleStruct(nlTest
 
         _this->SetupReader();
 
-        err = ClusterObjectUtils::Decode(_this->mReader, t);
+        err = DataModel::Decode(_this->mReader, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(apSuite, t.a == 20);
@@ -228,7 +227,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTest
 
     {
         Span<char> a;
-        ClusterObjectUtils::Encode(_this->mWriter, TLV::AnonymousTag, a);
+        DataModel::Encode(_this->mWriter, TLV::AnonymousTag, a);
     }
 
     //
@@ -249,7 +248,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTest
         // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
         t.c.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
-        err = ClusterObjectUtils::Encode(_this->mWriter, TLV::AnonymousTag, t);
+        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = _this->mWriter.Finalize();
@@ -266,7 +265,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTest
 
         _this->SetupReader();
 
-        err = ClusterObjectUtils::Decode(_this->mReader, t);
+        err = DataModel::Decode(_this->mReader, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(apSuite, t.a == 20);
@@ -330,7 +329,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStruc
         t.c.e = chip::Span<char>{ strbuf, strlen(strbuf) };
         t.d   = structList;
 
-        err = ClusterObjectUtils::Encode(_this->mWriter, TLV::AnonymousTag, t);
+        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = _this->mWriter.Finalize();
@@ -348,7 +347,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStruc
 
         _this->SetupReader();
 
-        err = ClusterObjectUtils::Decode(_this->mReader, t);
+        err = DataModel::Decode(_this->mReader, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(apSuite, t.a == 20);
@@ -437,7 +436,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNeste
             item.d = structList;
         }
 
-        err = ClusterObjectUtils::Encode(_this->mWriter, TLV::AnonymousTag, t);
+        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = _this->mWriter.Finalize();
@@ -454,7 +453,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNeste
 
         _this->SetupReader();
 
-        err = ClusterObjectUtils::Decode(_this->mReader, t);
+        err = DataModel::Decode(_this->mReader, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         uint32_t i = 0;
@@ -530,7 +529,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_OptionalFields(nlTestSuite *
         // Set the value of a to a specific value, and ensure it is not over-written after decode.
         t.a = 150;
 
-        err = ClusterObjectUtils::Decode(_this->mReader, t);
+        err = DataModel::Decode(_this->mReader, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         // Ensure that the decoder did not over-write the value set in the generated object
@@ -599,7 +598,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_ExtraField(nlTestSuite * apS
         _this->SetupReader();
 
         // Ensure successful decode despite the extra field.
-        err = ClusterObjectUtils::Decode(_this->mReader, t);
+        err = DataModel::Decode(_this->mReader, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(apSuite, t.a == 20);
@@ -681,7 +680,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTe
 
             _this->SetupReader();
 
-            err = ClusterObjectUtils::Decode(_this->mReader, t);
+            err = DataModel::Decode(_this->mReader, t);
             NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
         }
     }
@@ -733,7 +732,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTe
 
             _this->SetupReader();
 
-            err = ClusterObjectUtils::Decode(_this->mReader, t);
+            err = DataModel::Decode(_this->mReader, t);
             NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
         }
     }
@@ -777,7 +776,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidListType(nlTestSuite 
 
         _this->SetupReader();
 
-        err = ClusterObjectUtils::Decode(_this->mReader, t);
+        err = DataModel::Decode(_this->mReader, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         auto iter     = t.d.begin();
