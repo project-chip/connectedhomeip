@@ -24,6 +24,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 namespace Internal {
+namespace AppPreference {
 
 static CHIP_ERROR __IsKeyExist(const char * key)
 {
@@ -44,12 +45,12 @@ static CHIP_ERROR __IsKeyExist(const char * key)
     return err;
 }
 
-CHIP_ERROR AppPreference::CheckData(const char * key)
+CHIP_ERROR CheckData(const char * key)
 {
     return __IsKeyExist(key);
 }
 
-CHIP_ERROR AppPreference::GetData(const char * key, void * data, size_t dataSize, size_t * getDataSize, size_t offset)
+CHIP_ERROR GetData(const char * key, void * data, size_t dataSize, size_t * getDataSize, size_t offset)
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
     int preErr                    = PREFERENCE_ERROR_NONE;
@@ -102,7 +103,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR AppPreference::SaveData(const char * key, const uint8_t * data, size_t dataSize)
+CHIP_ERROR SaveData(const char * key, const uint8_t * data, size_t dataSize)
 {
     CHIP_ERROR err             = CHIP_NO_ERROR;
     int preErr                 = PREFERENCE_ERROR_NONE;
@@ -140,7 +141,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR AppPreference::RemoveData(const char * key)
+CHIP_ERROR RemoveData(const char * key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     int preErr     = PREFERENCE_ERROR_NONE;
@@ -159,6 +160,7 @@ CHIP_ERROR AppPreference::RemoveData(const char * key)
     return err;
 }
 
+} // namespace AppPreference
 } // namespace Internal
 } // namespace PersistedStorage
 } // namespace DeviceLayer
