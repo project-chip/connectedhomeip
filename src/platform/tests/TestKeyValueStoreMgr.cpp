@@ -79,8 +79,8 @@ static void TestKeyValueStoreMgr_StringKey(nlTestSuite * inSuite, void * inConte
 static void TestKeyValueStoreMgr_Uint32Key(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    const char * kTestKey = "uint32_key";
-    const char kTestValue = 5;
+    const char * kTestKey     = "uint32_key";
+    const uint32_t kTestValue = 5;
     uint32_t read_value;
     err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -199,6 +199,27 @@ static void TestKeyValueStoreMgr_MultiReadKey(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
+#ifdef __ZEPHYR__
+static void TestKeyValueStoreMgr_DoFactoryReset(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr const char * kStrKey  = "some_string_key";
+    constexpr const char * kUintKey = "some_uint_key";
+
+    NL_TEST_ASSERT(inSuite, KeyValueStoreMgr().Put(kStrKey, "some_string") == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, KeyValueStoreMgr().Put(kUintKey, uint32_t(1234)) == CHIP_NO_ERROR);
+
+    char readString[16];
+    uint32_t readValue;
+
+    NL_TEST_ASSERT(inSuite, KeyValueStoreMgr().Get(kStrKey, readString, sizeof(readString)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, KeyValueStoreMgr().Get(kUintKey, &readValue) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, KeyValueStoreMgrImpl().DoFactoryReset() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   KeyValueStoreMgr().Get(kStrKey, readString, sizeof(readString)) == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    NL_TEST_ASSERT(inSuite, KeyValueStoreMgr().Get(kUintKey, &readValue) == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+}
+#endif
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -212,6 +233,9 @@ static const nlTest sTests[] = { NL_TEST_DEF("Test KeyValueStoreMgr_EmptyStringK
 #ifndef __ZEPHYR__
                                  // Zephyr platform does not support partial or offset reads yet.
                                  NL_TEST_DEF("Test KeyValueStoreMgr_MultiReadKey", TestKeyValueStoreMgr_MultiReadKey),
+#endif
+#ifdef __ZEPHYR__
+                                 NL_TEST_DEF("Test TestKeyValueStoreMgr_DoFactoryReset", TestKeyValueStoreMgr_DoFactoryReset),
 #endif
                                  NL_TEST_SENTINEL() };
 
