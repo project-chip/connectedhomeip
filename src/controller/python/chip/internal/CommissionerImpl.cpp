@@ -98,7 +98,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         chip::Controller::CommissionerInitParams params;
 
         params.storageDelegate = &gServerStorage;
-        params.systemLayer     = &chip::DeviceLayer::SystemLayer;
+        params.systemLayer     = &chip::DeviceLayer::SystemLayer();
         params.inetLayer       = &chip::DeviceLayer::InetLayer;
         params.pairingDelegate = &gPairingDelegate;
 

@@ -61,10 +61,10 @@ private:
 
     SessionIDAllocator * mIDAllocator = nullptr;
 
-    const RendezvousAdvertisementDelegate * mAdvDelegate;
+    RendezvousAdvertisementDelegate * mAdvDelegate;
 
     bool HasAdvertisementDelegate() const { return mAdvDelegate != nullptr; }
-    const RendezvousAdvertisementDelegate * GetAdvertisementDelegate() const { return mAdvDelegate; }
+    RendezvousAdvertisementDelegate * GetAdvertisementDelegate() { return mAdvDelegate; }
 };
 
 } // namespace chip

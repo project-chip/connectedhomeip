@@ -21,6 +21,10 @@
 #include "LightingManager.h"
 #include <app/server/OnboardingCodesUtil.h>
 
+#ifdef CAPSENSE_ENABLED
+#include "capsense.h"
+#endif
+
 // FIXME: Undefine the `sleep()` function included by the CHIPDeviceLayer.h
 // from unistd.h to avoid a conflicting declaration with the `sleep()` provided
 // by Mbed-OS in mbed_power_mgmt.h.
@@ -58,13 +62,16 @@ static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
 
 static mbed::InterruptIn sLightingButton(LIGHTING_BUTTON);
 static mbed::InterruptIn sFunctionButton(FUNCTION_BUTTON);
-
+#ifdef CAPSENSE_ENABLED
+static mbed::CapsenseButton CapFunctionButton(Capsense::getInstance(), 0);
+static mbed::CapsenseButton CapLockButton(Capsense::getInstance(), 1);
+static mbed::CapsenseSlider CapSlider(Capsense::getInstance());
+#endif
 static bool sIsWiFiStationProvisioned = false;
 static bool sIsWiFiStationEnabled     = false;
 static bool sIsWiFiStationConnected   = false;
 static bool sIsPairedToAccount        = false;
 static bool sHaveBLEConnections       = false;
-static bool sHaveServiceConnectivity  = false;
 
 static mbed::Timeout sFunctionTimer;
 
@@ -87,7 +94,7 @@ int AppTask::Init()
                 if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
                     event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
                 {
-                    chip::app::Mdns::StartServer();
+                    chip::app::MdnsServer::Instance().StartServer();
                 }
             }
         },
@@ -95,10 +102,17 @@ int AppTask::Init()
 
     //-------------
     // Initialize button
+#ifdef CAPSENSE_ENABLED
+    CapFunctionButton.fall(mbed::callback(this, &AppTask::FunctionButtonPressEventHandler));
+    CapFunctionButton.rise(mbed::callback(this, &AppTask::FunctionButtonReleaseEventHandler));
+    CapLockButton.fall(mbed::callback(this, &AppTask::LightingButtonPressEventHandler));
+    CapSlider.on_move(mbed::callback(this, &AppTask::SliderEventHandler));
+#else
     sLightingButton.fall(mbed::callback(this, &AppTask::LightingButtonPressEventHandler));
     sFunctionButton.fall(mbed::callback(this, &AppTask::FunctionButtonPressEventHandler));
     sFunctionButton.rise(mbed::callback(this, &AppTask::FunctionButtonReleaseEventHandler));
-    //----------------
+#endif
+
     // Initialize lighting manager
     LightingMgr().Init(MBED_CONF_APP_LIGHTING_STATE_LED);
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
@@ -116,7 +130,7 @@ int AppTask::Init()
     chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -153,20 +167,14 @@ int AppTask::StartApp()
             sIsWiFiStationEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
             sIsWiFiStationConnected   = ConnectivityMgr().IsWiFiStationConnected();
             sHaveBLEConnections       = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity  = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 
-        // Consider the system to be "fully connected" if it has service
-        // connectivity and it is able to interact with the service on a regular basis.
-        bool isFullyConnected = sHaveServiceConnectivity;
-
         // Update the status LED if factory reset has not been initiated.
         //
-        // If system has "full connectivity", keep the LED On constantly.
+        // If system is connected to Wi-Fi station, keep the LED On constantly.
         //
-        // If thread and service provisioned, but not attached to the thread network yet OR no
-        // connectivity to the service OR subscriptions are not fully established
+        // If Wi-Fi is provisioned, but not connected to Wi-Fi station yet
         // THEN blink the LED Off for a short period of time.
         //
         // If the system has ble connection(s) uptill the stage above, THEN blink the LEDs at an even
@@ -175,12 +183,11 @@ int AppTask::StartApp()
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            if (isFullyConnected)
+            if (sIsWiFiStationConnected)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsWiFiStationProvisioned && sIsWiFiStationEnabled && sIsPairedToAccount &&
-                     (!sIsWiFiStationConnected || !isFullyConnected))
+            else if (sIsWiFiStationProvisioned && sIsWiFiStationEnabled && sIsPairedToAccount && !sIsWiFiStationConnected)
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -202,7 +209,7 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
     LightingManager::Action_t action = LightingManager::INVALID_ACTION;
     int32_t actor                    = 0;
-
+    uint8_t value                    = 0;
     if (aEvent->Type == AppEvent::kEventType_Lighting)
     {
         action = static_cast<LightingManager::Action_t>(aEvent->LightingEvent.Action);
@@ -213,8 +220,14 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
         action = LightingMgr().IsTurnedOn() ? LightingManager::OFF_ACTION : LightingManager::ON_ACTION;
         actor  = AppEvent::kEventType_Button;
     }
+    else if (aEvent->Type == AppEvent::kEventType_Slider)
+    {
+        action = LightingManager::LEVEL_ACTION;
+        actor  = AppEvent::kEventType_Slider;
+        value  = aEvent->SliderEvent.Value;
+    }
 
-    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action, actor, 0, NULL))
+    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action, actor, 0, &value))
         ChipLogProgress(NotSpecified, "Action is already in progress or active.");
 }
 
@@ -246,6 +259,40 @@ void AppTask::FunctionButtonReleaseEventHandler()
     button_event.ButtonEvent.Action = BUTTON_RELEASE_EVENT;
     button_event.Handler            = FunctionHandler;
     sAppTask.PostEvent(&button_event);
+}
+
+void AppTask::ButtonEventHandler(uint32_t id, bool pushed)
+{
+    if (id > 1)
+    {
+        ChipLogError(NotSpecified, "Wrong button ID");
+        return;
+    }
+
+    AppEvent button_event;
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Pin    = id == 0 ? LIGHTING_BUTTON : FUNCTION_BUTTON;
+    button_event.ButtonEvent.Action = pushed ? BUTTON_PUSH_EVENT : BUTTON_RELEASE_EVENT;
+
+    if (id == 0)
+    {
+        button_event.Handler = LightingActionEventHandler;
+    }
+    else
+    {
+        button_event.Handler = FunctionHandler;
+    }
+
+    sAppTask.PostEvent(&button_event);
+}
+
+void AppTask::SliderEventHandler(int slider_pos)
+{
+    AppEvent slider_event;
+    slider_event.Type              = AppEvent::kEventType_Slider;
+    slider_event.SliderEvent.Value = slider_pos;
+    slider_event.Handler           = LightingActionEventHandler;
+    sAppTask.PostEvent(&slider_event);
 }
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)

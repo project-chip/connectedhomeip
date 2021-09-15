@@ -22,7 +22,7 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <!-- TODO: Add feature map once it is supported -->
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
     <!-- Window Covering Information Attribute Set -->
     <attribute side="server" writable="false" code="0x0000" define="WC_TYPE"                                      type="ENUM8"    min="0x00"   max="0x09"   default="0x00"   optional="false">Type</attribute>
     <attribute side="server" writable="false" code="0x0001" define="WC_PHYSICAL_CLOSED_LIMIT_LIFT"                type="INT16U"   min="0x0000" max="0xFFFF" default="0x0000" optional="true">PhysicalClosedLimitLift</attribute>

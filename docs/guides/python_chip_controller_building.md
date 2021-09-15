@@ -223,7 +223,7 @@ with network credentials.
         Done
         ```
 
-    Matter specifiction does not define how the Thread or Wi-Fi credentials are
+    Matter specification does not define how the Thread or Wi-Fi credentials are
     obtained by Controller. For example, for Thread, instead of fetching
     datasets directly from the Thread Border Router, you might also use a
     different out-of-band method.
@@ -248,7 +248,7 @@ with network credentials.
 #### Commissioning a Wi-Fi device
 
 1. Assuming your Wi-Fi SSID is _TESTSSID_, and your Wi-Fi password is
-   _P455W4RD_, inject the credentials to the device by excuting the following
+   _P455W4RD_, inject the credentials to the device by executing the following
    command:
 
     ```
@@ -396,7 +396,7 @@ If no nodeid given, a random Node ID will be used.
 
 ### `close-session <nodeid>`
 
-If case there eixsts an open session (PASE or CASE) to the device with a given
+If case there exists an open session (PASE or CASE) to the device with a given
 Node ID, mark it as expired.
 
 ### `discover`
@@ -470,7 +470,7 @@ chip-device-ctrl > zcl LevelControl MoveWithOnOff 12344321 1 0 moveMode=1 rate=2
 For any integer and char string (null terminated) types, just use `key=value`,
 for example: `rate=2`, `string=123`, `string_2="123 456"`
 
-For byte string type, use `key=encoding:value`, currectly, we support `str` and
+For byte string type, use `key=encoding:value`, currently, we support `str` and
 `hex` encoding, the `str` encoding will encode a NULL terminated string. For
 example, `networkId=hex:0123456789abcdef` (for
 `[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]`), `ssid=str:Test` (for

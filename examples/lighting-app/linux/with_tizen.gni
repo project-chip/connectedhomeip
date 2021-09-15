@@ -12,25 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Operational Credentials Cluster Tests
+# add this gni as import in your build args to use tizen in the example
+# 'import("//with_tizen.gni")'
 
-config:
-    cluster: "Operational Credentials"
-    endpoint: 0
+import("//build_overrides/chip.gni")
 
-tests:
-    - label: "Read number of supported fabrics"
-      command: "readAttribute"
-      attribute: "SupportedFabrics"
-      response:
-          constraints:
-              type: uint8
-              minValue: 4
+import("${chip_root}/config/tizen/chip-gn/args.gni")
 
-    - label: "Read number of commissioned fabrics"
-      command: "readAttribute"
-      attribute: "CommissionedFabrics"
-      response:
-          constraints:
-              type: uint8
-              minValue: 1
+current_os = "tizen"

@@ -277,7 +277,9 @@
                 "host",
                 "nrf",
                 "qpg",
-                "infineon"
+                "infineon",
+                "telink",
+                "tizen"
             ],
             "default": "build"
         },

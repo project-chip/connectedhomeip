@@ -14,6 +14,7 @@
    limitations under the License.
 '''
 
+from abc import abstractmethod
 from construct import Struct, Int64ul, Int32ul, Int16ul, Int8ul
 from ctypes import CFUNCTYPE, c_void_p, c_uint32, c_uint64, c_uint8, c_uint16, c_ssize_t
 import ctypes
@@ -86,7 +87,7 @@ _OnCommandResponseStatusCodeReceivedFunct = CFUNCTYPE(
 _OnCommandResponseProtocolErrorFunct = CFUNCTYPE(None, c_uint64, c_uint8)
 _OnCommandResponseFunct = CFUNCTYPE(None, c_uint64, c_uint32)
 _OnReportDataFunct = CFUNCTYPE(
-    None, c_uint64, c_ssize_t, c_void_p, c_uint32, c_void_p, c_uint32, c_uint16)
+    None, c_uint64, c_uint64, c_ssize_t, c_void_p, c_uint32, c_void_p, c_uint32, c_uint16)
 _OnWriteResponseStatusFunct = CFUNCTYPE(None, c_void_p, c_uint32)
 
 _commandStatusDict = dict()
@@ -104,6 +105,14 @@ _writeStatusDictLock = threading.RLock()
 PLACEHOLDER_COMMAND_HANDLE = 1
 DEFAULT_ATTRIBUTEREAD_APPID = 0
 DEFAULT_ATTRIBUTEWRITE_APPID = 0
+
+_onSubscriptionReport = None
+
+
+class OnSubscriptionReport:
+    @abstractmethod
+    def OnData(self, path: AttributePath, subscriptionId: int, data: typing.Any) -> None:
+        pass
 
 
 def _GetCommandStatus(commandHandle: int):
@@ -151,7 +160,8 @@ def _OnCommandResponse(commandHandle: int, errorcode: int):
 
 
 @ _OnReportDataFunct
-def _OnReportData(nodeId: int, appId: int, attrPathBuf, attrPathBufLen: int, tlvDataBuf, tlvDataBufLen: int, statusCode: int):
+def _OnReportData(nodeId: int, appId: int, subscriptionId: int, attrPathBuf, attrPathBufLen: int, tlvDataBuf, tlvDataBufLen: int, statusCode: int):
+    global _onSubscriptionReport
     attrPath = AttributePathStruct.parse(
         ctypes.string_at(attrPathBuf, attrPathBufLen))
     tlvData = None
@@ -165,6 +175,10 @@ def _OnReportData(nodeId: int, appId: int, attrPathBuf, attrPathBufLen: int, tlv
     if appId < 256:
         # For all attribute read requests using CHIPCluster API, appId is filled by CHIPDevice, and should be smaller than 256 (UINT8_MAX).
         appId = DEFAULT_ATTRIBUTEREAD_APPID
+
+    if subscriptionId != 0:
+        if _onSubscriptionReport:
+            _onSubscriptionReport.OnData(path, subscriptionId, tlvData)
 
     with _attributeDictLock:
         _attributeDict[appId] = AttributeReadResult(
@@ -276,3 +290,8 @@ def GetAttributeReadResponse(appId: int) -> AttributeReadResult:
 def GetAttributeWriteResponse(appId: int) -> AttributeWriteResult:
     with _writeStatusDictLock:
         return _writeStatusDict.get(appId, None)
+
+
+def SetAttributeReportCallback(path: AttributePath, callback: OnSubscriptionReport):
+    global _onSubscriptionReport
+    _onSubscriptionReport = callback

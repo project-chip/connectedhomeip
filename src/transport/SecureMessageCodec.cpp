@@ -43,13 +43,13 @@ CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrReturnError(msgBuf->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
 
-    uint32_t msgId = counter.Value();
+    uint32_t messageCounter = counter.Value();
 
     static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
                   "Addition to generate payloadLength might overflow");
 
     packetHeader
-        .SetMessageId(msgId) //
+        .SetMessageCounter(messageCounter) //
         .SetEncryptionKeyID(state->GetPeerKeyID());
 
     packetHeader.GetFlags().Set(Header::FlagValues::kEncryptedMessage);
@@ -68,7 +68,7 @@ CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     VerifyOrReturnError(CanCastTo<uint16_t>(totalLen + taglen), CHIP_ERROR_INTERNAL);
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
-    ChipLogDetail(Inet, "Secure message was encrypted: Msg ID %" PRIu32, msgId);
+    ChipLogDetail(Inet, "Secure message was encrypted: Msg ID %" PRIu32, messageCounter);
 
     ReturnErrorOnFailure(counter.Advance());
     return CHIP_NO_ERROR;

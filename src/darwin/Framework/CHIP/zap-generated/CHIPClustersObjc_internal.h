@@ -145,6 +145,10 @@
 @property (readonly) chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster;
 @end
 
+@interface CHIPOtaSoftwareUpdateRequestor ()
+@property (readonly) chip::Controller::OtaSoftwareUpdateRequestorCluster cppCluster;
+@end
+
 @interface CHIPOccupancySensing ()
 @property (readonly) chip::Controller::OccupancySensingCluster cppCluster;
 @end

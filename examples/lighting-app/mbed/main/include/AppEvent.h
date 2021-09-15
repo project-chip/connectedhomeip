@@ -32,6 +32,7 @@ struct AppEvent
         kEventType_Timer,
         kEventType_Lighting,
         kEventType_Install,
+        kEventType_Slider,
     };
 
     uint16_t Type;
@@ -52,6 +53,10 @@ struct AppEvent
             uint8_t Action;
             int32_t Actor;
         } LightingEvent;
+        struct
+        {
+            uint8_t Value;
+        } SliderEvent;
     };
 
     EventHandler Handler;

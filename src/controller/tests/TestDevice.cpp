@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
+#if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
+#endif // CONFIG_NETWORK_LAYER_BLE
 #include <controller/CHIPDevice.h>
 #include <inet/IPAddress.h>
 #include <inet/InetLayer.h>
@@ -47,8 +49,12 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     ExchangeManager exchangeMgr;
     Inet::InetLayer inetLayer;
     System::LayerImpl systemLayer;
+#if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer blelayer;
-    FabricTable fabrics;
+#endif // CONFIG_NETWORK_LAYER_BLE
+    // Heap-allocate the fairly large FabricTable so we don't end up with a huge
+    // stack.
+    FabricTable * fabrics = Platform::New<FabricTable>();
     secure_channel::MessageCounterManager messageCounterManager;
     SessionIDAllocator idAllocator;
 
@@ -65,7 +71,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
         BleListenParameters(&blelayer)
 #endif
     );
-    sessionMgr.Init(&systemLayer, &transportMgr, &fabrics, &messageCounterManager);
+    sessionMgr.Init(&systemLayer, &transportMgr, fabrics, &messageCounterManager);
     exchangeMgr.Init(&sessionMgr);
     messageCounterManager.Init(&exchangeMgr);
 
@@ -76,7 +82,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
         .inetLayer       = &inetLayer,
         .storageDelegate = nullptr,
         .idAllocator     = &idAllocator,
-        .fabricsTable    = &fabrics,
+        .fabricsTable    = fabrics,
     };
     Device device;
     NodeId mockNodeId           = 1;
@@ -93,6 +99,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     messageCounterManager.Shutdown();
     exchangeMgr.Shutdown();
     sessionMgr.Shutdown();
+    Platform::Delete(fabrics);
     transportMgr.Close();
     inetLayer.Shutdown();
     systemLayer.Shutdown();

@@ -15,27 +15,18 @@
  *    limitations under the License.
  */
 
-/*
- * This file declare test suites utilities methods for delayed commands.
- *
- * Each method declared in this file needs to be implemented on a per-language
- * basis and permits to exposes methods to the test suites that are not part
- * of the regular cluster set of APIs.
- *
- */
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-const WaitForMs = {
-  name : 'WaitForMs',
-  arguments : [ { name : 'ms' } ],
-  response : { arguments : [] }
-};
+#include "DeviceNetworkProvisioningDelegateImpl.h"
 
-const DelayCommands = {
-  name : 'DelayCommands',
-  commands : [ WaitForMs ],
-};
+namespace chip {
+namespace DeviceLayer {
 
-//
-// Module exports
-//
-exports.DelayCommands = DelayCommands;
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+} // namespace DeviceLayer
+} // namespace chip

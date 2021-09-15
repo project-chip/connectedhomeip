@@ -36,8 +36,8 @@ struct ReadPrepareParams
     size_t mAttributePathParamsListSize             = 0;
     EventNumber mEventNumber                        = 0;
     uint32_t mTimeout                               = kImMessageTimeoutMsec;
-    uint16_t mMinIntervalSeconds                    = 0;
-    uint16_t mMaxIntervalSeconds                    = 0;
+    uint16_t mMinIntervalFloorSeconds               = 0;
+    uint16_t mMaxIntervalCeilingSeconds             = 0;
 
     ReadPrepareParams(SessionHandle sessionHandle) : mSessionHandle(sessionHandle) {}
     ReadPrepareParams(ReadPrepareParams && other) : mSessionHandle(other.mSessionHandle)
@@ -47,8 +47,8 @@ struct ReadPrepareParams
         mpAttributePathParamsList          = other.mpAttributePathParamsList;
         mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
         mEventNumber                       = other.mEventNumber;
-        mMinIntervalSeconds                = other.mMinIntervalSeconds;
-        mMaxIntervalSeconds                = other.mMaxIntervalSeconds;
+        mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
+        mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
         mTimeout                           = other.mTimeout;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
@@ -67,8 +67,8 @@ struct ReadPrepareParams
         mpAttributePathParamsList          = other.mpAttributePathParamsList;
         mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
         mEventNumber                       = other.mEventNumber;
-        mMinIntervalSeconds                = other.mMinIntervalSeconds;
-        mMaxIntervalSeconds                = other.mMaxIntervalSeconds;
+        mMinIntervalFloorSeconds           = other.mMinIntervalFloorSeconds;
+        mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
         mTimeout                           = other.mTimeout;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;

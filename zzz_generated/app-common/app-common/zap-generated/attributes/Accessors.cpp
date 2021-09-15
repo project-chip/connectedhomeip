@@ -1348,6 +1348,21 @@ EmberAfStatus SetReachable(chip::EndpointId endpoint, bool reachable)
 } // namespace Attributes
 } // namespace Basic
 
+namespace OtaSoftwareUpdateRequestor {
+namespace Attributes {
+EmberAfStatus GetUpdatePossible(chip::EndpointId endpoint, bool * updatePossible)
+{
+    return emberAfReadServerAttribute(endpoint, OtaSoftwareUpdateRequestor::Id, Ids::UpdatePossible, (uint8_t *) updatePossible,
+                                      sizeof(*updatePossible));
+}
+EmberAfStatus SetUpdatePossible(chip::EndpointId endpoint, bool updatePossible)
+{
+    return emberAfWriteServerAttribute(endpoint, OtaSoftwareUpdateRequestor::Id, Ids::UpdatePossible, (uint8_t *) &updatePossible,
+                                       ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+}
+} // namespace Attributes
+} // namespace OtaSoftwareUpdateRequestor
+
 namespace GeneralCommissioning {
 namespace Attributes {
 EmberAfStatus GetBreadcrumb(chip::EndpointId endpoint, uint64_t * breadcrumb)

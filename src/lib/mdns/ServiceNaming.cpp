@@ -123,11 +123,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         requiredSize = snprintf(buffer, bufferLen, "_T%u", subtype.code);
         break;
     case DiscoveryFilterType::kCommissioningMode:
-        if (subtype.code > 1)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        requiredSize = snprintf(buffer, bufferLen, "_C%u", subtype.code);
+        requiredSize = snprintf(buffer, bufferLen, "_CM");
         break;
     case DiscoveryFilterType::kCommissioner:
         if (subtype.code > 1)
@@ -135,14 +131,6 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         requiredSize = snprintf(buffer, bufferLen, "_D%u", subtype.code);
-        break;
-    case DiscoveryFilterType::kCommissioningModeFromCommand:
-        // 1 is the only valid value
-        if (subtype.code != 1)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        requiredSize = snprintf(buffer, bufferLen, "_A1");
         break;
     case DiscoveryFilterType::kInstanceName:
         requiredSize = snprintf(buffer, bufferLen, "%s", subtype.instanceName);

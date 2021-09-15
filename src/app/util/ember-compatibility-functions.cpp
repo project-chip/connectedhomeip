@@ -21,8 +21,10 @@
  *          when calling ember callbacks.
  */
 
+#include <app/ClusterInfo.h>
 #include <app/Command.h>
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/Engine.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -460,6 +462,23 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
                                                       : Protocols::SecureChannel::GeneralStatusCode::kFailure,
                                                   Protocols::SecureChannel::Id, imCode);
 }
-
 } // namespace app
 } // namespace chip
+
+void InteractionModelReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                                                      uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type,
+                                                      uint8_t * data)
+{
+    IgnoreUnusedVariable(manufacturerCode);
+    IgnoreUnusedVariable(type);
+    IgnoreUnusedVariable(data);
+    IgnoreUnusedVariable(mask);
+
+    ClusterInfo info;
+    info.mClusterId  = clusterId;
+    info.mFieldId    = attributeId;
+    info.mEndpointId = endpoint;
+    info.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
+
+    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
+}

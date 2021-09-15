@@ -43,9 +43,15 @@
 #include <unistd.h>
 
 namespace chip {
-
 namespace DeviceLayer {
 namespace Internal {
+
+namespace {
+System::LayerSocketsLoop & SystemLayerSocketsLoop()
+{
+    return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
+}
+} // anonymous namespace
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
@@ -116,16 +122,17 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThr
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t aMilliseconds)
 {
-    // Let SystemLayer.PrepareEvents() handle timers.
+    // Let System::LayerSocketsLoop.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
     mChipEventQueue.Push(*event);
 
-    SystemLayer.Signal(); // Trigger wake select on CHIP thread
+    SystemLayerSocketsLoop().Signal(); // Trigger wake select on CHIP thread
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -160,20 +167,20 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 
     Impl()->LockChipStack();
 
-    SystemLayer.EventLoopBegins();
+    SystemLayerSocketsLoop().EventLoopBegins();
     do
     {
-        SystemLayer.PrepareEvents();
+        SystemLayerSocketsLoop().PrepareEvents();
 
         Impl()->UnlockChipStack();
-        SystemLayer.WaitForEvents();
+        SystemLayerSocketsLoop().WaitForEvents();
         Impl()->LockChipStack();
 
-        SystemLayer.HandleEvents();
+        SystemLayerSocketsLoop().HandleEvents();
 
         ProcessDeviceEvents();
     } while (mShouldRunEventLoop.load(std::memory_order_relaxed));
-    SystemLayer.EventLoopEnds();
+    SystemLayerSocketsLoop().EventLoopEnds();
 
     Impl()->UnlockChipStack();
 
@@ -251,10 +258,10 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
 
         //
         // We need to grab the lock to protect critical sections accessed by the WakeSelect() call within
-        // SystemLayer.
+        // System::Layer.
         //
         Impl()->LockChipStack();
-        SystemLayer.Signal();
+        SystemLayerSocketsLoop().Signal();
         Impl()->UnlockChipStack();
 
         pthread_mutex_lock(&mStateLock);

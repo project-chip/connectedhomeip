@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,10 +15,19 @@
  *    limitations under the License.
  */
 
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeDelegate.h>
+#include <protocols/bdx/BdxTransferSession.h>
+#include <protocols/bdx/TransferFacilitator.h>
+
 #pragma once
 
-#include <transport/SecureSessionMgr.h>
+class BdxDownloader : public chip::bdx::Initiator
+{
+public:
+    void SetInitialExchange(chip::Messaging::ExchangeContext * ec);
 
-namespace chip {
-SecureSessionMgr & SessionManager();
-} // namespace chip
+private:
+    // inherited from bdx::Endpoint
+    void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event);
+};

@@ -50,11 +50,17 @@
 namespace chip {
 namespace System {
 
-ClockBase * globalClock = &staticClock;
+namespace Internal {
+
+ClockBase * gClockBase = &gClockImpl;
 
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+ClockImpl gClockImpl;
+#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
-ClockImpl staticClock;
+} // namespace Internal
+
+#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
 

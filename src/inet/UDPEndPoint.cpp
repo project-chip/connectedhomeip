@@ -864,6 +864,24 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
     System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
     IPPacketInfo * pktInfo           = NULL;
     System::PacketBufferHandle buf   = System::PacketBufferHandle::Adopt(p);
+    if (buf->HasChainedBuffer())
+    {
+        // Try the simple expedient of flattening in-place.
+        buf->CompactHead();
+    }
+
+    if (buf->HasChainedBuffer())
+    {
+        // Have to allocate a new big-enough buffer and copy.
+        uint16_t messageSize            = buf->TotalLength();
+        System::PacketBufferHandle copy = System::PacketBufferHandle::New(messageSize, 0);
+        if (copy.IsNull() || buf->Read(copy->Start(), messageSize) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Inet, "No memory to flatten incoming packet buffer chain of size %" PRIu16, buf->TotalLength());
+            return;
+        }
+        buf = std::move(copy);
+    }
 
     pktInfo = GetPacketInfo(buf);
     if (pktInfo != NULL)

@@ -49,9 +49,6 @@ void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
     sprintf(key, "VP");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
 
-    sprintf(key, "AP");
-    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kAdditionalPairing);
-
     sprintf(key, "CM");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kCommissioningMode);
 
@@ -153,17 +150,6 @@ void TestGetLongDiscriminator(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, GetLongDiscriminator(GetSpan(ld)) == 0);
 }
 
-void TestGetAdditionalPairing(nlTestSuite * inSuite, void * inContext)
-{
-    char ap[64];
-    sprintf(ap, "1");
-    NL_TEST_ASSERT(inSuite, GetAdditionalPairing(GetSpan(ap)) == 1);
-
-    // overflow a uint8
-    sprintf(ap, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);
-    NL_TEST_ASSERT(inSuite, GetAdditionalPairing(GetSpan(ap)) == 0);
-}
-
 void TestGetCommissioningMode(nlTestSuite * inSuite, void * inContext)
 {
     char cm[64];
@@ -172,6 +158,9 @@ void TestGetCommissioningMode(nlTestSuite * inSuite, void * inContext)
 
     sprintf(cm, "1");
     NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 1);
+
+    sprintf(cm, "2");
+    NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 2);
 
     // overflow a uint8
     sprintf(cm, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);
@@ -291,8 +280,8 @@ void TestGetPairingInstruction(nlTestSuite * inSuite, void * inContext)
 bool NodeDataIsEmpty(const DiscoveredNodeData & node)
 {
 
-    if (node.longDiscriminator != 0 || node.vendorId != 0 || node.productId != 0 || node.additionalPairing != 0 ||
-        node.commissioningMode != 0 || node.deviceType != 0 || node.rotatingIdLen != 0 || node.pairingHint != 0 ||
+    if (node.longDiscriminator != 0 || node.vendorId != 0 || node.productId != 0 || node.commissioningMode != 0 ||
+        node.deviceType != 0 || node.rotatingIdLen != 0 || node.pairingHint != 0 ||
         node.mrpRetryIntervalIdle != kUndefinedRetryInterval || node.mrpRetryIntervalActive != kUndefinedRetryInterval ||
         node.supportsTcp)
     {
@@ -335,14 +324,6 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, filled.productId == 456);
     filled.vendorId  = 0;
     filled.productId = 0;
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
-
-    // Additional Pairing
-    sprintf(key, "AP");
-    sprintf(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
-    NL_TEST_ASSERT(inSuite, filled.additionalPairing == 1);
-    filled.additionalPairing = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Commissioning mode
@@ -587,7 +568,6 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TxtFieldProduct", TestGetProduct),                                          //
     NL_TEST_DEF("TxtFieldVendor", TestGetVendor),                                            //
     NL_TEST_DEF("TxtFieldLongDiscriminator", TestGetLongDiscriminator),                      //
-    NL_TEST_DEF("TxtFieldAdditionalPairing", TestGetAdditionalPairing),                      //
     NL_TEST_DEF("TxtFieldCommissioningMode", TestGetCommissioningMode),                      //
     NL_TEST_DEF("TxtFieldDeviceType", TestGetDeviceType),                                    //
     NL_TEST_DEF("TxtFieldDeviceName", TestGetDeviceName),                                    //

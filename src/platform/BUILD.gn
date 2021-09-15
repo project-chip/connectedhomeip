@@ -61,7 +61,7 @@ if (chip_device_platform != "none") {
   }
 
   if (chip_stack_lock_tracking == "auto") {
-    if (chip_device_platform == "linux") {
+    if (chip_device_platform == "linux" || chip_device_platform == "tizen") {
       # TODO: should be fatal for development. Change once bugs are fixed
       chip_stack_lock_tracking = "log"
     } else {
@@ -102,7 +102,8 @@ if (chip_device_platform != "none") {
       "CHIP_ENABLE_ROTATING_DEVICE_ID=${chip_enable_rotating_device_id}",
     ]
 
-    if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+    if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
+        chip_device_platform == "tizen") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
@@ -154,6 +155,14 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET_LINUX=1",
         "CHIP_DEVICE_LAYER_TARGET=Linux",
       ]
+    } else if (chip_device_platform == "tizen") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_TIZEN=1",
+        "CHIP_DEVICE_LAYER_TARGET=Tizen",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+      defines -=
+          [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
     } else if (chip_device_platform == "nrfconnect") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=1",
@@ -295,6 +304,8 @@ if (chip_device_platform != "none") {
       _platform_target = "telink"
     } else if (chip_device_platform == "mbed") {
       _platform_target = "mbed"
+    } else if (chip_device_platform == "tizen") {
+      _platform_target = "Tizen"
     } else if (chip_device_platform == "external") {
       _platform_target = chip_platform_target
     } else if (chip_device_platform == "p6") {

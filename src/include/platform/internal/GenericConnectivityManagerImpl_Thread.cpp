@@ -109,7 +109,11 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity
             event.ServiceConnectivityChange.ViaThread.Result =
                 (haveServiceConnectivity) ? kConnectivity_Established : kConnectivity_Lost;
             event.ServiceConnectivityChange.Overall.Result = event.ServiceConnectivityChange.ViaThread.Result;
-            PlatformMgr().PostEvent(&event);
+            CHIP_ERROR status                              = PlatformMgr().PostEvent(&event);
+            if (status != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to post thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+            }
         }
     }
 }
