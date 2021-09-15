@@ -102,13 +102,13 @@ source "$CHIP_ROOT/scripts/activate.sh"
 # Generates ninja files
 [[ -n "$chip_mdns" ]] && chip_mdns_arg="chip_mdns=\"$chip_mdns\"" || chip_mdns_arg=""
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_use_clusters_for_ip_commissioning=$clusters $chip_mdns_arg"
-
 # Compiles python files
 # Check pybindings was requested
 if [ "$enable_pybindings" == true ]; then
+    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT/pycontroller" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_use_clusters_for_ip_commissioning=$clusters $chip_mdns_arg"
     ninja -v -C "$OUTPUT_ROOT" pycontroller
 else
+    gn --root="$CHIP_ROOT/src/controller/python" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_rtti=$enable_pybindings chip_use_clusters_for_ip_commissioning=$clusters $chip_mdns_arg"
     ninja -v -C "$OUTPUT_ROOT" python
 fi
 
