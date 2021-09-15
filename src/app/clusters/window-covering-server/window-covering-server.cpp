@@ -128,7 +128,6 @@ static OperationalState ValueToOperationalState(uint8_t value)
         return OperationalState::Reserved;
     }
 }
-
 static uint8_t OperationalStateToValue(const OperationalState & state)
 {
     switch (state)
