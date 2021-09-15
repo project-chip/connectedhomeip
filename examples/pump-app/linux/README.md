@@ -1,13 +1,8 @@
-# CHIP Linux Lighting Example
+# CHIP Linux Pump App Example
 
 An example showing the use of CHIP on the Linux. The document will describe how
-to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested
-on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
-Raspberry Pi Desktop 20.10 (aarch64)**
-
-This example can also be cross-compiled on x64 host and run on NXP i.MX 8M Mini
-EVK, see the associated [README document](../nxp/linux-imx/imx8m/README.md) for
-details.
+to build and run CHIP Linux Pump App Example on Raspberry Pi. This doc is tested
+on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)**
 
 <hr>
 

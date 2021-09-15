@@ -23,7 +23,7 @@
 namespace chip {
 namespace rpc {
 
-class LightingService;
+class Pump;
 
 } // namespace rpc
 } // namespace chip

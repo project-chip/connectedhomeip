@@ -13,8 +13,19 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/python.gni")
+  import("$dir_pw_protobuf_compiler/proto.gni")
+
+  pw_proto_library("pump_service") {
+    sources = [ "pump_service/pump_service.proto" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
+  }
+}
 
 chip_data_model("pump-common") {
   zap_file = "pump-app.zap"

@@ -37,6 +37,7 @@ pw_python_package("chip_rpc") {
     "${chip_root}/examples/ipv6only-app/common:wifi_service.python",
     "${chip_root}/examples/lighting-app/lighting-common:lighting_service.python",
     "${chip_root}/examples/lock-app/lock-common:locking_service.python",
+    "${chip_root}/examples/pump-app/pump-common:pump_service.python",
   ]
 }
 

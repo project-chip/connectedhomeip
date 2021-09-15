@@ -18,7 +18,7 @@
 
 #include "Rpc.h"
 
-#include "LightingManager.h"
+#include "PumpManager.h"
 #include <platform/CHIPDeviceError.h>
 
 /* ignore GCC Wconversion warnings for pigweed */
@@ -28,7 +28,7 @@
 #endif
 #include "button_service/button_service.rpc.pb.h"
 #include "device_service/device_service.rpc.pb.h"
-#include "lighting_service/lighting_service.rpc.pb.h"
+#include "pump_service/pump_service.rpc.pb.h"
 #include "pw_hdlc/rpc_channel.h"
 #include "pw_hdlc/rpc_packets.h"
 #include "pw_rpc/server.h"
@@ -43,18 +43,18 @@
 namespace chip {
 namespace rpc {
 
-class Lighting final : public generated::Lighting<Lighting>
+class Pump final : public generated::Pump<Pump>
 {
 public:
-    pw::Status Set(ServerContext &, const chip_rpc_LightingState & request, pw_protobuf_Empty & response)
+    pw::Status Set(ServerContext &, const chip_rpc_PumpState & request, pw_protobuf_Empty & response)
     {
-        LightingMgr().InitiateAction(request.on ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+        PumpManager().InitiateAction(0, request.on ? PumpManager::START_ACTION : PumpManager::STOP_ACTION);
         return pw::OkStatus();
     }
 
-    pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LightingState & response)
+    pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_PumpState & response)
     {
-        response.on = LightingMgr().IsTurnedOn();
+        response.on = !PumpManager().IsStopped();
         return pw::OkStatus();
     }
 };
@@ -99,12 +99,12 @@ public:
 namespace {
 
 chip::rpc::Button button_service;
-chip::rpc::Lighting lighting_service;
+chip::rpc::Pump pump_service;
 chip::rpc::Device device_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
-    server.RegisterService(lighting_service);
+    server.RegisterService(pump_service);
     server.RegisterService(button_service);
     server.RegisterService(device_service);
 }

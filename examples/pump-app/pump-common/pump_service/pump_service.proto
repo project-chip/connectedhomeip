@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+import 'pw_protobuf_protos/common.proto';
+
+package chip.rpc;
+
+message PumpState {
+  bool on = 1;
+}
+
+service Pump {
+  // Set will return OK if all supported fields are successfully applied, any
+  // unsupported fields will be ignored.
+  // Get can be used to determine which fields are supported.
+  rpc Set(PumpState) returns (pw.protobuf.Empty){}
+
+  // Get will populate all of the supported pump state fields with the
+  // current values. This can be used to discover the devices supported
+  // pump features.
+  rpc Get(pw.protobuf.Empty) returns (PumpState){}
+}
