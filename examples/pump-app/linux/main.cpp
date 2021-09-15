@@ -19,10 +19,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <app/chip-zcl-zpro-codec.h>
 #include <app/common/gen/enums.h>
 #include <app/common/gen/ids/Attributes.h>
 #include <app/common/gen/ids/Clusters.h>
-#include <app/chip-zcl-zpro-codec.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -80,13 +80,13 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    //GetAppTask().UpdateClusterState();
+    // GetAppTask().UpdateClusterState();
 }
 
 void emberAfPumpConfigurationAndControlClusterInitCallback(chip::EndpointId endpoint)
 {
     // TODO: Setup the default values in the cluster for this specific application
-    //GetAppTask().UpdateClusterState();
+    // GetAppTask().UpdateClusterState();
 }
 
 int main(int argc, char * argv[])

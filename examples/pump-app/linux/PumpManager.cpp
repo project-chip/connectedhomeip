@@ -107,13 +107,9 @@ bool PumpManager::InitiateAction(int32_t aActor, Action_t aAction)
     return action_initiated;
 }
 
-void PumpManager::PumpTimer(uint32_t aTimeoutMs)
-{
-}
+void PumpManager::PumpTimer(uint32_t aTimeoutMs) {}
 
-void PumpManager::CancelTimer(void)
-{
-}
+void PumpManager::CancelTimer(void) {}
 
 #if 0
 void PumpManager::TimerEventHandler(TimerHandle_t aTimer)
@@ -151,7 +147,7 @@ void PumpManager::AutoRestartTimerEventHandler(AppEvent * aEvent)
 
     pump->mAutoStartTimerArmed = false;
 
-    ChipLogProgress(Zcl,"Auto Re-Start has been triggered!");
+    ChipLogProgress(Zcl, "Auto Re-Start has been triggered!");
 
     pump->InitiateAction(actor, START_ACTION);
 }
@@ -187,7 +183,7 @@ void PumpManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 
             pump->mAutoStartTimerArmed = true;
 
-            ChipLogProgress(Zcl,"Auto Re-start enabled. Will be triggered in %u seconds", pump->mAutoStartDuration);
+            ChipLogProgress(Zcl, "Auto Re-start enabled. Will be triggered in %u seconds", pump->mAutoStartDuration);
         }
     }
 }
