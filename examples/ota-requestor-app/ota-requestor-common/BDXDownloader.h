@@ -30,4 +30,6 @@ public:
 private:
     // inherited from bdx::Endpoint
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event);
+
+    bool mIsTransferComplete = false;
 };
