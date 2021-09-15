@@ -51,11 +51,11 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     {
         if (event->CommissioningComplete.status == CHIP_NO_ERROR)
         {
-            ChipLogProgress(Discovery, "Commissioning completed successfully");
+            ChipLogProgress(AppServer, "Commissioning completed successfully");
         }
         else
         {
-            ChipLogError(Discovery, "Commissioning errored out with error %" CHIP_ERROR_FORMAT,
+            ChipLogError(AppServer, "Commissioning errored out with error %" CHIP_ERROR_FORMAT,
                          event->CommissioningComplete.status.Format());
         }
         // reset all advertising
@@ -64,7 +64,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
         app::MdnsServer::Instance().AdvertiseOperational();
-        ChipLogError(Discovery, "Operational advertising enabled");
+        ChipLogError(AppServer, "Operational advertising enabled");
     }
 }
 
@@ -97,7 +97,7 @@ void CommissioningWindowManager::OnSessionEstablished()
         &mPairingSession, SecureSession::SessionRole::kResponder, 0);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
+        ChipLogError(AppServer, "Failed in setting up secure channel: err %s", ErrorStr(err));
         OnSessionEstablishmentError(err);
         return;
     }
@@ -130,9 +130,7 @@ CHIP_ERROR CommissioningWindowManager::PrepareCommissioningWindow(uint16_t commi
     ReturnErrorOnFailure(mServer->GetExchangManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
 
-    ReturnErrorOnFailure(StartAdvertisement());
-
-    return CHIP_NO_ERROR;
+    return StartAdvertisement();
 }
 
 CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds,
@@ -140,6 +138,8 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(ResetFabrics
 {
     RestoreDiscriminator();
 
+    // TODO: Verify that the device supports BLE if the advertisementMode is kBLE
+    // If not, then return an error.
 #if CONFIG_NETWORK_LAYER_BLE
     SetBLE(advertisementMode == chip::CommissioningWindowAdvertisement::kBle);
 #else
@@ -183,6 +183,7 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t 
                                                                        uint16_t passcodeID)
 {
 #if CONFIG_NETWORK_LAYER_BLE
+    // TODO: Don't use BLE for commissioning additional fabrics on a device
     SetBLE(true);
 #else
     SetBLE(false);
