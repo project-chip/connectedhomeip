@@ -882,8 +882,6 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
     CHIP_ERROR err = ValidateReceivedMessage(exchange, payloadHeader, std::move(msg));
     SuccessOrExit(err);
 
-    SetPeerAddress(mMessageDispatch.GetPeerAddress());
-
     switch (static_cast<MsgType>(payloadHeader.GetMessageType()))
     {
     case MsgType::PBKDFParamRequest:

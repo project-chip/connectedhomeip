@@ -37,11 +37,12 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mAddress, GetAliceNodeId(), &mPairingBobToAlice,
-                                                      SecureSession::SessionRole::kInitiator, mSrcFabricIndex));
+    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mAliceAddress), GetAliceNodeId(),
+                                                      &mPairingBobToAlice, SecureSession::SessionRole::kInitiator,
+                                                      mSrcFabricIndex));
 
-    return mSecureSessionMgr.NewPairing(mAddress, GetBobNodeId(), &mPairingAliceToBob, SecureSession::SessionRole::kResponder,
-                                        mDestFabricIndex);
+    return mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mBobAddress), GetBobNodeId(), &mPairingAliceToBob,
+                                        SecureSession::SessionRole::kResponder, mDestFabricIndex);
 }
 
 // Shutdown all layers, finalize operations
@@ -65,6 +66,16 @@ SessionHandle MessagingContext::GetSessionAliceToBob()
 {
     // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
     return SessionHandle(GetBobNodeId(), GetAliceKeyId(), GetBobKeyId(), mDestFabricIndex);
+}
+
+Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)
+{
+    return mExchangeManager.NewContext(mSecureSessionMgr.CreateUnauthenticatedSession(mAliceAddress).Value(), delegate);
+}
+
+Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate)
+{
+    return mExchangeManager.NewContext(mSecureSessionMgr.CreateUnauthenticatedSession(mBobAddress).Value(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)

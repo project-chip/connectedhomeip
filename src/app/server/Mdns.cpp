@@ -27,16 +27,16 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
+#include <system/TimeSource.h>
 #include <transport/FabricTable.h>
 
 #include <app/server/Server.h>
 
 namespace chip {
 namespace app {
-namespace Mdns {
-
 namespace {
 
 bool HaveOperationalCredentials()
@@ -78,37 +78,172 @@ chip::ByteSpan FillMAC(uint8_t (&mac)[8])
 
 } // namespace
 
-uint16_t gSecuredPort   = CHIP_PORT;
-uint16_t gUnsecuredPort = CHIP_UDC_PORT;
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
-void SetSecuredPort(uint16_t port)
+constexpr const char kExtendedDiscoveryTimeoutKeypairStorage[] = "ExtDiscKey";
+
+void MdnsServer::SetExtendedDiscoveryTimeoutSecs(int16_t secs)
 {
-    gSecuredPort = port;
+    ChipLogDetail(Discovery, "SetExtendedDiscoveryTimeoutSecs %d", secs);
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kExtendedDiscoveryTimeoutKeypairStorage, &secs, sizeof(secs));
 }
 
-uint16_t GetSecuredPort()
+int16_t MdnsServer::GetExtendedDiscoveryTimeoutSecs()
 {
-    return gSecuredPort;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    int16_t secs;
+
+    err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(kExtendedDiscoveryTimeoutKeypairStorage, &secs, sizeof(secs));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to get extended timeout configuration err: %s", chip::ErrorStr(err));
+        secs = CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS;
+    }
+
+    ChipLogDetail(Discovery, "GetExtendedDiscoveryTimeoutSecs %d", secs);
+    return secs;
 }
 
-void SetUnsecuredPort(uint16_t port)
+/// Callback from Extended Discovery Expiration timer
+void HandleExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 {
-    gUnsecuredPort = port;
+    MdnsServer::Instance().OnExtendedDiscoveryExpiration(aSystemLayer, aAppState);
 }
 
-uint16_t GetUnsecuredPort()
+void MdnsServer::OnExtendedDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
 {
-    return gUnsecuredPort;
+    if (!MdnsServer::OnExpiration(mExtendedDiscoveryExpirationMs))
+    {
+        ChipLogDetail(Discovery, "OnExtendedDiscoveryExpiration callback for cleared session");
+        return;
+    }
+
+    ChipLogDetail(Discovery, "OnExtendedDiscoveryExpiration callback for valid session");
+
+    mExtendedDiscoveryExpirationMs = TIMEOUT_CLEARED;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
+/// Callback from Discovery Expiration timer
+void HandleDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
+{
+    MdnsServer::Instance().OnDiscoveryExpiration(aSystemLayer, aAppState);
 }
 
-CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen)
+bool MdnsServer::OnExpiration(uint64_t expirationMs)
+{
+    if (expirationMs == TIMEOUT_CLEARED)
+    {
+        ChipLogDetail(Discovery, "OnExpiration callback for cleared session");
+        return false;
+    }
+    uint64_t now = mTimeSource.GetCurrentMonotonicTimeMs();
+    if (expirationMs > now)
+    {
+        ChipLogDetail(Discovery, "OnExpiration callback for reset session");
+        return false;
+    }
+
+    ChipLogDetail(Discovery, "OnExpiration - valid time out");
+
+    // reset advertising
+    CHIP_ERROR err;
+    err = chip::Mdns::ServiceAdvertiser::Instance().StopPublishDevice();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to stop ServiceAdvertiser: %s", chip::ErrorStr(err));
+    }
+    err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to start ServiceAdvertiser: %s", chip::ErrorStr(err));
+    }
+
+    // restart operational (if needed)
+    err = AdvertiseOperational();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to advertise operational node: %s", chip::ErrorStr(err));
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    err = AdvertiseCommissioner();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to advertise commissioner: %s", chip::ErrorStr(err));
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+    return true;
+}
+
+void MdnsServer::OnDiscoveryExpiration(System::Layer * aSystemLayer, void * aAppState)
+{
+    if (!MdnsServer::OnExpiration(mDiscoveryExpirationMs))
+    {
+        ChipLogDetail(Discovery, "OnDiscoveryExpiration callback for cleared session");
+        return;
+    }
+
+    ChipLogDetail(Discovery, "OnDiscoveryExpiration callback for valid session");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    int16_t extTimeout = GetExtendedDiscoveryTimeoutSecs();
+    if (extTimeout != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
+    {
+        CHIP_ERROR err = AdvertiseCommissionableNode(chip::Mdns::CommissioningMode::kDisabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
+        }
+        // set timeout
+        ScheduleExtendedDiscoveryExpiration();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
+    mDiscoveryExpirationMs = TIMEOUT_CLEARED;
+}
+
+CHIP_ERROR MdnsServer::ScheduleDiscoveryExpiration()
+{
+    if (mDiscoveryTimeoutSecs == CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT)
+    {
+        return CHIP_NO_ERROR;
+    }
+    ChipLogDetail(Discovery, "Scheduling Discovery timeout in secs=%d", mDiscoveryTimeoutSecs);
+
+    mDiscoveryExpirationMs = mTimeSource.GetCurrentMonotonicTimeMs() + static_cast<uint64_t>(mDiscoveryTimeoutSecs) * 1000;
+
+    return DeviceLayer::SystemLayer().StartTimer(static_cast<uint32_t>(mDiscoveryTimeoutSecs) * 1000, HandleDiscoveryExpiration,
+                                                 nullptr);
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+CHIP_ERROR MdnsServer::ScheduleExtendedDiscoveryExpiration()
+{
+    int16_t extendedDiscoveryTimeoutSecs = GetExtendedDiscoveryTimeoutSecs();
+    if (extendedDiscoveryTimeoutSecs == CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT)
+    {
+        return CHIP_NO_ERROR;
+    }
+    ChipLogDetail(Discovery, "Scheduling Extended Discovery timeout in secs=%d", extendedDiscoveryTimeoutSecs);
+
+    mExtendedDiscoveryExpirationMs =
+        mTimeSource.GetCurrentMonotonicTimeMs() + static_cast<uint64_t>(extendedDiscoveryTimeoutSecs) * 1000;
+
+    return DeviceLayer::SystemLayer().StartTimer(static_cast<uint32_t>(extendedDiscoveryTimeoutSecs) * 1000,
+                                                 HandleExtendedDiscoveryExpiration, nullptr);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
+CHIP_ERROR MdnsServer::GetCommissionableInstanceName(char * buffer, size_t bufferLen)
 {
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
     return mdnsAdvertiser.GetCommissionableInstanceName(buffer, bufferLen);
 }
 
 /// Set MDNS operational advertisement
-CHIP_ERROR AdvertiseOperational()
+CHIP_ERROR MdnsServer::AdvertiseOperational()
 {
     for (const Transport::FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
     {
@@ -137,24 +272,15 @@ CHIP_ERROR AdvertiseOperational()
     return CHIP_NO_ERROR;
 }
 
-/// Overloaded utility method for commissioner and commissionable advertisement
-/// This method is used for both commissioner discovery and commissionable node discovery since
-/// they share many fields.
-///   commissionableNode = true : advertise commissionable node
-///   commissionableNode = false : advertise commissioner
-CHIP_ERROR Advertise(bool commissionableNode, CommissioningMode mode)
+CHIP_ERROR MdnsServer::Advertise(bool commissionableNode, chip::Mdns::CommissioningMode mode)
 {
-    bool commissioningMode       = (mode != CommissioningMode::kDisabled);
-    bool additionalCommissioning = (mode == CommissioningMode::kEnabledEnhanced);
-
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters()
                                    .SetPort(commissionableNode ? GetSecuredPort() : GetUnsecuredPort())
                                    .EnableIpV4(true);
     advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Mdns::CommssionAdvertiseMode::kCommissionableNode
                                                                       : chip::Mdns::CommssionAdvertiseMode::kCommissioner);
 
-    advertiseParameters.SetCommissioningMode(commissioningMode);
-    advertiseParameters.SetAdditionalCommissioning(additionalCommissioning);
+    advertiseParameters.SetCommissioningMode(mode);
 
     char pairingInst[chip::Mdns::kKeyPairingInstructionMaxLength + 1];
 
@@ -206,7 +332,7 @@ CHIP_ERROR Advertise(bool commissionableNode, CommissioningMode mode)
     advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
 
-    if (!additionalCommissioning)
+    if (mode != chip::Mdns::CommissioningMode::kEnabledEnhanced)
     {
         if (DeviceLayer::ConfigurationMgr().GetInitialPairingHint(value) != CHIP_NO_ERROR)
         {
@@ -255,26 +381,36 @@ CHIP_ERROR Advertise(bool commissionableNode, CommissioningMode mode)
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
-/// Set MDNS commissioner advertisement
-CHIP_ERROR AdvertiseCommissioner()
+CHIP_ERROR MdnsServer::AdvertiseCommissioner()
 {
-    return Advertise(false /* commissionableNode */, CommissioningMode::kDisabled);
+    return Advertise(false /* commissionableNode */, chip::Mdns::CommissioningMode::kDisabled);
 }
 
-/// Set MDNS commissionable node advertisement
-CHIP_ERROR AdvertiseCommissionableNode(CommissioningMode mode)
+CHIP_ERROR MdnsServer::AdvertiseCommissionableNode(chip::Mdns::CommissioningMode mode)
 {
     return Advertise(true /* commissionableNode */, mode);
 }
 
-/// (Re-)starts the minmdns server
-/// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
-/// - if device has been commissioned, then commissioning mode will reflect the state of mode argument
-void StartServer(CommissioningMode mode)
+void MdnsServer::StartServer(chip::Mdns::CommissioningMode mode)
 {
-    CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    ChipLogDetail(Discovery, "Mdns StartServer mode=%d", static_cast<int>(mode));
 
-    err = app::Mdns::AdvertiseOperational();
+    ClearTimeouts();
+
+    CHIP_ERROR err;
+    err = chip::Mdns::ServiceAdvertiser::Instance().StopPublishDevice();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to stop ServiceAdvertiser: %s", chip::ErrorStr(err));
+    }
+
+    err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to start ServiceAdvertiser: %s", chip::ErrorStr(err));
+    }
+
+    err = AdvertiseOperational();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to advertise operational node: %s", chip::ErrorStr(err));
@@ -282,22 +418,26 @@ void StartServer(CommissioningMode mode)
 
     if (HaveOperationalCredentials())
     {
-        if (mode != CommissioningMode::kDisabled)
+        ChipLogError(Discovery, "Have operational credentials");
+        if (mode != chip::Mdns::CommissioningMode::kDisabled)
         {
-            err = app::Mdns::AdvertiseCommissionableNode(mode);
+            err = AdvertiseCommissionableNode(mode);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Discovery, "Failed to advertise commissionable node: %s", chip::ErrorStr(err));
             }
+            // no need to set timeout because callers are currently doing that and their timeout might be longer than the default
         }
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        else
+        else if (GetExtendedDiscoveryTimeoutSecs() != CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED)
         {
-            err = app::Mdns::AdvertiseCommissionableNode(mode);
+            err = AdvertiseCommissionableNode(mode);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
             }
+            // set timeout
+            ScheduleExtendedDiscoveryExpiration();
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     }
@@ -305,16 +445,18 @@ void StartServer(CommissioningMode mode)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
         ChipLogProgress(Discovery, "Start dns-sd server - no current nodeId");
-        err = app::Mdns::AdvertiseCommissionableNode(CommissioningMode::kEnabledBasic);
+        err = AdvertiseCommissionableNode(chip::Mdns::CommissioningMode::kEnabledBasic);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Failed to advertise unprovisioned commissionable node: %s", chip::ErrorStr(err));
         }
+        // set timeout
+        ScheduleDiscoveryExpiration();
 #endif
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-    err = app::Mdns::AdvertiseCommissioner();
+    err = AdvertiseCommissioner();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to advertise commissioner: %s", chip::ErrorStr(err));
@@ -323,7 +465,7 @@ void StartServer(CommissioningMode mode)
 }
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
+CHIP_ERROR MdnsServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
 {
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t serialNumberSize                = 0;
@@ -339,6 +481,5 @@ CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rot
 }
 #endif
 
-} // namespace Mdns
 } // namespace app
 } // namespace chip

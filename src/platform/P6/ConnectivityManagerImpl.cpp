@@ -611,7 +611,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 ChipDeviceEvent event;
                 event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
                 event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
-                PlatformMgr().PostEvent(&event);
+                PlatformMgr().PostEventOrDie(&event);
             }
             // Search among the IPv6 addresses assigned to the interface for a Global Unicast
             // address (2000::/3) that is in the valid state.  If such an address is found...
@@ -624,7 +624,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                     ChipDeviceEvent event;
                     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
                     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
-                    PlatformMgr().PostEvent(&event);
+                    PlatformMgr().PostEventOrDie(&event);
                 }
             }
         }
@@ -642,7 +642,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
         event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
         event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
         addr.ToString(event.InternetConnectivityChange.address);
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
 
         if (haveIPv4Conn != hadIPv4Conn)
         {

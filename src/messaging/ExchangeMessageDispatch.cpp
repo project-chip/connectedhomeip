@@ -52,12 +52,13 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
     // If there is a pending acknowledgment piggyback it on this message.
     if (reliableMessageContext->IsAckPending())
     {
-        payloadHeader.SetAckId(reliableMessageContext->TakePendingPeerAckId());
+        payloadHeader.SetAckMessageCounter(reliableMessageContext->TakePendingPeerAckMessageCounter());
 
 #if !defined(NDEBUG)
         if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
         {
-            ChipLogDetail(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg", payloadHeader.GetAckId().Value());
+            ChipLogDetail(ExchangeManager, "Piggybacking Ack for MessageCounter:%08" PRIX32 " with msg",
+                          payloadHeader.GetAckMessageCounter().Value());
         }
 #endif
     }
@@ -103,9 +104,10 @@ CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint32_t messageCounter, c
 
     if (IsReliableTransmissionAllowed())
     {
-        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() && payloadHeader.GetAckId().HasValue())
+        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
+            payloadHeader.GetAckMessageCounter().HasValue())
         {
-            ReturnErrorOnFailure(reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckId().Value()));
+            ReturnErrorOnFailure(reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value()));
         }
 
         if (payloadHeader.NeedsAck())

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -560,12 +560,17 @@ CHIP_ERROR Device::WarmupCASESession()
     VerifyOrReturnError(mDeviceOperationalCertProvisioned, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == ConnectionState::NotConnected, CHIP_NO_ERROR);
 
-    Messaging::ExchangeContext * exchange =
-        mExchangeMgr->NewContext(SessionHandle::TemporaryUnauthenticatedSession(), &mCASESession);
+    // Create a UnauthenticatedSession for CASE pairing.
+    // Don't use mSecureSession here, because mSecureSession is the secure session.
+    Optional<SessionHandle> session = mSessionManager->CreateUnauthenticatedSession(mDeviceAddress);
+    if (!session.HasValue())
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(session.Value(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
-    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager->GetTransportManager()));
-    mCASESession.MessageDispatch().SetPeerAddress(mDeviceAddress);
+    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager));
 
     uint16_t keyID = 0;
     ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
@@ -791,10 +796,17 @@ Device::~Device()
     }
 }
 
-CHIP_ERROR Device::ReduceNOCChainBufferSize(size_t new_size)
+CHIP_ERROR Device::SetNOCCertBufferSize(size_t new_size)
 {
-    ReturnErrorCodeIf(new_size > sizeof(mNOCChainBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    mNOCChainBufferSize = new_size;
+    ReturnErrorCodeIf(new_size > sizeof(mNOCCertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+    mNOCCertBufferSize = new_size;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::SetICACertBufferSize(size_t new_size)
+{
+    ReturnErrorCodeIf(new_size > sizeof(mICACertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+    mICACertBufferSize = new_size;
     return CHIP_NO_ERROR;
 }
 

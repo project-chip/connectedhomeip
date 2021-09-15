@@ -85,7 +85,7 @@ session.
 
 Developers are encouraged to add tasks to the
 [launch json](../.vscode/launch.json) over time to make sure everyone is using
-the same base debuging setup.
+the same base debugging setup.
 
 ## Submitting a Pull Request - Practical Advice
 

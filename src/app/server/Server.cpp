@@ -152,15 +152,15 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    app::Mdns::SetSecuredPort(mSecuredServicePort);
-    app::Mdns::SetUnsecuredPort(mUnsecuredServicePort);
+    app::MdnsServer::Instance().SetSecuredPort(mSecuredServicePort);
+    app::MdnsServer::Instance().SetUnsecuredPort(mUnsecuredServicePort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     // TODO @bzbarsky-apple @cecille Move to examples
     // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED
     // StartServer only enables commissioning mode if device has not been commissioned
-    app::Mdns::StartServer();
+    app::MdnsServer::Instance().StartServer();
 #endif
 
     // TODO @pan-apple Use IM protocol ID.
@@ -210,7 +210,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
 
     CHIP_ERROR err;
     char nameBuffer[chip::Mdns::kMaxInstanceNameSize + 1];
-    err = app::Mdns::GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
+    err = app::MdnsServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to get mdns instance name error: %s", ErrorStr(err));

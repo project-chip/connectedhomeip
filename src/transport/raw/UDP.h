@@ -105,6 +105,8 @@ public:
      */
     CHIP_ERROR Init(UdpListenParameters & params);
 
+    uint16_t GetBoundPort();
+
     /**
      * Close the open endpoint without destroying the object
      */
