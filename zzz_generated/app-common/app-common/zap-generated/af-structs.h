@@ -22,16 +22,20 @@
 
 #include <stdint.h>
 
-#include <app/util/basic-types.h>
-#include <lib/support/Span.h>
-
 #include "enums.h"
+#include <app/util/basic-types.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/Span.h>
 
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp
 {
     uint16_t catalogVendorId;
-    uint8_t * applicationId;
+    const uint8_t * applicationId;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ApplicationLauncherApp;
 
 // Struct for AudioOutputInfo
@@ -40,12 +44,20 @@ typedef struct _AudioOutputInfo
     uint8_t index;
     uint8_t outputType;
     chip::ByteSpan name;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } AudioOutputInfo;
 
 // Struct for BasicCommissioningInfoType
 typedef struct _BasicCommissioningInfoType
 {
     uint32_t FailSafeExpiryLengthMs;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } BasicCommissioningInfoType;
 
 // Struct for ConfigureReportingRecord
@@ -58,6 +70,10 @@ typedef struct _ConfigureReportingRecord
     uint16_t maximumReportingInterval;
     uint8_t * reportableChangeLocation;
     uint16_t timeoutPeriod;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ConfigureReportingRecord;
 
 // Struct for ConfigureReportingStatusRecord
@@ -66,48 +82,72 @@ typedef struct _ConfigureReportingStatusRecord
     uint8_t status;
     uint8_t direction;
     chip::AttributeId attributeId;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ConfigureReportingStatusRecord;
 
 // Struct for ContentLaunchAdditionalInfo
 typedef struct _ContentLaunchAdditionalInfo
 {
-    uint8_t * name;
-    uint8_t * value;
+    const uint8_t * name;
+    const uint8_t * value;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ContentLaunchAdditionalInfo;
 
 // Struct for ContentLaunchBrandingInformation
 typedef struct _ContentLaunchBrandingInformation
 {
-    uint8_t * providerName;
+    const uint8_t * providerName;
     uint8_t background;
     uint8_t logo;
     uint8_t progressBar;
     uint8_t splash;
     uint8_t waterMark;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ContentLaunchBrandingInformation;
 
 // Struct for ContentLaunchDimension
 typedef struct _ContentLaunchDimension
 {
-    uint8_t * width;
-    uint8_t * height;
+    const uint8_t * width;
+    const uint8_t * height;
     uint8_t metric;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ContentLaunchDimension;
 
 // Struct for ContentLaunchParamater
 typedef struct _ContentLaunchParamater
 {
     uint8_t Type;
-    uint8_t * Value;
-    /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
+    const uint8_t * Value;
+    const /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ContentLaunchParamater;
 
 // Struct for ContentLaunchStyleInformation
 typedef struct _ContentLaunchStyleInformation
 {
-    uint8_t * imageUrl;
-    uint8_t * color;
+    const uint8_t * imageUrl;
+    const uint8_t * color;
     uint8_t size;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ContentLaunchStyleInformation;
 
 // Struct for DeviceType
@@ -115,6 +155,10 @@ typedef struct _DeviceType
 {
     chip::DeviceTypeId type;
     uint16_t revision;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } DeviceType;
 
 // Struct for DiscoverAttributesInfoRecord
@@ -122,6 +166,10 @@ typedef struct _DiscoverAttributesInfoRecord
 {
     chip::AttributeId attributeId;
     uint8_t attributeType;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } DiscoverAttributesInfoRecord;
 
 // Struct for ExtendedDiscoverAttributesInfoRecord
@@ -130,6 +178,10 @@ typedef struct _ExtendedDiscoverAttributesInfoRecord
     chip::AttributeId attributeId;
     uint8_t attributeType;
     uint8_t attributeAccessControl;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ExtendedDiscoverAttributesInfoRecord;
 
 // Struct for FabricDescriptor
@@ -141,6 +193,10 @@ typedef struct _FabricDescriptor
     chip::FabricId FabricId;
     chip::NodeId NodeId;
     chip::ByteSpan Label;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } FabricDescriptor;
 
 // Struct for GroupKey
@@ -151,6 +207,10 @@ typedef struct _GroupKey
     chip::ByteSpan GroupKeyRoot;
     uint64_t GroupKeyEpochStartTime;
     uint8_t GroupKeySecurityPolicy;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } GroupKey;
 
 // Struct for GroupState
@@ -159,6 +219,10 @@ typedef struct _GroupState
     uint16_t VendorId;
     uint16_t VendorGroupId;
     uint16_t GroupKeySetIndex;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } GroupState;
 
 // Struct for IasAceZoneStatusResult
@@ -166,6 +230,10 @@ typedef struct _IasAceZoneStatusResult
 {
     uint8_t zoneId;
     uint16_t zoneStatus;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } IasAceZoneStatusResult;
 
 // Struct for LabelStruct
@@ -173,6 +241,10 @@ typedef struct _LabelStruct
 {
     chip::ByteSpan label;
     chip::ByteSpan value;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } LabelStruct;
 
 // Struct for MediaInputInfo
@@ -182,6 +254,10 @@ typedef struct _MediaInputInfo
     uint8_t inputType;
     chip::ByteSpan name;
     chip::ByteSpan description;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } MediaInputInfo;
 
 // Struct for MediaPlaybackPosition
@@ -189,6 +265,10 @@ typedef struct _MediaPlaybackPosition
 {
     uint64_t updatedAt;
     uint64_t position;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } MediaPlaybackPosition;
 
 // Struct for NOCStruct
@@ -196,6 +276,10 @@ typedef struct _NOCStruct
 {
     uint8_t FabricIndex;
     chip::ByteSpan NOC;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } NOCStruct;
 
 // Struct for NavigateTargetTargetInfo
@@ -203,6 +287,10 @@ typedef struct _NavigateTargetTargetInfo
 {
     uint8_t identifier;
     chip::ByteSpan name;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } NavigateTargetTargetInfo;
 
 // Struct for NeighborTable
@@ -222,6 +310,10 @@ typedef struct _NeighborTable
     bool FullThreadDevice;
     bool FullNetworkData;
     bool IsChild;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } NeighborTable;
 
 // Struct for NetworkInterfaceType
@@ -233,6 +325,10 @@ typedef struct _NetworkInterfaceType
     bool OffPremiseServicesReachableIPv6;
     chip::ByteSpan HardwareAddress;
     uint8_t Type;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } NetworkInterfaceType;
 
 // Struct for Notification
@@ -240,6 +336,10 @@ typedef struct _Notification
 {
     uint16_t contentId;
     uint8_t statusFeedback;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } Notification;
 
 // Struct for OperationalDatasetComponents
@@ -257,6 +357,10 @@ typedef struct _OperationalDatasetComponents
     bool PskcPresent;
     bool SecurityPolicyPresent;
     bool ChannelMaskPresent;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } OperationalDatasetComponents;
 
 // Struct for PowerProfileRecord
@@ -266,6 +370,10 @@ typedef struct _PowerProfileRecord
     uint8_t energyPhaseId;
     bool powerProfileRemoteControl;
     uint8_t powerProfileState;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } PowerProfileRecord;
 
 // Struct for ReadAttributeStatusRecord
@@ -275,6 +383,10 @@ typedef struct _ReadAttributeStatusRecord
     uint8_t status;
     uint8_t attributeType;
     uint8_t * attributeLocation;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ReadAttributeStatusRecord;
 
 // Struct for ReadReportingConfigurationAttributeRecord
@@ -282,6 +394,10 @@ typedef struct _ReadReportingConfigurationAttributeRecord
 {
     uint8_t direction;
     chip::AttributeId attributeId;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ReadReportingConfigurationAttributeRecord;
 
 // Struct for ReadReportingConfigurationRecord
@@ -295,6 +411,10 @@ typedef struct _ReadReportingConfigurationRecord
     uint16_t maximumReportingInterval;
     uint8_t * reportableChangeLocation;
     uint16_t timeoutPeriod;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ReadReportingConfigurationRecord;
 
 // Struct for ReadStructuredAttributeRecord
@@ -303,6 +423,10 @@ typedef struct _ReadStructuredAttributeRecord
     chip::AttributeId attributeId;
     uint8_t indicator;
     uint16_t indicies;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ReadStructuredAttributeRecord;
 
 // Struct for ReportAttributeRecord
@@ -311,6 +435,10 @@ typedef struct _ReportAttributeRecord
     chip::AttributeId attributeId;
     uint8_t attributeType;
     uint8_t * attributeLocation;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ReportAttributeRecord;
 
 // Struct for RouteTable
@@ -326,6 +454,10 @@ typedef struct _RouteTable
     uint8_t Age;
     bool Allocated;
     bool LinkEstablished;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } RouteTable;
 
 // Struct for SceneExtensionAttributeInfo
@@ -333,6 +465,10 @@ typedef struct _SceneExtensionAttributeInfo
 {
     uint8_t attributeType;
     uint8_t * attributeLocation;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } SceneExtensionAttributeInfo;
 
 // Struct for SceneExtensionFieldSet
@@ -341,6 +477,10 @@ typedef struct _SceneExtensionFieldSet
     chip::ClusterId clusterId;
     uint8_t length;
     uint8_t value;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } SceneExtensionFieldSet;
 
 // Struct for ScheduledPhase
@@ -348,6 +488,10 @@ typedef struct _ScheduledPhase
 {
     uint8_t energyPhaseId;
     uint16_t scheduledTime;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ScheduledPhase;
 
 // Struct for SecurityPolicy
@@ -355,19 +499,42 @@ typedef struct _SecurityPolicy
 {
     uint16_t RotationTime;
     uint8_t Flags;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } SecurityPolicy;
+
+// Struct for SimpleStruct
+typedef struct _SimpleStruct
+{
+    uint64_t fieldA;
+    uint32_t fieldB;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
+} SimpleStruct;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet
 {
     uint64_t fabricIndex;
     chip::ByteSpan operationalCert;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } TestListStructOctet;
 
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {
     chip::ByteSpan DiscoveryResponse;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ThreadInterfaceScanResult;
 
 // Struct for ThreadMetrics
@@ -378,6 +545,10 @@ typedef struct _ThreadMetrics
     uint32_t StackFreeCurrent;
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } ThreadMetrics;
 
 // Struct for TransferredPhase
@@ -389,6 +560,10 @@ typedef struct _TransferredPhase
     uint16_t peakPower;
     uint16_t energy;
     uint16_t maxActivationDelay;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } TransferredPhase;
 
 // Struct for TvChannelInfo
@@ -399,15 +574,23 @@ typedef struct _TvChannelInfo
     chip::ByteSpan name;
     chip::ByteSpan callSign;
     chip::ByteSpan affiliateCallSign;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } TvChannelInfo;
 
 // Struct for TvChannelLineupInfo
 typedef struct _TvChannelLineupInfo
 {
-    uint8_t * operatorName;
-    uint8_t * lineupName;
-    uint8_t * postalCode;
+    const uint8_t * operatorName;
+    const uint8_t * lineupName;
+    const uint8_t * postalCode;
     uint8_t lineupInfoType;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } TvChannelLineupInfo;
 
 // Struct for WiFiInterfaceScanResult
@@ -418,6 +601,10 @@ typedef struct _WiFiInterfaceScanResult
     chip::ByteSpan BSSID;
     uint8_t Channel;
     uint32_t FrequencyBand;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } WiFiInterfaceScanResult;
 
 // Struct for WriteAttributeRecord
@@ -426,6 +613,10 @@ typedef struct _WriteAttributeRecord
     chip::AttributeId attributeId;
     uint8_t attributeType;
     uint8_t * attributeLocation;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } WriteAttributeRecord;
 
 // Struct for WriteAttributeStatusRecord
@@ -433,6 +624,10 @@ typedef struct _WriteAttributeStatusRecord
 {
     uint8_t status;
     chip::AttributeId attributeId;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } WriteAttributeStatusRecord;
 
 // Struct for WriteStructuredAttributeRecord
@@ -443,6 +638,10 @@ typedef struct _WriteStructuredAttributeRecord
     uint16_t indicies;
     uint8_t attributeType;
     uint8_t * attributeLocation;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } WriteStructuredAttributeRecord;
 
 // Struct for WriteStructuredAttributeStatusRecord
@@ -452,4 +651,8 @@ typedef struct _WriteStructuredAttributeStatusRecord
     chip::AttributeId attributeId;
     uint8_t indicator;
     uint16_t indicies;
+    static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+    static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+    static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+    static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } WriteStructuredAttributeStatusRecord;

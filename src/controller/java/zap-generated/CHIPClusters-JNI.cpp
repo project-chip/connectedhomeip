@@ -300,7 +300,6 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
 class CHIPCharStringAttributeCallback : public Callback::Callback<CharStringAttributeCallback>
 {
 public:
@@ -358,7 +357,6 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
 class CHIPInt8sAttributeCallback : public Callback::Callback<Int8sAttributeCallback>
 {
 public:
@@ -413,7 +411,6 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
 class CHIPInt8uAttributeCallback : public Callback::Callback<Int8uAttributeCallback>
 {
 public:
@@ -468,7 +465,6 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
 class CHIPInt16sAttributeCallback : public Callback::Callback<Int16sAttributeCallback>
 {
 public:
@@ -523,7 +519,6 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
 class CHIPInt16uAttributeCallback : public Callback::Callback<Int16uAttributeCallback>
 {
 public:
@@ -578,7 +573,6 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
 class CHIPInt32sAttributeCallback : public Callback::Callback<Int32sAttributeCallback>
 {
 public:
@@ -633,7 +627,6 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
 class CHIPInt32uAttributeCallback : public Callback::Callback<Int32uAttributeCallback>
 {
 public:
@@ -688,7 +681,6 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
 class CHIPInt64sAttributeCallback : public Callback::Callback<Int64sAttributeCallback>
 {
 public:
@@ -743,7 +735,6 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
 class CHIPInt64uAttributeCallback : public Callback::Callback<Int64uAttributeCallback>
 {
 public:
@@ -798,7 +789,6 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-
 class CHIPOctetStringAttributeCallback : public Callback::Callback<OctetStringAttributeCallback>
 {
 public:
@@ -859,6 +849,7 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
+// TODO: Type  is not supported yet.
 
 class CHIPAccountLoginClusterGetSetupPINResponseCallback : public Callback::Callback<AccountLoginClusterGetSetupPINResponseCallback>
 {
@@ -7875,7 +7866,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, AccountLoginCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -8065,7 +8055,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, AdministratorCommissioningCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -8157,7 +8146,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, ApplicationBasicCluster, readVendorNameAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -8194,7 +8182,6 @@ JNI_METHOD(void, ApplicationBasicCluster, readVendorNameAttribute)(JNIEnv * env,
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ApplicationBasicCluster, readVendorIdAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -8231,7 +8218,6 @@ JNI_METHOD(void, ApplicationBasicCluster, readVendorIdAttribute)(JNIEnv * env, j
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ApplicationBasicCluster, readApplicationNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -8269,7 +8255,6 @@ JNI_METHOD(void, ApplicationBasicCluster, readApplicationNameAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ApplicationBasicCluster, readProductIdAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -8306,7 +8291,6 @@ JNI_METHOD(void, ApplicationBasicCluster, readProductIdAttribute)(JNIEnv * env, 
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ApplicationBasicCluster, readApplicationIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -8344,7 +8328,6 @@ JNI_METHOD(void, ApplicationBasicCluster, readApplicationIdAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ApplicationBasicCluster, readCatalogVendorIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -8382,7 +8365,6 @@ JNI_METHOD(void, ApplicationBasicCluster, readCatalogVendorIdAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ApplicationBasicCluster, readApplicationStatusAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -8420,7 +8402,6 @@ JNI_METHOD(void, ApplicationBasicCluster, readApplicationStatusAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ApplicationBasicCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -8517,7 +8498,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, ApplicationLauncherCluster, readApplicationLauncherListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -8556,7 +8536,6 @@ JNI_METHOD(void, ApplicationLauncherCluster, readApplicationLauncherListAttribut
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ApplicationLauncherCluster, readCatalogVendorIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -8594,7 +8573,6 @@ JNI_METHOD(void, ApplicationLauncherCluster, readCatalogVendorIdAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ApplicationLauncherCluster, readApplicationIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -8632,7 +8610,6 @@ JNI_METHOD(void, ApplicationLauncherCluster, readApplicationIdAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ApplicationLauncherCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -8772,7 +8749,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, AudioOutputCluster, readAudioOutputListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -8809,7 +8785,6 @@ JNI_METHOD(void, AudioOutputCluster, readAudioOutputListAttribute)(JNIEnv * env,
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, AudioOutputCluster, readCurrentAudioOutputAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -8847,7 +8822,6 @@ JNI_METHOD(void, AudioOutputCluster, readCurrentAudioOutputAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, AudioOutputCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -8984,7 +8958,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, BarrierControlCluster, readBarrierMovingStateAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -9022,7 +8995,6 @@ JNI_METHOD(void, BarrierControlCluster, readBarrierMovingStateAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BarrierControlCluster, readBarrierSafetyStatusAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -9060,7 +9032,6 @@ JNI_METHOD(void, BarrierControlCluster, readBarrierSafetyStatusAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BarrierControlCluster, readBarrierCapabilitiesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -9098,7 +9069,6 @@ JNI_METHOD(void, BarrierControlCluster, readBarrierCapabilitiesAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BarrierControlCluster, readBarrierPositionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -9136,7 +9106,6 @@ JNI_METHOD(void, BarrierControlCluster, readBarrierPositionAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BarrierControlCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -9228,7 +9197,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, BasicCluster, readInteractionModelVersionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9265,7 +9233,6 @@ JNI_METHOD(void, BasicCluster, readInteractionModelVersionAttribute)(JNIEnv * en
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readVendorNameAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9302,7 +9269,6 @@ JNI_METHOD(void, BasicCluster, readVendorNameAttribute)(JNIEnv * env, jobject se
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readVendorIDAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9339,7 +9305,6 @@ JNI_METHOD(void, BasicCluster, readVendorIDAttribute)(JNIEnv * env, jobject self
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readProductNameAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9376,7 +9341,6 @@ JNI_METHOD(void, BasicCluster, readProductNameAttribute)(JNIEnv * env, jobject s
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readProductIDAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9413,7 +9377,6 @@ JNI_METHOD(void, BasicCluster, readProductIDAttribute)(JNIEnv * env, jobject sel
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readUserLabelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9490,7 +9453,6 @@ JNI_METHOD(void, BasicCluster, writeUserLabelAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readLocationAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9567,7 +9529,6 @@ JNI_METHOD(void, BasicCluster, writeLocationAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readHardwareVersionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9604,7 +9565,6 @@ JNI_METHOD(void, BasicCluster, readHardwareVersionAttribute)(JNIEnv * env, jobje
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readHardwareVersionStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9641,7 +9601,6 @@ JNI_METHOD(void, BasicCluster, readHardwareVersionStringAttribute)(JNIEnv * env,
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readSoftwareVersionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9678,7 +9637,6 @@ JNI_METHOD(void, BasicCluster, readSoftwareVersionAttribute)(JNIEnv * env, jobje
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readSoftwareVersionStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9715,7 +9673,6 @@ JNI_METHOD(void, BasicCluster, readSoftwareVersionStringAttribute)(JNIEnv * env,
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readManufacturingDateAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9752,7 +9709,6 @@ JNI_METHOD(void, BasicCluster, readManufacturingDateAttribute)(JNIEnv * env, job
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readPartNumberAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9789,7 +9745,6 @@ JNI_METHOD(void, BasicCluster, readPartNumberAttribute)(JNIEnv * env, jobject se
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readProductURLAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9826,7 +9781,6 @@ JNI_METHOD(void, BasicCluster, readProductURLAttribute)(JNIEnv * env, jobject se
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readProductLabelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9863,7 +9817,6 @@ JNI_METHOD(void, BasicCluster, readProductLabelAttribute)(JNIEnv * env, jobject 
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readSerialNumberAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9900,7 +9853,6 @@ JNI_METHOD(void, BasicCluster, readSerialNumberAttribute)(JNIEnv * env, jobject 
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readLocalConfigDisabledAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -9975,7 +9927,6 @@ JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readReachableAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -10012,7 +9963,6 @@ JNI_METHOD(void, BasicCluster, readReachableAttribute)(JNIEnv * env, jobject sel
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BasicCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -10132,7 +10082,6 @@ JNI_METHOD(void, BinaryInputBasicCluster, writeOutOfServiceAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BinaryInputBasicCluster, readPresentValueAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -10207,7 +10156,6 @@ JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BinaryInputBasicCluster, readStatusFlagsAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -10244,7 +10192,6 @@ JNI_METHOD(void, BinaryInputBasicCluster, readStatusFlagsAttribute)(JNIEnv * env
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BinaryInputBasicCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -10383,7 +10330,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, BindingCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -10465,7 +10411,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readVendorNameAttribute)(JNIEnv * en
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readVendorIDAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -10502,7 +10447,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readVendorIDAttribute)(JNIEnv * env,
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readProductNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -10540,7 +10484,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readProductNameAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readUserLabelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -10617,7 +10560,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, writeUserLabelAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readHardwareVersionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -10655,7 +10597,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readHardwareVersionAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readHardwareVersionStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -10693,7 +10634,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readHardwareVersionStringAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readSoftwareVersionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -10731,7 +10671,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readSoftwareVersionAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readSoftwareVersionStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -10769,7 +10708,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readSoftwareVersionStringAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readManufacturingDateAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -10807,7 +10745,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readManufacturingDateAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readPartNumberAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -10844,7 +10781,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readPartNumberAttribute)(JNIEnv * en
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readProductURLAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -10881,7 +10817,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readProductURLAttribute)(JNIEnv * en
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readProductLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -10919,7 +10854,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readProductLabelAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readSerialNumberAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -10957,7 +10891,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readSerialNumberAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readReachableAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -10994,7 +10927,6 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readReachableAttribute)(JNIEnv * env
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, BridgedDeviceBasicCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -11943,7 +11875,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readCurrentHueAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -11980,7 +11911,6 @@ JNI_METHOD(void, ColorControlCluster, readCurrentHueAttribute)(JNIEnv * env, job
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readCurrentSaturationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -12018,7 +11948,6 @@ JNI_METHOD(void, ColorControlCluster, readCurrentSaturationAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readRemainingTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12055,7 +11984,6 @@ JNI_METHOD(void, ColorControlCluster, readRemainingTimeAttribute)(JNIEnv * env, 
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readCurrentXAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12092,7 +12020,6 @@ JNI_METHOD(void, ColorControlCluster, readCurrentXAttribute)(JNIEnv * env, jobje
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readCurrentYAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12129,7 +12056,6 @@ JNI_METHOD(void, ColorControlCluster, readCurrentYAttribute)(JNIEnv * env, jobje
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readDriftCompensationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -12167,7 +12093,6 @@ JNI_METHOD(void, ColorControlCluster, readDriftCompensationAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readCompensationTextAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12204,7 +12129,6 @@ JNI_METHOD(void, ColorControlCluster, readCompensationTextAttribute)(JNIEnv * en
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorTemperatureAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12241,7 +12165,6 @@ JNI_METHOD(void, ColorControlCluster, readColorTemperatureAttribute)(JNIEnv * en
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorModeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12278,7 +12201,6 @@ JNI_METHOD(void, ColorControlCluster, readColorModeAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorControlOptionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -12354,7 +12276,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorControlOptionsAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readNumberOfPrimariesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -12392,7 +12313,6 @@ JNI_METHOD(void, ColorControlCluster, readNumberOfPrimariesAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary1XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12429,7 +12349,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary1XAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary1YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12466,7 +12385,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary1YAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary1IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -12504,7 +12422,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary1IntensityAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary2XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12541,7 +12458,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary2XAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary2YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12578,7 +12494,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary2YAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary2IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -12616,7 +12531,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary2IntensityAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary3XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12653,7 +12567,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary3XAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary3YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12690,7 +12603,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary3YAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary3IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -12728,7 +12640,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary3IntensityAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary4XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12765,7 +12676,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary4XAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary4YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12802,7 +12712,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary4YAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary4IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -12840,7 +12749,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary4IntensityAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary5XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12877,7 +12785,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary5XAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary5YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12914,7 +12821,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary5YAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary5IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -12952,7 +12858,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary5IntensityAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary6XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -12989,7 +12894,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary6XAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary6YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -13026,7 +12930,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary6YAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readPrimary6IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -13064,7 +12967,6 @@ JNI_METHOD(void, ColorControlCluster, readPrimary6IntensityAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readWhitePointXAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -13139,7 +13041,6 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointXAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readWhitePointYAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -13214,7 +13115,6 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointYAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorPointRXAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -13289,7 +13189,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRXAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorPointRYAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -13364,7 +13263,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRYAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorPointRIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -13440,7 +13338,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRIntensityAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorPointGXAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -13515,7 +13412,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGXAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorPointGYAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -13590,7 +13486,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGYAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorPointGIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -13666,7 +13561,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGIntensityAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorPointBXAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -13741,7 +13635,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBXAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorPointBYAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -13816,7 +13709,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBYAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorPointBIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -13892,7 +13784,6 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBIntensityAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readEnhancedCurrentHueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -13930,7 +13821,6 @@ JNI_METHOD(void, ColorControlCluster, readEnhancedCurrentHueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readEnhancedColorModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -13968,7 +13858,6 @@ JNI_METHOD(void, ColorControlCluster, readEnhancedColorModeAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorLoopActiveAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -14005,7 +13894,6 @@ JNI_METHOD(void, ColorControlCluster, readColorLoopActiveAttribute)(JNIEnv * env
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorLoopDirectionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -14043,7 +13931,6 @@ JNI_METHOD(void, ColorControlCluster, readColorLoopDirectionAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorLoopTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -14080,7 +13967,6 @@ JNI_METHOD(void, ColorControlCluster, readColorLoopTimeAttribute)(JNIEnv * env, 
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorLoopStartEnhancedHueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -14118,7 +14004,6 @@ JNI_METHOD(void, ColorControlCluster, readColorLoopStartEnhancedHueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorLoopStoredEnhancedHueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -14156,7 +14041,6 @@ JNI_METHOD(void, ColorControlCluster, readColorLoopStoredEnhancedHueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorCapabilitiesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -14194,7 +14078,6 @@ JNI_METHOD(void, ColorControlCluster, readColorCapabilitiesAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorTempPhysicalMinAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -14232,7 +14115,6 @@ JNI_METHOD(void, ColorControlCluster, readColorTempPhysicalMinAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readColorTempPhysicalMaxAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -14270,7 +14152,6 @@ JNI_METHOD(void, ColorControlCluster, readColorTempPhysicalMaxAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readCoupleColorTempToLevelMinMiredsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -14308,7 +14189,6 @@ JNI_METHOD(void, ColorControlCluster, readCoupleColorTempToLevelMinMiredsAttribu
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readStartUpColorTemperatureMiredsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -14385,7 +14265,6 @@ JNI_METHOD(void, ColorControlCluster, writeStartUpColorTemperatureMiredsAttribut
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ColorControlCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -14529,7 +14408,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, ContentLauncherCluster, readAcceptsHeaderListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -14568,7 +14446,6 @@ JNI_METHOD(void, ContentLauncherCluster, readAcceptsHeaderListAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ContentLauncherCluster, readSupportedStreamingTypesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -14607,7 +14484,6 @@ JNI_METHOD(void, ContentLauncherCluster, readSupportedStreamingTypesAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ContentLauncherCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -14690,7 +14566,6 @@ JNI_METHOD(void, DescriptorCluster, readDeviceListAttribute)(JNIEnv * env, jobje
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, DescriptorCluster, readServerListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -14727,7 +14602,6 @@ JNI_METHOD(void, DescriptorCluster, readServerListAttribute)(JNIEnv * env, jobje
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, DescriptorCluster, readClientListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -14764,7 +14638,6 @@ JNI_METHOD(void, DescriptorCluster, readClientListAttribute)(JNIEnv * env, jobje
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, DescriptorCluster, readPartsListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -14801,7 +14674,6 @@ JNI_METHOD(void, DescriptorCluster, readPartsListAttribute)(JNIEnv * env, jobjec
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, DescriptorCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -15970,7 +15842,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, DoorLockCluster, readLockStateAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -16007,7 +15878,6 @@ JNI_METHOD(void, DoorLockCluster, readLockStateAttribute)(JNIEnv * env, jobject 
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, DoorLockCluster, readLockTypeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -16044,7 +15914,6 @@ JNI_METHOD(void, DoorLockCluster, readLockTypeAttribute)(JNIEnv * env, jobject s
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, DoorLockCluster, readActuatorEnabledAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -16081,7 +15950,6 @@ JNI_METHOD(void, DoorLockCluster, readActuatorEnabledAttribute)(JNIEnv * env, jo
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, DoorLockCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -16164,7 +16032,6 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readMeasurementTypeAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ElectricalMeasurementCluster, readTotalActivePowerAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16202,7 +16069,6 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readTotalActivePowerAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16240,7 +16106,6 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageMinAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16278,7 +16143,6 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageMinAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageMaxAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16316,7 +16180,6 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageMaxAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16354,7 +16217,6 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentMinAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16392,7 +16254,6 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentMinAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentMaxAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16430,7 +16291,6 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentMaxAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16468,7 +16328,6 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerMinAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16506,7 +16365,6 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerMinAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerMaxAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16544,7 +16402,6 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerMaxAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ElectricalMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16636,7 +16493,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readPacketRxCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16674,7 +16530,6 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readPacketRxCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readPacketTxCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16712,7 +16567,6 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readPacketTxCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readTxErrCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16750,7 +16604,6 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readTxErrCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readCollisionCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16788,7 +16641,6 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readCollisionCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readOverrunCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16826,7 +16678,6 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readOverrunCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -16909,7 +16760,6 @@ JNI_METHOD(void, FixedLabelCluster, readLabelListAttribute)(JNIEnv * env, jobjec
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, FixedLabelCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -16991,7 +16841,6 @@ JNI_METHOD(void, FlowMeasurementCluster, readMeasuredValueAttribute)(JNIEnv * en
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, FlowMeasurementCluster, readMinMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -17029,7 +16878,6 @@ JNI_METHOD(void, FlowMeasurementCluster, readMinMeasuredValueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, FlowMeasurementCluster, readMaxMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -17067,7 +16915,6 @@ JNI_METHOD(void, FlowMeasurementCluster, readMaxMeasuredValueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -17255,7 +17102,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, GeneralCommissioningCluster, readBreadcrumbAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -17331,7 +17177,6 @@ JNI_METHOD(void, GeneralCommissioningCluster, writeBreadcrumbAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, GeneralCommissioningCluster, readBasicCommissioningInfoListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -17370,7 +17215,6 @@ JNI_METHOD(void, GeneralCommissioningCluster, readBasicCommissioningInfoListAttr
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, GeneralCommissioningCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -17455,7 +17299,6 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, readNetworkInterfacesAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, GeneralDiagnosticsCluster, readRebootCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -17493,7 +17336,6 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, readRebootCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, GeneralDiagnosticsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -17576,7 +17418,6 @@ JNI_METHOD(void, GroupKeyManagementCluster, readGroupsAttribute)(JNIEnv * env, j
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, GroupKeyManagementCluster, readGroupKeysAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -17613,7 +17454,6 @@ JNI_METHOD(void, GroupKeyManagementCluster, readGroupKeysAttribute)(JNIEnv * env
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, GroupKeyManagementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -17937,7 +17777,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, GroupsCluster, readNameSupportAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -17974,7 +17813,6 @@ JNI_METHOD(void, GroupsCluster, readNameSupportAttribute)(JNIEnv * env, jobject 
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, GroupsCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -18110,7 +17948,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, IdentifyCluster, readIdentifyTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -18185,7 +18022,6 @@ JNI_METHOD(void, IdentifyCluster, writeIdentifyTimeAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, IdentifyCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -18276,7 +18112,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, KeypadInputCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -18692,7 +18527,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, LevelControlCluster, readCurrentLevelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -18729,7 +18563,6 @@ JNI_METHOD(void, LevelControlCluster, readCurrentLevelAttribute)(JNIEnv * env, j
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, LevelControlCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -18820,7 +18653,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, LowPowerCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -19049,7 +18881,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, MediaInputCluster, readMediaInputListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -19086,7 +18917,6 @@ JNI_METHOD(void, MediaInputCluster, readMediaInputListAttribute)(JNIEnv * env, j
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, MediaInputCluster, readCurrentMediaInputAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -19123,7 +18953,6 @@ JNI_METHOD(void, MediaInputCluster, readCurrentMediaInputAttribute)(JNIEnv * env
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, MediaInputCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -19666,7 +19495,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, MediaPlaybackCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -20153,7 +19981,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, NetworkCommissioningCluster, readFeatureMapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -20191,7 +20018,6 @@ JNI_METHOD(void, NetworkCommissioningCluster, readFeatureMapAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, NetworkCommissioningCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -20389,7 +20215,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -20488,7 +20313,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, readDefaultOtaProviderAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -20566,7 +20390,6 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProviderAttri
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, readUpdatePossibleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -20604,7 +20427,6 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, readUpdatePossibleAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -20687,7 +20509,6 @@ JNI_METHOD(void, OccupancySensingCluster, readOccupancyAttribute)(JNIEnv * env, 
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OccupancySensingCluster, readOccupancySensorTypeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -20725,7 +20546,6 @@ JNI_METHOD(void, OccupancySensingCluster, readOccupancySensorTypeAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OccupancySensingCluster, readOccupancySensorTypeBitmapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -20763,7 +20583,6 @@ JNI_METHOD(void, OccupancySensingCluster, readOccupancySensorTypeBitmapAttribute
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OccupancySensingCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -21082,7 +20901,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, OnOffCluster, readOnOffAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -21119,7 +20937,6 @@ JNI_METHOD(void, OnOffCluster, readOnOffAttribute)(JNIEnv * env, jobject self, j
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OnOffCluster, readGlobalSceneControlAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -21156,7 +20973,6 @@ JNI_METHOD(void, OnOffCluster, readGlobalSceneControlAttribute)(JNIEnv * env, jo
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OnOffCluster, readOnTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -21230,7 +21046,6 @@ JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)(JNIEnv * env, jobject self,
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OnOffCluster, readOffWaitTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -21305,7 +21120,6 @@ JNI_METHOD(void, OnOffCluster, writeOffWaitTimeAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OnOffCluster, readStartUpOnOffAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -21380,7 +21194,6 @@ JNI_METHOD(void, OnOffCluster, writeStartUpOnOffAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OnOffCluster, readFeatureMapAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -21417,7 +21230,6 @@ JNI_METHOD(void, OnOffCluster, readFeatureMapAttribute)(JNIEnv * env, jobject se
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OnOffCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -21500,7 +21312,6 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, readSwitchTypeAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OnOffSwitchConfigurationCluster, readSwitchActionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -21576,7 +21387,6 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, writeSwitchActionsAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OnOffSwitchConfigurationCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -21966,7 +21776,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, OperationalCredentialsCluster, readFabricsListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22005,7 +21814,6 @@ JNI_METHOD(void, OperationalCredentialsCluster, readFabricsListAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OperationalCredentialsCluster, readSupportedFabricsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22043,7 +21851,6 @@ JNI_METHOD(void, OperationalCredentialsCluster, readSupportedFabricsAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OperationalCredentialsCluster, readCommissionedFabricsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22081,7 +21888,6 @@ JNI_METHOD(void, OperationalCredentialsCluster, readCommissionedFabricsAttribute
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, OperationalCredentialsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22165,7 +21971,6 @@ JNI_METHOD(void, PressureMeasurementCluster, readMeasuredValueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, PressureMeasurementCluster, readMinMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22203,7 +22008,6 @@ JNI_METHOD(void, PressureMeasurementCluster, readMinMeasuredValueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, PressureMeasurementCluster, readMaxMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22241,7 +22045,6 @@ JNI_METHOD(void, PressureMeasurementCluster, readMaxMeasuredValueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, PressureMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22325,7 +22128,6 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readMaxPressureAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readMaxSpeedAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22363,7 +22165,6 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readMaxSpeedAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readMaxFlowAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22401,7 +22202,6 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readMaxFlowAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readEffectiveOperationModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22439,7 +22239,6 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readEffectiveOperationModeA
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readEffectiveControlModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22477,7 +22276,6 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readEffectiveControlModeAtt
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readCapacityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22515,7 +22313,6 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readCapacityAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readOperationModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22591,7 +22388,6 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeOperationModeAttribute
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22675,7 +22471,6 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMeasuredValueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMinMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22713,7 +22508,6 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMinMeasuredValueAttribu
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMaxMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -22751,7 +22545,6 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMaxMeasuredValueAttribu
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -23121,7 +22914,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, ScenesCluster, readSceneCountAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23158,7 +22950,6 @@ JNI_METHOD(void, ScenesCluster, readSceneCountAttribute)(JNIEnv * env, jobject s
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ScenesCluster, readCurrentSceneAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23195,7 +22986,6 @@ JNI_METHOD(void, ScenesCluster, readCurrentSceneAttribute)(JNIEnv * env, jobject
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ScenesCluster, readCurrentGroupAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23232,7 +23022,6 @@ JNI_METHOD(void, ScenesCluster, readCurrentGroupAttribute)(JNIEnv * env, jobject
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ScenesCluster, readSceneValidAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23269,7 +23058,6 @@ JNI_METHOD(void, ScenesCluster, readSceneValidAttribute)(JNIEnv * env, jobject s
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ScenesCluster, readNameSupportAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23306,7 +23094,6 @@ JNI_METHOD(void, ScenesCluster, readNameSupportAttribute)(JNIEnv * env, jobject 
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ScenesCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23397,7 +23184,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, SoftwareDiagnosticsCluster, readCurrentHeapHighWatermarkAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -23435,7 +23221,6 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, readCurrentHeapHighWatermarkAttribu
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, SoftwareDiagnosticsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -23518,7 +23303,6 @@ JNI_METHOD(void, SwitchCluster, readNumberOfPositionsAttribute)(JNIEnv * env, jo
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, SwitchCluster, readCurrentPositionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23555,7 +23339,6 @@ JNI_METHOD(void, SwitchCluster, readCurrentPositionAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, SwitchCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23739,7 +23522,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, TvChannelCluster, readTvChannelListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23776,7 +23558,6 @@ JNI_METHOD(void, TvChannelCluster, readTvChannelListAttribute)(JNIEnv * env, job
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TvChannelCluster, readTvChannelLineupAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23813,7 +23594,6 @@ JNI_METHOD(void, TvChannelCluster, readTvChannelLineupAttribute)(JNIEnv * env, j
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TvChannelCluster, readCurrentTvChannelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23850,7 +23630,6 @@ JNI_METHOD(void, TvChannelCluster, readCurrentTvChannelAttribute)(JNIEnv * env, 
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TvChannelCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23944,7 +23723,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, TargetNavigatorCluster, readTargetNavigatorListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -23983,7 +23761,6 @@ JNI_METHOD(void, TargetNavigatorCluster, readTargetNavigatorListAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TargetNavigatorCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -24067,7 +23844,6 @@ JNI_METHOD(void, TemperatureMeasurementCluster, readMeasuredValueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TemperatureMeasurementCluster, readMinMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -24105,7 +23881,6 @@ JNI_METHOD(void, TemperatureMeasurementCluster, readMinMeasuredValueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TemperatureMeasurementCluster, readMaxMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -24143,7 +23918,6 @@ JNI_METHOD(void, TemperatureMeasurementCluster, readMaxMeasuredValueAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -24416,7 +24190,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readBooleanAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -24491,7 +24264,6 @@ JNI_METHOD(void, TestClusterCluster, writeBooleanAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readBitmap8Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -24566,7 +24338,6 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap8Attribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readBitmap16Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -24641,7 +24412,6 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap16Attribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readBitmap32Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -24716,7 +24486,6 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap32Attribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readBitmap64Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -24791,7 +24560,6 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap64Attribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readInt8uAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -24866,7 +24634,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt8uAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readInt16uAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -24941,7 +24708,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt16uAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readInt32uAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25016,7 +24782,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt32uAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readInt64uAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25091,7 +24856,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt64uAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readInt8sAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25166,7 +24930,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt8sAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readInt16sAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25241,7 +25004,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt16sAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readInt32sAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25316,7 +25078,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt32sAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readInt64sAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25391,7 +25152,6 @@ JNI_METHOD(void, TestClusterCluster, writeInt64sAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readEnum8Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25466,7 +25226,6 @@ JNI_METHOD(void, TestClusterCluster, writeEnum8Attribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readEnum16Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25541,7 +25300,6 @@ JNI_METHOD(void, TestClusterCluster, writeEnum16Attribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readOctetStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25618,7 +25376,6 @@ JNI_METHOD(void, TestClusterCluster, writeOctetStringAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readListInt8uAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25655,7 +25412,6 @@ JNI_METHOD(void, TestClusterCluster, readListInt8uAttribute)(JNIEnv * env, jobje
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readListOctetStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25692,7 +25448,6 @@ JNI_METHOD(void, TestClusterCluster, readListOctetStringAttribute)(JNIEnv * env,
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readListStructOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -25731,7 +25486,6 @@ JNI_METHOD(void, TestClusterCluster, readListStructOctetStringAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readLongOctetStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25808,7 +25562,6 @@ JNI_METHOD(void, TestClusterCluster, writeLongOctetStringAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readCharStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25885,7 +25638,6 @@ JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readLongCharStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -25962,7 +25714,6 @@ JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readUnsupportedAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -26037,7 +25788,6 @@ JNI_METHOD(void, TestClusterCluster, writeUnsupportedAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, TestClusterCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -26313,7 +26063,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readLocalTemperatureAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -26350,7 +26099,6 @@ JNI_METHOD(void, ThermostatCluster, readLocalTemperatureAttribute)(JNIEnv * env,
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readAbsMinHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -26388,7 +26136,6 @@ JNI_METHOD(void, ThermostatCluster, readAbsMinHeatSetpointLimitAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readAbsMaxHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -26426,7 +26173,6 @@ JNI_METHOD(void, ThermostatCluster, readAbsMaxHeatSetpointLimitAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readAbsMinCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -26464,7 +26210,6 @@ JNI_METHOD(void, ThermostatCluster, readAbsMinCoolSetpointLimitAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readAbsMaxCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -26502,7 +26247,6 @@ JNI_METHOD(void, ThermostatCluster, readAbsMaxCoolSetpointLimitAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readOccupiedCoolingSetpointAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -26578,7 +26322,6 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedCoolingSetpointAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readOccupiedHeatingSetpointAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -26654,7 +26397,6 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedHeatingSetpointAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readMinHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -26730,7 +26472,6 @@ JNI_METHOD(void, ThermostatCluster, writeMinHeatSetpointLimitAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readMaxHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -26806,7 +26547,6 @@ JNI_METHOD(void, ThermostatCluster, writeMaxHeatSetpointLimitAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readMinCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -26882,7 +26622,6 @@ JNI_METHOD(void, ThermostatCluster, writeMinCoolSetpointLimitAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readMaxCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -26958,7 +26697,6 @@ JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readControlSequenceOfOperationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27035,7 +26773,6 @@ JNI_METHOD(void, ThermostatCluster, writeControlSequenceOfOperationAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readSystemModeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -27110,7 +26847,6 @@ JNI_METHOD(void, ThermostatCluster, writeSystemModeAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readStartOfWeekAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -27147,7 +26883,6 @@ JNI_METHOD(void, ThermostatCluster, readStartOfWeekAttribute)(JNIEnv * env, jobj
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readNumberOfWeeklyTransitionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27185,7 +26920,6 @@ JNI_METHOD(void, ThermostatCluster, readNumberOfWeeklyTransitionsAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readNumberOfDailyTransitionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27223,7 +26957,6 @@ JNI_METHOD(void, ThermostatCluster, readNumberOfDailyTransitionsAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readFeatureMapAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -27260,7 +26993,6 @@ JNI_METHOD(void, ThermostatCluster, readFeatureMapAttribute)(JNIEnv * env, jobje
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -27384,7 +27116,6 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDi
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readKeypadLockoutAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27462,7 +27193,6 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockout
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readScheduleProgrammingVisibilityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27541,7 +27271,6 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgr
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27634,7 +27363,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChannelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27672,7 +27400,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChannelAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRoutingRoleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27710,7 +27437,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRoutingRoleAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readNetworkNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27748,7 +27474,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readNetworkNameAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPanIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27786,7 +27511,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPanIdAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readExtendedPanIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27824,7 +27548,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readExtendedPanIdAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readMeshLocalPrefixAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27862,7 +27585,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readMeshLocalPrefixAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readOverrunCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27900,7 +27622,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readOverrunCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readNeighborTableListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27939,7 +27660,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readNeighborTableListAttribute
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRouteTableListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -27978,7 +27698,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRouteTableListAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPartitionIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28016,7 +27735,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPartitionIdAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readWeightingAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28054,7 +27772,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readWeightingAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readDataVersionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28092,7 +27809,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readDataVersionAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readStableDataVersionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28130,7 +27846,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readStableDataVersionAttribute
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readLeaderRouterIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28168,7 +27883,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readLeaderRouterIdAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readDetachedRoleCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28206,7 +27920,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readDetachedRoleCountAttribute
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChildRoleCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28244,7 +27957,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChildRoleCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRouterRoleCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28282,7 +27994,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRouterRoleCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readLeaderRoleCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28320,7 +28031,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readLeaderRoleCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readAttachAttemptCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28358,7 +28068,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readAttachAttemptCountAttribut
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPartitionIdChangeCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28396,7 +28105,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPartitionIdChangeCountAttr
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readBetterPartitionAttachAttemptCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28434,7 +28142,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readBetterPartitionAttachAttem
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readParentChangeCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28472,7 +28179,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readParentChangeCountAttribute
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxTotalCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28510,7 +28216,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxTotalCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxUnicastCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28548,7 +28253,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxUnicastCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBroadcastCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28586,7 +28290,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBroadcastCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxAckRequestedCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28624,7 +28327,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxAckRequestedCountAttribu
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxAckedCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28662,7 +28364,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxAckedCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxNoAckRequestedCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28700,7 +28401,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxNoAckRequestedCountAttri
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDataCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28738,7 +28438,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDataCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDataPollCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28776,7 +28475,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDataPollCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBeaconCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28814,7 +28512,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBeaconCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBeaconRequestCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28852,7 +28549,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBeaconRequestCountAttrib
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxOtherCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28890,7 +28586,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxOtherCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxRetryCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28928,7 +28623,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxRetryCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDirectMaxRetryExpiryCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -28966,7 +28660,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDirectMaxRetryExpiryCoun
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxIndirectMaxRetryExpiryCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29004,7 +28697,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxIndirectMaxRetryExpiryCo
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrCcaCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29042,7 +28734,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrCcaCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrAbortCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29080,7 +28771,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrAbortCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrBusyChannelCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29118,7 +28808,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrBusyChannelCountAttri
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxTotalCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29156,7 +28845,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxTotalCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxUnicastCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29194,7 +28882,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxUnicastCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBroadcastCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29232,7 +28919,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBroadcastCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDataCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29270,7 +28956,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDataCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDataPollCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29308,7 +28993,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDataPollCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBeaconCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29346,7 +29030,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBeaconCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBeaconRequestCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29384,7 +29067,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBeaconRequestCountAttrib
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxOtherCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29422,7 +29104,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxOtherCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxAddressFilteredCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29460,7 +29141,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxAddressFilteredCountAttr
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDestAddrFilteredCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29498,7 +29178,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDestAddrFilteredCountAtt
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDuplicatedCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29536,7 +29215,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDuplicatedCountAttribute
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrNoFrameCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29574,7 +29252,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrNoFrameCountAttribute
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrUnknownNeighborCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29612,7 +29289,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrUnknownNeighborCountA
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrInvalidSrcAddrCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29650,7 +29326,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrInvalidSrcAddrCountAt
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrSecCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29688,7 +29363,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrSecCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrFcsCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29726,7 +29400,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrFcsCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrOtherCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29764,7 +29437,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrOtherCountAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readSecurityPolicyAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29803,7 +29475,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readSecurityPolicyAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChannelMaskAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29841,7 +29512,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChannelMaskAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readOperationalDatasetComponentsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29880,7 +29550,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readOperationalDatasetComponen
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readActiveNetworkFaultsListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -29919,7 +29588,6 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readActiveNetworkFaultsListAtt
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30002,7 +29670,6 @@ JNI_METHOD(void, WakeOnLanCluster, readWakeOnLanMacAddressAttribute)(JNIEnv * en
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WakeOnLanCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -30093,7 +29760,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readBssidAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -30130,7 +29796,6 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readBssidAttribute)(JNIEnv * env
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readSecurityTypeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30168,7 +29833,6 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readSecurityTypeAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readWiFiVersionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30206,7 +29870,6 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readWiFiVersionAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readChannelNumberAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30244,7 +29907,6 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readChannelNumberAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readRssiAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -30281,7 +29943,6 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readRssiAttribute)(JNIEnv * env,
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30647,7 +30308,6 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readTypeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -30684,7 +30344,6 @@ JNI_METHOD(void, WindowCoveringCluster, readTypeAttribute)(JNIEnv * env, jobject
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30722,7 +30381,6 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30760,7 +30418,6 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readConfigStatusAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -30797,7 +30454,6 @@ JNI_METHOD(void, WindowCoveringCluster, readConfigStatusAttribute)(JNIEnv * env,
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftPercentageAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30835,7 +30491,6 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftPercentageAttribu
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltPercentageAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30873,7 +30528,6 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltPercentageAttribu
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readOperationalStatusAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30911,7 +30565,6 @@ JNI_METHOD(void, WindowCoveringCluster, readOperationalStatusAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readTargetPositionLiftPercent100thsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30949,7 +30602,6 @@ JNI_METHOD(void, WindowCoveringCluster, readTargetPositionLiftPercent100thsAttri
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readTargetPositionTiltPercent100thsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -30987,7 +30639,6 @@ JNI_METHOD(void, WindowCoveringCluster, readTargetPositionTiltPercent100thsAttri
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readEndProductTypeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -31024,7 +30675,6 @@ JNI_METHOD(void, WindowCoveringCluster, readEndProductTypeAttribute)(JNIEnv * en
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftPercent100thsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -31062,7 +30712,6 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftPercent100thsAttr
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltPercent100thsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -31100,7 +30749,6 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltPercent100thsAttr
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readInstalledOpenLimitLiftAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -31138,7 +30786,6 @@ JNI_METHOD(void, WindowCoveringCluster, readInstalledOpenLimitLiftAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readInstalledClosedLimitLiftAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -31176,7 +30823,6 @@ JNI_METHOD(void, WindowCoveringCluster, readInstalledClosedLimitLiftAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readInstalledOpenLimitTiltAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -31214,7 +30860,6 @@ JNI_METHOD(void, WindowCoveringCluster, readInstalledOpenLimitTiltAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readInstalledClosedLimitTiltAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -31252,7 +30897,6 @@ JNI_METHOD(void, WindowCoveringCluster, readInstalledClosedLimitTiltAttribute)
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readModeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -31327,7 +30971,6 @@ JNI_METHOD(void, WindowCoveringCluster, writeModeAttribute)
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readSafetyStatusAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -31364,7 +31007,6 @@ JNI_METHOD(void, WindowCoveringCluster, readSafetyStatusAttribute)(JNIEnv * env,
         ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
-
 JNI_METHOD(void, WindowCoveringCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {

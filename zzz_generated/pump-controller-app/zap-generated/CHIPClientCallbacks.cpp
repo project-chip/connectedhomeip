@@ -30,16 +30,15 @@
 #include <app/util/basic-types.h>
 #include <app/util/prepare-list.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::app::List;
-
-namespace {
-[[maybe_unused]] constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
-} // namespace
 
 #define CHECK_STATUS_WITH_RETVAL(error, retval)                                                                                    \
     if (CHIP_NO_ERROR != error)                                                                                                    \

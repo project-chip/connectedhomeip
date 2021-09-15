@@ -2862,6 +2862,11 @@ class ChipClusters:
                     "type": "str",
                     "writable": True,
                 },
+                0x00000020: {
+                    "attributeName": "SimpleStruct",
+                    "attributeId": 0x00000020,
+                    "type": "",
+                },
                 0x000000FF: {
                     "attributeName": "Unsupported",
                     "attributeId": 0x000000FF,
@@ -5034,6 +5039,8 @@ class ChipClusters:
     def ClusterTestCluster_WriteAttributeLongCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
         value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_LongCharString(device, ZCLendpoint, ZCLgroupid, value, len(value))
+    def ClusterTestCluster_ReadAttributeSimpleStruct(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_SimpleStruct(device, ZCLendpoint, ZCLgroupid)
     def ClusterTestCluster_ReadAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid)
     def ClusterTestCluster_WriteAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bool):
@@ -6723,6 +6730,9 @@ class ChipClusters:
         # Cluster TestCluster WriteAttribute LongCharString
         self._chipLib.chip_ime_WriteAttribute_TestCluster_LongCharString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_WriteAttribute_TestCluster_LongCharString.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute SimpleStruct
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_SimpleStruct.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_SimpleStruct.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Unsupported
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.restype = ctypes.c_uint32

@@ -30,16 +30,15 @@
 #include <app/util/basic-types.h>
 #include <app/util/prepare-list.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::app::List;
-
-namespace {
-[[maybe_unused]] constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
-} // namespace
 
 #define CHECK_STATUS_WITH_RETVAL(error, retval)                                                                                    \
     if (CHIP_NO_ERROR != error)                                                                                                    \
@@ -359,36 +358,51 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
                                                                               Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback)
 {
-    // TODO: Add actual support for array and lists.
-    const uint8_t * message = nullptr;
-    uint16_t messageLen     = 0;
-    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
-    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    size_t count   = 0;
+    TLV::TLVType tmpType;
+    TLV::TLVReader reader;
+
+    VerifyOrExit(tlvData != nullptr && tlvData->GetType() == chip::TLV::TLVType::kTLVType_Array, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    reader.Init(*tlvData);
+    reader.EnterContainer(tmpType);
+
+    SuccessOrExit(err = chip::TLV::Utilities::Count(reader, count, false /* recursive */));
+    VerifyOrExit(chip::CanCastTo<uint16_t>(count), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Move declare of data[count] into the braces to make complier happy with the above SuccessOrExit and VerifyOrExit.
+    {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
+        _BasicCommissioningInfoType data[count];
+#pragma GCC diagnostic pop
+        for (size_t i = 0; i < count && CHIP_NO_ERROR == (err = reader.Next()); i++)
+        {
+            SuccessOrExit(err = reader.Get(data[i]));
+        }
+        SuccessOrExit(err); // Verify we did not met error when calling reader.Next().
+        // If we have exactly count elements, we should not see any errors above, but should meet an error exactly after we iterated
+        // all elements.
+        VerifyOrExit(reader.Next() == CHIP_END_OF_TLV, err = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
+
+        // All error cases goes to exit label, then we must have collected all the elements without error here.
+        Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback> * cb =
+            Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(
+                onSuccessCallback);
+        cb->mCall(cb->mContext, static_cast<uint16_t>(count), data);
+    }
+
+exit:
+    if (CHIP_NO_ERROR != err)
     {
         if (onFailureCallback != nullptr)
         {
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, res);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
         }
-        return;
     }
-
-    CHECK_MESSAGE_LENGTH_VOID(2);
-    uint16_t count = Encoding::LittleEndian::Read16(message);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wvla"
-    _BasicCommissioningInfoType data[count];
-#pragma GCC diagnostic pop
-    for (size_t i = 0; i < count; i++)
-    {
-        CHECK_MESSAGE_LENGTH_VOID(4);
-        data[i].FailSafeExpiryLengthMs = emberAfGetInt32u(message, 0, 4);
-        message += 4;
-    }
-    Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback> * cb =
-        Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, count, data);
 }
 #if !defined(__clang__)
 #pragma GCC diagnostic pop
@@ -401,51 +415,50 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
-    // TODO: Add actual support for array and lists.
-    const uint8_t * message = nullptr;
-    uint16_t messageLen     = 0;
-    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
-    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    size_t count   = 0;
+    TLV::TLVType tmpType;
+    TLV::TLVReader reader;
+
+    VerifyOrExit(tlvData != nullptr && tlvData->GetType() == chip::TLV::TLVType::kTLVType_Array, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    reader.Init(*tlvData);
+    reader.EnterContainer(tmpType);
+
+    SuccessOrExit(err = chip::TLV::Utilities::Count(reader, count, false /* recursive */));
+    VerifyOrExit(chip::CanCastTo<uint16_t>(count), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Move declare of data[count] into the braces to make complier happy with the above SuccessOrExit and VerifyOrExit.
+    {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
+        _FabricDescriptor data[count];
+#pragma GCC diagnostic pop
+        for (size_t i = 0; i < count && CHIP_NO_ERROR == (err = reader.Next()); i++)
+        {
+            SuccessOrExit(err = reader.Get(data[i]));
+        }
+        SuccessOrExit(err); // Verify we did not met error when calling reader.Next().
+        // If we have exactly count elements, we should not see any errors above, but should meet an error exactly after we iterated
+        // all elements.
+        VerifyOrExit(reader.Next() == CHIP_END_OF_TLV, err = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
+
+        // All error cases goes to exit label, then we must have collected all the elements without error here.
+        Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
+            Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
+        cb->mCall(cb->mContext, static_cast<uint16_t>(count), data);
+    }
+
+exit:
+    if (CHIP_NO_ERROR != err)
     {
         if (onFailureCallback != nullptr)
         {
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, res);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
         }
-        return;
     }
-
-    CHECK_MESSAGE_LENGTH_VOID(2);
-    uint16_t count = Encoding::LittleEndian::Read16(message);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wvla"
-    _FabricDescriptor data[count];
-#pragma GCC diagnostic pop
-    for (size_t i = 0; i < count; i++)
-    {
-        CHECK_MESSAGE_LENGTH_VOID(1);
-        data[i].FabricIndex = emberAfGetInt8u(message, 0, 1);
-        message += 1;
-        CHECK_STATUS_VOID(ReadByteSpan(message, 67, &data[i].RootPublicKey));
-        messageLen = static_cast<uint16_t>(messageLen - 67);
-        message += 67;
-        CHECK_MESSAGE_LENGTH_VOID(2);
-        data[i].VendorId = emberAfGetInt16u(message, 0, 2);
-        message += 2;
-        CHECK_MESSAGE_LENGTH_VOID(8);
-        data[i].FabricId = emberAfGetInt64u(message, 0, 8);
-        message += 8;
-        CHECK_MESSAGE_LENGTH_VOID(8);
-        data[i].NodeId = emberAfGetInt64u(message, 0, 8);
-        message += 8;
-        CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].Label));
-        messageLen = static_cast<uint16_t>(messageLen - 34);
-        message += 34;
-    }
-    Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
-        Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, count, data);
 }
 #if !defined(__clang__)
 #pragma GCC diagnostic pop
@@ -459,37 +472,51 @@ void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV
                                                                              Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback)
 {
-    // TODO: Add actual support for array and lists.
-    const uint8_t * message = nullptr;
-    uint16_t messageLen     = 0;
-    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
-    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    size_t count   = 0;
+    TLV::TLVType tmpType;
+    TLV::TLVReader reader;
+
+    VerifyOrExit(tlvData != nullptr && tlvData->GetType() == chip::TLV::TLVType::kTLVType_Array, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    reader.Init(*tlvData);
+    reader.EnterContainer(tmpType);
+
+    SuccessOrExit(err = chip::TLV::Utilities::Count(reader, count, false /* recursive */));
+    VerifyOrExit(chip::CanCastTo<uint16_t>(count), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Move declare of data[count] into the braces to make complier happy with the above SuccessOrExit and VerifyOrExit.
+    {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
+        chip::ByteSpan data[count];
+#pragma GCC diagnostic pop
+        for (size_t i = 0; i < count && CHIP_NO_ERROR == (err = reader.Next()); i++)
+        {
+            SuccessOrExit(err = reader.Get(data[i]));
+        }
+        SuccessOrExit(err); // Verify we did not met error when calling reader.Next().
+        // If we have exactly count elements, we should not see any errors above, but should meet an error exactly after we iterated
+        // all elements.
+        VerifyOrExit(reader.Next() == CHIP_END_OF_TLV, err = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
+
+        // All error cases goes to exit label, then we must have collected all the elements without error here.
+        Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback> * cb =
+            Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>::FromCancelable(
+                onSuccessCallback);
+        cb->mCall(cb->mContext, static_cast<uint16_t>(count), data);
+    }
+
+exit:
+    if (CHIP_NO_ERROR != err)
     {
         if (onFailureCallback != nullptr)
         {
             Callback::Callback<DefaultFailureCallback> * cb =
                 Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, res);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
         }
-        return;
     }
-
-    CHECK_MESSAGE_LENGTH_VOID(2);
-    uint16_t count = Encoding::LittleEndian::Read16(message);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wvla"
-    chip::ByteSpan data[count];
-#pragma GCC diagnostic pop
-    for (size_t i = 0; i < count; i++)
-    {
-        CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));
-        uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
-        messageLen           = static_cast<uint16_t>(messageLen - entryLength);
-        message += entryLength;
-    }
-    Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback> * cb =
-        Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, count, data);
 }
 #if !defined(__clang__)
 #pragma GCC diagnostic pop
