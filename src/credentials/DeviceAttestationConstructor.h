@@ -26,36 +26,38 @@ namespace Credentials {
 
 /**
  *  @brief Take the attestation elements buffer and return each component seperately.
+ *         All output data stays valid while attestationElements buffer is valid.
  *
- *  @param[in]    attestationElements Buffer containg source of attestion
+ *  @param[in]    attestationElements ByteSpan containg source of Attestation Elements data.
  *  @param[out]   certificationDeclaration
  *  @param[out]   attestationNonce
  *  @param[out]   timestamp
- *  @param[out]   firmwareInfo
+ *  @param[out]   firmwareInfo ByteSpan containing Firmware Information data if present within attestationElements.
+ *                             Empty ByteSpan if not present in attestationElements.
  *  @param[out]   vendorReservedArray
  *  @param[inout] vendorReservedArraySize
- *  @param[out]   vendorId (from vendor reserved elements)
- *  @param[out]   profileNum (from vendor reserved elements)
+ *  @param[out]   vendorId Vendor ID fetched from Attestation Elements data.
+ *  @param[out]   profileNum Profile Number fetched from Attestation Elements data.
  */
 CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, ByteSpan & certificationDeclaration,
                                           ByteSpan & attestationNonce, uint32_t & timestamp, ByteSpan & firmwareInfo,
-                                          ByteSpan * vendorReservedArray, size_t vendorReservedArraySize, uint16_t & vendorId,
+                                          ByteSpan * vendorReservedArray, size_t & vendorReservedArraySize, uint16_t & vendorId,
                                           uint16_t & profileNum);
 
 /**
  *  @brief Take each component separately and form the Attestation Elements buffer.
  *
- *  @param[in]  certificationDeclaration
- *  @param[in]  attestationNonce
- *  @param[in]  timestamp
- *  @param[in]  firmwareInfo
- *  @param[in]  vendorReservedArray
- *  @param[in]  vendorReservedArraySize
- *  @param[in]  vendorId (from vendor reserved elements)
- *  @param[in]  profileNum (from vendor reserved elements)
- *  @param[out] attestationElements Buffer containg source of attestion
+ *  @param[in]  certificationDeclaration Valid Certification Declaration data.
+ *  @param[in]  attestationNonce Attestation Nonce - 32 octets required.
+ *  @param[in]  timestamp Timestamp data in epoch time format.
+ *  @param[in]  firmwareInfo Optional Firmware Information data - Can be empty.
+ *  @param[in]  vendorReservedArray Array of Vendor Reserved entries.
+ *  @param[in]  vendorReservedArraySize Number of Vendor Reserved entries present in the array.
+ *  @param[in]  vendorId Vendor ID to be written to Vendor Reserved entries' Qualified Tags
+ *  @param[in]  profileNum Profile Number to be written to Vendor Reserved entries' Qualified Tags
+ *  @param[out] attestationElements Buffer used to write all AttestationElements data, formed with all the data fields above.
+ *                                  Provided buffer needs to be capable to handle all data fields + tags.
  */
-
 CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaration, const ByteSpan & attestationNonce,
                                         uint32_t timestamp, const ByteSpan & firmwareInfo, ByteSpan * vendorReservedArray,
                                         size_t vendorReservedArraySize, uint16_t vendorId, uint16_t profileNum,
