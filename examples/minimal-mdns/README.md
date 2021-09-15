@@ -85,7 +85,7 @@ discovery.
 
 ### Advertising to test client listings
 
-#### Simulated uncommisioned node
+#### Simulated uncommissioned node
 
 ```sh
 dns-sd -R DD200C20D25AE5F7 _matterc._udp,S52,L840,V123 . 11111 D=840 VP=123+456
@@ -99,11 +99,11 @@ S52._sub._matterc._udp.local.          PTR   DD200C20D25AE5F7._matterc._udp.loca
 L840._sub._matterc._udp.local.         PTR   DD200C20D25AE5F7._matterc._udp.local.
 V123._sub._matterc._udp.local.         PTR   DD200C20D25AE5F7._matterc._udp.local.
 DD200C20D25AE5F7._matterc._udp.local.  TXT   "D=840" "VP=123+456"
-DD200C20D25AE5F7._mattterc._udp.local.  SRV   0 0 11111 B75AFB458ECD.local.
+DD200C20D25AE5F7._matterc._udp.local.  SRV   0 0 11111 B75AFB458ECD.local.
 B75AFB458ECD.local.                  AAAA  ba2a:b311:742e:b44c:f515:576f:9783:3f30
 ```
 
-#### Simulated commisioning node
+#### Simulated commissioning node
 
 ```sh
 dns-sd -R DD200C20D25AE5F7 _matterd._udp,S52,L840,V123 . 11111 D=840 VP=123+456 PH=3
@@ -121,7 +121,7 @@ DD200C20D25AE5F7._matterd._udp.local.  SRV   0 0 11111 B75AFB458ECD.local.
 B75AFB458ECD.local.                    AAAA  ba2a:b311:742e:b44c:f515:576f:9783:3f30
 ```
 
-#### Simulated commisioned node
+#### Simulated commissioned node
 
 ```sh
 dns-sd -R 2906C908D115D362-8FC7772401CD0696 _matter._tcp . 22222
@@ -132,15 +132,15 @@ dns-sd -R 2906C908D115D362-8FC7772401CD0696 _matter._tcp . 22222
 Nodes:
 
 ```sh
-dns-sd -B _matterc._udp         # Nodes awaiting commisioning
-dns-sd -B _matterc._udp,S52     # Nodes awaiting commisioning with short discriminator 52
-dns-sd -B _matterc._udp,L840    # Nodes awaiting commisioning with long discriminator 840
-dns-sd -B _matterc._udp,V123    # Nodes awaiting commisioning with vendor id 123
+dns-sd -B _matterc._udp         # Nodes awaiting commissioning
+dns-sd -B _matterc._udp,S52     # Nodes awaiting commissioning with short discriminator 52
+dns-sd -B _matterc._udp,L840    # Nodes awaiting commissioning with long discriminator 840
+dns-sd -B _matterc._udp,V123    # Nodes awaiting commissioning with vendor id 123
 
-dns-sd -B _matterd._udp         # Commisionable nodes
-dns-sd -B _matterd._udp,S52     # Commisionable nodes with short discriminator 52
-dns-sd -B _matterd._udp,L840    # Commisionable nodes with long discriminator 840
-dns-sd -B _matterd._udp,V123    # Commisionable nodes with vendor id 123
+dns-sd -B _matterd._udp         # Commissionable nodes
+dns-sd -B _matterd._udp,S52     # Commissionable nodes with short discriminator 52
+dns-sd -B _matterd._udp,L840    # Commissionable nodes with long discriminator 840
+dns-sd -B _matterd._udp,V123    # Commissionable nodes with vendor id 123
 ```
 
 IP Address:

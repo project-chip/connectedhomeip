@@ -24,8 +24,9 @@ const fs                = require('fs');
 const path              = require('path');
 
 // Import helpers from zap core
-const templateUtil = require(zapPath + 'src-electron/generator/template-util.js')
+const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
+const { TestSuiteHelperCluster }        = require('./TestSuiteHelperCluster.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
 
 const kClusterName       = 'cluster';
@@ -70,6 +71,12 @@ function setDefaultType(test)
   case 'writeAttribute':
     test.isAttribute      = true;
     test.isWriteAttribute = true;
+    break;
+
+  case 'subscribeAttribute':
+    test.isAttribute          = true;
+    test.isReadAttribute      = true;
+    test.isSubscribeAttribute = true;
     break;
 
   default:
@@ -140,6 +147,7 @@ function setDefaultResponse(test)
   }
 
   if (!hasResponseValueOrConstraints) {
+    console.log(test);
     console.log(test[kResponseName]);
     const errorStr = 'Test does not have a "value" or a "constraints" defined.';
     throwError(test, errorStr);
@@ -202,8 +210,6 @@ function parse(filename)
   return yaml;
 }
 
-// Templates Internal Utils
-
 function printErrorAndExit(context, msg)
 {
   console.log(context.testName, ': ', context.label);
@@ -211,10 +217,29 @@ function printErrorAndExit(context, msg)
   process.exit(1);
 }
 
+function getClusters()
+{
+  // Create a new array to merge the configured clusters list and test
+  // simulated clusters.
+  return Clusters.getClusters().then(clusters => clusters.concat(TestSuiteHelperCluster));
+}
+
+function getCommands(clusterName)
+{
+  return (clusterName == TestSuiteHelperCluster.name) ? Promise.resolve(TestSuiteHelperCluster.commands)
+                                                      : Clusters.getClientCommands(clusterName);
+}
+
+function getAttributes(clusterName)
+{
+  return (clusterName == TestSuiteHelperCluster.name) ? Promise.resolve(TestSuiteHelperCluster.attributes)
+                                                      : Clusters.getServerAttributes(clusterName);
+}
+
 function assertCommandOrAttribute(context)
 {
   const clusterName = context.cluster;
-  return Clusters.getClusters().then(clusters => {
+  return getClusters().then(clusters => {
     if (!clusters.find(cluster => cluster.name == clusterName)) {
       const names = clusters.map(item => item.name);
       printErrorAndExit(context, 'Missing cluster "' + clusterName + '" in: \n\t* ' + names.join('\n\t* '));
@@ -225,10 +250,10 @@ function assertCommandOrAttribute(context)
 
     if (context.isCommand) {
       filterName = context.command;
-      items      = Clusters.getClientCommands(clusterName);
+      items      = getCommands(clusterName);
     } else if (context.isAttribute) {
       filterName = context.attribute;
-      items      = Clusters.getServerAttributes(clusterName);
+      items      = getAttributes(clusterName);
     } else {
       printErrorAndExit(context, 'Unsupported command type: ', context);
     }
@@ -270,6 +295,19 @@ function chip_tests(items, options)
 function chip_tests_items(options)
 {
   return templateUtil.collectBlocks(this.tests, options, this);
+}
+
+function isTestOnlyCluster(name)
+{
+  return name == TestSuiteHelperCluster.name;
+}
+
+function chip_tests_with_command_attribute_info(options)
+{
+  const promise = assertCommandOrAttribute(this).then(item => {
+    return [ item ];
+  });
+  return asBlocks.call(this, promise, options);
 }
 
 function chip_tests_item_parameters(options)
@@ -322,14 +360,14 @@ function chip_tests_item_response_parameters(options)
         }
       }
 
-      const unusedResponseValues = responseValues.filter(response => 'value' in response);
-      unusedResponseValues.forEach(unusedResponseValue => {
-        printErrorAndExit(this,
-            'Missing "' + unusedResponseValue.name + '" in response arguments list:\n\t* '
-                + responseArgs.map(response => response.name).join('\n\t* '));
-      });
-
       return responseArg;
+    });
+
+    const unusedResponseValues = responseValues.filter(response => 'value' in response);
+    unusedResponseValues.forEach(unusedResponseValue => {
+      printErrorAndExit(this,
+          'Missing "' + unusedResponseValue.name + '" in response arguments list:\n\t* '
+              + responseArgs.map(response => response.name).join('\n\t* '));
     });
 
     return responses;
@@ -338,10 +376,20 @@ function chip_tests_item_response_parameters(options)
   return asBlocks.call(this, promise, options);
 }
 
+function chip_tests_WaitForAttributeReport_attribute_info(options)
+{
+  const waitfor = Object.assign(JSON.parse(JSON.stringify(this.waitfor)), { command : 'readAttribute', isAttribute : true });
+  setDefaults(waitfor, this.parent);
+  return templateUtil.collectBlocks([ waitfor ], options, this);
+}
+
 //
 // Module exports
 //
-exports.chip_tests                          = chip_tests;
-exports.chip_tests_items                    = chip_tests_items;
-exports.chip_tests_item_parameters          = chip_tests_item_parameters;
-exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
+exports.chip_tests                                       = chip_tests;
+exports.chip_tests_items                                 = chip_tests_items;
+exports.chip_tests_item_parameters                       = chip_tests_item_parameters;
+exports.chip_tests_item_response_parameters              = chip_tests_item_response_parameters;
+exports.isTestOnlyCluster                                = isTestOnlyCluster;
+exports.chip_tests_with_command_attribute_info           = chip_tests_with_command_attribute_info;
+exports.chip_tests_WaitForAttributeReport_attribute_info = chip_tests_WaitForAttributeReport_attribute_info;

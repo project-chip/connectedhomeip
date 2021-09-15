@@ -23,8 +23,8 @@
 #include <string.h>
 #include <vector>
 
-#include <support/BytesCircularBuffer.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/BytesCircularBuffer.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

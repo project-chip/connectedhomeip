@@ -22,12 +22,12 @@
 #include <sstream>
 #include <string.h>
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
 
 using namespace chip::Mdns;
 
@@ -548,10 +548,6 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, chip::Inet::InterfaceId interf
 
     return Resolve(context, callback, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
 }
-
-void GetMdnsTimeout(timeval & timeout) {}
-
-void HandleMdnsTimeout() {}
 
 } // namespace Mdns
 } // namespace chip

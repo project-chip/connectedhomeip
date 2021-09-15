@@ -31,9 +31,9 @@
 #include <platform/mbed/BLEManagerImpl.h>
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 // Show BLE status with LEDs
 #define _BLEMGRIMPL_USE_LEDS 0
@@ -184,7 +184,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         ChipDeviceEvent chip_event;
         chip_event.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
         chip_event.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-        PlatformMgrImpl().PostEvent(&chip_event);
+        PlatformMgrImpl().PostEventOrDie(&chip_event);
 
         PlatformMgr().ScheduleWork(ble_manager.DriveBLEState, 0);
     }
@@ -208,7 +208,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
         ChipDeviceEvent chip_event;
         chip_event.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
         chip_event.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-        PlatformMgrImpl().PostEvent(&chip_event);
+        PlatformMgrImpl().PostEventOrDie(&chip_event);
 
         if (event.isConnected())
         {
@@ -305,7 +305,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
             chip_event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
             break;
         }
-        PlatformMgrImpl().PostEvent(&chip_event);
+        PlatformMgrImpl().PostEventOrDie(&chip_event);
 
         ChipLogProgress(DeviceLayer, "BLE connection terminated, mbed-os reason: %d", reason.value());
         ChipLogProgress(DeviceLayer, "Current number of connections: %" PRIu16 "/%d", ble_manager.NumConnections(),
@@ -397,7 +397,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             chip_event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
             chip_event.CHIPoBLEWriteReceived.ConId = params->connHandle;
             chip_event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
-            PlatformMgrImpl().PostEvent(&chip_event);
+            PlatformMgrImpl().PostEventOrDie(&chip_event);
         }
         else
         {
@@ -447,7 +447,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             ChipDeviceEvent chip_event;
             chip_event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
             chip_event.CHIPoBLESubscribe.ConId = params.connHandle;
-            PlatformMgrImpl().PostEvent(&chip_event);
+            PlatformMgrImpl().PostEventOrDie(&chip_event);
         }
     }
 
@@ -460,7 +460,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             ChipDeviceEvent chip_event;
             chip_event.Type                      = DeviceEventType::kCHIPoBLEUnsubscribe;
             chip_event.CHIPoBLEUnsubscribe.ConId = params.connHandle;
-            PlatformMgrImpl().PostEvent(&chip_event);
+            PlatformMgrImpl().PostEventOrDie(&chip_event);
         }
     }
 
@@ -473,7 +473,7 @@ struct CHIPService : public ble::GattServer::EventHandler
             ChipDeviceEvent chip_event;
             chip_event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
             chip_event.CHIPoBLEIndicateConfirm.ConId = params.connHandle;
-            PlatformMgrImpl().PostEvent(&chip_event);
+            PlatformMgrImpl().PostEventOrDie(&chip_event);
         }
     }
 
@@ -627,7 +627,7 @@ void BLEManagerImpl::HandleInitComplete(bool no_error)
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
     security_mgr.setSecurityManagerEventHandler(&sSecurityManagerEventHandler);
 
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 #if _BLEMGRIMPL_USE_LEDS
@@ -926,7 +926,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogDetail(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-        PlatformMgrImpl().PostEvent(&connEstEvent);
+        PlatformMgrImpl().PostEventOrDie(&connEstEvent);
     }
     break;
 

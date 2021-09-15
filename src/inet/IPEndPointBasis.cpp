@@ -36,8 +36,8 @@
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
 
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
@@ -344,12 +344,6 @@ CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
         switch (mLwIPEndPointType)
         {
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        case kLwIPEndPointType_Raw:
-            raw_set_flags(mRaw, RAW_FLAGS_MULTICAST_LOOP);
-            break;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         case kLwIPEndPointType_UDP:
             udp_set_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
@@ -365,12 +359,6 @@ CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
     {
         switch (mLwIPEndPointType)
         {
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        case kLwIPEndPointType_Raw:
-            raw_clear_flags(mRaw, RAW_FLAGS_MULTICAST_LOOP);
-            break;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         case kLwIPEndPointType_UDP:
@@ -658,11 +646,13 @@ done:
     return (lPacketInfo);
 }
 
-CHIP_ERROR IPEndPointBasis::PostPacketBufferEvent(chip::System::Layer & aLayer, System::Object & aTarget,
+CHIP_ERROR IPEndPointBasis::PostPacketBufferEvent(chip::System::LayerLwIP * aLayer, System::Object & aTarget,
                                                   System::EventType aEventType, System::PacketBufferHandle && aBuffer)
 {
+    VerifyOrReturnError(aLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     const CHIP_ERROR error =
-        aLayer.PostEvent(aTarget, aEventType, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(aBuffer));
+        aLayer->PostEvent(aTarget, aEventType, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(aBuffer));
     if (error == CHIP_NO_ERROR)
     {
         // If PostEvent() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
@@ -941,7 +931,7 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
         mSocket = ::socket(family, aType, aProtocol);
         if (mSocket == -1)
             return chip::System::MapErrorPOSIX(errno);
-        ReturnErrorOnFailure(SystemLayer().StartWatchingSocket(mSocket, &mWatch));
+        ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->StartWatchingSocket(mSocket, &mWatch));
 
         mAddrType = aAddressType;
 

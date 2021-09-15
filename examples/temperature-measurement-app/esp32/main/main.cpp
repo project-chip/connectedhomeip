@@ -36,7 +36,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#include <support/ErrorStr.h>
+#include <lib/support/ErrorStr.h>
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -80,7 +80,7 @@ extern "C" void app_main()
         return;
     }
 
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

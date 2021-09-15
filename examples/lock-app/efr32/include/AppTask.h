@@ -24,6 +24,7 @@
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"
+#include "sl_simple_button_instances.h"
 
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
@@ -48,7 +49,7 @@ public:
     void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
 
-    void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
+    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction);
 
 private:
     friend AppTask & GetAppTask(void);

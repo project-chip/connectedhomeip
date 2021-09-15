@@ -38,8 +38,7 @@ class ChipUtility(object):
             v = bytearray(len)
             memmove((c_byte * len).from_buffer(v), ptr, len)
             return v
-        else:
-            return None
+        return None
 
     @staticmethod
     def ByteArrayToVoidPtr(array):
@@ -47,13 +46,12 @@ class ChipUtility(object):
             if not (isinstance(array, bytes) or isinstance(array, bytearray)):
                 raise TypeError("Array must be an str or a bytearray")
             return cast((c_byte * len(array)).from_buffer_copy(array), c_void_p)
-        else:
-            return c_void_p(0)
+        return c_void_p(0)
 
     @staticmethod
     def IsByteArrayAllZeros(array):
-        for i in range(len(array)):
-            if array[i] != 0:
+        for i in array:
+            if i != 0:
                 return False
         return True
 

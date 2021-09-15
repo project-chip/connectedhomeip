@@ -22,6 +22,7 @@ from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
 from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
+from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 
 from .targets import Application, Board, Platform
 
@@ -87,6 +88,7 @@ _MATCHERS = {
     Platform.ANDROID: Matcher(AndroidBuilder),
     Platform.INFINEON: Matcher(InfineonBuilder),
     Platform.TELINK: Matcher(TelinkBuilder),
+    Platform.TIZEN: Matcher(TizenBuilder),
 }
 
 # Matrix of what can be compiled and what build options are required
@@ -131,6 +133,9 @@ _MATCHERS[Platform.NRF].AcceptBoard(Board.NRF52840, board=NrfBoard.NRF52840)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LOCK, app=NrfApp.LOCK)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LIGHT, app=NrfApp.LIGHT)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.SHELL, app=NrfApp.SHELL)
+_MATCHERS[Platform.NRF].AcceptApplication(Application.PUMP, app=NrfApp.PUMP)
+_MATCHERS[Platform.NRF].AcceptApplication(
+    Application.PUMP_CONTROLLER, app=NrfApp.PUMP_CONTROLLER)
 
 _MATCHERS[Platform.TELINK].AcceptBoard(
     Board.TLSR9518ADK80D, board=TelinkBoard.TLSR9518ADK80D)
@@ -146,6 +151,10 @@ _MATCHERS[Platform.INFINEON].AcceptApplication(
     Application.LOCK, app=InfineonApp.LOCK)
 _MATCHERS[Platform.INFINEON].AcceptBoard(
     Board.P6BOARD, board=InfineonBoard.P6BOARD)
+
+_MATCHERS[Platform.TIZEN].AcceptBoard(Board.ARM, board=TizenBoard.ARM)
+_MATCHERS[Platform.TIZEN].AcceptApplication(
+    Application.LIGHT, app=TizenApp.LIGHT)
 
 
 class BuilderFactory:

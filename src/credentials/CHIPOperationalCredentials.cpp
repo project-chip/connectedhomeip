@@ -28,9 +28,9 @@
 #endif
 
 #include <credentials/CHIPOperationalCredentials.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace Credentials {

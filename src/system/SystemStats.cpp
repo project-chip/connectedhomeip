@@ -31,7 +31,7 @@
 // Include module header
 #include <system/SystemStats.h>
 
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 #include <string.h>
 
@@ -48,9 +48,6 @@ static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
     "SystemLayer_NumPacketBufs",
 #endif
     "SystemLayer_NumTimersInUse",
-#if INET_CONFIG_NUM_RAW_ENDPOINTS
-    "InetLayer_NumRawEpsInUse",
-#endif
 #if INET_CONFIG_NUM_TCP_ENDPOINTS
     "InetLayer_NumTCPEpsInUse",
 #endif

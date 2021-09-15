@@ -41,6 +41,10 @@
 
 #include "RNG_Interface.h"
 
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#include "PWR_Configuration.h"
+#endif
+
 /*******************************************************************************
  * Local data types
  *******************************************************************************/
@@ -60,7 +64,6 @@ namespace DeviceLayer {
 namespace Internal {
 
 namespace {
-
 /*******************************************************************************
  * Macros & Constants definitions
  *******************************************************************************/
@@ -131,6 +134,10 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
                                                  0x9D, 0x11 } };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x12 } };
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+static bool bleAppStopInProgress;
+#endif
 } // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -148,7 +155,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(!mFlags.Has(Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
     // Initialize the Chip BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
     (void) RNG_Init();
@@ -199,6 +206,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(OSA_EventWait(event_msg, CHIP_BLE_KW_EVNT_INIT_COMPLETE, TRUE, CHIP_BLE_KW_EVNT_TIMEOUT, &flags) ==
                      osaStatus_Success,
                  err = CHIP_ERROR_INCORRECT_STATE);
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    PWR_ChangeDeepSleepMode(cPWR_PowerDown_RamRet);
+#endif
 
     GattServer_RegisterHandlesForWriteNotifications(1, attChipRxHandle);
 
@@ -392,7 +403,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-        PlatformMgr().PostEvent(&connEstEvent);
+        PlatformMgr().PostEventOrDie(&connEstEvent);
         break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe:
@@ -438,17 +449,14 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     return false;
 }
 
+void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)
+{
+    BLEMgrImpl().blekw_stop_connection_internal(connObj);
+}
+
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
-
-    if (Gap_Disconnect(conId) != gBleSuccess_c)
-    {
-        ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
-        return false;
-    }
-
-    return true;
+    return blekw_stop_connection_internal(conId);
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -502,7 +510,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
         {
             event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
             event.CHIPoBLEIndicateConfirm.ConId = conId;
-            PlatformMgr().PostEvent(&event);
+            err                                 = PlatformMgr().PostEvent(&event);
         }
 
         if (err != CHIP_NO_ERROR)
@@ -715,18 +723,28 @@ BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_start_advertising(gapAdvertising
         return BLE_E_START_ADV;
     }
 
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    PWR_DisallowDeviceToSleep();
+#endif
+
     if (OSA_EventWait(event_msg, (CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED), FALSE, CHIP_BLE_KW_EVNT_TIMEOUT,
                       &event_mask) != osaStatus_Success)
     {
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+        PWR_AllowDeviceToSleep();
+#endif
         return BLE_E_START_ADV_FAILED;
     }
 
     if (event_mask & CHIP_BLE_KW_EVNT_ADV_FAILED)
     {
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+        PWR_AllowDeviceToSleep();
+#endif
         return BLE_E_START_ADV_FAILED;
     }
 
-#if cPWR_UsePowerDownMode
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     PWR_AllowDeviceToSleep();
 #endif
 
@@ -890,7 +908,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         ChipDeviceEvent advChange;
         advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
         advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-        PlatformMgr().PostEvent(&advChange);
+        err                                        = PlatformMgr().PostEvent(&advChange);
     }
 
     return err;
@@ -899,6 +917,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     ble_err_t err;
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
     if (mFlags.Has(Flags::kAdvertising))
     {
@@ -918,13 +937,13 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
                 ChipDeviceEvent advChange;
                 advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
                 advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-                PlatformMgr().PostEvent(&advChange);
+                error                                      = PlatformMgr().PostEvent(&advChange);
             }
         }
     }
     CancelBleAdvTimeoutTimer();
 
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 void BLEManagerImpl::DriveBLEState(void)
@@ -1056,7 +1075,7 @@ void BLEManagerImpl::HandleConnectionCloseEvent(blekw_msg_t * msg)
         event.CHIPoBLEConnectionError.ConId  = device_id_loc;
         event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
 
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
         mFlags.Set(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -1130,7 +1149,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(blekw_msg_t * msg)
             {
                 event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
                 event.CHIPoBLESubscribe.ConId = att_wr_data->device_id;
-                PlatformMgr().PostEvent(&event);
+                err                           = PlatformMgr().PostEvent(&event);
             }
         }
     }
@@ -1139,7 +1158,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(blekw_msg_t * msg)
         bleConnState->subscribed      = 0;
         event.Type                    = DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = att_wr_data->device_id;
-        PlatformMgr().PostEvent(&event);
+        err                           = PlatformMgr().PostEvent(&event);
     }
 
 exit:
@@ -1177,7 +1196,7 @@ void BLEManagerImpl::HandleRXCharWrite(blekw_msg_t * msg)
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = att_wr_data->device_id;
         event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
-        PlatformMgr().PostEvent(&event);
+        err                               = PlatformMgr().PostEvent(&event);
     }
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1262,6 +1281,9 @@ void BLEManagerImpl::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionE
     {
         /* Notify App Task that the BLE is connected now */
         (void) blekw_msg_add_u8(BLE_KW_MSG_CONNECTED, (uint8_t) deviceId);
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+        PWR_AllowDeviceToSleep();
+#endif
     }
     else if (pConnectionEvent->eventType == gConnEvtDisconnected_c)
     {
@@ -1269,6 +1291,14 @@ void BLEManagerImpl::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionE
 
         /* Notify App Task that the BLE is disconnected now */
         (void) blekw_msg_add_u8(BLE_KW_MSG_DISCONNECTED, (uint8_t) deviceId);
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+        if (bleAppStopInProgress == TRUE)
+        {
+            bleAppStopInProgress = FALSE;
+            PWR_AllowDeviceToSleep();
+        }
+#endif
     }
     else if (pConnectionEvent->eventType == gConnEvtPairingRequest_c)
     {
@@ -1285,7 +1315,9 @@ void BLEManagerImpl::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionE
 /* Called by BLE when a connect is received */
 void BLEManagerImpl::BLE_SignalFromISRCallback(void)
 {
-    /* TODO: Low Power */
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    PWR_DisallowDeviceToSleep();
+#endif /* cPWR_UsePowerDownMode */
 }
 
 void BLEManagerImpl::blekw_connection_timeout_cb(TimerHandle_t timer)
@@ -1553,6 +1585,26 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
     {
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
+}
+
+bool BLEManagerImpl::blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId)
+{
+    ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
+
+    if (Gap_Disconnect(conId) != gBleSuccess_c)
+    {
+        ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
+        return false;
+    }
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    else
+    {
+        bleAppStopInProgress = TRUE;
+        PWR_DisallowDeviceToSleep();
+    }
+#endif
+
+    return true;
 }
 
 } // namespace Internal

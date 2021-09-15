@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include <core/CHIPCore.h>
-#include <core/PeerId.h>
 #include <inet/IPAddress.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/PeerId.h>
 #include <lib/mdns/Advertiser.h>
 #include <lib/mdns/Resolver.h>
 #include <lib/mdns/platform/Mdns.h>
@@ -43,7 +43,7 @@ public:
     void OnNodeIdResolved(const Mdns::ResolvedNodeData & nodeData) override
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\n",
-                        ChipLogValueX64(nodeData.mPeerId.GetFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
+                        ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
         streamer_printf(streamer_get(), "   Hostname: %s\n", nodeData.mHostName);
         streamer_printf(streamer_get(), "   IP address: %s\n", nodeData.mAddress.ToString(ipAddressBuf));
         streamer_printf(streamer_get(), "   Port: %" PRIu16 "\n", nodeData.mPort);
@@ -82,7 +82,6 @@ public:
         streamer_printf(streamer_get(), "   Device type: %" PRIu16 "\n", nodeData.deviceType);
         streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.deviceName);
         streamer_printf(streamer_get(), "   Commissioning mode: %d\n", static_cast<int>(nodeData.commissioningMode));
-        streamer_printf(streamer_get(), "   Additional pairing: %d\n", static_cast<int>(nodeData.additionalPairing));
         streamer_printf(streamer_get(), "   Pairing hint: %" PRIu16 "\n", nodeData.pairingHint);
         streamer_printf(streamer_get(), "   Pairing instruction: %s\n", nodeData.pairingInstruction);
         streamer_printf(streamer_get(), "   Rotating ID %s\n", rotatingId);
@@ -119,7 +118,7 @@ CHIP_ERROR ResolveHandler(int argc, char ** argv)
     streamer_printf(streamer_get(), "Resolving ...\n");
 
     PeerId peerId;
-    peerId.SetFabricId(strtoull(argv[0], NULL, 10));
+    peerId.SetCompressedFabricId(strtoull(argv[0], NULL, 10));
     peerId.SetNodeId(strtoull(argv[1], NULL, 10));
 
     return Mdns::Resolver::Instance().ResolveNodeId(peerId, Inet::kIPAddressType_Any);
@@ -158,9 +157,6 @@ bool ParseSubType(int argc, char ** argv, Mdns::DiscoveryFilter & filter)
         break;
     case 'C':
         filterType = Mdns::DiscoveryFilterType::kCommissioningMode;
-        break;
-    case 'A':
-        filterType = Mdns::DiscoveryFilterType::kCommissioningModeFromCommand;
         break;
     default:
         return false;

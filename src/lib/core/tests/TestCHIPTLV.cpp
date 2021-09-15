@@ -26,19 +26,19 @@
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
-#include <core/CHIPCircularTLVBuffer.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVData.hpp>
-#include <core/CHIPTLVDebug.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPCircularTLVBuffer.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVData.hpp>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
 
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
-#include <support/ScopedBuffer.h>
-#include <support/UnitTestRegistration.h>
-#include <support/UnitTestUtils.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/UnitTestUtils.h>
 
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -1967,7 +1967,7 @@ void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
 
     ReadEncoding1(inSuite, reader);
 
-    reader.Init(buf.Retain(), buf->MaxDataLength());
+    reader.Init(buf.Retain());
     reader.ImplicitProfileId = TestProfile_2;
 
     ReadEncoding1(inSuite, reader);
@@ -2477,7 +2477,6 @@ void CheckCHIPTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
  */
 void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
 {
-    System::PacketBufferTLVWriter writer;
     System::PacketBufferTLVReader reader;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
@@ -2485,25 +2484,34 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
     uint16_t reserve = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
 
     // Repeatedly write and read a TLV encoding to a chain of PacketBuffers. Use progressively larger
-    // and larger amounts of space in the first buffer to force the encoding/decoding to overlap the
+    // and larger amounts of space in the first buffer to force the encoding to overlap the
     // end of the buffer and the beginning of the next.
     for (; reserve < maxDataLen; reserve++)
     {
         buf->SetStart(buf->Start() + reserve);
 
-        writer.Init(buf.Retain(), /* useChainedBuffers = */ true);
-        writer.ImplicitProfileId = TestProfile_2;
+        {
+            System::PacketBufferTLVWriter writer;
+            // Scope for writer because we want it to go out of scope before we
+            // mess with the chain after writing is done.
+            writer.Init(buf.Retain(), /* useChainedBuffers = */ true);
+            writer.ImplicitProfileId = TestProfile_2;
 
-        WriteEncoding1(inSuite, writer);
+            WriteEncoding1(inSuite, writer);
+        }
 
         TestBufferContents(inSuite, buf, Encoding1, sizeof(Encoding1));
 
-        reader.Init(buf.Retain(), /* useChainedBuffers = */ true);
+        // Compact the buffer, since we don't allow reading from chained
+        // buffers.
+        buf->CompactHead();
+
+        reader.Init(buf.Retain());
         reader.ImplicitProfileId = TestProfile_2;
 
         ReadEncoding1(inSuite, reader);
 
-        buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+        buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
     }
 }
 
@@ -3013,7 +3021,7 @@ void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
 void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
 {
     CHIP_ERROR err;
-    uint8_t buf[2048];
+    uint8_t buf[2048] = { 0 };
     TLVReader reader;
 
     reader.Init(buf);
@@ -3812,6 +3820,188 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void AssertCanReadString(nlTestSuite * inSuite, ContiguousBufferTLVReader & reader, const char * expectedString)
+{
+    Span<const char> str;
+    CHIP_ERROR err = reader.GetStringView(str);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, str.size() == strlen(expectedString));
+    NL_TEST_ASSERT(inSuite, strncmp(str.data(), expectedString, str.size()) == 0);
+}
+
+static void AssertCannotReadString(nlTestSuite * inSuite, ContiguousBufferTLVReader & reader)
+{
+    Span<const char> str;
+    CHIP_ERROR err = reader.GetStringView(str);
+    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+}
+
+static void CheckGetStringView(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t buf[256];
+    const char testString[] = "This is a test";
+    {
+        TLVWriter writer;
+        writer.Init(buf);
+        CHIP_ERROR err = writer.PutString(CommonTag(0), testString);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        // First check that basic read from entire buffer works.
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf);
+        reader.Next();
+        AssertCanReadString(inSuite, reader, testString);
+
+        // Now check that read from a buffer bounded by the number of bytes
+        // written works.
+        reader.Init(buf, writer.GetLengthWritten());
+        reader.Next();
+        AssertCanReadString(inSuite, reader, testString);
+
+        // Now check that read from a buffer bounded by fewer than the number of
+        // bytes written fails.
+        reader.Init(buf, writer.GetLengthWritten() - 1);
+        reader.Next();
+        AssertCannotReadString(inSuite, reader);
+    }
+
+    {
+        // Check that an integer cannot be read as a string.
+        TLVWriter writer;
+        writer.Init(buf);
+        CHIP_ERROR err = writer.Put(CommonTag(0), static_cast<uint8_t>(5));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf);
+        reader.Next();
+        AssertCannotReadString(inSuite, reader);
+    }
+
+    {
+        // Check that an octet string cannot be read as a string.
+        TLVWriter writer;
+        writer.Init(buf);
+        CHIP_ERROR err =
+            writer.PutBytes(CommonTag(0), reinterpret_cast<const uint8_t *>(testString), static_cast<uint32_t>(strlen(testString)));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf);
+        reader.Next();
+        AssertCannotReadString(inSuite, reader);
+    }
+
+    {
+        // Check that a manually constructed string can be read as a string.
+        const uint8_t shortString[] = { CHIP_TLV_UTF8_STRING_2ByteLength(CHIP_TLV_TAG_COMMON_PROFILE_2Bytes(0), 2, 'a', 'b') };
+        ContiguousBufferTLVReader reader;
+        reader.Init(shortString);
+        reader.Next();
+        AssertCanReadString(inSuite, reader, "ab");
+    }
+
+    {
+        // Check that a manually constructed string with bogus length cannot be read as a string.
+        const uint8_t shortString[] = { CHIP_TLV_UTF8_STRING_2ByteLength(CHIP_TLV_TAG_COMMON_PROFILE_2Bytes(0), 3, 'a', 'b') };
+        ContiguousBufferTLVReader reader;
+        reader.Init(shortString);
+        reader.Next();
+        AssertCannotReadString(inSuite, reader);
+    }
+}
+
+static void AssertCanReadBytes(nlTestSuite * inSuite, ContiguousBufferTLVReader & reader, const ByteSpan & expectedBytes)
+{
+    ByteSpan bytes;
+    CHIP_ERROR err = reader.GetByteView(bytes);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, bytes.data_equal(expectedBytes));
+}
+
+static void AssertCannotReadBytes(nlTestSuite * inSuite, ContiguousBufferTLVReader & reader)
+{
+    ByteSpan bytes;
+    CHIP_ERROR err = reader.GetByteView(bytes);
+    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+}
+
+static void CheckGetByteView(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t buf[256];
+    const uint8_t testBytes[] = { 'T', 'h', 'i', 's', 'i', 's', 'a', 't', 'e', 's', 't', '\0' };
+    {
+        TLVWriter writer;
+        writer.Init(buf);
+        CHIP_ERROR err = writer.PutBytes(CommonTag(0), testBytes, sizeof(testBytes));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        // First check that basic read from entire buffer works.
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf);
+        reader.Next();
+        AssertCanReadBytes(inSuite, reader, ByteSpan(testBytes));
+
+        // Now check that read from a buffer bounded by the number of bytes
+        // written works.
+        reader.Init(buf, writer.GetLengthWritten());
+        reader.Next();
+        AssertCanReadBytes(inSuite, reader, ByteSpan(testBytes));
+
+        // Now check that read from a buffer bounded by fewer than the number of
+        // bytes written fails.
+        reader.Init(buf, writer.GetLengthWritten() - 1);
+        reader.Next();
+        AssertCannotReadBytes(inSuite, reader);
+    }
+
+    {
+        // Check that an integer cannot be read as an octet string.
+        TLVWriter writer;
+        writer.Init(buf);
+        CHIP_ERROR err = writer.Put(CommonTag(0), static_cast<uint8_t>(5));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf);
+        reader.Next();
+        AssertCannotReadBytes(inSuite, reader);
+    }
+
+    {
+        // Check that an string cannot be read as an octet string.
+        TLVWriter writer;
+        writer.Init(buf);
+        CHIP_ERROR err = writer.PutString(CommonTag(0), reinterpret_cast<const char *>(testBytes));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        ContiguousBufferTLVReader reader;
+        reader.Init(buf);
+        reader.Next();
+        AssertCannotReadBytes(inSuite, reader);
+    }
+
+    {
+        // Check that a manually constructed octet string can be read as octet string.
+        const uint8_t shortBytes[] = { CHIP_TLV_BYTE_STRING_2ByteLength(CHIP_TLV_TAG_COMMON_PROFILE_2Bytes(0), 2, 1, 2) };
+        ContiguousBufferTLVReader reader;
+        reader.Init(shortBytes);
+        reader.Next();
+        const uint8_t expectedBytes[] = { 1, 2 };
+        AssertCanReadBytes(inSuite, reader, ByteSpan(expectedBytes));
+    }
+
+    {
+        // Check that a manually constructed octet string with bogus length
+        // cannot be read as an octet string.
+        const uint8_t shortBytes[] = { CHIP_TLV_BYTE_STRING_2ByteLength(CHIP_TLV_TAG_COMMON_PROFILE_2Bytes(0), 3, 1, 2) };
+        ContiguousBufferTLVReader reader;
+        reader.Init(shortBytes);
+        reader.Next();
+        AssertCannotReadBytes(inSuite, reader);
+    }
+}
+
 // Test Suite
 
 /**
@@ -3842,6 +4032,8 @@ static const nlTest sTests[] =
     NL_TEST_DEF("CHIP TLV ByteSpan",                   CheckCHIPTLVByteSpan),
     NL_TEST_DEF("CHIP TLV Check reserve",              CheckCloseContainerReserve),
     NL_TEST_DEF("CHIP TLV Reader Fuzz Test",           TLVReaderFuzzTest),
+    NL_TEST_DEF("CHIP TLV GetStringView Test",         CheckGetStringView),
+    NL_TEST_DEF("CHIP TLV GetByteView Test",           CheckGetByteView),
 
     NL_TEST_SENTINEL()
 };

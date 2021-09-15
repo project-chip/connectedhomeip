@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <app/common/gen/af-structs.h>
+#include <app-common/zap-generated/af-structs.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <string>
 #include <vector>
 
@@ -28,5 +28,5 @@ class MediaInputManager
 {
 public:
     CHIP_ERROR Init();
-    std::vector<EmberAfMediaInputInfo> proxyGetInputList();
+    std::vector<MediaInputInfo> proxyGetInputList();
 };

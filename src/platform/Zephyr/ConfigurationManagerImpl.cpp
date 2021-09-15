@@ -26,15 +26,15 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
-#include <core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/Zephyr/ZephyrConfig.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 #include <platform/internal/FactoryProvisioning.cpp>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <power/reboot.h>
 
@@ -90,10 +90,10 @@ void ConfigurationManagerImpl::_InitiateFactoryReset()
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     ChipLogProgress(DeviceLayer, "Performing factory reset");
-    const CHIP_ERROR err = FactoryResetConfig();
+    const CHIP_ERROR err = PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
 
     if (err != CHIP_NO_ERROR)
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Factory reset failed: %s", ErrorStr(err));
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     ThreadStackMgr().ErasePersistentInfo();

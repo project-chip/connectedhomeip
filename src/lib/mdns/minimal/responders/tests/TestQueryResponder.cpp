@@ -14,13 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <mdns/minimal/responders/QueryResponder.h>
+#include <lib/mdns/minimal/responders/QueryResponder.h>
 
 #include <vector>
 
-#include <mdns/minimal/records/Ptr.h>
+#include <lib/mdns/minimal/records/Ptr.h>
 
-#include <support/UnitTestRegistration.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

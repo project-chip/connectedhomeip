@@ -27,6 +27,8 @@ static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "CommissionManager.cpp",
+    "CommissionManager.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
     "Mdns.cpp",
@@ -37,8 +39,6 @@ static_library("server") {
     "RendezvousServer.h",
     "Server.cpp",
     "Server.h",
-    "StorablePeerConnection.cpp",
-    "StorablePeerConnection.h",
   ]
 
   public_configs = [ ":server_config" ]

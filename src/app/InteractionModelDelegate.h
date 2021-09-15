@@ -25,8 +25,8 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ClusterInfo.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/Constants.h>
@@ -40,6 +40,7 @@ static constexpr uint32_t kImMessageTimeoutMsec = 12000;
 class ReadClient;
 class WriteClient;
 class CommandSender;
+class ReadHandler;
 
 /**
  * @brief
@@ -97,7 +98,7 @@ public:
      *                            fail to process report data.
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
-    virtual CHIP_ERROR ReportError(const ReadClient * apReadClient, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR ReadError(const ReadClient * apReadClient, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     /**
      * Notification that a Command Send has received an Invoke Command Response containing a status code.
@@ -194,6 +195,25 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    /**
+     * Notification that a Subscribe Response has been processed and application can do further work .
+     */
+    virtual CHIP_ERROR SubscribeResponseProcessed(const ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that Subscription has been established successfully and application can do further work in handler.
+     */
+    virtual CHIP_ERROR SubscriptionEstablished(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that a read interaction was completed on the client successfully.
+     * @param[in]  apReadClient  A current read client which can identify the read client to the consumer, particularly
+     * during multiple read interactions
+     * @param[in]  aError  notify final error regarding the current read interaction
+     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
+     */
+    virtual CHIP_ERROR ReadDone(const ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     virtual ~InteractionModelDelegate() = default;
 };

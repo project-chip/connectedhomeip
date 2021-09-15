@@ -35,9 +35,9 @@
 #include "sl_bt_stack_init.h"
 #include "timers.h"
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/EFR32/freertos_bluetooth.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 using namespace ::chip;
 using namespace ::chip::Ble;
 
@@ -159,7 +159,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     sl_status_t ret;
 
     // Initialize the CHIP BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
     memset(mBleConnections, 0, sizeof(mBleConnections));
@@ -423,7 +423,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLESubscribe");
         HandleSubscribeReceived(event->CHIPoBLESubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         connEstEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-        PlatformMgr().PostEvent(&connEstEvent);
+        PlatformMgr().PostEventOrDie(&connEstEvent);
     }
     break;
 
@@ -523,7 +523,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     {
         event.Type                        = DeviceEventType::kCHIPoBLENotifyConfirm;
         event.CHIPoBLENotifyConfirm.ConId = conId;
-        PlatformMgr().PostEvent(&event);
+        err                               = PlatformMgr().PostEvent(&event);
     }
 
 exit:
@@ -722,8 +722,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
     CHIP_ERROR err;
     sl_status_t ret;
-    const uint8_t kResolvableRandomAddrType = 2; // Private resolvable random address type
-    bd_addr unusedBdAddr;                        // We can ignore this field when setting random address.
     uint32_t interval_min;
     uint32_t interval_max;
     uint32_t BleAdvTimeoutMs;
@@ -734,18 +732,24 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     // If already advertising, stop it, before changing values
     if (mFlags.Has(Flags::kAdvertising))
     {
-        sl_bt_advertiser_stop(sInstance.advertising_set_handle);
+        sl_bt_advertiser_stop(advertising_set_handle);
     }
     else
     {
         ChipLogDetail(DeviceLayer, "Start BLE advertissement");
     }
 
-    err = ConfigureAdvertisingData();
-    SuccessOrExit(err);
-
+#ifndef EFR32MG24
+    // set_random_address call causes problems with MG24 family.
+    // Todo fix in GSDK.
+    const uint8_t kResolvableRandomAddrType = 2; // Private resolvable random address type
+    bd_addr unusedBdAddr;                        // We can ignore this field when setting random address.
     sl_bt_advertiser_set_random_address(advertising_set_handle, kResolvableRandomAddrType, unusedBdAddr, &unusedBdAddr);
     (void) unusedBdAddr;
+#endif
+
+    err = ConfigureAdvertisingData();
+    SuccessOrExit(err);
 
     mFlags.Clear(Flags::kRestartAdvertising);
 
@@ -877,7 +881,7 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
 
         ChipLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", connHandle, conn_evt->reason);
 
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
 
         // Arrange to re-enable connectable advertising in case it was disabled due to the
         // maximum connection limit being reached.
@@ -927,7 +931,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(volatile sl_bt_msg_t * evt)
             {
                 event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
                 event.CHIPoBLESubscribe.ConId = evt->data.evt_gatt_server_user_write_request.connection;
-                PlatformMgr().PostEvent(&event);
+                err                           = PlatformMgr().PostEvent(&event);
             }
         }
     }
@@ -936,7 +940,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(volatile sl_bt_msg_t * evt)
         bleConnState->subscribed      = 0;
         event.Type                    = DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = evt->data.evt_gatt_server_user_write_request.connection;
-        PlatformMgr().PostEvent(&event);
+        err                           = PlatformMgr().PostEvent(&event);
     }
 
 exit:
@@ -966,7 +970,7 @@ void BLEManagerImpl::HandleRXCharWrite(volatile sl_bt_msg_t * evt)
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = evt->data.evt_gatt_server_user_write_request.connection;
         event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
-        PlatformMgr().PostEvent(&event);
+        err                               = PlatformMgr().PostEvent(&event);
     }
 
 exit:
@@ -992,7 +996,7 @@ void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
 
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleSoftTimerEvent(volatile sl_bt_msg_t * evt)
@@ -1007,7 +1011,7 @@ void BLEManagerImpl::HandleSoftTimerEvent(volatile sl_bt_msg_t * evt)
         event.CHIPoBLEConnectionError.ConId                          = mIndConfId[evt->data.evt_system_soft_timer.handle];
         sInstance.mIndConfId[evt->data.evt_system_soft_timer.handle] = kUnusedIndex;
         event.CHIPoBLEConnectionError.Reason                         = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
     }
 }
 

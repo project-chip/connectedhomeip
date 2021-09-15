@@ -33,15 +33,15 @@
 #include <inttypes.h>
 #include <stddef.h>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
-#include <support/CHIPFaultInjection.h>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 using namespace chip::Encoding;
 using namespace chip::Inet;
@@ -224,7 +224,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             }
 
             // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
+            ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
             found = true;
             return false;
         }
@@ -290,7 +290,14 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
 
-        CHIP_ERROR err = ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
+        if (ec->IsEncryptionRequired() != packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
+        {
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
+            ec->Close();
+            return;
+        }
+
+        CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.
@@ -315,7 +322,7 @@ void ExchangeManager::OnConnectionExpired(SessionHandle session)
     }
 
     mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->mSecureSession == session)
+        if (ec->mSecureSession.HasValue() && ec->mSecureSession.Value() == session)
         {
             ec->OnConnectionExpired();
             // Continue to iterate because there can be multiple exchanges

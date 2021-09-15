@@ -32,7 +32,7 @@
 
 #include <inet/InetConfig.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <system/SystemError.h>
 
 #define CHIP_INET_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kInet, (e))

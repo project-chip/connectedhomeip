@@ -34,12 +34,6 @@ namespace Transport {
 class SessionMessageCounter
 {
 public:
-    void Reset()
-    {
-        mLocalMessageCounter.Reset();
-        mPeerMessageCounter.Reset();
-    }
-
     MessageCounter & GetLocalMessageCounter() { return mLocalMessageCounter; }
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 

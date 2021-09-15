@@ -29,8 +29,8 @@
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
 #include <ble/BleUUID.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/BlePlatformDelegate.h>
-#include <support/logging/CHIPLogging.h>
 
 #import "UUIDHelper.h"
 

@@ -63,6 +63,6 @@ void P6Log(const char * aFormat, ...);
 #ifdef __cplusplus
 }
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 void appError(CHIP_ERROR error);
 #endif

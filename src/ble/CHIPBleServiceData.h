@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
 
 namespace chip {
 namespace Ble {

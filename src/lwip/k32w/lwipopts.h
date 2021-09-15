@@ -55,9 +55,14 @@
 
 #define LWIP_SOCKET 0
 
-// TODO: seems like this is unnecessary on Thread-only platforms
-#define LWIP_RAW 1
-#define MEMP_NUM_RAW_PCB (5)
+#define LWIP_RAW 0
+#define MEMP_NUM_RAW_PCB 0
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#define LWIP_TCP 1
+#else
+#define LWIP_TCP 0
+#define MEMP_NUM_TCP_PCB 0
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 // TODO: verify count
 #define MEMP_NUM_UDP_PCB (7)
@@ -94,7 +99,7 @@
 #define MEMP_SEPARATE_POOLS (1)
 #define LWIP_PBUF_FROM_CUSTOM_POOLS (0)
 #define MEMP_USE_CUSTOM_POOLS (0)
-#define PBUF_POOL_SIZE (8)
+#define PBUF_POOL_SIZE (6)
 #define PBUF_POOL_BUFSIZE (1280)
 #define PBUF_CUSTOM_POOL_IDX_START (MEMP_PBUF_POOL_SMALL)
 #define PBUF_CUSTOM_POOL_IDX_END (MEMP_PBUF_POOL_LARGE)
@@ -126,7 +131,7 @@
 
 // TODO: make LWIP_DEBUG conditional on build type
 
-#define LWIP_DEBUG 1
+#define LWIP_DEBUG 0
 #define MEMP_OVERFLOW_CHECK (0)
 #define MEMP_SANITY_CHECK (0)
 #define MEM_DEBUG (LWIP_DBG_OFF)

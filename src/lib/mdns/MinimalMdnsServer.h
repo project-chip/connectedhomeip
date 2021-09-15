@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #pragma once
-#include <mdns/minimal/Server.h>
+#include <lib/mdns/minimal/Server.h>
 
 namespace chip {
 namespace Mdns {
@@ -90,6 +90,7 @@ public:
 
     /// Calls Server().Listen() on all available interfaces
     CHIP_ERROR StartServer(chip::Inet::InetLayer * inetLayer, uint16_t port);
+    void ShutdownServer();
 
     void SetQueryDelegate(MdnsPacketDelegate * delegate) { mQueryDelegate = delegate; }
     void SetResponseDelegate(MdnsPacketDelegate * delegate) { mResponseDelegate = delegate; }

@@ -27,8 +27,8 @@
 
 #include <inet/InetConfig.h>
 
-#include <support/BitFlags.h>
-#include <support/DLLUtil.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/DLLUtil.h>
 #include <system/SystemObject.h>
 
 #include <stdint.h>

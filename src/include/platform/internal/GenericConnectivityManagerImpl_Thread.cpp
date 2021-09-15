@@ -25,9 +25,9 @@
 #ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_CPP
 #define GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_CPP
 
+#include <lib/support/CodeUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -109,7 +109,11 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity
             event.ServiceConnectivityChange.ViaThread.Result =
                 (haveServiceConnectivity) ? kConnectivity_Established : kConnectivity_Lost;
             event.ServiceConnectivityChange.Overall.Result = event.ServiceConnectivityChange.ViaThread.Result;
-            PlatformMgr().PostEvent(&event);
+            CHIP_ERROR status                              = PlatformMgr().PostEvent(&event);
+            if (status != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to post thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+            }
         }
     }
 }

@@ -190,7 +190,8 @@ private:
      * processing, the event might get dispatched (on the work item processing
      * thread) before PostEvent returns.
      */
-    void PostEvent(const ChipDeviceEvent * event);
+    [[nodiscard]] CHIP_ERROR PostEvent(const ChipDeviceEvent * event);
+    void PostEventOrDie(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
     CHIP_ERROR StartChipTimer(uint32_t durationMS);
 
@@ -354,9 +355,16 @@ inline void PlatformManager::UnlockChipStack()
     static_cast<ImplClass *>(this)->_UnlockChipStack();
 }
 
-inline void PlatformManager::PostEvent(const ChipDeviceEvent * event)
+inline CHIP_ERROR PlatformManager::PostEvent(const ChipDeviceEvent * event)
 {
-    static_cast<ImplClass *>(this)->_PostEvent(event);
+    return static_cast<ImplClass *>(this)->_PostEvent(event);
+}
+
+inline void PlatformManager::PostEventOrDie(const ChipDeviceEvent * event)
+{
+    CHIP_ERROR status = static_cast<ImplClass *>(this)->_PostEvent(event);
+    VerifyOrDieWithMsg(status == CHIP_NO_ERROR, DeviceLayer, "Failed to post event %d: %" CHIP_ERROR_FORMAT,
+                       static_cast<int>(event->Type), status.Format());
 }
 
 inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)

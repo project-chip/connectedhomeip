@@ -39,16 +39,16 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/binding-table.h>
 #include <app/util/common.h>
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #include <system/SystemLayer.h>
 
 using namespace chip;
@@ -692,53 +692,6 @@ EmberStatus emAfPluginReportingRemoveEntry(uint8_t index)
         status = EMBER_SUCCESS;
     }
     return status;
-}
-
-void emberAfReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                             uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
-{
-    uint8_t i;
-    for (i = 0; i < REPORT_TABLE_SIZE; i++)
-    {
-        EmberAfPluginReportingEntry entry;
-        emAfPluginReportingGetEntry(i, &entry);
-        if (entry.endpoint == EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID)
-        {
-            continue;
-        }
-        if (entry.direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED && entry.endpoint == endpoint &&
-            entry.clusterId == clusterId && entry.attributeId == attributeId && entry.mask == mask &&
-            entry.manufacturerCode == manufacturerCode)
-        {
-            // For CHAR and OCTET strings, the string value may be too long to fit into the
-            // lastReportValue field (EmberAfDifferenceType), so instead we save the string's
-            // hash, and detect changes in string value based on unequal hash.
-            uint32_t stringHash = 0;
-            uint8_t dataSize    = emberAfGetDataSize(type);
-            uint8_t * dataRef   = data;
-            if (type == ZCL_OCTET_STRING_ATTRIBUTE_TYPE || type == ZCL_CHAR_STRING_ATTRIBUTE_TYPE)
-            {
-                stringHash = computeStringHash(data + 1, emberAfStringLength(data));
-                dataRef    = (uint8_t *) &stringHash;
-                dataSize   = sizeof(stringHash);
-            }
-            // If we are reporting this particular attribute, we only care whether
-            // the new value meets the reportable change criteria.  If it does, we
-            // mark the entry as ready to report and reschedule the tick.  Whether
-            // the tick will be scheduled for immediate or delayed execution depends
-            // on the minimum reporting interval.  This is handled in the scheduler.
-            EmberAfDifferenceType difference =
-                emberAfGetDifference(dataRef, emAfPluginReportVolatileData[i].lastReportValue, dataSize);
-            uint8_t analogOrDiscrete = emberAfGetAttributeAnalogOrDiscreteType(type);
-            if ((analogOrDiscrete == EMBER_AF_DATA_TYPE_DISCRETE && difference != 0) ||
-                (analogOrDiscrete == EMBER_AF_DATA_TYPE_ANALOG && entry.data.reported.reportableChange <= difference))
-            {
-                emAfPluginReportVolatileData[i].reportableChange = true;
-                scheduleTick();
-            }
-            break;
-        }
-    }
 }
 
 bool emAfPluginReportingDoEntriesMatch(const EmberAfPluginReportingEntry * const entry1,

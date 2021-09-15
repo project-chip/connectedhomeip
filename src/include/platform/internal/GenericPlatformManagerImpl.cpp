@@ -33,13 +33,17 @@
 #include <platform/internal/EventLogging.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
+
 namespace Internal {
+
+extern chip::System::Layer * gSystemLayer;
+extern chip::System::LayerImpl gSystemLayerImpl;
 
 extern CHIP_ERROR InitEntropy();
 
@@ -56,7 +60,12 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     // Arrange for Device Layer errors to be translated to text.
     RegisterDeviceLayerErrorFormatter();
 
-    // TODO Initialize the source used by CHIP to get secure random data.
+    err = InitEntropy();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Entropy initialization failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
 
     err = ConfigurationMgr().Init();
     if (err != CHIP_NO_ERROR)
@@ -66,8 +75,11 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP system layer.
-    new (&SystemLayer) System::Layer();
-    err = SystemLayer.Init();
+    if (gSystemLayer == nullptr)
+    {
+        gSystemLayer = &gSystemLayerImpl;
+    }
+    err = gSystemLayer->Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
@@ -75,8 +87,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP Inet layer.
-    new (&InetLayer) Inet::InetLayer();
-    err = InetLayer.Init(SystemLayer, nullptr);
+    err = InetLayer.Init(*gSystemLayer, nullptr);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));
@@ -134,7 +145,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 #endif
 
     ChipLogError(DeviceLayer, "System Layer shutdown");
-    err = SystemLayer.Shutdown();
+    err = gSystemLayer->Shutdown();
 
     return err;
 }
@@ -196,7 +207,11 @@ void GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFun
     event.CallWorkFunct.WorkFunct = workFunct;
     event.CallWorkFunct.Arg       = arg;
 
-    Impl()->PostEvent(&event);
+    CHIP_ERROR status = Impl()->PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, status.Format());
+    }
 }
 
 template <class ImplClass>
@@ -213,7 +228,7 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         break;
 
     case DeviceEventType::kChipSystemLayerEvent:
-        // If the event is a CHIP System or Inet Layer event, deliver it to the SystemLayer event handler.
+        // If the event is a CHIP System or Inet Layer event, deliver it to the System::Layer event handler.
         Impl()->DispatchEventToSystemLayer(event);
         break;
 
@@ -249,13 +264,14 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const ChipDeviceEvent * event)
 {
-    // TODO(#788): remove ifdef LWIP once SystemLayer event APIs are generally available
+    // TODO(#788): remove ifdef LWIP once System::Layer event APIs are generally available
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Invoke the System Layer's event handler function.
-    err = SystemLayer.WatchableEventsManager().HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
-                                                           event->ChipSystemLayerEvent.Argument);
+    err = static_cast<System::LayerImplLwIP &>(SystemLayer())
+              .HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
+                           event->ChipSystemLayerEvent.Argument);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s", event->Type, ErrorStr(err));

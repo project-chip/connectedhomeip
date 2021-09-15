@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 
 #include <ChipShellCollection.h>
 

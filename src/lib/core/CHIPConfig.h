@@ -1813,17 +1813,6 @@
 #endif
 
 /**
- *  @def CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
- *
- *  @brief
- *    If asserted (1), enable logging of errors at function exit via the
- *    ChipLogFunctError() macro.
- */
-#ifndef CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-#define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 0
-#endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-
-/**
  *  @def CHIP_CONFIG_ENABLE_CONDITION_LOGGING
  *
  *  @brief
@@ -2263,6 +2252,18 @@
 #endif // CHIP_CONFIG_ENABLE_IFJ_SERVICE_FABRIC_JOIN
 
 /**
+ * @def CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+ *
+ * @brief Define the size of the pool used for tracking CHIP unauthenticated
+ * states. The entries in the pool are automatically rotated by LRU. The size
+ * of the pool limits how many PASE and CASE pairing sessions can be processed
+ * simultaneously.
+ */
+#ifndef CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+#define CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE 4
+#endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+
+/**
  * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking CHIP
@@ -2359,6 +2360,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MDNS_CACHE_SIZE
+ *
+ * @brief
+ *      Define the size of the MDNS cache
+ *
+ *      If CHIP_CONFIG_MDNS_CACHE_SIZE is 0, the builtin cache is not used.
+ *
+ */
+#ifndef CHIP_CONFIG_MDNS_CACHE_SIZE
+#define CHIP_CONFIG_MDNS_CACHE_SIZE 20
+#endif
+/**
  *  @name Interaction Model object pool configuration.
  *
  *  @brief
@@ -2446,6 +2459,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+ *
+ * @brief Defines the object pool for allocating attribute path for subscription in device controller.
+ */
+#ifndef CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+#define CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE CHIP_IM_MAX_NUM_READ_CLIENT
 #endif
 
 /**

@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <vector>
 
 class ClusterManager

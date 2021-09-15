@@ -129,3 +129,6 @@ EmberStatus emberAfClearReportTableCallback(void);
  */
 void emberAfReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                              uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data);
+void InteractionModelReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                      chip::AttributeId attributeId, uint8_t mask, uint16_t manufacturerCode,
+                                                      EmberAfAttributeType type, uint8_t * data);

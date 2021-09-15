@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

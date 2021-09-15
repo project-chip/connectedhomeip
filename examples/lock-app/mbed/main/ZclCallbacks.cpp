@@ -16,14 +16,14 @@
  *    limitations under the License.
  */
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "AppTask.h"
 #include "BoltLockManager.h"
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 

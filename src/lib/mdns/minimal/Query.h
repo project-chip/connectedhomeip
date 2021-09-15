@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <support/BufferWriter.h>
+#include <lib/support/BufferWriter.h>
 
-#include <mdns/minimal/core/Constants.h>
-#include <mdns/minimal/core/QName.h>
+#include <lib/mdns/minimal/core/Constants.h>
+#include <lib/mdns/minimal/core/QName.h>
 
 namespace mdns {
 namespace Minimal {

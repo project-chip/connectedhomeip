@@ -17,8 +17,8 @@
 
 #include "MessagingContext.h"
 
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
 
 namespace chip {
 namespace Test {
@@ -37,11 +37,12 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
-                                                      SecureSession::SessionRole::kInitiator, mSrcFabricIndex));
+    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mAliceAddress), GetAliceNodeId(),
+                                                      &mPairingBobToAlice, SecureSession::SessionRole::kInitiator,
+                                                      mSrcFabricIndex));
 
-    return mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal, SecureSession::SessionRole::kResponder,
-                                        mDestFabricIndex);
+    return mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mBobAddress), GetBobNodeId(), &mPairingAliceToBob,
+                                        SecureSession::SessionRole::kResponder, mDestFabricIndex);
 }
 
 // Shutdown all layers, finalize operations
@@ -55,28 +56,38 @@ CHIP_ERROR MessagingContext::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-SessionHandle MessagingContext::GetSessionLocalToPeer()
+SessionHandle MessagingContext::GetSessionBobToAlice()
 {
     // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
-    return SessionHandle(GetDestinationNodeId(), GetLocalKeyId(), GetPeerKeyId(), GetFabricIndex());
+    return SessionHandle(GetAliceNodeId(), GetBobKeyId(), GetAliceKeyId(), GetFabricIndex());
 }
 
-SessionHandle MessagingContext::GetSessionPeerToLocal()
+SessionHandle MessagingContext::GetSessionAliceToBob()
 {
     // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
-    return SessionHandle(GetSourceNodeId(), GetPeerKeyId(), GetLocalKeyId(), mDestFabricIndex);
+    return SessionHandle(GetBobNodeId(), GetAliceKeyId(), GetBobKeyId(), mDestFabricIndex);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext(GetSessionLocalToPeer(), delegate);
+    return mExchangeManager.NewContext(mSecureSessionMgr.CreateUnauthenticatedSession(mAliceAddress).Value(), delegate);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegate * delegate)
+Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate)
+{
+    return mExchangeManager.NewContext(mSecureSessionMgr.CreateUnauthenticatedSession(mBobAddress).Value(), delegate);
+}
+
+Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext(GetSessionPeerToLocal(), delegate);
+    return mExchangeManager.NewContext(GetSessionBobToAlice(), delegate);
+}
+
+Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate)
+{
+    // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
+    return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate);
 }
 
 } // namespace Test

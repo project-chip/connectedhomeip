@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lwip/lwip.gni")
@@ -31,6 +32,9 @@ config("includes") {
     ".",
     "${root_gen_dir}/include",
   ]
+
+  # TODO: generated file dependency should be a lib NOT an include
+  include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
 
   defines = [ "CHIP_HAVE_CONFIG_H=1" ]
 }
@@ -54,10 +58,6 @@ if (chip_build_tests) {
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
       "${chip_root}/src/transport/retransmit/tests",
     ]
-
-    if (chip_device_platform != "fake") {
-      deps += [ "${chip_root}/src/protocols/secure_channel/tests" ]
-    }
 
     if (current_os != "zephyr") {
       deps += [ "${chip_root}/src/lib/mdns/minimal/records/tests" ]
@@ -90,6 +90,12 @@ if (chip_build_tests) {
 
     if (chip_config_network_layer_ble) {
       deps += [ "${chip_root}/src/ble/tests" ]
+    }
+
+    # On nrfconnect, the controller tests run into
+    # https://github.com/project-chip/connectedhomeip/issues/9630
+    if (chip_device_platform != "nrfconnect") {
+      deps += [ "${chip_root}/src/controller/tests" ]
     }
 
     if (current_os != "zephyr" && chip_device_platform != "esp32") {

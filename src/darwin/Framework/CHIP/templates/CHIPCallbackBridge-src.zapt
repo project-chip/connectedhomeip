@@ -1,0 +1,33 @@
+{{> header}}
+
+{{#if (chip_has_client_clusters)}}
+#import "CHIPCallbackBridge_internal.h"
+
+{{#>CHIPCallbackBridge partial-type=""            }}DefaultSuccessCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="Octet_String"}}OctetStringAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="Char_String" }}CharStringAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="Boolean"     }}BooleanAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="Int8u"       }}Int8uAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="Int8s"       }}Int8sAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="Int16u"      }}Int16uAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="Int16s"      }}Int16sAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="Int32u"      }}Int32uAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="Int32s"      }}Int32sAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="Int64u"      }}Int64uAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge partial-type="Int64s"      }}Int64sAttributeCallback{{/CHIPCallbackBridge}}
+
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if isList}}
+{{#>CHIPCallbackBridge partial-type="List"        }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}ListAttributeCallback{{/CHIPCallbackBridge}}
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
+{{#chip_client_clusters}}
+{{#chip_cluster_responses}}
+{{#>CHIPCallbackBridge partial-type="Command"     }}{{asUpperCamelCase ../../name}}Cluster{{asUpperCamelCase ../name}}Callback{{/CHIPCallbackBridge}}
+{{/chip_cluster_responses}}
+{{/chip_client_clusters}}
+
+{{/if}}

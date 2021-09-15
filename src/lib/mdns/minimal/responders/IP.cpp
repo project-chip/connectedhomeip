@@ -16,7 +16,7 @@
  */
 #include "IP.h"
 
-#include <mdns/minimal/records/IP.h>
+#include <lib/mdns/minimal/records/IP.h>
 
 namespace mdns {
 namespace Minimal {

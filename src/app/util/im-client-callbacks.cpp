@@ -19,17 +19,17 @@
 
 #include <cinttypes>
 
+#include <app-common/zap-generated/enums.h>
 #include <app/Command.h>
-#include <app/common/gen/enums.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPEncoding.h>
-#include <support/SafeInt.h>
-#include <support/TypeTraits.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/TypeTraits.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::app::List;
@@ -372,10 +372,20 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
     Callback::Cancelable * onSuccessCallback = nullptr;
     Callback::Cancelable * onFailureCallback = nullptr;
     app::TLVDataFilter tlvFilter             = nullptr;
-    NodeId sourceId                          = aPath.mNodeId;
+    NodeId sourceId                          = apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId();
     // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
     uint8_t sequenceNumber = static_cast<uint8_t>(apReadClient->GetAppIdentifier());
-    CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceId, sequenceNumber, &onSuccessCallback, &onFailureCallback, &tlvFilter);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (apReadClient->IsSubscriptionType())
+    {
+        err = gCallbacks.GetReportCallback(sourceId, aPath.mEndpointId, aPath.mClusterId, aPath.mFieldId, &onSuccessCallback,
+                                           &tlvFilter);
+    }
+    else
+    {
+        err = gCallbacks.GetResponseCallback(sourceId, sequenceNumber, &onSuccessCallback, &onFailureCallback, &tlvFilter);
+    }
 
     if (CHIP_NO_ERROR != err)
     {
@@ -384,7 +394,7 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
             ChipLogDetail(Zcl, "%s: Missing success callback", __FUNCTION__);
         }
 
-        if (onFailureCallback == nullptr)
+        if (onFailureCallback == nullptr && !apReadClient->IsSubscriptionType())
         {
             ChipLogDetail(Zcl, "%s: Missing failure callback", __FUNCTION__);
         }
@@ -404,12 +414,57 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
         ChipLogProgress(Zcl, "  attribute TLV Type: 0x%02x", apData->GetType());
         tlvFilter(apData, onSuccessCallback, onFailureCallback);
     }
-    else
+    else if (onFailureCallback != nullptr)
     {
         Callback::Callback<DefaultFailureCallback> * cb =
             Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
         // TODO: Should change failure callbacks to accept uint16 status code.
         cb->mCall(cb->mContext, static_cast<uint8_t>(to_underlying(status)));
+    }
+
+    return true;
+}
+
+bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient, EmberAfStatus status)
+{
+    ChipLogProgress(Zcl, "SubscribeResponse:");
+    ChipLogProgress(Zcl, "  ApplicationIdentifier: %" PRIx64, apSubscribeClient->GetAppIdentifier());
+    LogStatus(status);
+
+    // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
+    uint8_t sequenceNumber = static_cast<uint8_t>(apSubscribeClient->GetAppIdentifier());
+
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    Callback::Cancelable * onSuccessCallback = nullptr;
+    Callback::Cancelable * onFailureCallback = nullptr;
+    err = gCallbacks.GetResponseCallback(apSubscribeClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId(),
+                                         sequenceNumber, &onSuccessCallback, &onFailureCallback);
+
+    if (CHIP_NO_ERROR != err)
+    {
+        if (onSuccessCallback == nullptr)
+        {
+            ChipLogDetail(Zcl, "%s: Missing success callback", __FUNCTION__);
+        }
+
+        if (onFailureCallback == nullptr)
+        {
+            ChipLogDetail(Zcl, "%s: Missing failure callback", __FUNCTION__);
+        }
+        return true;
+    }
+
+    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultSuccessCallback> * cb =
+            Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
+        cb->mCall(cb->mContext);
+    }
+    else
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, static_cast<uint8_t>(status));
     }
 
     return true;

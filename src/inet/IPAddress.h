@@ -31,7 +31,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #include <inet/InetConfig.h>
 

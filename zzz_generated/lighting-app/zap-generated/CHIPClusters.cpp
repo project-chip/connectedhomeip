@@ -21,18 +21,15 @@
 
 #include <cstdint>
 
-#include <support/BufferWriter.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
-#include <system/SystemPacketBuffer.h>
-
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/common/gen/ids/Attributes.h>
-#include <app/util/basic-types.h>
-
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/InteractionModelEngine.h>
+#include <app/chip-zcl-zpro-codec.h>
+#include <app/util/basic-types.h>
+#include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
 #define COMMAND_HEADER(name, clusterId)                                                                                            \
@@ -70,8 +67,6 @@ constexpr uint8_t kFrameControlGlobalCommand = 0x00;
 
 // Pick source endpoint as 1 for now
 constexpr EndpointId kSourceEndpoint = 1;
-
-[[maybe_unused]] const uint8_t kReportingDirectionReported = 0x00;
 } // namespace
 
 using namespace app::Clusters;

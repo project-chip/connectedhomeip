@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include <mdns/Advertiser_ImplMinimalMdnsAllocator.h>
+#include <lib/mdns/Advertiser_ImplMinimalMdnsAllocator.h>
 
-#include <support/UnitTestRegistration.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

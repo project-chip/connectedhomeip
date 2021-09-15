@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <support/BitFlags.h>
+#include <lib/support/BitFlags.h>
 
 namespace chip {
 namespace System {

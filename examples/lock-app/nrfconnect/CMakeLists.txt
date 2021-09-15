@@ -18,8 +18,7 @@ cmake_minimum_required(VERSION 3.13.1)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
-get_filename_component(LOCK_GEN_DIR ${CHIP_ROOT}/zzz_generated/lock-app/ REALPATH)
-set(LOCK_GEN_SRC ${LOCK_GEN_DIR}/zap-generated/)
+get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
@@ -49,10 +48,13 @@ target_compile_options(app PRIVATE -Werror)
 project(chip-nrfconnect-lock-example)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
+include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
+include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
-target_include_directories(app PRIVATE 
-                           main/include 
-                           ${LOCK_GEN_DIR} 
+target_include_directories(app PRIVATE
+                           main/include
+                           ${GEN_DIR}/app-common
+                           ${GEN_DIR}/lock-app
                            ${NLIO_ROOT}
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)
@@ -62,49 +64,17 @@ target_sources(app PRIVATE
                main/BoltLockManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${LOCK_GEN_SRC}/attribute-size.cpp
-               ${LOCK_GEN_SRC}/callback-stub.cpp
-               ${LOCK_GEN_SRC}/IMClusterCommandHandler.cpp
+               ${GEN_DIR}/lock-app/zap-generated/attribute-size.cpp
+               ${GEN_DIR}/lock-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/lock-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
-               ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
-               ${CHIP_ROOT}/src/app/common/gen/attributes/Accessors.cpp
-               ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
-               ${CHIP_ROOT}/src/app/reporting/reporting.cpp
-               ${CHIP_ROOT}/src/app/util/af-event.cpp
-               ${CHIP_ROOT}/src/app/util/af-main-common.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-list-byte-span.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-size-util.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-table.cpp
-               ${CHIP_ROOT}/src/app/util/binding-table.cpp
-               ${CHIP_ROOT}/src/app/util/chip-message-send.cpp
-               ${CHIP_ROOT}/src/app/util/client-api.cpp
-               ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
-               ${CHIP_ROOT}/src/app/util/ember-print.cpp
-               ${CHIP_ROOT}/src/app/util/error-mapping.cpp
-               ${CHIP_ROOT}/src/app/util/message.cpp
-               ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
-               ${CHIP_ROOT}/src/app/util/process-global-message.cpp
-               ${CHIP_ROOT}/src/app/util/util.cpp
-               ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
-               ${CHIP_ROOT}/src/app/server/Mdns.cpp
-               ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
-               ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
-               ${CHIP_ROOT}/src/app/server/Server.cpp
-               ${CHIP_ROOT}/src/app/server/StorablePeerConnection.cpp
-               ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
-               ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
-               ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
-               ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp)
+               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
+
+chip_configure_data_model(app
+    INCLUDE_SERVER
+    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lock-common/lock-app.zap
+)
 
 if(BUILD_WITH_DFU)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
 endif()
-
-include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

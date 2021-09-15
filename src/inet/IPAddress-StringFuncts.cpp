@@ -31,7 +31,7 @@
 #include <string.h>
 
 #include <inet/InetLayer.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <arpa/inet.h>

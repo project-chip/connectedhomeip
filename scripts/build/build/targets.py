@@ -25,6 +25,7 @@ class Platform(IntEnum):
     ANDROID = auto()
     INFINEON = auto()
     TELINK = auto()
+    TIZEN = auto()
 
     @property
     def ArgName(self):
@@ -61,7 +62,7 @@ class Board(IntEnum):
     # Telink platform
     TLSR9518ADK80D = auto()
 
-    # Android platform
+    # Android, Tizen platform
     ARM = auto()
     ARM64 = auto()
     X64 = auto()
@@ -92,6 +93,8 @@ class Application(IntEnum):
     BRIDGE = auto()
     TEMPERATURE_MEASUREMENT = auto()
     THERMOSTAT = auto()
+    PUMP = auto()
+    PUMP_CONTROLLER = auto()
 
     @property
     def ArgName(self):

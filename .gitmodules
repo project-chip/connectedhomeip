@@ -95,6 +95,10 @@
 	path = third_party/mbed-os-posix-socket/repo
 	url = https://github.com/ARMmbed/mbed-os-posix-socket.git
 	branch  = main
+[submodule "mbed-os-cypress-capsense-button"]
+	path = third_party/mbed-os-cypress-capsense-button/repo
+	url = https://github.com/ARMmbed/mbed-os-cypress-capsense-button.git
+	branch = main
 [submodule "p6/abstraction-rtos"]
 	path = third_party/p6/p6_sdk/libs/abstraction-rtos
 	url = https://github.com/Infineon/abstraction-rtos

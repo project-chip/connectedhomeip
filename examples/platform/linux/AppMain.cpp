@@ -24,23 +24,23 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <core/CHIPError.h>
-#include <core/NodeId.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/NodeId.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/ScopedBuffer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/CHIPMem.h>
-#include <support/RandUtils.h>
-#include <support/ScopedBuffer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <ControllerShellCommands.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/KeyValueStoreManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
@@ -65,6 +65,17 @@ using namespace chip::Transport;
 using chip::Shell::Engine;
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+/*
+ * The device shall check every kWifiStartCheckTimeUsec whether Wi-Fi management
+ * has been fully initialized. If after kWifiStartCheckAttempts Wi-Fi management
+ * still hasn't been initialized, the device configuration is reset, and device
+ * needs to be paired again.
+ */
+static constexpr useconds_t kWifiStartCheckTimeUsec = 100 * 1000; // 100 ms
+static constexpr uint8_t kWifiStartCheckAttempts    = 5;
+#endif
+
 namespace {
 void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -75,6 +86,23 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
     }
 }
 } // namespace
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+static bool EnsureWifiIsStarted()
+{
+    for (int cnt = 0; cnt < kWifiStartCheckAttempts; cnt++)
+    {
+        if (chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
+        {
+            return true;
+        }
+
+        usleep(kWifiStartCheckTimeUsec);
+    }
+
+    return chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted();
+}
+#endif
 
 int ChipLinuxAppInit(int argc, char ** argv)
 {
@@ -88,13 +116,13 @@ int ChipLinuxAppInit(int argc, char ** argv)
     err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
+    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
+    SuccessOrExit(err);
+
     err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
     err = ParseArguments(argc, argv);
-    SuccessOrExit(err);
-
-    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
     ConfigurationMgr().LogDeviceConfig();
@@ -108,18 +136,20 @@ int ChipLinuxAppInit(int argc, char ** argv)
 
     chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
-
 #if CONFIG_NETWORK_LAYER_BLE
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
     chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
-#endif
-
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
         chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+        if (!EnsureWifiIsStarted())
+        {
+            ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
+        }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -235,17 +265,17 @@ void ChipLinuxAppMainLoop()
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     chip::Shell::RegisterCommissioneeCommands();
 #endif
+    uint16_t securePort   = CHIP_PORT;
+    uint16_t unsecurePort = CHIP_UDC_PORT;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     // use a different service port to make testing possible with other sample devices running on same host
-    ServerConfigParams params;
-    params.securedServicePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
-    params.unsecuredServicePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
-    SetServerConfig(params);
+    securePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
+    unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     // Init ZCL Data Model and CHIP App Server
-    InitServer();
+    chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

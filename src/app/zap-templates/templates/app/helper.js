@@ -16,7 +16,7 @@
  */
 
 // Import helpers from zap core
-const zapPath      = '../../../../../third_party/zap/repo/src-electron/';
+const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 const zclQuery     = require(zapPath + 'db/query-zcl.js')
@@ -335,16 +335,22 @@ function asMEI(prefix, suffix)
   return cHelper.asHex((prefix << 16) + suffix, 8);
 }
 
+function asTestSuiteSimulatedClusterCommandPartial(label)
+{
+  return "TestSuiteHelper_" + asUpperCamelCase(label)
+}
+
 //
 // Module exports
 //
-exports.asPrintFormat                     = asPrintFormat;
-exports.asReadType                        = asReadType;
-exports.asReadTypeLength                  = asReadTypeLength;
-exports.chip_endpoint_generated_functions = chip_endpoint_generated_functions
-exports.chip_endpoint_cluster_list        = chip_endpoint_cluster_list
-exports.asTypeLiteralSuffix               = asTypeLiteralSuffix;
-exports.asLowerCamelCase                  = asLowerCamelCase;
-exports.asUpperCamelCase                  = asUpperCamelCase;
-exports.hasSpecificAttributes             = hasSpecificAttributes;
-exports.asMEI                             = asMEI;
+exports.asPrintFormat                             = asPrintFormat;
+exports.asReadType                                = asReadType;
+exports.asReadTypeLength                          = asReadTypeLength;
+exports.chip_endpoint_generated_functions         = chip_endpoint_generated_functions
+exports.chip_endpoint_cluster_list                = chip_endpoint_cluster_list
+exports.asTypeLiteralSuffix                       = asTypeLiteralSuffix;
+exports.asLowerCamelCase                          = asLowerCamelCase;
+exports.asUpperCamelCase                          = asUpperCamelCase;
+exports.hasSpecificAttributes                     = hasSpecificAttributes;
+exports.asMEI                                     = asMEI;
+exports.asTestSuiteSimulatedClusterCommandPartial = asTestSuiteSimulatedClusterCommandPartial;

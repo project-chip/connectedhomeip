@@ -16,11 +16,13 @@
  */
 
 // pull together CHIP headers
+#import <CHIP/CHIPCluster.h>
 #import <CHIP/CHIPClustersObjc.h>
 #import <CHIP/CHIPDevice.h>
 #import <CHIP/CHIPDeviceController.h>
 #import <CHIP/CHIPDevicePairingDelegate.h>
 #import <CHIP/CHIPError.h>
+#import <CHIP/CHIPKeypair.h>
 #import <CHIP/CHIPManualSetupPayloadParser.h>
 #import <CHIP/CHIPPersistentStorageDelegate.h>
 #import <CHIP/CHIPQRCodeSetupPayloadParser.h>

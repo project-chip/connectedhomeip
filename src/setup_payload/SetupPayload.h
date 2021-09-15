@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 
 namespace chip {

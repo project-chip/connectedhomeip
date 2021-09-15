@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <ble/BleLayer.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/CASESession.h>
@@ -37,16 +38,16 @@ public:
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             SecureSessionMgr * sessionMgr, Transport::FabricTable * fabrics,
-                                             SessionIDAllocator * idAllocator);
+                                             Ble::BleLayer * bleLayer, SecureSessionMgr * sessionMgr,
+                                             Transport::FabricTable * fabrics, SessionIDAllocator * idAllocator);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 
     //// ExchangeDelegate Implementation ////
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * reliableMessageManager,
                                                             SecureSessionMgr * sessionMgr) override
@@ -62,8 +63,7 @@ private:
     CASESession mPairingSession;
     uint16_t mSessionKeyId         = 0;
     SecureSessionMgr * mSessionMgr = nullptr;
-
-    FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
+    Ble::BleLayer * mBleLayer      = nullptr;
 
     Transport::FabricTable * mFabrics = nullptr;
 

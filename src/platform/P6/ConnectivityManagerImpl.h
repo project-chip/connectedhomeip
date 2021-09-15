@@ -30,7 +30,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 
 #include <cy_wcm.h>
-#include <support/BitFlags.h>
+#include <lib/support/BitFlags.h>
 
 namespace Inet {
 class IPAddress;

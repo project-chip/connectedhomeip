@@ -23,18 +23,18 @@
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
 
-#include <mdns/Advertiser_ImplMinimalMdnsAllocator.h>
-#include <mdns/minimal/ResponseSender.h>
-#include <mdns/minimal/Server.h>
-#include <mdns/minimal/core/FlatAllocatedQName.h>
-#include <mdns/minimal/responders/IP.h>
-#include <mdns/minimal/responders/Ptr.h>
-#include <mdns/minimal/responders/QueryResponder.h>
-#include <mdns/minimal/responders/Srv.h>
-#include <mdns/minimal/responders/Txt.h>
-#include <support/CHIPMem.h>
-#include <support/RandUtils.h>
-#include <support/StringBuilder.h>
+#include <lib/mdns/Advertiser_ImplMinimalMdnsAllocator.h>
+#include <lib/mdns/minimal/ResponseSender.h>
+#include <lib/mdns/minimal/Server.h>
+#include <lib/mdns/minimal/core/FlatAllocatedQName.h>
+#include <lib/mdns/minimal/responders/IP.h>
+#include <lib/mdns/minimal/responders/Ptr.h>
+#include <lib/mdns/minimal/responders/QueryResponder.h>
+#include <lib/mdns/minimal/responders/Srv.h>
+#include <lib/mdns/minimal/responders/Txt.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/StringBuilder.h>
 
 // Enable detailed mDNS logging for received queries
 #undef DETAIL_LOGGING
@@ -486,9 +486,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
             }
         }
 
+        if (params.GetCommissioningMode() != CommissioningMode::kDisabled)
         {
-            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                               DiscoveryFilter(DiscoveryFilterType::kCommissioningMode, params.GetCommissioningMode() ? 1 : 0));
+            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kCommissioningMode));
             FullQName longServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
@@ -498,23 +498,6 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
                      .IsValid())
             {
                 ChipLogError(Discovery, "Failed to add commissioning mode PTR record mDNS responder");
-                return CHIP_ERROR_NO_MEMORY;
-            }
-        }
-
-        if (params.GetCommissioningMode() && params.GetAdditionalCommissioning())
-        {
-            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                               DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1));
-            FullQName longServiceName =
-                allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-            ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
-            if (!allocator->AddResponder<PtrResponder>(longServiceName, instanceName)
-                     .SetReportAdditional(instanceName)
-                     .SetReportInServiceListing(true)
-                     .IsValid())
-            {
-                ChipLogError(Discovery, "Failed to add open window commissioning mode PTR record mDNS responder");
                 return CHIP_ERROR_NO_MEMORY;
             }
         }
@@ -542,8 +525,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
 FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertisingParameters & params)
 {
-    // Max number of TXT fields from the spec is 9: D, VP, AP, CM, DT, DN, RI, PI, PH.
-    constexpr size_t kMaxTxtFields = 9;
+    // Max number of TXT fields from the spec is 8: D, VP, CM, DT, DN, RI, PI, PH.
+    constexpr size_t kMaxTxtFields = 8;
     const char * txtFields[kMaxTxtFields];
     size_t numTxtFields = 0;
 
@@ -586,15 +569,8 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         txtFields[numTxtFields++] = txtDiscriminator;
 
         char txtCommissioningMode[chip::Mdns::kKeyCommissioningModeMaxLength + 4];
-        snprintf(txtCommissioningMode, sizeof(txtCommissioningMode), "CM=%d", params.GetCommissioningMode() ? 1 : 0);
+        snprintf(txtCommissioningMode, sizeof(txtCommissioningMode), "CM=%d", static_cast<int>(params.GetCommissioningMode()));
         txtFields[numTxtFields++] = txtCommissioningMode;
-
-        char txtAdditionalCommissioning[chip::Mdns::kKeyAdditionalCommissioningMaxLength + 4];
-        if (params.GetCommissioningMode() && params.GetAdditionalCommissioning())
-        {
-            snprintf(txtAdditionalCommissioning, sizeof(txtAdditionalCommissioning), "AP=1");
-            txtFields[numTxtFields++] = txtAdditionalCommissioning;
-        }
 
         char txtRotatingDeviceId[chip::Mdns::kKeyRotatingIdMaxLength + 4];
         if (params.GetRotatingId().HasValue())

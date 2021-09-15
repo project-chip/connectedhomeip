@@ -209,6 +209,8 @@ class DeviceMgrCmd(Cmd):
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
 
+        "open-commissioning-window",
+
         "get-fabricid",
     ]
 
@@ -449,32 +451,33 @@ class DeviceMgrCmd(Cmd):
         # Devices may be uncommissioned, or may already be on the network. Need to check both ways.
         # TODO(cecille): implement soft-ap connection.
 
-        if int(setupPayload.attributes["RendezvousInformation"]) & onnetwork:
-            print("Attempting to find device on Network")
-            longDiscriminator = ctypes.c_uint16(
-                int(setupPayload.attributes['Discriminator']))
-            self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
-                longDiscriminator)
-            print("Waiting for device responses...")
-            strlen = 100
-            addrStrStorage = ctypes.create_string_buffer(strlen)
-            # If this device is on the network and we're looking specifically for 1 device,
-            # expect a quick response.
-            if self.wait_for_one_discovered_device():
-                self.devCtrl.GetIPForDiscoveredDevice(
-                    0, addrStrStorage, strlen)
-                addrStr = addrStrStorage.value.decode('utf-8')
-                print("Connecting to device at " + addrStr)
-                pincode = ctypes.c_uint32(
-                    int(setupPayload.attributes['SetUpPINCode']))
-                if self.devCtrl.ConnectIP(addrStrStorage, pincode, nodeid):
-                    print("Connected")
-                    return 0
-                else:
-                    print("Unable to connect")
-                    return 1
-            else:
-                print("Unable to locate device on network")
+        # Any device that is already commissioned into a fabric needs to use on-network
+        # pairing, so look first on the network regardless of the QR code contents.
+        print("Attempting to find device on Network")
+        longDiscriminator = ctypes.c_uint16(
+            int(setupPayload.attributes['Discriminator']))
+        self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
+            longDiscriminator)
+        print("Waiting for device responses...")
+        strlen = 100
+        addrStrStorage = ctypes.create_string_buffer(strlen)
+        # If this device is on the network and we're looking specifically for 1 device,
+        # expect a quick response.
+        if self.wait_for_one_discovered_device():
+            self.devCtrl.GetIPForDiscoveredDevice(
+                0, addrStrStorage, strlen)
+            addrStr = addrStrStorage.value.decode('utf-8')
+            print("Connecting to device at " + addrStr)
+            pincode = ctypes.c_uint32(
+                int(setupPayload.attributes['SetUpPINCode']))
+            try:
+                self.devCtrl.ConnectIP(addrStrStorage, pincode, nodeid)
+                print("Connected")
+                return 0
+            except Exception as ex:
+                print(f"Unable to connect on network: {ex}")
+        else:
+            print("Unable to locate device on network")
 
         if int(setupPayload.attributes["RendezvousInformation"]) & ble:
             print("Attempting to connect via BLE")
@@ -482,11 +485,12 @@ class DeviceMgrCmd(Cmd):
                 int(setupPayload.attributes['Discriminator']))
             pincode = ctypes.c_uint32(
                 int(setupPayload.attributes['SetUpPINCode']))
-            if self.devCtrl.ConnectBLE(longDiscriminator, pincode, nodeid):
+            try:
+                self.devCtrl.ConnectBLE(longDiscriminator, pincode, nodeid)
                 print("Connected")
                 return 0
-            else:
-                print("Unable to connect")
+            except Exception as ex:
+                print(f"Unable to connect: {ex}")
         return -1
 
     def do_connect(self, line):
@@ -494,6 +498,7 @@ class DeviceMgrCmd(Cmd):
         connect -ip <ip address> <setup pin code> [<nodeid>]
         connect -ble <discriminator> <setup pin code> [<nodeid>]
         connect -qr <qr code> [<nodeid>]
+        connect -code <manual pairing code> [<nodeid>]
 
         connect command is used for establishing a rendezvous session to the device.
         currently, only connect using setupPinCode is supported.
@@ -520,11 +525,22 @@ class DeviceMgrCmd(Cmd):
                     "utf-8"), int(args[2]), nodeid)
             elif args[0] == "-ble" and len(args) >= 3:
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
-            elif args[0] == '-qr' and len(args) >= 2:
+            elif args[0] in ['-qr', '-code'] and len(args) >= 2:
                 if len(args) == 3:
                     nodeid = int(args[2])
                 print("Parsing QR code {}".format(args[1]))
-                setupPayload = SetupPayload().ParseQrCode(args[1])
+
+                setupPayload = None
+                if args[0] == '-qr':
+                    setupPayload = SetupPayload().ParseQrCode(args[1])
+                elif args[0] == '-code':
+                    setupPayload = SetupPayload(
+                    ).ParseManualPairingCode(args[1])
+
+                if not int(setupPayload.attributes.get("RendezvousInformation", 0)):
+                    print("No rendezvous information provided, default to all.")
+                    setupPayload.attributes["RendezvousInformation"] = 0b111
+                setupPayload.Print()
                 self.ConnectFromSetupPayload(setupPayload, nodeid)
             else:
                 print("Usage:")
@@ -569,6 +585,7 @@ class DeviceMgrCmd(Cmd):
                     address = "{}:{}".format(
                         *address) if address else "unknown"
                     print("Current address: " + address)
+                    self.devCtrl.CommissioningComplete(int(args[1]))
             else:
                 self.do_help("resolve")
         except exceptions.ChipStackException as ex:
@@ -601,8 +618,7 @@ class DeviceMgrCmd(Cmd):
         discover -s short_discriminator
         discover -v vendor_id
         discover -t device_type
-        discover -c commissioning_enabled
-        discover -a
+        discover -c
 
         discover command is used to discover available devices.
         """
@@ -627,9 +643,7 @@ class DeviceMgrCmd(Cmd):
             group.add_argument(
                 '-t', help='discover commissionable nodes with given device type', type=int)
             group.add_argument(
-                '-c', help='discover commissionable nodes with given commissioning mode', type=int)
-            group.add_argument(
-                '-a', help='discover commissionable nodes put in commissioning mode from command', action='store_true')
+                '-c', help='discover commissionable nodes in commissioning mode', action='store_true')
             args = parser.parse_args(arglist)
             if args.all:
                 self.commissionableNodeCtrl.DiscoverCommissioners()
@@ -661,11 +675,7 @@ class DeviceMgrCmd(Cmd):
                     ctypes.c_uint16(args.t))
                 self.wait_for_many_discovered_devices()
             elif args.c is not None:
-                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled(
-                    ctypes.c_uint16(args.c))
-                self.wait_for_many_discovered_devices()
-            elif args.a is not None:
-                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabledFromCommand()
+                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled()
                 self.wait_for_many_discovered_devices()
             else:
                 self.do_help("discover")
@@ -842,11 +852,51 @@ class DeviceMgrCmd(Cmd):
         """
         print("Pairing Thread Credential is nolonger available, use NetworkCommissioning cluster instead.")
 
+    def do_opencommissioningwindow(self, line):
+        """
+        open-commissioning-window <nodeid> [options]
+
+        Options:
+          -t  Timeout (in seconds)     
+          -o  Option  [OriginalSetupCode = 0, TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
+          -d  Discriminator Value
+          -i  Iteration
+
+          This command is used by a current Administrator to instruct a Node to go into commissioning mode
+        """
+        try:
+            arglist = shlex.split(line)
+
+            if len(arglist) <= 1:
+                print("Usage:")
+                self.do_help("open-commissioning-window")
+                return
+            parser = argparse.ArgumentParser()
+            parser.add_argument(
+                "-t", type=int, default=0, dest='timeout')
+            parser.add_argument(
+                "-o", type=int, default=0, dest='option')
+            parser.add_argument(
+                "-i", type=int, default=0, dest='iteration')
+            parser.add_argument(
+                "-d", type=int, default=0, dest='discriminator')
+            args = parser.parse_args(arglist[1:])
+
+            self.devCtrl.OpenCommissioningWindow(
+                int(arglist[0]), args.timeout, args.iteration, args.discriminator, args.option)
+
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+            return
+        except:
+            self.do_help("open-commissioning-window")
+            return
+
     def do_getfabricid(self, line):
         """
           get-fabricid
 
-          Read the current Fabric Id of the controller device, return 0 if not available.
+          Read the current Compressed Fabric Id of the controller device, return 0 if not available.
         """
         try:
             args = shlex.split(line)
@@ -855,14 +905,20 @@ class DeviceMgrCmd(Cmd):
                 print("Unexpected argument: " + args[1])
                 return
 
-            fabricid = self.devCtrl.GetFabricId()
+            compressed_fabricid = self.devCtrl.GetCompressedFabricId()
+            raw_fabricid = self.devCtrl.GetFabricId()
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading FabricID:")
             print(str(ex))
             return
 
         print("Get fabric ID complete")
-        print("Fabric ID: " + hex(fabricid))
+
+        print("Raw Fabric ID: 0x{:016x}".format(raw_fabricid)
+              + " (" + str(raw_fabricid) + ")")
+
+        print("Compressed Fabric ID: 0x{:016x}".format(compressed_fabricid)
+              + " (" + str(compressed_fabricid) + ")")
 
     def do_history(self, line):
         """

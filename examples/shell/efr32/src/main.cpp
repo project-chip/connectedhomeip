@@ -31,14 +31,15 @@
 #include <ChipShellCollection.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
 
 #include <AppConfig.h>
 #include <app/server/Server.h>
 #include <init_efrPlatform.h>
+#include <sl_system_kernel.h>
 
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
@@ -81,7 +82,7 @@ void appError(int err)
         ;
 }
 
-unsigned int sleep(unsigned int seconds)
+extern "C" unsigned int sleep(unsigned int seconds)
 {
     const TickType_t xDelay = 1000 * seconds / portTICK_PERIOD_MS;
     vTaskDelay(xDelay);
@@ -181,5 +182,5 @@ int main(void)
         EFR32_LOG("MEMORY ERROR!!!");
     }
 
-    vTaskStartScheduler();
+    sl_system_kernel_start();
 }

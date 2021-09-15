@@ -18,7 +18,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include <support/ThreadOperationalDataset.h>
+#include <lib/support/ThreadOperationalDataset.h>
 
 namespace chip {
 namespace Thread {

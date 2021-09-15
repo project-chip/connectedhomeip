@@ -26,8 +26,8 @@
 
 #include <app/InteractionModelEngine.h>
 #include <controller/CHIPCluster.h>
+#include <lib/support/CodeUtils.h>
 #include <protocols/temp_zcl/TempZCL.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace Controller {
@@ -80,10 +80,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * onReportCallback)
+CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * onReportCallback,
+                                                  app::TLVDataFilter tlvDataFilter)
 {
     VerifyOrReturnError(onReportCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mDevice->AddReportHandler(mEndpoint, mClusterId, attributeId, onReportCallback);
+    VerifyOrReturnError(tlvDataFilter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mDevice->AddReportHandler(mEndpoint, mClusterId, attributeId, onReportCallback, tlvDataFilter);
 
     return CHIP_NO_ERROR;
 }

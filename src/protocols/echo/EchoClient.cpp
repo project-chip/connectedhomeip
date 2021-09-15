@@ -38,8 +38,8 @@ CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SessionHan
     if (mExchangeMgr != nullptr)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    mExchangeMgr           = exchangeMgr;
-    mSecureSession         = session;
+    mExchangeMgr = exchangeMgr;
+    mSecureSession.SetValue(session);
     OnEchoResponseReceived = nullptr;
     mExchangeCtx           = nullptr;
 
@@ -71,7 +71,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, Me
     }
 
     // Create a new exchange context.
-    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession, this);
+    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession.Value(), this);
     if (mExchangeCtx == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -92,8 +92,8 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, Me
     return err;
 }
 
-CHIP_ERROR EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
+CHIP_ERROR EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                         System::PacketBufferHandle && payload)
 {
     // Assert that the exchange context matches the client's current context.
     // This should never fail because even if SendEchoRequest is called

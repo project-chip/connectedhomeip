@@ -30,13 +30,13 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
@@ -117,7 +117,6 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -134,13 +133,13 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 
     err = apWriteHandler->AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
                                                  Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
-    ChipLogFunctError(err);
     return err;
 }
 } // namespace app
 } // namespace chip
 
 namespace {
+bool testSyncReport = false;
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
 LivenessEventGenerator gLivenessGenerator;
@@ -161,12 +160,47 @@ void InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
     chip::app::EventManagement::CreateEventManagement(apMgr, sizeof(logStorageResources) / sizeof(logStorageResources[0]),
                                                       gCircularEventBuffer, logStorageResources);
 }
+
+void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
+{
+    chip::app::ClusterInfo dirtyPath;
+    dirtyPath.mClusterId  = kTestClusterId;
+    dirtyPath.mEndpointId = kTestEndpointId;
+    dirtyPath.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
+    printf("MutateClusterHandler is triggered...");
+    // send dirty change
+    if (!testSyncReport)
+    {
+        dirtyPath.mFieldId = 1;
+        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
+        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+        chip::DeviceLayer::SystemLayer().StartTimer(1000, MutateClusterHandler, NULL);
+        testSyncReport = true;
+    }
+    else
+    {
+        dirtyPath.mFieldId = 10; // unknown field
+        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
+        // send sync message(empty report)
+        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    }
+}
+
+class MockInteractionModelApp : public chip::app::InteractionModelDelegate
+{
+public:
+    virtual CHIP_ERROR SubscriptionEstablished(const chip::app::ReadHandler * apReadHandler)
+    {
+        chip::DeviceLayer::SystemLayer().StartTimer(1000, MutateClusterHandler, NULL);
+        return CHIP_NO_ERROR;
+    }
+};
 } // namespace
 
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::app::InteractionModelDelegate mockDelegate;
+    MockInteractionModelApp mockDelegate;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
     const chip::FabricIndex gFabricIndex = 0;
     chip::Transport::FabricTable fabrics;
@@ -177,7 +211,7 @@ int main(int argc, char * argv[])
         chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer, &gTransportManager, &fabrics, &gMessageCounterManager);
+    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &fabrics, &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
