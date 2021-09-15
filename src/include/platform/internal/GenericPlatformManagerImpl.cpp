@@ -257,6 +257,12 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 #endif // CHIP_PROGRESS_LOGGING
 }
 
+template <class ImplClass>    
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+} 
+
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const ChipDeviceEvent * event)
 {

@@ -194,6 +194,11 @@ private:
     void DispatchEvent(const ChipDeviceEvent * event);
     CHIP_ERROR StartChipTimer(uint32_t durationMS);
 
+    // Software Diagnostics methods
+    CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree);
+    CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed);
+    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark); 
+
 protected:
     // Construction/destruction limited to subclasses.
     PlatformManager()  = default;
@@ -367,6 +372,21 @@ inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
 inline CHIP_ERROR PlatformManager::StartChipTimer(uint32_t durationMS)
 {
     return static_cast<ImplClass *>(this)->_StartChipTimer(durationMS);
+}
+
+inline CHIP_ERROR PlatformManager::GetCurrentHeapFree(uint64_t & currentHeapFree)
+{
+    return static_cast<ImplClass *>(this)->_GetCurrentHeapFree(currentHeapFree);
+}
+
+inline CHIP_ERROR PlatformManager::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+{
+    return static_cast<ImplClass *>(this)->_GetCurrentHeapUsed(currentHeapUsed);
+}
+
+inline CHIP_ERROR PlatformManager::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+{
+    return static_cast<ImplClass *>(this)->_GetCurrentHeapHighWatermark(currentHeapHighWatermark);
 }
 
 } // namespace DeviceLayer
