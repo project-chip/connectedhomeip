@@ -263,3 +263,11 @@ void emberAfPluginColorControlServerXyTransitionEventHandler(chip::EndpointId en
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 void emberAfPluginColorControlServerHueSatTransitionEventHandler(chip::EndpointId endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+
+/** @brief
+ *
+ * This function is called from the level control server when there is a changed.
+ *
+ * @param endpoint The identifying endpoint Ver.: always
+ */
+void emberAfPluginLevelControlCoupledColorTempChangeCallback(chip::EndpointId endpoint);

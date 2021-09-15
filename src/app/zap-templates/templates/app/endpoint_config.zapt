@@ -1,113 +1,183 @@
 {{> header}}
 
-// Prevent multiple inclusion
 #pragma once
 
-{{#endpoint_config}}
+{{#all_user_cluster_attributes_for_generated_defaults}}
+  {{#first}}#define GENERATED_DEFAULTS_COUNT ({{count}}) {{/first}}
+{{/all_user_cluster_attributes_for_generated_defaults}}
 
-
-// Default values for the attributes longer than a pointer,
-// in a form of a binary blob
-// Separate block is generated for big-endian and little-endian cases.
 #if BIGENDIAN_CPU
-#define GENERATED_DEFAULTS {{endpoint_attribute_long_defaults endian="big"}}
+#define GENERATED_DEFAULTS { \
+{{#all_user_cluster_attributes_for_generated_defaults}}
+  \
+  /* {{arrayIndex}}{{#first}}0{{/first}},{{attributeValueType}} value for cluster: {{clusterName}}, attribute: {{name}}, side: {{side}} */ \
+  {{#if isString}}{{format_zcl_string_as_characters_for_generated_defaults defaultValue attributeSize}}{{else}}{{as_generated_default_macro defaultValue attributeSize endian="big"}}{{/if}} \
+{{/all_user_cluster_attributes_for_generated_defaults}}
+}
+#else //!BIGENDIAN_CPU
+#define GENERATED_DEFAULTS { \
+{{#all_user_cluster_attributes_for_generated_defaults}}
+  \
+  /* {{arrayIndex}}{{#first}}0{{/first}},{{attributeValueType}} value for cluster: {{clusterName}}, attribute: {{name}}, side: {{side~}} */ \
+  {{#if isString}}{{format_zcl_string_as_characters_for_generated_defaults defaultValue attributeSize}}{{else}}{{as_generated_default_macro defaultValue attributeSize endian="little"}}{{/if}} \
+{{/all_user_cluster_attributes_for_generated_defaults}}
+}
+#endif
 
-#else // !BIGENDIAN_CPU
-#define GENERATED_DEFAULTS {{endpoint_attribute_long_defaults endian="little"}}
-#endif // BIGENDIAN_CPU
-
-#define GENERATED_DEFAULTS_COUNT ({{endpoint_attribute_long_defaults_count}})
-
-#define ZAP_TYPE(type) ZCL_ ## type ## _ATTRIBUTE_TYPE
-#define ZAP_LONG_DEFAULTS_INDEX(index) {(uint8_t*)(&generatedDefaults[index])}
-#define ZAP_MIN_MAX_DEFAULTS_INDEX(index) {(uint8_t*)(&minMaxDefault[index])}
-#define ZAP_EMPTY_DEFAULT() {(uint16_t) 0}
-#define ZAP_SIMPLE_DEFAULT(x) {(uint16_t) x}
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
-#define GENERATED_MIN_MAX_DEFAULT_COUNT {{endpoint_attribute_min_max_count}}
-#define GENERATED_MIN_MAX_DEFAULTS {{endpoint_attribute_min_max_list}}
+{{#all_user_cluster_attributes_min_max_defaults}}
+	{{~#first}}#define GENERATED_MIN_MAX_DEFAULT_COUNT {{count}}{{new_line 1}}{{/first}}
+	{{~#first}}#define GENERATED_MIN_MAX_DEFAULTS { {{/first~}}
+{	\
+	{{generated_defaults_index ./clusterName ./name 'DEFAULT' ./defaultValue '(uint8_t*)&(generatedDefaults[' '])'}}, /* Cluster: {{clusterName}}, Attribute Default Value: {{name}} interval */ \
+	{{generated_defaults_index ./clusterName ./name 'MINIMUM' ./attributeMinValue '(uint8_t*)&(generatedDefaults[' '])'}}, /* Cluster: {{clusterName}}, Attribute Minimum Value: {{name}} interval */ \
+	{{generated_defaults_index ./clusterName ./name 'MAXIMUM' ./attributeMaxValue '(uint8_t*)&(generatedDefaults[' '])'}} /* Cluster: {{clusterName}}, Attribute Maximum Value: {{name}} interval */ \
+}{{~#not_last~}}, \ {{/not_last}}{{#last}} } {{/last}}
+{{/all_user_cluster_attributes_min_max_defaults}}
 
-#define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_ ## mask
+{{#all_user_cluster_generated_attributes}}
+	{{~#first}}#define GENERATED_ATTRIBUTE_COUNT {{count}}{{new_line 1}}{{/first}}
+{{/all_user_cluster_generated_attributes}}
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT {{endpoint_attribute_count}}
-#define GENERATED_ATTRIBUTES {{ endpoint_attribute_list }}
-
-// This is an array of EmberAfCluster structures.
-#define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *)(&generatedAttributes[index]))
+#define GENERATED_ATTRIBUTES { \
+{{#all_user_cluster_generated_attributes}}
+  {{#if isAttributeBounded}}
+	  { {{as_hex code 4}}, ZCL_{{as_delimited_macro type}}_ATTRIBUTE_TYPE, {{attributeSize}}, ({{attribute_mask isWritable storageOption isAttributeBounded mfgCode clusterCode side isSingleton 'ATTRIBUTE_MASK_' ''}}), { (uint8_t*)&(minMaxDefaults[{{generated_attributes_min_max_index clusterName name}}]) } }{{#not_last}},{{/not_last}} /* {{index}} Cluster: {{clusterName}}, Attribute: {{name}}, Side: {{side}}*/ \
+  {{else if (is_number_greater_than attributeSize 2)}}
+    { {{as_hex code 4}}, ZCL_{{as_delimited_macro type}}_ATTRIBUTE_TYPE, {{attributeSize}}, ({{attribute_mask isWritable storageOption isAttributeBounded mfgCode clusterCode side isSingleton 'ATTRIBUTE_MASK_' ''}}), { {{#unless defaultValue}}(uint8_t *) NULL{{else}}{{generated_defaults_index ./clusterName ./name 'DEFAULT' ./defaultValue '(uint8_t*)&(generatedDefaults[' '])'}}{{/unless}} } }{{#not_last}},{{/not_last}} /* {{index}} Cluster: {{clusterName}}, Attribute: {{name}}, Side: {{side}}*/ \
+  {{else}}
+    { {{as_hex code 4}}, ZCL_{{as_delimited_macro type}}_ATTRIBUTE_TYPE, {{attributeSize}}, ({{attribute_mask isWritable storageOption isAttributeBounded mfgCode clusterCode side isSingleton 'ATTRIBUTE_MASK_' ''}}), { (uint16_t){{#if defaultValue includeZero=true}}{{defaultValue}}{{else}}0x00{{/if}}  } }{{#not_last}},{{/not_last}} /* {{index}} Cluster: {{clusterName}}, Attribute: {{name}}, Side: {{side}}*/ \
+  {{/if}}
+{{/all_user_cluster_generated_attributes}}
+}
 
 // Cluster function static arrays
-#define GENERATED_FUNCTION_ARRAYS   {{chip_endpoint_generated_functions}}
+#define GENERATED_FUNCTION_ARRAYS {{#generated_clustes_details}}{{chip_cluster_functions}}{{/generated_clustes_details}}
 
-#define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_ ## mask
-#define GENERATED_CLUSTER_COUNT {{endpoint_cluster_count}}
-#define GENERATED_CLUSTERS {{chip_endpoint_cluster_list}}
+{{#generated_clustes_details}}
+{{~#first}}#define GENERATED_CLUSTER_COUNT {{count}}{{new_line 1}}{{/first}}
+{{/generated_clustes_details}}
 
-#define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster*)(&generatedClusters[index]))
+// This is an array of EmberAfCluster structures.
+#define GENERATED_CLUSTERS { \
+{{#generated_clustes_details}}
+  { {{as_hex clusterCode 4}}, (EmberAfAttributeMetadata*)&(generatedAttributes[{{#all_user_cluster_generated_attributes}}{{#if (is_lowercase_equal ./clusterName ../clusterName)}}{{#if (is_num_equal ./clusterIndex 1)}}{{#if (is_lowercase_equal ./clusterSide ../clusterSide)}}{{index}}{{/if}}{{/if}}{{/if}}{{/all_user_cluster_generated_attributes}}]), {{attributeCount}}, {{attributesSize}}, {{chip_cluster_functions_mask}}, {{chip_cluster_functions_name 'NULL'}} }{{#not_last}},{{/not_last}} /* {{index}}, Endpoint Id: {{endpointIdentifier}}, Cluster: {{clusterName}}, Side: {{side}}*/ \
+{{/generated_clustes_details}}
+}
 
+#define GENERATED_ENDPOINT_TYPE_COUNT ({{#generated_endpoint_type_details}}{{#first}}{{count}}{{/first}}{{else}}0{{/generated_endpoint_type_details}})
 
 // This is an array of EmberAfEndpointType structures.
-#define GENERATED_ENDPOINT_TYPES {{endpoint_types_list}}
-
+#define GENERATED_ENDPOINT_TYPES { \
+{{#generated_endpoint_type_details}}
+  { ((EmberAfCluster*)&(generatedClusters[{{#generated_clustes_details}}{{#if (is_num_equal ./endpointIndex 1)}}{{#if (is_num_equal ./endpointTypeId ../endpointTypeId)}}{{./index}}{{/if}}{{/if}}{{/generated_clustes_details}}])), {{clusterCount}}, {{attributesSize}} }, \
+{{/generated_endpoint_type_details}}
+}
 
 // Largest attribute size is needed for various buffers
-#define ATTRIBUTE_LARGEST ({{endpoint_largest_attribute_size}})
+#define ATTRIBUTE_LARGEST ({{#all_user_cluster_generated_attributes}}{{#first}}{{maxAttributeSize}}{{/first}}{{else}}1{{/all_user_cluster_generated_attributes}})
 
 // Total size of singleton attributes
-#define ATTRIBUTE_SINGLETONS_SIZE ({{endpoint_singletons_size}})
+#define ATTRIBUTE_SINGLETONS_SIZE ({{#all_user_cluster_generated_attributes}}{{#first}}{{singletonAttributeSize}}{{/first}}{{else}}0{{/all_user_cluster_generated_attributes}})
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE ({{endpoint_total_storage_size}})
+#define ATTRIBUTE_MAX_SIZE ({{#generated_endpoint_type_details}}{{#first}}{{totalAttributeSizeAcrossEndpoints}}{{/first}}{{else}}0{{/generated_endpoint_type_details}})
 
 // Number of fixed endpoints
-#define FIXED_ENDPOINT_COUNT ({{endpoint_count}})
+#define FIXED_ENDPOINT_COUNT ({{#generated_endpoint_type_details}}{{#first}}{{count}}{{/first}}{{else}}0{{/generated_endpoint_type_details}})
 
 // Array of endpoints that are supported, the data inside
 // the array is the endpoint number.
-#define FIXED_ENDPOINT_ARRAY {{endpoint_fixed_endpoint_array}}
+#define FIXED_ENDPOINT_ARRAY { \
+{{#generated_endpoint_type_details}}
+  {{endpointIdentifier}}{{#not_last}},{{/not_last}} \
+{{/generated_endpoint_type_details}}
+}
 
 // Array of profile ids
-#define FIXED_PROFILE_IDS {{endpoint_fixed_profile_id_array}}
+#define FIXED_PROFILE_IDS { \
+{{#generated_endpoint_type_details}}
+  {{profileId}}{{#not_last}},{{/not_last}} \
+{{/generated_endpoint_type_details}}
+}
 
 // Array of device ids
-#define FIXED_DEVICE_IDS {{endpoint_fixed_device_id_array}}
+#define FIXED_DEVICE_IDS { \
+{{#generated_endpoint_type_details}}
+  {{#if deviceId}}{{deviceId}}{{else}}0{{/if}}{{#not_last}},{{/not_last}} \
+{{/generated_endpoint_type_details}}
+}
 
 // Array of device versions
-#define FIXED_DEVICE_VERSIONS {{endpoint_fixed_device_version_array}}
+#define FIXED_DEVICE_VERSIONS { \
+{{#generated_endpoint_type_details}}
+  {{#if deviceId}}{{deviceVersion}}{{else}}0{{/if}}{{#not_last}},{{/not_last}} \
+{{/generated_endpoint_type_details}}
+}
 
 // Array of endpoint types supported on each endpoint
-#define FIXED_ENDPOINT_TYPES {{endpoint_fixed_endpoint_type_array}}
+#define FIXED_ENDPOINT_TYPES { \
+{{#generated_endpoint_type_details}}
+  {{index}}{{#not_last}},{{/not_last}} \
+{{/generated_endpoint_type_details}}
+}
 
 // Array of networks supported on each endpoint
-#define FIXED_NETWORKS {{endpoint_fixed_network_array}}
+#define FIXED_NETWORKS { \
+{{#generated_endpoint_type_details}}
+  {{networkId}}{{#not_last}},{{/not_last}} \
+{{/generated_endpoint_type_details}}
+}
 
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_ ## mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT ({{endpoint_command_count}})
-#define GENERATED_COMMANDS {{endpoint_command_list}}
+#define EMBER_AF_GENERATED_COMMAND_COUNT ({{#all_user_cluster_generated_commands}}{{#first}}{{count}}{{/first}}{{else}}0{{/all_user_cluster_generated_commands}})
+
+#define GENERATED_COMMANDS { \
+{{#all_user_cluster_generated_commands}}
+{{~#if (is_num_equal 2 numberOfClusterSidesEnabled)}}
+  { {{as_hex clusterCode 4}}, {{as_hex commandCode 2}}, {{command_mask  commandSource "either" 1 1 commandMfgCode "COMMAND_MASK_"}} }, /* {{index}}, Cluster: {{clusterName}}, Command: {{commandName}}*/ \
+{{else}}
+  { {{as_hex clusterCode 4}}, {{as_hex commandCode 2}}, {{command_mask  commandSource clusterSide incoming outgoing commandMfgCode "COMMAND_MASK_"}} }, /* {{index}}, Cluster: {{clusterName}}, Command: {{commandName}}*/ \
+{{/if}}
+{{/all_user_cluster_generated_commands}}
+}
+
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
-#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT ({{endpoint_command_manufacturer_code_count}})
-#define GENERATED_COMMAND_MANUFACTURER_CODES {{endpoint_command_manufacturer_codes}}
+#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT ({{#all_user_cluster_generated_commands}}{{#first}}{{mfgCommandCount}}{{/first}}{{else}}0{{/all_user_cluster_generated_commands}})
+#define GENERATED_COMMAND_MANUFACTURER_CODES { \
+{{#all_user_cluster_generated_commands}}
+{{#if (is_defined commandMfgCode)}}
+  { {{index}}, {{as_hex commandMfgCode}} },  \
+{{/if}}
+{{/all_user_cluster_generated_commands}}
+}
 
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.
-#define GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT ({{endpoint_cluster_manufacturer_code_count}})
-#define GENERATED_CLUSTER_MANUFACTURER_CODES {{endpoint_cluster_manufacturer_codes}}
+#define GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT ({{#generated_clustes_details}}{{#first}}{{mfgClusterCount}}{{/first}}{{else}}0{{/generated_clustes_details}})
+#define GENERATED_CLUSTER_MANUFACTURER_CODES { \
+{{#generated_clustes_details}}
+{{#if (is_defined mfgCode)}}
+  { {{index}}, {{as_hex mfgCode}} },  \
+{{/if}}
+{{/generated_clustes_details}}
+}
 
 // This is an array of EmberAfManufacturerCodeEntry structures for attributes.
-#define GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT ({{endpoint_attribute_manufacturer_code_count}})
-#define GENERATED_ATTRIBUTE_MANUFACTURER_CODES {{endpoint_attribute_manufacturer_codes}}
+#define GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT ({{#all_user_cluster_generated_attributes}}{{#first}}{{mfgAttributeCount}}{{/first}}{{else}}0{{/all_user_cluster_generated_attributes}})
+#define GENERATED_ATTRIBUTE_MANUFACTURER_CODES { \
+{{#all_user_cluster_generated_attributes}}
+{{#if (is_defined mfgCode)}}
+  { {{index}}, {{as_hex mfgCode}} },  \
+{{/if}}
+{{/all_user_cluster_generated_attributes}}
+}
 
-// Array of EmberAfPluginReportingEntry structures.
-#define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_ ## x
-#define ZAP_REPORT_DIRECTION(x) ZRD(x)
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (0)
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS {}
 
-// User options for plugin Reporting
-#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE ({{endpoint_reporting_config_default_count}})
-#define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
-
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE ({{endpoint_reporting_config_default_count}})
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS {{endpoint_reporting_config_defaults}}
-
-{{/endpoint_config}}
+#define EMBER_AF_MANUFACTURER_CODE {{user_manufacturer_code}}
+#define EMBER_AF_DEFAULT_RESPONSE_POLICY_{{user_default_response_policy toupper="true"}}

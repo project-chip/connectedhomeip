@@ -134,129 +134,59 @@ function asReadType(type)
 // These helpers only works within the endpoint_config iterator
 
 // List of all cluster with generated functions
-var endpointClusterWithInit = [
-  'Basic',
-  'Identify',
-  'Groups',
-  'Scenes',
-  'Occupancy Sensing',
-  'On/Off',
-  'Level Control',
-  'Color Control',
-  'IAS Zone',
-  'Pump Configuration and Control',
-  'Ethernet Network Diagnostics',
-  'Software Diagnostics',
-  'Thread Network Diagnostics',
-  'General Diagnostics',
-  'WiFi Network Diagnostics',
-];
-var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
-var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
-var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
+const generatedFunctions = {
+  Init : [
+    'Basic', 'Identify', 'Groups', 'Scenes', 'OccupancySensing', 'OnOff', 'LevelControl', 'ColorControl', 'IasZone',
+    'PumpConfigurationAndControl', 'EthernetNetworkDiagnostics', 'SoftwareDiagnostics', 'ThreadNetworkDiagnostics',
+    'GeneralDiagnostics', 'WiFiNetworkDiagnostics',
+  ],
+  AttributeChanged : [ 'Identify', 'DoorLock', 'PumpConfigurationAndControl' ],
+  PreAttributeChanged : [ 'IasZone' ],
+  MessageSent : [ 'IasZone' ],
+};
 
-/**
- * Populate the GENERATED_FUNCTIONS field
- */
-function chip_endpoint_generated_functions()
+const generatedFunctionTypes = [ 'Init', 'AttributeChanged', 'MessageSent', 'PreAttributeChanged' ];
+
+function getGeneratedFunctionTypes(context)
 {
-  let alreadySetCluster = [];
-  let ret               = '\\\n';
-  this.clusterList.forEach((c) => {
-    let clusterName  = c.clusterName;
-    let functionList = '';
-    if (alreadySetCluster.includes(clusterName)) {
-      // Only one array of Generated functions per cluster across all endpoints
-      return
-    }
-    if (c.comment.includes('server')) {
-      let hasFunctionArray = false
-      if (endpointClusterWithInit.includes(clusterName))
-      {
-        hasFunctionArray = true
-        functionList     = functionList.concat(
-            `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
-      }
+  if (context.clusterSide != 'server') {
+    return [];
+  }
 
-      if (endpointClusterWithAttributeChanged.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
-            cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
-        hasFunctionArray = true
-      }
-
-      if (endpointClusterWithMessageSent.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
-            cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
-        hasFunctionArray = true
-      }
-
-      if (endpointClusterWithPreAttribute.includes(clusterName)) {
-        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
-            cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
-        hasFunctionArray = true
-      }
-
-      if (hasFunctionArray) {
-        ret = ret.concat(
-            `const EmberAfGenericClusterFunction chipFuncArray${cHelper.asCamelCased(clusterName, false)}Server[] = {\\\n`)
-        ret = ret.concat(functionList)
-        ret = ret.concat(`};\\\n`)
-        alreadySetCluster.push(clusterName)
-      }
-    }
-  })
-  return ret.concat('\n');
+  return generatedFunctionTypes.filter(type => generatedFunctions[type].includes(asUpperCamelCase(context.clusterName)));
 }
 
-/**
- * Return endpoint config GENERATED_CLUSTER MACRO
- * To be used as a replacement of endpoint_cluster_list since this one
- * includes the GENERATED_FUNCTIONS array
- */
-function chip_endpoint_cluster_list()
+const alreadyGeneratedFunctions = [];
+
+function chip_cluster_functions()
 {
-  let ret = '{ \\\n';
-  this.clusterList.forEach((c) => {
-    let mask          = '';
-    let functionArray = c.functions;
-    let clusterName   = c.clusterName;
+  const clusterName = asUpperCamelCase(this.clusterName);
+  // Only one array of Generated functions per cluster across all endpoints
+  if (alreadyGeneratedFunctions.includes(clusterName)) {
+    return null;
+  }
+  alreadyGeneratedFunctions.push(clusterName);
 
-    if (c.comment.includes('server')) {
-      let hasFunctionArray = false;
-      if (endpointClusterWithInit.includes(clusterName)) {
-        c.mask.push('INIT_FUNCTION')
-        hasFunctionArray = true
-      }
+  const types = getGeneratedFunctionTypes(this);
+  if (types.length == 0) {
+    return null;
+  }
 
-      if (endpointClusterWithAttributeChanged.includes(clusterName)) {
-        c.mask.push('ATTRIBUTE_CHANGED_FUNCTION')
-        hasFunctionArray = true
-      }
+  const functions = types.map(type => `(EmberAfGenericClusterFunction) emberAf${clusterName}ClusterServer${type}Callback,`);
+  return `\\\nconst EmberAfGenericClusterFunction chipFuncArray${clusterName}Server[] = { \\\n${functions.join(' \\\n')}}; \\\n`;
+}
 
-      if (endpointClusterWithPreAttribute.includes(clusterName)) {
-        c.mask.push('PRE_ATTRIBUTE_CHANGED_FUNCTION')
-        hasFunctionArray = true
-      }
+function chip_cluster_functions_name(defaultValue)
+{
+  const types = getGeneratedFunctionTypes(this);
+  return types.length == 0 ? defaultValue : `chipFuncArray${asUpperCamelCase(this.clusterName)}Server`;
+}
 
-      if (endpointClusterWithMessageSent.includes(clusterName)) {
-        c.mask.push('MESSAGE_SENT_FUNCTION')
-        hasFunctionArray = true
-      }
-
-      if (hasFunctionArray) {
-        functionArray = 'chipFuncArray' + cHelper.asCamelCased(clusterName, false) + 'Server'
-      }
-    }
-
-    if (c.mask.length == 0) {
-      mask = '0'
-    } else {
-      mask = c.mask.map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`).join(' | ')
-    }
-    ret = ret.concat(`  { ${c.clusterId}, ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), ${c.attributeCount}, ${c.attributeSize}, ${
-        mask}, ${functionArray} }, /* ${c.comment} */ \\\n`)
-  })
-  return ret.concat('}\n');
+function chip_cluster_functions_mask()
+{
+  const types = getGeneratedFunctionTypes(this);
+  const masks = [ this.clusterSide ].concat(types.map(type => type + 'Function'));
+  return masks.map(mask => `CLUSTER_MASK_${cHelper.asDelimitedMacro(mask)}`).join(' | ');
 }
 
 //  End of Endpoint-config specific helpers
@@ -417,14 +347,15 @@ function asChipZapType(type)
 //
 // Module exports
 //
-exports.asPrintFormat                     = asPrintFormat;
-exports.asReadType                        = asReadType;
-exports.asReadTypeLength                  = asReadTypeLength;
-exports.chip_endpoint_generated_functions = chip_endpoint_generated_functions
-exports.chip_endpoint_cluster_list        = chip_endpoint_cluster_list
-exports.asTypeLiteralSuffix               = asTypeLiteralSuffix;
-exports.asLowerCamelCase                  = asLowerCamelCase;
-exports.asUpperCamelCase                  = asUpperCamelCase;
-exports.hasSpecificAttributes             = hasSpecificAttributes;
-exports.asMEI                             = asMEI;
-exports.asChipZapType                     = asChipZapType;
+exports.asPrintFormat               = asPrintFormat;
+exports.asReadType                  = asReadType;
+exports.asReadTypeLength            = asReadTypeLength;
+exports.chip_cluster_functions      = chip_cluster_functions;
+exports.chip_cluster_functions_name = chip_cluster_functions_name;
+exports.chip_cluster_functions_mask = chip_cluster_functions_mask;
+exports.asTypeLiteralSuffix         = asTypeLiteralSuffix;
+exports.asLowerCamelCase            = asLowerCamelCase;
+exports.asUpperCamelCase            = asUpperCamelCase;
+exports.hasSpecificAttributes       = hasSpecificAttributes;
+exports.asMEI                       = asMEI;
+exports.asChipZapType               = asChipZapType;
