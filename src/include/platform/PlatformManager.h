@@ -197,7 +197,7 @@ private:
     // Software Diagnostics methods
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree);
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed);
-    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark); 
+    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
 
 protected:
     // Construction/destruction limited to subclasses.

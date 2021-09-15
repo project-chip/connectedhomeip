@@ -60,7 +60,7 @@ protected:
 
     CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
     CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
-    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark); 
+    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
 
     // ===== Support methods that can be overridden by the implementation subclass.
 
@@ -84,7 +84,7 @@ inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetCurrentHeapFree(uin
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-template <class ImplClass>    
+template <class ImplClass>
 inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
