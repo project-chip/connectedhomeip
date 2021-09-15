@@ -30,12 +30,6 @@ using chip::bdx::StatusCode;
 using chip::bdx::TransferControlFlags;
 using chip::bdx::TransferSession;
 
-bool IsStatusReportMessage(const TransferSession::MessageTypeData & msgTypeData)
-{
-    return (msgTypeData.ProtocolId == chip::Protocols::SecureChannel::Id) &&
-        (msgTypeData.MessageType == static_cast<uint8_t>(chip::Protocols::SecureChannel::MsgType::StatusReport));
-}
-
 BdxOtaSender::BdxOtaSender()
 {
     memset(mFilepath, 0, kFilepathMaxLength);
@@ -68,7 +62,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         break;
     case TransferSession::OutputEventType::kMsgToSend: {
         chip::Messaging::SendFlags sendFlags;
-        if (!IsStatusReportMessage(event.msgTypeData))
+        if (!event.msgTypeData.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
         {
             // All messages sent from the Sender expect a response, except for a StatusReport which would indicate an error and the
             // end of the transfer.

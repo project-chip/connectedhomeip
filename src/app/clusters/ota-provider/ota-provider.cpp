@@ -168,8 +168,6 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(EndpointId endpoi
     ChipLogDetail(Zcl, "OTA Provider received QueryImage");
 
     // TODO: (#7112) change location size checking once CHAR_STRING is supported
-    // The following commented code does not work because location is being treated as uint8_t* and this leads to always sending a
-    // failure response message.
     const size_t locationLen = strlen(reinterpret_cast<char *>(location));
     if (locationLen != kLocationParamLength)
     {
