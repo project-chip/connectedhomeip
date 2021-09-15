@@ -339,6 +339,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>::ConnectivityFlags>
     ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
+std::mutex ConnectivityManagerImpl::mWpaSupplicantLock;
 
 bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity()
 {
@@ -399,8 +400,11 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
     bool ret            = false;
     const gchar * state = nullptr;
 
+    mWpaSupplicantLock.lock();
+
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
+        mWpaSupplicantLock.unlock();
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationConnected: interface not connected");
         return false;
     }
@@ -412,6 +416,8 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
             .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity);
         ret = true;
     }
+
+    mWpaSupplicantLock.unlock();
 
     return ret;
 }
@@ -426,8 +432,11 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
     bool ret          = false;
     const gchar * bss = nullptr;
 
+    mWpaSupplicantLock.lock();
+
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
+        mWpaSupplicantLock.unlock();
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationProvisioned: interface not connected");
         return false;
     }
@@ -438,13 +447,18 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
         ret = true;
     }
 
+    mWpaSupplicantLock.unlock();
+
     return ret;
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 {
+    mWpaSupplicantLock.lock();
+
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
+        mWpaSupplicantLock.unlock();
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _ClearWiFiStationProvision: interface not connected");
         return;
     }
@@ -461,12 +475,20 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
             g_error_free(err);
         }
     }
+
+    mWpaSupplicantLock.unlock();
 }
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {
-    return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
+    mWpaSupplicantLock.lock();
+
+    bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
         mWpaSupplicant.scanState == GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
+
+    mWpaSupplicantLock.unlock();
+
+    return ret;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
@@ -559,7 +581,10 @@ CHIP_ERROR ConnectivityManagerImpl::_GetEthOverrunCount(uint64_t & overrunCount)
 
 void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
-    GError * err                            = nullptr;
+    GError * err = nullptr;
+
+    mWpaSupplicantLock.lock();
+
     WpaFiW1Wpa_supplicant1Interface * iface = wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus_finish(res, &err);
 
     if (mWpaSupplicant.iface)
@@ -584,11 +609,15 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
 
     if (err != nullptr)
         g_error_free(err);
+
+    mWpaSupplicantLock.unlock();
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     GError * err = nullptr;
+
+    mWpaSupplicantLock.lock();
 
     gboolean result =
         wpa_fi_w1_wpa_supplicant1_call_get_interface_finish(mWpaSupplicant.proxy, &mWpaSupplicant.interfacePath, res, &err);
@@ -648,13 +677,20 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
 
     if (err != nullptr)
         g_error_free(err);
+
+    mWpaSupplicantLock.unlock();
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                                    gpointer user_data)
 {
+    mWpaSupplicantLock.lock();
+
     if (mWpaSupplicant.interfacePath)
+    {
+        mWpaSupplicantLock.unlock();
         return;
+    }
 
     mWpaSupplicant.interfacePath = const_cast<gchar *>(path);
     if (mWpaSupplicant.interfacePath)
@@ -666,13 +702,20 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * prox
                                                               mWpaSupplicant.interfacePath, nullptr, _OnWpaInterfaceProxyReady,
                                                               nullptr);
     }
+
+    mWpaSupplicantLock.unlock();
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                                      gpointer user_data)
 {
+    mWpaSupplicantLock.lock();
+
     if (mWpaSupplicant.interfacePath == nullptr)
+    {
+        mWpaSupplicantLock.unlock();
         return;
+    }
 
     if (g_strcmp0(mWpaSupplicant.interfacePath, path) == 0)
     {
@@ -694,11 +737,15 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * pr
 
         mWpaSupplicant.scanState = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
     }
+
+    mWpaSupplicantLock.unlock();
 }
 
 void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     GError * err = nullptr;
+
+    mWpaSupplicantLock.lock();
 
     mWpaSupplicant.proxy = wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus_finish(res, &err);
     if (mWpaSupplicant.proxy != nullptr && err == nullptr)
@@ -722,6 +769,8 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 
     if (err != nullptr)
         g_error_free(err);
+
+    mWpaSupplicantLock.unlock();
 }
 
 void ConnectivityManagerImpl::StartWiFiManagement()
@@ -740,7 +789,13 @@ void ConnectivityManagerImpl::StartWiFiManagement()
 
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 {
-    return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
+    mWpaSupplicantLock.lock();
+
+    bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
+
+    mWpaSupplicantLock.unlock();
+
+    return ret;
 }
 
 void ConnectivityManagerImpl::DriveAPState()
