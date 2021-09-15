@@ -21,6 +21,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMemString.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/Flags.h>
 #include <protocols/bdx/BdxTransferSession.h>
 
 #include <fstream>
@@ -28,6 +29,12 @@
 using chip::bdx::StatusCode;
 using chip::bdx::TransferControlFlags;
 using chip::bdx::TransferSession;
+
+bool IsStatusReportMessage(const TransferSession::MessageTypeData & msgTypeData)
+{
+    return (msgTypeData.ProtocolId == chip::Protocols::SecureChannel::Id) &&
+        (msgTypeData.MessageType == static_cast<uint8_t>(chip::Protocols::SecureChannel::MsgType::StatusReport));
+}
 
 BdxOtaSender::BdxOtaSender()
 {
@@ -59,14 +66,23 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
     {
     case TransferSession::OutputEventType::kNone:
         break;
-    case TransferSession::OutputEventType::kMsgToSend:
+    case TransferSession::OutputEventType::kMsgToSend: {
+        chip::Messaging::SendFlags sendFlags;
+        if (!IsStatusReportMessage(event.msgTypeData))
+        {
+            // All messages sent from the Sender expect a response, except for a StatusReport which would indicate an error and the
+            // end of the transfer.
+            sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
+        }
         VerifyOrReturn(mExchangeCtx != nullptr, ChipLogError(BDX, "%s: mExchangeCtx is null", __FUNCTION__));
-        err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, std::move(event.MsgData));
+        err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, std::move(event.MsgData),
+                                        sendFlags);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(BDX, "SendMessage failed: %s", chip::ErrorStr(err));
         }
         break;
+    }
     case TransferSession::OutputEventType::kInitReceived: {
         // TransferSession will automatically reject a transfer if there are no
         // common supported control modes. It will also default to the smaller
@@ -97,19 +113,20 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         {
             // TODO: AbortTransfer() needs to support GeneralStatusCode failures as well as BDX specific errors.
             mTransfer.AbortTransfer(StatusCode::kUnknown);
+            return;
         }
 
         std::ifstream otaFile(mFilepath, std::ifstream::in);
         VerifyOrReturn(otaFile.good(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
         otaFile.seekg(mNumBytesSent);
         otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
-        VerifyOrReturn(otaFile.good(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
+        VerifyOrReturn(otaFile.good() || otaFile.eof(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
 
         blockData.Data   = blockBuf->Start();
         blockData.Length = otaFile.gcount();
-        blockData.IsEof  = (otaFile.gcount() < blockSize) ||
-            (mNumBytesSent + static_cast<uint64_t>(otaFile.gcount()) == mTransfer.GetTransferLength() || (otaFile.peek() == EOF));
-        mNumBytesSent = static_cast<uint32_t>(mNumBytesSent + otaFile.gcount());
+        blockData.IsEof  = (blockData.Length < blockSize) ||
+            (mNumBytesSent + static_cast<uint64_t>(blockData.Length) == mTransfer.GetTransferLength() || (otaFile.peek() == EOF));
+        mNumBytesSent = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
 
         VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlock(blockData),
                        ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err)));
