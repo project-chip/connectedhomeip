@@ -20,17 +20,16 @@
 #include "AppTask.h"
 #include "PigweedLoggerMutex.h"
 #include "RpcService.h"
-#include "button_service/button_service.rpc.pb.h"
-#include "device_service/device_service.rpc.pb.h"
 #include "esp_log.h"
+#include "esp_system.h"
 #include "freertos/FreeRTOS.h"
-#include "freertos/event_groups.h"
-#include "freertos/semphr.h"
 #include "freertos/task.h"
-#include "locking_service/locking_service.rpc.pb.h"
-#include "pw_log/log.h"
 #include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
+#include "rpc_services/Button.h"
+#include "rpc_services/Device.h"
+#include "rpc_services/Locking.h"
+
 #include <lib/support/logging/CHIPLogging.h>
 
 const char * TAG = "RPC";
@@ -42,56 +41,23 @@ static bool uartInitialised;
 namespace chip {
 namespace rpc {
 
-class Locking final : public generated::Locking<Locking>
-{
-
-public:
-    pw::Status Set(ServerContext &, const chip_rpc_LockingState & request, pw_protobuf_Empty & response)
-    {
-        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock,
-                                     request.locked ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
-        return pw::OkStatus();
-    }
-
-    pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LockingState & response)
-    {
-        response.locked = !BoltLockMgr().IsUnlocked();
-        return pw::OkStatus();
-    }
-};
-
-class Button final : public generated::Button<Button>
+class Esp32Button final : public Button
 {
 public:
-    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
+    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
         GetAppTask().ButtonEventHandler(request.idx, request.pushed);
         return pw::OkStatus();
     }
 };
 
-class Device final : public generated::Device<Device>
+class Esp32Device final : public Device
 {
 public:
-    pw::Status FactoryReset(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
-        ConfigurationMgr().InitiateFactoryReset();
-        return pw::OkStatus();
-    }
-    pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
-    {
-        return pw::OkStatus();
-    }
-    pw::Status TriggerOta(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
-    {
-        // TODO: auto err = DeviceLayer::SoftwareUpdateMgr().CheckNow();
-        return pw::Status::Unimplemented();
-    }
-    pw::Status GetDeviceInfo(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
-    {
-        response.vendor_id        = 1234;
-        response.product_id       = 5678;
-        response.software_version = 0;
+        esp_restart();
+        // WILL NOT RETURN
         return pw::OkStatus();
     }
 };
@@ -101,7 +67,7 @@ constexpr uint8_t kRpcTaskPriority  = 5;
 
 TaskHandle_t rpcTaskHandle;
 
-Button button_service;
+Esp32Button button_service;
 Locking locking_service;
 Device device_service;
 
@@ -122,7 +88,7 @@ void Init()
     PigweedLogger::init();
     uartInitialised = true;
 
-    ESP_LOGI(TAG, "----------- esp32-pigweed-service starting -----------");
+    ESP_LOGI(TAG, "----------- esp32-rpc-service starting -----------");
 
     xTaskCreate(RunRpcService, "RPC", kRpcStackSizeBytes / sizeof(StackType_t), nullptr, kRpcTaskPriority, &rpcTaskHandle);
 }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,21 @@
 
 #pragma once
 
-#include <kernel.h>
+#include "button_service/button_service.rpc.pb.h"
 
 namespace chip {
 namespace rpc {
 
-class NrfButton;
+class Button : public generated::Button<Button>
+{
+public:
+    virtual ~Button() = default;
 
-void RunRpcService(void *, void *, void *);
-
-k_tid_t Init();
+    virtual pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
+    {
+        return pw::Status::Unimplemented();
+    }
+};
 
 } // namespace rpc
 } // namespace chip

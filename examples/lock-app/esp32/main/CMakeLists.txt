@@ -21,6 +21,7 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_CURRENT_LIST_DIR}"
                      "${CMAKE_SOURCE_DIR}/../../platform/esp32/pw_sys_io/public"
                      "${CMAKE_SOURCE_DIR}/../../platform/esp32"
+                     "${CMAKE_SOURCE_DIR}/../../common"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support"
@@ -87,11 +88,11 @@ pw_proto_library(button_service
 
 pw_proto_library(locking_service
   SOURCES
-    ${CHIP_ROOT}/examples/lock-app/lock-common/locking_service/locking_service.proto
+    ${CHIP_ROOT}/examples/common/pigweed/protos/locking_service.proto
   PREFIX
     locking_service
   STRIP_PREFIX
-    ${CHIP_ROOT}/examples/lock-app/lock-common/locking_service
+    ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
     pw_protobuf.common_protos
 )
