@@ -138,7 +138,6 @@ on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)**
 -   To use the chip-rpc console after it has been installed run:
     `python3 -m chip_rpc.console -s localhost:33000 -o /<YourFolder>/pw_log.out`
 
--   Then you can Get and Set the pump using the RPCs:
-    `rpcs.chip.rpc.Pump.Get()`
+-   Then you can Get and Set the pump using the RPCs: `rpcs.chip.rpc.Pump.Get()`
 
     `rpcs.chip.rpc.Pump.Set(on=True)`
