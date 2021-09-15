@@ -23,12 +23,12 @@
 
 #include "SetupPayload.h"
 
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVData.hpp>
-#include <core/CHIPTLVUtilities.hpp>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVData.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/RandUtils.h>
 #include <utility>
 
 namespace chip {

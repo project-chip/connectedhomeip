@@ -91,8 +91,8 @@ private:
     uint16_t mBoundPort;
 
     CHIP_ERROR GetSocket(IPAddressType addrType);
-    void HandlePendingIO();
-    static void HandlePendingIO(System::WatchableSocket & socket);
+    void HandlePendingIO(System::SocketEvents events);
+    static void HandlePendingIO(System::SocketEvents events, intptr_t data);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_source_t mReadableSource = nullptr;

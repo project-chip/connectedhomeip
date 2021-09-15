@@ -27,9 +27,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ScopedBuffer.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
 
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {
@@ -120,20 +120,19 @@ int Commands::Run(int argc, char ** argv)
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 #endif // !CONFIG_USE_SEPARATE_EVENTLOOP
 
-    if (command)
+exit:
+#if CONFIG_USE_SEPARATE_EVENTLOOP
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
+
+    if ((err == CHIP_NO_ERROR) && (command != nullptr))
     {
         err = command->GetCommandExitStatus();
     }
-
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
     }
-
-#if CONFIG_USE_SEPARATE_EVENTLOOP
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
     if (command)
     {

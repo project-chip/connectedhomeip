@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include <mdns/ServiceNaming.h>
+#include <lib/mdns/ServiceNaming.h>
 
 #include <string.h>
 
-#include <support/UnitTestRegistration.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -34,12 +34,14 @@ void TestMakeInstanceName(nlTestSuite * inSuite, void * inContext)
     char buffer[128];
 
     NL_TEST_ASSERT(inSuite,
-                   MakeInstanceName(buffer, sizeof(buffer), PeerId().SetFabricId(0x1234).SetNodeId(0x5678)) == CHIP_NO_ERROR);
+                   MakeInstanceName(buffer, sizeof(buffer), PeerId().SetCompressedFabricId(0x1234).SetNodeId(0x5678)) ==
+                       CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "0000000000001234-0000000000005678") == 0);
 
     NL_TEST_ASSERT(inSuite,
                    MakeInstanceName(buffer, sizeof(buffer),
-                                    PeerId().SetFabricId(0x1122334455667788ULL).SetNodeId(0x123456789abcdefULL)) == CHIP_NO_ERROR);
+                                    PeerId().SetCompressedFabricId(0x1122334455667788ULL).SetNodeId(0x123456789abcdefULL)) ==
+                       CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "1122334455667788-0123456789ABCDEF") == 0);
 
     // insufficient buffer size:
@@ -61,12 +63,12 @@ void TestExtractIdFromInstanceName(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName(nullptr, &peerId) == CHIP_ERROR_INVALID_ARGUMENT);
 
     NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("ABCDEF1234567890-1234567890ABCDEF", &peerId) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, peerId == PeerId().SetFabricId(0xABCDEF1234567890ULL).SetNodeId(0x1234567890ABCDEFULL));
+    NL_TEST_ASSERT(inSuite, peerId == PeerId().SetCompressedFabricId(0xABCDEF1234567890ULL).SetNodeId(0x1234567890ABCDEFULL));
 
     // ending in period (partial name) is acceptable
     NL_TEST_ASSERT(inSuite,
                    ExtractIdFromInstanceName("1122334455667788-AABBCCDDEEFF1122.some.suffix.here", &peerId) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, peerId == PeerId().SetFabricId(0x1122334455667788ULL).SetNodeId(0xaabbccddeeff1122ULL));
+    NL_TEST_ASSERT(inSuite, peerId == PeerId().SetCompressedFabricId(0x1122334455667788ULL).SetNodeId(0xaabbccddeeff1122ULL));
 
     // Invalid: non hex character
     NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1x22334455667788-AABBCCDDEEDD1122", &peerId) != CHIP_NO_ERROR);
@@ -145,22 +147,8 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
 
     // Commisioning mode tests
     filter.type = DiscoveryFilterType::kCommissioningMode;
-    filter.code = 0;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C0") == 0);
-    filter.code = 1;
-    NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C1") == 0);
-    filter.code = 2; // only or or 1 allwoed
-    NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) != CHIP_NO_ERROR);
-
-    // Commissioning mode open from command
-    filter.type = DiscoveryFilterType::kCommissioningModeFromCommand;
-    filter.code = 1;
-    NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_A1") == 0);
-    filter.code = 0; // 1 is only value allowed
-    NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_CM") == 0);
 
     // None tests.
     filter.type = DiscoveryFilterType::kNone;
@@ -231,27 +219,9 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
 
     // Commisioning mode tests
     filter.type = DiscoveryFilterType::kCommissioningMode;
-    filter.code = 0;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C0._sub._matterc") == 0);
-    filter.code = 1;
-    NL_TEST_ASSERT(inSuite,
-                   MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C1._sub._matterc") == 0);
-    filter.code = 2; // only or or 1 allwoed
-    NL_TEST_ASSERT(inSuite,
-                   MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) != CHIP_NO_ERROR);
-
-    // Commissioning mode open from command
-    filter.type = DiscoveryFilterType::kCommissioningModeFromCommand;
-    filter.code = 1;
-    NL_TEST_ASSERT(inSuite,
-                   MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_A1._sub._matterc") == 0);
-    filter.code = 0; // 1 is only value allowed
-    NL_TEST_ASSERT(inSuite,
-                   MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_CM._sub._matterc") == 0);
 
     // None tests
     filter.type = DiscoveryFilterType::kNone;
@@ -272,11 +242,10 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 9, filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_matterc") == 0);
 
-    // Test buffer exactly the right size for subtype - "_C1._sub._matterc" = 17 + nullchar = 18
+    // Test buffer exactly the right size for subtype - "_CM._sub._matterc" = 17 + nullchar = 18
     filter.type = DiscoveryFilterType::kCommissioningMode;
-    filter.code = 1;
     NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, 18, filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_C1._sub._matterc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_CM._sub._matterc") == 0);
 }
 
 const nlTest sTests[] = {

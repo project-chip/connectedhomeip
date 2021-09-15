@@ -21,7 +21,7 @@
 #include "ResponseBuilder.h"
 #include "Server.h"
 
-#include <mdns/minimal/responders/QueryResponder.h>
+#include <lib/mdns/minimal/responders/QueryResponder.h>
 
 #include <inet/InetLayer.h>
 #include <system/SystemPacketBuffer.h>

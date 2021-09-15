@@ -34,11 +34,11 @@
 
 #pragma once
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 #include <platform/logging/LogV.h>
 
-#include <support/logging/Constants.h>
+#include <lib/support/logging/Constants.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -252,63 +252,6 @@ bool IsCategoryEnabled(uint8_t category);
 #define ChipLogIfFalse(aCondition) IgnoreUnusedVariable(aCondition)
 
 #endif // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
-
-/**
- *  @def ChipLogFunctError(aErr)
- *
- *  @brief
- *    If the given error value (@a aErr) is not successful (!= CHIP_NO_ERROR),
- *    the method logs the file name, line number, and the error code.
- *
- *  @note
- *    Evaluation of @a aErr is always done, but logging is only enabled when
- *    #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING is enabled. This can be turned
- *    on or off for each compilation unit by enabling or disabling, as desired,
- *    #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING before ChipLogging.h is included
- *    by the preprocessor.
- *
- *  Example Usage:
- *
- *  @code
- *  #define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 1
- *
- *  #include <chip/Support/Logging/ChipLogging.h>
- *
- *  ...
- *
- *  void foo(void)
- *  {
- *      CHIP_ERROR err = CHIP_NO_ERROR;
- *
- *      ...
- *
- *  exit:
- *      ChipLogFunctError(err);
- *  }
- *  @endcode
- *
- *  @param[in]  aErr     A scalar status to be evaluated against CHIP_NO_ERROR.
- *
- *  @sa #CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
- *
- */
-
-#if CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING && !defined(ChipLogFunctError)
-
-#define ChipLogFunctError(aErr)                                                                                                    \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        if ((aErr) != CHIP_NO_ERROR)                                                                                               \
-        {                                                                                                                          \
-            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(aErr), __FILE__, __LINE__);                                         \
-        }                                                                                                                          \
-    } while (0)
-
-#else // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-
-#define ChipLogFunctError(aErr) IgnoreUnusedVariable(aErr)
-
-#endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
 
 /*
  *  @brief

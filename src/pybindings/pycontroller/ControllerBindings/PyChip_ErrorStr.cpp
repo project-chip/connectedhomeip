@@ -14,10 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
 #include <sstream>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
 
 #include <functional>
 #include <pybind11/pybind11.h>

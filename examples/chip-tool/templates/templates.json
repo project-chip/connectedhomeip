@@ -24,25 +24,37 @@
             "path": "../../../src/app/zap-templates/partials/cluster_header.zapt"
         },
         {
+            "name": "process_response_value",
+            "path": "partials/process_response_value.zapt"
+        },
+        {
             "name": "test_cluster",
             "path": "partials/test_cluster.zapt"
+        },
+        {
+            "name": "TestSuiteHelper_WaitForMs",
+            "path": "partials/testsuite/WaitForMs.zapt"
+        },
+        {
+            "name": "TestSuiteHelper_WaitForAttributeReport",
+            "path": "partials/testsuite/WaitForAttributeReport.zapt"
         }
     ],
     "templates": [
         {
             "path": "commands.zapt",
             "name": "Cluster Commands header",
-            "output": "examples/chip-tool/commands/clusters/Commands.h"
+            "output": "cluster/Commands.h"
         },
         {
             "path": "reporting-commands.zapt",
             "name": "Reporting Commands header",
-            "output": "examples/chip-tool/commands/reporting/Commands.h"
+            "output": "reporting/Commands.h"
         },
         {
             "path": "tests-commands.zapt",
             "name": "Tests Commands header",
-            "output": "examples/chip-tool/commands/tests/Commands.h"
+            "output": "test/Commands.h"
         }
     ]
 }

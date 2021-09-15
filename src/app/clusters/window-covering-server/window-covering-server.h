@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/util/af-types.h>
 
 namespace chip {

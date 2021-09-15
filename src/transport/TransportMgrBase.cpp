@@ -16,7 +16,7 @@
 
 #include <transport/TransportMgrBase.h>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
 
@@ -52,6 +52,15 @@ void TransportMgrBase::Close()
 
 void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
+    if (msg->HasChainedBuffer())
+    {
+        // Something in the lower levels messed up.
+        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        peerAddress.ToString(addrBuffer);
+        ChipLogError(Inet, "message from %s dropped due to lower layers not ensuring a single packet buffer.", addrBuffer);
+        return;
+    }
+
     if (mSecureSessionMgr != nullptr)
     {
         mSecureSessionMgr->OnMessageReceived(peerAddress, std::move(msg));

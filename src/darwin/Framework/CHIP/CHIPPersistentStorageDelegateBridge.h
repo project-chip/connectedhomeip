@@ -18,7 +18,7 @@
 #import "CHIPPersistentStorageDelegate.h"
 
 #import "CHIPError_Internal.h"
-#include <core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

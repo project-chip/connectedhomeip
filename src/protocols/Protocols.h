@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 
 namespace chip {
 namespace Protocols {

@@ -29,11 +29,11 @@
 
 #include "common.h"
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
@@ -77,7 +77,7 @@ void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
 void Shutdown()
 {
-    chip::DeviceLayer::SystemLayer.CancelTimer(EchoTimerHandler, NULL);
+    chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
     gEchoClient.Shutdown();
     ShutdownChip();
 }
@@ -123,7 +123,7 @@ CHIP_ERROR SendEchoRequest()
 
     gLastEchoTime = chip::System::Clock::GetMonotonicMilliseconds();
 
-    err = chip::DeviceLayer::SystemLayer.StartTimer(gEchoInterval, EchoTimerHandler, NULL);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(gEchoInterval, EchoTimerHandler, NULL);
     if (err != CHIP_NO_ERROR)
     {
         printf("Unable to schedule timer\n");
@@ -141,7 +141,7 @@ CHIP_ERROR SendEchoRequest()
     else
     {
         printf("Send echo request failed, err: %s\n", chip::ErrorStr(err));
-        chip::DeviceLayer::SystemLayer.CancelTimer(EchoTimerHandler, NULL);
+        chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
     }
 
     return err;
@@ -234,7 +234,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer, &gTCPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &fabrics, &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
@@ -244,7 +244,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer, &gUDPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &fabrics, &gMessageCounterManager);
         SuccessOrExit(err);
     }
 
@@ -264,7 +264,7 @@ int main(int argc, char * argv[])
     // Arrange to get a callback whenever an Echo Response is received.
     gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
-    err = chip::DeviceLayer::SystemLayer.StartTimer(0, EchoTimerHandler, NULL);
+    err = chip::DeviceLayer::SystemLayer().StartTimer(0, EchoTimerHandler, NULL);
     SuccessOrExit(err);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();

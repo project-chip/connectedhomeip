@@ -34,12 +34,11 @@
 
 #include "window-covering-server.h"
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
-#include <app/common/gen/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af-types.h>
@@ -163,6 +162,26 @@ bool IsOpen(chip::EndpointId endpoint)
     Attributes::GetInstalledOpenLimitTilt(endpoint, &tiltLimit);
     return liftPosition == liftLimit && tiltPosition == tiltLimit;
 }
+static uint8_t OperationalStateToValue(const OperationalState & state)
+{
+    switch (state)
+    {
+    case OperationalState::Stall:
+        return 0x00;
+    case OperationalState::MovingUpOrOpen:
+        return 0x01;
+    case OperationalState::MovingDownOrClose:
+        return 0x02;
+    case OperationalState::Reserved:
+    default:
+        return 0x03;
+    }
+}
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace WindowCovering {
 
 bool IsClosed(chip::EndpointId endpoint)
 {

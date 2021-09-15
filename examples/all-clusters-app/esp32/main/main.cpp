@@ -43,10 +43,10 @@
 #include <string>
 #include <vector>
 
-#include <app/common/gen/att-storage.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/att-storage.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/Mdns.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -56,11 +56,11 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/shell/Engine.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <support/CHIPMem.h>
-#include <support/ErrorStr.h>
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
@@ -330,14 +330,12 @@ class SetupListModel : public ListScreen::Model
 public:
     SetupListModel()
     {
-        std::string resetWiFi                      = "Reset WiFi";
-        std::string resetToFactory                 = "Reset to factory";
-        std::string forceWifiCommissioningBasic    = "Force WiFi commissioning (basic)";
-        std::string forceWifiCommissioningEnhanced = "Force WiFi commissioning (enhanced)";
+        std::string resetWiFi                   = "Reset WiFi";
+        std::string resetToFactory              = "Reset to factory";
+        std::string forceWifiCommissioningBasic = "Force WiFi commissioning (basic)";
         options.emplace_back(resetWiFi);
         options.emplace_back(resetToFactory);
         options.emplace_back(forceWifiCommissioningBasic);
-        options.emplace_back(forceWifiCommissioningEnhanced);
     }
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }
@@ -348,7 +346,7 @@ public:
         if (i == 0)
         {
             ConnectivityMgr().ClearWiFiStationProvision();
-            OpenBasicCommissioningWindow(ResetFabrics::kYes);
+            chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(ResetFabrics::kYes);
         }
         else if (i == 1)
         {
@@ -356,13 +354,10 @@ public:
         }
         else if (i == 2)
         {
-            app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledBasic);
-            OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
-        }
-        else if (i == 3)
-        {
-            app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledEnhanced);
-            OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
+            app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledBasic);
+
+            chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(
+                ResetFabrics::kYes, kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdns);
         }
     }
 
@@ -634,7 +629,7 @@ extern "C" void app_main()
 
     // Init ZCL Data Model and CHIP App Server
     AppCallbacks callbacks;
-    InitServer(&callbacks);
+    chip::Server::GetInstance().Init(&callbacks);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

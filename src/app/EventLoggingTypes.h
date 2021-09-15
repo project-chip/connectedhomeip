@@ -19,8 +19,8 @@
 
 #include <app/ClusterInfo.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
 #include <system/SystemPacketBuffer.h>
 
 constexpr size_t kNumPriorityLevel = 3;

@@ -14,20 +14,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <mdns/minimal/ResponseSender.h>
+#include <lib/mdns/minimal/ResponseSender.h>
 
 #include <string>
 #include <vector>
 
-#include <mdns/minimal/RecordData.h>
-#include <mdns/minimal/core/FlatAllocatedQName.h>
-#include <mdns/minimal/responders/Ptr.h>
-#include <mdns/minimal/responders/Srv.h>
-#include <mdns/minimal/responders/Txt.h>
-#include <mdns/minimal/tests/CheckOnlyServer.h>
+#include <lib/mdns/minimal/RecordData.h>
+#include <lib/mdns/minimal/core/FlatAllocatedQName.h>
+#include <lib/mdns/minimal/responders/Ptr.h>
+#include <lib/mdns/minimal/responders/Srv.h>
+#include <lib/mdns/minimal/responders/Txt.h>
+#include <lib/mdns/minimal/tests/CheckOnlyServer.h>
 
-#include <support/CHIPMem.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/af.h>
 
 using namespace chip;

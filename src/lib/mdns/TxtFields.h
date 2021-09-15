@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
-#include <mdns/Resolver.h>
-#include <support/Span.h>
+#include <lib/core/CHIPError.h>
+#include <lib/mdns/Resolver.h>
+#include <lib/support/Span.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -52,7 +52,6 @@ TxtFieldKey GetTxtFieldKey(const ByteSpan & key);
 uint16_t GetProduct(const ByteSpan & value);
 uint16_t GetVendor(const ByteSpan & value);
 uint16_t GetLongDiscriminator(const ByteSpan & value);
-uint8_t GetAdditionalPairing(const ByteSpan & value);
 uint8_t GetCommissioningMode(const ByteSpan & value);
 // TODO: possibly 32-bit? see spec issue #3226
 uint16_t GetDeviceType(const ByteSpan & value);

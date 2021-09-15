@@ -24,10 +24,10 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <thread>
 
@@ -107,7 +107,11 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                         ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", name,
                                       event.InternetConnectivityChange.address);
 
-                        PlatformMgr().PostEvent(&event);
+                        CHIP_ERROR status = PlatformMgr().PostEvent(&event);
+                        if (status != CHIP_NO_ERROR)
+                        {
+                            ChipLogDetail(DeviceLayer, "Failed to report IP address: %" CHIP_ERROR_FORMAT, status.Format());
+                        }
                     }
                     routeInfo = RTA_NEXT(routeInfo, rtl);
                 }

@@ -22,10 +22,10 @@
 #include "JniTypeWrappers.h"
 
 #include <lib/mdns/platform/Mdns.h>
-#include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <string>
 
@@ -102,11 +102,6 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, Inet::InterfaceId interface, M
 
     return CHIP_NO_ERROR;
 }
-
-// Implementation of other methods required by the CHIP stack
-
-void GetMdnsTimeout(timeval & timeout) {}
-void HandleMdnsTimeout() {}
 
 // Implemention of Java-specific functions
 

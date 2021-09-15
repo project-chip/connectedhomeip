@@ -49,10 +49,8 @@ def main(argv):
             }, argv)
         dfs: DFs = memdf.collect.collect_files(config)
 
-        by = config['report.by']
         symbols = dfs[SymbolDF.name]
-        summary = symbols[[by, 'size'
-                           ]].groupby(by).aggregate(np.sum).reset_index()
+        summary = memdf.select.groupby(config, symbols)
         memdf.report.write_dfs(config, {SymbolDF.name: summary})
 
     except Exception as exception:

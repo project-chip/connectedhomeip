@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <mdns/minimal/Server.h>
+#include <lib/mdns/minimal/Server.h>
 
 namespace MdnsExample {
 

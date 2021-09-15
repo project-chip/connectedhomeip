@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <support/Defer.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/Defer.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <memory>
 

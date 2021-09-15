@@ -19,9 +19,10 @@
 
 namespace chip {
 
-// ZCL strings are stored as pascal-strings (first byte contains the length of the
-// data), so the maximum string length is the maximum of uint8_t
-constexpr size_t kBufferMaximumSize = std::numeric_limits<uint8_t>::max();
+// ZCL strings are stored as pascal-strings (first byte contains the length of
+// the data), and a length of 255 means "invalid string" so the maximum actually
+// allowed string length is 254.
+constexpr size_t kBufferMaximumSize = 254;
 
 CHIP_ERROR MakeZclCharString(MutableByteSpan & buffer, const char * cString)
 {

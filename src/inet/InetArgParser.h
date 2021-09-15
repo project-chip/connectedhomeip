@@ -25,11 +25,11 @@
 
 #pragma once
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 
-#include <support/CHIPArgParser.hpp>
+#include <lib/support/CHIPArgParser.hpp>
 
 #include <inet/IPAddress.h>
 

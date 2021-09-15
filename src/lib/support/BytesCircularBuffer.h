@@ -19,9 +19,9 @@
 
 #include <cstddef>
 
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
-#include <support/Span.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 

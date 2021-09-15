@@ -28,12 +28,12 @@
 
 #include <type_traits>
 
-#include <core/CHIPError.h>
-#include <core/Optional.h>
-#include <core/PeerId.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/core/PeerId.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
-#include <support/BitFlags.h>
-#include <support/TypeTraits.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -113,12 +113,12 @@ class PacketHeader
 {
 public:
     /**
-     * Gets the message id set in the header.
+     * Gets the message counter set in the header.
      *
      * Message IDs are expecte to monotonically increase by one for each mesage
      * that has been sent.
      */
-    uint32_t GetMessageId() const { return mMessageId; }
+    uint32_t GetMessageCounter() const { return mMessageCounter; }
 
     /**
      * Gets the source node id in the current message.
@@ -198,9 +198,9 @@ public:
         return *this;
     }
 
-    PacketHeader & SetMessageId(uint32_t id)
+    PacketHeader & SetMessageCounter(uint32_t id)
     {
-        mMessageId = id;
+        mMessageCounter = id;
         return *this;
     }
 
@@ -295,7 +295,7 @@ private:
     static constexpr int kHeaderVersion = 2;
 
     /// Value expected to be incremented for each message sent.
-    uint32_t mMessageId = 0;
+    uint32_t mMessageCounter = 0;
 
     /// What node the message originated from
     Optional<NodeId> mSourceNodeId;
@@ -350,7 +350,7 @@ public:
      *
      * NOTE: the Acknowledged Message Counter is optional and may be missing.
      */
-    const Optional<uint32_t> & GetAckId() const { return mAckId; }
+    const Optional<uint32_t> & GetAckMessageCounter() const { return mAckMessageCounter; }
 
     /**
      * Set the message type for this header.  This requires setting the protocol
@@ -391,17 +391,17 @@ public:
         return *this;
     }
 
-    PayloadHeader & SetAckId(uint32_t id)
+    PayloadHeader & SetAckMessageCounter(uint32_t id)
     {
-        mAckId.SetValue(id);
+        mAckMessageCounter.SetValue(id);
         mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_AckMsg);
         return *this;
     }
 
     /** Set the AckMsg flag bit. */
-    PayloadHeader & SetAckId(Optional<uint32_t> id)
+    PayloadHeader & SetAckMessageCounter(Optional<uint32_t> id)
     {
-        mAckId = id;
+        mAckMessageCounter = id;
         mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_AckMsg, id.HasValue());
         return *this;
     }
@@ -540,7 +540,7 @@ private:
     Header::ExFlags mExchangeFlags;
 
     /// Message counter of a previous message that is being acknowledged by the current message
-    Optional<uint32_t> mAckId;
+    Optional<uint32_t> mAckMessageCounter;
 };
 
 /** Handles encoding/decoding of CHIP message headers */

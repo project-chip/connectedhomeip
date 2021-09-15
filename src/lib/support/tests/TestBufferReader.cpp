@@ -22,8 +22,8 @@
  *
  */
 
-#include <support/BufferReader.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/BufferReader.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <type_traits>
 
 #include <nlunit-test.h>

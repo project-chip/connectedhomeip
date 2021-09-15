@@ -1463,17 +1463,6 @@
 #endif // CHIP_CONFIG_DEBUG_CERT_VALIDATION
 
 /**
- *  @def CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
- *
- *  @brief
- *    EC curve to be used to generate chip operational device certificate.
- *
- */
-#ifndef CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
-#define CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime256v1)
-#endif // CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
-
-/**
  *  @def CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_BEFORE
  *
  *  @brief
@@ -1574,42 +1563,6 @@
 #ifndef CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER "GlobalMCTR"
 #endif // CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
-
-/**
- *  @def CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
- *
- *  @brief
- *    Default ECDH curve to be used when initiating a CASE session, if not overridden by the application.
- *
- */
-#ifndef CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
-#if CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_secp224r1)
-#elif CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime256v1)
-#elif CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime192v1)
-#else
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_secp160r1)
-#endif
-#endif // CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
-
-/**
- *  @def CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
- *
- *  @brief
- *    Default set of ECDH curves allowed to be used in a CASE session (initiating or responding), if not overridden by the
- * application.
- *
- */
-#ifndef CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
-#if CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1 || CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES                                                                                    \
-    (chip::Profiles::Security::kChipCurveSet_secp224r1 | chip::Profiles::Security::kChipCurveSet_prime256v1)
-#else
-#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES (chip::Profiles::Security::kChipCurveSet_All)
-#endif
-#endif // CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
 
 /**
  * @def CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE
@@ -1858,17 +1811,6 @@
 #ifndef CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
 #define CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE 256
 #endif
-
-/**
- *  @def CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
- *
- *  @brief
- *    If asserted (1), enable logging of errors at function exit via the
- *    ChipLogFunctError() macro.
- */
-#ifndef CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
-#define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 0
-#endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
 
 /**
  *  @def CHIP_CONFIG_ENABLE_CONDITION_LOGGING
@@ -2310,6 +2252,18 @@
 #endif // CHIP_CONFIG_ENABLE_IFJ_SERVICE_FABRIC_JOIN
 
 /**
+ * @def CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+ *
+ * @brief Define the size of the pool used for tracking CHIP unauthenticated
+ * states. The entries in the pool are automatically rotated by LRU. The size
+ * of the pool limits how many PASE and CASE pairing sessions can be processed
+ * simultaneously.
+ */
+#ifndef CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+#define CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE 4
+#endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+
+/**
  * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking CHIP
@@ -2406,6 +2360,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MDNS_CACHE_SIZE
+ *
+ * @brief
+ *      Define the size of the MDNS cache
+ *
+ *      If CHIP_CONFIG_MDNS_CACHE_SIZE is 0, the builtin cache is not used.
+ *
+ */
+#ifndef CHIP_CONFIG_MDNS_CACHE_SIZE
+#define CHIP_CONFIG_MDNS_CACHE_SIZE 20
+#endif
+/**
  *  @name Interaction Model object pool configuration.
  *
  *  @brief
@@ -2493,6 +2459,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+ *
+ * @brief Defines the object pool for allocating attribute path for subscription in device controller.
+ */
+#ifndef CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+#define CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE CHIP_IM_MAX_NUM_READ_CLIENT
 #endif
 
 /**

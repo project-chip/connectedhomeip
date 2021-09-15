@@ -61,10 +61,6 @@
 #include <inet/DNSResolver.h>
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-#include <inet/RawEndPoint.h>
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -84,7 +80,7 @@
 #include <system/SystemLayer.h>
 #include <system/SystemStats.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #if INET_CONFIG_MAX_DROPPABLE_EVENTS
 
@@ -149,10 +145,6 @@ class DLL_EXPORT InetLayer
     friend class DNSResolver;
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    friend class RawEndPoint;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     friend class TCPEndPoint;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -185,13 +177,9 @@ public:
     // Must be called before System::Layer::Shutdown(), since this holds a pointer to that.
     CHIP_ERROR Shutdown();
 
-    chip::System::Layer * SystemLayer() const;
+    chip::System::Layer * SystemLayer() const { return mSystemLayer; }
 
     // End Points
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    CHIP_ERROR NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEndPoint ** retEndPoint);
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR NewTCPEndPoint(TCPEndPoint ** retEndPoint);
@@ -230,7 +218,7 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static CHIP_ERROR HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType, uintptr_t aArgument);
 
-    static chip::System::LwIPEventHandlerDelegate sInetEventHandlerDelegate;
+    static chip::System::LayerLwIP::EventHandlerDelegate sInetEventHandlerDelegate;
 
     // In some implementations, there may be a shared event / message
     // queue for the InetLayer used by other system events / messages.
@@ -253,9 +241,6 @@ public:
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
             type == kInetEvent_UDPDataReceived ||
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-            type == kInetEvent_RawDataReceived ||
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
             false;
     }
 
@@ -308,11 +293,6 @@ private:
 
     bool IsIdleTimerRunning();
 };
-
-inline chip::System::Layer * InetLayer::SystemLayer() const
-{
-    return mSystemLayer;
-}
 
 /**
  *  @class IPPacketInfo

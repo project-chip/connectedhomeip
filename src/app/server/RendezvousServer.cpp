@@ -18,15 +18,15 @@
 #include <app/server/RendezvousServer.h>
 
 #include <app/server/Mdns.h>
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
 #endif
-#include <mdns/Advertiser.h>
+#include <lib/mdns/Advertiser.h>
 
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -56,11 +56,11 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
                          event->CommissioningComplete.status.Format());
         }
         // reset all advertising
-        app::Mdns::StartServer(app::Mdns::CommissioningMode::kDisabled);
+        app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kDisabled);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
-        app::Mdns::AdvertiseOperational();
+        app::MdnsServer::Instance().AdvertiseOperational();
         ChipLogError(Discovery, "Operational advertising enabled");
     }
 }
@@ -96,8 +96,8 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
     // reset all advertising, indicating we are in commissioningMode
     // and we were put into this state via a command for additional commissioning
     // NOTE: when device has never been commissioned, Rendezvous will ensure AP is false
-    app::Mdns::StartServer(params.HasPASEVerifier() ? app::Mdns::CommissioningMode::kEnabledBasic
-                                                    : app::Mdns::CommissioningMode::kEnabledEnhanced);
+    app::MdnsServer::Instance().StartServer(params.HasPASEVerifier() ? Mdns::CommissioningMode::kEnabledBasic
+                                                                     : Mdns::CommissioningMode::kEnabledEnhanced);
 
     mSessionMgr      = sessionMgr;
     mExchangeManager = exchangeManager;
@@ -118,8 +118,7 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
         ReturnErrorOnFailure(mPairingSession.WaitForPairing(params.GetSetupPINCode(), pbkdf2IterCount, salt, keyID, this));
     }
 
-    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));
-    mPairingSession.MessageDispatch().SetPeerAddress(params.GetPeerAddress());
+    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(mSessionMgr));
 
     return CHIP_NO_ERROR;
 }
@@ -134,7 +133,7 @@ void RendezvousServer::Cleanup()
     }
 
     // reset all advertising
-    app::Mdns::StartServer(app::Mdns::CommissioningMode::kDisabled);
+    app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kDisabled);
 }
 
 void RendezvousServer::OnSessionEstablishmentError(CHIP_ERROR err)

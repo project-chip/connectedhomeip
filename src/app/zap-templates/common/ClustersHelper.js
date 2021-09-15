@@ -16,7 +16,7 @@
  */
 
 // Import helpers from zap core
-const zapPath           = '../../../../third_party/zap/repo/src-electron/';
+const zapPath           = '../../../../third_party/zap/repo/dist/src-electron/';
 const queryConfig       = require(zapPath + 'db/query-config.js')
 const queryCommand      = require(zapPath + 'db/query-command.js')
 const queryEndpoint     = require(zapPath + 'db/query-endpoint.js')
@@ -73,7 +73,7 @@ function loadStructItems(struct, packageId)
 function loadStructs(packageId)
 {
   const { db, sessionId } = this.global;
-  return zclQuery.selectAllStructs(db, packageId)
+  return zclQuery.selectAllStructsWithItemCount(db, packageId)
       .then(structs => Promise.all(structs.map(struct => loadStructItems.call(this, struct, packageId))));
 }
 

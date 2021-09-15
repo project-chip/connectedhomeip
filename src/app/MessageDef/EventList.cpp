@@ -90,7 +90,6 @@ CHIP_ERROR EventList::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -102,7 +101,6 @@ EventDataElement::Builder & EventList::Builder::CreateEventBuilder()
     VerifyOrExit(CHIP_NO_ERROR == mError, mEventDataElementBuilder.ResetError(mError));
 
     mError = mEventDataElementBuilder.Init(mpWriter);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mEventDataElementBuilder would be un-/partial initialized and cannot be used to write anything

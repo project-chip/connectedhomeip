@@ -18,6 +18,7 @@
     <string name="camera_unavailable_alert_title">Camera unavailable</string>
     <string name="camera_unavailable_alert_subtitle">Error launching camera to scan the QR code.</string>
     <string name="camera_unavailable_alert_exit">Exit</string>
+    <string name="input_address_btn_text">Input device address</string>
 
     <string name="send_echo_btn_text">Send echo</string>
     <string name="echo_status_connecting">Connecting…</string>
@@ -35,6 +36,14 @@
     <string name="echo_input_hint_text">Enter message for device</string>
     <string name="update_device_address_btn_text">Update address</string>
 
+    <string name="address_commissioning_title_text">Commission with IP address</string>
+    <string name="default_discriminator">3840</string>
+    <string name="default_pincode">20202021</string>
+    <string name="enter_device_address_label_text">Device address</string>
+    <string name="enter_discriminator_label_text">Discriminator</string>
+    <string name="enter_pincode_label_text">Pincode</string>
+    <string name="commission_btn_text">Commission</string>
+
     <string name="send_command_on_btn_text">On</string>
     <string name="send_command_off_btn_text">Off</string>
     <string name="send_command_toggle_btn_text">Toggle</string>
@@ -50,6 +59,7 @@
     <string name="rendezvous_over_ble_pairing_failure_text">Pairing failed</string>
     <string name="rendezvous_over_ble_commissioning_success_text">Network commissioning completed</string>
     <string name="rendezvous_over_ble_commissioning_failure_text">Network commissioning failed</string>
+    <string name="commissioning_completed">Commissioning completed with result: %1$d</string>
 
     <string name="attestation_test_btn_text">Attestation Test</string>
     <string name="attestation_fetching_status">Fetching…</string>

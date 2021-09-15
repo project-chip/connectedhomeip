@@ -25,6 +25,7 @@ chip_test_suite("tests") {
     "TestCHIPCallback.cpp",
     "TestCHIPErrorStr.cpp",
     "TestCHIPTLV.cpp",
+    "TestOptional.cpp",
     "TestReferenceCounted.cpp",
   ]
 

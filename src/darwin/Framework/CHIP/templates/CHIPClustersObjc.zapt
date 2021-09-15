@@ -6,23 +6,11 @@
 
 #import <Foundation/Foundation.h>
 
-@class CHIPDevice;
+#include "CHIPCluster.h"
 
 typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
 
 NS_ASSUME_NONNULL_BEGIN
-
-/**
- * CHIPCluster
- *    This is the base class for clusters.
- */
-@interface CHIPCluster : NSObject
-
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
-@end
 
 {{#chip_client_clusters}}
 
@@ -42,13 +30,14 @@ NS_ASSUME_NONNULL_BEGIN
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-- (void)readAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)responseHandler;
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
+- (void)read{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler;
 {{#if isWritableAttribute}}
-- (void)writeAttribute{{asUpperCamelCase name}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
+- (void)write{{>attribute}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{#if isReportableAttribute}}
-- (void) configureAttribute{{asUpperCamelCase name}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler;
-- (void) reportAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)responseHandler;
+- (void) configure{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler;
+- (void) report{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{/chip_server_cluster_attributes}}
 

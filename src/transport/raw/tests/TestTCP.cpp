@@ -23,11 +23,11 @@
 
 #include "NetworkTestHelpers.h"
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <system/SystemLayer.h>
 #include <system/SystemObject.h>
 #include <transport/TransportMgr.h>
@@ -67,7 +67,7 @@ using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPacke
 
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
-constexpr uint32_t kMessageId       = 18;
+constexpr uint32_t kMessageCounter  = 18;
 
 using TestContext = chip::Test::IOContext;
 TestContext sContext;
@@ -122,7 +122,7 @@ public:
         NL_TEST_ASSERT(mSuite, !buffer.IsNull());
 
         PacketHeader header;
-        header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
+        header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
 
         SetCallback([](const uint8_t * message, size_t length, int count, void * data) { return memcmp(message, data, length); },
                     const_cast<void *>(static_cast<const void *>(PAYLOAD)));
@@ -243,7 +243,7 @@ bool TestData::Init(const uint16_t sizes[])
     Free();
 
     PacketHeader header;
-    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
+    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
     const size_t headerLength = header.EncodeSizeBytes();
 
     // Determine the total length.

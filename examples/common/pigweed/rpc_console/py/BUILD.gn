@@ -21,9 +21,13 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 pw_python_package("chip_rpc") {
   generate_setup = {
-    name = "chip_rpc"
-    version = "0.0.1"
-    install_requires = [ "ipython" ]
+    metadata = {
+      name = "chip_rpc"
+      version = "0.0.1"
+    }
+    options = {
+      install_requires = [ "ipython" ]
+    }
   }
   sources = [ "chip_rpc/console.py" ]
   python_deps = [

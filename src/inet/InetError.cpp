@@ -26,7 +26,7 @@
 #include <inet/Inet.h>
 #include <inet/InetError.h>
 
-#include <support/ErrorStr.h>
+#include <lib/support/ErrorStr.h>
 
 extern void FormatError(char * buf, uint16_t bufSize, const char * subsys, int32_t err, const char * desc);
 

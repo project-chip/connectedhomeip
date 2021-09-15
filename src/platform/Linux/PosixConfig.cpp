@@ -27,10 +27,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/Linux/CHIPLinuxStorage.h>
 #include <platform/Linux/PosixConfig.h>
-#include <support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

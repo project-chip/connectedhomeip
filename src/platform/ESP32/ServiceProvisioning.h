@@ -18,7 +18,7 @@
 #ifndef _SERVICE_PROVISIONING_H
 #define _SERVICE_PROVISIONING_H
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key);
 

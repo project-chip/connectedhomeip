@@ -20,13 +20,13 @@
 #include <algorithm>
 #include <cstdint>
 
-#include <core/CHIPError.h>
-#include <core/Optional.h>
-#include <core/PeerId.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/core/PeerId.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeString.h>
 #include <lib/support/Span.h>
-#include <support/CHIPMemString.h>
-#include <support/SafeString.h>
 
 namespace chip {
 namespace Mdns {
@@ -67,6 +67,13 @@ enum class CommssionAdvertiseMode : uint8_t
 {
     kCommissionableNode,
     kCommissioner,
+};
+
+enum class CommissioningMode
+{
+    kDisabled,       // Commissioning Mode is disabled, CM=0 in DNS-SD key/value pairs
+    kEnabledBasic,   // Basic Commissioning Mode, CM=1 in DNS-SD key/value pairs
+    kEnabledEnhanced // Enhanced Commissioning Mode, CM=2 in DNS-SD key/value pairs
 };
 
 template <class Derived>
@@ -141,12 +148,13 @@ class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionA
 {
 public:
     static constexpr uint8_t kTxtMaxNumber  = 9;
-    static constexpr uint8_t kTxtMaxKeySize = MaxStringLength("D", "VP", "CM", "DT", "DN", "RI", "PI", "PH"); // possible keys
+    static constexpr uint8_t kTxtMaxKeySize = MaxStringLength("D", "VP", "CM", "AP", "DT", "DN", "RI", "PI", "PH"); // possible keys
     static constexpr uint8_t kTxtMaxValueSize =
         std::max({ kKeyDiscriminatorMaxLength, kKeyVendorProductMaxLength, kKeyAdditionalCommissioningMaxLength,
                    kKeyCommissioningModeMaxLength, kKeyDeviceTypeMaxLength, kKeyDeviceNameMaxLength, kKeyRotatingIdMaxLength,
                    kKeyPairingInstructionMaxLength, kKeyPairingHintMaxLength });
-    static constexpr size_t kTxtTotalKeySize   = TotalStringLength("D", "VP", "CM", "DT", "DN", "RI", "PI", "PH"); // possible keys
+    static constexpr size_t kTxtTotalKeySize =
+        TotalStringLength("D", "VP", "CM", "AP", "DT", "DN", "RI", "PI", "PH"); // possible keys
     static constexpr size_t kTxtTotalValueSize = kKeyDiscriminatorMaxLength + kKeyVendorProductMaxLength +
         kKeyAdditionalCommissioningMaxLength + kKeyCommissioningModeMaxLength + kKeyDeviceTypeMaxLength + kKeyDeviceNameMaxLength +
         kKeyRotatingIdMaxLength + kKeyPairingInstructionMaxLength + kKeyPairingHintMaxLength;
@@ -179,19 +187,12 @@ public:
     }
     Optional<uint16_t> GetProductId() const { return mProductId; }
 
-    CommissionAdvertisingParameters & SetCommissioningMode(bool modeEnabled)
+    CommissionAdvertisingParameters & SetCommissioningMode(CommissioningMode mode)
     {
-        mCommissioningModeEnabled = modeEnabled;
+        mCommissioningMode = mode;
         return *this;
     }
-    bool GetCommissioningMode() const { return mCommissioningModeEnabled; }
-
-    CommissionAdvertisingParameters & SetAdditionalCommissioning(bool additionalCommissioningEnabled)
-    {
-        mAdditionalCommissioningEnabled = additionalCommissioningEnabled;
-        return *this;
-    }
-    bool GetAdditionalCommissioning() const { return mAdditionalCommissioningEnabled; }
+    CommissioningMode GetCommissioningMode() const { return mCommissioningMode; }
 
     CommissionAdvertisingParameters & SetDeviceType(Optional<uint16_t> deviceType)
     {
@@ -272,8 +273,7 @@ private:
     uint8_t mShortDiscriminator          = 0;
     uint16_t mLongDiscriminator          = 0; // 12-bit according to spec
     CommssionAdvertiseMode mMode         = CommssionAdvertiseMode::kCommissionableNode;
-    bool mCommissioningModeEnabled       = false;
-    bool mAdditionalCommissioningEnabled = false;
+    CommissioningMode mCommissioningMode = CommissioningMode::kEnabledBasic;
     chip::Optional<uint16_t> mVendorId;
     chip::Optional<uint16_t> mProductId;
     chip::Optional<uint16_t> mDeviceType;

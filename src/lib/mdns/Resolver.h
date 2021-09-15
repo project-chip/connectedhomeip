@@ -21,12 +21,13 @@
 #include <limits>
 
 #include "lib/support/logging/CHIPLogging.h"
-#include <core/CHIPError.h>
-#include <core/Optional.h>
-#include <core/PeerId.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/core/PeerId.h>
+#include <lib/support/BytesToHex.h>
 
 namespace chip {
 namespace Mdns {
@@ -85,7 +86,6 @@ struct DiscoveredNodeData
     uint16_t longDiscriminator;
     uint16_t vendorId;
     uint16_t productId;
-    uint8_t additionalPairing;
     uint8_t commissioningMode;
     // TODO: possibly 32-bit - see spec issue #3226
     uint16_t deviceType;
@@ -97,7 +97,9 @@ struct DiscoveredNodeData
     bool supportsTcp;
     uint32_t mrpRetryIntervalIdle;
     uint32_t mrpRetryIntervalActive;
+    uint16_t port;
     int numIPs;
+    Inet::InterfaceId interfaceId[kMaxIPAddresses];
     Inet::IPAddress ipAddress[kMaxIPAddresses];
 
     void Reset()
@@ -107,7 +109,6 @@ struct DiscoveredNodeData
         longDiscriminator = 0;
         vendorId          = 0;
         productId         = 0;
-        additionalPairing = 0;
         commissioningMode = 0;
         deviceType        = 0;
         memset(deviceName, 0, sizeof(deviceName));
@@ -138,6 +139,64 @@ struct DiscoveredNodeData
         return mrpRetryIntervalActive != kUndefinedRetryInterval ? Optional<uint32_t>{ mrpRetryIntervalActive }
                                                                  : Optional<uint32_t>{};
     }
+
+    void LogDetail() const
+    {
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+        if (rotatingIdLen > 0)
+        {
+            char rotatingIdString[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
+            Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
+            ChipLogDetail(Discovery, "Rotating ID: %s", rotatingIdString);
+        }
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
+        if (strlen(deviceName) != 0)
+        {
+            ChipLogDetail(Discovery, "\tDevice Name: %s", deviceName);
+        }
+        if (vendorId > 0)
+        {
+            ChipLogDetail(Discovery, "\tVendor ID: %u", vendorId);
+        }
+        if (productId > 0)
+        {
+            ChipLogDetail(Discovery, "\tProduct ID: %u", productId);
+        }
+        if (deviceType > 0)
+        {
+            ChipLogDetail(Discovery, "\tDevice Type: %u", deviceType);
+        }
+        if (longDiscriminator > 0)
+        {
+            ChipLogDetail(Discovery, "\tLong Discriminator: %u", longDiscriminator);
+        }
+        if (strlen(pairingInstruction) != 0)
+        {
+            ChipLogDetail(Discovery, "\tPairing Instruction: %s", pairingInstruction);
+        }
+        if (pairingHint > 0)
+        {
+            ChipLogDetail(Discovery, "\tPairing Hint: 0x%x", pairingHint);
+        }
+        if (!IsHost(""))
+        {
+            ChipLogDetail(Discovery, "\tHostname: %s", hostName);
+        }
+        for (int j = 0; j < numIPs; j++)
+        {
+#if CHIP_DETAIL_LOGGING
+            char buf[Inet::kMaxIPAddressStringLength];
+            char * ipAddressOut = ipAddress[j].ToString(buf);
+            ChipLogDetail(Discovery, "\tIP Address #%d: %s", j + 1, ipAddressOut);
+            (void) ipAddressOut;
+#endif // CHIP_DETAIL_LOGGING
+        }
+        if (port > 0)
+        {
+            ChipLogDetail(Discovery, "\tPort: %u", port);
+        }
+        ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
+    }
 };
 
 enum class DiscoveryFilterType : uint8_t
@@ -148,7 +207,6 @@ enum class DiscoveryFilterType : uint8_t
     kVendor,
     kDeviceType,
     kCommissioningMode,
-    kCommissioningModeFromCommand,
     kInstanceName,
     kCommissioner
 };
@@ -158,6 +216,7 @@ struct DiscoveryFilter
     uint16_t code;
     const char * instanceName;
     DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
+    DiscoveryFilter(DiscoveryFilterType newType) : type(newType) {}
     DiscoveryFilter(DiscoveryFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
     DiscoveryFilter(DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
 };
@@ -195,6 +254,7 @@ public:
     ///
     /// Unsual name to allow base MDNS classes to implement both Advertiser and Resolver interfaces.
     virtual CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) = 0;
+    virtual void ShutdownResolver()                                                    = 0;
 
     /// Registers a resolver delegate if none has been registered before
     virtual CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) = 0;

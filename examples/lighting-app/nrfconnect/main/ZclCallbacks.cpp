@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-#include <app/common/gen/ids/Attributes.h>
-#include <app/common/gen/ids/Clusters.h>
-#include <app/common/gen/ids/Commands.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 

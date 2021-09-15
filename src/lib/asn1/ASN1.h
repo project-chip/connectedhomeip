@@ -26,9 +26,13 @@
 
 #pragma once
 
-#include <support/DLLUtil.h>
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+#include <asn1/ASN1OID.h>
+#endif
 
-#include <asn1/ASN1Error.h>
+#include <lib/asn1/ASN1Error.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace TLV {
@@ -46,10 +50,6 @@ class TLVReader;
 
 namespace chip {
 namespace ASN1 {
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-#include <asn1/ASN1OID.h>
-#endif
 
 static constexpr size_t kMaxConstructedAndEncapsulatedTypesDepth = 10;
 
@@ -102,7 +102,13 @@ struct ASN1UniversalTime
 class DLL_EXPORT ASN1Reader
 {
 public:
-    void Init(const uint8_t * buf, uint32_t len);
+    void Init(const uint8_t * buf, size_t len);
+    void Init(const ByteSpan & data) { Init(data.data(), data.size()); }
+    template <size_t N>
+    void Init(const uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
 
     uint8_t GetClass(void) const { return Class; };
     uint32_t GetTag(void) const { return Tag; };
@@ -163,7 +169,13 @@ private:
 class DLL_EXPORT ASN1Writer
 {
 public:
-    void Init(uint8_t * buf, uint32_t maxLen);
+    void Init(uint8_t * buf, size_t maxLen);
+    void Init(const MutableByteSpan & data) { Init(data.data(), data.size()); }
+    template <size_t N>
+    void Init(uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
     void InitNullWriter(void);
     uint16_t GetLengthWritten(void) const;
 
@@ -174,10 +186,10 @@ public:
     CHIP_ERROR PutString(uint32_t tag, const char * val, uint16_t valLen);
     CHIP_ERROR PutOctetString(const uint8_t * val, uint16_t valLen);
     CHIP_ERROR PutOctetString(uint8_t cls, uint32_t tag, const uint8_t * val, uint16_t valLen);
-    CHIP_ERROR PutOctetString(uint8_t cls, uint32_t tag, chip::TLV::TLVReader & val);
+    CHIP_ERROR PutOctetString(uint8_t cls, uint32_t tag, chip::TLV::TLVReader & tlvReader);
     CHIP_ERROR PutBitString(uint32_t val);
     CHIP_ERROR PutBitString(uint8_t unusedBits, const uint8_t * val, uint16_t valLen);
-    CHIP_ERROR PutBitString(uint8_t unusedBits, chip::TLV::TLVReader & val);
+    CHIP_ERROR PutBitString(uint8_t unusedBits, chip::TLV::TLVReader & tlvReader);
     CHIP_ERROR PutTime(const ASN1UniversalTime & val);
     CHIP_ERROR PutNull(void);
     CHIP_ERROR PutConstructedType(const uint8_t * val, uint16_t valLen);
@@ -186,7 +198,7 @@ public:
     CHIP_ERROR StartEncapsulatedType(uint8_t cls, uint32_t tag, bool bitStringEncoding);
     CHIP_ERROR EndEncapsulatedType(void);
     CHIP_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, const uint8_t * val, uint16_t valLen);
-    CHIP_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, chip::TLV::TLVReader & val);
+    CHIP_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, chip::TLV::TLVReader & tlvReader);
 
 private:
     static constexpr size_t kMaxDeferredLengthDepth = kMaxConstructedAndEncapsulatedTypesDepth;
@@ -201,6 +213,7 @@ private:
     CHIP_ERROR WriteDeferredLength(void);
     static uint8_t BytesForLength(int32_t len);
     static void EncodeLength(uint8_t * buf, uint8_t bytesForLen, int32_t lenToEncode);
+    void WriteData(const uint8_t * p, size_t len);
 };
 
 OID ParseObjectID(const uint8_t * encodedOID, uint16_t encodedOIDLen);

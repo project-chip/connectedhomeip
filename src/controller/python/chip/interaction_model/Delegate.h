@@ -79,8 +79,9 @@ typedef void (*PythonInteractionModelDelegate_OnCommandResponseFunct)(uint64_t c
 typedef void (*PythonInteractionModelDelegate_OnWriteResponseStatusFunct)(void * writeStatusBuf, uint32_t writeStatusBufLen);
 
 typedef void (*PythonInteractionModelDelegate_OnReportDataFunct)(chip::NodeId nodeId, uint64_t readClientAppIdentifier,
-                                                                 void * attributePathBuf, size_t attributePathBufLen,
-                                                                 uint8_t * readTlvData, size_t readTlvDataLen, uint16_t statusCode);
+                                                                 uint64_t subscriptionId, void * attributePathBuf,
+                                                                 size_t attributePathBufLen, uint8_t * readTlvData,
+                                                                 size_t readTlvDataLen, uint16_t statusCode);
 
 void pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(
     PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct f);

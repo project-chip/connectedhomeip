@@ -38,13 +38,12 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <system/SystemError.h>
-#include <system/SystemTimer.h>
 
 #include <nlunit-test.h>
 
@@ -81,9 +80,6 @@ void HandleTimer(Layer * aLayer, void * aAppState)
 // Test before init network, Inet is not initialized
 static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 {
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    RawEndPoint * testRawEP = nullptr;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     UDPEndPoint * testUDPEP = nullptr;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
@@ -96,10 +92,12 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     char testHostName[20]  = "www.nest.com";
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+    // Deinit system layer and network
+    ShutdownNetwork();
+    if (gSystemLayer.IsInitialized())
+    {
+        ShutdownSystemLayer();
+    }
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     err = gInet.NewUDPEndPoint(&testUDPEP);
@@ -312,29 +310,11 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     InterfaceId intId;
 
     // EndPoint
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    RawEndPoint * testRaw6EP = nullptr;
-#if INET_CONFIG_ENABLE_IPV4
-    RawEndPoint * testRaw4EP = nullptr;
-#endif // INET_CONFIG_ENABLE_IPV4
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
     UDPEndPoint * testUDPEP  = nullptr;
     TCPEndPoint * testTCPEP1 = nullptr;
     PacketBufferHandle buf   = PacketBufferHandle::New(PacketBuffer::kMaxSize);
-    bool didBind             = false;
-    bool didListen           = false;
 
     // init all the EndPoints
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRaw6EP);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-#if INET_CONFIG_ENABLE_IPV4
-    err = gInet.NewRawEndPoint(kIPVersion_4, kIPProtocol_ICMPv4, &testRaw4EP);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-#endif // INET_CONFIG_ENABLE_IPV4
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
     err = gInet.NewUDPEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -346,73 +326,9 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = gInet.GetInterfaceFromAddr(addr, intId);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // RawEndPoint special cases to cover the error branch
-    uint8_t ICMP6Types[2] = { 128, 129 };
 #if INET_CONFIG_ENABLE_IPV4
     NL_TEST_ASSERT(inSuite, IPAddress::FromString("10.0.0.1", addr_v4));
 #endif // INET_CONFIG_ENABLE_IPV4
-
-    // error bind cases
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    err = testRaw6EP->Bind(kIPAddressType_Unknown, addr_any);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
-#if INET_CONFIG_ENABLE_IPV4
-    err = testRaw6EP->Bind(kIPAddressType_IPv4, addr);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
-    err = testRaw6EP->BindIPv6LinkLocal(intId, addr_v4);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
-#endif // INET_CONFIG_ENABLE_IPV4
-    err = testRaw6EP->BindInterface(kIPAddressType_Unknown, INET_NULL_INTERFACEID);
-    NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
-
-    // A bind should succeed with appropriate permissions but will
-    // otherwise fail.
-
-    err = testRaw6EP->BindIPv6LinkLocal(intId, addr);
-    NL_TEST_ASSERT(inSuite, (err == CHIP_NO_ERROR) || (err == System::MapErrorPOSIX(EPERM)));
-
-    didBind = (err == CHIP_NO_ERROR);
-
-    // Listen after bind should succeed if the prior bind succeeded.
-
-    err = testRaw6EP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
-    NL_TEST_ASSERT(inSuite, (didBind && (err == CHIP_NO_ERROR)) || (!didBind && (err == CHIP_ERROR_INCORRECT_STATE)));
-
-    didListen = (err == CHIP_NO_ERROR);
-
-    // If the first listen succeeded, then the second listen should be successful.
-
-    err = testRaw6EP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
-    NL_TEST_ASSERT(inSuite, (didBind && didListen && (err == CHIP_NO_ERROR)) || (!didBind && (err == CHIP_ERROR_INCORRECT_STATE)));
-
-    didListen = (err == CHIP_NO_ERROR);
-
-    // A bind-after-listen should result in an incorrect state error;
-    // otherwise, it will fail with a permissions error.
-
-    err = testRaw6EP->Bind(kIPAddressType_IPv6, addr);
-    NL_TEST_ASSERT(inSuite,
-                   (didListen && (err == CHIP_ERROR_INCORRECT_STATE)) || (!didListen && (err == System::MapErrorPOSIX(EPERM))));
-
-    // error SetICMPFilter case
-    err = testRaw6EP->SetICMPFilter(0, ICMP6Types);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
-
-#if INET_CONFIG_ENABLE_IPV4
-    // We should never be able to send an IPv4-addressed message on an
-    // IPv6 raw socket.
-    //
-    // Ostensibly the address obtained above from
-    // gInet.GetLinkLocalAddr(INET_NULL_INTERFACEID, &addr) is an IPv6
-    // LLA; however, make sure it actually is.
-
-    NL_TEST_ASSERT(inSuite, addr.Type() == kIPAddressType_IPv6);
-
-    err = testRaw4EP->SendTo(addr, std::move(buf));
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
-    testRaw4EP->Free();
-#endif // INET_CONFIG_ENABLE_IPV4
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
     // UdpEndPoint special cases to cover the error branch
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
@@ -485,33 +401,24 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    testTCPEP1->Shutdown();
+    testTCPEP1->Free();
 }
 
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 // Test the InetLayer resource limitation
 static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    RawEndPoint * testRawEP = nullptr;
-#endif //
-    UDPEndPoint * testUDPEP = nullptr;
-    TCPEndPoint * testTCPEP = nullptr;
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
+    UDPEndPoint * testUDPEP[INET_CONFIG_NUM_UDP_ENDPOINTS + 1] = { nullptr };
+    TCPEndPoint * testTCPEP[INET_CONFIG_NUM_TCP_ENDPOINTS + 1] = { nullptr };
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    for (int i = 0; i < INET_CONFIG_NUM_RAW_ENDPOINTS + 1; i++)
-        err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS + 1; i++)
-        err = gInet.NewUDPEndPoint(&testUDPEP);
+        err = gInet.NewUDPEndPoint(&testUDPEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
 
     for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS + 1; i++)
-        err = gInet.NewTCPEndPoint(&testTCPEP);
+        err = gInet.NewTCPEndPoint(&testTCPEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
 
     // Verify same aComplete and aAppState args do not exhaust timer pool
@@ -521,12 +428,25 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
+    char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
         err = gSystemLayer.StartTimer(10, HandleTimer, &numTimersTest[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
+#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
     ShutdownNetwork();
     ShutdownSystemLayer();
+
+    // Release UDP endpoints
+    for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS; i++)
+        testUDPEP[i]->Free();
+
+    // Release TCP endpoints
+    for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
+    {
+        testTCPEP[i]->Free();
+    }
 }
 #endif
 
@@ -565,6 +485,8 @@ static int TestSetup(void * inContext)
  */
 static int TestTeardown(void * inContext)
 {
+    ShutdownNetwork();
+    ShutdownSystemLayer();
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }

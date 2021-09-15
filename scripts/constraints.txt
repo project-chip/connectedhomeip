@@ -135,7 +135,7 @@ portpicker==1.4.0
     #   mobly
 prettytable==0.7.2
     # via -r requirements.mbed.txt
-prompt-toolkit==3.0.18
+prompt-toolkit==3.0.20
     # via ipython
 protobuf==3.17.3
     # via -r requirements.txt

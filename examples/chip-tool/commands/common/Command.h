@@ -21,8 +21,8 @@
 #include "controller/ExampleOperationalCredentialsIssuer.h"
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
-#include <support/Span.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <atomic>
 #include <condition_variable>
@@ -109,7 +109,7 @@ public:
     Command(const char * commandName) : mName(commandName) {}
     virtual ~Command() {}
 
-    void SetExecutionContext(ExecutionContext & execContext) { mExecContext = &execContext; }
+    void SetExecutionContext(ExecutionContext & execContext) { mExecContext = execContext; }
 
     const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;
@@ -206,8 +206,7 @@ public:
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
 protected:
-    ExecutionContext * GetExecContext() { return mExecContext; }
-    ExecutionContext * mExecContext;
+    ExecutionContext * GetExecContext() { return &mExecContext; }
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);
@@ -217,6 +216,8 @@ private:
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
     const char * mName            = nullptr;
     std::vector<Argument> mArgs;
+
+    ExecutionContext mExecContext;
 
 #if CONFIG_USE_SEPARATE_EVENTLOOP
     std::condition_variable cvWaitingForResponse;

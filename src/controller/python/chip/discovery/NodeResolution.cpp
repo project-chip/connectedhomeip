@@ -16,9 +16,9 @@
  */
 
 #include <chip/internal/ChipThreadWork.h>
-#include <mdns/Resolver.h>
+#include <lib/mdns/Resolver.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CodeUtils.h>
 
 #include <type_traits>
 
@@ -45,7 +45,7 @@ public:
             char ipAddressBuffer[128];
 
             mSuccessCallback(                                                         //
-                nodeData.mPeerId.GetFabricId(),                                       //
+                nodeData.mPeerId.GetCompressedFabricId(),                             //
                 nodeData.mPeerId.GetNodeId(),                                         //
                 nodeData.mInterfaceId,                                                //
                 nodeData.mAddress.ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
@@ -62,7 +62,7 @@ public:
     {
         if (mFailureCallback != nullptr)
         {
-            mFailureCallback(peerId.GetFabricId(), peerId.GetNodeId(), error.AsInteger());
+            mFailureCallback(peerId.GetCompressedFabricId(), peerId.GetNodeId(), error.AsInteger());
         }
         else
         {
@@ -101,7 +101,7 @@ extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, ui
         result = Resolver::Instance().SetResolverDelegate(&gPythonResolverDelegate);
         ReturnOnFailure(result);
 
-        result = Resolver::Instance().ResolveNodeId(chip::PeerId().SetFabricId(fabricId).SetNodeId(nodeId),
+        result = Resolver::Instance().ResolveNodeId(chip::PeerId().SetCompressedFabricId(fabricId).SetNodeId(nodeId),
                                                     chip::Inet::IPAddressType::kIPAddressType_Any);
     });
 

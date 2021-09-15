@@ -26,6 +26,8 @@
 #ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_IPP
 #define GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_IPP
 
+#include <cassert>
+
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
 #include <openthread/joiner.h>
@@ -43,15 +45,15 @@
 #include <openthread/srp_client.h>
 #endif
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/FixedBufferAllocator.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/CodeUtils.h>
-#include <support/FixedBufferAllocator.h>
-#include <support/ThreadOperationalDataset.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <limits>
 
@@ -87,7 +89,11 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChang
     event.ThreadStateChange.ChildNodesChanged = (flags & (OT_CHANGED_THREAD_CHILD_ADDED | OT_CHANGED_THREAD_CHILD_REMOVED)) != 0;
     event.ThreadStateChange.OpenThread.Flags  = flags;
 
-    PlatformMgr().PostEvent(&event);
+    CHIP_ERROR status = PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post Thread state change: %" CHIP_ERROR_FORMAT, status.Format());
+    }
 }
 
 template <class ImplClass>
@@ -238,14 +244,16 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
     Impl()->LockThreadStack();
     otErr = otDatasetSetActiveTlvs(mOTInst, &tlvs);
     Impl()->UnlockThreadStack();
+    if (otErr != OT_ERROR_NONE)
+    {
+        return MapOpenThreadError(otErr);
+    }
 
     // post an event alerting other subsystems about change in provisioning state
     ChipDeviceEvent event;
     event.Type                                           = DeviceEventType::kServiceProvisioningChange;
     event.ServiceProvisioningChange.IsServiceProvisioned = true;
-    PlatformMgr().PostEvent(&event);
-
-    return MapOpenThreadError(otErr);
+    return PlatformMgr().PostEvent(&event);
 }
 
 template <class ImplClass>
@@ -830,7 +838,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     // state change occurs.  Note that we reference the OnOpenThreadStateChange method
     // on the concrete implementation class so that that class can override the default
     // method implementation if it chooses to.
-    otErr = otSetStateChangedCallback(otInst, ImplClass::OnOpenThreadStateChange, this);
+    otErr = otSetStateChangedCallback(otInst, ImplClass::OnOpenThreadStateChange, mOTInst);
     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
     // Enable automatic assignment of Thread advertised addresses.

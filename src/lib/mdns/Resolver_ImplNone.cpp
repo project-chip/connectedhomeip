@@ -17,7 +17,7 @@
 
 #include "Resolver.h"
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Mdns {
@@ -29,6 +29,7 @@ public:
     CHIP_ERROR SetResolverDelegate(ResolverDelegate *) override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) override { return CHIP_NO_ERROR; }
+    void ShutdownResolver() override {}
 
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override
     {

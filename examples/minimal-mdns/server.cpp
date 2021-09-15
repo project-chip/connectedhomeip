@@ -22,20 +22,19 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-#include <mdns/ServiceNaming.h>
-#include <mdns/minimal/QueryBuilder.h>
-#include <mdns/minimal/ResponseSender.h>
-#include <mdns/minimal/Server.h>
-#include <mdns/minimal/core/QName.h>
-#include <mdns/minimal/responders/IP.h>
-#include <mdns/minimal/responders/Ptr.h>
-#include <mdns/minimal/responders/Srv.h>
-#include <mdns/minimal/responders/Txt.h>
+#include <lib/mdns/ServiceNaming.h>
+#include <lib/mdns/minimal/QueryBuilder.h>
+#include <lib/mdns/minimal/ResponseSender.h>
+#include <lib/mdns/minimal/Server.h>
+#include <lib/mdns/minimal/core/QName.h>
+#include <lib/mdns/minimal/responders/IP.h>
+#include <lib/mdns/minimal/responders/Ptr.h>
+#include <lib/mdns/minimal/responders/Srv.h>
+#include <lib/mdns/minimal/responders/Txt.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/SystemTimer.h>
 
 #include "AllInterfaceListener.h"
 #include "PacketReporter.h"

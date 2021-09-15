@@ -15,26 +15,31 @@
  *    limitations under the License.
  */
 
-#include "Discovery_ImplPlatform.h"
+#include <lib/mdns/Discovery_ImplPlatform.h>
 
 #include <inttypes.h>
 
-#include "ServiceNaming.h"
-#include "lib/core/CHIPSafeCasts.h"
-#include "lib/mdns/TxtFields.h"
-#include "lib/mdns/platform/Mdns.h"
-#include "lib/support/logging/CHIPLogging.h"
-#include "platform/CHIPDeviceConfig.h"
-#include "platform/CHIPDeviceLayer.h"
-#include "support/CHIPMemString.h"
-#include "support/CodeUtils.h"
-#include "support/ErrorStr.h"
-#include "support/RandUtils.h"
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/mdns/MdnsCache.h>
+#include <lib/mdns/ServiceNaming.h>
+#include <lib/mdns/TxtFields.h>
+#include <lib/mdns/platform/Mdns.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace Mdns {
 
 DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+MdnsCache<CHIP_CONFIG_MDNS_CACHE_SIZE> DiscoveryImplPlatform::sMdnsCache;
+#endif
 
 DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
 
@@ -126,7 +131,6 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char discriminatorBuf[kKeyDiscriminatorMaxLength + 1];
     char vendorProductBuf[kKeyVendorProductMaxLength + 1];
     char commissioningModeBuf[kKeyCommissioningModeMaxLength + 1];
-    char additionalCommissioningingBuf[kKeyAdditionalCommissioningMaxLength + 1];
     char deviceTypeBuf[kKeyDeviceTypeMaxLength + 1];
     char deviceNameBuf[kKeyDeviceNameMaxLength + 1];
     char rotatingIdBuf[kKeyRotatingIdMaxLength + 1];
@@ -140,7 +144,6 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 1];
     char vendorSubType[kSubTypeVendorMaxLength + 1];
     char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 1];
-    char additionalCommissioningSubType[kSubTypeAdditionalCommissioningMaxLength + 1];
     char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 1];
     // size of subTypes array should be count of SubTypes above
     const char * subTypes[kSubTypeMaxNumber];
@@ -206,16 +209,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         textEntries[textEntrySize++] = { "D", reinterpret_cast<const uint8_t *>(discriminatorBuf),
                                          strnlen(discriminatorBuf, sizeof(discriminatorBuf)) };
 
-        snprintf(commissioningModeBuf, sizeof(commissioningModeBuf), "%u", params.GetCommissioningMode() ? 1 : 0);
+        snprintf(commissioningModeBuf, sizeof(commissioningModeBuf), "%u", static_cast<int>(params.GetCommissioningMode()));
         textEntries[textEntrySize++] = { "CM", reinterpret_cast<const uint8_t *>(commissioningModeBuf),
                                          strnlen(commissioningModeBuf, sizeof(commissioningModeBuf)) };
-
-        if (params.GetCommissioningMode() && params.GetAdditionalCommissioning())
-        {
-            snprintf(additionalCommissioningingBuf, sizeof(additionalCommissioningingBuf), "1");
-            textEntries[textEntrySize++] = { "AP", reinterpret_cast<const uint8_t *>(additionalCommissioningingBuf),
-                                             strnlen(additionalCommissioningingBuf, sizeof(additionalCommissioningingBuf)) };
-        }
 
         if (params.GetRotatingId().HasValue())
         {
@@ -248,19 +244,11 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         {
             subTypes[subTypeSize++] = longDiscriminatorSubtype;
         }
-        if (MakeServiceSubtype(commissioningModeSubType, sizeof(commissioningModeSubType),
-                               DiscoveryFilter(DiscoveryFilterType::kCommissioningMode, params.GetCommissioningMode() ? 1 : 0)) ==
-            CHIP_NO_ERROR)
+        if ((params.GetCommissioningMode() != CommissioningMode::kDisabled) &&
+            (MakeServiceSubtype(commissioningModeSubType, sizeof(commissioningModeSubType),
+                                DiscoveryFilter(DiscoveryFilterType::kCommissioningMode)) == CHIP_NO_ERROR))
         {
             subTypes[subTypeSize++] = commissioningModeSubType;
-        }
-        if (params.GetCommissioningMode() && params.GetAdditionalCommissioning())
-        {
-            if (MakeServiceSubtype(additionalCommissioningSubType, sizeof(additionalCommissioningSubType),
-                                   DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1)) == CHIP_NO_ERROR)
-            {
-                subTypes[subTypeSize++] = additionalCommissioningSubType;
-            }
         }
     }
 
@@ -437,6 +425,28 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
 {
     ReturnErrorOnFailure(Init());
 
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+    Inet::IPAddress addr;
+    uint16_t port;
+    Inet::InterfaceId iface;
+
+    /* see if the entry is cached and use it.... */
+
+    if (sMdnsCache.Lookup(peerId, addr, port, iface) == CHIP_NO_ERROR)
+    {
+        ResolvedNodeData nodeData;
+
+        nodeData.mInterfaceId = iface;
+        nodeData.mPort        = port;
+        nodeData.mAddress     = addr;
+        nodeData.mPeerId      = peerId;
+
+        mResolverDelegate->OnNodeIdResolved(nodeData);
+
+        return CHIP_NO_ERROR;
+    }
+#endif
+
     MdnsService service;
 
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
@@ -472,10 +482,14 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, MdnsService * resu
     DiscoveredNodeData data;
     Platform::CopyString(data.hostName, result->mHostName);
 
-    if (result->mAddress.HasValue())
+    if (result->mAddress.HasValue() && data.numIPs < DiscoveredNodeData::kMaxIPAddresses)
     {
-        data.ipAddress[data.numIPs++] = result->mAddress.Value();
+        data.ipAddress[data.numIPs]   = result->mAddress.Value();
+        data.interfaceId[data.numIPs] = result->mInterface;
+        data.numIPs++;
     }
+
+    data.port = result->mPort;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
@@ -538,6 +552,17 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
         mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), error);
         return;
     }
+
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+    // TODO --  define appropriate TTL, for now use 2000 msec (rfc default)
+    // figure out way to use TTL value from mDNS packet in  future update
+    error = mgr->sMdnsCache.Insert(nodeData.mPeerId, result->mAddress.Value(), result->mPort, result->mInterface, 2 * 1000);
+
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Discovery, "MdnsCache insert failed with %s", chip::ErrorStr(error));
+    }
+#endif
 
     Platform::CopyString(nodeData.mHostName, result->mHostName);
     nodeData.mInterfaceId = result->mInterface;

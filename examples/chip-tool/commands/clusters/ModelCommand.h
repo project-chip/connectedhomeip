@@ -22,7 +22,7 @@
 #include "../common/Command.h"
 #include <app/chip-zcl-zpro-codec.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
 
 // Limits on endpoint values.
 #define CHIP_ZCL_ENDPOINT_MIN 0x00

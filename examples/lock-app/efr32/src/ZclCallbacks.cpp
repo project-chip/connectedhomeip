@@ -23,8 +23,8 @@
 #include "AppConfig.h"
 #include "BoltLockManager.h"
 
-#include <app/common/gen/ids/Attributes.h>
-#include <app/common/gen/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af-types.h>
 
 using namespace ::chip;

@@ -844,9 +844,9 @@ class BluezManager(ChipBleBase):
                     self.bluez, self.bus, ADAPTER_INTERFACE, "/org/bluez"
                 )
             ]
-            for i in range(len(adapters)):
+            for adapter in adapters:
                 self.logger.info("AdapterName: %s   AdapterAddress: %s" % (
-                    adapters[i].path.replace("/org/bluez/", ""), adapters[i].Address))
+                    adapter.path.replace("/org/bluez/", ""), adapter.Address))
         except dbus.exceptions.DBusException as ex:
             self.logger.debug(str(ex))
 

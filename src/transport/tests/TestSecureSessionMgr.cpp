@@ -24,13 +24,13 @@
 #define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API // Up here in case some other header
                                               // includes SecureSessionMgr.h indirectly
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -66,7 +66,7 @@ public:
                            const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                            System::PacketBufferHandle && msgBuf) override
     {
-        NL_TEST_ASSERT(mSuite, session == mRemoteToLocalSession); // Packet received by remote peer
+        NL_TEST_ASSERT(mSuite, session == mRemoteToLocalSession.Value()); // Packet received by remote peer
 
         size_t data_len = msgBuf->DataLength();
 
@@ -88,20 +88,20 @@ public:
     {
         // Preset the MessageCounter
         if (NewConnectionHandlerCallCount == 0)
-            mRemoteToLocalSession = session;
+            mRemoteToLocalSession.SetValue(session);
         if (NewConnectionHandlerCallCount == 1)
-            mLocalToRemoteSession = session;
+            mLocalToRemoteSession.SetValue(session);
         NewConnectionHandlerCallCount++;
     }
     void OnConnectionExpired(SessionHandle session) override { mOldConnectionDropped = true; }
 
     bool mOldConnectionDropped = false;
 
-    nlTestSuite * mSuite = nullptr;
-    SessionHandle mRemoteToLocalSession;
-    SessionHandle mLocalToRemoteSession;
-    int ReceiveHandlerCallCount       = 0;
-    int NewConnectionHandlerCallCount = 0;
+    nlTestSuite * mSuite                          = nullptr;
+    Optional<SessionHandle> mRemoteToLocalSession = Optional<SessionHandle>::Missing();
+    Optional<SessionHandle> mLocalToRemoteSession = Optional<SessionHandle>::Missing();
+    int ReceiveHandlerCallCount                   = 0;
+    int NewConnectionHandlerCallCount             = 0;
 
     bool LargeMessageSent = false;
 };
@@ -166,7 +166,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
+    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession.Value();
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
@@ -180,7 +180,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest);
 
     EncryptedPacketBufferHandle preparedMessage;
-    err = secureSessionMgr.BuildEncryptedMessagePayload(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
@@ -194,8 +194,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     callback.LargeMessageSent = true;
 
-    err = secureSessionMgr.BuildEncryptedMessagePayload(localToRemoteSession, payloadHeader, std::move(large_buffer),
-                                                        preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(large_buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
@@ -211,8 +210,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     callback.LargeMessageSent = true;
 
-    err = secureSessionMgr.BuildEncryptedMessagePayload(localToRemoteSession, payloadHeader, std::move(extra_large_buffer),
-                                                        preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(extra_large_buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_MESSAGE_TOO_LONG);
 }
 
@@ -256,7 +254,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
+    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession.Value();
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
@@ -272,14 +270,14 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     payloadHeader.SetInitiator(true);
 
-    err = secureSessionMgr.BuildEncryptedMessagePayload(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Reset receive side message counter, or duplicated message will be denied.
-    Transport::PeerConnectionState * state = secureSessionMgr.GetPeerConnectionState(callback.mRemoteToLocalSession);
+    Transport::PeerConnectionState * state = secureSessionMgr.GetPeerConnectionState(callback.mRemoteToLocalSession.Value());
     state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
@@ -330,7 +328,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
+    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession.Value();
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
@@ -346,7 +344,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     payloadHeader.SetInitiator(true);
 
-    err = secureSessionMgr.BuildEncryptedMessagePayload(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
@@ -356,7 +354,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     /* -------------------------------------------------------------------------------------------*/
     // Reset receive side message counter, or duplicated message will be denied.
-    Transport::PeerConnectionState * state = secureSessionMgr.GetPeerConnectionState(callback.mRemoteToLocalSession);
+    Transport::PeerConnectionState * state = secureSessionMgr.GetPeerConnectionState(callback.mRemoteToLocalSession.Value());
     state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     PacketHeader packetHeader;
@@ -364,14 +362,14 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     // Change Message ID
-    EncryptedPacketBufferHandle badMessageIdMsg = preparedMessage.CloneData();
-    NL_TEST_ASSERT(inSuite, badMessageIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
+    EncryptedPacketBufferHandle badMessageCounterMsg = preparedMessage.CloneData();
+    NL_TEST_ASSERT(inSuite, badMessageCounterMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
-    uint32_t msgID = packetHeader.GetMessageId();
-    packetHeader.SetMessageId(msgID + 1);
-    NL_TEST_ASSERT(inSuite, badMessageIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
+    uint32_t messageCounter = packetHeader.GetMessageCounter();
+    packetHeader.SetMessageCounter(messageCounter + 1);
+    NL_TEST_ASSERT(inSuite, badMessageCounterMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badMessageIdMsg);
+    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badMessageCounterMsg);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);

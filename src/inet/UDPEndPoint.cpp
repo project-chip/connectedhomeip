@@ -33,8 +33,8 @@
 #include "InetFaultInjection.h"
 #include <inet/InetLayer.h>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemFaultInjection.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -232,7 +232,7 @@ CHIP_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
         } boundAddr;
         socklen_t boundAddrLen = sizeof(boundAddr);
 
-        if (getsockname(mSocket.GetFD(), &boundAddr.any, &boundAddrLen) == 0)
+        if (getsockname(mSocket, &boundAddr.any, &boundAddrLen) == 0)
         {
             if (boundAddr.any.sa_family == AF_INET)
             {
@@ -246,17 +246,16 @@ CHIP_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = SystemLayer().WatchableEventsManager().GetDispatchQueue();
+    dispatch_queue_t dispatchQueue = static_cast<System::LayerSocketsLoop *>(Layer().SystemLayer())->GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
-        unsigned long fd = static_cast<unsigned long>(mSocket.GetFD());
+        unsigned long fd = static_cast<unsigned long>(mSocket);
 
         mReadableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, dispatchQueue);
         ReturnErrorCodeIf(mReadableSource == nullptr, CHIP_ERROR_NO_MEMORY);
 
         dispatch_source_set_event_handler(mReadableSource, ^{
-            this->mSocket.SetPendingIO(System::SocketEventFlags::kRead);
-            this->HandlePendingIO();
+            this->HandlePendingIO(System::SocketEventFlags::kRead);
         });
         dispatch_resume(mReadableSource);
     }
@@ -350,8 +349,9 @@ CHIP_ERROR UDPEndPoint::Listen(OnMessageReceivedFunct onMessageReceived, OnRecei
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Wait for ability to read on this endpoint.
-    mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
-    ReturnErrorOnFailure(mSocket.RequestCallbackOnPendingRead());
+    auto layer = static_cast<System::LayerSockets *>(Layer().SystemLayer());
+    ReturnErrorOnFailure(layer->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
+    ReturnErrorOnFailure(layer->RequestCallbackOnPendingRead(mWatch));
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return CHIP_NO_ERROR;
@@ -392,13 +392,12 @@ void UDPEndPoint::Close()
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-        if (mSocket.HasFD())
+        if (mSocket != INET_INVALID_SOCKET_FD)
         {
-            mSocket.Close();
+            static_cast<System::LayerSockets *>(Layer().SystemLayer())->StopWatchingSocket(&mWatch);
+            close(mSocket);
+            mSocket = INET_INVALID_SOCKET_FD;
         }
-
-        // Clear any results from select() that indicate pending I/O for the socket.
-        mSocket.ClearPendingIO();
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
         if (mReadableSource)
@@ -861,10 +860,28 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
 void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port)
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
-    UDPEndPoint * ep                   = static_cast<UDPEndPoint *>(arg);
-    chip::System::Layer & lSystemLayer = ep->SystemLayer();
-    IPPacketInfo * pktInfo             = NULL;
-    System::PacketBufferHandle buf     = System::PacketBufferHandle::Adopt(p);
+    UDPEndPoint * ep                 = static_cast<UDPEndPoint *>(arg);
+    System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
+    IPPacketInfo * pktInfo           = NULL;
+    System::PacketBufferHandle buf   = System::PacketBufferHandle::Adopt(p);
+    if (buf->HasChainedBuffer())
+    {
+        // Try the simple expedient of flattening in-place.
+        buf->CompactHead();
+    }
+
+    if (buf->HasChainedBuffer())
+    {
+        // Have to allocate a new big-enough buffer and copy.
+        uint16_t messageSize            = buf->TotalLength();
+        System::PacketBufferHandle copy = System::PacketBufferHandle::New(messageSize, 0);
+        if (copy.IsNull() || buf->Read(copy->Start(), messageSize) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Inet, "No memory to flatten incoming packet buffer chain of size %" PRIu16, buf->TotalLength());
+            return;
+        }
+        buf = std::move(copy);
+    }
 
     pktInfo = GetPacketInfo(buf);
     if (pktInfo != NULL)
@@ -907,21 +924,19 @@ CHIP_ERROR UDPEndPoint::GetSocket(IPAddressType aAddressType)
 }
 
 // static
-void UDPEndPoint::HandlePendingIO(System::WatchableSocket & socket)
+void UDPEndPoint::HandlePendingIO(System::SocketEvents events, intptr_t data)
 {
-    reinterpret_cast<UDPEndPoint *>(socket.GetCallbackData())->HandlePendingIO();
+    reinterpret_cast<UDPEndPoint *>(data)->HandlePendingIO(events);
 }
 
-void UDPEndPoint::HandlePendingIO()
+void UDPEndPoint::HandlePendingIO(System::SocketEvents events)
 {
-    if (mState == kState_Listening && OnMessageReceived != nullptr && mSocket.HasPendingRead())
+    if (mState == kState_Listening && OnMessageReceived != nullptr && events.Has(System::SocketEventFlags::kRead))
     {
         const uint16_t lPort = mBoundPort;
 
         IPEndPointBasis::HandlePendingIO(lPort);
     }
-
-    mSocket.ClearPendingIO();
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

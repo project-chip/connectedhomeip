@@ -27,13 +27,13 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
-#include <core/CHIPTLVTags.h>
-#include <core/CHIPTLVTypes.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLVTags.h>
+#include <lib/core/CHIPTLVTypes.h>
 
-#include <support/DLLUtil.h>
-#include <support/Span.h>
-#include <support/TypeTraits.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -842,6 +842,75 @@ protected:
     CHIP_ERROR ReadData(uint8_t * buf, uint32_t len);
     CHIP_ERROR GetElementHeadLength(uint8_t & elemHeadBytes) const;
     TLVElementType ElementType() const;
+};
+
+/**
+ * A TLVReader that is guaranteed to be backed by a single contiguous buffer.
+ * This allows it to expose some additional methods that allow consumers to
+ * directly access the data in that buffer in a safe way that is guaranteed to
+ * work as long as the reader object stays in scope.
+ */
+class ContiguousBufferTLVReader : public TLVReader
+{
+public:
+    ContiguousBufferTLVReader() : TLVReader() {}
+
+    /**
+     * Init with input buffer as ptr + length pair.
+     */
+    void Init(const uint8_t * data, size_t dataLen) { TLVReader::Init(data, dataLen); }
+
+    /**
+     * Init with input buffer as ByteSpan.
+     */
+    void Init(const ByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Init with input buffer as byte array.
+     */
+    template <size_t N>
+    void Init(const uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
+
+    /**
+     * Allow opening a container, with a new ContiguousBufferTLVReader reading
+     * that container.  See TLVReader::OpenContainer for details.
+     */
+    CHIP_ERROR OpenContainer(ContiguousBufferTLVReader & containerReader);
+
+    /**
+     * Get the value of the current UTF8 string as a Span<const char> pointing
+     * into the TLV data.  Consumers may need to copy the data elsewhere as
+     * needed (e.g. before releasing the reader and its backing buffer if they
+     * plan to use the data after that point).
+     *
+     * @param[out] data                     A Span<const char> representing the string data.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV UTF8 string, or
+     *                                      the reader is not positioned on an element.
+     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely (i.e. the string length was "too big").
+     *
+     */
+    CHIP_ERROR GetStringView(Span<const char> & data);
+
+    /**
+     * Get the value of the current octet string as a ByteSpan pointing into the
+     * TLV data.  Consumers may need to copy the data elsewhere as needed
+     * (e.g. before releasing the reader and its backing buffer if they plan to
+     * use the data after that point).
+     *
+     * @param[out] data                     A ByteSpan representing the string data.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV octet string, or
+     *                                      the reader is not positioned on an element.
+     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely (i.e. the string length was "too big").
+     *
+     */
+    CHIP_ERROR GetByteView(ByteSpan & data);
 };
 
 /**

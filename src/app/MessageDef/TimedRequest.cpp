@@ -94,7 +94,6 @@ TimedRequest::Builder & TimedRequest::Builder::TimeoutMs(const uint16_t aTimeout
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_TimeoutMs), aTimeoutMs);
-        ChipLogFunctError(mError);
     }
     EndOfContainer();
     return *this;

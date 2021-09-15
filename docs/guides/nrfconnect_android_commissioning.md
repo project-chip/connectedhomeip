@@ -1,8 +1,8 @@
 # Commissioning nRF Connect Accessory using Android CHIPTool
 
-You can use [CHIPTool](../../src/android/CHIPTool/README.md) for Android
-smartphones to commission a Nordic Semiconductor device running an nRF Connect
-platform example onto a CHIP-enabled Thread network.
+You can use [CHIPTool](android_chiptool_building.md) for Android smartphones to
+commission a Nordic Semiconductor device running an nRF Connect platform example
+onto a CHIP-enabled Thread network.
 
 This guide references the nRF52840 DK and the door lock example application
 based on the nRF Connect platform, but the instructions are also valid for the
@@ -49,7 +49,7 @@ The following diagram shows the connectivity between network components required
 to allow communication between devices running the CHIPTool and Lock
 applications:
 
-<img src="./images/nrfconnect_android_connectivity.svg" alt="CHIP nodes connectivity" width="600" />
+![CHIP nodes connectivity](./images/nrfconnect_android_connectivity.png)
 
 <hr>
 
@@ -185,22 +185,23 @@ device successfully joins the Thread network.
 
 ## Sending CHIP commands
 
-Once the device is commissioned, the following screen appears:
-
-![CHIPTool device control screen](./images/CHIPTool_device_commissioned.jpg)
-
-The two textboxes at the top contain **Fabric ID** and **Node ID** of the last
-commissioned device.
+Once the device is commissioned, the main application screen appears.
 
 Check the IPv6 connectivity with the device using the following steps:
 
-1. Tap **UPDATE ADDRESS** to learn or refresh the IPv6 address of the device.
+1. Tap **LIGHT ON/OFF & LEVEL CLUSTER**. The following screen appears:
+
+    ![CHIPTool device control screen](./images/CHIPTool_device_commissioned.jpg)
+
+    The two textboxes at the top contain **Fabric ID** and **Node ID** of the
+    last commissioned device.
+
+2. Tap **UPDATE ADDRESS** to learn or refresh the IPv6 address of the device.
    CHIPTool will use a built-in DNS-SD client to resolve **Fabric ID** and
    **Node ID** of the device to its IPv6 address. The result of the operation,
    be it the address or an error message, will be displayed at the bottom of the
    screen.
-
-2. Tap the following buttons to change the lock state of the nRF Connect door
+3. Tap the following buttons to change the lock state of the nRF Connect door
    lock example application referenced in this guide:
 
     - **ON** and **OFF** buttons lock and unlock the door, respectively.

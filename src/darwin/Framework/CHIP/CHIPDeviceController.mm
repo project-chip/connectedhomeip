@@ -19,8 +19,10 @@
 #import "CHIPDevicePairingDelegateBridge.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
+#import "CHIPKeypair.h"
 #import "CHIPLogging.h"
 #import "CHIPOperationalCredentialsDelegate.h"
+#import "CHIPP256KeypairBridge.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 #import "CHIPSetupPayload.h"
 #import <zap-generated/CHIPClustersObjc.h>
@@ -30,8 +32,8 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
-#include <support/CHIPMem.h>
 
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device_id";
 
@@ -56,6 +58,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
 @property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
+@property (readonly) CHIPP256KeypairBridge keypairBridge;
 @property (readonly) chip::NodeId localDeviceId;
 @property (readonly) uint16_t listenPort;
 @end
@@ -125,7 +128,9 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return YES;
 }
 
-- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate vendorId:(uint16_t)vendorId
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+       vendorId:(uint16_t)vendorId
+      nocSigner:(id<CHIPKeypair>)nocSigner
 {
     chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
@@ -145,7 +150,13 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate);
 
-        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge);
+        // create a CHIPP256KeypairBridge here and pass it to the operationalCredentialsDelegate
+        std::unique_ptr<chip::Crypto::CHIPP256KeypairNativeBridge> nativeBridge;
+        if (nocSigner != nil) {
+            _keypairBridge.Init(nocSigner);
+            nativeBridge.reset(new chip::Crypto::CHIPP256KeypairNativeBridge(_keypairBridge));
+        }
+        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge, std::move(nativeBridge));
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }
@@ -467,7 +478,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     }
     dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
-            errorCode = self.cppCommissioner->UpdateDevice(deviceID, fabricId);
+            errorCode = self.cppCommissioner->UpdateDevice(deviceID);
             CHIP_LOG_ERROR("Update device address returned: %s", chip::ErrorStr(errorCode));
         }
     });

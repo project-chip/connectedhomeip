@@ -34,12 +34,12 @@
 #include <ble/BleConfig.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
-#include <support/BitFlags.h>
-#include <support/CHIPFaultInjection.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <ble/BLEEndPoint.h>
 #include <ble/BleLayer.h>

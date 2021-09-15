@@ -26,11 +26,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <mdns/Advertiser.h>
-#include <mdns/Resolver.h>
-#include <support/BytesToHex.h>
-#include <support/CHIPMemString.h>
-#include <support/SafeInt.h>
+#include <lib/mdns/Advertiser.h>
+#include <lib/mdns/Resolver.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace Mdns {
@@ -140,11 +140,6 @@ uint16_t GetLongDiscriminator(const ByteSpan & value)
     return MakeU16FromAsciiDecimal(value);
 }
 
-uint8_t GetAdditionalPairing(const ByteSpan & value)
-{
-    return MakeU8FromAsciiDecimal(value);
-}
-
 uint8_t GetCommissioningMode(const ByteSpan & value)
 {
     return MakeU8FromAsciiDecimal(value);
@@ -195,10 +190,6 @@ TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
     else if (IsKey(key, "VP"))
     {
         return TxtFieldKey::kVendorProduct;
-    }
-    else if (IsKey(key, "AP"))
-    {
-        return TxtFieldKey::kAdditionalPairing;
     }
     else if (IsKey(key, "CM"))
     {
@@ -255,9 +246,6 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredN
     case Internal::TxtFieldKey::kVendorProduct:
         nodeData.vendorId  = Internal::GetVendor(val);
         nodeData.productId = Internal::GetProduct(val);
-        break;
-    case Internal::TxtFieldKey::kAdditionalPairing:
-        nodeData.additionalPairing = Internal::GetAdditionalPairing(val);
         break;
     case Internal::TxtFieldKey::kCommissioningMode:
         nodeData.commissioningMode = Internal::GetCommissioningMode(val);

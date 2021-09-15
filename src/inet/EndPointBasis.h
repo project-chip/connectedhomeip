@@ -32,10 +32,10 @@
 #include <inet/InetInterface.h>
 #include <inet/InetLayerEvents.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <system/WatchableSocket.h>
+#include <system/SocketEvents.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -44,9 +44,6 @@
 
 //--- Declaration of LWIP protocol control buffer structure names
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-struct raw_pcb;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
 struct udp_pcb;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
@@ -97,8 +94,9 @@ protected:
 #endif
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    System::WatchableSocket mSocket; /**< Encapsulated socket descriptor. */
+    int mSocket;                     /**< Encapsulated socket descriptor. */
     IPAddressType mAddrType;         /**< Protocol family, i.e. IPv4 or IPv6. */
+    System::SocketWatchToken mWatch; /**< Socket event watcher */
 #endif                               // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -106,9 +104,6 @@ protected:
     union
     {
         const void * mVoid; /**< An untyped protocol control buffer reference */
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        raw_pcb * mRaw; /**< Raw network interface protocol control */
-#endif                  // INET_CONFIG_ENABLE_RAW_ENDPOINT
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         udp_pcb * mUDP; /**< User datagram protocol (UDP) control */
 #endif                  // INET_CONFIG_ENABLE_UDP_ENDPOINT
@@ -145,7 +140,7 @@ inline bool EndPointBasis::IsNetworkFrameworkEndPoint(void) const
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 inline bool EndPointBasis::IsSocketsEndPoint() const
 {
-    return mSocket.HasFD();
+    return mSocket != INET_INVALID_SOCKET_FD;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -174,20 +169,6 @@ inline bool EndPointBasis::IsOpenEndPoint() const
 
     return lResult;
 }
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-inline void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic)
-{
-    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
-    {
-        DeferredRelease(aTactic);
-    }
-    else
-    {
-        Release();
-    }
-}
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace Inet
 } // namespace chip

@@ -17,6 +17,7 @@
 
 #include <AppConfig.h>
 #include <WindowApp.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/common/gen/attributes/Accessors.h>
 #include <app/server/Server.h>
@@ -69,7 +70,7 @@ WindowApp::Cover * WindowApp::GetCover(chip::EndpointId endpoint)
 CHIP_ERROR WindowApp::Init()
 {
     // Init ZCL Data Model
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

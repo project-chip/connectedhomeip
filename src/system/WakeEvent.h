@@ -27,26 +27,26 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#include <core/CHIPError.h>
-#include <system/WatchableSocket.h>
+#include <lib/core/CHIPError.h>
+#include <system/SocketEvents.h>
 
 namespace chip {
 namespace System {
 
+class LayerSockets;
 class WakeEventTest;
-class WatchableEventManager;
 
 /**
  * @class WakeEvent
  *
- * An instance of this type can be used by a WatchableEventManager to allow other threads
- * to wake its event loop thread via WatchableEventManager::Signal().
+ * An instance of this type can be used by a System::Layer to allow other threads
+ * to wake its event loop thread via System::Layer::Signal().
  */
 class WakeEvent
 {
 public:
-    CHIP_ERROR Open(WatchableEventManager & watchState); /**< Initialize the pipeline */
-    void Close();                                        /**< Close both ends of the pipeline. */
+    CHIP_ERROR Open(LayerSockets & systemLayer); /**< Initialize the pipeline */
+    void Close(LayerSockets & systemLayer);      /**< Close both ends of the pipeline. */
 
     CHIP_ERROR Notify(); /**< Set the event. */
     void Confirm();      /**< Clear the event. */
@@ -54,13 +54,14 @@ public:
 private:
     friend class WakeEventTest;
 
-    int GetReadFD() const { return mFD.GetFD(); }
-    static void Confirm(WatchableSocket & socket) { reinterpret_cast<WakeEvent *>(socket.GetCallbackData())->Confirm(); }
+    int GetReadFD() const { return mReadFD; }
+    static void Confirm(System::SocketEvents events, intptr_t data) { reinterpret_cast<WakeEvent *>(data)->Confirm(); }
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
     int mWriteFD;
 #endif
-    WatchableSocket mFD;
+    int mReadFD;
+    SocketWatchToken mReadWatch;
 };
 
 } // namespace System

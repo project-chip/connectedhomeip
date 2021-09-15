@@ -34,9 +34,9 @@
 #include <ble/BtpEngineTest.h>
 #endif
 
-#include <support/BufferReader.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/BufferReader.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 // Define below to enable extremely verbose BLE-specific debug logging.
 #undef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
@@ -321,6 +321,10 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
 
         mRxBuf->AddToEnd(std::move(data));
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
+
+        // For now, limit BtpEngine message size to max length of 1 pbuf, as we do for chip messages sent via IP.
+        // TODO add support for BtpEngine messages longer than 1 pbuf
+        VerifyOrExit(!mRxBuf->HasChainedBuffer(), err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
     }
     else if (mRxState == kState_InProgress)
     {

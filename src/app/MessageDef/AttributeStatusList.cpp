@@ -43,7 +43,6 @@ AttributeStatusElement::Builder & AttributeStatusList::Builder::CreateAttributeS
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeStatusBuilder.ResetError(mError));
 
     mError = mAttributeStatusBuilder.Init(mpWriter);
-    ChipLogFunctError(mError);
 
 exit:
     // on error, mAttributeStatusBuilder would be un-/partial initialized and cannot be used to write anything
@@ -108,7 +107,6 @@ CHIP_ERROR AttributeStatusList::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }

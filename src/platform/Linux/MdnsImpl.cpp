@@ -25,10 +25,11 @@
 
 #include <netinet/in.h>
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
+#include <system/SystemLayer.h>
 
 using chip::Mdns::kMdnsTypeMaxSize;
 using chip::Mdns::MdnsServiceProtocol;
@@ -88,10 +89,11 @@ AvahiWatchEvent ToAvahiWatchEvent(SocketEvents events)
                                         (events.Has(chip::System::SocketEventFlags::kError) ? AVAHI_WATCH_ERR : 0));
 }
 
-void AvahiWatchCallbackTrampoline(chip::System::WatchableSocket & socket)
+void AvahiWatchCallbackTrampoline(chip::System::SocketEvents events, intptr_t data)
 {
-    AvahiWatch * const watch = reinterpret_cast<AvahiWatch *>(socket.GetCallbackData());
-    watch->mCallback(watch, socket.GetFD(), ToAvahiWatchEvent(socket.GetPendingEvents()), watch->mContext);
+    AvahiWatch * const watch = reinterpret_cast<AvahiWatch *>(data);
+    watch->mPendingIO        = ToAvahiWatchEvent(events);
+    watch->mCallback(watch, watch->mSocket, watch->mPendingIO, watch->mContext);
 }
 
 CHIP_ERROR MakeAvahiStringListFromTextEntries(TextEntry * entries, size_t size, AvahiStringList ** strListOut)
@@ -135,8 +137,6 @@ namespace Mdns {
 
 MdnsAvahi MdnsAvahi::sInstance;
 
-constexpr uint64_t kUsPerSec = 1000 * 1000;
-
 Poller::Poller()
 {
     mAvahiPoller.userdata         = this;
@@ -149,7 +149,7 @@ Poller::Poller()
     mAvahiPoller.timeout_update = TimeoutUpdate;
     mAvahiPoller.timeout_free   = TimeoutFree;
 
-    mWatchableEvents = &DeviceLayer::SystemLayer.WatchableEventsManager();
+    mEarliestTimeout = std::chrono::steady_clock::time_point();
 }
 
 AvahiWatch * Poller::WatchNew(const struct AvahiPoll * poller, int fd, AvahiWatchEvent event, AvahiWatchCallback callback,
@@ -162,18 +162,12 @@ AvahiWatch * Poller::WatchNew(int fd, AvahiWatchEvent event, AvahiWatchCallback 
 {
     VerifyOrDie(callback != nullptr && fd >= 0);
 
-    auto watch = std::make_unique<AvahiWatch>();
-    watch->mSocket.Init(*mWatchableEvents);
-    LogErrorOnFailure(watch->mSocket.Attach(fd));
-    watch->mSocket.SetCallback(AvahiWatchCallbackTrampoline, reinterpret_cast<intptr_t>(watch.get()));
-    if (event & AVAHI_WATCH_IN)
-    {
-        LogErrorOnFailure(watch->mSocket.RequestCallbackOnPendingRead());
-    }
-    if (event & AVAHI_WATCH_OUT)
-    {
-        LogErrorOnFailure(watch->mSocket.RequestCallbackOnPendingWrite());
-    }
+    auto watch     = std::make_unique<AvahiWatch>();
+    watch->mSocket = fd;
+    LogErrorOnFailure(DeviceLayer::SystemLayerSockets().StartWatchingSocket(fd, &watch->mSocketWatch));
+    LogErrorOnFailure(DeviceLayer::SystemLayerSockets().SetCallback(watch->mSocketWatch, AvahiWatchCallbackTrampoline,
+                                                                    reinterpret_cast<intptr_t>(watch.get())));
+    WatchUpdate(watch.get(), event);
     watch->mCallback = callback;
     watch->mContext  = context;
     watch->mPoller   = this;
@@ -186,25 +180,25 @@ void Poller::WatchUpdate(AvahiWatch * watch, AvahiWatchEvent event)
 {
     if (event & AVAHI_WATCH_IN)
     {
-        LogErrorOnFailure(watch->mSocket.RequestCallbackOnPendingRead());
+        LogErrorOnFailure(DeviceLayer::SystemLayerSockets().RequestCallbackOnPendingRead(watch->mSocketWatch));
     }
     else
     {
-        LogErrorOnFailure(watch->mSocket.ClearCallbackOnPendingRead());
+        LogErrorOnFailure(DeviceLayer::SystemLayerSockets().ClearCallbackOnPendingRead(watch->mSocketWatch));
     }
     if (event & AVAHI_WATCH_OUT)
     {
-        LogErrorOnFailure(watch->mSocket.RequestCallbackOnPendingWrite());
+        LogErrorOnFailure(DeviceLayer::SystemLayerSockets().RequestCallbackOnPendingWrite(watch->mSocketWatch));
     }
     else
     {
-        LogErrorOnFailure(watch->mSocket.ClearCallbackOnPendingWrite());
+        LogErrorOnFailure(DeviceLayer::SystemLayerSockets().ClearCallbackOnPendingWrite(watch->mSocketWatch));
     }
 }
 
 AvahiWatchEvent Poller::WatchGetEvents(AvahiWatch * watch)
 {
-    return ToAvahiWatchEvent(watch->mSocket.GetPendingEvents());
+    return watch->mPendingIO;
 }
 
 void Poller::WatchFree(AvahiWatch * watch)
@@ -214,7 +208,7 @@ void Poller::WatchFree(AvahiWatch * watch)
 
 void Poller::WatchFree(AvahiWatch & watch)
 {
-    (void) watch.mSocket.ReleaseFD();
+    DeviceLayer::SystemLayerSockets().StopWatchingSocket(&watch.mSocketWatch);
     mWatches.erase(std::remove_if(mWatches.begin(), mWatches.end(),
                                   [&watch](const std::unique_ptr<AvahiWatch> & aValue) { return aValue.get() == &watch; }),
                    mWatches.end());
@@ -244,9 +238,10 @@ steady_clock::time_point GetAbsTimeout(const struct timeval * timeout)
 
 AvahiTimeout * Poller::TimeoutNew(const struct timeval * timeout, AvahiTimeoutCallback callback, void * context)
 {
-
     mTimers.emplace_back(new AvahiTimeout{ GetAbsTimeout(timeout), callback, timeout != nullptr, context, this });
-    return mTimers.back().get();
+    AvahiTimeout * timer = mTimers.back().get();
+    SystemTimerUpdate(timer);
+    return timer;
 }
 
 void Poller::TimeoutUpdate(AvahiTimeout * timer, const struct timeval * timeout)
@@ -255,6 +250,7 @@ void Poller::TimeoutUpdate(AvahiTimeout * timer, const struct timeval * timeout)
     {
         timer->mAbsTimeout = GetAbsTimeout(timeout);
         timer->mEnabled    = true;
+        static_cast<Poller *>(timer->mPoller)->SystemTimerUpdate(timer);
     }
     else
     {
@@ -274,38 +270,17 @@ void Poller::TimeoutFree(AvahiTimeout & timer)
                   mTimers.end());
 }
 
-void Poller::GetTimeout(timeval & timeout)
+void Poller::SystemTimerCallback(System::Layer * layer, void * data)
 {
-    microseconds timeoutVal = seconds(timeout.tv_sec) + microseconds(timeout.tv_usec);
-
-    for (auto && timer : mTimers)
-    {
-        steady_clock::time_point absTimeout = timer->mAbsTimeout;
-        steady_clock::time_point now        = steady_clock::now();
-
-        if (!timer->mEnabled)
-        {
-            continue;
-        }
-        if (absTimeout < now)
-        {
-            timeoutVal = microseconds(0);
-            break;
-        }
-        else
-        {
-            timeoutVal = std::min(timeoutVal, duration_cast<microseconds>(absTimeout - now));
-        }
-    }
-
-    timeout.tv_sec  = static_cast<uint64_t>(timeoutVal.count()) / kUsPerSec;
-    timeout.tv_usec = static_cast<uint64_t>(timeoutVal.count()) % kUsPerSec;
+    static_cast<Poller *>(data)->HandleTimeout();
 }
 
 void Poller::HandleTimeout()
 {
+    mEarliestTimeout             = std::chrono::steady_clock::time_point();
     steady_clock::time_point now = steady_clock::now();
 
+    AvahiTimeout * earliest = nullptr;
     for (auto && timer : mTimers)
     {
         if (!timer->mEnabled)
@@ -316,6 +291,27 @@ void Poller::HandleTimeout()
         {
             timer->mCallback(timer.get(), timer->mContext);
         }
+        else
+        {
+            if ((earliest == nullptr) || (timer->mAbsTimeout < earliest->mAbsTimeout))
+            {
+                earliest = timer.get();
+            }
+        }
+    }
+    if (earliest)
+    {
+        SystemTimerUpdate(earliest);
+    }
+}
+
+void Poller::SystemTimerUpdate(AvahiTimeout * timer)
+{
+    if ((mEarliestTimeout == std::chrono::steady_clock::time_point()) || (timer->mAbsTimeout < mEarliestTimeout))
+    {
+        mEarliestTimeout = timer->mAbsTimeout;
+        auto msDelay     = std::chrono::duration_cast<std::chrono::milliseconds>(steady_clock::now() - mEarliestTimeout).count();
+        DeviceLayer::SystemLayer().StartTimer(msDelay, SystemTimerCallback, this);
     }
 }
 
@@ -610,8 +606,13 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
 
             Platform::CopyString(service.mName, name);
             CopyTypeWithoutProtocol(service.mType, type);
-            service.mProtocol               = GetProtocolInType(type);
-            service.mAddressType            = ToAddressType(protocol);
+            service.mProtocol    = GetProtocolInType(type);
+            service.mAddressType = ToAddressType(protocol);
+            service.mInterface   = INET_NULL_INTERFACEID;
+            if (interface != AVAHI_IF_UNSPEC)
+            {
+                service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
+            }
             service.mType[kMdnsTypeMaxSize] = 0;
             context->mServices.push_back(service);
         }
@@ -691,6 +692,11 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         result.mProtocol    = GetProtocolInType(type);
         result.mPort        = port;
         result.mAddressType = ToAddressType(protocol);
+        result.mInterface   = INET_NULL_INTERFACEID;
+        if (interface != AVAHI_IF_UNSPEC)
+        {
+            result.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
+        }
         Platform::CopyString(result.mHostName, host_name);
         // Returned value is full QName, want only host part.
         char * dot = strchr(result.mHostName, '.');
@@ -746,16 +752,6 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
     avahi_service_resolver_free(resolver);
     chip::Platform::Delete(context);
-}
-
-void GetMdnsTimeout(timeval & timeout)
-{
-    MdnsAvahi::GetInstance().GetPoller().GetTimeout(timeout);
-}
-
-void HandleMdnsTimeout()
-{
-    MdnsAvahi::GetInstance().GetPoller().HandleTimeout();
 }
 
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)

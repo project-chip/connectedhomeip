@@ -28,7 +28,7 @@
 #include <stdio.h>
 
 #include <app/AppBuildConfig.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {

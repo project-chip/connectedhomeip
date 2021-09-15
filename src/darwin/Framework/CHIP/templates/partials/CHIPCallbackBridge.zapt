@@ -1,47 +1,83 @@
-class CHIP{{name}}CallbackBridge : public Callback::Callback<{{name}}Callback> {
+{{#if header}}
+class CHIP{{> @partial-block}}Bridge : public CHIPCallbackBridge<{{> @partial-block}}>
+{
 public:
-    CHIP{{name}}CallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
-        : Callback::Callback<{{name}}Callback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-        , mKeepAlive(keepAlive)
-        {}
-
-    ~CHIP{{name}}CallbackBridge() {};
-
-    static void CallbackFn(void * context{{#if type}}, {{#if (isCharString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} value{{/if}})
-    {
-        {{#if (isString type)}}
-        NSData * data = [NSData dataWithBytes: value.data() length: value.size()];
-        {{/if}}
-        CHIP{{name}}CallbackBridge * callback = reinterpret_cast<CHIP{{name}}CallbackBridge *>(context);
-        if (callback && callback->mQueue)
-        {
-            dispatch_async(callback->mQueue, ^{
-                {{#if (isStrEqual name "DefaultFailure")}}
-                NSError * error = [CHIPError errorForZCLErrorCode:value];
-                callback->mHandler(error, nil);
-                {{else if (isOctetString type)}}
-                callback->mHandler(nil, @{ @"value": data });
-                {{else if (isCharString type)}}
-                NSString * str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-                callback->mHandler(nil, @{ @"value": str });
-                {{else if type}}
-                callback->mHandler(nil, @{ @"value": [NSNumber numberWith{{asObjectiveCNumberType name type false}}:value] });
-                {{else}}
-                callback->mHandler(nil, nil);
-                {{/if}}
-                if (!callback->mKeepAlive) {
-                    callback->Cancel();
-                    delete callback;
-                }
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-    bool mKeepAlive;
+    CHIP{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action, bool keepAlive = false)
+      : CHIPCallbackBridge<{{> @partial-block}}>(queue, handler, action, OnSuccessFn, keepAlive)
+      {};
+    
+    static void OnSuccessFn(void * context
+      {{#if (isStrEqual partial-type "Command")}}
+      {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
+      {{else if (isStrEqual partial-type "List")}}
+      , uint16_t count, {{chipType}} * entries
+      {{else if partial-type}}
+      , {{#if (isCharString partial-type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType partial-type}}{{/if}} value
+      {{else}}
+      {{/if}}
+    );
 };
+{{else}}
+void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
+  {{#if (isStrEqual partial-type "Command")}}
+  {{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}}
+  {{else if (isStrEqual partial-type "List")}}
+  , uint16_t count, {{chipType}} * entries
+  {{else if partial-type}}
+  , {{#if (isCharString partial-type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType partial-type}}{{/if}} value
+  {{else}}
+  {{/if}}
+)
+{
+    {{#if (isStrEqual partial-type "Command")}}
+    DispatchSuccess(context, @{
+      {{#chip_cluster_response_arguments}}
+      {{#if isArray}}
+      // {{asSymbol label}} : {{asUnderlyingZclType type}}
+      // Conversion from this type to Objc is not properly implemented yet
+      {{else if (isOctetString type)}}
+      @"{{asSymbol label}}" : [NSData dataWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size()],
+      {{else if (isCharString type)}}
+      @"{{asSymbol label}}" : [NSString stringWithFormat:@"%s", {{asSymbol label}}],
+      {{else}}
+      @"{{asSymbol label}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:{{asSymbol label}}],
+      {{/if}}
+      {{/chip_cluster_response_arguments}}
+    });
+    {{else if (isStrEqual partial-type "List")}}
+    id array = [NSMutableArray arrayWithCapacity:count];
+    for (uint16_t i = 0; i < count; i++)
+    {
+        {{#if isStruct}}
+        array[i] = @{
+          {{#chip_attribute_list_entryTypes}}
+          {{#if (isOctetString type)}}
+          @"{{name}}" : [NSData dataWithBytes:entries[i].{{name}}.data() length:entries[i].{{name}}.size()],
+          {{else if (isCharString type)}}
+          @"{{name}}" : [[NSString alloc] initWithBytes:entries[i].{{name}}+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i].{{name}}) encoding:NSUTF8StringEncoding],
+          {{else}}
+          @"{{name}}" : [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i].{{name}}],
+          {{/if}}
+          {{/chip_attribute_list_entryTypes}}
+        };
+        {{else if (isOctetString type)}}
+        array[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
+        {{else if (isCharString type)}}
+        array[i] = [[NSString alloc] initWithBytes:entries[i]+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i]) encoding:NSUTF8StringEncoding];
+        {{else}}
+        array[i] = [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i]];
+        {{/if}}
+    }
 
+    DispatchSuccess(context, @{ @"value": array });
+    {{else if (isOctetString partial-type)}}
+    DispatchSuccess(context, @{ @"value": [NSData dataWithBytes: value.data() length: value.size()] });
+    {{else if (isCharString partial-type)}}
+    DispatchSuccess(context, @{ @"value": [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding] });
+    {{else if partial-type}}
+    DispatchSuccess(context, @{ @"value": [NSNumber numberWith{{asObjectiveCNumberType name partial-type false}}:value] });
+    {{else}}
+    DispatchSuccess(context, nil);
+    {{/if}}
+};
+{{/if}}

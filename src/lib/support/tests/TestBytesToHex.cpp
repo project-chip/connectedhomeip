@@ -18,8 +18,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <support/BytesToHex.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

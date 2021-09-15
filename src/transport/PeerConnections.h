@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <system/TimeSource.h>
 #include <transport/FabricTable.h>
 #include <transport/PeerConnectionState.h>
@@ -252,7 +252,7 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        assert(begin == nullptr || (begin >= iter && begin < &mStates[kMaxConnectionCount]));
+        VerifyOrDie(begin == nullptr || (begin >= iter && begin < &mStates[kMaxConnectionCount]));
 
         if (begin != nullptr)
         {
@@ -314,6 +314,30 @@ public:
             }
         }
         return state;
+    }
+
+    /**
+     * Get the first peer connection state that matches the given fabric index.
+     *
+     * @param fabric The fabric index to match
+     *
+     * @return the state found, nullptr if not found
+     */
+    CHECK_RETURN_VALUE
+    PeerConnectionState * FindPeerConnectionStateByFabric(FabricIndex fabric)
+    {
+        for (auto & state : mStates)
+        {
+            if (!state.IsInitialized())
+            {
+                continue;
+            }
+            if (state.GetFabricIndex() == fabric)
+            {
+                return &state;
+            }
+        }
+        return nullptr;
     }
 
     /// Convenience method to mark a peer connection state as active

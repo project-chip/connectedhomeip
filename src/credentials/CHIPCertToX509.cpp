@@ -31,16 +31,16 @@
 #include <inttypes.h>
 #include <stddef.h>
 
-#include <asn1/ASN1.h>
-#include <asn1/ASN1Macros.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
-#include <core/CHIPTLV.h>
 #include <credentials/CHIPCert.h>
+#include <lib/asn1/ASN1.h>
+#include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/SafeInt.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/SafeInt.h>
 
 namespace chip {
 namespace Credentials {
@@ -790,7 +790,6 @@ exit:
 static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
     CHIP_ERROR err;
-    uint64_t tag;
     TLVType containerType;
 
     if (reader.GetType() == kTLVType_NotSpecified)
@@ -799,8 +798,7 @@ static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, Chi
         SuccessOrExit(err);
     }
     VerifyOrExit(reader.GetType() == kTLVType_Structure, err = CHIP_ERROR_WRONG_TLV_TYPE);
-    tag = reader.GetTag();
-    VerifyOrExit(tag == AnonymousTag, err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrExit(reader.GetTag() == AnonymousTag, err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     err = reader.EnterContainer(containerType);
     SuccessOrExit(err);
@@ -842,7 +840,7 @@ DLL_EXPORT CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, Mutable
 
     reader.Init(chipCert);
 
-    writer.Init(x509Cert.data(), static_cast<uint32_t>(x509Cert.size()));
+    writer.Init(x509Cert);
 
     certData.Clear();
 

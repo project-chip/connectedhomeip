@@ -14,7 +14,7 @@
 @property (nonatomic, strong) UILabel * temperatureLabel;
 @property (nonatomic, strong) UITextField * minIntervalInSecondsTextField;
 @property (nonatomic, strong) UITextField * maxIntervalInSecondsTextField;
-@property (nonatomic, strong) UITextField * deltaInFahrenheitTextField;
+@property (nonatomic, strong) UITextField * deltaInCelsiusTextField;
 @property (nonatomic, strong) UIButton * sendReportingSetup;
 @end
 
@@ -51,7 +51,7 @@
 {
     [_minIntervalInSecondsTextField resignFirstResponder];
     [_maxIntervalInSecondsTextField resignFirstResponder];
-    [_deltaInFahrenheitTextField resignFirstResponder];
+    [_deltaInCelsiusTextField resignFirstResponder];
 }
 
 - (void)setupUI
@@ -76,7 +76,7 @@
 
     // Temperature label
     _temperatureLabel = [UILabel new];
-    _temperatureLabel.text = @"°F";
+    _temperatureLabel.text = @"°C";
     _temperatureLabel.textColor = UIColor.blackColor;
     _temperatureLabel.textAlignment = NSTextAlignmentCenter;
     _temperatureLabel.font = [UIFont systemFontOfSize:50 weight:UIFontWeightThin];
@@ -120,15 +120,15 @@
     [maxIntervalInSecondsView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 
     // Delta
-    _deltaInFahrenheitTextField = [UITextField new];
-    _deltaInFahrenheitTextField.keyboardType = UIKeyboardTypeNumberPad;
-    UILabel * deltaInFahrenheitLabel = [UILabel new];
-    [deltaInFahrenheitLabel setText:@"Delta (F):"];
-    UIView * deltaInFahrenheitView = [CHIPUIViewUtils viewWithLabel:deltaInFahrenheitLabel textField:_deltaInFahrenheitTextField];
-    [stackView addArrangedSubview:deltaInFahrenheitView];
+    _deltaInCelsiusTextField = [UITextField new];
+    _deltaInCelsiusTextField.keyboardType = UIKeyboardTypeNumberPad;
+    UILabel * deltaInCelsiusLabel = [UILabel new];
+    [deltaInCelsiusLabel setText:@"Delta (°C):"];
+    UIView * deltaInCelsiusView = [CHIPUIViewUtils viewWithLabel:deltaInCelsiusLabel textField:_deltaInCelsiusTextField];
+    [stackView addArrangedSubview:deltaInCelsiusView];
 
-    deltaInFahrenheitView.translatesAutoresizingMaskIntoConstraints = false;
-    [deltaInFahrenheitView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+    deltaInCelsiusView.translatesAutoresizingMaskIntoConstraints = false;
+    [deltaInCelsiusView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 
     // Reporting button
     _sendReportingSetup = [UIButton new];
@@ -153,7 +153,14 @@
 
 - (void)updateTempInUI:(int)newTemp
 {
-    _temperatureLabel.text = [NSString stringWithFormat:@"%@ °F", @(newTemp)];
+    double tempInCelsius = (double) newTemp / 100;
+    NSNumberFormatter * formatter = [[NSNumberFormatter alloc] init];
+    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    formatter.minimumFractionDigits = 0;
+    formatter.maximumFractionDigits = 2;
+    [formatter setRoundingMode:NSNumberFormatterRoundFloor];
+    _temperatureLabel.text =
+        [NSString stringWithFormat:@"%@ °C", [formatter stringFromNumber:[NSNumber numberWithFloat:tempInCelsius]]];
     NSLog(@"Status: Updated temp in UI to %@", _temperatureLabel.text);
 }
 
@@ -187,10 +194,10 @@
 {
     int minIntervalSeconds = [_minIntervalInSecondsTextField.text intValue];
     int maxIntervalSeconds = [_maxIntervalInSecondsTextField.text intValue];
-    int deltaInFahrenheit = [_deltaInFahrenheitTextField.text intValue];
+    int deltaInCelsius = [_deltaInCelsiusTextField.text intValue];
 
-    NSLog(@"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds),
-        @(deltaInFahrenheit));
+    NSLog(
+        @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInCelsius));
 
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
@@ -200,7 +207,7 @@
                 [cluster
                     configureAttributeMeasuredValueWithMinInterval:minIntervalSeconds
                                                        maxInterval:maxIntervalSeconds
-                                                            change:deltaInFahrenheit
+                                                            change:deltaInCelsius
                                                    responseHandler:^(NSError * error, NSDictionary * values) {
                                                        if (error == nil)
                                                            return;

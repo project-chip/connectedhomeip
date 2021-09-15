@@ -43,13 +43,12 @@
 #include <app/util/attribute-storage.h>
 
 #include <platform/CHIPDeviceLayer.h>
-#include <system/SystemTimer.h>
 
 #define EMBER_MAX_EVENT_CONTROL_DELAY_MS (UINT32_MAX / 2)
 #define EMBER_MAX_EVENT_CONTROL_DELAY_QS (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 8)
 #define EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 16)
 
-#include <app/common/gen/callback.h>
+#include <app-common/zap-generated/callback.h>
 
 #include <zap-generated/af-gen-event.h>
 
@@ -149,7 +148,7 @@ EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t de
     {
         control->status = EMBER_EVENT_MS_TIME;
 #if !CHIP_DEVICE_LAYER_NONE
-        chip::DeviceLayer::SystemLayer.StartTimer(delayMs, EventControlHandler, control);
+        chip::DeviceLayer::SystemLayer().StartTimer(delayMs, EventControlHandler, control);
 #endif
     }
     else
@@ -165,7 +164,7 @@ void emberEventControlSetInactive(EmberEventControl * control)
     {
         control->status = EMBER_EVENT_INACTIVE;
 #if !CHIP_DEVICE_LAYER_NONE
-        chip::DeviceLayer::SystemLayer.CancelTimer(EventControlHandler, control);
+        chip::DeviceLayer::SystemLayer().CancelTimer(EventControlHandler, control);
 #endif
     }
 }
@@ -179,7 +178,7 @@ void emberEventControlSetActive(EmberEventControl * control)
 {
     control->status = EMBER_EVENT_ZERO_DELAY;
 #if !CHIP_DEVICE_LAYER_NONE
-    chip::DeviceLayer::SystemLayer.ScheduleWork(EventControlHandler, control);
+    chip::DeviceLayer::SystemLayer().ScheduleWork(EventControlHandler, control);
 #endif
 }
 

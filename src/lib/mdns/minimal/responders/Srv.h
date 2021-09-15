@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <mdns/minimal/records/Srv.h>
-#include <mdns/minimal/responders/RecordResponder.h>
+#include <lib/mdns/minimal/records/Srv.h>
+#include <lib/mdns/minimal/responders/RecordResponder.h>
 
 namespace mdns {
 namespace Minimal {

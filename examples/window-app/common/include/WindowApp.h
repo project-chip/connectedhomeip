@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/util/af-types.h>
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 class WindowApp
 {

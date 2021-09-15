@@ -47,6 +47,11 @@
 // These are configuration options that are unique to Zephyr platforms.
 // These can be overridden by the application as needed.
 
+#ifndef CHIP_DEVICE_CONFIG_SETTINGS_KEY
+/// Key for all Matter persistent data stored using the Zephyr Settings API
+#define CHIP_DEVICE_CONFIG_SETTINGS_KEY "mt"
+#endif // CHIP_DEVICE_CONFIG_SETTINGS_KEY
+
 // ========== Platform-specific Configuration Overrides =========
 
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY

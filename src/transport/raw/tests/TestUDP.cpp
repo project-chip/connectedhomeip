@@ -23,9 +23,9 @@
 
 #include "NetworkTestHelpers.h"
 
-#include <core/CHIPCore.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
@@ -44,7 +44,7 @@ namespace {
 
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
-constexpr uint32_t kMessageId       = 18;
+constexpr uint32_t kMessageCounter  = 18;
 
 using TestContext = chip::Test::IOContext;
 TestContext sContext;
@@ -67,7 +67,7 @@ public:
 
         NL_TEST_ASSERT(mSuite, packetHeader.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, packetHeader.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
-        NL_TEST_ASSERT(mSuite, packetHeader.GetMessageId() == kMessageId);
+        NL_TEST_ASSERT(mSuite, packetHeader.GetMessageCounter() == kMessageCounter);
 
         size_t data_len = msgBuf->DataLength();
         int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
@@ -90,7 +90,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     Transport::UDP udp;
 
-    CHIP_ERROR err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
+    CHIP_ERROR err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(type).SetListenPort(0));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -122,7 +122,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     Transport::UDP udp;
 
-    err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()));
+    err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()).SetListenPort(0));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite);
@@ -133,13 +133,13 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     ReceiveHandlerCallCount = 0;
 
     PacketHeader header;
-    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
+    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
 
     err = header.EncodeBeforeData(buffer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Should be able to send a message to itself by just calling send.
-    err = udp.SendMessage(Transport::PeerAddress::UDP(addr), std::move(buffer));
+    err = udp.SendMessage(Transport::PeerAddress::UDP(addr, udp.GetBoundPort()), std::move(buffer));
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO(#2698): the underlying system does not support IPV6. This early return

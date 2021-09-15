@@ -32,17 +32,16 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPKeyIds.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPKeyIds.h>
+#include <lib/support/Defer.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
-#include <support/Defer.h>
-#include <support/logging/CHIPLogging.h>
-#include <system/SystemTimer.h>
 
 using namespace chip::Encoding;
 using namespace chip::Inet;
@@ -51,11 +50,10 @@ using namespace chip::System;
 namespace chip {
 namespace Messaging {
 
-static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, Protocols::Id protocolId,
-                                     uint8_t msgType, PacketBufferHandle && payload)
+static void DefaultOnMessageReceived(ExchangeContext * ec, Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && payload)
 {
-    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32,
-                 protocolId.ToFullyQualifiedSpecForm(), msgType, ec->GetExchangeId(), packetHeader.GetMessageId());
+    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16, protocolId.ToFullyQualifiedSpecForm(),
+                 msgType, ec->GetExchangeId());
 }
 
 bool ExchangeContext::IsInitiator() const
@@ -94,6 +92,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     Transport::PeerConnectionState * state = nullptr;
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSecureSession.HasValue(), CHIP_ERROR_CONNECTION_ABORTED);
 
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
@@ -105,7 +104,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     bool reliableTransmissionRequested = true;
 
-    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
+    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession.Value());
     // If sending via UDP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
     if (state != nullptr && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
     {
@@ -142,7 +141,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     {
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
-        CHIP_ERROR err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
+        CHIP_ERROR err = mDispatch->SendMessage(mSecureSession.Value(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
                                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
         if (err != CHIP_NO_ERROR && IsResponseExpected())
         {
@@ -234,9 +233,9 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Sess
 {
     VerifyOrDie(mExchangeMgr == nullptr);
 
-    mExchangeMgr   = em;
-    mExchangeId    = ExchangeId;
-    mSecureSession = session;
+    mExchangeMgr = em;
+    mExchangeId  = ExchangeId;
+    mSecureSession.SetValue(session);
     mFlags.Set(Flags::kFlagInitiator, Initiator);
     mDelegate = delegate;
 
@@ -306,7 +305,11 @@ bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & 
         (mExchangeId == payloadHeader.GetExchangeID())
 
         // AND The Session ID associated with the incoming message matches the Session ID associated with the exchange.
-        && (mSecureSession.MatchIncomingSession(session))
+        && (mSecureSession.HasValue() && mSecureSession.Value().MatchIncomingSession(session))
+
+        // TODO: This check should be already implied by the equality of session check,
+        // It should be removed after we have implemented the temporary node id for PASE and CASE sessions
+        && (IsEncryptionRequired() == packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
 
         // AND The message was sent by an initiator and the exchange context is a responder (IsInitiator==false)
         //    OR The message was sent by a responder and the exchange context is an initiator (IsInitiator==true) (for the broadcast
@@ -321,7 +324,7 @@ void ExchangeContext::OnConnectionExpired()
     // connection state) value, because it's still referencing the now-expired
     // connection.  This will mean that no more messages can be sent via this
     // exchange, which seems fine given the semantics of connection expiration.
-    mSecureSession = SessionHandle();
+    mSecureSession.ClearValue();
 
     if (!IsResponseExpected())
     {
@@ -385,7 +388,7 @@ void ExchangeContext::NotifyResponseTimeout()
     MessageHandled();
 }
 
-CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader,
                                           const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
                                           PacketBufferHandle && msgBuf)
 {
@@ -427,8 +430,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         MessageHandled();
     });
 
-    ReturnErrorOnFailure(mDispatch->OnMessageReceived(packetHeader.GetFlags(), payloadHeader, packetHeader.GetMessageId(),
-                                                      peerAddress, msgFlags, GetReliableMessageContext()));
+    ReturnErrorOnFailure(
+        mDispatch->OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
 
     if (IsAckPending() && !mDelegate)
     {
@@ -459,12 +462,11 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     if (mDelegate != nullptr)
     {
-        return mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
+        return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
     }
     else
     {
-        DefaultOnMessageReceived(this, packetHeader, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(),
-                                 std::move(msgBuf));
+        DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), std::move(msgBuf));
         return CHIP_NO_ERROR;
     }
 }

@@ -25,10 +25,10 @@
 
 #include <platform/Zephyr/ZephyrConfig.h>
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <settings/settings.h>
 
@@ -41,11 +41,12 @@ namespace Internal {
     (key);                                                                                                                         \
     static_assert(sizeof(key) <= SETTINGS_MAX_NAME_LEN, "Config key too long: " key)
 
-// Config namespaces
+// Define the configuration keys to be part of the CHIP_DEVICE_CONFIG_SETTINGS_KEY subtree
+// so that they get erased when KeyValueStoreManagerImpl::DoFactoryReset() is called.
 // clang-format off
-#define NAMESPACE_FACTORY  "chip-fact/"
-#define NAMESPACE_CONFIG   "chip-conf/"
-#define NAMESPACE_COUNTERS "chip-cntr/"
+#define NAMESPACE_FACTORY  CHIP_DEVICE_CONFIG_SETTINGS_KEY "/fct/"
+#define NAMESPACE_CONFIG   CHIP_DEVICE_CONFIG_SETTINGS_KEY "/cfg/"
+#define NAMESPACE_COUNTERS CHIP_DEVICE_CONFIG_SETTINGS_KEY "/ctr/"
 // clang-format on
 
 // Keys stored in the chip factory nam

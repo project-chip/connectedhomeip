@@ -24,11 +24,11 @@
 #include <cstdint>
 #include <utility>
 
-#include <core/CHIPEncoding.h>
-#include <support/BufferWriter.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/BufferWriter.h>
 
-#include <mdns/minimal/core/BytesRange.h>
-#include <mdns/minimal/core/DnsHeader.h>
+#include <lib/mdns/minimal/core/BytesRange.h>
+#include <lib/mdns/minimal/core/DnsHeader.h>
 
 namespace mdns {
 namespace Minimal {
