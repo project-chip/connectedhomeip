@@ -129,19 +129,6 @@ static OperationalState ValueToOperationalState(uint8_t value)
     }
 }
 
-bool IsOpen(chip::EndpointId endpoint)
-{
-    uint16_t liftPosition = 0;
-    uint16_t liftLimit    = 0;
-    uint16_t tiltPosition = 0;
-    uint16_t tiltLimit    = 0;
-
-    Attributes::GetTargetPositionLiftPercent100ths(endpoint, &liftPosition);
-    Attributes::GetInstalledOpenLimitLift(endpoint, &liftLimit);
-    Attributes::GetTargetPositionTiltPercent100ths(endpoint, &tiltPosition);
-    Attributes::GetInstalledOpenLimitTilt(endpoint, &tiltLimit);
-    return liftPosition == liftLimit && tiltPosition == tiltLimit;
-}
 static uint8_t OperationalStateToValue(const OperationalState & state)
 {
     switch (state)
@@ -162,6 +149,20 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WindowCovering {
+
+bool IsOpen(chip::EndpointId endpoint)
+{
+    uint16_t liftPosition = 0;
+    uint16_t liftLimit    = 0;
+    uint16_t tiltPosition = 0;
+    uint16_t tiltLimit    = 0;
+
+    Attributes::GetTargetPositionLiftPercent100ths(endpoint, &liftPosition);
+    Attributes::GetInstalledOpenLimitLift(endpoint, &liftLimit);
+    Attributes::GetTargetPositionTiltPercent100ths(endpoint, &tiltPosition);
+    Attributes::GetInstalledOpenLimitTilt(endpoint, &tiltLimit);
+    return liftPosition == liftLimit && tiltPosition == tiltLimit;
+}
 
 bool IsClosed(chip::EndpointId endpoint)
 {
