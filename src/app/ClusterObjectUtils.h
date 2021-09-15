@@ -18,10 +18,11 @@
 
 #pragma once
 
-#include <lib/core/CHIPSafeCasts.h>
 #include <iterator>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/Optional.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
@@ -81,8 +82,10 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, const Span<X> & x)
  *
  *
  */
-template <typename X, typename std::enable_if_t<std::is_class<X>::value &&
-                      std::is_same<decltype(&X::Encode), CHIP_ERROR (X::*)(TLV::TLVWriter &, uint64_t)>::value, X> * = nullptr>
+template <typename X,
+          typename std::enable_if_t<std::is_class<X>::value &&
+                                        std::is_same<decltype(&X::Encode), CHIP_ERROR (X::*)(TLV::TLVWriter &, uint64_t)>::value,
+                                    X> * = nullptr>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, X & x)
 {
     return x.Encode(writer, tag);
@@ -152,9 +155,6 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
  * such that no memory has to be provided ahead of time to store the entirety of the decoded
  * list contents.
  *
- * Specifically, this provides a read-only input iterator that overloads the '->' operator to dynamically
- * decode the list item at a given position in the stored TLVReader and return it to the caller.
- *
  */
 template <typename T>
 class IteratableList
@@ -188,137 +188,96 @@ public:
     class Iterator
     {
     public:
-        /*
-         * @brief
-         *
-         * Since neither the iterator constructor nor the operator overload permit sending errors back,
-         * encapsulate a tuple of the value and error that is then returned to the caller when decoding
-         */
-        struct ValuePair
-        {
-            bool HasError() { return (status != CHIP_NO_ERROR); }
-            CHIP_ERROR status;
-            T value;
-        };
-
         using iterator_category = std::input_iterator_tag;
-        using value_type        = ValuePair;
-        using pointer           = ValuePair *;
-        using reference         = ValuePair &;
 
         /*
-         * @brief
+         * Initialize the iterator with a reference to a reader.
          *
-         * Constructor
-         *
-         * reader       Pointer to a TLV reader whoose contents are copied into an internal
-         *              reader instance that is then used to track the iterator position
-         *              within the backing buffer.
-         *
-         * signature    A unique signature that associated it with a given IteratableList instance
-         *              This permits actually comparing two iterators trivially to ensure they're
-         *              both logically iterating over the same list.
-         *
-         * isEnd        A flag that indicates if the iterator is pointing at the end of the TLV list.
-         *              This is preferable to actually iterating over the list till the end.
+         * This reader should be pointing into the list just after
+         * having called `OpenContainer` on the list element.
          */
-        Iterator(TLV::TLVReader * reader, uintptr_t signature, bool isEnd = false)
+        Iterator(const TLV::TLVReader & reader)
         {
-            mSignature    = signature;
-            mIsEnd        = isEnd;
-            mValue.status = CHIP_NO_ERROR;
-            mDecoded      = false;
-
-            if (!isEnd && reader)
-            {
-                mReader.Init(*reader);
-                mValue.status = mReader.Next();
-            }
-        }
-
-        friend bool operator==(const Iterator & a, const Iterator & b)
-        {
-            return ((a.mSignature == b.mSignature) && ((a.mIsEnd == b.mIsEnd)));
-        }
-
-        friend bool operator!=(const Iterator & a, const Iterator & b)
-        {
-            return !((a.mSignature == b.mSignature) && ((a.mIsEnd == b.mIsEnd)));
+            mStatus = CHIP_NO_ERROR;
+            mReader.Init(reader);
         }
 
         /*
-         * @brief
+         * Increments the iterator to point to the next list element
+         * if a valid one exists, and decodes the list element into
+         * the internal value storage.
          *
-         * De-reference operator overload that returns a fully decoded list item
-         * at the current iterator position.
+         * If an element does exist and was successfully decoded, this
+         * shall return true.
          *
-         * Before accessing the value within the pair, the status should *always* be
-         * checked first.
-         *
-         * This can be called multiple times safely at the same iterator position.
-         *
-         */
-        ValuePair * operator->()
-        {
-            if (mValue.status == CHIP_NO_ERROR && !mDecoded)
-            {
-                mValue.status = Decode(mReader, mValue.value);
-                mDecoded      = true;
-            }
-
-            return &mValue;
-        }
-
-        /*
-         * @brief
-         *
-         * Increments the iterator one item forward in the current list.
-         *
-         * The caller should check the status of the operation by using the
-         * -> operator above to accesss the status within the ValuePair.
+         * Otherwise, if any error was encountered OR the end of the list
+         * was reached, this shall return false.
          *
          */
-        Iterator & operator++()
+        bool Next()
         {
-            if (mValue.status != CHIP_NO_ERROR)
+            if (mStatus != CHIP_NO_ERROR)
             {
-                return *this;
+                return false;
             }
 
-            mValue.status = mReader.Next();
+            mStatus = mReader.Next();
 
-            if (mValue.status != CHIP_NO_ERROR)
+            if (mStatus == CHIP_NO_ERROR)
             {
-                if (mValue.status == CHIP_END_OF_TLV)
+                mStatus = Decode(mReader, mValue);
+                if (mStatus != CHIP_NO_ERROR)
                 {
-                    mIsEnd        = true;
-                    mValue.status = CHIP_NO_ERROR;
+                    return false;
+                }
+                else
+                {
+                    return true;
                 }
             }
-            else if (mValue.status == CHIP_NO_ERROR)
+            else if (mStatus == CHIP_END_OF_TLV)
             {
-                //
-                // clear our tracker variable so that the value at this new position
-                // can be decoded in a subsequence call to the -> operator overload above.
-                //
-                mDecoded = false;
+                return false;
             }
+            else
+            {
+                return false;
+            }
+        }
 
-            return *this;
+        /*
+         * Retrieves a reference to the decoded value, if one
+         * was decoded on a previous call to Next().
+         */
+        const T & GetValue() { return mValue; }
+
+        /*
+         * Returns the result of all previous operations on this iterator.
+         *
+         * Notably, if the end-of-list was encountered in a previous call to Next,
+         * the status returned shall be CHIP_NO_ERROR.
+         *
+         */
+        CHIP_ERROR GetError()
+        {
+            if (mStatus == CHIP_END_OF_TLV)
+            {
+                return CHIP_NO_ERROR;
+            }
+            else
+            {
+                return mStatus;
+            }
         }
 
     private:
-        ValuePair mValue;
-        bool mDecoded;
-        uintptr_t mSignature;
+        T mValue;
+        CHIP_ERROR mStatus;
         TLV::TLVReader mReader;
-        bool mIsEnd;
     };
 
     TLV::TLVReader & GetReader() { return mReader; }
-
-    Iterator begin() { return Iterator(&mReader, (uintptr_t) this, false); }
-    Iterator end() { return Iterator(NULL, (uintptr_t) this, true); }
+    Iterator begin() const { return Iterator(mReader); }
 
 private:
     TLV::TLVReader mReader;
