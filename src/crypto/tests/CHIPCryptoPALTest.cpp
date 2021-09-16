@@ -108,20 +108,19 @@ using TestHMAC_sha                      = HMAC_sha;
 #endif
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
+#if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
 class HeapChecker
 {
 public:
     explicit HeapChecker(nlTestSuite * testSuite) : mTestSuite(testSuite)
     {
-#if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
+
         size_t numBlocks;
         mbedtls_memory_buffer_alloc_cur_get(&mHeapBytesUsed, &numBlocks);
-#endif
     }
 
     ~HeapChecker()
     {
-#if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
         size_t bytesUsed;
         size_t numBlocks;
         mbedtls_memory_buffer_alloc_cur_get(&bytesUsed, &numBlocks);
@@ -131,13 +130,19 @@ public:
             mbedtls_memory_buffer_alloc_status();
             NL_TEST_ASSERT(mTestSuite, bytesUsed == mHeapBytesUsed);
         }
-#endif
     }
 
 private:
     nlTestSuite * mTestSuite;
     size_t mHeapBytesUsed;
 };
+#else
+class HeapChecker
+{
+public:
+    explicit HeapChecker(nlTestSuite *) {}
+};
+#endif
 
 } // namespace
 

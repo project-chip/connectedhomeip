@@ -254,7 +254,6 @@ CHIP_ERROR Spake2p::Init(const uint8_t * context, size_t context_len)
     if (state != CHIP_SPAKE2P_STATE::PREINIT)
     {
         Clear();
-        state = CHIP_SPAKE2P_STATE::PREINIT;
     }
 
     ReturnErrorOnFailure(InitImpl());
