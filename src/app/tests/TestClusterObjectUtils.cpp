@@ -38,6 +38,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <system/SystemLayerImpl.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
@@ -225,11 +226,6 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTest
     _this->mpSuite = apSuite;
     _this->SetupBuf();
 
-    {
-        Span<char> a;
-        DataModel::Encode(_this->mWriter, TLV::AnonymousTag, a);
-    }
-
     //
     // Encode
     //
@@ -300,7 +296,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStruc
         uint32_t intBuf[4] = { 10000, 10001, 10002, 10003 };
         char strbuf[10]    = "chip";
         clusters::TestCluster::SimpleStruct::Type structList[4];
-        int i = 0;
+        uint8_t i = 0;
         chip::ByteSpan spanList[4];
 
         t.a   = 20;
@@ -313,7 +309,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStruc
 
         for (auto & item : structList)
         {
-            item.a = (uint8_t) i;
+            item.a = i;
             item.b = true;
             i++;
         }
@@ -420,14 +416,14 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNeste
         clusters::TestCluster::DoubleNestedStructList::Type t;
         clusters::TestCluster::NestedStructList::Type n[4];
         clusters::TestCluster::SimpleStruct::Type structList[4];
-        uint32_t i;
+        uint8_t i;
 
         t.a = n;
 
         i = 0;
         for (auto & item : structList)
         {
-            item.a = 35 + (uint8_t) i;
+            item.a = (uint8_t)(35) + i;
             i++;
         }
 
@@ -456,7 +452,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNeste
         err = DataModel::Decode(_this->mReader, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        uint32_t i = 0;
+        uint8_t i = 0;
 
         auto iter = t.a.begin();
         while (iter.Next())
@@ -469,7 +465,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNeste
             {
                 auto & nestedItem = nestedIter.GetValue();
 
-                NL_TEST_ASSERT(apSuite, nestedItem.a == (35 + (uint8_t) i));
+                NL_TEST_ASSERT(apSuite, nestedItem.a == ((uint8_t)35 + i));
                 i++;
             }
         }
