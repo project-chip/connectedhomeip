@@ -69,12 +69,16 @@ Complete the following steps to prepare the CHIP build:
     ```shell
     source scripts/bootstrap.sh
     ```
+
 3. Choose how you want to build the Android CHIPTool. There are two ways: from
    script, or from source within Android Studio.
 
 <a name="building-scripts"></a>
+
 ## Building Android CHIPTool from scripts
-This is the simplest option. In the command line, run the following command from the top CHIP directory:
+
+This is the simplest option. In the command line, run the following command from
+the top CHIP directory:
 
 ```shell
 ./scripts/build/build_examples.py --platform android --board arm64 build
@@ -83,16 +87,23 @@ This is the simplest option. In the command line, run the following command from
 See the table above for other values of `TARGET_CPU`.
 
 The debug Android package `app-debug.apk` will be generated at
-`out/android-$TARGET_CPU-chip_tool/outputs/apk/debug/`, and can be installed with
+`out/android-$TARGET_CPU-chip_tool/outputs/apk/debug/`, and can be installed
+with
+
 ```shell
 adb install out/android-$TARGET_CPU-chip_tool/outputs/apk/debug/app-debug.apk
 ```
 
-You can use Android Studio to edit the Android CHIPTool app itself, but you will not be able to edit CHIP Android code from `src/controller/java`, or other CHIP C++ code within Android Studio.
+You can use Android Studio to edit the Android CHIPTool app itself, but you will
+not be able to edit CHIP Android code from `src/controller/java`, or other CHIP
+C++ code within Android Studio.
 
 <a name="building-studio"></a>
+
 ## Building Android CHIPTool from Android Studio
-This option allows Android Studio to build the core CHIP code from source, which allows us to directly edit core CHIP code in-IDE.
+
+This option allows Android Studio to build the core CHIP code from source, which
+allows us to directly edit core CHIP code in-IDE.
 
 1. In the command line, run the following command from the top CHIP directory:
 
@@ -123,10 +134,13 @@ This option allows Android Studio to build the core CHIP code from source, which
 
 The debug Android package `app-debug.apk` will be generated at
 `src/android/CHIPTool/app/build/outputs/apk/debug/`, and can be installed with
+
 ```shell
 adb install src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
 ```
+
 or
+
 ```shell
 (cd src/android/CHIPTool && ./gradlew installDebug)
 ```
