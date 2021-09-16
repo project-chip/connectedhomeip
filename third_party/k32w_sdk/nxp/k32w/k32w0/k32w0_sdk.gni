@@ -169,13 +169,6 @@ template("k32w0_sdk") {
       "HEAP_SIZE=0xF000",
       "gLoggingActive_d=0",
       "gLogRingPlacementOffset_c=0xF000",
-
-      #TODO: move OT defines in an OT specific GN file
-      "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
-      "OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1",
-
-      #TODO: move this define in a MBEDTLS specific GN file
-      "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
     ]
 
     if (chip_mdns == "platform") {

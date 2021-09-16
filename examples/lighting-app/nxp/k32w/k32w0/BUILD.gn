@@ -72,7 +72,7 @@ k32w0_executable("light_app") {
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
-    "${k32w_platform_dir}/app/support:freertos_mbedtls_utils",
+    "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
     "${openthread_root}:libopenthread-cli-ftd",
     "${openthread_root}:libopenthread-ftd",
   ]

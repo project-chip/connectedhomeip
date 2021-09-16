@@ -22,6 +22,11 @@ openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 config("openthread_k32w0_config") {
   include_dirs = [ "${openthread_nxp_root}/src/k32w0/k32w061" ]
   include_dirs += [ "${chip_root}/examples/platform/nxp/k32w/k32w0" ]
+
+  defines = [
+    "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
+    "OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1",
+  ]
 }
 
 source_set("openthread_core_config_k32w0") {
