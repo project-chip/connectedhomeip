@@ -35,7 +35,6 @@ using namespace chip;
 using chip::app::clusters::OTAProviderDelegate;
 
 namespace {
-constexpr uint8_t kLocationParamLength   = 2;   // The expected length of the Location parameter in QueryImage
 constexpr size_t kMaxMetadataLen         = 512; // The maximum length of Metadata in any OTA Provider command
 constexpr size_t kUpdateTokenParamLength = 32;  // The expected length of the Update Token parameter used in multiple commands
 
