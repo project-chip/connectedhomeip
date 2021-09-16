@@ -27,6 +27,33 @@
 
 #include "enums.h"
 
+// Struct for SimpleStruct
+typedef struct _SimpleStruct
+{
+    /* TYPE WARNING: unknown defaults to */ uint8_t * a;
+    bool b;
+    uint8_t c;
+    chip::ByteSpan d;
+    uint8_t * e;
+} SimpleStruct;
+
+// Struct for NestedStructList
+typedef struct _NestedStructList
+{
+    /* TYPE WARNING: unknown defaults to */ uint8_t * a;
+    bool b;
+    SimpleStruct d;
+    /* TYPE WARNING: unknown defaults to */ uint8_t * e;
+    chip::ByteSpan f;
+    /* TYPE WARNING: unknown defaults to */ uint8_t * g;
+} NestedStructList;
+
+// Struct for DoubleNestedStructList
+typedef struct _DoubleNestedStructList
+{
+    NestedStructList a;
+} DoubleNestedStructList;
+
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp
 {
@@ -224,32 +251,12 @@ typedef struct _NeighborTable
     bool IsChild;
 } NeighborTable;
 
-// Struct for SimpleStruct
-typedef struct _SimpleStruct
-{
-    /* TYPE WARNING: unknown defaults to */ uint8_t * a;
-    bool b;
-    uint8_t c;
-    chip::ByteSpan d;
-    uint8_t * e;
-} EmberAfSimpleStruct;
-
 // Struct for NestedStruct
 typedef struct _NestedStruct
 {
     /* TYPE WARNING: unknown defaults to */ uint8_t * a;
     bool b;
-    _SimpleStruct c;
-} EmberAfNestedStruct;
-
-// Struct for NestedStructList
-typedef struct _NestedStructList
-{
-    /* TYPE WARNING: unknown defaults to */ uint8_t * a;
-    bool b;
-    _SimpleStruct c;
-    _SimpleStruct d;
-} EmberAfNestedStructList;
+} NestedStruct;
 
 // Struct for NetworkInterfaceType
 typedef struct _NetworkInterfaceType
