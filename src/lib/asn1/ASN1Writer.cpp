@@ -387,7 +387,7 @@ CHIP_ERROR ASN1Writer::EncodeHead(uint8_t cls, uint8_t tag, bool isConstructed, 
 
     // Make sure there's enough space to encode the entire value.
     // Note that the calculated total length doesn't overflow because `len` is a signed value (int32_t).
-    // Note that if `len` is not kUnknownLength then it is positive (`len` >= 0).
+    // Note that if `len` is not kUnknownLength then it is non-negative (`len` >= 0).
     totalLen = 1 + bytesForLen + static_cast<uint32_t>(len != kUnknownLength ? len : 0);
     VerifyOrReturnError((mWritePoint + totalLen) <= mBufEnd, ASN1_ERROR_OVERFLOW);
 
