@@ -10580,7 +10580,7 @@ public:
         switch (mTestIndex++)
         {
         case 0:
-            err = TestSendClusterDelayCommandsCommandWaitForMs_0();
+            err = TestSendClusterTestSuiteCommandWaitForMs_0();
             break;
         }
 
@@ -10599,9 +10599,9 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestSendClusterDelayCommandsCommandWaitForMs_0()
+    CHIP_ERROR TestSendClusterTestSuiteCommandWaitForMs_0()
     {
-        ChipLogProgress(chipTool, "DelayCommands - Wait 100ms");
+        ChipLogProgress(chipTool, "TestSuite - WaitForMs - Wait 100ms");
 
         return WaitForMs(100);
     }
@@ -10633,22 +10633,13 @@ public:
             err = TestSendClusterOnOffCommandOff_0();
             break;
         case 1:
-            err = TestSendClusterOnOffCommandWaitForReport_1();
+            err = TestSendClusterOnOffCommandSubscribeAttribute_1();
             break;
         case 2:
-            err = TestSendClusterOnOffCommandSubscribeAttribute_2();
+            err = TestSendClusterOnOffCommandOn_2();
             break;
         case 3:
-            err = TestSendClusterOnOffCommandOn_3();
-            break;
-        case 4:
-            err = TestSendClusterOnOffCommandWaitForReport_4();
-            break;
-        case 5:
-            err = TestSendClusterOnOffCommandOff_5();
-            break;
-        case 6:
-            err = TestSendClusterOnOffCommandWaitForReport_6();
+            err = TestSendClusterTestSuiteCommandWaitForAttributeReport_3();
             break;
         }
 
@@ -10661,7 +10652,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 4;
 
     //
     // Tests methods
@@ -10721,37 +10712,52 @@ private:
         runner->NextTest();
     }
 
-    // Test Report: Subscribe OnOff Attribute
+    // Test Subscribe OnOff Attribute
     using SuccessCallback_1 = void (*)(void * context, bool onOff);
-    chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{ OnTestSendClusterOnOffCommandWaitForReport_1_SuccessResponse,
-                                                                      this };
+    chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{
+        OnTestSendClusterOnOffCommandSubscribeAttribute_1_SuccessResponse, this
+    };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
-        OnTestSendClusterOnOffCommandWaitForReport_1_FailureResponse, this
+        OnTestSendClusterOnOffCommandSubscribeAttribute_1_FailureResponse, this
+    };
+    chip::Callback::Callback<DefaultSuccessCallback> mOnSubscriptionEstablishedCallback_1{
+        SubscribeAttribute_1_OnSubscriptionEstablishedCallback, this
     };
 
     bool mIsFailureExpected_1 = 0;
 
     bool mReceivedReport_1 = false;
 
-    CHIP_ERROR TestSendClusterOnOffCommandWaitForReport_1()
+    CHIP_ERROR TestSendClusterOnOffCommandSubscribeAttribute_1()
     {
-        ChipLogProgress(chipTool, "On/Off - Report: Subscribe OnOff Attribute: Sending command...");
+        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Sending command...");
 
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReportAttributeOnOff(mOnSuccessCallback_1.Cancel());
-
-        ReturnErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(0, OnWaitForMsFn, this));
+        cluster.ReportAttributeOnOff(mOnSuccessCallback_1.Cancel());
+        err = cluster.ConfigureAttributeOnOff(mOnSubscriptionEstablishedCallback_1.Cancel(), mOnFailureCallback_1.Cancel(), 2, 10);
 
         return err;
     }
 
-    static void OnTestSendClusterOnOffCommandWaitForReport_1_FailureResponse(void * context, uint8_t status)
+    static void SubscribeAttribute_1_OnSubscriptionEstablishedCallback(void * context)
     {
-        ChipLogProgress(chipTool, "On/Off - Report: Subscribe OnOff Attribute: Failure Response");
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+        if (!runner->mReceivedReport_1)
+        {
+            ChipLogError(chipTool, "Error: Initial report not received!");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterOnOffCommandSubscribeAttribute_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Failure Response");
 
         TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
 
@@ -10761,11 +10767,13 @@ private:
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
+
+        runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandWaitForReport_1_SuccessResponse(void * context, bool onOff)
+    static void OnTestSendClusterOnOffCommandSubscribeAttribute_1_SuccessResponse(void * context, bool onOff)
     {
-        ChipLogProgress(chipTool, "On/Off - Report: Subscribe OnOff Attribute: Success Response");
+        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Success Response");
 
         TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
 
@@ -10776,50 +10784,41 @@ private:
             return;
         }
 
-        if (runner->mReceivedReport_1)
-        {
-            // Receiving report more than once is not an error since the subscription may be alive for a long time.
-            ChipLogProgress(chipTool, "Note: on report called more than once.");
-            return;
-        }
-        runner->mReceivedReport_1 = true;
-
         if (onOff != false)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "false");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
+
+        runner->mReceivedReport_1 = true;
     }
 
-    // Test Subscribe OnOff Attribute
-    using SuccessCallback_2 = void (*)(void * context, bool onOff);
-    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
-        OnTestSendClusterOnOffCommandSubscribeAttribute_2_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
-        OnTestSendClusterOnOffCommandSubscribeAttribute_2_FailureResponse, this
-    };
+    // Test Turn On the light to see attribute change
+    using SuccessCallback_2 = void (*)(void * context);
+    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{ OnTestSendClusterOnOffCommandOn_2_SuccessResponse, this };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{ OnTestSendClusterOnOffCommandOn_2_FailureResponse,
+                                                                           this };
 
     bool mIsFailureExpected_2 = 0;
 
-    CHIP_ERROR TestSendClusterOnOffCommandSubscribeAttribute_2()
+    CHIP_ERROR TestSendClusterOnOffCommandOn_2()
     {
-        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Sending command...");
+        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ConfigureAttributeOnOff(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(), 2, 10);
+        err = cluster.On(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
 
         return err;
     }
 
-    static void OnTestSendClusterOnOffCommandSubscribeAttribute_2_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterOnOffCommandOn_2_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Failure Response");
+        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Failure Response");
 
         TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
 
@@ -10833,9 +10832,9 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandSubscribeAttribute_2_SuccessResponse(void * context, bool onOff)
+    static void OnTestSendClusterOnOffCommandOn_2_SuccessResponse(void * context)
     {
-        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Success Response");
+        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Success Response");
 
         TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
 
@@ -10846,132 +10845,33 @@ private:
             return;
         }
 
-        if (!runner->mReceivedReport_1)
-        {
-            ChipLogError(chipTool, "Error: Initial report not received!");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
         runner->NextTest();
     }
 
-    // Test Turn On the light to see attribute change
-    using SuccessCallback_3 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_3> mOnSuccessCallback_3{ OnTestSendClusterOnOffCommandOn_3_SuccessResponse, this };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{ OnTestSendClusterOnOffCommandOn_3_FailureResponse,
-                                                                           this };
+    // The callback should be called atleast once
+    using OnReportCallback_3 = void (*)(void * context, bool onOff);
+    chip::Callback::Callback<OnReportCallback_3> mOnReportCallback_3{ SubscribeAttribute_3_OnReportCallback, this };
 
-    bool mIsFailureExpected_3 = 0;
+    bool mReceivedReport_3 = false;
 
-    CHIP_ERROR TestSendClusterOnOffCommandOn_3()
+    CHIP_ERROR TestSendClusterTestSuiteCommandWaitForAttributeReport_3()
     {
-        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Sending command...");
-
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.On(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterOnOffCommandOn_3_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Failure Response");
-
-        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
-
-        if (runner->mIsFailureExpected_3 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterOnOffCommandOn_3_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Success Response");
-
-        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
-
-        if (runner->mIsFailureExpected_3 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Check for attribute report
-    using SuccessCallback_4 = void (*)(void * context, bool onOff);
-    chip::Callback::Callback<SuccessCallback_4> mOnSuccessCallback_4{ OnTestSendClusterOnOffCommandWaitForReport_4_SuccessResponse,
-                                                                      this };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
-        OnTestSendClusterOnOffCommandWaitForReport_4_FailureResponse, this
-    };
-
-    bool mIsFailureExpected_4 = 0;
-
-    bool mReceivedReport_4 = false;
-
-    CHIP_ERROR TestSendClusterOnOffCommandWaitForReport_4()
-    {
-        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Sending command...");
-
+        ChipLogProgress(chipTool, "TestSuite - WaitForAttributeReport - Check for attribute report");
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReportAttributeOnOff(mOnSuccessCallback_4.Cancel());
-
-        return err;
+        return cluster.ReportAttributeOnOff(mOnReportCallback_3.Cancel());
     }
 
-    static void OnTestSendClusterOnOffCommandWaitForReport_4_FailureResponse(void * context, uint8_t status)
+    static void SubscribeAttribute_3_OnReportCallback(void * context, bool onOff)
     {
-        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Failure Response");
-
+        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Report Data");
         TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
 
-        if (runner->mIsFailureExpected_4 == false)
+        if (runner->mReceivedReport_3)
         {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            // Receiving attribute more than once is not an issue, since the following handler will override previous handlers.
             return;
         }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterOnOffCommandWaitForReport_4_SuccessResponse(void * context, bool onOff)
-    {
-        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Success Response");
-
-        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
-
-        if (runner->mIsFailureExpected_4 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        if (runner->mReceivedReport_4)
-        {
-            // Receiving report more than once is not an error since the subscription may be alive for a long time.
-            ChipLogProgress(chipTool, "Note: on report called more than once.");
-            return;
-        }
-        runner->mReceivedReport_4 = true;
 
         if (onOff != true)
         {
@@ -10980,133 +10880,8 @@ private:
             return;
         }
 
-        runner->NextTest();
-    }
-
-    // Test Turn Off the light to see attribute change
-    using SuccessCallback_5 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_5> mOnSuccessCallback_5{ OnTestSendClusterOnOffCommandOff_5_SuccessResponse, this };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{ OnTestSendClusterOnOffCommandOff_5_FailureResponse,
-                                                                           this };
-
-    bool mIsFailureExpected_5 = 0;
-
-    CHIP_ERROR TestSendClusterOnOffCommandOff_5()
-    {
-        ChipLogProgress(chipTool, "On/Off - Turn Off the light to see attribute change: Sending command...");
-
-        chip::Controller::OnOffCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.Off(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterOnOffCommandOff_5_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "On/Off - Turn Off the light to see attribute change: Failure Response");
-
-        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
-
-        if (runner->mIsFailureExpected_5 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterOnOffCommandOff_5_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "On/Off - Turn Off the light to see attribute change: Success Response");
-
-        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
-
-        if (runner->mIsFailureExpected_5 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Check for attribute report
-    using SuccessCallback_6 = void (*)(void * context, bool onOff);
-    chip::Callback::Callback<SuccessCallback_6> mOnSuccessCallback_6{ OnTestSendClusterOnOffCommandWaitForReport_6_SuccessResponse,
-                                                                      this };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
-        OnTestSendClusterOnOffCommandWaitForReport_6_FailureResponse, this
-    };
-
-    bool mIsFailureExpected_6 = 0;
-
-    bool mReceivedReport_6 = false;
-
-    CHIP_ERROR TestSendClusterOnOffCommandWaitForReport_6()
-    {
-        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Sending command...");
-
-        chip::Controller::OnOffCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReportAttributeOnOff(mOnSuccessCallback_6.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterOnOffCommandWaitForReport_6_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Failure Response");
-
-        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
-
-        if (runner->mIsFailureExpected_6 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterOnOffCommandWaitForReport_6_SuccessResponse(void * context, bool onOff)
-    {
-        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Success Response");
-
-        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
-
-        if (runner->mIsFailureExpected_6 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        if (runner->mReceivedReport_6)
-        {
-            // Receiving report more than once is not an error since the subscription may be alive for a long time.
-            ChipLogProgress(chipTool, "Note: on report called more than once.");
-            return;
-        }
-        runner->mReceivedReport_6 = true;
-
-        if (onOff != false)
-        {
-            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "false");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
+        runner->mReceivedReport_3 = true;
+        ChipLogProgress(chipTool, "On/Off - report received.");
         runner->NextTest();
     }
 };

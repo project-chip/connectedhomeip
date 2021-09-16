@@ -20,8 +20,20 @@
             "path": "partials/test_cluster.zapt"
         },
         {
+            "name": "process_response_value",
+            "path": "partials/process_response_value.zapt"
+        },
+        {
             "name": "CHIPCallbackBridge",
             "path": "partials/CHIPCallbackBridge.zapt"
+        },
+        {
+            "name": "TestSuiteHelper_WaitForMs",
+            "path": "partials/testsuite/WaitForMs.zapt"
+        },
+        {
+            "name": "TestSuiteHelper_WaitForAttributeReport",
+            "path": "partials/testsuite/WaitForAttributeReport.zapt"
         }
     ],
     "templates": [
