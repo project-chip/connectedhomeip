@@ -144,6 +144,7 @@ CHIP_ERROR ASN1Reader::GetInteger(int64_t & val)
 {
     ReturnErrorCodeIf(Value == nullptr, ASN1_ERROR_INVALID_STATE);
     ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
+    ReturnErrorCodeIf(ValueLen > sizeof(int64_t), ASN1_ERROR_VALUE_OVERFLOW);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
 
     const uint8_t * p = Value;
