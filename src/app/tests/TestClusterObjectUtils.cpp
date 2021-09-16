@@ -423,7 +423,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNeste
         i = 0;
         for (auto & item : structList)
         {
-            item.a = (uint8_t)(35) + i;
+            item.a = (uint8_t)(35 + i);
             i++;
         }
 
