@@ -7,24 +7,30 @@
         android:id="@+id/basicClusterFabricIdEd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:hint="@string/enter_fabric_id_hint_text"
         android:inputType="text"
-        android:textSize="20sp"
-        android:hint="@string/enter_fabric_id_hint_text"/>
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/basicClusterDeviceIdEd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_toEndOf="@id/basicClusterFabricIdEd"
+        android:hint="@string/enter_device_id_hint_text"
         android:inputType="text"
-        android:textSize="20sp"
-        android:hint="@string/enter_device_id_hint_text"/>
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/basicClusterUpdateAddressBtn"
@@ -55,19 +61,22 @@
         android:text="@string/basic_cluster_write_user_label_btn_text" />
 
     <EditText
-        android:id="@+id/deviceIdEd"
+        android:id="@+id/userLabelEd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_alignParentEnd="true"
         android:layout_below="@id/readUserLabelBtn"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_toEndOf="@id/writeUserLabelBtn"
+        android:hint="@string/basic_cluster_write_user_label_hint_text"
         android:inputType="text"
-        android:textSize="20sp"
-        android:hint="@string/basic_cluster_write_user_label_hint_text"/>
+        android:textSize="20sp" />
 
     <Button
-        android:id="@+id/readProducNameBtn"
+        android:id="@+id/readProductNameBtn"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_margin="10dp"
@@ -76,13 +85,13 @@
         android:text="@string/basic_cluster_read_product_name_btn_text" />
 
     <TextView
-        android:id="@+id/basicClustCommandStatus"
+        android:id="@+id/basicClusterCommandStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:layout_below="@id/readProducNameBtn"
-        android:singleLine="false"
+        android:layout_below="@id/readProductNameBtn"
         android:minLines="4"
-        android:textSize="20sp"/>
+        android:padding="16dp"
+        android:singleLine="false"
+        android:textSize="20sp" />
 
 </RelativeLayout>
