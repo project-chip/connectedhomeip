@@ -37,7 +37,7 @@ namespace System {
  *  @tparam     T   a subclass of Object to be allocated from the arena.
  *  @tparam     N   a positive integer number of objects of class T to allocate from the arena.
  */
-template <class T, unsigned int N>
+template <class T, size_t N>
 class ObjectPoolHeap : public ObjectPoolStatistics
 {
 public:
@@ -59,6 +59,9 @@ public:
     void ReleaseObject(T * object)
     {
         std::lock_guard<std::recursive_mutex> lock(mutex);
+        if (object == nullptr)
+            return;
+
         auto iter = mObjects.find(object);
         VerifyOrDie(iter != mObjects.end());
         mObjects.erase(iter);

@@ -84,8 +84,6 @@ static_library("support") {
     "PersistedCounter.cpp",
     "PersistedCounter.h",
     "PersistentStorageMacros.h",
-    "Pool.cpp",
-    "Pool.h",
     "PrivateHeap.cpp",
     "PrivateHeap.h",
     "RandUtils.cpp",

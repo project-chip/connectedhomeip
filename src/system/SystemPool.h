@@ -37,10 +37,10 @@ namespace chip {
 namespace System {
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-template <class T, unsigned int N>
+template <class T, size_t N>
 using ObjectPool = ObjectPoolHeap<T, N>;
 #else
-template <class T, unsigned int N>
+template <class T, size_t N>
 using ObjectPool = ObjectPoolNonHeap<T, N>;
 #endif
 

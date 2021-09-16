@@ -31,9 +31,9 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
-#include <lib/support/Pool.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/SystemPool.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -66,7 +66,7 @@ public:
     };
 
 public:
-    ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
+    ReliableMessageMgr(System::ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageMgr();
 
     void Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr);
@@ -224,7 +224,7 @@ public:
 #endif // CHIP_CONFIG_TEST
 
 private:
-    BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
+    System::ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
     SecureSessionMgr * mSessionMgr;
     uint64_t mTimeStampBase; // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts

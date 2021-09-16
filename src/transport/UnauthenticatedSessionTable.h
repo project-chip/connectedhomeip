@@ -19,9 +19,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/Pool.h>
 #include <lib/support/ReferenceCountedHandle.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemPool.h>
 #include <system/TimeSource.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -193,7 +193,7 @@ private:
     }
 
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
-    BitMapObjectPool<UnauthenticatedSession, kMaxConnectionCount> mEntries;
+    System::ObjectPool<UnauthenticatedSession, kMaxConnectionCount> mEntries;
 };
 
 } // namespace Transport

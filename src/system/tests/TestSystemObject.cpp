@@ -28,14 +28,6 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-// Install a sleep in the high water mark function, to force
-// collisions between the threads that call it.
-
-// clang-format off
-#include <lib/support/UnitTestUtils.h>
-#define SYSTEM_OBJECT_HWM_TEST_HOOK() do { chip::test_utils::SleepMillis(1); } while(0)
-// clang-format on
-
 #include <system/SystemLayer.h>
 #include <system/SystemPool.h>
 
@@ -48,18 +40,18 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>
-#include <lwip/tcpip.h>
 #include <lwip/sys.h>
+#include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <type_traits>
 
 // Test context
