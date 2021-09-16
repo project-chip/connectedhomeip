@@ -232,20 +232,20 @@ private:
     static ColorControlServer instance;
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
-    std::unordered_map<chip::EndpointId, ColorHueTransitionState> colorHueTransitionStates;
-    std::unordered_map<chip::EndpointId, Color16uTransitionState> colorSatTransitionStates;
+    ColorHueTransitionState colorHueTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    Color16uTransitionState colorSatTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 #endif
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
-    std::unordered_map<chip::EndpointId, Color16uTransitionState> colorXtransitionStates;
-    std::unordered_map<chip::EndpointId, Color16uTransitionState> colorYtransitionStates;
+    Color16uTransitionState colorXtransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    Color16uTransitionState colorYtransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-    std::unordered_map<chip::EndpointId, Color16uTransitionState> colorTempTransitionStates;
+    Color16uTransitionState colorTempTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-    std::unordered_map<chip::EndpointId, EmberEventControl> eventControls;
+    EmberEventControl eventControls[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 };
 
 /**********************************************************

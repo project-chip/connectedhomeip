@@ -251,13 +251,8 @@ uint16_t ColorControlServer::computeTransitionTimeFromStateAndRate(ColorControlS
  */
 EmberEventControl * ColorControlServer::getEventControl(EndpointId endpoint)
 {
-    if (eventControls.count(endpoint) == 0)
-    {
-        EmberEventControl controller;
-        eventControls.emplace(endpoint, controller);
-    }
-
-    return &(eventControls.at(endpoint));
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    return &eventControls[index];
 }
 
 /** @brief Compute Pwm from HSV
@@ -356,13 +351,8 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
  */
 ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTransitionState(EndpointId endpoint)
 {
-    if (colorHueTransitionStates.count(endpoint) == 0)
-    {
-        ColorControlServer::ColorHueTransitionState state;
-        colorHueTransitionStates.emplace(endpoint, state);
-    }
-
-    return &(colorHueTransitionStates.at(endpoint));
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    return &colorHueTransitionStates[index];
 }
 
 /**
@@ -373,13 +363,8 @@ ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTra
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getSaturationTransitionState(EndpointId endpoint)
 {
-    if (colorSatTransitionStates.count(endpoint) == 0)
-    {
-        ColorControlServer::Color16uTransitionState state;
-        colorSatTransitionStates.emplace(endpoint, state);
-    }
-
-    return &(colorSatTransitionStates.at(endpoint));
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    return &colorSatTransitionStates[index];
 }
 
 /**
@@ -1529,13 +1514,8 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransitionState(EndpointId endpoint)
 {
-    if (colorXtransitionStates.count(endpoint) == 0)
-    {
-        ColorControlServer::Color16uTransitionState state;
-        colorXtransitionStates.emplace(endpoint, state);
-    }
-
-    return &(colorXtransitionStates.at(endpoint));
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    return &colorXtransitionStates[index];
 }
 
 /**
@@ -1546,13 +1526,8 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransition
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getYTransitionState(EndpointId endpoint)
 {
-    if (colorYtransitionStates.count(endpoint) == 0)
-    {
-        ColorControlServer::Color16uTransitionState state;
-        colorYtransitionStates.emplace(endpoint, state);
-    }
-
-    return &(colorYtransitionStates.at(endpoint));
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    return &colorYtransitionStates[index];
 }
 
 uint16_t ColorControlServer::findNewColorValueFromStep(uint16_t oldValue, int16_t step)
@@ -1834,13 +1809,8 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransitionState(EndpointId endpoint)
 {
-    if (colorHueTransitionStates.count(endpoint) == 0)
-    {
-        ColorControlServer::Color16uTransitionState state;
-        colorTempTransitionStates.emplace(endpoint, state);
-    }
-
-    return &(colorTempTransitionStates.at(endpoint));
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    return &colorTempTransitionStates[index];
 }
 
 /**
