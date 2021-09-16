@@ -142,8 +142,14 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
         ReturnErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().GetPollPeriod(sedPollPeriod));
         // Increment default MRP retry intervals by SED poll period to be on the safe side
         // and avoid unnecessary retransmissions.
-        mrpRetryIntervalIdle.SetValue(mrpRetryIntervalIdle.Value() + sedPollPeriod);
-        mrpRetryIntervalActive.SetValue(mrpRetryIntervalActive.Value() + sedPollPeriod);
+        if (mrpRetryIntervalIdle.HasValue())
+        {
+            mrpRetryIntervalIdle.SetValue(mrpRetryIntervalIdle.Value() + sedPollPeriod);
+        }
+        if (mrpRetryIntervalActive.HasValue())
+        {
+            mrpRetryIntervalActive.SetValue(mrpRetryIntervalActive.Value() + sedPollPeriod);
+        }
     }
 #endif
     if (mrpRetryIntervalIdle.HasValue())
@@ -157,8 +163,7 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
             snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32, mrpRetryIntervalIdle.Value());
         VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalIdleMaxLength),
                             CHIP_ERROR_INVALID_STRING_LENGTH);
-        txtEntryStorage[txtEntryIdx++] = { "CRI", Uint8::from_const_char(mrpRetryIdleStorage),
-                                           strlen(mrpRetryIdleStorage) };
+        txtEntryStorage[txtEntryIdx++] = { "CRI", Uint8::from_const_char(mrpRetryIdleStorage), strlen(mrpRetryIdleStorage) };
     }
     if (mrpRetryIntervalActive.HasValue())
     {
@@ -171,8 +176,7 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
             snprintf(mrpRetryActiveStorage, sizeof(mrpRetryActiveStorage), "%" PRIu32, mrpRetryIntervalActive.Value());
         VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalActiveMaxLength),
                             CHIP_ERROR_INVALID_STRING_LENGTH);
-        txtEntryStorage[txtEntryIdx++] = { "CRA", Uint8::from_const_char(mrpRetryActiveStorage),
-                                           strlen(mrpRetryActiveStorage) };
+        txtEntryStorage[txtEntryIdx++] = { "CRA", Uint8::from_const_char(mrpRetryActiveStorage), strlen(mrpRetryActiveStorage) };
     }
     return CHIP_NO_ERROR;
 }

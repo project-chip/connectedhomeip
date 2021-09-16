@@ -163,8 +163,14 @@ private:
             ReturnErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().GetPollPeriod(sedPollPeriod));
             // Increment default MRP retry intervals by SED poll period to be on the safe side
             // and avoid unnecessary retransmissions.
-            mrpRetryIntervalIdle.SetValue(mrpRetryIntervalIdle.Value() + sedPollPeriod);
-            mrpRetryIntervalActive.SetValue(mrpRetryIntervalActive.Value() + sedPollPeriod);
+            if (mrpRetryIntervalIdle.HasValue())
+            {
+                mrpRetryIntervalIdle.SetValue(mrpRetryIntervalIdle.Value() + sedPollPeriod);
+            }
+            if (mrpRetryIntervalActive.HasValue())
+            {
+                mrpRetryIntervalActive.SetValue(mrpRetryIntervalActive.Value() + sedPollPeriod);
+            }
         }
 #endif
         if (mrpRetryIntervalIdle.HasValue())
