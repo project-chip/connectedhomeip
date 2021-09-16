@@ -15337,7 +15337,7 @@ private:
 
         uint8_t stepModeArgument        = 1;
         uint8_t stepSizeArgument        = 5;
-        uint8_t transitionTimeArgument  = 25;
+        uint16_t transitionTimeArgument = 25U;
         uint8_t optionsMaskArgument     = 0;
         uint8_t optionsOverrideArgument = 0;
         err = cluster.StepHue(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel(), stepModeArgument, stepSizeArgument,
@@ -15400,7 +15400,7 @@ private:
 
         uint8_t stepModeArgument        = 3;
         uint8_t stepSizeArgument        = 5;
-        uint8_t transitionTimeArgument  = 25;
+        uint16_t transitionTimeArgument = 25U;
         uint8_t optionsMaskArgument     = 0;
         uint8_t optionsOverrideArgument = 0;
         err = cluster.StepHue(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel(), stepModeArgument, stepSizeArgument,
@@ -15649,7 +15649,7 @@ private:
 
         uint8_t stepModeArgument        = 1;
         uint8_t stepSizeArgument        = 15;
-        uint8_t transitionTimeArgument  = 10;
+        uint16_t transitionTimeArgument = 10U;
         uint8_t optionsMaskArgument     = 0;
         uint8_t optionsOverrideArgument = 0;
         err = cluster.StepSaturation(mOnSuccessCallback_15.Cancel(), mOnFailureCallback_15.Cancel(), stepModeArgument,
@@ -15712,7 +15712,7 @@ private:
 
         uint8_t stepModeArgument        = 3;
         uint8_t stepSizeArgument        = 20;
-        uint8_t transitionTimeArgument  = 10;
+        uint16_t transitionTimeArgument = 10U;
         uint8_t optionsMaskArgument     = 0;
         uint8_t optionsOverrideArgument = 0;
         err = cluster.StepSaturation(mOnSuccessCallback_16.Cancel(), mOnFailureCallback_16.Cancel(), stepModeArgument,
