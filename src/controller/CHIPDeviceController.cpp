@@ -137,6 +137,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     ReturnErrorOnFailure(Mdns::Resolver::Instance().SetResolverDelegate(this));
     RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
+    RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
     Mdns::Resolver::Instance().StartResolver(params.systemState->InetLayer(), kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
@@ -230,6 +231,7 @@ CHIP_ERROR DeviceController::Shutdown()
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     Mdns::Resolver::Instance().SetResolverDelegate(nullptr);
     mDeviceAddressUpdateDelegate = nullptr;
+    mDeviceDiscoveryDelegate     = nullptr;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     return CHIP_NO_ERROR;
@@ -1645,7 +1647,8 @@ void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNod
     {
         mUdcServer->OnCommissionableNodeFound(nodeData);
     }
-    return AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(nodeData);
+
+    AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(nodeData);
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
