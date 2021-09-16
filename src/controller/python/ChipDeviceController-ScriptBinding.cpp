@@ -48,6 +48,7 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <app/server/Mdns.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -214,6 +215,9 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     (*outDevCtrl)->SetUdpListenPort(0);
     err = (*outDevCtrl)->Init(initParams);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    chip::app::MdnsServer::Instance().StartServer(chip::Mdns::CommissioningMode::kDisabled);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     return CHIP_NO_ERROR.AsInteger();
 }
