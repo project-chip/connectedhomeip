@@ -69,8 +69,8 @@ struct PASESessionSerializable
     uint16_t mKeLen;
     uint8_t mKe[kMAX_Hash_Length];
     uint8_t mPairingComplete;
-    uint16_t mLocalKeyId;
-    uint16_t mPeerKeyId;
+    uint16_t mLocalSessionId;
+    uint16_t mPeerSessionId;
 };
 
 struct PASEVerifier
@@ -89,6 +89,10 @@ public:
     PASESession & operator=(PASESession &&) = default;
 
     virtual ~PASESession();
+
+    // TODO: The SetPeerNodeId method should not be exposed; we should not need
+    // to associate a node ID with a PASE session.
+    using PairingSession::SetPeerNodeId;
 
     /**
      * @brief
@@ -212,12 +216,11 @@ public:
      *         object ensures that the exchange will be closed on completion of the handshake.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override;
 
     /**
      * @brief
@@ -243,8 +246,8 @@ private:
 
     CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
-    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PacketHeader & packetHeader,
-                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg);
+    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
+                                       System::PacketBufferHandle && msg);
 
     static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt,
                                           PASEVerifier & verifier);
@@ -252,25 +255,28 @@ private:
     CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const ByteSpan & salt);
 
     CHIP_ERROR SendPBKDFParamRequest();
-    CHIP_ERROR HandlePBKDFParamRequest(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandlePBKDFParamRequest(System::PacketBufferHandle && msg);
 
-    CHIP_ERROR SendPBKDFParamResponse();
-    CHIP_ERROR HandlePBKDFParamResponse(const System::PacketBufferHandle & msg);
+    CHIP_ERROR SendPBKDFParamResponse(ByteSpan initiatorRandom, bool initiatorHasPBKDFParams);
+    CHIP_ERROR HandlePBKDFParamResponse(System::PacketBufferHandle && msg);
 
     CHIP_ERROR SendMsg1();
 
-    CHIP_ERROR HandleMsg1_and_SendMsg2(const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleMsg2_and_SendMsg3(const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleMsg3(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleMsg1_and_SendMsg2(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleMsg2_and_SendMsg3(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleMsg3(System::PacketBufferHandle && msg);
 
-    void SendErrorMsg(Spake2pErrorType errorCode);
-    CHIP_ERROR HandleErrorMsg(const System::PacketBufferHandle & msg);
+    void SendStatusReport(uint16_t protocolCode);
+    CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg);
+
+    // TODO - Move EstimateTLVStructOverhead to CHIPTLV header file
+    constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }
 
     void CloseExchange();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
-    Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
+    Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_PakeError;
 
 #ifdef ENABLE_HSM_SPAKE
     Spake2pHSM_P256_SHA256_HKDF_HMAC mSpake2p;
@@ -287,6 +293,10 @@ private:
     uint32_t mSetupPINCode;
 
     bool mComputeVerifier = true;
+
+    bool mHavePBKDFParameters = false;
+
+    uint8_t mPBKDFLocalRandomData[kPBKDFParamRandomNumberSize];
 
     Hash_SHA256_stream mCommissioningHash;
     uint32_t mIterationCount = 0;
@@ -329,14 +339,14 @@ class SecurePairingUsingTestSecret : public PairingSession
 public:
     SecurePairingUsingTestSecret()
     {
-        SetLocalKeyId(0);
-        SetPeerKeyId(0);
+        SetLocalSessionId(0);
+        SetPeerSessionId(0);
     }
 
-    SecurePairingUsingTestSecret(uint16_t peerKeyId, uint16_t localKeyId)
+    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId)
     {
-        SetLocalKeyId(localKeyId);
-        SetPeerKeyId(peerKeyId);
+        SetLocalSessionId(localSessionId);
+        SetPeerSessionId(peerSessionId);
     }
 
     CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override
@@ -353,8 +363,8 @@ public:
         memset(&serializable, 0, sizeof(serializable));
         serializable.mKeLen           = static_cast<uint16_t>(secretLen);
         serializable.mPairingComplete = 1;
-        serializable.mLocalKeyId      = GetLocalKeyId();
-        serializable.mPeerKeyId       = GetPeerKeyId();
+        serializable.mLocalSessionId  = GetLocalSessionId();
+        serializable.mPeerSessionId   = GetPeerSessionId();
 
         memcpy(serializable.mKe, kTestSecret, secretLen);
         return CHIP_NO_ERROR;

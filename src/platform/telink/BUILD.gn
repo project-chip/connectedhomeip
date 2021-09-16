@@ -58,4 +58,6 @@ static_library("telink") {
       deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
     }
   }
+
+  public_deps += [ "${chip_root}/src/crypto" ]
 }

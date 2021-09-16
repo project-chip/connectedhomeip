@@ -29,7 +29,7 @@ RUN set -x \
 # Install Python modules
 RUN set -x \
     && pip3 install --no-cache-dir -U mbed-cli mbed-tools \
-    && pip3 install --no-cache-dir -r /opt/mbed-os/requirements.txt \
+    && pip3 install --no-cache-dir --ignore-installed -r /opt/mbed-os/requirements.txt \
     && : # last line
 
 # ------------------------------------------------------------------------------

@@ -48,7 +48,6 @@ CHIP_ERROR ReportData::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -161,7 +160,6 @@ CHIP_ERROR ReportData::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -232,7 +230,6 @@ ReportData::Builder & ReportData::Builder::SuppressResponse(const bool aSuppress
     mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_SuppressResponse), aSuppressResponse);
 
 exit:
-    ChipLogFunctError(mError);
     return *this;
 }
 
@@ -242,7 +239,6 @@ ReportData::Builder & ReportData::Builder::SubscriptionId(const uint64_t aSubscr
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_SubscriptionId), aSubscriptionId);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -253,7 +249,6 @@ AttributeDataList::Builder & ReportData::Builder::CreateAttributeDataListBuilder
     if (mError == CHIP_NO_ERROR)
     {
         mError = mAttributeDataListBuilder.Init(mpWriter, kCsTag_AttributeDataList);
-        ChipLogFunctError(mError);
     }
     else
     {
@@ -268,7 +263,6 @@ EventList::Builder & ReportData::Builder::CreateEventDataListBuilder()
     if (mError == CHIP_NO_ERROR)
     {
         mError = mEventDataListBuilder.Init(mpWriter, kCsTag_EventDataList);
-        ChipLogFunctError(mError);
     }
     else
     {
@@ -283,7 +277,6 @@ ReportData::Builder & ReportData::Builder::MoreChunkedMessages(const bool aMoreC
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_MoreChunkedMessages), aMoreChunkedMessages);
-        ChipLogFunctError(mError);
     }
     return *this;
 }

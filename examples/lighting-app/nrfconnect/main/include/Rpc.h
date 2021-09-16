@@ -23,7 +23,7 @@
 namespace chip {
 namespace rpc {
 
-class Button;
+class NrfButton;
 
 void RunRpcService(void *, void *, void *);
 

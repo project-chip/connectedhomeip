@@ -52,12 +52,13 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
     // If there is a pending acknowledgment piggyback it on this message.
     if (reliableMessageContext->IsAckPending())
     {
-        payloadHeader.SetAckId(reliableMessageContext->TakePendingPeerAckId());
+        payloadHeader.SetAckMessageCounter(reliableMessageContext->TakePendingPeerAckMessageCounter());
 
 #if !defined(NDEBUG)
         if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
         {
-            ChipLogDetail(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg", payloadHeader.GetAckId().Value());
+            ChipLogDetail(ExchangeManager, "Piggybacking Ack for MessageCounter:%08" PRIX32 " with msg",
+                          payloadHeader.GetAckMessageCounter().Value());
         }
 #endif
     }
@@ -94,30 +95,26 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(const Header::Flags & headerFlags, const PayloadHeader & payloadHeader,
-                                                      uint32_t messageId, const Transport::PeerAddress & peerAddress,
-                                                      MessageFlags msgFlags, ReliableMessageContext * reliableMessageContext)
+CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
+                                                      const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+                                                      ReliableMessageContext * reliableMessageContext)
 {
-    if (IsEncryptionRequired())
-    {
-        VerifyOrReturnError(headerFlags.Has(Header::FlagValues::kEncryptedMessage), CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
     ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
                       CHIP_ERROR_INVALID_ARGUMENT);
 
     if (IsReliableTransmissionAllowed())
     {
-        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() && payloadHeader.GetAckId().HasValue())
+        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
+            payloadHeader.GetAckMessageCounter().HasValue())
         {
-            ReturnErrorOnFailure(reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckId().Value()));
+            ReturnErrorOnFailure(reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value()));
         }
 
         if (payloadHeader.NeedsAck())
         {
             // An acknowledgment needs to be sent back to the peer for this message on this exchange,
 
-            ReturnErrorOnFailure(reliableMessageContext->HandleNeedsAck(messageId, msgFlags));
+            ReturnErrorOnFailure(reliableMessageContext->HandleNeedsAck(messageCounter, msgFlags));
         }
     }
 

@@ -244,7 +244,7 @@ bool ChipKeyId::IsValidKeyId(uint32_t keyId)
  *  @return      true                  If the identified key can be used to encrypt CHIP messages.
  *
  */
-bool ChipKeyId::IsMessageEncryptionKeyId(uint32_t keyId, bool allowLogicalKeys)
+bool ChipKeyId::IsMessageSessionId(uint32_t keyId, bool allowLogicalKeys)
 {
     switch (GetType(keyId))
     {

@@ -169,6 +169,43 @@ exit:
     return err;
 }
 
+CHIP_ERROR GetTestCertAKID(uint8_t certType, ByteSpan & akid)
+{
+    CHIP_ERROR err;
+
+#define SELECT_CERT(NAME)                                                                                                          \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (certType == TestCert::k##NAME)                                                                                         \
+        {                                                                                                                          \
+            akid = ByteSpan(sTestCert_##NAME##_AuthorityKeyId, sTestCert_##NAME##_AuthorityKeyId_Len);                             \
+            ExitNow(err = CHIP_NO_ERROR);                                                                                          \
+        }                                                                                                                          \
+    } while (0)
+
+    SELECT_CERT(Root01);
+    SELECT_CERT(Root02);
+    SELECT_CERT(ICA01);
+    SELECT_CERT(ICA02);
+    SELECT_CERT(ICA01_1);
+    SELECT_CERT(FWSign01);
+    SELECT_CERT(Node01_01);
+    SELECT_CERT(Node01_02);
+    SELECT_CERT(Node02_01);
+    SELECT_CERT(Node02_02);
+    SELECT_CERT(Node02_03);
+    SELECT_CERT(Node02_04);
+    SELECT_CERT(Node02_05);
+    SELECT_CERT(Node02_06);
+    SELECT_CERT(Node02_07);
+#undef SELECT_CERT
+
+    err = CHIP_ERROR_CA_CERT_NOT_FOUND;
+
+exit:
+    return err;
+}
+
 CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags,
                         BitFlags<CertDecodeFlags> decodeFlags)
 {
@@ -334,6 +371,12 @@ extern const uint8_t sTestCert_Root01_SubjectKeyId[] = {
 
 extern const uint8_t sTestCert_Root01_SubjectKeyId_Len = sizeof(sTestCert_Root01_SubjectKeyId);
 
+extern const uint8_t sTestCert_Root01_AuthorityKeyId[] = {
+    0x13, 0xAF, 0x81, 0xAB, 0x37, 0x37, 0x4B, 0x2E, 0xD2, 0xA9, 0x64, 0x9B, 0x12, 0xB7, 0xA3, 0xA4, 0x28, 0x7E, 0x15, 0x1D,
+};
+
+extern const uint8_t sTestCert_Root01_AuthorityKeyId_Len = sizeof(sTestCert_Root01_AuthorityKeyId);
+
 /**************  Test Root02 Certificate  **************
 Certificate:
     Data:
@@ -463,6 +506,12 @@ extern const uint8_t sTestCert_Root02_SubjectKeyId[] = {
 
 extern const uint8_t sTestCert_Root02_SubjectKeyId_Len = sizeof(sTestCert_Root02_SubjectKeyId);
 
+extern const uint8_t sTestCert_Root02_AuthorityKeyId[] = {
+    0xB2, 0x1B, 0xEA, 0x40, 0xAB, 0xF2, 0xAB, 0xA9, 0x56, 0xF9, 0x82, 0xE1, 0xDA, 0xD2, 0xB6, 0x06, 0x92, 0x06, 0x90, 0xE0,
+};
+
+extern const uint8_t sTestCert_Root02_AuthorityKeyId_Len = sizeof(sTestCert_Root02_AuthorityKeyId);
+
 /**************  Test ICA01 Certificate  **************
 Certificate:
     Data:
@@ -583,6 +632,12 @@ extern const uint8_t sTestCert_ICA01_SubjectKeyId[] = {
 };
 
 extern const uint8_t sTestCert_ICA01_SubjectKeyId_Len = sizeof(sTestCert_ICA01_SubjectKeyId);
+
+extern const uint8_t sTestCert_ICA01_AuthorityKeyId[] = {
+    0x13, 0xAF, 0x81, 0xAB, 0x37, 0x37, 0x4B, 0x2E, 0xD2, 0xA9, 0x64, 0x9B, 0x12, 0xB7, 0xA3, 0xA4, 0x28, 0x7E, 0x15, 0x1D,
+};
+
+extern const uint8_t sTestCert_ICA01_AuthorityKeyId_Len = sizeof(sTestCert_ICA01_AuthorityKeyId);
 
 /**************  Test ICA02 Certificate  **************
 Certificate:
@@ -713,6 +768,12 @@ extern const uint8_t sTestCert_ICA02_SubjectKeyId[] = {
 
 extern const uint8_t sTestCert_ICA02_SubjectKeyId_Len = sizeof(sTestCert_ICA02_SubjectKeyId);
 
+extern const uint8_t sTestCert_ICA02_AuthorityKeyId[] = {
+    0xB2, 0x1B, 0xEA, 0x40, 0xAB, 0xF2, 0xAB, 0xA9, 0x56, 0xF9, 0x82, 0xE1, 0xDA, 0xD2, 0xB6, 0x06, 0x92, 0x06, 0x90, 0xE0,
+};
+
+extern const uint8_t sTestCert_ICA02_AuthorityKeyId_Len = sizeof(sTestCert_ICA02_AuthorityKeyId);
+
 /**************  Test ICA01_1 Certificate  **************
 Certificate:
     Data:
@@ -833,6 +894,12 @@ extern const uint8_t sTestCert_ICA01_1_SubjectKeyId[] = {
 };
 
 extern const uint8_t sTestCert_ICA01_1_SubjectKeyId_Len = sizeof(sTestCert_ICA01_1_SubjectKeyId);
+
+extern const uint8_t sTestCert_ICA01_1_AuthorityKeyId[] = {
+    0x13, 0xAF, 0x81, 0xAB, 0x37, 0x37, 0x4B, 0x2E, 0xD2, 0xA9, 0x64, 0x9B, 0x12, 0xB7, 0xA3, 0xA4, 0x28, 0x7E, 0x15, 0x1D,
+};
+
+extern const uint8_t sTestCert_ICA01_1_AuthorityKeyId_Len = sizeof(sTestCert_ICA01_1_AuthorityKeyId);
 
 /**************  Test FWSign01 Certificate  **************
 Certificate:
@@ -962,6 +1029,12 @@ extern const uint8_t sTestCert_FWSign01_SubjectKeyId[] = {
 };
 
 extern const uint8_t sTestCert_FWSign01_SubjectKeyId_Len = sizeof(sTestCert_FWSign01_SubjectKeyId);
+
+extern const uint8_t sTestCert_FWSign01_AuthorityKeyId[] = {
+    0x93, 0x88, 0x3C, 0x64, 0x9F, 0xC1, 0x7E, 0xC1, 0x2A, 0x6A, 0x1D, 0x77, 0xCF, 0xB9, 0x97, 0x2A, 0x55, 0x9C, 0x1A, 0xD8,
+};
+
+extern const uint8_t sTestCert_FWSign01_AuthorityKeyId_Len = sizeof(sTestCert_FWSign01_AuthorityKeyId);
 
 /**************  Test Node01_01 Certificate  **************
 Certificate:
@@ -1093,6 +1166,12 @@ extern const uint8_t sTestCert_Node01_01_SubjectKeyId[] = {
 
 extern const uint8_t sTestCert_Node01_01_SubjectKeyId_Len = sizeof(sTestCert_Node01_01_SubjectKeyId);
 
+extern const uint8_t sTestCert_Node01_01_AuthorityKeyId[] = {
+    0x53, 0x52, 0xD7, 0x05, 0x9E, 0x9C, 0x15, 0xA5, 0x08, 0x90, 0x68, 0x62, 0x86, 0x48, 0x01, 0xA2, 0x9F, 0x1F, 0x41, 0xD3,
+};
+
+extern const uint8_t sTestCert_Node01_01_AuthorityKeyId_Len = sizeof(sTestCert_Node01_01_AuthorityKeyId);
+
 /**************  Test Node01_02 Certificate  **************
 Certificate:
     Data:
@@ -1222,6 +1301,12 @@ extern const uint8_t sTestCert_Node01_02_SubjectKeyId[] = {
 };
 
 extern const uint8_t sTestCert_Node01_02_SubjectKeyId_Len = sizeof(sTestCert_Node01_02_SubjectKeyId);
+
+extern const uint8_t sTestCert_Node01_02_AuthorityKeyId[] = {
+    0x13, 0xAF, 0x81, 0xAB, 0x37, 0x37, 0x4B, 0x2E, 0xD2, 0xA9, 0x64, 0x9B, 0x12, 0xB7, 0xA3, 0xA4, 0x28, 0x7E, 0x15, 0x1D,
+};
+
+extern const uint8_t sTestCert_Node01_02_AuthorityKeyId_Len = sizeof(sTestCert_Node01_02_AuthorityKeyId);
 
 /**************  Test Node02_01 Certificate  **************
 Certificate:
@@ -1354,6 +1439,12 @@ extern const uint8_t sTestCert_Node02_01_SubjectKeyId[] = {
 };
 
 extern const uint8_t sTestCert_Node02_01_SubjectKeyId_Len = sizeof(sTestCert_Node02_01_SubjectKeyId);
+
+extern const uint8_t sTestCert_Node02_01_AuthorityKeyId[] = {
+    0xCF, 0x42, 0xBC, 0xF8, 0xDF, 0x48, 0x09, 0xD9, 0x26, 0x6F, 0x23, 0x15, 0x5A, 0x16, 0xB0, 0x7F, 0x04, 0xBB, 0x3D, 0x84,
+};
+
+extern const uint8_t sTestCert_Node02_01_AuthorityKeyId_Len = sizeof(sTestCert_Node02_01_AuthorityKeyId);
 
 /**************  Test Node02_02 Certificate  **************
 Certificate:
@@ -1489,6 +1580,12 @@ extern const uint8_t sTestCert_Node02_02_SubjectKeyId[] = {
 };
 
 extern const uint8_t sTestCert_Node02_02_SubjectKeyId_Len = sizeof(sTestCert_Node02_02_SubjectKeyId);
+
+extern const uint8_t sTestCert_Node02_02_AuthorityKeyId[] = {
+    0xCF, 0x42, 0xBC, 0xF8, 0xDF, 0x48, 0x09, 0xD9, 0x26, 0x6F, 0x23, 0x15, 0x5A, 0x16, 0xB0, 0x7F, 0x04, 0xBB, 0x3D, 0x84,
+};
+
+extern const uint8_t sTestCert_Node02_02_AuthorityKeyId_Len = sizeof(sTestCert_Node02_02_AuthorityKeyId);
 
 /**************  Test Node02_03 Certificate  **************
 Certificate:
@@ -1626,6 +1723,12 @@ extern const uint8_t sTestCert_Node02_03_SubjectKeyId[] = {
 
 extern const uint8_t sTestCert_Node02_03_SubjectKeyId_Len = sizeof(sTestCert_Node02_03_SubjectKeyId);
 
+extern const uint8_t sTestCert_Node02_03_AuthorityKeyId[] = {
+    0xCF, 0x42, 0xBC, 0xF8, 0xDF, 0x48, 0x09, 0xD9, 0x26, 0x6F, 0x23, 0x15, 0x5A, 0x16, 0xB0, 0x7F, 0x04, 0xBB, 0x3D, 0x84,
+};
+
+extern const uint8_t sTestCert_Node02_03_AuthorityKeyId_Len = sizeof(sTestCert_Node02_03_AuthorityKeyId);
+
 /**************  Test Node02_04 Certificate  **************
 Certificate:
     Data:
@@ -1761,6 +1864,12 @@ extern const uint8_t sTestCert_Node02_04_SubjectKeyId[] = {
 };
 
 extern const uint8_t sTestCert_Node02_04_SubjectKeyId_Len = sizeof(sTestCert_Node02_04_SubjectKeyId);
+
+extern const uint8_t sTestCert_Node02_04_AuthorityKeyId[] = {
+    0xCF, 0x42, 0xBC, 0xF8, 0xDF, 0x48, 0x09, 0xD9, 0x26, 0x6F, 0x23, 0x15, 0x5A, 0x16, 0xB0, 0x7F, 0x04, 0xBB, 0x3D, 0x84,
+};
+
+extern const uint8_t sTestCert_Node02_04_AuthorityKeyId_Len = sizeof(sTestCert_Node02_04_AuthorityKeyId);
 
 /**************  Test Node02_05 Certificate  **************
 Certificate:
@@ -1899,6 +2008,12 @@ extern const uint8_t sTestCert_Node02_05_SubjectKeyId[] = {
 };
 
 extern const uint8_t sTestCert_Node02_05_SubjectKeyId_Len = sizeof(sTestCert_Node02_05_SubjectKeyId);
+
+extern const uint8_t sTestCert_Node02_05_AuthorityKeyId[] = {
+    0xCF, 0x42, 0xBC, 0xF8, 0xDF, 0x48, 0x09, 0xD9, 0x26, 0x6F, 0x23, 0x15, 0x5A, 0x16, 0xB0, 0x7F, 0x04, 0xBB, 0x3D, 0x84,
+};
+
+extern const uint8_t sTestCert_Node02_05_AuthorityKeyId_Len = sizeof(sTestCert_Node02_05_AuthorityKeyId);
 
 /**************  Test Node02_06 Certificate  **************
 Certificate:
@@ -2045,6 +2160,12 @@ extern const uint8_t sTestCert_Node02_06_SubjectKeyId[] = {
 
 extern const uint8_t sTestCert_Node02_06_SubjectKeyId_Len = sizeof(sTestCert_Node02_06_SubjectKeyId);
 
+extern const uint8_t sTestCert_Node02_06_AuthorityKeyId[] = {
+    0xCF, 0x42, 0xBC, 0xF8, 0xDF, 0x48, 0x09, 0xD9, 0x26, 0x6F, 0x23, 0x15, 0x5A, 0x16, 0xB0, 0x7F, 0x04, 0xBB, 0x3D, 0x84,
+};
+
+extern const uint8_t sTestCert_Node02_06_AuthorityKeyId_Len = sizeof(sTestCert_Node02_06_AuthorityKeyId);
+
 /**************  Test Node02_07 Certificate  **************
 Certificate:
     Data:
@@ -2189,6 +2310,12 @@ extern const uint8_t sTestCert_Node02_07_SubjectKeyId[] = {
 };
 
 extern const uint8_t sTestCert_Node02_07_SubjectKeyId_Len = sizeof(sTestCert_Node02_07_SubjectKeyId);
+
+extern const uint8_t sTestCert_Node02_07_AuthorityKeyId[] = {
+    0xCF, 0x42, 0xBC, 0xF8, 0xDF, 0x48, 0x09, 0xD9, 0x26, 0x6F, 0x23, 0x15, 0x5A, 0x16, 0xB0, 0x7F, 0x04, 0xBB, 0x3D, 0x84,
+};
+
+extern const uint8_t sTestCert_Node02_07_AuthorityKeyId_Len = sizeof(sTestCert_Node02_07_AuthorityKeyId);
 
 } // namespace TestCerts
 } // namespace chip

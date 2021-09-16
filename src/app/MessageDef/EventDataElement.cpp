@@ -48,7 +48,6 @@ CHIP_ERROR EventDataElement::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -212,7 +211,6 @@ EventDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) 
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -392,7 +390,6 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -452,7 +449,6 @@ CHIP_ERROR EventDataElement::Parser::GetData(chip::TLV::TLVReader * const apRead
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_Data), *apReader);
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -468,7 +464,6 @@ EventPath::Builder & EventDataElement::Builder::CreateEventPathBuilder()
     if (mError == CHIP_NO_ERROR)
     {
         mError = mEventPathBuilder.Init(mpWriter, kCsTag_EventPath);
-        ChipLogFunctError(mError);
     }
     else
     {
@@ -483,7 +478,6 @@ EventDataElement::Builder EventDataElement::Builder::PriorityLevel(const uint8_t
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_PriorityLevel), aPriorityLevel);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -494,7 +488,6 @@ EventDataElement::Builder EventDataElement::Builder::Number(const uint64_t aNumb
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_Number), aNumber);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -505,7 +498,6 @@ EventDataElement::Builder EventDataElement::Builder::UTCTimestamp(const uint64_t
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_UTCTimestamp), aUTCTimestamp);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -516,7 +508,6 @@ EventDataElement::Builder EventDataElement::Builder::SystemTimestamp(const uint6
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_SystemTimestamp), aSystemTimestamp);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -527,7 +518,6 @@ EventDataElement::Builder EventDataElement::Builder::DeltaUTCTimestamp(const uin
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_DeltaUTCTimestamp), aDeltaUTCTimestamp);
-        ChipLogFunctError(mError);
     }
     return *this;
 }
@@ -538,7 +528,6 @@ EventDataElement::Builder EventDataElement::Builder::DeltaSystemTimestamp(const 
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_DeltaSystemTimestamp), aDeltaSystemTimestamp);
-        ChipLogFunctError(mError);
     }
     return *this;
 }

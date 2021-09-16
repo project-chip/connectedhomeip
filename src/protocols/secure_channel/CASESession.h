@@ -71,8 +71,8 @@ struct CASESessionSerializable
     uint8_t mIPK[kIPKSize];
     uint8_t mPairingComplete;
     NodeId mPeerNodeId;
-    uint16_t mLocalKeyId;
-    uint16_t mPeerKeyId;
+    uint16_t mLocalSessionId;
+    uint16_t mPeerSessionId;
 };
 
 class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession
@@ -155,8 +155,8 @@ public:
     SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
 
     //// ExchangeDelegate Implementation ////
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
                                                             SecureSessionMgr * sessionMgr) override
@@ -195,14 +195,14 @@ private:
     CHIP_ERROR HandleSigmaR3(System::PacketBufferHandle && msg);
 
     CHIP_ERROR SendSigmaR1Resume();
-    CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                     MutableByteSpan & salt);
-    CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);
+    CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderNOC, const ByteSpan & responderICAC,
+                                                Crypto::P256PublicKey & responderID);
     CHIP_ERROR ConstructSaltSigmaR3(const ByteSpan & ipk, MutableByteSpan & salt);
-    CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
-    CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
+    CHIP_ERROR ConstructTBSData(const ByteSpan & senderNOC, const ByteSpan & senderICAC, const ByteSpan & senderPubKey,
+                                const ByteSpan & receiverPubKey, uint8_t * tbsData, size_t & tbsDataLen);
     CHIP_ERROR RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk);
 
     static constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields)
@@ -222,8 +222,8 @@ private:
     // TODO: Remove this and replace with system method to retrieve current time
     CHIP_ERROR SetEffectiveTime(void);
 
-    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg);
+    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                       System::PacketBufferHandle & msg);
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 

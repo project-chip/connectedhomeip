@@ -70,7 +70,8 @@ executable("chip-lighting-app") {
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
-      "${chip_root}/examples/lighting-app/lighting-common:lighting_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:rpc_services",
     ]
 
     deps += pw_build_LINK_DEPS

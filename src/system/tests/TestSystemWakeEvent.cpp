@@ -32,7 +32,7 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <system/SystemError.h>
-#include <system/SystemLayer.h>
+#include <system/SystemLayerImpl.h>
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
@@ -56,7 +56,7 @@ namespace {
 
 struct TestContext
 {
-    ::chip::System::Layer mSystemLayer;
+    ::chip::System::LayerImpl mSystemLayer;
     WakeEvent mWakeEvent;
     fd_set mReadSet;
     fd_set mWriteSet;

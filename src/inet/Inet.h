@@ -38,10 +38,6 @@
 #include <inet/DNSResolver.h>
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-#include <inet/RawEndPoint.h>
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT

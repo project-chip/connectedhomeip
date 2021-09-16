@@ -885,6 +885,28 @@ public:
 private:
 };
 
+class DLL_EXPORT OtaSoftwareUpdateRequestorCluster : public ClusterBase
+{
+public:
+    OtaSoftwareUpdateRequestorCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateRequestor::Id) {}
+    ~OtaSoftwareUpdateRequestorCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR AnnounceOtaProvider(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   chip::ByteSpan serverLocation, uint16_t vendorId, uint8_t announcementReason,
+                                   chip::ByteSpan metadataForNode);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeDefaultOtaProvider(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeUpdatePossible(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeDefaultOtaProvider(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                chip::ByteSpan value);
+
+private:
+};
+
 class DLL_EXPORT OccupancySensingCluster : public ClusterBase
 {
 public:
@@ -963,8 +985,8 @@ public:
     ~OperationalCredentialsCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan nOCArray,
-                      chip::ByteSpan iPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId);
+    CHIP_ERROR AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan nOCValue,
+                      chip::ByteSpan iCACValue, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId);
     CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          chip::ByteSpan rootCertificate);
     CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -976,7 +998,7 @@ public:
     CHIP_ERROR UpdateFabricLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                  chip::ByteSpan label);
     CHIP_ERROR UpdateNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                         chip::ByteSpan nOCArray);
+                         chip::ByteSpan nOCValue, chip::ByteSpan iCACValue);
 
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);

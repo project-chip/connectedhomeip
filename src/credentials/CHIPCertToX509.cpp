@@ -58,7 +58,7 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
     uint64_t tlvTag;
     uint32_t tlvTagNum;
     OID attrOID;
-    uint32_t asn1Tag;
+    uint8_t asn1Tag;
     const uint8_t * asn1AttrVal;
     uint32_t asn1AttrValLen;
     uint8_t chipAttrStr[17];
@@ -790,7 +790,6 @@ exit:
 static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
     CHIP_ERROR err;
-    uint64_t tag;
     TLVType containerType;
 
     if (reader.GetType() == kTLVType_NotSpecified)
@@ -799,8 +798,7 @@ static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, Chi
         SuccessOrExit(err);
     }
     VerifyOrExit(reader.GetType() == kTLVType_Structure, err = CHIP_ERROR_WRONG_TLV_TYPE);
-    tag = reader.GetTag();
-    VerifyOrExit(tag == AnonymousTag, err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrExit(reader.GetTag() == AnonymousTag, err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     err = reader.EnterContainer(containerType);
     SuccessOrExit(err);
@@ -842,7 +840,7 @@ DLL_EXPORT CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, Mutable
 
     reader.Init(chipCert);
 
-    writer.Init(x509Cert.data(), static_cast<uint32_t>(x509Cert.size()));
+    writer.Init(x509Cert);
 
     certData.Clear();
 

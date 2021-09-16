@@ -20,6 +20,7 @@
 
 #include "../common/Command.h"
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <zap-generated/tests/CHIPClusters.h>
 
 class TestCommand : public Command
 {
@@ -35,11 +36,15 @@ public:
 
     virtual void NextTest() = 0;
 
+    /////////// GlobalCommands Interface /////////
+    CHIP_ERROR WaitForMs(uint32_t ms);
+
 protected:
     ChipDevice * mDevice;
 
     static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+    static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
 
     chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;

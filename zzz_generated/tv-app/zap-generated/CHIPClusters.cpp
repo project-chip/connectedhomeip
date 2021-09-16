@@ -67,8 +67,6 @@ constexpr uint8_t kFrameControlGlobalCommand = 0x00;
 
 // Pick source endpoint as 1 for now
 constexpr EndpointId kSourceEndpoint = 1;
-
-[[maybe_unused]] const uint8_t kReportingDirectionReported = 0x00;
 } // namespace
 
 using namespace app::Clusters;
@@ -533,8 +531,8 @@ CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::C
 
 // OperationalCredentials Cluster Commands
 CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 chip::ByteSpan nOCArray, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode,
-                                                 uint16_t adminVendorId)
+                                                 chip::ByteSpan nOCValue, chip::ByteSpan iCACValue, chip::ByteSpan iPKValue,
+                                                 chip::NodeId caseAdminNode, uint16_t adminVendorId)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -555,8 +553,10 @@ CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSucces
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // nOCArray: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nOCArray));
+    // nOCValue: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nOCValue));
+    // iCACValue: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), iCACValue));
     // iPKValue: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), iPKValue));
     // caseAdminNode: nodeId

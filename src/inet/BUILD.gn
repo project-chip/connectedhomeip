@@ -38,7 +38,6 @@ buildconfig_header("inet_buildconfig") {
     "INET_CONFIG_ENABLE_IPV4=${chip_inet_config_enable_ipv4}",
     "INET_CONFIG_ENABLE_DNS_RESOLVER=${chip_inet_config_enable_dns_resolver}",
     "INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS=${chip_inet_config_enable_async_dns_sockets}",
-    "INET_CONFIG_ENABLE_RAW_ENDPOINT=${chip_inet_config_enable_raw_endpoint}",
     "INET_CONFIG_ENABLE_TCP_ENDPOINT=${chip_inet_config_enable_tcp_endpoint}",
     "INET_CONFIG_ENABLE_UDP_ENDPOINT=${chip_inet_config_enable_udp_endpoint}",
     "HAVE_LWIP_RAW_BIND_NETIF=true",
@@ -105,13 +104,6 @@ static_library("inet") {
 
   if (chip_system_config_use_lwip) {
     public_deps += [ "${chip_root}/src/lwip" ]
-  }
-
-  if (chip_inet_config_enable_raw_endpoint) {
-    sources += [
-      "RawEndPoint.cpp",
-      "RawEndPoint.h",
-    ]
   }
 
   if (chip_inet_config_enable_tcp_endpoint) {

@@ -46,7 +46,6 @@ CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, Interaction
     SuccessOrExit(err);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -73,7 +72,6 @@ CHIP_ERROR Command::Reset()
     mCommandIndex = 0;
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -122,7 +120,6 @@ CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload,
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -163,7 +160,6 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams,
                                                              TLV::kTLVType_Structure, mDataElementContainerType);
     }
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -188,7 +184,6 @@ CHIP_ERROR Command::FinishCommand(bool aIsStatus)
     MoveToState(CommandState::AddCommand);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -240,7 +235,6 @@ CHIP_ERROR Command::FinalizeCommandsMessage(System::PacketBufferHandle & command
     err = mCommandMessageWriter.Finalize(&commandPacket);
     SuccessOrExit(err);
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 

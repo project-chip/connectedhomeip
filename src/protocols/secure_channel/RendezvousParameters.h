@@ -31,21 +31,6 @@ namespace chip {
 // The largest supported value for Rendezvous discriminators
 const uint16_t kMaxRendezvousDiscriminatorValue = 0xFFF;
 
-class DLL_EXPORT RendezvousAdvertisementDelegate
-{
-public:
-    /// called to start advertising that rendezvous is possible (commisioning available)
-    virtual CHIP_ERROR StartAdvertisement() const { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /// called when advertisement is not needed for Rendezvous (e.g. got a BLE connection)
-    virtual CHIP_ERROR StopAdvertisement() const { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    /// Called when a rendezvous operation is complete
-    virtual void RendezvousComplete() const {}
-
-    virtual ~RendezvousAdvertisementDelegate() {}
-};
-
 class RendezvousParameters
 {
 public:
@@ -111,16 +96,6 @@ public:
         return *this;
     }
 
-    bool HasAdvertisementDelegate() const { return mAdvDelegate != nullptr; }
-
-    const RendezvousAdvertisementDelegate * GetAdvertisementDelegate() const { return mAdvDelegate; }
-
-    RendezvousParameters & SetAdvertisementDelegate(RendezvousAdvertisementDelegate * delegate)
-    {
-        mAdvDelegate = delegate;
-        return *this;
-    }
-
 #if CONFIG_NETWORK_LAYER_BLE
     bool HasBleLayer() const { return mBleLayer != nullptr; }
     Ble::BleLayer * GetBleLayer() const { return mBleLayer; }
@@ -151,8 +126,6 @@ private:
 
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
-
-    RendezvousAdvertisementDelegate * mAdvDelegate = nullptr;
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer               = nullptr;

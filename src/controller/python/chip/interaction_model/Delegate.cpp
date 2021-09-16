@@ -126,8 +126,9 @@ void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apRead
         {
             AttributePath path{ .endpointId = aPath.mEndpointId, .clusterId = aPath.mClusterId, .fieldId = aPath.mFieldId };
             onReportDataFunct(apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId(),
-                              apReadClient->GetAppIdentifier(), &path, sizeof(path), writerBuffer, writer.GetLengthWritten(),
-                              to_underlying(status));
+                              apReadClient->GetAppIdentifier(),
+                              /* TODO: Use real SubscriptionId */ apReadClient->IsSubscriptionType() ? 1 : 0, &path, sizeof(path),
+                              writerBuffer, writer.GetLengthWritten(), to_underlying(status));
         }
         else
         {

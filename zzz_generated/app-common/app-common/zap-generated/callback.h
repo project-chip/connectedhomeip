@@ -15765,13 +15765,13 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::EndpointId 
  * @brief  Cluster AddNOC Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterAddNOCCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                        chip::ByteSpan NOCArray, chip::ByteSpan IPKValue,
+                                                        chip::ByteSpan NOCValue, chip::ByteSpan ICACValue, chip::ByteSpan IPKValue,
                                                         chip::NodeId CaseAdminNode, uint16_t AdminVendorId);
 /**
  * @brief  Cluster UpdateNOC Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterUpdateNOCCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                           chip::ByteSpan NOCArray);
+                                                           chip::ByteSpan NOCValue, chip::ByteSpan ICACValue);
 /**
  * @brief  Cluster NOCResponse Command callback (from server)
  */

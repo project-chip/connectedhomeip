@@ -351,6 +351,10 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                           Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback)
@@ -361,15 +365,21 @@ void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::T
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     uint16_t data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -380,7 +390,14 @@ void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::T
         Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
@@ -390,15 +407,21 @@ void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvDa
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _AudioOutputInfo data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -415,7 +438,14 @@ void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvDa
         Callback::Callback<AudioOutputAudioOutputListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
 {
@@ -425,15 +455,21 @@ void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader *
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::ByteSpan data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));
@@ -445,7 +481,14 @@ void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader *
         Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void ContentLauncherClusterSupportedStreamingTypesListAttributeFilter(TLV::TLVReader * tlvData,
                                                                       Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback)
@@ -456,15 +499,21 @@ void ContentLauncherClusterSupportedStreamingTypesListAttributeFilter(TLV::TLVRe
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     uint8_t data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -475,7 +524,14 @@ void ContentLauncherClusterSupportedStreamingTypesListAttributeFilter(TLV::TLVRe
         Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void DescriptorClusterDeviceListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
 {
@@ -485,15 +541,21 @@ void DescriptorClusterDeviceListListAttributeFilter(TLV::TLVReader * tlvData, Ca
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _DeviceType data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(4);
@@ -507,7 +569,14 @@ void DescriptorClusterDeviceListListAttributeFilter(TLV::TLVReader * tlvData, Ca
         Callback::Callback<DescriptorDeviceListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void DescriptorClusterServerListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
 {
@@ -517,15 +586,21 @@ void DescriptorClusterServerListListAttributeFilter(TLV::TLVReader * tlvData, Ca
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::ClusterId data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(4);
@@ -536,7 +611,14 @@ void DescriptorClusterServerListListAttributeFilter(TLV::TLVReader * tlvData, Ca
         Callback::Callback<DescriptorServerListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void DescriptorClusterClientListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
 {
@@ -546,15 +628,21 @@ void DescriptorClusterClientListListAttributeFilter(TLV::TLVReader * tlvData, Ca
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::ClusterId data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(4);
@@ -565,7 +653,14 @@ void DescriptorClusterClientListListAttributeFilter(TLV::TLVReader * tlvData, Ca
         Callback::Callback<DescriptorClientListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void DescriptorClusterPartsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
 {
@@ -575,15 +670,21 @@ void DescriptorClusterPartsListListAttributeFilter(TLV::TLVReader * tlvData, Cal
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::EndpointId data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -594,7 +695,14 @@ void DescriptorClusterPartsListListAttributeFilter(TLV::TLVReader * tlvData, Cal
         Callback::Callback<DescriptorPartsListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void FixedLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
 {
@@ -604,15 +712,21 @@ void FixedLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Cal
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _LabelStruct data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_STATUS_VOID(ReadByteSpan(message, 18, &data[i].label));
@@ -626,7 +740,14 @@ void FixedLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Cal
         Callback::Callback<FixedLabelLabelListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                               Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback)
@@ -637,15 +758,21 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _BasicCommissioningInfoType data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(4);
@@ -656,7 +783,14 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
         Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void GeneralDiagnosticsClusterNetworkInterfacesListAttributeFilter(TLV::TLVReader * tlvData,
                                                                    Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback)
@@ -667,15 +801,21 @@ void GeneralDiagnosticsClusterNetworkInterfacesListAttributeFilter(TLV::TLVReade
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _NetworkInterfaceType data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_STATUS_VOID(ReadByteSpan(message, 34, &data[i].Name));
@@ -701,7 +841,14 @@ void GeneralDiagnosticsClusterNetworkInterfacesListAttributeFilter(TLV::TLVReade
         Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void GroupKeyManagementClusterGroupsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
@@ -711,15 +858,21 @@ void GroupKeyManagementClusterGroupsListAttributeFilter(TLV::TLVReader * tlvData
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _GroupState data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -736,7 +889,14 @@ void GroupKeyManagementClusterGroupsListAttributeFilter(TLV::TLVReader * tlvData
         Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback)
 {
@@ -746,15 +906,21 @@ void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvD
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _GroupKey data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -777,7 +943,14 @@ void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvD
         Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
@@ -787,15 +960,21 @@ void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _MediaInputInfo data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -815,7 +994,14 @@ void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData
         Callback::Callback<MediaInputMediaInputListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
@@ -825,15 +1011,21 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _FabricDescriptor data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -859,7 +1051,14 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
         Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void TvChannelClusterTvChannelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
@@ -869,15 +1068,21 @@ void TvChannelClusterTvChannelListListAttributeFilter(TLV::TLVReader * tlvData, 
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _TvChannelInfo data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -900,7 +1105,14 @@ void TvChannelClusterTvChannelListListAttributeFilter(TLV::TLVReader * tlvData, 
         Callback::Callback<TvChannelTvChannelListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                   Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
@@ -911,15 +1123,21 @@ void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _NavigateTargetTargetInfo data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -933,7 +1151,14 @@ void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader
         Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void TestClusterClusterListInt8uListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
 {
@@ -943,15 +1168,21 @@ void TestClusterClusterListInt8uListAttributeFilter(TLV::TLVReader * tlvData, Ca
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     uint8_t data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -962,7 +1193,14 @@ void TestClusterClusterListInt8uListAttributeFilter(TLV::TLVReader * tlvData, Ca
         Callback::Callback<TestClusterListInt8uListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void TestClusterClusterListOctetStringListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
@@ -972,15 +1210,21 @@ void TestClusterClusterListOctetStringListAttributeFilter(TLV::TLVReader * tlvDa
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     chip::ByteSpan data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));
@@ -992,7 +1236,14 @@ void TestClusterClusterListOctetStringListAttributeFilter(TLV::TLVReader * tlvDa
         Callback::Callback<TestClusterListOctetStringListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void TestClusterClusterListStructOctetStringListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
 {
@@ -1002,15 +1253,21 @@ void TestClusterClusterListStructOctetStringListAttributeFilter(TLV::TLVReader *
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _TestListStructOctet data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(8);
@@ -1024,7 +1281,14 @@ void TestClusterClusterListStructOctetStringListAttributeFilter(TLV::TLVReader *
         Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                          Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback)
@@ -1035,15 +1299,21 @@ void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(TLV::TL
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _NeighborTable data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(8);
@@ -1093,7 +1363,14 @@ void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(TLV::TL
         Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void ThreadNetworkDiagnosticsClusterRouteTableListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                       Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback)
@@ -1104,15 +1381,21 @@ void ThreadNetworkDiagnosticsClusterRouteTableListListAttributeFilter(TLV::TLVRe
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _RouteTable data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(8);
@@ -1150,7 +1433,14 @@ void ThreadNetworkDiagnosticsClusterRouteTableListListAttributeFilter(TLV::TLVRe
         Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void ThreadNetworkDiagnosticsClusterSecurityPolicyListAttributeFilter(TLV::TLVReader * tlvData,
                                                                       Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback)
@@ -1161,15 +1451,21 @@ void ThreadNetworkDiagnosticsClusterSecurityPolicyListAttributeFilter(TLV::TLVRe
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _SecurityPolicy data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
@@ -1183,7 +1479,14 @@ void ThreadNetworkDiagnosticsClusterSecurityPolicyListAttributeFilter(TLV::TLVRe
         Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void ThreadNetworkDiagnosticsClusterOperationalDatasetComponentsListAttributeFilter(TLV::TLVReader * tlvData,
                                                                                     Callback::Cancelable * onSuccessCallback,
                                                                                     Callback::Cancelable * onFailureCallback)
@@ -1194,15 +1497,21 @@ void ThreadNetworkDiagnosticsClusterOperationalDatasetComponentsListAttributeFil
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     _OperationalDatasetComponents data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -1247,7 +1556,14 @@ void ThreadNetworkDiagnosticsClusterOperationalDatasetComponentsListAttributeFil
             onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
+#if !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif // __clang__
 void ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                                Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback)
@@ -1258,15 +1574,21 @@ void ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter(T
     EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
     if (res != EMBER_ZCL_STATUS_SUCCESS)
     {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, res);
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, res);
+        }
         return;
     }
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     uint8_t data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -1277,6 +1599,9 @@ void ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter(T
         Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
+#if !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif // __clang__
 
 bool emberAfAccountLoginClusterGetSetupPINResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t * setupPIN)
 {
@@ -2340,254 +2665,5 @@ bool emberAfTestClusterClusterTestSpecificResponseCallback(EndpointId endpoint, 
     Callback::Callback<TestClusterClusterTestSpecificResponseCallback> * cb =
         Callback::Callback<TestClusterClusterTestSpecificResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, returnValue);
-    return true;
-}
-
-bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
-{
-    ChipLogProgress(Zcl, "emberAfReportAttributeCallback:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    NodeId sourceId = emberAfCurrentCommand()->SourceNodeId();
-    ChipLogProgress(Zcl, "  Source NodeId: %" PRIu64, sourceId);
-
-    EndpointId endpointId = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
-    ChipLogProgress(Zcl, "  Source EndpointId: 0x%04x", endpointId);
-
-    // TODO onFailureCallback is just here because of the CHECK_MESSAGE_LENGTH macro. It needs to be removed.
-    Callback::Cancelable * onFailureCallback = nullptr;
-
-    while (messageLen)
-    {
-        CHECK_MESSAGE_LENGTH(4);
-        AttributeId attributeId = Encoding::LittleEndian::Read32(message); // attribId
-        ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-
-        GET_REPORT_CALLBACK("emberAfReportAttributesCallback");
-
-        CHECK_MESSAGE_LENGTH(1);
-        uint8_t attributeType = Encoding::Read8(message);
-        ChipLogProgress(Zcl, "  attributeType: 0x%02x", attributeType);
-
-        switch (attributeType)
-        {
-        case 0x00: // nodata / No data
-        case 0x0A: // data24 / 24-bit data
-        case 0x0C: // data40 / 40-bit data
-        case 0x0D: // data48 / 48-bit data
-        case 0x0E: // data56 / 56-bit data
-        case 0x1A: // map24 / 24-bit bitmap
-        case 0x1C: // map40 / 40-bit bitmap
-        case 0x1D: // map48 / 48-bit bitmap
-        case 0x1E: // map56 / 56-bit bitmap
-        case 0x22: // uint24 / Unsigned 24-bit integer
-        case 0x24: // uint40 / Unsigned 40-bit integer
-        case 0x25: // uint48 / Unsigned 48-bit integer
-        case 0x26: // uint56 / Unsigned 56-bit integer
-        case 0x2A: // int24 / Signed 24-bit integer
-        case 0x2C: // int40 / Signed 40-bit integer
-        case 0x2D: // int48 / Signed 48-bit integer
-        case 0x2E: // int56 / Signed 56-bit integer
-        case 0x38: // semi / Semi-precision
-        case 0x39: // single / Single precision
-        case 0x3A: // double / Double precision
-        case 0x48: // array / Array
-        case 0x49: // struct / Structure
-        case 0x50: // set / Set
-        case 0x51: // bag / Bag
-        case 0xE0: // ToD / Time of day
-        {
-            ChipLogError(Zcl, "attributeType 0x%02x is not supported", attributeType);
-            return true;
-        }
-
-        case 0x41: // octstr / Octet string
-        case 0x42: // string / Character string
-        {
-            // Short Strings must contains at least one byte for the length
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t length = Encoding::Read8(message);
-            ChipLogProgress(Zcl, "  length: 0x%02x", length);
-
-            // When the length is set to 0xFF, it represents a non-value. In this case the data field is zero length.
-            if (length == 0xFF)
-            {
-                length = 0;
-            }
-
-            CHECK_MESSAGE_LENGTH(length);
-            if (attributeType == 0x41)
-            {
-                Callback::Callback<OctetStringAttributeCallback> * cb =
-                    Callback::Callback<OctetStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            else
-            {
-                Callback::Callback<CharStringAttributeCallback> * cb =
-                    Callback::Callback<CharStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            break;
-        }
-
-        case 0x43: // octstr16 / Long octet string
-        case 0x44: // string16 / Long character string
-        {
-            // Long Strings must contains at least two bytes for the length
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t length = Encoding::LittleEndian::Read16(message);
-            ChipLogProgress(Zcl, "  length: 0x%02x", length);
-
-            // When the length is set to 0xFFFF, it represents a non-value. In this case the data field is zero length.
-            if (length == 0xFFFF)
-            {
-                length = 0;
-            }
-
-            CHECK_MESSAGE_LENGTH(length);
-            if (attributeType == 0x43)
-            {
-                Callback::Callback<OctetStringAttributeCallback> * cb =
-                    Callback::Callback<OctetStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            else
-            {
-                Callback::Callback<CharStringAttributeCallback> * cb =
-                    Callback::Callback<CharStringAttributeCallback>::FromCancelable(onReportCallback);
-                cb->mCall(cb->mContext, ByteSpan(message, length));
-            }
-            break;
-        }
-
-        case 0x08: // data8 / 8-bit data
-        case 0x18: // map8 / 8-bit bitmap
-        case 0x20: // uint8 / Unsigned  8-bit integer
-        case 0x30: // enum8 / 8-bit enumeration
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t value = Encoding::Read8(message);
-            ChipLogProgress(Zcl, "  value: 0x%02x", value);
-
-            Callback::Callback<Int8uAttributeCallback> * cb =
-                Callback::Callback<Int8uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x09: // data16 / 16-bit data
-        case 0x19: // map16 / 16-bit bitmap
-        case 0x21: // uint16 / Unsigned 16-bit integer
-        case 0x31: // enum16 / 16-bit enumeration
-        case 0xE8: // clusterId / Cluster ID
-        case 0xE9: // attribId / Attribute ID
-        case 0xEA: // bacOID / BACnet OID
-        case 0xF1: // key128 / 128-bit security key
-        case 0xFF: // unk / Unknown
-        {
-            CHECK_MESSAGE_LENGTH(2);
-            uint16_t value = Encoding::LittleEndian::Read16(message);
-            ChipLogProgress(Zcl, "  value: 0x%04x", value);
-
-            Callback::Callback<Int16uAttributeCallback> * cb =
-                Callback::Callback<Int16uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x0B: // data32 / 32-bit data
-        case 0x1B: // map32 / 32-bit bitmap
-        case 0x23: // uint32 / Unsigned 32-bit integer
-        case 0xE1: // date / Date
-        case 0xE2: // UTC / UTCTime
-        {
-            CHECK_MESSAGE_LENGTH(4);
-            uint32_t value = Encoding::LittleEndian::Read32(message);
-            ChipLogProgress(Zcl, "  value: 0x%08x", value);
-
-            Callback::Callback<Int32uAttributeCallback> * cb =
-                Callback::Callback<Int32uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x0F: // data64 / 64-bit data
-        case 0x1F: // map64 / 64-bit bitmap
-        case 0x27: // uint64 / Unsigned 64-bit integer
-        case 0xF0: // EUI64 / IEEE address
-        {
-            CHECK_MESSAGE_LENGTH(8);
-            uint64_t value = Encoding::LittleEndian::Read64(message);
-            ChipLogProgress(Zcl, "  value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
-
-            Callback::Callback<Int64uAttributeCallback> * cb =
-                Callback::Callback<Int64uAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x10: // bool / Boolean
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            uint8_t value = Encoding::Read8(message);
-            ChipLogProgress(Zcl, "  value: %d", value);
-
-            Callback::Callback<BooleanAttributeCallback> * cb =
-                Callback::Callback<BooleanAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x28: // int8 / Signed 8-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(1);
-            int8_t value = CastToSigned(Encoding::Read8(message));
-            ChipLogProgress(Zcl, "  value: %" PRId8, value);
-
-            Callback::Callback<Int8sAttributeCallback> * cb =
-                Callback::Callback<Int8sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x29: // int16 / Signed 16-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(2);
-            int16_t value = CastToSigned(Encoding::LittleEndian::Read16(message));
-            ChipLogProgress(Zcl, "  value: %" PRId16, value);
-
-            Callback::Callback<Int16sAttributeCallback> * cb =
-                Callback::Callback<Int16sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x2B: // int32 / Signed 32-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(4);
-            int32_t value = CastToSigned(Encoding::LittleEndian::Read32(message));
-            ChipLogProgress(Zcl, "  value: %" PRId32, value);
-
-            Callback::Callback<Int32sAttributeCallback> * cb =
-                Callback::Callback<Int32sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-
-        case 0x2F: // int64 / Signed 64-bit integer
-        {
-            CHECK_MESSAGE_LENGTH(8);
-            int64_t value = CastToSigned(Encoding::LittleEndian::Read64(message));
-            ChipLogProgress(Zcl, "  value: %" PRId64, value);
-
-            Callback::Callback<Int64sAttributeCallback> * cb =
-                Callback::Callback<Int64sAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, value);
-            break;
-        }
-        }
-    }
-
     return true;
 }

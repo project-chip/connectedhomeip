@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -32,10 +32,12 @@
 
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/UnitTestRegistration.h>
 
 using namespace chip;
 using namespace chip::ASN1;
+using namespace chip::TLV;
 
 enum
 {
@@ -63,6 +65,7 @@ enum
 };
 
 // clang-format off
+static uint8_t kTestVal_09_BitString_AsOctetString[] = { 0xE7, 0xC0 };
 static uint8_t kTestVal_20_OctetString[]        = { 0x01, 0x03, 0x05, 0x07, 0x10, 0x30, 0x50, 0x70, 0x00 };
 static const char * kTestVal_21_PrintableString = "Sudden death in Venice";
 static const char * kTestVal_22_UTFString       = "Ond bra\xCC\x8A""d do\xCC\x88""d i Venedig";
@@ -154,11 +157,11 @@ exit:
 static void TestASN1_Encode(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    uint8_t buf[2048];
+    static uint8_t buf[2048];
     ASN1Writer writer;
     uint16_t encodedLen;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
 
     err = EncodeASN1TestData(writer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -188,7 +191,7 @@ static void TestASN1_Decode(nlTestSuite * inSuite, void * inContext)
     int64_t intVal;
     OID oidVal;
 
-    reader.Init(TestASN1_EncodedData, sizeof(TestASN1_EncodedData));
+    reader.Init(TestASN1_EncodedData);
 
     ASN1_PARSE_ENTER_SEQUENCE
     {
@@ -301,7 +304,7 @@ static void TestASN1_NullWriter(nlTestSuite * inSuite, void * inContext)
 static void TestASN1_ObjectID(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    uint8_t buf[2048];
+    static uint8_t buf[2048];
     ASN1Writer writer;
     ASN1Reader reader;
     uint16_t encodedLen;
@@ -362,6 +365,122 @@ exit:
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
+static void TestASN1_FromTLVReader(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err;
+    static uint8_t tlvBuf[128];
+    static uint8_t asn1Buf1[128];
+    static uint8_t asn1Buf2[128];
+    TLVWriter tlvWriter;
+    TLVReader tlvReader;
+    ASN1Writer writer;
+    ASN1Reader reader;
+    MutableByteSpan tlvEncodedData(tlvBuf);
+    MutableByteSpan asn1EncodedData1(asn1Buf1);
+    MutableByteSpan asn1EncodedData2(asn1Buf2);
+    TLVType outerContainerType;
+
+    // Construct TLV Encoded Structure.
+    {
+        tlvWriter.Init(tlvEncodedData);
+
+        err = tlvWriter.StartContainer(AnonymousTag, kTLVType_Structure, outerContainerType);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = tlvWriter.PutBytes(TLV::ContextTag(1), kTestVal_20_OctetString, sizeof(kTestVal_20_OctetString));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = tlvWriter.PutBytes(TLV::ContextTag(2), kTestVal_09_BitString_AsOctetString,
+                                 sizeof(kTestVal_09_BitString_AsOctetString));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = tlvWriter.PutString(TLV::ContextTag(3), kTestVal_21_PrintableString);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = tlvWriter.EndContainer(outerContainerType);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = tlvWriter.Finalize();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+
+    // Construct first ASN1 SEQUESNCE using values.
+    writer.Init(asn1EncodedData1);
+    ASN1_START_SEQUENCE
+    {
+        ASN1_ENCODE_OCTET_STRING(kTestVal_20_OctetString, sizeof(kTestVal_20_OctetString));
+
+        ASN1_ENCODE_BIT_STRING(kTestVal_09_BitString);
+
+        err = writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_PrintableString, false,
+                              reinterpret_cast<const uint8_t *>(kTestVal_21_PrintableString), strlen(kTestVal_21_PrintableString));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+    ASN1_END_SEQUENCE;
+    asn1EncodedData1.reduce_size(writer.GetLengthWritten());
+
+    // Construct second ASN1 SEQUENCE from TLVReader.
+    tlvReader.Init(tlvEncodedData);
+    writer.Init(asn1EncodedData2);
+    ASN1_START_SEQUENCE
+    {
+        err = tlvReader.Next(kTLVType_Structure, AnonymousTag);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = tlvReader.EnterContainer(outerContainerType);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = tlvReader.Next(kTLVType_ByteString, ContextTag(1));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.PutOctetString(kASN1TagClass_Universal, kASN1UniversalTag_OctetString, tlvReader);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = tlvReader.Next(kTLVType_ByteString, ContextTag(2));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.PutBitString(6, tlvReader);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = tlvReader.Next(kTLVType_UTF8String, ContextTag(3));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_PrintableString, false, tlvReader);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = tlvReader.ExitContainer(outerContainerType);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+    ASN1_END_SEQUENCE;
+    asn1EncodedData2.reduce_size(writer.GetLengthWritten());
+
+    // Compare two ASN1 SEQUENCEs.
+    NL_TEST_ASSERT(inSuite, asn1EncodedData2.data_equal(asn1EncodedData1));
+
+    // Initialize ASN1Reader and test data.
+    reader.Init(asn1EncodedData2);
+    ASN1_PARSE_ENTER_SEQUENCE
+    {
+        ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_OctetString);
+        NL_TEST_ASSERT(inSuite, reader.GetValue() != nullptr);
+        NL_TEST_ASSERT(inSuite, reader.GetValueLen() == sizeof(kTestVal_20_OctetString));
+        NL_TEST_ASSERT(inSuite, memcmp(reader.GetValue(), kTestVal_20_OctetString, sizeof(kTestVal_20_OctetString)) == 0);
+
+        uint32_t val;
+        ASN1_PARSE_BIT_STRING(val);
+        NL_TEST_ASSERT(inSuite, val == kTestVal_09_BitString);
+
+        ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_PrintableString);
+        NL_TEST_ASSERT(inSuite, reader.GetValue() != nullptr);
+        NL_TEST_ASSERT(inSuite, reader.GetValueLen() == strlen(kTestVal_21_PrintableString));
+        NL_TEST_ASSERT(inSuite, memcmp(reader.GetValue(), kTestVal_21_PrintableString, strlen(kTestVal_21_PrintableString)) == 0);
+    }
+    ASN1_EXIT_SEQUENCE;
+
+exit:
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -373,6 +492,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Test ASN1 decoding macros", TestASN1_Decode),
     NL_TEST_DEF("Test ASN1 NULL writer", TestASN1_NullWriter),
     NL_TEST_DEF("Test ASN1 Object IDs", TestASN1_ObjectID),
+    NL_TEST_DEF("Test ASN1 Init with ByteSpan", TestASN1_FromTLVReader),
     NL_TEST_SENTINEL()
 };
 // clang-format on

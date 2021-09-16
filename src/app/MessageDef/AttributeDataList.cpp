@@ -84,7 +84,6 @@ CHIP_ERROR AttributeDataList::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -96,7 +95,6 @@ AttributeDataElement::Builder & AttributeDataList::Builder::CreateAttributeDataE
     VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeDataElementBuilder.ResetError(mError));
 
     mError = mAttributeDataElementBuilder.Init(mpWriter);
-    ChipLogFunctError(mError);
 
 exit:
 

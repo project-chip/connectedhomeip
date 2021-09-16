@@ -69,6 +69,13 @@ enum class CommssionAdvertiseMode : uint8_t
     kCommissioner,
 };
 
+enum class CommissioningMode
+{
+    kDisabled,       // Commissioning Mode is disabled, CM=0 in DNS-SD key/value pairs
+    kEnabledBasic,   // Basic Commissioning Mode, CM=1 in DNS-SD key/value pairs
+    kEnabledEnhanced // Enhanced Commissioning Mode, CM=2 in DNS-SD key/value pairs
+};
+
 template <class Derived>
 class BaseAdvertisingParams
 {
@@ -180,19 +187,12 @@ public:
     }
     Optional<uint16_t> GetProductId() const { return mProductId; }
 
-    CommissionAdvertisingParameters & SetCommissioningMode(bool modeEnabled)
+    CommissionAdvertisingParameters & SetCommissioningMode(CommissioningMode mode)
     {
-        mCommissioningModeEnabled = modeEnabled;
+        mCommissioningMode = mode;
         return *this;
     }
-    bool GetCommissioningMode() const { return mCommissioningModeEnabled; }
-
-    CommissionAdvertisingParameters & SetAdditionalCommissioning(bool additionalCommissioningEnabled)
-    {
-        mAdditionalCommissioningEnabled = additionalCommissioningEnabled;
-        return *this;
-    }
-    bool GetAdditionalCommissioning() const { return mAdditionalCommissioningEnabled; }
+    CommissioningMode GetCommissioningMode() const { return mCommissioningMode; }
 
     CommissionAdvertisingParameters & SetDeviceType(Optional<uint16_t> deviceType)
     {
@@ -273,8 +273,7 @@ private:
     uint8_t mShortDiscriminator          = 0;
     uint16_t mLongDiscriminator          = 0; // 12-bit according to spec
     CommssionAdvertiseMode mMode         = CommssionAdvertiseMode::kCommissionableNode;
-    bool mCommissioningModeEnabled       = false;
-    bool mAdditionalCommissioningEnabled = false;
+    CommissioningMode mCommissioningMode = CommissioningMode::kEnabledBasic;
     chip::Optional<uint16_t> mVendorId;
     chip::Optional<uint16_t> mProductId;
     chip::Optional<uint16_t> mDeviceType;
