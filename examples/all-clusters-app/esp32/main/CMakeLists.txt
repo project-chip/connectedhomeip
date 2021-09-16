@@ -80,6 +80,7 @@ if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
 set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/../../platform/esp32/pw_sys_io/public"
+                     "${CMAKE_SOURCE_DIR}/../../common"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/../../../src/lib/support"
@@ -149,6 +150,17 @@ pw_proto_library(device_service
     pw_protobuf.common_protos
 )
 
+pw_proto_library(lighting_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/lighting_service.proto
+  PREFIX
+    lighting_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
 pw_proto_library(wifi_service
   SOURCES
     ${CHIP_ROOT}/examples/ipv6only-app/common/wifi_service/wifi_service.proto
@@ -165,6 +177,7 @@ pw_proto_library(wifi_service
 target_link_libraries(${COMPONENT_LIB} PUBLIC
   button_service.nanopb_rpc
   device_service.nanopb_rpc
+  lighting_service.nanopb_rpc
   wifi_service.nanopb_rpc
   pw_checksum
   pw_hdlc

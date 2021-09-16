@@ -37,19 +37,19 @@
  * Header format (little endian):
  *
  * -------- Unencrypted header -----------------------------------------------------
- *  16 bit: | VERSION: 4 bit | FLAGS: 4 bit | ENCRYPTTYPE: 4 bit | RESERVED: 4 bit |
- *  32 bit: | MESSAGE_ID                                                           |
+ *  8 bit:  | Message Flags: VERSION: 4 bit | S: 1 bit | RESERVED: 1 bit | DSIZ: 2 bit |
+ *  8 bit:  | Security Flags: P: 1 bit | C: 1 bit | MX: 1 bit | RESERVED: 3 bit | Session Type: 2 bit |
+ *  16 bit: | Session ID                                                           |
+ *  32 bit: | Message Counter                                                      |
  *  64 bit: | SOURCE_NODE_ID (iff source node flag is set)                         |
  *  64 bit: | DEST_NODE_ID (iff destination node flag is set)                      |
- *  16 bit: | Encryption Key ID                                                    |
- *  16 bit: | Payload Length                                                       |
  * -------- Encrypted header -------------------------------------------------------
- *  8 bit:  | Exchange Header                                                      |
- *  8 bit:  | Message Type                                                         |
- *  16 bit: | Exchange ID                                                          |
- *  16 bit: | Optional Vendor ID                                                   |
- *  16 bit: | Protocol ID                                                          |
- *  32 bit: | Acknowledged Message Counter (if A flag in the Header is set)        |
+ *  8 bit:  | Exchange Flags: RESERVED: 3 bit | V: 1 bit | SX: 1 bit | R: 1 bit | A: 1 bit | I: 1 bit |
+ *  8 bit:  | Protocol Opcode                                                      |
+ * 16 bit:  | Exchange ID                                                          |
+ * 16 bit:  | Protocol ID                                                          |
+ * 16 bit:  | Optional Vendor ID                                                   |
+ * 32 bit:  | Acknowledged Message Counter (if A flag in the Header is set)        |
  * -------- Encrypted Application Data Start ---------------------------------------
  *  <var>:  | Encrypted Data                                                       |
  * -------- Encrypted Application Data End -----------------------------------------
@@ -83,9 +83,9 @@ constexpr uint16_t kVersionMask = 0x00F0;
 constexpr int kVersionShift = 4;
 
 /// Mask to extract just the encryption type part from a 16bit header prefix.
-constexpr uint16_t kEncryptionTypeMask = 0x3000;
+constexpr uint16_t kSessionTypeMask = 0x3000;
 /// Shift to convert to/from a masked encryption type 16bit value to a 2bit encryption type.
-constexpr int kEncryptionTypeShift = 12;
+constexpr int kSessionTypeShift = 12;
 
 } // namespace
 
@@ -127,11 +127,11 @@ uint16_t PayloadHeader::EncodeSizeBytes() const
     return static_cast<uint16_t>(size);
 }
 
-uint16_t MessageAuthenticationCode::TagLenForEncryptionType(Header::EncryptionType encType)
+uint16_t MessageAuthenticationCode::TagLenForSessionType(Header::SessionType sessionType)
 {
-    switch (encType)
+    switch (sessionType)
     {
-    case Header::EncryptionType::kAESCCMTagLen16:
+    case Header::SessionType::kAESCCMTagLen16:
         return 16;
 
     default:
@@ -151,10 +151,13 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     err = reader.Read16(&header).StatusCode();
     SuccessOrExit(err);
     version = ((header & kVersionMask) >> kVersionShift);
-    VerifyOrExit(version == kHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
+    VerifyOrExit(version == kMsgHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
 
     mFlags.SetRaw(header);
-    mEncryptionType = static_cast<Header::EncryptionType>((header & kEncryptionTypeMask) >> kEncryptionTypeShift);
+    mSessionType = static_cast<Header::SessionType>((header & kSessionTypeMask) >> kSessionTypeShift);
+
+    err = reader.Read16(&mSessionId).StatusCode();
+    SuccessOrExit(err);
 
     err = reader.Read32(&mMessageCounter).StatusCode();
     SuccessOrExit(err);
@@ -182,9 +185,6 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     {
         mDestinationNodeId.ClearValue();
     }
-
-    err = reader.Read16(&mEncryptionKeyID).StatusCode();
-    SuccessOrExit(err);
 
     octets_read = static_cast<uint16_t>(reader.OctetsRead());
     VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
@@ -271,11 +271,12 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     encodeFlags.Set(Header::FlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
         .Set(Header::FlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue());
 
-    uint16_t header = (kHeaderVersion << kVersionShift) | encodeFlags.Raw();
-    header |= (static_cast<uint16_t>(static_cast<uint16_t>(mEncryptionType) << kEncryptionTypeShift) & kEncryptionTypeMask);
+    uint16_t header = (kMsgHeaderVersion << kVersionShift) | encodeFlags.Raw();
+    header |= (static_cast<uint16_t>(static_cast<uint16_t>(mSessionType) << kSessionTypeShift) & kSessionTypeMask);
 
     uint8_t * p = data;
     LittleEndian::Write16(p, header);
+    LittleEndian::Write16(p, mSessionId);
     LittleEndian::Write32(p, mMessageCounter);
     if (mSourceNodeId.HasValue())
     {
@@ -285,8 +286,6 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     {
         LittleEndian::Write64(p, mDestinationNodeId.Value());
     }
-
-    LittleEndian::Write16(p, mEncryptionKeyID);
 
     // Written data size provided to caller on success
     VerifyOrReturnError(p - data == EncodeSizeBytes(), CHIP_ERROR_INTERNAL);
@@ -351,7 +350,7 @@ CHIP_ERROR PayloadHeader::EncodeBeforeData(const System::PacketBufferHandle & bu
 CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, const uint8_t * const data, uint16_t size,
                                              uint16_t * decode_len)
 {
-    const uint16_t taglen = TagLenForEncryptionType(packetHeader.GetEncryptionType());
+    const uint16_t taglen = TagLenForSessionType(packetHeader.GetSessionType());
 
     VerifyOrReturnError(taglen != 0, CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER);
     VerifyOrReturnError(size >= taglen, CHIP_ERROR_INVALID_ARGUMENT);
@@ -367,7 +366,7 @@ CHIP_ERROR MessageAuthenticationCode::Encode(const PacketHeader & packetHeader, 
                                              uint16_t * encode_size) const
 {
     uint8_t * p           = data;
-    const uint16_t taglen = TagLenForEncryptionType(packetHeader.GetEncryptionType());
+    const uint16_t taglen = TagLenForSessionType(packetHeader.GetSessionType());
 
     VerifyOrReturnError(taglen != 0, CHIP_ERROR_WRONG_ENCRYPTION_TYPE);
     VerifyOrReturnError(size >= taglen, CHIP_ERROR_INVALID_ARGUMENT);

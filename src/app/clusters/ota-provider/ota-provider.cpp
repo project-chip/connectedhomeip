@@ -168,10 +168,10 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(EndpointId endpoi
     ChipLogDetail(Zcl, "OTA Provider received QueryImage");
 
     // TODO: (#7112) change location size checking once CHAR_STRING is supported
-    const uint8_t locationLen = emberAfStringLength(location);
+    const size_t locationLen = strlen(reinterpret_cast<char *>(location));
     if (locationLen != kLocationParamLength)
     {
-        ChipLogError(Zcl, "expected location length %" PRIu8 ", got %" PRIu8, locationLen, kLocationParamLength);
+        ChipLogError(Zcl, "expected location length %" PRIu8 ", got %zu", kLocationParamLength, locationLen);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
     else if (metadataForProvider.size() > kMaxMetadataLen)

@@ -69,8 +69,8 @@ struct PASESessionSerializable
     uint16_t mKeLen;
     uint8_t mKe[kMAX_Hash_Length];
     uint8_t mPairingComplete;
-    uint16_t mLocalKeyId;
-    uint16_t mPeerKeyId;
+    uint16_t mLocalSessionId;
+    uint16_t mPeerSessionId;
 };
 
 struct PASEVerifier
@@ -339,14 +339,14 @@ class SecurePairingUsingTestSecret : public PairingSession
 public:
     SecurePairingUsingTestSecret()
     {
-        SetLocalKeyId(0);
-        SetPeerKeyId(0);
+        SetLocalSessionId(0);
+        SetPeerSessionId(0);
     }
 
-    SecurePairingUsingTestSecret(uint16_t peerKeyId, uint16_t localKeyId)
+    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId)
     {
-        SetLocalKeyId(localKeyId);
-        SetPeerKeyId(peerKeyId);
+        SetLocalSessionId(localSessionId);
+        SetPeerSessionId(peerSessionId);
     }
 
     CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override
@@ -363,8 +363,8 @@ public:
         memset(&serializable, 0, sizeof(serializable));
         serializable.mKeLen           = static_cast<uint16_t>(secretLen);
         serializable.mPairingComplete = 1;
-        serializable.mLocalKeyId      = GetLocalKeyId();
-        serializable.mPeerKeyId       = GetPeerKeyId();
+        serializable.mLocalSessionId  = GetLocalSessionId();
+        serializable.mPeerSessionId   = GetPeerSessionId();
 
         memcpy(serializable.mKe, kTestSecret, secretLen);
         return CHIP_NO_ERROR;

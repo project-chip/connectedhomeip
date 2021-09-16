@@ -71,8 +71,8 @@ struct CASESessionSerializable
     uint8_t mIPK[kIPKSize];
     uint8_t mPairingComplete;
     NodeId mPeerNodeId;
-    uint16_t mLocalKeyId;
-    uint16_t mPeerKeyId;
+    uint16_t mLocalSessionId;
+    uint16_t mPeerSessionId;
 };
 
 class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession

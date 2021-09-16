@@ -20,7 +20,7 @@ config:
 
 tests:
     - label: "Wait 100ms"
-      cluster: "TestSuite"
+      cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
