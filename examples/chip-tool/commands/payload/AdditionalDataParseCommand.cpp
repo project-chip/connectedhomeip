@@ -30,7 +30,11 @@ CHIP_ERROR AdditionalDataParseCommand::Run()
     AdditionalDataPayload resultPayload;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    size_t additionalDataPayloadBytesLength = static_cast<size_t>(ceil(strlen(mPayload) / 2));
+    if (strlen(mPayload) % 2 != 0)
+    {
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
+    }
+    size_t additionalDataPayloadBytesLength = strlen(mPayload) / 2;
     std::unique_ptr<uint8_t[]> additionalDataPayloadBytes(new uint8_t[additionalDataPayloadBytesLength]);
 
     size_t bufferSize =

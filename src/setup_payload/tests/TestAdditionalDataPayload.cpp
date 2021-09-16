@@ -83,7 +83,11 @@ CHIP_ERROR GenerateAdditionalDataPayload(nlTestSuite * inSuite, uint16_t lifetim
 CHIP_ERROR ParseAdditionalDataPayload(const char * additionalDataPayload, size_t additionalDataPayloadLength,
                                       chip::SetupPayloadData::AdditionalDataPayload & outPayload)
 {
-    size_t additionalDataPayloadBytesLength = static_cast<size_t>(ceil(additionalDataPayloadLength / 2));
+    if (additionalDataPayloadLength % 2 != 0)
+    {
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
+    }
+    size_t additionalDataPayloadBytesLength = additionalDataPayloadLength / 2;
     std::unique_ptr<uint8_t[]> additionalDataPayloadBytes(new uint8_t[additionalDataPayloadBytesLength]);
     size_t bufferSize = chip::Encoding::HexToBytes(additionalDataPayload, additionalDataPayloadLength,
                                                    additionalDataPayloadBytes.get(), additionalDataPayloadBytesLength);
