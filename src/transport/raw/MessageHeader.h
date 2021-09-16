@@ -31,6 +31,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
+#include <lib/core/GroupId.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
@@ -136,6 +137,13 @@ public:
      */
     const Optional<NodeId> & GetDestinationNodeId() const { return mDestinationNodeId; }
 
+    /**
+     * Gets the destination group id in the current message.
+     *
+     * NOTE: the destination group id is optional and may be missing.
+     */
+    const Optional<GroupId> & GetDestinationGroupId() const { return mDestinationGroupId; }
+
     uint16_t GetSessionId() const { return mSessionId; }
 
     Header::Flags & GetFlags() { return mFlags; }
@@ -191,6 +199,27 @@ public:
     {
         mDestinationNodeId.ClearValue();
         mFlags.Clear(Header::FlagValues::kDestinationNodeIdPresent);
+        return *this;
+    }
+
+    PacketHeader & SetDestinationGroupId(GroupId id)
+    {
+        mDestinationGroupId.SetValue(id);
+        mFlags.Set(Header::FlagValues::kDestinationGroupIdPresent);
+        return *this;
+    }
+
+    PacketHeader & SetDestinationGroupId(Optional<GroupId> id)
+    {
+        mDestinationGroupId = id;
+        mFlags.Set(Header::FlagValues::kDestinationGroupIdPresent, id.HasValue());
+        return *this;
+    }
+
+    PacketHeader & ClearDestinationGroupId()
+    {
+        mDestinationGroupId.ClearValue();
+        mFlags.Clear(Header::FlagValues::kDestinationGroupIdPresent);
         return *this;
     }
 
@@ -304,6 +333,7 @@ private:
 
     /// Intended recipient of the message.
     Optional<NodeId> mDestinationNodeId;
+    Optional<GroupId> mDestinationGroupId;
 
     /// Session ID
     uint16_t mSessionId = kMsgSessionIdUnsecured;

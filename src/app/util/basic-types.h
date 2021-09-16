@@ -27,6 +27,8 @@
 
 // Pull in NodeId
 #include <lib/core/NodeId.h>
+// Pull in GroupId
+#include <lib/core/GroupId.h>
 
 // Pull in VendorId
 #include <lib/core/CHIPVendorIdentifiers.hpp>
@@ -44,7 +46,6 @@ typedef uint64_t EventNumber;
 typedef uint64_t FabricId;
 typedef uint8_t FabricIndex;
 typedef uint32_t FieldId;
-typedef uint16_t GroupId;
 typedef uint16_t ListIndex;
 typedef uint32_t TransactionId;
 typedef uint32_t StatusCode;
