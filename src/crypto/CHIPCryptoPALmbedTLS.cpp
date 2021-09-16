@@ -941,12 +941,11 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 
 exit:
     _log_mbedTLS_error(result);
-
-    FreeImpl();
+    Clear();
     return error;
 }
 
-void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
+void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
 {
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 

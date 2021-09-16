@@ -1229,7 +1229,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal()
     return CHIP_NO_ERROR;
 }
 
-void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl()
+void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
 {
     Spake2p_Context * const context = to_inner_spake2p_context(&mSpake2pContext);
 
