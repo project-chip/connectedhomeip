@@ -415,15 +415,14 @@ CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, Certific
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ASN1Writer writer;
-    uint32_t size = static_cast<uint32_t>(std::min(static_cast<size_t>(UINT32_MAX), x509Cert.size()));
-    writer.Init(x509Cert.data(), size);
+    writer.Init(x509Cert);
 
     ReturnErrorOnFailure(EncodeTBSCert(requestParams, issuerLevel, subject, subjectPubkey, issuerKeypair.Pubkey(), writer));
 
     Crypto::P256ECDSASignature signature;
     ReturnErrorOnFailure(issuerKeypair.ECDSA_sign_msg(x509Cert.data(), writer.GetLengthWritten(), signature));
 
-    writer.Init(x509Cert.data(), size);
+    writer.Init(x509Cert);
 
     ASN1_START_SEQUENCE
     {

@@ -43,9 +43,7 @@ CHIP_ERROR PlatformEventing::PostEvent(System::Layer & aLayer, System::Object & 
     event.ChipSystemLayerEvent.Target   = &aTarget;
     event.ChipSystemLayerEvent.Argument = aArgument;
 
-    PlatformMgr().PostEvent(&event);
-
-    return CHIP_NO_ERROR;
+    return PlatformMgr().PostEvent(&event);
 }
 
 CHIP_ERROR PlatformEventing::DispatchEvents(System::Layer & aLayer)

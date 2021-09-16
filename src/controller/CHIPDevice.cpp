@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -335,8 +335,8 @@ void Device::OnConnectionExpired(SessionHandle session)
     mSecureSession.ClearValue();
 }
 
-CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
-                                     const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PayloadHeader & payloadHeader,
+                                     System::PacketBufferHandle && msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -552,6 +552,7 @@ void Device::OperationalCertProvisioned()
 
     Persist();
     CloseSession();
+    mState = ConnectionState::NotConnected;
 }
 
 CHIP_ERROR Device::WarmupCASESession()
@@ -559,12 +560,17 @@ CHIP_ERROR Device::WarmupCASESession()
     VerifyOrReturnError(mDeviceOperationalCertProvisioned, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == ConnectionState::NotConnected, CHIP_NO_ERROR);
 
-    Messaging::ExchangeContext * exchange =
-        mExchangeMgr->NewContext(SessionHandle::TemporaryUnauthenticatedSession(), &mCASESession);
+    // Create a UnauthenticatedSession for CASE pairing.
+    // Don't use mSecureSession here, because mSecureSession is the secure session.
+    Optional<SessionHandle> session = mSessionManager->CreateUnauthenticatedSession(mDeviceAddress);
+    if (!session.HasValue())
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(session.Value(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
-    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager->GetTransportManager()));
-    mCASESession.MessageDispatch().SetPeerAddress(mDeviceAddress);
+    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager));
 
     uint16_t keyID = 0;
     ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
@@ -601,9 +607,6 @@ void Device::OnSessionEstablishmentError(CHIP_ERROR error)
 
 void Device::OnSessionEstablished()
 {
-    // TODO: the session should know which peer we are trying to connect to when started
-    mCASESession.SetPeerNodeId(mDeviceId);
-
     CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mCASESession,
                                                  SecureSession::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
@@ -690,9 +693,9 @@ void Device::CancelIMResponseHandler(app::CommandSender * commandObj)
 }
 
 void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute,
-                              Callback::Cancelable * onReportCallback)
+                              Callback::Cancelable * onReportCallback, app::TLVDataFilter tlvDataFilter)
 {
-    mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
+    mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback, tlvDataFilter);
 }
 
 CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
@@ -708,7 +711,7 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
     {
         AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback, aTlvDataFilter);
     }
-    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // The application context is used to identify different requests from client application the type of it is intptr_t, here we
     // use the seqNum.
     chip::app::ReadPrepareParams readPrepareParams(mSecureSession.Value());
     readPrepareParams.mpAttributePathParamsList    = &aPath;
@@ -720,6 +723,45 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
         CancelResponseHandler(seqNum);
     }
     return err;
+}
+
+CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalFloorSeconds,
+                                                 uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback)
+{
+    bool loadedSecureSession = false;
+    uint8_t seqNum           = GetNextSequenceNumber();
+    aPath.mNodeId            = GetDeviceId();
+
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    app::AttributePathParams * path = mpIMDelegate->AllocateAttributePathParam(1, seqNum);
+
+    VerifyOrReturnError(path != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    *path = aPath;
+
+    // The application context is used to identify different requests from client application the type of it is intptr_t, here we
+    // use the seqNum.
+    app::ReadPrepareParams params(GetSecureSession());
+    params.mpAttributePathParamsList    = path;
+    params.mAttributePathParamsListSize = 1;
+    params.mMinIntervalFloorSeconds     = mMinIntervalFloorSeconds;
+    params.mMaxIntervalCeilingSeconds   = mMaxIntervalCeilingSeconds;
+
+    CHIP_ERROR err =
+        chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(params, seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mpIMDelegate->FreeAttributePathParam(seqNum);
+        return err;
+    }
+
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
@@ -754,10 +796,17 @@ Device::~Device()
     }
 }
 
-CHIP_ERROR Device::ReduceNOCChainBufferSize(size_t new_size)
+CHIP_ERROR Device::SetNOCCertBufferSize(size_t new_size)
 {
-    ReturnErrorCodeIf(new_size > sizeof(mNOCChainBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    mNOCChainBufferSize = new_size;
+    ReturnErrorCodeIf(new_size > sizeof(mNOCCertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+    mNOCCertBufferSize = new_size;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::SetICACertBufferSize(size_t new_size)
+{
+    ReturnErrorCodeIf(new_size > sizeof(mICACertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+    mICACertBufferSize = new_size;
     return CHIP_NO_ERROR;
 }
 

@@ -47,7 +47,6 @@ CHIP_ERROR StatusElement::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -80,7 +79,6 @@ CHIP_ERROR StatusElement::Parser::DecodeStatusElement(Protocols::SecureChannel::
     SuccessOrExit(err);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -174,7 +172,6 @@ CHIP_ERROR StatusElement::Parser::CheckSchemaValidity() const
     err = reader.ExitContainer(mOuterContainerType);
 
 exit:
-    ChipLogFunctError(err);
 
     return err;
 }
@@ -207,7 +204,6 @@ StatusElement::Builder & StatusElement::Builder::EncodeStatusElement(const Proto
     SuccessOrExit(mError);
 
 exit:
-    ChipLogFunctError(mError);
     return *this;
 }
 

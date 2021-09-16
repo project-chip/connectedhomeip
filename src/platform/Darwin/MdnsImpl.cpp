@@ -549,9 +549,5 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, chip::Inet::InterfaceId interf
     return Resolve(context, callback, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
 }
 
-void GetMdnsTimeout(timeval & timeout) {}
-
-void HandleMdnsTimeout() {}
-
 } // namespace Mdns
 } // namespace chip

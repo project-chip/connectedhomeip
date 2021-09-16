@@ -1,5 +1,5 @@
 {
-  "featureLevel": 45,
+  "featureLevel": 51,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -2754,7 +2754,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "5",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -2885,7 +2885,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "5",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -4835,7 +4835,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "5",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -5146,7 +5146,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "5",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -5954,7 +5954,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "5",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -6250,7 +6250,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "5",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -6289,6 +6289,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 514
     }
-  ],
-  "log": []
+  ]
 }

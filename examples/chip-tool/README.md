@@ -64,7 +64,7 @@ where:
 
 -   ssid is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX where
     the bytes of the SSID are encoded as two-digit hex numbers.
--   paswword is the Wi-Fi password, again either as a string or as hex data
+-   password is the Wi-Fi password, again either as a string or as hex data
 -   The 0 is the fabric id, until more complete support for multiple fabrics is
     implemented in our commissioning process.
 

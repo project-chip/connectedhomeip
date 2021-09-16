@@ -256,7 +256,7 @@ below:
 ![POWER_VIEW](../../platform/k32w/doc/images/power_view.JPG)
 
 Please note that that the Power Measurement Tool is not very accurate and
-professional tools must be used if exact power consumption needs to be kwnown.
+professional tools must be used if exact power consumption needs to be known.
 
 ## Known issues
 

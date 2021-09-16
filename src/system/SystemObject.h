@@ -58,6 +58,8 @@ namespace System {
 
 // Forward class and class template declarations
 class Layer;
+class LayerSockets;
+class LayerLwIP;
 template <class T, unsigned int N>
 class ObjectPool;
 
@@ -110,7 +112,7 @@ protected:
         kReleaseDeferralErrorTactic_Die,     /**< Die with message. */
     };
 
-    void DeferredRelease(Layer * aSystemLayer, ReleaseDeferralErrorTactic aTactic);
+    void DeferredRelease(LayerLwIP * aSystemLayer, ReleaseDeferralErrorTactic aTactic);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:

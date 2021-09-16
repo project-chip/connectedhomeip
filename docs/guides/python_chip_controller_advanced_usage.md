@@ -110,7 +110,7 @@ Reading symbols from python3...
 ```
 
 The Python will create lots of threads due to main loop, so you may want to
-supress thread related outputs first by running the following command:
+suppress thread related outputs first by running the following command:
 
 ```
 (gdb) set print thread-events off
@@ -247,4 +247,4 @@ then you can use `bt` (for `backtrace`) to see the backtrace of the call stack.
 ```
 
 The frame #0 and frame #1 are the function frames in the CHIP C++ library, the
-other frames live in the Python intepreter so you can ignore it.
+other frames live in the Python interpreter so you can ignore it.

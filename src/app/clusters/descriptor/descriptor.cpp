@@ -91,7 +91,7 @@ EmberAfStatus writeDeviceAttribute(EndpointId endpoint, uint16_t index)
     DeviceTypeId deviceTypeId = emberAfDeviceIdFromIndex(index);
     uint16_t revision         = emberAfDeviceVersionFromIndex(index);
 
-    EmberAfDeviceType deviceType;
+    DeviceType deviceType;
     deviceType.type     = deviceTypeId;
     deviceType.revision = revision;
 

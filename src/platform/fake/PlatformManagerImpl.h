@@ -50,7 +50,7 @@ private:
     void _RunEventLoop() {}
     CHIP_ERROR _StartEventLoopTask() { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StopEventLoopTask() { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    void _PostEvent(const ChipDeviceEvent * event) {}
+    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event) { return CHIP_NO_ERROR; }
     void _DispatchEvent(const ChipDeviceEvent * event) {}
     CHIP_ERROR _StartChipTimer(int64_t durationMS) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 

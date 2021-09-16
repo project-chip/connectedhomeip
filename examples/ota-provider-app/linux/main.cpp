@@ -121,7 +121,7 @@ int main(int argc, char * argv[])
     }
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
-    InitServer();
+    chip::Server::GetInstance().Init();
 
     exchangeMgr = chip::ExchangeManager();
     err         = exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id, &bdxServer);
@@ -139,7 +139,7 @@ int main(int argc, char * argv[])
 
     BitFlags<TransferControlFlags> bdxFlags;
     bdxFlags.Set(TransferControlFlags::kReceiverDrive);
-    err = bdxServer.PrepareForTransfer(&chip::DeviceLayer::SystemLayer, chip::bdx::TransferRole::kSender, bdxFlags,
+    err = bdxServer.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
                                        kMaxBdxBlockSize, kBdxTimeoutMs, kBdxPollFreqMs);
     if (err != CHIP_NO_ERROR)
     {

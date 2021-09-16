@@ -131,7 +131,6 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     }
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -145,7 +144,6 @@ CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePa
     err = ConstructAttributePath(attributePathParams, attributeDataElement);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -163,7 +161,6 @@ CHIP_ERROR WriteClient::FinishAttribute()
     MoveToState(State::AddAttribute);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -211,7 +208,6 @@ CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
     SuccessOrExit(err);
 
 exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -277,13 +273,12 @@ exit:
     {
         ClearExistingExchangeContext();
     }
-    ChipLogFunctError(err);
 
     return err;
 }
 
-CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                          System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Assert that the exchange context matches the client's current context.
@@ -382,7 +377,6 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusElement(AttributeStatusElement::Pa
     }
 
 exit:
-    ChipLogFunctError(err);
     if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
     {
         mpDelegate->WriteResponseProtocolError(this, mAttributeStatusIndex);

@@ -298,6 +298,15 @@ static constexpr AttributeId Reachable               = 0x00000011;
 } // namespace Attributes
 } // namespace Basic
 
+namespace OtaSoftwareUpdateRequestor {
+namespace Attributes {
+namespace Ids {
+static constexpr AttributeId DefaultOtaProvider = 0x00000001;
+static constexpr AttributeId UpdatePossible     = 0x00000002;
+} // namespace Ids
+} // namespace Attributes
+} // namespace OtaSoftwareUpdateRequestor
+
 namespace GeneralCommissioning {
 namespace Attributes {
 namespace Ids {
