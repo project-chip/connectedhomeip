@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/basicClusterFabricIdEd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:hint="@string/enter_fabric_id_hint_text"/>
+
+    <EditText
+        android:id="@+id/basicClusterDeviceIdEd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/basicClusterFabricIdEd"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:hint="@string/enter_device_id_hint_text"/>
+
+    <Button
+        android:id="@+id/basicClusterUpdateAddressBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/update_device_address_btn_text"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/basicClusterFabricIdEd" />
+
+    <Button
+        android:id="@+id/readUserLabelBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/basic_cluster_read_user_label_btn_text"
+        android:layout_below="@id/basicClusterUpdateAddressBtn"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/writeUserLabelBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_below="@id/readUserLabelBtn"
+        android:layout_alignParentStart="true"
+        android:text="@string/basic_cluster_write_user_label_btn_text" />
+
+    <EditText
+        android:id="@+id/deviceIdEd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/readUserLabelBtn"
+        android:layout_toEndOf="@id/writeUserLabelBtn"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:hint="@string/basic_cluster_write_user_label_hint_text"/>
+
+    <Button
+        android:id="@+id/readProducNameBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_below="@id/writeUserLabelBtn"
+        android:layout_alignParentStart="true"
+        android:text="@string/basic_cluster_read_product_name_btn_text" />
+
+    <TextView
+        android:id="@+id/basicClustCommandStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_below="@id/readProducNameBtn"
+        android:singleLine="false"
+        android:minLines="4"
+        android:textSize="20sp"/>
+
+</RelativeLayout>
