@@ -225,7 +225,7 @@ public:
         static_assert(alignof(Lambda) <= CHIP_CONFIG_LAMBDA_EVENT_ALIGN);
 
         // Implicit cast a capture-less lambda into a raw function pointer.
-        event.LambdaProxy = [] (const void * body) { (*static_cast<const Lambda *>(body))(); };
+        event.LambdaProxy = [](const void * body) { (*static_cast<const Lambda *>(body))(); };
         memcpy(event.LambdaBody, &lambda, sizeof(Lambda));
 
         return ScheduleLambdaBridge(event);
