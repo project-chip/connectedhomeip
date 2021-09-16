@@ -51,8 +51,6 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeC
 {
     System::PacketBufferTLVWriter writer;
     TLVWriter innerWriter;
-    uint8_t rotatingDeviceIdBuffer[RotatingDeviceId::kMaxLength];
-    size_t rotatingDeviceIdBufferOutputSize = 0;
 
     // Initialize TLVWriter
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
@@ -61,14 +59,16 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeC
 
     if (additionalDataFields.Has(AdditionalDataFields::RotatingDeviceId))
     {
+        uint8_t rotatingDeviceIdInternalBuffer[RotatingDeviceId::kMaxLength];
+        MutableByteSpan rotatingDeviceIdBuffer = MutableByteSpan(rotatingDeviceIdInternalBuffer, sizeof(rotatingDeviceIdInternalBuffer));
+
         // Generating Device Rotating Id
         ReturnErrorOnFailure(generateRotatingDeviceIdAsBinary(lifetimeCounter, serialNumberBuffer, serialNumberBufferSize,
-                                                              rotatingDeviceIdBuffer, ArraySize(rotatingDeviceIdBuffer),
-                                                              rotatingDeviceIdBufferOutputSize));
-
+                                                              rotatingDeviceIdBuffer));
         // Adding the rotating device id to the TLV data
-        ReturnErrorOnFailure(innerWriter.PutBytes(ContextTag(kRotatingDeviceIdTag), rotatingDeviceIdBuffer,
-                                                  static_cast<uint32_t>(rotatingDeviceIdBufferOutputSize)));
+        ReturnErrorOnFailure(innerWriter.PutBytes(ContextTag(kRotatingDeviceIdTag),
+                                                  rotatingDeviceIdBuffer.data(),
+                                                  static_cast<uint32_t>(rotatingDeviceIdBuffer.size())));
     }
 
     ReturnErrorOnFailure(writer.CloseContainer(innerWriter));
@@ -77,12 +77,10 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeC
 }
 
 CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsBinary(
-    uint16_t lifetimeCounter, const char * serialNumberBuffer, size_t serialNumberBufferSize, uint8_t * rotatingDeviceIdBuffer,
-    size_t rotatingDeviceIdBufferSize, size_t & rotatingDeviceIdValueOutputSize)
+    uint16_t lifetimeCounter, const char * serialNumberBuffer, size_t serialNumberBufferSize, MutableByteSpan & rotatingDeviceIdBuffer)
 {
-    uint8_t outputBuffer[RotatingDeviceId::kMaxLength];
     uint8_t hashOutputBuffer[kSHA256_Hash_Length];
-    BufferWriter outputBufferWriter(outputBuffer, sizeof(outputBuffer));
+    BufferWriter outputBufferWriter(rotatingDeviceIdBuffer);
     uint8_t lifetimeCounterBuffer[2];
 
     if (serialNumberBuffer == nullptr)
@@ -91,8 +89,6 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsBinary(
     }
 
     Put16(lifetimeCounterBuffer, lifetimeCounter);
-
-    VerifyOrReturnError(rotatingDeviceIdBufferSize >= RotatingDeviceId::kMaxLength, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Computing the Rotating Device Id
     // RDI = Lifetime_Counter + SuffixBytes(SHA256(Serial_Number + Lifetime_Counter), 16)
@@ -107,10 +103,8 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsBinary(
     outputBufferWriter.Put16(lifetimeCounter);
     outputBufferWriter.Put(&hashOutputBuffer[kSHA256_Hash_Length - RotatingDeviceId::kHashSuffixLength],
                            RotatingDeviceId::kHashSuffixLength);
-
-    rotatingDeviceIdValueOutputSize = outputBufferWriter.Needed();
-    memmove(rotatingDeviceIdBuffer, outputBuffer, rotatingDeviceIdValueOutputSize);
-
+    VerifyOrReturnError(outputBufferWriter.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    rotatingDeviceIdBuffer.reduce_size(outputBufferWriter.Needed());
     return CHIP_NO_ERROR;
 }
 
@@ -118,16 +112,14 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsHexString(
     uint16_t lifetimeCounter, const char * serialNumberBuffer, size_t serialNumberBufferSize, char * rotatingDeviceIdBuffer,
     size_t rotatingDeviceIdBufferSize, size_t & rotatingDeviceIdValueOutputSize)
 {
-    uint8_t rotatingDeviceIdBufferTemp[RotatingDeviceId::kMaxLength];
-    size_t rotatingDeviceIdBufferSizeTemp = 0;
-
+    uint8_t rotatingDeviceIdInternalBuffer[RotatingDeviceId::kMaxLength];
+    MutableByteSpan rotatingDeviceIdBufferTemp = MutableByteSpan(rotatingDeviceIdInternalBuffer, sizeof(rotatingDeviceIdInternalBuffer));
     ReturnErrorOnFailure(generateRotatingDeviceIdAsBinary(lifetimeCounter, serialNumberBuffer, serialNumberBufferSize,
-                                                          rotatingDeviceIdBufferTemp, ArraySize(rotatingDeviceIdBufferTemp),
-                                                          rotatingDeviceIdBufferSizeTemp));
+                                                          rotatingDeviceIdBufferTemp));
 
     VerifyOrReturnError(rotatingDeviceIdBufferSize >= RotatingDeviceId::kHexMaxLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorOnFailure(BytesToUppercaseHexString(rotatingDeviceIdBufferTemp, rotatingDeviceIdBufferSizeTemp,
+    ReturnErrorOnFailure(BytesToUppercaseHexString(rotatingDeviceIdBufferTemp.data(), rotatingDeviceIdBufferTemp.size(),
                                                    rotatingDeviceIdBuffer, rotatingDeviceIdBufferSize));
-    rotatingDeviceIdValueOutputSize = rotatingDeviceIdBufferSizeTemp * 2;
+    rotatingDeviceIdValueOutputSize = rotatingDeviceIdBufferTemp.size() * 2;
     return CHIP_NO_ERROR;
 }
