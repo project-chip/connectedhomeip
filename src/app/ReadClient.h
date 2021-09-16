@@ -28,6 +28,7 @@
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequest.h>
+#include <app/MessageDef/StatusResponse.h>
 #include <app/MessageDef/SubscribeRequest.h>
 #include <app/MessageDef/SubscribeResponse.h>
 #include <app/ReadPrepareParams.h>
@@ -95,7 +96,7 @@ public:
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
-    CHIP_ERROR SendStatusReport(CHIP_ERROR aError);
+    CHIP_ERROR SendStatusResponse(CHIP_ERROR aError);
 
 private:
     friend class TestReadInteraction;
