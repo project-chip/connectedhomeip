@@ -18,17 +18,14 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <transport/SecureSessionMgr.h>
-
-#if CHIP_ENABLE_OPENTHREAD
-#include <platform/ThreadStackManager.h>
-#endif
 #include <lib/mdns/Advertiser.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace {
+
+// As per specifications (Section 13.3), Nodes SHALL exit commissioning mode after 20 failed commission attempts.
+constexpr uint8_t kMaxFailedCommissioningAttempts = 20;
 
 void HandleCommissioningWindowTimeout(chip::System::Layer * aSystemLayer, void * aAppState)
 {
@@ -52,14 +49,14 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         if (event->CommissioningComplete.status == CHIP_NO_ERROR)
         {
             ChipLogProgress(AppServer, "Commissioning completed successfully");
+            Cleanup();
         }
         else
         {
-            ChipLogError(AppServer, "Commissioning errored out with error %" CHIP_ERROR_FORMAT,
+            ChipLogError(AppServer, "Commissioning failed with error %" CHIP_ERROR_FORMAT,
                          event->CommissioningComplete.status.Format());
+            OnSessionEstablishmentError(event->CommissioningComplete.status);
         }
-        // reset all advertising
-        app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kDisabled);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
@@ -70,9 +67,17 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 
 void CommissioningWindowManager::Cleanup()
 {
-    mServer->GetExchangManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
-    mPairingSession.Clear();
     StopAdvertisement();
+
+    mUseECM = false;
+
+    mECMDiscriminator = 0;
+    mECMPasscodeID    = 0;
+    mECMIterations    = 0;
+    mECMSaltLength    = 0;
+
+    memset(&mECMPASEVerifier, 0, sizeof(mECMPASEVerifier));
+    memset(mECMSalt, 0, sizeof(mECMSalt));
 
     // reset all advertising
     app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kDisabled);
@@ -80,13 +85,25 @@ void CommissioningWindowManager::Cleanup()
 
 void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    Cleanup();
+    mFailedCommissioningAttempts++;
+    ChipLogError(AppServer, "Commissioning failed (attempt %d): %s", mFailedCommissioningAttempts, ErrorStr(err));
 
-    ChipLogError(AppServer, "Commissioning failed during session establishment: %s", ErrorStr(err));
-
-    if (mAppDelegate != nullptr)
+    if (mFailedCommissioningAttempts < kMaxFailedCommissioningAttempts)
     {
-        mAppDelegate->OnRendezvousStopped();
+        // If the number of commissioning attempts have not exceeded maximum retries, let's reopen
+        // the pairing window.
+        err = OpenCommissioningWindow();
+    }
+
+    // If the commissioning attempts limit exceeded, or reopening the commissioning window failed.
+    if (err != CHIP_NO_ERROR)
+    {
+        Cleanup();
+
+        if (mAppDelegate != nullptr)
+        {
+            mAppDelegate->OnRendezvousStopped();
+        }
     }
 }
 
@@ -110,27 +127,52 @@ void CommissioningWindowManager::OnSessionEstablished()
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 
-    Cleanup();
+    StopAdvertisement();
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
 }
 
-CHIP_ERROR CommissioningWindowManager::PrepareCommissioningWindow(uint16_t commissioningTimeoutSeconds,
-                                                                  uint16_t & allocatedSessionID)
+CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
 {
-    ReturnErrorOnFailure(mIDAllocator->Allocate(allocatedSessionID));
+    uint16_t keyID = 0;
+    ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
 
+    mPairingSession.Clear();
     ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(&mServer->GetSecureSessionManager()));
 
-    if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
+    if (mCommissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
         ReturnErrorOnFailure(
-            DeviceLayer::SystemLayer().StartTimer(commissioningTimeoutSeconds * 1000, HandleCommissioningWindowTimeout, this));
+            DeviceLayer::SystemLayer().StartTimer(mCommissioningTimeoutSeconds * 1000, HandleCommissioningWindowTimeout, this));
     }
 
     ReturnErrorOnFailure(mServer->GetExchangManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
 
-    return StartAdvertisement();
+    ReturnErrorOnFailure(StartAdvertisement());
+
+    if (mUseECM)
+    {
+        ReturnErrorOnFailure(SetTemporaryDiscriminator(mECMDiscriminator));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength),
+                                                            mECMPasscodeID, keyID, this));
+
+        // reset all advertising, indicating we are in commissioningMode
+        app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledEnhanced);
+    }
+    else
+    {
+        uint32_t pinCode;
+        ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
+
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(
+            pinCode, kSpake2p_Iteration_Count,
+            ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), keyID, this));
+
+        // reset all advertising, indicating we are in commissioningMode
+        app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledBasic);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(uint16_t commissioningTimeoutSeconds,
@@ -146,26 +188,17 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(uint16_t com
     SetBLE(false);
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-    uint16_t keyID = 0;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint32_t pinCode;
+    mFailedCommissioningAttempts = 0;
+    mCommissioningTimeoutSeconds = commissioningTimeoutSeconds;
 
-    SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
-    SuccessOrExit(err = PrepareCommissioningWindow(commissioningTimeoutSeconds, keyID));
-    SuccessOrExit(err = mPairingSession.WaitForPairing(
-                      pinCode, kSpake2p_Iteration_Count,
-                      ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), keyID,
-                      this));
+    mUseECM = false;
 
-    // reset all advertising, indicating we are in commissioningMode
-    // and we were put into this state via a command for additional commissioning
-    app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledBasic);
-
-exit:
+    CHIP_ERROR err = OpenCommissioningWindow();
     if (err != CHIP_NO_ERROR)
     {
         Cleanup();
     }
+
     return err;
 }
 
@@ -180,18 +213,23 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t 
     SetBLE(false);
 #endif
 
-    uint16_t keyID = 0;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(salt.size() <= sizeof(mECMSalt), CHIP_ERROR_INVALID_ARGUMENT);
 
-    SuccessOrExit(err = SetTemporaryDiscriminator(discriminator));
-    SuccessOrExit(err = PrepareCommissioningWindow(commissioningTimeoutSeconds, keyID));
-    SuccessOrExit(err = mPairingSession.WaitForPairing(verifier, iterations, salt, passcodeID, keyID, this));
+    memcpy(mECMSalt, salt.data(), salt.size());
+    mECMSaltLength = static_cast<uint32_t>(salt.size());
 
-    // reset all advertising, indicating we are in commissioningMode
-    // and we were put into this state via a command for additional commissioning
-    app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledEnhanced);
+    mFailedCommissioningAttempts = 0;
+    mCommissioningTimeoutSeconds = commissioningTimeoutSeconds;
 
-exit:
+    mECMDiscriminator = discriminator;
+    mECMPasscodeID    = passcodeID;
+    mECMIterations    = iterations;
+
+    memcpy(&mECMPASEVerifier, &verifier, sizeof(PASEVerifier));
+
+    mUseECM = true;
+
+    CHIP_ERROR err = OpenCommissioningWindow();
     if (err != CHIP_NO_ERROR)
     {
         Cleanup();
@@ -225,6 +263,9 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 CHIP_ERROR CommissioningWindowManager::StopAdvertisement()
 {
     RestoreDiscriminator();
+
+    mServer->GetExchangManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
+    mPairingSession.Clear();
 
     mCommissioningWindowOpen = false;
 
