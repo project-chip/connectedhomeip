@@ -26,7 +26,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVData.hpp>
-#include <lib/core/CHIPTLVDebug.hpp>
+//#include <lib/core/CHIPTLVText.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/PrivateHeap.h>
@@ -55,19 +55,19 @@ static TransportMgr<Transport::UDP> gTransportManager;
 
 namespace app {
 
-class TestClusterObjectUtils
+class TestDataModelSerialization
 {
 public:
-    static void TestClusterObjectUtils_EncAndDecSimpleStruct(nlTestSuite * apSuite, void * apContext);
-    static void TestClusterObjectUtils_EncAndDecNestedStruct(nlTestSuite * apSuite, void * apContext);
-    static void TestClusterObjectUtils_EncAndDecNestedStructList(nlTestSuite * apSuite, void * apContext);
-    static void TestClusterObjectUtils_EncAndDecIterableNestedStructList(nlTestSuite * apSuite, void * apContext);
-    static void TestClusterObjectUtils_EncAndDecIterableDoubleNestedStructList(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_EncAndDecSimpleStruct(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_EncAndDecNestedStruct(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_EncAndDecNestedStructList(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_EncAndDecIterableNestedStructList(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_EncAndDecIterableDoubleNestedStructList(nlTestSuite * apSuite, void * apContext);
 
-    static void TestClusterObjectUtils_OptionalFields(nlTestSuite * apSuite, void * apContext);
-    static void TestClusterObjectUtils_ExtraField(nlTestSuite * apSuite, void * apContext);
-    static void TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTestSuite * apSuite, void * apContext);
-    static void TestClusterObjectUtils_InvalidListType(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_OptionalFields(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_ExtraField(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_InvalidSimpleFieldTypes(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_InvalidListType(nlTestSuite * apSuite, void * apContext);
 
 private:
     void SetupBuf();
@@ -82,9 +82,9 @@ private:
 
 using namespace chip::TLV;
 
-TestClusterObjectUtils gTestClusterObjectUtils;
+TestDataModelSerialization gTestDataModelSerialization;
 
-void TestClusterObjectUtils::SetupBuf()
+void TestDataModelSerialization::SetupBuf()
 {
     chip::System::PacketBufferHandle buf;
 
@@ -95,18 +95,20 @@ void TestClusterObjectUtils::SetupBuf()
     mReader.Init(mStore);
 }
 
-void TestClusterObjectUtils::DumpBuf()
+void TestDataModelSerialization::DumpBuf()
 {
     TLV::TLVReader reader;
     reader.Init(mStore);
 
     //
-    // TODO: Check-in TLV Text pretty printer in separate PR
+    // Enable this once the TLV pretty printer has been checked in.
     //
-    // chip::TLV::Utilities::Print(reader);
+#if ENABLE_TLV_PRINT_OUT
+    chip::TLV::Debug::Print(reader);
+#endif
 }
 
-void TestClusterObjectUtils::SetupReader()
+void TestDataModelSerialization::SetupReader()
 {
     CHIP_ERROR err;
 
@@ -144,11 +146,7 @@ CHIP_ERROR EncodeStruct(TLV::TLVWriter & writer, uint64_t tag, ArgTypes... Args)
 
 bool StringMatches(Span<const char> str1, const char * str2)
 {
-    if ((str1.data() == nullptr) ^ (str2 == nullptr))
-    {
-        return false;
-    }
-    else if (str1.data() == nullptr || str2 == nullptr)
+    if (str1.data() == nullptr || str2 == nullptr)
     {
         return false;
     }
@@ -158,13 +156,13 @@ bool StringMatches(Span<const char> str1, const char * str2)
         return false;
     }
 
-    return (strncmp(str1.data(), str2, str1.size()) == 0 ? true : false);
+    return (strncmp(str1.data(), str2, str1.size()) == 0);
 }
 
-void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecSimpleStruct(nlTestSuite * apSuite, void * apContext)
+void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruct(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    auto * _this = static_cast<TestClusterObjectUtils *>(apContext);
+    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -182,7 +180,6 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecSimpleStruct(nlTest
         t.c = clusters::TestCluster::SimpleEnum::VALUEA;
         t.d = buf;
 
-        // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
         t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
         err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
@@ -218,10 +215,10 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecSimpleStruct(nlTest
     }
 }
 
-void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTestSuite * apSuite, void * apContext)
+void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruct(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    auto * _this = static_cast<TestClusterObjectUtils *>(apContext);
+    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -241,7 +238,6 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTest
         t.c.c = clusters::TestCluster::SimpleEnum::VALUEB;
         t.c.d = buf;
 
-        // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
         t.c.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
         err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
@@ -279,10 +275,11 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct(nlTest
     }
 }
 
-void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStructList(nlTestSuite * apSuite, void * apContext)
+void TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableNestedStructList(nlTestSuite * apSuite,
+                                                                                              void * apContext)
 {
     CHIP_ERROR err;
-    auto * _this = static_cast<TestClusterObjectUtils *>(apContext);
+    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -321,7 +318,8 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStruc
         spanList[2] = buf;
         spanList[3] = buf;
 
-        // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
+        t.g = buf;
+
         t.c.e = chip::Span<char>{ strbuf, strlen(strbuf) };
         t.d   = structList;
 
@@ -398,13 +396,28 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStruc
 
             NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
         }
+
+        {
+            i         = 0;
+            auto iter = t.g.begin();
+
+            while (iter.Next())
+            {
+                auto & item = iter.GetValue();
+                NL_TEST_ASSERT(apSuite, item == i);
+                i++;
+            }
+
+            NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
+        }
     }
 }
 
-void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNestedStructList(nlTestSuite * apSuite, void * apContext)
+void TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableDoubleNestedStructList(nlTestSuite * apSuite,
+                                                                                                    void * apContext)
 {
     CHIP_ERROR err;
-    auto * _this = static_cast<TestClusterObjectUtils *>(apContext);
+    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -465,7 +478,7 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNeste
             {
                 auto & nestedItem = nestedIter.GetValue();
 
-                NL_TEST_ASSERT(apSuite, nestedItem.a == ((uint8_t)35 + i));
+                NL_TEST_ASSERT(apSuite, nestedItem.a == ((uint8_t) 35 + i));
                 i++;
             }
         }
@@ -474,10 +487,10 @@ void TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNeste
     }
 }
 
-void TestClusterObjectUtils::TestClusterObjectUtils_OptionalFields(nlTestSuite * apSuite, void * apContext)
+void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    auto * _this = static_cast<TestClusterObjectUtils *>(apContext);
+    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -495,7 +508,6 @@ void TestClusterObjectUtils::TestClusterObjectUtils_OptionalFields(nlTestSuite *
         t.c = clusters::TestCluster::SimpleEnum::VALUEA;
         t.d = buf;
 
-        // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
         t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
         // Encode every field manually except a.
@@ -543,10 +555,10 @@ void TestClusterObjectUtils::TestClusterObjectUtils_OptionalFields(nlTestSuite *
     }
 }
 
-void TestClusterObjectUtils::TestClusterObjectUtils_ExtraField(nlTestSuite * apSuite, void * apContext)
+void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    auto * _this = static_cast<TestClusterObjectUtils *>(apContext);
+    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -564,7 +576,6 @@ void TestClusterObjectUtils::TestClusterObjectUtils_ExtraField(nlTestSuite * apS
         t.c = clusters::TestCluster::SimpleEnum::VALUEA;
         t.d = buf;
 
-        // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
         t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
         // Encode every field + an extra field.
@@ -620,10 +631,10 @@ struct UintSpann : public Span<uint8_t>
 
 void DoSomething(ByteSpann s) {}
 
-void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTestSuite * apSuite, void * apContext)
+void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTypes(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    auto * _this = static_cast<TestClusterObjectUtils *>(apContext);
+    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -648,7 +659,6 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTe
             t.c = clusters::TestCluster::SimpleEnum::VALUEA;
             t.d = buf;
 
-            // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
             t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
             // Encode every field manually except a.
@@ -700,7 +710,6 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTe
             t.c = clusters::TestCluster::SimpleEnum::VALUEA;
             t.d = buf;
 
-            // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
             t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
 
             // Encode every field manually except a.
@@ -734,10 +743,10 @@ void TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes(nlTe
     }
 }
 
-void TestClusterObjectUtils::TestClusterObjectUtils_InvalidListType(nlTestSuite * apSuite, void * apContext)
+void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
-    auto * _this = static_cast<TestClusterObjectUtils *>(apContext);
+    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
@@ -817,26 +826,26 @@ void InitializeChip(nlTestSuite * apSuite)
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("TestClusterObjectUtils_EncAndDecSimple", chip::app::TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecSimpleStruct),
-    NL_TEST_DEF("TestClusterObjectUtils_EncAndDecNestedStruct", chip::app::TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecNestedStruct),
-    NL_TEST_DEF("TestClusterObjectUtils_EncAndDecIterableNestedStructList", chip::app::TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableNestedStructList),
-    NL_TEST_DEF("TestClusterObjectUtils_EncAndDecIterableDoubleNestedStructList", chip::app::TestClusterObjectUtils::TestClusterObjectUtils_EncAndDecIterableDoubleNestedStructList),
-    NL_TEST_DEF("TestClusterObjectUtils_OptionalFields", chip::app::TestClusterObjectUtils::TestClusterObjectUtils_OptionalFields),
-    NL_TEST_DEF("TestClusterObjectUtils_ExtraField", chip::app::TestClusterObjectUtils::TestClusterObjectUtils_ExtraField),
-    NL_TEST_DEF("TestClusterObjectUtils_InvalidSimpleFieldTypes", chip::app::TestClusterObjectUtils::TestClusterObjectUtils_InvalidSimpleFieldTypes),
-    NL_TEST_DEF("TestClusterObjectUtils_InvalidListType", chip::app::TestClusterObjectUtils::TestClusterObjectUtils_InvalidListType),
+    NL_TEST_DEF("TestDataModelSerialization_EncAndDecSimple", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruct),
+    NL_TEST_DEF("TestDataModelSerialization_EncAndDecNestedStruct", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruct),
+    NL_TEST_DEF("TestDataModelSerialization_EncAndDecIterableNestedStructList", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableNestedStructList),
+    NL_TEST_DEF("TestDataModelSerialization_EncAndDecIterableDoubleNestedStructList", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableDoubleNestedStructList),
+    NL_TEST_DEF("TestDataModelSerialization_OptionalFields", chip::app::TestDataModelSerialization::TestDataModelSerialization_OptionalFields),
+    NL_TEST_DEF("TestDataModelSerialization_ExtraField", chip::app::TestDataModelSerialization::TestDataModelSerialization_ExtraField),
+    NL_TEST_DEF("TestDataModelSerialization_InvalidSimpleFieldTypes", chip::app::TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTypes),
+    NL_TEST_DEF("TestDataModelSerialization_InvalidListType", chip::app::TestDataModelSerialization::TestDataModelSerialization_InvalidListType),
     NL_TEST_SENTINEL()
 };
 // clang-format on
 
 } // namespace
 
-int TestClusterObjectUtils()
+int TestDataModelSerialization()
 {
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "TestClusterObjectUtils",
+        "TestDataModelSerialization",
         &sTests[0],
         nullptr,
         nullptr
@@ -845,9 +854,9 @@ int TestClusterObjectUtils()
 
     InitializeChip(&theSuite);
 
-    nlTestRunner(&theSuite, &chip::app::gTestClusterObjectUtils);
+    nlTestRunner(&theSuite, &chip::app::gTestDataModelSerialization);
 
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestClusterObjectUtils)
+CHIP_REGISTER_TEST_SUITE(TestDataModelSerialization)

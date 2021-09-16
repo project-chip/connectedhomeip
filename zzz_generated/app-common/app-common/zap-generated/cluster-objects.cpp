@@ -1,4 +1,5 @@
 #include "cluster-objects.h"
+#include "lib/core/CHIPTLVTags.h"
 
 #pragma GCC diagnostic ignored "-Wstack-usage="
 
@@ -7,13 +8,19 @@ namespace app {
 namespace clusters {
 namespace TestCluster {
 namespace TestListStructOctet {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag)
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
 {
     TLV::TLVType outer;
+
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kFabricIndexFieldId), fabricIndex));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kOperationalCertFieldId), operationalCert));
+
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kFabricIndexFieldId), fabricIndex));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kOperationalCertFieldId), operationalCert));
+    }
+
     ReturnErrorOnFailure(writer.EndContainer(outer));
+
     return CHIP_NO_ERROR;
 }
 
@@ -45,16 +52,20 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace TestListStructOctet
 
 namespace SimpleStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag)
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
 {
     TLV::TLVType outer;
 
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kAFieldId), a));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kBFieldId), b));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kCFieldId), c));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kDFieldId), d));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kEFieldId), e));
+
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kAFieldId), a));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kBFieldId), b));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kCFieldId), c));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kDFieldId), d));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kEFieldId), e));
+    }
+
     ReturnErrorOnFailure(writer.EndContainer(outer));
 
     return CHIP_NO_ERROR;
@@ -102,14 +113,18 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace SimpleStruct
 
 namespace NestedStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag)
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
 {
     TLV::TLVType outer;
 
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kAFieldId), a));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kBFieldId), b));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kCFieldId), c));
+
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kAFieldId), a));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kBFieldId), b));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kCFieldId), c));
+    }
+
     ReturnErrorOnFailure(writer.EndContainer(outer));
 
     return CHIP_NO_ERROR;
@@ -147,132 +162,25 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace NestedStruct
 
 namespace NestedStructList {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag)
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
 {
     TLV::TLVType outer;
 
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
 
     {
-        TLV::TLVType outer1;
-
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kAFieldId), a));
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kBFieldId), b));
         ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kCFieldId), c));
-
-        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kDFieldId), TLV::kTLVType_Array, outer1));
-        for (auto & item : d)
-        {
-            ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag, item));
-        }
-        ReturnErrorOnFailure(writer.EndContainer(outer1));
-
-        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kEFieldId), TLV::kTLVType_Array, outer1));
-        for (auto & item : e)
-        {
-            ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag, item));
-        }
-        ReturnErrorOnFailure(writer.EndContainer(outer1));
-
-        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kFFieldId), TLV::kTLVType_Array, outer1));
-        for (auto & item : f)
-        {
-            ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag, item));
-        }
-        ReturnErrorOnFailure(writer.EndContainer(outer1));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kDFieldId), d));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kEFieldId), e));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kFFieldId), f));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kGFieldId), g));
     }
 
     ReturnErrorOnFailure(writer.EndContainer(outer));
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err;
-    TLV::TLVType outer;
-
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
-
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        uint64_t tag = reader.GetTag();
-
-        if (tag == TLV::ContextTag(kAFieldId))
-        {
-            ReturnErrorOnFailure(DataModel::Decode(reader, a));
-        }
-        else if (tag == TLV::ContextTag(kBFieldId))
-        {
-            ReturnErrorOnFailure(DataModel::Decode(reader, b));
-        }
-        else if (tag == TLV::ContextTag(kCFieldId))
-        {
-            ReturnErrorOnFailure(DataModel::Decode(reader, c));
-        }
-        else if (tag == TLV::ContextTag(kDFieldId))
-        {
-            TLV::TLVType outer1;
-            size_t destBufSize = d.size();
-            uint32_t i         = 0;
-
-            ReturnErrorOnFailure(reader.EnterContainer(outer1));
-
-            while ((err = reader.Next()) == CHIP_NO_ERROR)
-            {
-                VerifyOrReturnError(destBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-                ReturnErrorOnFailure(DataModel::Decode(reader, d.data()[i]));
-                destBufSize--;
-            }
-
-            ReturnErrorOnFailure(reader.ExitContainer(outer1));
-        }
-        else if (tag == TLV::ContextTag(kEFieldId))
-        {
-            TLV::TLVType outer1;
-            size_t destBufSize = e.size();
-            uint32_t i         = 0;
-
-            ReturnErrorOnFailure(reader.EnterContainer(outer1));
-
-            while ((err = reader.Next()) == CHIP_NO_ERROR)
-            {
-                VerifyOrReturnError(destBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-                ReturnErrorOnFailure(DataModel::Decode(reader, e.data()[i]));
-                destBufSize--;
-            }
-
-            ReturnErrorOnFailure(reader.ExitContainer(outer1));
-        }
-        else if (tag == TLV::ContextTag(kFFieldId))
-        {
-            TLV::TLVType outer1;
-            size_t destBufSize = f.size();
-            uint32_t i         = 0;
-
-            ReturnErrorOnFailure(reader.EnterContainer(outer1));
-
-            while ((err = reader.Next()) == CHIP_NO_ERROR)
-            {
-                VerifyOrReturnError(destBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-                ReturnErrorOnFailure(DataModel::Decode(reader, f.data()[i]));
-                destBufSize--;
-            }
-
-            ReturnErrorOnFailure(reader.ExitContainer(outer1));
-        }
-    }
-
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace NestedStructList
-
-namespace IteratableNestedStructList {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag)
-{
-    return CHIP_ERROR_BAD_REQUEST;
 }
 
 CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
@@ -316,24 +224,70 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
+} // namespace NestedStructList
+
+namespace IteratableNestedStructList {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
+{
+    return CHIP_ERROR_BAD_REQUEST;
+}
+
+CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err;
+    TLV::TLVType outer;
+
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        uint64_t tag = reader.GetTag();
+
+        if (tag == TLV::ContextTag(kAFieldId))
+        {
+            ReturnErrorOnFailure(DataModel::Decode(reader, a));
+        }
+        else if (tag == TLV::ContextTag(kBFieldId))
+        {
+            ReturnErrorOnFailure(DataModel::Decode(reader, b));
+        }
+        else if (tag == TLV::ContextTag(kCFieldId))
+        {
+            ReturnErrorOnFailure(DataModel::Decode(reader, c));
+        }
+        else if (tag == TLV::ContextTag(kDFieldId))
+        {
+            ReturnErrorOnFailure(DataModel::Decode(reader, d));
+        }
+        else if (tag == TLV::ContextTag(kEFieldId))
+        {
+            ReturnErrorOnFailure(DataModel::Decode(reader, e));
+        }
+        else if (tag == TLV::ContextTag(kFFieldId))
+        {
+            ReturnErrorOnFailure(DataModel::Decode(reader, f));
+        }
+        else if (tag == TLV::ContextTag(kGFieldId))
+        {
+            ReturnErrorOnFailure(DataModel::Decode(reader, g));
+        }
+    }
+
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
 } // namespace IteratableNestedStructList
 
 namespace DoubleNestedStructList {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag)
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
 {
     TLV::TLVType outer;
 
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
 
     {
-        TLV::TLVType outer1;
-
-        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kAFieldId), TLV::kTLVType_Array, outer1));
-        for (auto & item : a)
-        {
-            ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag, item));
-        }
-        ReturnErrorOnFailure(writer.EndContainer(outer1));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kAFieldId), a));
     }
 
     ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -355,20 +309,7 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 
         if (tag == TLV::ContextTag(kAFieldId))
         {
-            TLV::TLVType outer1;
-            size_t destBufSize = a.size();
-            uint32_t i         = 0;
-
-            ReturnErrorOnFailure(reader.EnterContainer(outer1));
-
-            while ((err = reader.Next()) == CHIP_NO_ERROR)
-            {
-                VerifyOrReturnError(destBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-                ReturnErrorOnFailure(DataModel::Decode(reader, a.data()[i]));
-                destBufSize--;
-            }
-
-            ReturnErrorOnFailure(reader.ExitContainer(outer1));
+            ReturnErrorOnFailure(DataModel::Decode(reader, a));
         }
     }
 
@@ -378,7 +319,7 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace DoubleNestedStructList
 
 namespace IteratableDoubleNestedStructList {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag)
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
 {
     return CHIP_ERROR_BAD_REQUEST;
 }

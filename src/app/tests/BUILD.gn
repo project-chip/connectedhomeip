@@ -25,9 +25,9 @@ chip_test_suite("tests") {
   test_sources = [
     "TestCHIPDeviceCallbacksMgr.cpp",
     "TestClusterInfo.cpp",
-    "TestClusterObjectUtils.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
+    "TestDataModelSerialization.cpp",
     "TestEventLogging.cpp",
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",

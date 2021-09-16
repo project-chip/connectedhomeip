@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "DataModelSerialization.h"
+#include "Encode.h"
 #include <iterator>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -108,30 +108,20 @@ public:
             if (mStatus == CHIP_NO_ERROR)
             {
                 mStatus = Decode(mReader, mValue);
-                if (mStatus != CHIP_NO_ERROR)
-                {
-                    return false;
-                }
-                else
+                if (mStatus == CHIP_NO_ERROR)
                 {
                     return true;
                 }
             }
-            else if (mStatus == CHIP_END_OF_TLV)
-            {
-                return false;
-            }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         /*
          * Retrieves a reference to the decoded value, if one
          * was decoded on a previous call to Next().
          */
-        const T & GetValue() { return mValue; }
+        const T & GetValue() const { return mValue; }
 
         /*
          * Returns the result of all previous operations on this iterator.
@@ -140,7 +130,7 @@ public:
          * the status returned shall be CHIP_NO_ERROR.
          *
          */
-        CHIP_ERROR GetError()
+        CHIP_ERROR GetError() const
         {
             if (mStatus == CHIP_END_OF_TLV)
             {

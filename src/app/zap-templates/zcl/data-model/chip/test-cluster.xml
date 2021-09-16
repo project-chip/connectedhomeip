@@ -54,6 +54,7 @@ limitations under the License.
     <item name="d" type="SimpleStruct" array="true" optional="false"/>
     <item name="e" type="UINT32U" array="true" optional="false"/>
     <item name="f" type="OCTET_STRING" array="true" optional="false"/>
+    <item name="g" type="UINT8U" array="true" optional="false"/>
    </struct>
 
    <struct name="DoubleNestedStructList">

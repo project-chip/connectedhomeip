@@ -1,7 +1,9 @@
 #pragma once
 
-#include <app/DataModelSerialization.h>
-#include <app/DataModelTypes.h>
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
+#include <app/data-model/IteratableList.h>
+#include <app/data-model/Uint8Span.h>
 #include <app/util/basic-types.h>
 #include <array>
 #include <lib/core/CHIPTLV.h>
@@ -35,7 +37,7 @@ struct Type
     int64_t fabricIndex;
     chip::ByteSpan operationalCert;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace TestListStructOctet
@@ -58,7 +60,7 @@ struct Type
     chip::ByteSpan d;
     chip::Span<const char> e;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace SimpleStruct
@@ -78,7 +80,7 @@ public:
     bool b    = false;
     SimpleStruct::Type c;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace NestedStruct
@@ -92,6 +94,7 @@ enum FieldId
     kDFieldId = 3,
     kEFieldId = 4,
     kFFieldId = 5,
+    kGFieldId = 6,
 };
 
 struct Type
@@ -103,8 +106,9 @@ public:
     chip::Span<SimpleStruct::Type> d;
     chip::Span<uint32_t> e;
     chip::Span<chip::ByteSpan> f;
+    DataModel::Uint8Span g;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace NestedStructList
@@ -117,7 +121,8 @@ enum FieldId
     kCFieldId = 2,
     kDFieldId = 3,
     kEFieldId = 4,
-    kFFieldId = 5
+    kFFieldId = 5,
+    kGFieldId = 6
 };
 
 struct Type
@@ -129,8 +134,9 @@ public:
     DataModel::IteratableList<SimpleStruct::Type> d;
     DataModel::IteratableList<uint32_t> e;
     DataModel::IteratableList<chip::ByteSpan> f;
+    DataModel::IteratableList<uint8_t> g;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace IteratableNestedStructList
@@ -146,7 +152,7 @@ struct Type
 public:
     chip::Span<NestedStructList::Type> a;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace DoubleNestedStructList
@@ -162,7 +168,7 @@ struct Type
 public:
     DataModel::IteratableList<IteratableNestedStructList::Type> a;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag);
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace IteratableDoubleNestedStructList
