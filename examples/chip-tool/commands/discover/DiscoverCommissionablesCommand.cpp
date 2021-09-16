@@ -24,7 +24,7 @@ using namespace ::chip;
 CHIP_ERROR DiscoverCommissionablesCommand::Run()
 {
     mCommissioner = GetExecContext()->commissioner;
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint16_t) 0);
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint64_t) 0);
     return mCommissioner->DiscoverCommissionableNodes(filter);
 }
 

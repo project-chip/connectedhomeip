@@ -208,16 +208,17 @@ enum class DiscoveryFilterType : uint8_t
     kDeviceType,
     kCommissioningMode,
     kInstanceName,
-    kCommissioner
+    kCommissioner,
+    kCompressedFabricId,
 };
 struct DiscoveryFilter
 {
     DiscoveryFilterType type;
-    uint16_t code;
+    uint64_t code;
     const char * instanceName;
     DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
     DiscoveryFilter(DiscoveryFilterType newType) : type(newType) {}
-    DiscoveryFilter(DiscoveryFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
+    DiscoveryFilter(DiscoveryFilterType newType, uint64_t newCode) : type(newType), code(newCode) {}
     DiscoveryFilter(DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
 };
 enum class DiscoveryType
