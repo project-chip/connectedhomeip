@@ -163,7 +163,7 @@ CHIP_ERROR ASN1Reader::GetBoolean(bool & val)
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
     VerifyOrReturnError(Value[0] == 0 || Value[0] == 0xFF, ASN1_ERROR_INVALID_ENCODING);
 
-    val = (Value[0] == 0) ? false : true;
+    val = (Value[0] != 0);
 
     return CHIP_NO_ERROR;
 }
