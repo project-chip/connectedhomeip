@@ -54,22 +54,6 @@ using namespace app::Clusters;
 
 ColorControlServer ColorControlServer::instance;
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
-std::unordered_map<chip::EndpointId, ColorControlServer::ColorHueTransitionState> ColorControlServer::colorHueTransitionStates;
-std::unordered_map<chip::EndpointId, ColorControlServer::Color16uTransitionState> ColorControlServer::colorSatTransitionStates;
-#endif
-
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
-std::unordered_map<chip::EndpointId, ColorControlServer::Color16uTransitionState> ColorControlServer::colorXtransitionStates;
-std::unordered_map<chip::EndpointId, ColorControlServer::Color16uTransitionState> ColorControlServer::colorYtransitionStates;
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
-
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-std::unordered_map<chip::EndpointId, ColorControlServer::Color16uTransitionState> ColorControlServer::colorTempTransitionStates;
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-
-std::unordered_map<chip::EndpointId, EmberEventControl> ColorControlServer::eventControls;
-
 /**********************************************************
  * ColorControl Implementation
  *********************************************************/
