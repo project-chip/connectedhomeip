@@ -231,9 +231,17 @@ uint16_t ColorControlServer::computeTransitionTimeFromStateAndRate(ColorControlS
         min = p->currentValue;
     }
 
-    transitionTime = max - min;
-    transitionTime *= 10;
-    transitionTime /= rate;
+    // If currentValue == finalValue, force 1 step
+    if (max == min)
+    {
+        transitionTime = 1;
+    }
+    else
+    {
+        transitionTime = max - min;
+        transitionTime *= 10;
+        transitionTime /= rate;
+    }
 
     if (transitionTime > MAX_INT16U_VALUE)
     {
