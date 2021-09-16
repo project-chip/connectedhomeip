@@ -65,7 +65,6 @@ void TestCreateReleaseObject(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == i + 1);
     }
 
-
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     uint32_t * fail = pool.CreateObject();
     NL_TEST_ASSERT(inSuite, fail == nullptr);
