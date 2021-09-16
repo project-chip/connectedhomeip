@@ -60,7 +60,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs-linux-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: |
@@ -94,7 +94,7 @@ jobs:
                   scripts/tests/test_suites.sh  -a tv
             - name: Uploading core files
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }}
+              if: ${{ failure() }} && ${{ !env.ACT }}
               with:
                   name: crash-core-linux-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: /tmp/cores/
@@ -102,7 +102,7 @@ jobs:
                   retention-days: 5
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }}
+              if: ${{ failure() }} && ${{ !env.ACT }}
               with:
                   name: crash-objdir-linux-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: objdir-clone/
@@ -149,7 +149,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs-darwin-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: |
@@ -175,7 +175,7 @@ jobs:
                   scripts/tests/test_suites.sh
             - name: Uploading core files
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }}
+              if: ${{ failure() }} && ${{ !env.ACT }}
               with:
                   name: crash-core-darwin-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: /cores/
@@ -183,13 +183,13 @@ jobs:
                   retention-days: 5
             - name: Uploading diagnostic logs
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }}
+              if: ${{ failure() }} && ${{ !env.ACT }}
               with:
                   name: crash-log-darwin-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v2
-              if: ${{ failure() }}
+              if: ${{ failure() }} && ${{ !env.ACT }}
               with:
                   name: crash-objdir-darwin-${{ matrix.type }}-${{ matrix.eventloop }}
                   path: objdir-clone/
