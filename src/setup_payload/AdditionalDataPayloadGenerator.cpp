@@ -60,7 +60,7 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeC
     if (additionalDataFields.Has(AdditionalDataFields::RotatingDeviceId))
     {
         uint8_t rotatingDeviceIdInternalBuffer[RotatingDeviceId::kMaxLength];
-        MutableByteSpan rotatingDeviceIdBuffer = MutableByteSpan(rotatingDeviceIdInternalBuffer, sizeof(rotatingDeviceIdInternalBuffer));
+        MutableByteSpan rotatingDeviceIdBuffer = MutableByteSpan(rotatingDeviceIdInternalBuffer);
 
         // Generating Device Rotating Id
         ReturnErrorOnFailure(generateRotatingDeviceIdAsBinary(lifetimeCounter, serialNumberBuffer, serialNumberBufferSize,
@@ -113,7 +113,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsHexString(
     size_t rotatingDeviceIdBufferSize, size_t & rotatingDeviceIdValueOutputSize)
 {
     uint8_t rotatingDeviceIdInternalBuffer[RotatingDeviceId::kMaxLength];
-    MutableByteSpan rotatingDeviceIdBufferTemp = MutableByteSpan(rotatingDeviceIdInternalBuffer, sizeof(rotatingDeviceIdInternalBuffer));
+    MutableByteSpan rotatingDeviceIdBufferTemp = MutableByteSpan(rotatingDeviceIdInternalBuffer);
     ReturnErrorOnFailure(generateRotatingDeviceIdAsBinary(lifetimeCounter, serialNumberBuffer, serialNumberBufferSize,
                                                           rotatingDeviceIdBufferTemp));
 
