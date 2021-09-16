@@ -45,7 +45,7 @@ tests:
           value: 4
 
     - label: "read the optional global attribute: FeatureMap"
-      disabled: true    
+      disabled: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
