@@ -830,8 +830,6 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     err = InitializePairedDeviceList();
     SuccessOrExit(err);
 
-    params.SetAdvertisementDelegate(&mRendezvousAdvDelegate);
-
     // TODO: We need to specify the peer address for BLE transport in bindings.
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
         params.GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
@@ -1125,9 +1123,6 @@ void DeviceCommissioner::FreeRendezvousSession()
 
 void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
-    mRendezvousAdvDelegate.StopAdvertisement();
-    mRendezvousAdvDelegate.RendezvousComplete();
-
     FreeRendezvousSession();
 
     // TODO: make mStorageDelegate mandatory once all controller applications implement the interface.

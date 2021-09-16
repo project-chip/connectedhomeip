@@ -43,7 +43,8 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(End
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
-    VerifyOrExit(!Server::GetInstance().GetCommissionManager().IsPairingWindowOpen(), status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen(),
+                 status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(sizeof(verifier) == pakeVerifier.size(), status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(iterations >= kPBKDFMinimumIterations, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(iterations <= kPBKDFMaximumIterations, status = EMBER_ZCL_STATUS_FAILURE);
@@ -55,7 +56,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(End
     memcpy(verifier.mW0, &verifierData[0], kSpake2p_WS_Length);
     memcpy(verifier.mL, &verifierData[kSpake2p_WS_Length], kSpake2p_WS_Length);
 
-    VerifyOrExit(Server::GetInstance().GetCommissionManager().OpenEnhancedCommissioningWindow(
+    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenEnhancedCommissioningWindow(
                      commissioningTimeout, discriminator, verifier, iterations, salt, passcodeID) == CHIP_NO_ERROR,
                  status = EMBER_ZCL_STATUS_FAILURE);
     ChipLogProgress(Zcl, "Commissioning window is now open");
@@ -75,10 +76,11 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
-    VerifyOrExit(!Server::GetInstance().GetCommissionManager().IsPairingWindowOpen(), status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen(),
+                 status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(ResetFabrics::kNo,
-                                                                                           commissioningTimeout) == CHIP_NO_ERROR,
+    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(commissioningTimeout) ==
+                     CHIP_NO_ERROR,
                  status = EMBER_ZCL_STATUS_FAILURE);
     ChipLogProgress(Zcl, "Commissioning window is now open");
 
@@ -94,7 +96,7 @@ exit:
 bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
     ChipLogProgress(Zcl, "Received command to close commissioning window");
-    Server::GetInstance().GetCommissionManager().CloseCommissioningWindow();
+    Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
     ChipLogProgress(Zcl, "Commissioning window is now closed");
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
