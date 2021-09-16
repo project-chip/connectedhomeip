@@ -46,12 +46,12 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, X x)
     return writer.Put(tag, x);
 }
 
-CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, ByteSpan x)
+inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, ByteSpan x)
 {
     return writer.Put(tag, x);
 }
 
-CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, const Span<const char> x)
+inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, const Span<const char> x)
 {
     return writer.PutString(tag, x.data(), static_cast<uint32_t>(x.size()));
 }
@@ -108,7 +108,7 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 // The passed in ByteSpan is ignored and updated to point directly into
 // the buffer backing the reader.
 //
-CHIP_ERROR Decode(TLV::TLVReader & reader, ByteSpan & x)
+inline CHIP_ERROR Decode(TLV::TLVReader & reader, ByteSpan & x)
 {
     VerifyOrReturnError(reader.GetType() == TLV::kTLVType_ByteString, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     return reader.Get(x);
@@ -122,7 +122,7 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, ByteSpan & x)
 // The passed in char Span is ignored and updated to point directly into
 // the buffer backing the reader.
 //
-CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
+inline CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
 {
     ByteSpan bs;
 
