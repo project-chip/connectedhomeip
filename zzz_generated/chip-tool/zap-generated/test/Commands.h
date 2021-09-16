@@ -81,7 +81,7 @@ private:
     {
         ChipLogProgress(chipTool, "Target Navigator - Read attribute Target Navigator list: Sending command...");
 
-        chip::Controller::TargetNavigatorCluster cluster;
+        chip::Controller::TargetNavigatorClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -147,7 +147,7 @@ private:
     {
         ChipLogProgress(chipTool, "Target Navigator - Navigate Target Command: Sending command...");
 
-        chip::Controller::TargetNavigatorCluster cluster;
+        chip::Controller::TargetNavigatorClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -256,7 +256,7 @@ private:
     {
         ChipLogProgress(chipTool, "Audio Output - Read attribute Audio Output list: Sending command...");
 
-        chip::Controller::AudioOutputCluster cluster;
+        chip::Controller::AudioOutputClusterTest cluster;
         cluster.Associate(mDevice, 2);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -321,7 +321,7 @@ private:
     {
         ChipLogProgress(chipTool, "Audio Output - Select Output Command: Sending command...");
 
-        chip::Controller::AudioOutputCluster cluster;
+        chip::Controller::AudioOutputClusterTest cluster;
         cluster.Associate(mDevice, 2);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -379,7 +379,7 @@ private:
     {
         ChipLogProgress(chipTool, "Audio Output - Rename Output Command: Sending command...");
 
-        chip::Controller::AudioOutputCluster cluster;
+        chip::Controller::AudioOutputClusterTest cluster;
         cluster.Associate(mDevice, 2);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -490,7 +490,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Launcher - Read attribute Application Launcher list: Sending command...");
 
-        chip::Controller::ApplicationLauncherCluster cluster;
+        chip::Controller::ApplicationLauncherClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -555,7 +555,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Launcher - Launch App Command: Sending command...");
 
-        chip::Controller::ApplicationLauncherCluster cluster;
+        chip::Controller::ApplicationLauncherClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -617,7 +617,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Launcher - Read attribute catalog vendor id: Sending command...");
 
-        chip::Controller::ApplicationLauncherCluster cluster;
+        chip::Controller::ApplicationLauncherClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -681,7 +681,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Launcher - Read attribute application id: Sending command...");
 
-        chip::Controller::ApplicationLauncherCluster cluster;
+        chip::Controller::ApplicationLauncherClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -787,7 +787,7 @@ private:
     {
         ChipLogProgress(chipTool, "Keypad Input - Send Key Command: Sending command...");
 
-        chip::Controller::KeypadInputCluster cluster;
+        chip::Controller::KeypadInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -891,7 +891,7 @@ private:
     {
         ChipLogProgress(chipTool, "Account Login - Get Setup PIN Command: Sending command...");
 
-        chip::Controller::AccountLoginCluster cluster;
+        chip::Controller::AccountLoginClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -948,7 +948,7 @@ private:
     {
         ChipLogProgress(chipTool, "Account Login - Login Command: Sending command...");
 
-        chip::Controller::AccountLoginCluster cluster;
+        chip::Controller::AccountLoginClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1051,7 +1051,7 @@ private:
     {
         ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Sending command...");
 
-        chip::Controller::WakeOnLanCluster cluster;
+        chip::Controller::WakeOnLanClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1169,7 +1169,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Change Status Command: Sending command...");
 
-        chip::Controller::ApplicationBasicCluster cluster;
+        chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1227,7 +1227,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute vendor id: Sending command...");
 
-        chip::Controller::ApplicationBasicCluster cluster;
+        chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1291,7 +1291,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute product id: Sending command...");
 
-        chip::Controller::ApplicationBasicCluster cluster;
+        chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1355,7 +1355,7 @@ private:
     {
         ChipLogProgress(chipTool, "Application Basic - Read attribute catalog vendor id: Sending command...");
 
-        chip::Controller::ApplicationBasicCluster cluster;
+        chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1492,7 +1492,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Play Command: Sending command...");
 
-        chip::Controller::MediaPlaybackCluster cluster;
+        chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1556,7 +1556,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Pause Command: Sending command...");
 
-        chip::Controller::MediaPlaybackCluster cluster;
+        chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1620,7 +1620,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Stop Command: Sending command...");
 
-        chip::Controller::MediaPlaybackCluster cluster;
+        chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1684,7 +1684,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Start Over Command: Sending command...");
 
-        chip::Controller::MediaPlaybackCluster cluster;
+        chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1748,7 +1748,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Previous Command: Sending command...");
 
-        chip::Controller::MediaPlaybackCluster cluster;
+        chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1812,7 +1812,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Next Command: Sending command...");
 
-        chip::Controller::MediaPlaybackCluster cluster;
+        chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1876,7 +1876,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Rewind Command: Sending command...");
 
-        chip::Controller::MediaPlaybackCluster cluster;
+        chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1940,7 +1940,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Fast Forward Command: Sending command...");
 
-        chip::Controller::MediaPlaybackCluster cluster;
+        chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2004,7 +2004,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Forward Command: Sending command...");
 
-        chip::Controller::MediaPlaybackCluster cluster;
+        chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2070,7 +2070,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Skip Backward Command: Sending command...");
 
-        chip::Controller::MediaPlaybackCluster cluster;
+        chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2137,7 +2137,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Playback - Media Playback Seek Command: Sending command...");
 
-        chip::Controller::MediaPlaybackCluster cluster;
+        chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevice, 3);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2251,7 +2251,7 @@ private:
     {
         ChipLogProgress(chipTool, "TV Channel - Read attribute TV Channel list: Sending command...");
 
-        chip::Controller::TvChannelCluster cluster;
+        chip::Controller::TvChannelClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2316,7 +2316,7 @@ private:
     {
         ChipLogProgress(chipTool, "TV Channel - Change Channel By Number Command: Sending command...");
 
-        chip::Controller::TvChannelCluster cluster;
+        chip::Controller::TvChannelClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2376,7 +2376,7 @@ private:
     {
         ChipLogProgress(chipTool, "TV Channel - Skip Channel Command: Sending command...");
 
-        chip::Controller::TvChannelCluster cluster;
+        chip::Controller::TvChannelClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2475,7 +2475,7 @@ private:
     {
         ChipLogProgress(chipTool, "Low Power - Sleep Input Status Command: Sending command...");
 
-        chip::Controller::LowPowerCluster cluster;
+        chip::Controller::LowPowerClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2590,7 +2590,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Read attribute media input list: Sending command...");
 
-        chip::Controller::MediaInputCluster cluster;
+        chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2655,7 +2655,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Select Input Command: Sending command...");
 
-        chip::Controller::MediaInputCluster cluster;
+        chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2713,7 +2713,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Read current input list: Sending command...");
 
-        chip::Controller::MediaInputCluster cluster;
+        chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2777,7 +2777,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Hide Input Status Command: Sending command...");
 
-        chip::Controller::MediaInputCluster cluster;
+        chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2834,7 +2834,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Show Input Status Command: Sending command...");
 
-        chip::Controller::MediaInputCluster cluster;
+        chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2891,7 +2891,7 @@ private:
     {
         ChipLogProgress(chipTool, "Media Input - Rename Input Command: Sending command...");
 
-        chip::Controller::MediaInputCluster cluster;
+        chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3325,7 +3325,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Send Test Command: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3382,7 +3382,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Send Test Not Handled Command: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3439,7 +3439,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Send Test Specific Command: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3503,7 +3503,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Send Test Add Arguments Command: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3569,7 +3569,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Send failing Test Add Arguments Command: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3628,7 +3628,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BOOLEAN Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3692,7 +3692,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BOOLEAN True: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3750,7 +3750,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BOOLEAN True: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3814,7 +3814,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BOOLEAN False: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3872,7 +3872,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BOOLEAN False: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3936,7 +3936,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP8 Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4000,7 +4000,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BITMAP8 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4058,7 +4058,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP8 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4122,7 +4122,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BITMAP8 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4180,7 +4180,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP8 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4244,7 +4244,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP16 Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4308,7 +4308,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BITMAP16 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4366,7 +4366,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP16 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4430,7 +4430,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BITMAP16 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4488,7 +4488,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP16 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4552,7 +4552,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP32 Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4616,7 +4616,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BITMAP32 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4674,7 +4674,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP32 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4738,7 +4738,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BITMAP32 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4796,7 +4796,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP32 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4860,7 +4860,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP64 Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4924,7 +4924,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BITMAP64 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4982,7 +4982,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP64 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5046,7 +5046,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute BITMAP64 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5104,7 +5104,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute BITMAP64 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5168,7 +5168,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT8U Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5232,7 +5232,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT8U Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5290,7 +5290,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT8U Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5354,7 +5354,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT8U Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5412,7 +5412,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT8U Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5476,7 +5476,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT16U Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5540,7 +5540,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT16U Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5598,7 +5598,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT16U Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5662,7 +5662,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT16U Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5720,7 +5720,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT16U Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5784,7 +5784,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5848,7 +5848,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT32U Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5906,7 +5906,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5970,7 +5970,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT32U Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6028,7 +6028,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6092,7 +6092,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT64U Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6156,7 +6156,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT64U Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6214,7 +6214,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT64U Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6278,7 +6278,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT64U Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6336,7 +6336,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT64U Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6400,7 +6400,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT8S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6464,7 +6464,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT8S Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6522,7 +6522,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT8S Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6586,7 +6586,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT8S Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6644,7 +6644,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT8S Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6708,7 +6708,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT8S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6766,7 +6766,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT8S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6830,7 +6830,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT16S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6894,7 +6894,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT16S Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6952,7 +6952,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT16S Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7016,7 +7016,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT16S Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7074,7 +7074,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT16S Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7138,7 +7138,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT16S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7196,7 +7196,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT16S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7260,7 +7260,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7324,7 +7324,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT32S Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7382,7 +7382,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32S Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7446,7 +7446,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT32S Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7504,7 +7504,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32S Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7568,7 +7568,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT32S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7626,7 +7626,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7690,7 +7690,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT64S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7754,7 +7754,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT64S Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7812,7 +7812,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT64S Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7876,7 +7876,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT64S Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7934,7 +7934,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT64S Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7998,7 +7998,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT64S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8056,7 +8056,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT64S Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8120,7 +8120,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute ENUM8 Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8184,7 +8184,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute ENUM8 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8242,7 +8242,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute ENUM8 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8306,7 +8306,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute ENUM8 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8364,7 +8364,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute ENUM8 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8428,7 +8428,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute ENUM16 Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8492,7 +8492,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute ENUM16 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8550,7 +8550,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute ENUM16 Max Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8614,7 +8614,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute ENUM16 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8672,7 +8672,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute ENUM16 Min Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8736,7 +8736,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute OCTET_STRING Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8801,7 +8801,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute OCTET_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8860,7 +8860,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute OCTET_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8925,7 +8925,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute OCTET_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8985,7 +8985,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute OCTET_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9050,7 +9050,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute OCTET_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9109,7 +9109,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute LONG_OCTET_STRING Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9174,7 +9174,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute LONG_OCTET_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9240,7 +9240,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute LONG_OCTET_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9315,7 +9315,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute LONG_OCTET_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9374,7 +9374,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute CHAR_STRING Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9439,7 +9439,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9497,7 +9497,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Value too long: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9557,7 +9557,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Empty: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9616,7 +9616,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute LONG_CHAR_STRING Default Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9681,7 +9681,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute LONG_CHAR_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9747,7 +9747,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute LONG_CHAR_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9822,7 +9822,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute LONG_CHAR_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9881,7 +9881,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9946,7 +9946,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST_OCTET_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10011,7 +10011,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute LIST_STRUCT_OCTET_STRING: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10077,7 +10077,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute UNSUPPORTED: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10147,7 +10147,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Writeattribute UNSUPPORTED: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10212,7 +10212,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Send Test Command to unsupported endpoint: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 200);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10321,7 +10321,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Write attribute INT32U Value: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10379,7 +10379,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value MinValue Constraints: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10443,7 +10443,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value MaxValue Constraints: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10507,7 +10507,7 @@ private:
     {
         ChipLogProgress(chipTool, "Test Cluster - Read attribute INT32U Value NotValue Constraints: Sending command...");
 
-        chip::Controller::TestClusterCluster cluster;
+        chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10580,7 +10580,7 @@ public:
         switch (mTestIndex++)
         {
         case 0:
-            err = TestSendClusterTestSuiteCommandWaitForMs_0();
+            err = TestSendClusterDelayCommandsCommandWaitForMs_0();
             break;
         }
 
@@ -10599,9 +10599,9 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestSendClusterTestSuiteCommandWaitForMs_0()
+    CHIP_ERROR TestSendClusterDelayCommandsCommandWaitForMs_0()
     {
-        ChipLogProgress(chipTool, "TestSuite - WaitForMs - Wait 100ms");
+        ChipLogProgress(chipTool, "DelayCommands - Wait 100ms");
 
         return WaitForMs(100);
     }
@@ -10633,13 +10633,22 @@ public:
             err = TestSendClusterOnOffCommandOff_0();
             break;
         case 1:
-            err = TestSendClusterOnOffCommandSubscribeAttribute_1();
+            err = TestSendClusterOnOffCommandWaitForReport_1();
             break;
         case 2:
-            err = TestSendClusterOnOffCommandOn_2();
+            err = TestSendClusterOnOffCommandSubscribeAttribute_2();
             break;
         case 3:
-            err = TestSendClusterTestSuiteCommandWaitForAttributeReport_3();
+            err = TestSendClusterOnOffCommandOn_3();
+            break;
+        case 4:
+            err = TestSendClusterOnOffCommandWaitForReport_4();
+            break;
+        case 5:
+            err = TestSendClusterOnOffCommandOff_5();
+            break;
+        case 6:
+            err = TestSendClusterOnOffCommandWaitForReport_6();
             break;
         }
 
@@ -10652,7 +10661,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 7;
 
     //
     // Tests methods
@@ -10670,7 +10679,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Set OnOff Attribute to false: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10712,52 +10721,37 @@ private:
         runner->NextTest();
     }
 
-    // Test Subscribe OnOff Attribute
+    // Test Report: Subscribe OnOff Attribute
     using SuccessCallback_1 = void (*)(void * context, bool onOff);
-    chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{
-        OnTestSendClusterOnOffCommandSubscribeAttribute_1_SuccessResponse, this
-    };
+    chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{ OnTestSendClusterOnOffCommandWaitForReport_1_SuccessResponse,
+                                                                      this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
-        OnTestSendClusterOnOffCommandSubscribeAttribute_1_FailureResponse, this
-    };
-    chip::Callback::Callback<DefaultSuccessCallback> mOnSubscriptionEstablishedCallback_1{
-        SubscribeAttribute_1_OnSubscriptionEstablishedCallback, this
+        OnTestSendClusterOnOffCommandWaitForReport_1_FailureResponse, this
     };
 
     bool mIsFailureExpected_1 = 0;
 
     bool mReceivedReport_1 = false;
 
-    CHIP_ERROR TestSendClusterOnOffCommandSubscribeAttribute_1()
+    CHIP_ERROR TestSendClusterOnOffCommandWaitForReport_1()
     {
-        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Sending command...");
+        ChipLogProgress(chipTool, "On/Off - Report: Subscribe OnOff Attribute: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        cluster.ReportAttributeOnOff(mOnSuccessCallback_1.Cancel());
-        err = cluster.ConfigureAttributeOnOff(mOnSubscriptionEstablishedCallback_1.Cancel(), mOnFailureCallback_1.Cancel(), 2, 10);
+        err = cluster.ReportAttributeOnOff(mOnSuccessCallback_1.Cancel());
+
+        ReturnErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(0, OnWaitForMsFn, this));
 
         return err;
     }
 
-    static void SubscribeAttribute_1_OnSubscriptionEstablishedCallback(void * context)
+    static void OnTestSendClusterOnOffCommandWaitForReport_1_FailureResponse(void * context, uint8_t status)
     {
-        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
-        if (!runner->mReceivedReport_1)
-        {
-            ChipLogError(chipTool, "Error: Initial report not received!");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterOnOffCommandSubscribeAttribute_1_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Failure Response");
+        ChipLogProgress(chipTool, "On/Off - Report: Subscribe OnOff Attribute: Failure Response");
 
         TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
 
@@ -10767,13 +10761,11 @@ private:
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
-
-        runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandSubscribeAttribute_1_SuccessResponse(void * context, bool onOff)
+    static void OnTestSendClusterOnOffCommandWaitForReport_1_SuccessResponse(void * context, bool onOff)
     {
-        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Success Response");
+        ChipLogProgress(chipTool, "On/Off - Report: Subscribe OnOff Attribute: Success Response");
 
         TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
 
@@ -10784,41 +10776,50 @@ private:
             return;
         }
 
+        if (runner->mReceivedReport_1)
+        {
+            // Receiving report more than once is not an error since the subscription may be alive for a long time.
+            ChipLogProgress(chipTool, "Note: on report called more than once.");
+            return;
+        }
+        runner->mReceivedReport_1 = true;
+
         if (onOff != false)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "false");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
-
-        runner->mReceivedReport_1 = true;
     }
 
-    // Test Turn On the light to see attribute change
-    using SuccessCallback_2 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{ OnTestSendClusterOnOffCommandOn_2_SuccessResponse, this };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{ OnTestSendClusterOnOffCommandOn_2_FailureResponse,
-                                                                           this };
+    // Test Subscribe OnOff Attribute
+    using SuccessCallback_2 = void (*)(void * context, bool onOff);
+    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
+        OnTestSendClusterOnOffCommandSubscribeAttribute_2_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
+        OnTestSendClusterOnOffCommandSubscribeAttribute_2_FailureResponse, this
+    };
 
     bool mIsFailureExpected_2 = 0;
 
-    CHIP_ERROR TestSendClusterOnOffCommandOn_2()
+    CHIP_ERROR TestSendClusterOnOffCommandSubscribeAttribute_2()
     {
-        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Sending command...");
+        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.On(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+        err = cluster.ConfigureAttributeOnOff(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(), 2, 10);
 
         return err;
     }
 
-    static void OnTestSendClusterOnOffCommandOn_2_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterOnOffCommandSubscribeAttribute_2_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Failure Response");
+        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Failure Response");
 
         TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
 
@@ -10832,9 +10833,9 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandOn_2_SuccessResponse(void * context)
+    static void OnTestSendClusterOnOffCommandSubscribeAttribute_2_SuccessResponse(void * context, bool onOff)
     {
-        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Success Response");
+        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Success Response");
 
         TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
 
@@ -10845,33 +10846,132 @@ private:
             return;
         }
 
+        if (!runner->mReceivedReport_1)
+        {
+            ChipLogError(chipTool, "Error: Initial report not received!");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
         runner->NextTest();
     }
 
-    // The callback should be called atleast once
-    using OnReportCallback_3 = void (*)(void * context, bool onOff);
-    chip::Callback::Callback<OnReportCallback_3> mOnReportCallback_3{ SubscribeAttribute_3_OnReportCallback, this };
+    // Test Turn On the light to see attribute change
+    using SuccessCallback_3 = void (*)(void * context);
+    chip::Callback::Callback<SuccessCallback_3> mOnSuccessCallback_3{ OnTestSendClusterOnOffCommandOn_3_SuccessResponse, this };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{ OnTestSendClusterOnOffCommandOn_3_FailureResponse,
+                                                                           this };
 
-    bool mReceivedReport_3 = false;
+    bool mIsFailureExpected_3 = 0;
 
-    CHIP_ERROR TestSendClusterTestSuiteCommandWaitForAttributeReport_3()
+    CHIP_ERROR TestSendClusterOnOffCommandOn_3()
     {
-        ChipLogProgress(chipTool, "TestSuite - WaitForAttributeReport - Check for attribute report");
-        chip::Controller::OnOffCluster cluster;
+        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Sending command...");
+
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
-        return cluster.ReportAttributeOnOff(mOnReportCallback_3.Cancel());
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.On(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+
+        return err;
     }
 
-    static void SubscribeAttribute_3_OnReportCallback(void * context, bool onOff)
+    static void OnTestSendClusterOnOffCommandOn_3_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Report Data");
+        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Failure Response");
+
         TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
 
-        if (runner->mReceivedReport_3)
+        if (runner->mIsFailureExpected_3 == false)
         {
-            // Receiving attribute more than once is not an issue, since the following handler will override previous handlers.
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterOnOffCommandOn_3_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "On/Off - Turn On the light to see attribute change: Success Response");
+
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+
+        if (runner->mIsFailureExpected_3 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Check for attribute report
+    using SuccessCallback_4 = void (*)(void * context, bool onOff);
+    chip::Callback::Callback<SuccessCallback_4> mOnSuccessCallback_4{ OnTestSendClusterOnOffCommandWaitForReport_4_SuccessResponse,
+                                                                      this };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
+        OnTestSendClusterOnOffCommandWaitForReport_4_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_4 = 0;
+
+    bool mReceivedReport_4 = false;
+
+    CHIP_ERROR TestSendClusterOnOffCommandWaitForReport_4()
+    {
+        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Sending command...");
+
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReportAttributeOnOff(mOnSuccessCallback_4.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterOnOffCommandWaitForReport_4_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Failure Response");
+
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+
+        if (runner->mIsFailureExpected_4 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterOnOffCommandWaitForReport_4_SuccessResponse(void * context, bool onOff)
+    {
+        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Success Response");
+
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+
+        if (runner->mIsFailureExpected_4 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (runner->mReceivedReport_4)
+        {
+            // Receiving report more than once is not an error since the subscription may be alive for a long time.
+            ChipLogProgress(chipTool, "Note: on report called more than once.");
+            return;
+        }
+        runner->mReceivedReport_4 = true;
 
         if (onOff != true)
         {
@@ -10880,8 +10980,133 @@ private:
             return;
         }
 
-        runner->mReceivedReport_3 = true;
-        ChipLogProgress(chipTool, "On/Off - report received.");
+        runner->NextTest();
+    }
+
+    // Test Turn Off the light to see attribute change
+    using SuccessCallback_5 = void (*)(void * context);
+    chip::Callback::Callback<SuccessCallback_5> mOnSuccessCallback_5{ OnTestSendClusterOnOffCommandOff_5_SuccessResponse, this };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{ OnTestSendClusterOnOffCommandOff_5_FailureResponse,
+                                                                           this };
+
+    bool mIsFailureExpected_5 = 0;
+
+    CHIP_ERROR TestSendClusterOnOffCommandOff_5()
+    {
+        ChipLogProgress(chipTool, "On/Off - Turn Off the light to see attribute change: Sending command...");
+
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.Off(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterOnOffCommandOff_5_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "On/Off - Turn Off the light to see attribute change: Failure Response");
+
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+
+        if (runner->mIsFailureExpected_5 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterOnOffCommandOff_5_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "On/Off - Turn Off the light to see attribute change: Success Response");
+
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+
+        if (runner->mIsFailureExpected_5 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Check for attribute report
+    using SuccessCallback_6 = void (*)(void * context, bool onOff);
+    chip::Callback::Callback<SuccessCallback_6> mOnSuccessCallback_6{ OnTestSendClusterOnOffCommandWaitForReport_6_SuccessResponse,
+                                                                      this };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
+        OnTestSendClusterOnOffCommandWaitForReport_6_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_6 = 0;
+
+    bool mReceivedReport_6 = false;
+
+    CHIP_ERROR TestSendClusterOnOffCommandWaitForReport_6()
+    {
+        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Sending command...");
+
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReportAttributeOnOff(mOnSuccessCallback_6.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterOnOffCommandWaitForReport_6_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Failure Response");
+
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+
+        if (runner->mIsFailureExpected_6 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterOnOffCommandWaitForReport_6_SuccessResponse(void * context, bool onOff)
+    {
+        ChipLogProgress(chipTool, "On/Off - Check for attribute report: Success Response");
+
+        TestSubscribe_OnOff * runner = reinterpret_cast<TestSubscribe_OnOff *>(context);
+
+        if (runner->mIsFailureExpected_6 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (runner->mReceivedReport_6)
+        {
+            // Receiving report more than once is not an error since the subscription may be alive for a long time.
+            ChipLogProgress(chipTool, "Note: on report called more than once.");
+            return;
+        }
+        runner->mReceivedReport_6 = true;
+
+        if (onOff != false)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "false");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
         runner->NextTest();
     }
 };
@@ -10912,13 +11137,19 @@ public:
             err = TestSendClusterOnOffCommandReadAttribute_0();
             break;
         case 1:
-            err = TestSendClusterOnOffCommandReadAttribute_1();
+            err = TestSendClusterOnOffCommandWriteAttribute_1();
             break;
         case 2:
             err = TestSendClusterOnOffCommandReadAttribute_2();
             break;
         case 3:
             err = TestSendClusterOnOffCommandReadAttribute_3();
+            break;
+        case 4:
+            err = TestSendClusterOnOffCommandWriteAttribute_4();
+            break;
+        case 5:
+            err = TestSendClusterOnOffCommandReadAttribute_5();
             break;
         }
 
@@ -10931,7 +11162,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 6;
 
     //
     // Tests methods
@@ -10951,7 +11182,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read the global attribute: ClusterRevision: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11000,33 +11231,37 @@ private:
         runner->NextTest();
     }
 
-    // Test reads back global attribute: ClusterRevision
+    // Test write the default values to mandatory global attribute: ClusterRevision
     using SuccessCallback_1 = void (*)(void * context, uint16_t clusterRevision);
-    chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{ OnTestSendClusterOnOffCommandReadAttribute_1_SuccessResponse,
+    chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{ OnTestSendClusterOnOffCommandWriteAttribute_1_SuccessResponse,
                                                                       this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
-        OnTestSendClusterOnOffCommandReadAttribute_1_FailureResponse, this
+        OnTestSendClusterOnOffCommandWriteAttribute_1_FailureResponse, this
     };
 
-    bool mIsFailureExpected_1 = 0;
+    bool mIsFailureExpected_1 = 1;
 
-    CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_1()
+    CHIP_ERROR TestSendClusterOnOffCommandWriteAttribute_1()
     {
-        ChipLogProgress(chipTool, "On/Off - reads back global attribute: ClusterRevision: Sending command...");
+        ChipLogProgress(chipTool,
+                        "On/Off - write the default values to mandatory global attribute: ClusterRevision: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+        uint16_t clusterRevisionArgument = 3U;
+        err = cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
+                                                    clusterRevisionArgument);
 
         return err;
     }
 
-    static void OnTestSendClusterOnOffCommandReadAttribute_1_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterOnOffCommandWriteAttribute_1_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "On/Off - reads back global attribute: ClusterRevision: Failure Response");
+        ChipLogProgress(chipTool,
+                        "On/Off - write the default values to mandatory global attribute: ClusterRevision: Failure Response");
 
         Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
@@ -11040,13 +11275,70 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandReadAttribute_1_SuccessResponse(void * context, uint16_t clusterRevision)
+    static void OnTestSendClusterOnOffCommandWriteAttribute_1_SuccessResponse(void * context, uint16_t clusterRevision)
+    {
+        ChipLogProgress(chipTool,
+                        "On/Off - write the default values to mandatory global attribute: ClusterRevision: Success Response");
+
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test reads back global attribute: ClusterRevision
+    using SuccessCallback_2 = void (*)(void * context, uint16_t clusterRevision);
+    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{ OnTestSendClusterOnOffCommandReadAttribute_2_SuccessResponse,
+                                                                      this };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
+        OnTestSendClusterOnOffCommandReadAttribute_2_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_2 = 0;
+
+    CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_2()
+    {
+        ChipLogProgress(chipTool, "On/Off - reads back global attribute: ClusterRevision: Sending command...");
+
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterOnOffCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "On/Off - reads back global attribute: ClusterRevision: Failure Response");
+
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterOnOffCommandReadAttribute_2_SuccessResponse(void * context, uint16_t clusterRevision)
     {
         ChipLogProgress(chipTool, "On/Off - reads back global attribute: ClusterRevision: Success Response");
 
         Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
-        if (runner->mIsFailureExpected_1 == true)
+        if (runner->mIsFailureExpected_2 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -11064,36 +11356,36 @@ private:
     }
 
     // Test read the optional global attribute: FeatureMap
-    using SuccessCallback_2 = void (*)(void * context, uint32_t featureMap);
-    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{ OnTestSendClusterOnOffCommandReadAttribute_2_SuccessResponse,
+    using SuccessCallback_3 = void (*)(void * context, uint32_t featureMap);
+    chip::Callback::Callback<SuccessCallback_3> mOnSuccessCallback_3{ OnTestSendClusterOnOffCommandReadAttribute_3_SuccessResponse,
                                                                       this };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
-        OnTestSendClusterOnOffCommandReadAttribute_2_FailureResponse, this
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
+        OnTestSendClusterOnOffCommandReadAttribute_3_FailureResponse, this
     };
 
-    bool mIsFailureExpected_2 = 0;
+    bool mIsFailureExpected_3 = 0;
 
-    CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_2()
+    CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_3()
     {
         ChipLogProgress(chipTool, "On/Off - read the optional global attribute: FeatureMap: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeFeatureMap(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+        err = cluster.ReadAttributeFeatureMap(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
 
         return err;
     }
 
-    static void OnTestSendClusterOnOffCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterOnOffCommandReadAttribute_3_FailureResponse(void * context, uint8_t status)
     {
         ChipLogProgress(chipTool, "On/Off - read the optional global attribute: FeatureMap: Failure Response");
 
         Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
-        if (runner->mIsFailureExpected_2 == false)
+        if (runner->mIsFailureExpected_3 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -11103,13 +11395,13 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandReadAttribute_2_SuccessResponse(void * context, uint32_t featureMap)
+    static void OnTestSendClusterOnOffCommandReadAttribute_3_SuccessResponse(void * context, uint32_t featureMap)
     {
         ChipLogProgress(chipTool, "On/Off - read the optional global attribute: FeatureMap: Success Response");
 
         Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
-        if (runner->mIsFailureExpected_2 == true)
+        if (runner->mIsFailureExpected_3 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -11126,37 +11418,38 @@ private:
         runner->NextTest();
     }
 
-    // Test reads back optional global attribute: FeatureMap
-    using SuccessCallback_3 = void (*)(void * context, uint32_t featureMap);
-    chip::Callback::Callback<SuccessCallback_3> mOnSuccessCallback_3{ OnTestSendClusterOnOffCommandReadAttribute_3_SuccessResponse,
+    // Test write the default values to optional global attribute: FeatureMap
+    using SuccessCallback_4 = void (*)(void * context, uint32_t featureMap);
+    chip::Callback::Callback<SuccessCallback_4> mOnSuccessCallback_4{ OnTestSendClusterOnOffCommandWriteAttribute_4_SuccessResponse,
                                                                       this };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
-        OnTestSendClusterOnOffCommandReadAttribute_3_FailureResponse, this
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
+        OnTestSendClusterOnOffCommandWriteAttribute_4_FailureResponse, this
     };
 
-    bool mIsFailureExpected_3 = 0;
+    bool mIsFailureExpected_4 = 1;
 
-    CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_3()
+    CHIP_ERROR TestSendClusterOnOffCommandWriteAttribute_4()
     {
-        ChipLogProgress(chipTool, "On/Off - reads back optional global attribute: FeatureMap: Sending command...");
+        ChipLogProgress(chipTool, "On/Off - write the default values to optional global attribute: FeatureMap: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeFeatureMap(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+        uint32_t featureMapArgument = 0UL;
+        err = cluster.WriteAttributeFeatureMap(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel(), featureMapArgument);
 
         return err;
     }
 
-    static void OnTestSendClusterOnOffCommandReadAttribute_3_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterOnOffCommandWriteAttribute_4_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "On/Off - reads back optional global attribute: FeatureMap: Failure Response");
+        ChipLogProgress(chipTool, "On/Off - write the default values to optional global attribute: FeatureMap: Failure Response");
 
         Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
-        if (runner->mIsFailureExpected_3 == false)
+        if (runner->mIsFailureExpected_4 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -11166,13 +11459,69 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterOnOffCommandReadAttribute_3_SuccessResponse(void * context, uint32_t featureMap)
+    static void OnTestSendClusterOnOffCommandWriteAttribute_4_SuccessResponse(void * context, uint32_t featureMap)
+    {
+        ChipLogProgress(chipTool, "On/Off - write the default values to optional global attribute: FeatureMap: Success Response");
+
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
+
+        if (runner->mIsFailureExpected_4 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test reads back optional global attribute: FeatureMap
+    using SuccessCallback_5 = void (*)(void * context, uint32_t featureMap);
+    chip::Callback::Callback<SuccessCallback_5> mOnSuccessCallback_5{ OnTestSendClusterOnOffCommandReadAttribute_5_SuccessResponse,
+                                                                      this };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
+        OnTestSendClusterOnOffCommandReadAttribute_5_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_5 = 0;
+
+    CHIP_ERROR TestSendClusterOnOffCommandReadAttribute_5()
+    {
+        ChipLogProgress(chipTool, "On/Off - reads back optional global attribute: FeatureMap: Sending command...");
+
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeFeatureMap(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterOnOffCommandReadAttribute_5_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "On/Off - reads back optional global attribute: FeatureMap: Failure Response");
+
+        Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
+
+        if (runner->mIsFailureExpected_5 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterOnOffCommandReadAttribute_5_SuccessResponse(void * context, uint32_t featureMap)
     {
         ChipLogProgress(chipTool, "On/Off - reads back optional global attribute: FeatureMap: Success Response");
 
         Test_TC_OO_1_1 * runner = reinterpret_cast<Test_TC_OO_1_1 *>(context);
 
-        if (runner->mIsFailureExpected_3 == true)
+        if (runner->mIsFailureExpected_5 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -11279,7 +11628,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read the mandatory attribute: OnOff: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11342,7 +11691,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back mandatory attribute: OnOff: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11405,7 +11754,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: GlobalSceneControl: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11468,7 +11817,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: OnTime: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11531,7 +11880,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: OffWaitTime: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11594,7 +11943,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - read LT attribute: StartUpOnOff: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11657,7 +12006,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - write the default value to LT attribute: OnTime: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11714,7 +12063,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - write the default value to LT attribute: OffWaitTime: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11771,7 +12120,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - write the default value to LT attribute: StartUpOnOff: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11829,7 +12178,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back LT attribute: OnTime: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11893,7 +12242,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back LT attribute: OffWaitTime: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11957,7 +12306,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - reads back LT attribute: StartUpOnOff: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12100,7 +12449,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Off Command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12156,7 +12505,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12217,7 +12566,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send On Command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12273,7 +12622,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12334,7 +12683,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Off Command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12390,7 +12739,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12451,7 +12800,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Toggle Command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12507,7 +12856,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after toggle command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12568,7 +12917,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Toggle Command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12624,7 +12973,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after toggle command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12685,7 +13034,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send On Command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12742,7 +13091,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12803,7 +13152,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Send Off Command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12860,7 +13209,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13017,7 +13366,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Interaction Model Version: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13076,7 +13425,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Vendor Name: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13141,7 +13490,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query VendorID: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13199,7 +13548,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Product Name: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13264,7 +13613,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ProductID: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13322,7 +13671,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query User Label: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13387,7 +13736,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query User Location: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13455,7 +13804,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query HardwareVersion: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13513,7 +13862,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query HardwareVersionString: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13588,7 +13937,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query SoftwareVersion: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13647,7 +13996,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query SoftwareVersionString: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13726,7 +14075,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ManufacturingDate: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13808,7 +14157,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query PartNumber: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13880,7 +14229,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ProductURL: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13954,7 +14303,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query ProductLabel: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14026,7 +14375,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query SerialNumber: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14098,7 +14447,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query LocalConfigDisabled: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14163,7 +14512,7 @@ private:
     {
         ChipLogProgress(chipTool, "Basic - Query Reachable: Sending command...");
 
-        chip::Controller::BasicCluster cluster;
+        chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14365,7 +14714,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Turn on light for color control tests: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14421,7 +14770,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14485,7 +14834,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move to hue shortest distance command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14548,7 +14897,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move to hue longest distance command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14611,7 +14960,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move to hue up command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14674,7 +15023,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move to hue down command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14736,7 +15085,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move hue up command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14797,7 +15146,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move hue stop command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14858,7 +15207,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move hue down command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14919,7 +15268,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move hue stop command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14981,7 +15330,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Step hue up command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15044,7 +15393,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Step hue down command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15107,7 +15456,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move to saturation command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15169,7 +15518,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move saturation up command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15231,7 +15580,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move saturation down command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15293,7 +15642,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Step saturation up command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15356,7 +15705,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Step saturation down command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15419,7 +15768,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move To current hue and saturation command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15480,7 +15829,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Turn off light that we turned on: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15537,7 +15886,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15662,7 +16011,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Turn on light for color control tests: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15718,7 +16067,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15782,7 +16131,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move to Color command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15845,7 +16194,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move Color command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15907,7 +16256,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Stop Move Step command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -15967,7 +16316,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Step Color command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16027,7 +16376,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Turn off light that we turned on: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16083,7 +16432,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16214,7 +16563,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Turn on light for color control tests: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16270,7 +16619,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16334,7 +16683,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move To Color Temperature command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16396,7 +16745,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move up color temperature command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16461,7 +16810,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Stop Color Temperature command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16526,7 +16875,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Move down color temperature command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16591,7 +16940,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Step up color temperature command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16657,7 +17006,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Step down color temperature command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16720,7 +17069,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Turn off light that we turned on: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16776,7 +17125,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16916,7 +17265,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Turn on light for color control tests: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16972,7 +17321,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17036,7 +17385,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Enhanced Move To Hue command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17101,7 +17450,7 @@ private:
             chipTool,
             "Color Control - Check Remaining time attribute value matched the value sent by the last command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17169,7 +17518,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Down command : Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17231,7 +17580,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Stop command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17293,7 +17642,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Up command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17355,7 +17704,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Stop command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17417,7 +17766,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Enhanced Step Hue Up command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17480,7 +17829,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Enhanced Step Hue Down command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17543,7 +17892,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Enhanced move to hue and saturation command: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17605,7 +17954,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Turn off light that we turned on: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17662,7 +18011,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17811,7 +18160,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Turn on light for color control tests: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17867,7 +18216,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is true after on command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17931,7 +18280,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Color Loop Set Command - Set all Attributs: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17997,7 +18346,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Check ColorLoopDirection Value: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18061,7 +18410,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Check ColorLoopTime Value: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18125,7 +18474,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Check ColorLoopStartEnhancedHue Value: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18190,7 +18539,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Check ColorLoopActive Value: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18254,7 +18603,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Color Loop Set Command - Start Color Loop: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18320,7 +18669,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Check ColorLoopActive Value: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18385,7 +18734,7 @@ private:
         ChipLogProgress(chipTool,
                         "Color Control - Color Loop Set Command - Set direction and time while running: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18453,7 +18802,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Check ColorLoopDirection Value: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18517,7 +18866,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Check ColorLoopTime Value: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18581,7 +18930,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Color Loop Set Command - Set direction while running: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18647,7 +18996,7 @@ private:
     {
         ChipLogProgress(chipTool, "Color Control - Check ColorLoopDirection Value: Sending command...");
 
-        chip::Controller::ColorControlCluster cluster;
+        chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18708,7 +19057,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Turn off light that we turned on: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18765,7 +19114,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check on/off attribute value is false after off command: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18841,7 +19190,10 @@ public:
             err = TestSendClusterWindowCoveringCommandReadAttribute_0();
             break;
         case 1:
-            err = TestSendClusterWindowCoveringCommandReadAttribute_1();
+            err = TestSendClusterWindowCoveringCommandWriteAttribute_1();
+            break;
+        case 2:
+            err = TestSendClusterWindowCoveringCommandReadAttribute_2();
             break;
         }
 
@@ -18854,7 +19206,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 3;
 
     //
     // Tests methods
@@ -18875,7 +19227,7 @@ private:
     {
         ChipLogProgress(chipTool, "Window Covering - read the global attribute: ClusterRevision: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18924,34 +19276,39 @@ private:
         runner->NextTest();
     }
 
-    // Test reads back global attribute: ClusterRevision
+    // Test write the default value to mandatory global attribute: ClusterRevision
     using SuccessCallback_1 = void (*)(void * context, uint16_t clusterRevision);
     chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{
-        OnTestSendClusterWindowCoveringCommandReadAttribute_1_SuccessResponse, this
+        OnTestSendClusterWindowCoveringCommandWriteAttribute_1_SuccessResponse, this
     };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
-        OnTestSendClusterWindowCoveringCommandReadAttribute_1_FailureResponse, this
+        OnTestSendClusterWindowCoveringCommandWriteAttribute_1_FailureResponse, this
     };
 
-    bool mIsFailureExpected_1 = 0;
+    bool mIsFailureExpected_1 = 1;
 
-    CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_1()
+    CHIP_ERROR TestSendClusterWindowCoveringCommandWriteAttribute_1()
     {
-        ChipLogProgress(chipTool, "Window Covering - reads back global attribute: ClusterRevision: Sending command...");
+        ChipLogProgress(
+            chipTool,
+            "Window Covering - write the default value to mandatory global attribute: ClusterRevision: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+        uint16_t clusterRevisionArgument = 2U;
+        err = cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
+                                                    clusterRevisionArgument);
 
         return err;
     }
 
-    static void OnTestSendClusterWindowCoveringCommandReadAttribute_1_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterWindowCoveringCommandWriteAttribute_1_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Window Covering - reads back global attribute: ClusterRevision: Failure Response");
+        ChipLogProgress(
+            chipTool, "Window Covering - write the default value to mandatory global attribute: ClusterRevision: Failure Response");
 
         Test_TC_WNCV_1_1 * runner = reinterpret_cast<Test_TC_WNCV_1_1 *>(context);
 
@@ -18965,13 +19322,71 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterWindowCoveringCommandReadAttribute_1_SuccessResponse(void * context, uint16_t clusterRevision)
+    static void OnTestSendClusterWindowCoveringCommandWriteAttribute_1_SuccessResponse(void * context, uint16_t clusterRevision)
+    {
+        ChipLogProgress(
+            chipTool, "Window Covering - write the default value to mandatory global attribute: ClusterRevision: Success Response");
+
+        Test_TC_WNCV_1_1 * runner = reinterpret_cast<Test_TC_WNCV_1_1 *>(context);
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test reads back global attribute: ClusterRevision
+    using SuccessCallback_2 = void (*)(void * context, uint16_t clusterRevision);
+    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
+        OnTestSendClusterWindowCoveringCommandReadAttribute_2_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
+        OnTestSendClusterWindowCoveringCommandReadAttribute_2_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_2 = 0;
+
+    CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_2()
+    {
+        ChipLogProgress(chipTool, "Window Covering - reads back global attribute: ClusterRevision: Sending command...");
+
+        chip::Controller::WindowCoveringClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterWindowCoveringCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Window Covering - reads back global attribute: ClusterRevision: Failure Response");
+
+        Test_TC_WNCV_1_1 * runner = reinterpret_cast<Test_TC_WNCV_1_1 *>(context);
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterWindowCoveringCommandReadAttribute_2_SuccessResponse(void * context, uint16_t clusterRevision)
     {
         ChipLogProgress(chipTool, "Window Covering - reads back global attribute: ClusterRevision: Success Response");
 
         Test_TC_WNCV_1_1 * runner = reinterpret_cast<Test_TC_WNCV_1_1 *>(context);
 
-        if (runner->mIsFailureExpected_1 == true)
+        if (runner->mIsFailureExpected_2 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -19076,7 +19491,7 @@ private:
     {
         ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: Type: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19140,7 +19555,7 @@ private:
     {
         ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: Type: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19204,7 +19619,7 @@ private:
     {
         ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: ConfigStatus: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19268,7 +19683,7 @@ private:
     {
         ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: ConfigStatus: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19333,7 +19748,7 @@ private:
         ChipLogProgress(chipTool,
                         "Window Covering - read the RO mandatory attribute default: OperationalStatus: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19397,7 +19812,7 @@ private:
     {
         ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: OperationalStatus: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19461,7 +19876,7 @@ private:
     {
         ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: EndProductType: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19525,7 +19940,7 @@ private:
     {
         ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: EndProductType: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19589,7 +20004,7 @@ private:
     {
         ChipLogProgress(chipTool, "Window Covering - read the RW mandatory attribute default: Mode: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19653,7 +20068,7 @@ private:
     {
         ChipLogProgress(chipTool, "Window Covering - write a value into the RW mandatory attribute:: Mode: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19711,7 +20126,7 @@ private:
     {
         ChipLogProgress(chipTool, "Window Covering - reads back the RW mandatory attribute: Mode: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19787,7 +20202,10 @@ public:
             err = TestSendClusterBinaryInputBasicCommandReadAttribute_0();
             break;
         case 1:
-            err = TestSendClusterBinaryInputBasicCommandReadAttribute_1();
+            err = TestSendClusterBinaryInputBasicCommandWriteAttribute_1();
+            break;
+        case 2:
+            err = TestSendClusterBinaryInputBasicCommandReadAttribute_2();
             break;
         }
 
@@ -19800,7 +20218,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 3;
 
     //
     // Tests methods
@@ -19821,7 +20239,7 @@ private:
     {
         ChipLogProgress(chipTool, "Binary Input (Basic) - read the global attribute: ClusterRevision: Sending command...");
 
-        chip::Controller::BinaryInputBasicCluster cluster;
+        chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19870,34 +20288,40 @@ private:
         runner->NextTest();
     }
 
-    // Test reads back global attribute: ClusterRevision
+    // Test write the default values to mandatory global attribute: ClusterRevision
     using SuccessCallback_1 = void (*)(void * context, uint16_t clusterRevision);
     chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{
-        OnTestSendClusterBinaryInputBasicCommandReadAttribute_1_SuccessResponse, this
+        OnTestSendClusterBinaryInputBasicCommandWriteAttribute_1_SuccessResponse, this
     };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
-        OnTestSendClusterBinaryInputBasicCommandReadAttribute_1_FailureResponse, this
+        OnTestSendClusterBinaryInputBasicCommandWriteAttribute_1_FailureResponse, this
     };
 
-    bool mIsFailureExpected_1 = 0;
+    bool mIsFailureExpected_1 = 1;
 
-    CHIP_ERROR TestSendClusterBinaryInputBasicCommandReadAttribute_1()
+    CHIP_ERROR TestSendClusterBinaryInputBasicCommandWriteAttribute_1()
     {
-        ChipLogProgress(chipTool, "Binary Input (Basic) - reads back global attribute: ClusterRevision: Sending command...");
+        ChipLogProgress(
+            chipTool,
+            "Binary Input (Basic) - write the default values to mandatory global attribute: ClusterRevision: Sending command...");
 
-        chip::Controller::BinaryInputBasicCluster cluster;
+        chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+        uint16_t clusterRevisionArgument = 1U;
+        err = cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
+                                                    clusterRevisionArgument);
 
         return err;
     }
 
-    static void OnTestSendClusterBinaryInputBasicCommandReadAttribute_1_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterBinaryInputBasicCommandWriteAttribute_1_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Binary Input (Basic) - reads back global attribute: ClusterRevision: Failure Response");
+        ChipLogProgress(
+            chipTool,
+            "Binary Input (Basic) - write the default values to mandatory global attribute: ClusterRevision: Failure Response");
 
         Test_TC_BI_1_1 * runner = reinterpret_cast<Test_TC_BI_1_1 *>(context);
 
@@ -19911,13 +20335,72 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterBinaryInputBasicCommandReadAttribute_1_SuccessResponse(void * context, uint16_t clusterRevision)
+    static void OnTestSendClusterBinaryInputBasicCommandWriteAttribute_1_SuccessResponse(void * context, uint16_t clusterRevision)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Binary Input (Basic) - write the default values to mandatory global attribute: ClusterRevision: Success Response");
+
+        Test_TC_BI_1_1 * runner = reinterpret_cast<Test_TC_BI_1_1 *>(context);
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test reads back global attribute: ClusterRevision
+    using SuccessCallback_2 = void (*)(void * context, uint16_t clusterRevision);
+    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
+        OnTestSendClusterBinaryInputBasicCommandReadAttribute_2_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
+        OnTestSendClusterBinaryInputBasicCommandReadAttribute_2_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_2 = 0;
+
+    CHIP_ERROR TestSendClusterBinaryInputBasicCommandReadAttribute_2()
+    {
+        ChipLogProgress(chipTool, "Binary Input (Basic) - reads back global attribute: ClusterRevision: Sending command...");
+
+        chip::Controller::BinaryInputBasicClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterBinaryInputBasicCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Binary Input (Basic) - reads back global attribute: ClusterRevision: Failure Response");
+
+        Test_TC_BI_1_1 * runner = reinterpret_cast<Test_TC_BI_1_1 *>(context);
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterBinaryInputBasicCommandReadAttribute_2_SuccessResponse(void * context, uint16_t clusterRevision)
     {
         ChipLogProgress(chipTool, "Binary Input (Basic) - reads back global attribute: ClusterRevision: Success Response");
 
         Test_TC_BI_1_1 * runner = reinterpret_cast<Test_TC_BI_1_1 *>(context);
 
-        if (runner->mIsFailureExpected_1 == true)
+        if (runner->mIsFailureExpected_2 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -20035,7 +20518,7 @@ private:
     {
         ChipLogProgress(chipTool, "Temperature Measurement - read the global attribute: ClusterRevision: Sending command...");
 
-        chip::Controller::TemperatureMeasurementCluster cluster;
+        chip::Controller::TemperatureMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20100,7 +20583,7 @@ private:
     {
         ChipLogProgress(chipTool, "Temperature Measurement - reads back global attribute: ClusterRevision: Sending command...");
 
-        chip::Controller::TemperatureMeasurementCluster cluster;
+        chip::Controller::TemperatureMeasurementClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20211,7 +20694,7 @@ private:
     {
         ChipLogProgress(chipTool, "Occupancy Sensing - read the global attribute: ClusterRevision: Sending command...");
 
-        chip::Controller::OccupancySensingCluster cluster;
+        chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20275,7 +20758,7 @@ private:
     {
         ChipLogProgress(chipTool, "Occupancy Sensing - reads back global attribute: ClusterRevision: Sending command...");
 
-        chip::Controller::OccupancySensingCluster cluster;
+        chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20385,7 +20868,7 @@ private:
     {
         ChipLogProgress(chipTool, "Operational Credentials - Read number of supported fabrics: Sending command...");
 
-        chip::Controller::OperationalCredentialsCluster cluster;
+        chip::Controller::OperationalCredentialsClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20452,7 +20935,7 @@ private:
     {
         ChipLogProgress(chipTool, "Operational Credentials - Read number of commissioned fabrics: Sending command...");
 
-        chip::Controller::OperationalCredentialsCluster cluster;
+        chip::Controller::OperationalCredentialsClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
         CHIP_ERROR err = CHIP_NO_ERROR;

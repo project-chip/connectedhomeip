@@ -16,7 +16,7 @@
  */
 
 /*
- * This file declare test suites utilities methods for test suite.
+ * This file declare test suites utilities methods for delayed commands.
  *
  * Each method declared in this file needs to be implemented on a per-language
  * basis and permits to exposes methods to the test suites that are not part
@@ -30,21 +30,12 @@ const WaitForMs = {
   response : { arguments : [] }
 };
 
-const WaitForAttributeRepor = {
-  name : 'WaitForAttributeReport',
-  arguments : [],
-  response : { arguments : [ { name : 'value' } ] }
-  /*
-   * 'WaitForAttributeResponse' will take "attribute" parameter for detailed attribute path.
-   */
-};
-
-const TestSuiteHelperCluster = {
-  name : 'TestSuite',
-  commands : [ WaitForMs, WaitForAttributeRepor ],
+const DelayCommands = {
+  name : 'DelayCommands',
+  commands : [ WaitForMs ],
 };
 
 //
 // Module exports
 //
-exports.TestSuiteHelperCluster = TestSuiteHelperCluster;
+exports.DelayCommands = DelayCommands;

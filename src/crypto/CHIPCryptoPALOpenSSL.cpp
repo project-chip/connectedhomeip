@@ -1229,8 +1229,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal()
     return CHIP_NO_ERROR;
 }
 
-void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl()
+void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
 {
+    VerifyOrReturn(state != CHIP_SPAKE2P_STATE::PREINIT);
+
     Spake2p_Context * const context = to_inner_spake2p_context(&mSpake2pContext);
 
     if (context->curve != nullptr)
@@ -1255,6 +1257,8 @@ void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl()
     free_bn(xy);
     free_bn(tempbn);
     free_bn(order);
+
+    state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out)

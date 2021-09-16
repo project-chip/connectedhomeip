@@ -126,9 +126,11 @@ pw_proto_library(device_service
 
 pw_proto_library(lighting_service
   SOURCES
-    ${CHIP_ROOT}/examples/lighting-app/lighting-common/lighting_service/lighting_service.proto
+    ${CHIP_ROOT}/examples/common/pigweed/protos/lighting_service.proto
   STRIP_PREFIX
-    ${CHIP_ROOT}/examples/lighting-app/lighting-common/
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  PREFIX
+    lighting_service
   DEPS
     pw_protobuf.common_protos
 )
@@ -145,6 +147,7 @@ target_include_directories(app PRIVATE
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
   ../../common
+  ../../common/pigweed
   ../../common/pigweed/nrfconnect)
 
 target_link_libraries(app PRIVATE

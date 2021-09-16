@@ -35,3 +35,6 @@
 // Use /dev/urandom as entropy generator
 #undef MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
 #undef MBEDTLS_NO_PLATFORM_ENTROPY
+
+// Configure heap usage monitoring
+#define MBEDTLS_MEMORY_DEBUG

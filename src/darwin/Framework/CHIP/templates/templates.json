@@ -20,20 +20,8 @@
             "path": "partials/test_cluster.zapt"
         },
         {
-            "name": "process_response_value",
-            "path": "partials/process_response_value.zapt"
-        },
-        {
             "name": "CHIPCallbackBridge",
             "path": "partials/CHIPCallbackBridge.zapt"
-        },
-        {
-            "name": "TestSuiteHelper_WaitForMs",
-            "path": "partials/testsuite/WaitForMs.zapt"
-        },
-        {
-            "name": "TestSuiteHelper_WaitForAttributeReport",
-            "path": "partials/testsuite/WaitForAttributeReport.zapt"
         }
     ],
     "templates": [
@@ -61,6 +49,16 @@
             "path": "CHIPClustersObjc-src.zapt",
             "name": "Objc ZCL API",
             "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc.mm"
+        },
+        {
+            "path": "CHIPTestClustersObjc.zapt",
+            "name": "Test Objc API Header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPTestClustersObjc.h"
+        },
+        {
+            "path": "CHIPTestClustersObjc-src.zapt",
+            "name": "Test Objc API",
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPTestClustersObjc.mm"
         },
         {
             "path": "clusters-tests.zapt",

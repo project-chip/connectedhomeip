@@ -87,8 +87,7 @@ void PASESession::Clear()
     memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg = MsgType::PASE_PakeError;
 
-    // Note: we don't need to explicitly clear the state of mSpake2p object.
-    //       Clearing the following state takes care of it.
+    mSpake2p.Clear();
     mCommissioningHash.Clear();
 
     mIterationCount = 0;

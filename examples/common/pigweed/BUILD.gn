@@ -18,7 +18,10 @@ import("$dir_pw_build/target_types.gni")
 import("pigweed_rpcs.gni")
 
 config("default_config") {
-  include_dirs = [ ".." ]
+  include_dirs = [
+    ".",
+    "..",
+  ]
 }
 
 if (chip_enable_pw_rpc) {
@@ -39,6 +42,24 @@ if (chip_enable_pw_rpc) {
     strip_prefix = "protos"
     prefix = "button_service"
   }
+
+  pw_proto_library("lighting_service") {
+    sources = [ "protos/lighting_service.proto" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
+    strip_prefix = "protos"
+    prefix = "lighting_service"
+  }
+
+  pw_proto_library("locking_service") {
+    sources = [ "protos/locking_service.proto" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
+    strip_prefix = "protos"
+    prefix = "locking_service"
+  }
+}
+
+pw_source_set("rpc_services") {
+  public_configs = [ ":default_config" ]
 }
 
 pw_source_set("system_rpc_server") {
