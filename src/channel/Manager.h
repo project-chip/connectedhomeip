@@ -22,8 +22,8 @@
 #include <channel/Channel.h>
 #include <channel/ChannelContext.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/Pool.h>
 #include <messaging/ExchangeMgr.h>
+#include <system/SystemPool.h>
 
 namespace chip {
 namespace Messaging {
@@ -83,8 +83,8 @@ public:
     }
 
 private:
-    BitMapObjectPool<ChannelContext, CHIP_CONFIG_MAX_ACTIVE_CHANNELS> mChannelContexts;
-    BitMapObjectPool<ChannelContextHandleAssociation, CHIP_CONFIG_MAX_CHANNEL_HANDLES> mChannelHandles;
+    System::ObjectPool<ChannelContext, CHIP_CONFIG_MAX_ACTIVE_CHANNELS> mChannelContexts;
+    System::ObjectPool<ChannelContextHandleAssociation, CHIP_CONFIG_MAX_CHANNEL_HANDLES> mChannelHandles;
     ExchangeManager * mExchangeManager;
 };
 

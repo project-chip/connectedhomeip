@@ -31,20 +31,18 @@ namespace chip {
 namespace System {
 
 /**
- *  @brief
- *      A class template used for allocating Object subclass objects from an ObjectArena<> template union.
+ *  @brief A class template used for allocating objects.
  *
- *  @tparam     T   a subclass of Object to be allocated from the arena.
- *  @tparam     N   a positive integer number of objects of class T to allocate from the arena.
+ *  @tparam     T   the type of object to be allocated.
  */
-template <class T, unsigned int N>
+template <class T>
 class ObjectPoolHeap : public ObjectPoolStatistics
 {
 public:
     template <typename... Args>
     T * CreateObject(Args &&... args)
     {
-        std::lock_guard<std::recursive_mutex> lock(mutex);
+        std::lock_guard<std::mutex> lock(mutex);
         T * object = new T(std::forward<Args>(args)...);
         if (object == nullptr)
         {
@@ -58,7 +56,10 @@ public:
 
     void ReleaseObject(T * object)
     {
-        std::lock_guard<std::recursive_mutex> lock(mutex);
+        std::lock_guard<std::mutex> lock(mutex);
+        if (object == nullptr)
+            return;
+
         auto iter = mObjects.find(object);
         VerifyOrDie(iter != mObjects.end());
         mObjects.erase(iter);
@@ -83,9 +84,8 @@ public:
     template <typename Function>
     bool ForEachActiveObject(Function && function)
     {
-        std::lock_guard<std::recursive_mutex> lock(mutex);
         // Create a new copy of original set, allowing add/remove elements while iterating in the same thread.
-        for (auto object : std::set<T *>(mObjects))
+        for (auto object : CopyObjectSet())
         {
             if (!function(object))
                 return false;
@@ -94,8 +94,14 @@ public:
     }
 
 private:
-    std::recursive_mutex mutex;
+    std::mutex mutex;
     std::set<T *> mObjects;
+
+    std::set<T *> CopyObjectSet()
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        return mObjects;
+    }
 };
 
 } // namespace System

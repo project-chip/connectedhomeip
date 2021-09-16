@@ -25,15 +25,17 @@
 
 #include <set>
 
-#include <lib/support/Pool.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <system/SystemPool.h>
 
 #include <nlunit-test.h>
 
-namespace chip {
+namespace {
 
-template <class T, size_t N>
-size_t GetNumObjectsInUse(BitMapObjectPool<T, N> & pool)
+using namespace chip;
+
+template <class T>
+size_t GetNumObjectsInUse(T & pool)
 {
     size_t count = 0;
     pool.ForEachActiveObject([&count](void *) {
@@ -43,60 +45,47 @@ size_t GetNumObjectsInUse(BitMapObjectPool<T, N> & pool)
     return count;
 }
 
-} // namespace chip
-
-namespace {
-
-using namespace chip;
-
 void TestReleaseNull(nlTestSuite * inSuite, void * inContext)
 {
     constexpr const size_t size = 10;
-    BitMapObjectPool<uint32_t, size> pool;
+    System::ObjectPool<uint32_t, size> pool;
     pool.ReleaseObject(nullptr);
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == 0);
-    NL_TEST_ASSERT(inSuite, pool.Allocated() == 0);
 }
 
 void TestCreateReleaseObject(nlTestSuite * inSuite, void * inContext)
 {
     constexpr const size_t size = 100;
-    BitMapObjectPool<uint32_t, size> pool;
+    System::ObjectPool<uint32_t, size> pool;
     uint32_t * obj[size];
-    for (size_t i = 0; i < pool.Size(); ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         obj[i] = pool.CreateObject();
         NL_TEST_ASSERT(inSuite, obj[i] != nullptr);
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == i + 1);
-        NL_TEST_ASSERT(inSuite, pool.Allocated() == i + 1);
     }
 
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     uint32_t * fail = pool.CreateObject();
     NL_TEST_ASSERT(inSuite, fail == nullptr);
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size);
-    NL_TEST_ASSERT(inSuite, pool.Allocated() == size);
-    NL_TEST_ASSERT(inSuite, pool.Exhausted());
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
     pool.ReleaseObject(obj[55]);
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size - 1);
-    NL_TEST_ASSERT(inSuite, pool.Allocated() == size - 1);
-    NL_TEST_ASSERT(inSuite, !pool.Exhausted());
     NL_TEST_ASSERT(inSuite, obj[55] == pool.CreateObject());
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size);
-    NL_TEST_ASSERT(inSuite, pool.Allocated() == size);
-    NL_TEST_ASSERT(inSuite, pool.Exhausted());
 
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     fail = pool.CreateObject();
     NL_TEST_ASSERT(inSuite, fail == nullptr);
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size);
-    NL_TEST_ASSERT(inSuite, pool.Allocated() == size);
-    NL_TEST_ASSERT(inSuite, pool.Exhausted());
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
-    for (size_t i = 0; i < pool.Size(); ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         pool.ReleaseObject(obj[i]);
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size - i - 1);
-        NL_TEST_ASSERT(inSuite, pool.Allocated() == size - i - 1);
     }
 }
 
@@ -112,16 +101,16 @@ void TestCreateReleaseStruct(nlTestSuite * inSuite, void * inContext)
     std::set<S *> objs1;
 
     constexpr const size_t size = 100;
-    BitMapObjectPool<S, size> pool;
+    System::ObjectPool<S, size> pool;
     S * objs2[size];
-    for (size_t i = 0; i < pool.Size(); ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         objs2[i] = pool.CreateObject(objs1);
         NL_TEST_ASSERT(inSuite, objs2[i] != nullptr);
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == i + 1);
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == objs1.size());
     }
-    for (size_t i = 0; i < pool.Size(); ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         pool.ReleaseObject(objs2[i]);
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size - i - 1);

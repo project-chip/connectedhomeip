@@ -37,7 +37,7 @@ void ChannelContext::Start(const ChannelBuilder & builder)
 
 ExchangeContext * ChannelContext::NewExchange(ExchangeDelegate * delegate)
 {
-    assert(GetState() == ChannelState::kReady);
+    VerifyOrDie(GetState() == ChannelState::kReady);
     return mExchangeManager->NewContext(GetReadyVars().mSession, delegate);
 }
 

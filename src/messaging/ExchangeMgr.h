@@ -27,12 +27,12 @@
 #include <array>
 
 #include <lib/support/DLLUtil.h>
-#include <lib/support/Pool.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
+#include <system/SystemPool.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 
@@ -234,7 +234,7 @@ private:
 
     FabricIndex mFabricIndex = 0;
 
-    BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
+    System::ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
 
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
 
