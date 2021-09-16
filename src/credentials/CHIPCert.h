@@ -740,8 +740,10 @@ CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint1
 /**
  * @brief Convert a raw CHIP signature to an ASN.1 DER encoded signature structure.
  *
- * @param rawSig        P256 ECDSA signature in raw form.
- * @param derSig        Buffer to store converted ASN.1 DER encoded signature.
+ * @param[in]     rawSig  P256 ECDSA signature in raw form.
+ * @param[in,out] derSig  Output buffer to receive the converted ASN.1 DER encoded signature.
+ *                        `derSig` must be at least `kMax_ECDSA_Signature_Length_Der` bytes long.
+ *                        The `derSig` size will be set to the actual DER encoded signature length on success.
  *
  * @retval  #CHIP_NO_ERROR  If the signature value was successfully converted.
  */

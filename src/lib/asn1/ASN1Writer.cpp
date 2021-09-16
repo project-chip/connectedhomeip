@@ -376,8 +376,8 @@ CHIP_ERROR ASN1Writer::EncodeHead(uint8_t cls, uint8_t tag, bool isConstructed, 
     // Do nothing for a null writer.
     VerifyOrReturnError(mBuf != nullptr, CHIP_NO_ERROR);
 
-    // Only tags <= 31 supported. The implication of this is that encoded tags are exactly 1 byte long.
-    VerifyOrReturnError(tag <= 0x1F, ASN1_ERROR_UNSUPPORTED_ENCODING);
+    // Only tags < 31 supported. The implication of this is that encoded tags are exactly 1 byte long.
+    VerifyOrReturnError(tag < 0x1F, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
     // Only positive and kUnknownLength values are supported for len input.
     VerifyOrReturnError(len >= 0 || len == kUnknownLength, ASN1_ERROR_UNSUPPORTED_ENCODING);
@@ -387,6 +387,7 @@ CHIP_ERROR ASN1Writer::EncodeHead(uint8_t cls, uint8_t tag, bool isConstructed, 
 
     // Make sure there's enough space to encode the entire value.
     // Note that the calculated total length doesn't overflow because `len` is a signed value (int32_t).
+    // Note that if `len` is not kUnknownLength then it is positive (`len` >= 0).
     totalLen = 1 + bytesForLen + static_cast<uint32_t>(len != kUnknownLength ? len : 0);
     VerifyOrReturnError((mWritePoint + totalLen) <= mBufEnd, ASN1_ERROR_OVERFLOW);
 

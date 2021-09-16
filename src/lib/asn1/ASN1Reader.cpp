@@ -254,16 +254,18 @@ CHIP_ERROR ASN1Reader::GetBitString(uint32_t & outVal)
 CHIP_ERROR ASN1Reader::DecodeHead()
 {
     const uint8_t * p = mElemStart;
-    ReturnErrorCodeIf(p + 1 >= mBufEnd, ASN1_ERROR_UNDERRUN);
+    ReturnErrorCodeIf(p >= mBufEnd, ASN1_ERROR_UNDERRUN);
 
     Class       = *p & 0xC0;
     Constructed = (*p & 0x20) != 0;
     Tag         = *p & 0x1F;
 
-    // Only tags <= 31 supported. The implication of this is that encoded tags are exactly 1 byte long.
-    ReturnErrorCodeIf(Tag == 0x1F, ASN1_ERROR_UNSUPPORTED_ENCODING);
+    // Only tags < 31 supported. The implication of this is that encoded tags are exactly 1 byte long.
+    VerifyOrReturnError(Tag < 0x1F, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
     p++;
+    ReturnErrorCodeIf(p >= mBufEnd, ASN1_ERROR_UNDERRUN);
+
     if ((*p & 0x80) == 0)
     {
         ValueLen      = *p & 0x7F;
