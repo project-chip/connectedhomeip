@@ -99,14 +99,14 @@ groups:
             teams: [reviewers-google]
         reviews:
             request: 1
-#     shared-reviewers-lg:
-#         type: optional
-#         conditions:
-#             - files.include('*')
-#         reviewers:
-#             teams: [reviewers-lg]
-#         reviews:
-#             request: 1
+    shared-reviewers-lg:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-lg]
+        reviews:
+            request: 1
     shared-reviewers-nordic:
         type: optional
         conditions:
