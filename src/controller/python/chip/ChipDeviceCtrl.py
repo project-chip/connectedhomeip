@@ -111,7 +111,7 @@ class ChipDeviceController(object):
             if err != 0:
                 print("Failed to update node address: {}".format(err))
                 # Failed update address, don't wait for HandleCommissioningComplete
-                self.state = DCState.IDLEHandleCommissioningComplete
+                self.state = DCState.IDLE
                 self._ChipStack.callbackRes = err
                 self._ChipStack.completeEvent.set()
             else:
