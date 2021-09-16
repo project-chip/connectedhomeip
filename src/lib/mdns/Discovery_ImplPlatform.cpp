@@ -157,7 +157,7 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
             snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32, mrpRetryIntervalIdle.Value());
         VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalIdleMaxLength),
                             CHIP_ERROR_INVALID_STRING_LENGTH);
-        txtEntryStorage[txtEntryIdx++] = { "CRI", reinterpret_cast<const uint8_t *>(mrpRetryIdleStorage),
+        txtEntryStorage[txtEntryIdx++] = { "CRI", Uint8::from_const_char(mrpRetryIdleStorage),
                                            strlen(mrpRetryIdleStorage) };
     }
     if (mrpRetryIntervalActive.HasValue())
