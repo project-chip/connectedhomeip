@@ -85,6 +85,8 @@ public:
 
     CHIP_ERROR _JoinerStart();
 
+    CHIP_ERROR _GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t * buffer, uint16_t & ReadLength);
+
     ~ThreadStackManagerImpl() = default;
 
     static ThreadStackManagerImpl sInstance;

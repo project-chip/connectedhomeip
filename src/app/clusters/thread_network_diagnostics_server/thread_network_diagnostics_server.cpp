@@ -16,11 +16,73 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <lib/core/Optional.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/ConnectivityManager.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ThreadNetworkDiagnostics::Attributes;
+using namespace chip::DeviceLayer;
+
+namespace {
+
+class ThreadDiagosticsAttrAccess : public AttributeAccessInterface
+{
+public:
+    // Register for the EthernetNetworkDiagnostics cluster on all endpoints.
+    ThreadDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
+
+    CHIP_ERROR Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead) override;
+
+private:
+    CHIP_ERROR ReadIfSupported(chip::AttributeId attributeId, TLV::TLVWriter * aWriter);
+};
+
+ThreadDiagosticsAttrAccess gAttrAccess;
+
+CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead)
+{
+    if (aClusterInfo.mClusterId != ThreadNetworkDiagnostics::Id)
+    {
+        // We shouldn't have been called at all.
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    *aDataRead = true;
+
+    return ReadIfSupported(aClusterInfo.mFieldId, aWriter);
+}
+
+CHIP_ERROR ThreadDiagosticsAttrAccess::ReadIfSupported(chip::AttributeId attributeId, TLV::TLVWriter * aWriter)
+{
+    uint8_t * pData = nullptr;
+    uint16_t dataLen;
+
+    // GetThreadNetworkDiagnosticAttributeInfo will alloc memory for the data returned.
+    CHIP_ERROR err = ThreadStackMgr().GetThreadNetworkDiagnosticAttributeInfo(attributeId, pData, dataLen);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        aWriter->PutBytes(TLV::ContextTag(AttributeDataElement::kCsTag_Data), pData, dataLen);
+    }
+
+    if (pData != nullptr)
+    {
+        CHIPPlatformMemoryFree(pData);
+    }
+    return err;
+}
+} // anonymous namespace
 
 bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
@@ -32,4 +94,14 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoi
 
     emberAfSendImmediateDefaultResponse(status);
     return true;
+}
+
+void emberAfThreadNetworkDiagnosticsClusterServerInitCallback(EndpointId endpoint)
+{
+    static bool attrAccessRegistered = false;
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gAttrAccess);
+        attrAccessRegistered = true;
+    }
 }

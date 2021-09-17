@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -105,6 +107,8 @@ public:
     CHIP_ERROR DnsResolve(const char * aServiceName, const char * aInstanceName, DnsResolveCallback aCallback, void * aContext);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+    CHIP_ERROR GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t * buffer, uint16_t & ReadLength);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -367,6 +371,11 @@ inline CHIP_ERROR ThreadStackManager::GetPollPeriod(uint32_t & buf)
 inline CHIP_ERROR ThreadStackManager::JoinerStart()
 {
     return static_cast<ImplClass *>(this)->_JoinerStart();
+}
+inline CHIP_ERROR ThreadStackManager::GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t * buffer,
+                                                                              uint16_t & ReadLength)
+{
+    return static_cast<ImplClass *>(this)->_GetThreadNetworkDiagnosticAttributeInfo(attributeId, buffer, ReadLength);
 }
 
 } // namespace DeviceLayer

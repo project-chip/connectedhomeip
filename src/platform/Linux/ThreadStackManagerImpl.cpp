@@ -462,6 +462,11 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::_GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t * buffer, uint16_t & ReadLength)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 ThreadStackManager & ThreadStackMgr()
 {
     return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
