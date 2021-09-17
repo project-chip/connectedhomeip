@@ -146,7 +146,7 @@ static void scheduleIdentifyTick(EndpointId endpoint)
         }
         else if (identifyTime > 0)
         {
-            /* we only start of both callbacks are set */
+            /* we only start if both callbacks are set */
             if (nullptr != identify->mOnIdentifyStart && nullptr != identify->mOnIdentifyStop && false == identify->mActive)
             {
                 identify->mActive = true;
