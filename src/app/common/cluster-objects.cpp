@@ -1,5 +1,4 @@
 #include "cluster-objects.h"
-#include "lib/core/CHIPTLVTags.h"
 
 #pragma GCC diagnostic ignored "-Wstack-usage="
 
@@ -46,6 +45,7 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
         }
     }
 
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -107,6 +107,7 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
         }
     }
 
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -156,6 +157,7 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
         }
     }
 
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -209,30 +211,29 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
         }
         else if (tag == TLV::ContextTag(kDFieldId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, d));
+            return CHIP_ERROR_NOT_IMPLEMENTED;
         }
         else if (tag == TLV::ContextTag(kEFieldId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, e));
+            return CHIP_ERROR_NOT_IMPLEMENTED;
         }
         else if (tag == TLV::ContextTag(kFFieldId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, f));
+            return CHIP_ERROR_NOT_IMPLEMENTED;
         }
     }
 
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace NestedStructList
 
-namespace DecodableNestedStructList {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
+CHIP_ERROR DecodableType::Encode(TLV::TLVWriter & writer, uint64_t tag) const
 {
     return CHIP_ERROR_BAD_REQUEST;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -274,10 +275,12 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
         }
     }
 
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace DecodableNestedStructList
+
+} // namespace NestedStructList
 
 namespace DoubleNestedStructList {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
@@ -309,22 +312,22 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 
         if (tag == TLV::ContextTag(kAFieldId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, a));
+            return CHIP_ERROR_NOT_IMPLEMENTED;
         }
     }
 
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
+
     return CHIP_NO_ERROR;
 }
-} // namespace DoubleNestedStructList
 
-namespace DecodableDoubleNestedStructList {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
+CHIP_ERROR DecodableType::Encode(TLV::TLVWriter & writer, uint64_t tag) const
 {
     return CHIP_ERROR_BAD_REQUEST;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -342,10 +345,13 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
         }
     }
 
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace DecodableDoubleNestedStructList
+
+} // namespace DoubleNestedStructList
+
 } // namespace TestCluster
 } // namespace clusters
 } // namespace app

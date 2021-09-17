@@ -18,14 +18,9 @@
 
 #pragma once
 
-#include "Decode.h"
-#include "Encode.h"
-#include <iterator>
-#include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPSafeCasts.h>
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
 #include <lib/core/CHIPTLV.h>
-#include <lib/core/Optional.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
@@ -46,33 +41,16 @@ public:
     /*
      * @brief
      *
-     * This calls stores a TLV reader positioned on the list this class is to manage.
+     * This call stores a TLV reader positioned on the list this class is to manage.
      *
      * Specifically, the passed-in TLV reader should be pointing into the list just after
      * having called `OpenContainer` on the list element.
      */
     void SetReader(const TLV::TLVReader & reader) { mReader = reader; }
 
-    size_t size()
-    {
-        CHIP_ERROR err;
-        TLV::TLVReader reader;
-        reader.Init(mReader);
-        size_t count = 0;
-
-        while ((err = reader.Next()) == CHIP_NO_ERROR)
-        {
-            count++;
-        }
-
-        return count;
-    }
-
     class Iterator
     {
     public:
-        using iterator_category = std::input_iterator_tag;
-
         /*
          * Initialize the iterator with a reference to a reader.
          *
@@ -93,8 +71,12 @@ public:
          * If an element does exist and was successfully decoded, this
          * shall return true.
          *
-         * Otherwise, if any error was encountered OR the end of the list
-         * was reached, this shall return false.
+         * Otherwise, if the end of list is reached, this call shall return
+         * false.
+         *
+         * If an error was encountered at any point during the iteration or decode,
+         * this shall return false as well. The caller is expected to invoke GetStatus()
+         * to retrieve the status of the operation.
          *
          */
         bool Next()
@@ -125,7 +107,7 @@ public:
          * the status returned shall be CHIP_NO_ERROR.
          *
          */
-        CHIP_ERROR GetError() const
+        CHIP_ERROR GetStatus() const
         {
             if (mStatus == CHIP_END_OF_TLV)
             {
@@ -143,7 +125,6 @@ public:
         TLV::TLVReader mReader;
     };
 
-    TLV::TLVReader & GetReader() { return mReader; }
     Iterator begin() const { return Iterator(mReader); }
 
 private:

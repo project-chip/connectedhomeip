@@ -22,38 +22,16 @@
  *
  */
 
-#include <app/InteractionModelEngine.h>
-#include <lib/core/CHIPCore.h>
+#include <app/common/cluster-objects.h>
 #include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVData.hpp>
-//#include <lib/core/CHIPTLVText.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
-#include <lib/support/ErrorStr.h>
-#include <lib/support/PrivateHeap.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
-#include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
-#include <messaging/Flags.h>
 #include <nlunit-test.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
-#include <protocols/secure_channel/PASESession.h>
-#include <system/SystemLayerImpl.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SecureSessionMgr.h>
-#include <transport/raw/UDP.h>
 
-#include <cluster-objects.h>
-
-namespace chip {
-static System::LayerImpl gSystemLayer;
-static SecureSessionMgr gSessionManager;
-static Messaging::ExchangeManager gExchangeManager;
-static secure_channel::MessageCounterManager gMessageCounterManager;
-static TransportMgr<Transport::UDP> gTransportManager;
-
-namespace app {
+using namespace chip;
+using namespace chip::app;
 
 class TestDataModelSerialization
 {
@@ -69,30 +47,37 @@ public:
     static void TestDataModelSerialization_InvalidSimpleFieldTypes(nlTestSuite * apSuite, void * apContext);
     static void TestDataModelSerialization_InvalidListType(nlTestSuite * apSuite, void * apContext);
 
+    void Shutdown();
+
 private:
     void SetupBuf();
     void DumpBuf();
     void SetupReader();
 
-    chip::System::TLVPacketBufferBackingStore mStore;
-    chip::TLV::TLVWriter mWriter;
-    chip::TLV::TLVReader mReader;
+    System::TLVPacketBufferBackingStore mStore;
+    TLV::TLVWriter mWriter;
+    TLV::TLVReader mReader;
     nlTestSuite * mpSuite;
 };
 
-using namespace chip::TLV;
+using namespace TLV;
 
 TestDataModelSerialization gTestDataModelSerialization;
 
 void TestDataModelSerialization::SetupBuf()
 {
-    chip::System::PacketBufferHandle buf;
+    System::PacketBufferHandle buf;
 
     buf = System::PacketBufferHandle::New(1024);
     mStore.Init(std::move(buf));
 
     mWriter.Init(mStore);
     mReader.Init(mStore);
+}
+
+void TestDataModelSerialization::Shutdown()
+{
+    System::PacketBufferHandle buf = mStore.Release();
 }
 
 void TestDataModelSerialization::DumpBuf()
@@ -104,7 +89,7 @@ void TestDataModelSerialization::DumpBuf()
     // Enable this once the TLV pretty printer has been checked in.
     //
 #if ENABLE_TLV_PRINT_OUT
-    chip::TLV::Debug::Print(reader);
+    TLV::Debug::Print(reader);
 #endif
 }
 
@@ -180,7 +165,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
         t.c = clusters::TestCluster::SimpleEnum::VALUEA;
         t.d = buf;
 
-        t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
+        t.e = Span<char>{ strbuf, strlen(strbuf) };
 
         err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -205,6 +190,8 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
         NL_TEST_ASSERT(apSuite, t.a == 20);
         NL_TEST_ASSERT(apSuite, t.b == true);
         NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::VALUEA);
+
+        NL_TEST_ASSERT(apSuite, t.d.size() == 4);
 
         for (uint32_t i = 0; i < t.d.size(); i++)
         {
@@ -238,7 +225,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
         t.c.c = clusters::TestCluster::SimpleEnum::VALUEB;
         t.c.d = buf;
 
-        t.c.e = chip::Span<char>{ strbuf, strlen(strbuf) };
+        t.c.e = Span<char>{ strbuf, strlen(strbuf) };
 
         err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -265,6 +252,8 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
         NL_TEST_ASSERT(apSuite, t.c.a == 11);
         NL_TEST_ASSERT(apSuite, t.c.b == true);
         NL_TEST_ASSERT(apSuite, t.c.c == clusters::TestCluster::SimpleEnum::VALUEB);
+
+        NL_TEST_ASSERT(apSuite, t.c.d.size() == 4);
 
         for (uint32_t i = 0; i < t.c.d.size(); i++)
         {
@@ -294,7 +283,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
         char strbuf[10]    = "chip";
         clusters::TestCluster::SimpleStruct::Type structList[4];
         uint8_t i = 0;
-        chip::ByteSpan spanList[4];
+        ByteSpan spanList[4];
 
         t.a   = 20;
         t.b   = true;
@@ -320,7 +309,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
 
         t.g = buf;
 
-        t.c.e = chip::Span<char>{ strbuf, strlen(strbuf) };
+        t.c.e = Span<char>{ strbuf, strlen(strbuf) };
         t.d   = structList;
 
         err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
@@ -336,7 +325,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
     // Decode
     //
     {
-        clusters::TestCluster::DecodableNestedStructList::Type t;
+        clusters::TestCluster::NestedStructList::DecodableType t;
         int i;
 
         _this->SetupReader();
@@ -357,12 +346,12 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
             while (iter.Next())
             {
                 auto & item = iter.GetValue();
-                NL_TEST_ASSERT(apSuite, item.a == (uint8_t) i);
+                NL_TEST_ASSERT(apSuite, item.a == static_cast<uint8_t>(i));
                 NL_TEST_ASSERT(apSuite, item.b == true);
                 i++;
             }
 
-            NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
             NL_TEST_ASSERT(apSuite, i == 4);
         }
 
@@ -372,11 +361,11 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
             while (iter.Next())
             {
                 auto & item = iter.GetValue();
-                NL_TEST_ASSERT(apSuite, item == (unsigned int) (i + 10000));
+                NL_TEST_ASSERT(apSuite, item == static_cast<uint32_t>(i + 10000));
                 i++;
             }
 
-            NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
             NL_TEST_ASSERT(apSuite, i == 4);
         }
 
@@ -398,7 +387,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
                 i++;
             }
 
-            NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
             NL_TEST_ASSERT(apSuite, i == 4);
         }
 
@@ -413,7 +402,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
                 i++;
             }
 
-            NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
             NL_TEST_ASSERT(apSuite, i == 4);
         }
     }
@@ -442,7 +431,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDo
         i = 0;
         for (auto & item : structList)
         {
-            item.a = (uint8_t)(35 + i);
+            item.a = static_cast<uint8_t>(35 + i);
             i++;
         }
 
@@ -464,7 +453,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDo
     // Decode
     //
     {
-        clusters::TestCluster::DecodableDoubleNestedStructList::Type t;
+        clusters::TestCluster::DoubleNestedStructList::DecodableType t;
 
         _this->SetupReader();
 
@@ -484,7 +473,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDo
             {
                 auto & nestedItem = nestedIter.GetValue();
 
-                NL_TEST_ASSERT(apSuite, nestedItem.a == ((uint8_t) 35 + j));
+                NL_TEST_ASSERT(apSuite, nestedItem.a == (static_cast<uint8_t>(35) + j));
                 j++;
             }
 
@@ -492,7 +481,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDo
             i++;
         }
 
-        NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, i == 4);
     }
 }
@@ -518,7 +507,7 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
         t.c = clusters::TestCluster::SimpleEnum::VALUEA;
         t.d = buf;
 
-        t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
+        t.e = Span<char>{ strbuf, strlen(strbuf) };
 
         // Encode every field manually except a.
         {
@@ -556,6 +545,8 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
         NL_TEST_ASSERT(apSuite, t.b == true);
         NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::VALUEA);
 
+        NL_TEST_ASSERT(apSuite, t.d.size() == 4);
+
         for (uint32_t i = 0; i < t.d.size(); i++)
         {
             NL_TEST_ASSERT(apSuite, t.d.data()[i] == i);
@@ -586,7 +577,7 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
         t.c = clusters::TestCluster::SimpleEnum::VALUEA;
         t.d = buf;
 
-        t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
+        t.e = Span<char>{ strbuf, strlen(strbuf) };
 
         // Encode every field + an extra field.
         {
@@ -622,6 +613,8 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
         NL_TEST_ASSERT(apSuite, t.b == true);
         NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::VALUEA);
 
+        NL_TEST_ASSERT(apSuite, t.d.size() == 4);
+
         for (uint32_t i = 0; i < t.d.size(); i++)
         {
             NL_TEST_ASSERT(apSuite, t.d.data()[i] == i);
@@ -631,16 +624,6 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
     }
 }
 
-struct ByteSpann : public Span<uint8_t>
-{
-};
-
-struct UintSpann : public Span<uint8_t>
-{
-};
-
-void DoSomething(ByteSpann s) {}
-
 void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTypes(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err;
@@ -648,9 +631,6 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
-    ByteSpann s;
-
-    DoSomething(s);
 
     //
     // Case #1: Swap out field a (an integer) with a boolean.
@@ -669,7 +649,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
             t.c = clusters::TestCluster::SimpleEnum::VALUEA;
             t.d = buf;
 
-            t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
+            t.e = Span<char>{ strbuf, strlen(strbuf) };
 
             // Encode every field manually except a.
             {
@@ -720,7 +700,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
             t.c = clusters::TestCluster::SimpleEnum::VALUEA;
             t.d = buf;
 
-            t.e = chip::Span<char>{ strbuf, strlen(strbuf) };
+            t.e = Span<char>{ strbuf, strlen(strbuf) };
 
             // Encode every field manually except a.
             {
@@ -787,7 +767,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
     // Decode
     //
     {
-        clusters::TestCluster::DecodableNestedStructList::Type t;
+        clusters::TestCluster::NestedStructList::DecodableType t;
 
         _this->SetupReader();
 
@@ -802,71 +782,45 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
             hadItems = true;
         }
 
-        NL_TEST_ASSERT(apSuite, iter.GetError() != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, iter.GetStatus() != CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !hadItems);
     }
 }
 
-} // namespace app
-} // namespace chip
-
-namespace {
-
-void InitializeChip(nlTestSuite * apSuite)
+int Initialize(void * apSuite)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    chip::Transport::FabricTable fabrics;
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    return SUCCESS;
+}
 
-    err = chip::Platform::MemoryInit();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    chip::gSystemLayer.Init();
-
-    err = chip::gSessionManager.Init(&chip::gSystemLayer, &chip::gTransportManager, &fabrics, &chip::gMessageCounterManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = chip::gExchangeManager.Init(&chip::gSessionManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&chip::gExchangeManager, nullptr);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+int Finalize(void * aContext)
+{
+    gTestDataModelSerialization.Shutdown();
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
 }
 
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("TestDataModelSerialization_EncAndDecSimple", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruct),
-    NL_TEST_DEF("TestDataModelSerialization_EncAndDecNestedStruct", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruct),
-    NL_TEST_DEF("TestDataModelSerialization_EncAndDecDecodableNestedStructList", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNestedStructList),
-    NL_TEST_DEF("TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList),
-    NL_TEST_DEF("TestDataModelSerialization_OptionalFields", chip::app::TestDataModelSerialization::TestDataModelSerialization_OptionalFields),
-    NL_TEST_DEF("TestDataModelSerialization_ExtraField", chip::app::TestDataModelSerialization::TestDataModelSerialization_ExtraField),
-    NL_TEST_DEF("TestDataModelSerialization_InvalidSimpleFieldTypes", chip::app::TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTypes),
-    NL_TEST_DEF("TestDataModelSerialization_InvalidListType", chip::app::TestDataModelSerialization::TestDataModelSerialization_InvalidListType),
+    NL_TEST_DEF("TestDataModelSerialization_EncAndDecSimple", TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruct),
+    NL_TEST_DEF("TestDataModelSerialization_EncAndDecNestedStruct", TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruct),
+    NL_TEST_DEF("TestDataModelSerialization_EncAndDecDecodableNestedStructList",  TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNestedStructList),
+    NL_TEST_DEF("TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList", TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList),
+    NL_TEST_DEF("TestDataModelSerialization_OptionalFields", TestDataModelSerialization::TestDataModelSerialization_OptionalFields),
+    NL_TEST_DEF("TestDataModelSerialization_ExtraField",  TestDataModelSerialization::TestDataModelSerialization_ExtraField),
+    NL_TEST_DEF("TestDataModelSerialization_InvalidSimpleFieldTypes", TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTypes),
+    NL_TEST_DEF("TestDataModelSerialization_InvalidListType", TestDataModelSerialization::TestDataModelSerialization_InvalidListType),
     NL_TEST_SENTINEL()
 };
 // clang-format on
 
-} // namespace
+nlTestSuite theSuite = { "TestDataModelSerialization", &sTests[0], Initialize, Finalize };
 
-int TestDataModelSerialization()
+int DataModelSerializationTest()
 {
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "TestDataModelSerialization",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
-
-    InitializeChip(&theSuite);
-
-    nlTestRunner(&theSuite, &chip::app::gTestDataModelSerialization);
-
+    nlTestRunner(&theSuite, &gTestDataModelSerialization);
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestDataModelSerialization)
+CHIP_REGISTER_TEST_SUITE(DataModelSerializationTest)

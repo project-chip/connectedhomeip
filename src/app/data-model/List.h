@@ -18,14 +18,9 @@
 
 #pragma once
 
-#include "Decode.h"
-#include "Encode.h"
-#include <iterator>
-#include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPSafeCasts.h>
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
 #include <lib/core/CHIPTLV.h>
-#include <lib/core/Optional.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
@@ -43,43 +38,32 @@ namespace DataModel {
 template <typename T>
 struct List : public Span<T>
 {
+    //
+    // The following 'using' statements are needed to make visible
+    // all constructors of the base class within this derived class,
+    // as well as introduce functions in the base class into the
+    // derived class.
+    //
+    // This is needed to make it seamless to initialize and interact with
+    // List<T> instances as though they were just Spans.
+    //
     using Span<T>::Span;
     using Span<T>::operator=;
 };
 
 template <typename X>
-inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, List<X> x)
+inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, List<X> list)
 {
     TLV::TLVType type;
 
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
-    for (auto & item : x)
+    for (auto & item : list)
     {
         ReturnErrorOnFailure(Encode(writer, TLV::AnonymousTag, item));
     }
     ReturnErrorOnFailure(writer.EndContainer(type));
 
     return CHIP_NO_ERROR;
-}
-
-template <typename X>
-CHIP_ERROR Decode(TLV::TLVReader & reader, List<X> & x)
-{
-    TLV::TLVType outer1;
-    size_t destBufSize = x.size();
-    uint32_t i         = 0;
-    CHIP_ERROR err;
-
-    ReturnErrorOnFailure(reader.EnterContainer(outer1));
-
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(destBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(DataModel::Decode(reader, x.data()[i]));
-        destBufSize--;
-    }
-
-    return reader.ExitContainer(outer1);
 }
 
 } // namespace DataModel

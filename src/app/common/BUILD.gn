@@ -14,23 +14,16 @@
 
 import("//build_overrides/chip.gni")
 
-config("includes") {
-  include_dirs =
-      [ "../../../zzz_generated/app-common/app-common/zap-generated" ]
-}
-
 static_library("cluster-objects") {
   output_name = "libClusterObjects"
 
-  sources = [ "../../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp" ]
+  sources = [ "cluster-objects.cpp" ]
 
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
-
-  public_configs = [ ":includes" ]
 
   defines = []
 }

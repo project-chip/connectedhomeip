@@ -18,12 +18,9 @@
 
 #pragma once
 
-#include <iterator>
-#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
-#include <lib/core/Optional.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
@@ -72,7 +69,7 @@ inline CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
 
     VerifyOrReturnError(reader.GetType() == TLV::kTLVType_UTF8String, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     ReturnErrorOnFailure(reader.Get(bs));
-    x = Span<const char>(Uint8::to_const_char(bs.data()), (size_t) bs.size());
+    x = Span<const char>(Uint8::to_const_char(bs.data()), bs.size());
     return CHIP_NO_ERROR;
 }
 
@@ -86,7 +83,10 @@ inline CHIP_ERROR Decode(TLV::TLVReader & reader, Span<const char> & x)
  * CHIP_ERROR <Object>::Decode(TLVReader &reader);
  *
  */
-template <typename X, typename std::enable_if_t<std::is_class<X>::value, int> = 0>
+template <
+    typename X,
+    typename std::enable_if_t<
+        std::is_class<X>::value && std::is_same<decltype(&X::Decode), CHIP_ERROR (X::*)(TLV::TLVReader &)>::value, X> * = nullptr>
 CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 {
     return x.Decode(reader);

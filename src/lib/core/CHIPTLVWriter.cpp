@@ -253,7 +253,7 @@ CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char * buf, uint32_t len)
     return WriteElementWithData(kTLVType_UTF8String, tag, reinterpret_cast<const uint8_t *>(buf), len);
 }
 
-CHIP_ERROR TLVWriter::PutString(uint64_t tag, const Span<const char> str)
+CHIP_ERROR TLVWriter::PutString(uint64_t tag, Span<const char> str)
 {
     if (!CanCastTo<uint32_t>(str.size()))
     {

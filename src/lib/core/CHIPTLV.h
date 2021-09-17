@@ -1394,7 +1394,7 @@ public:
      *                              TLVBackingStore.
      *
      */
-    CHIP_ERROR PutString(uint64_t tag, const Span<const char> str);
+    CHIP_ERROR PutString(uint64_t tag, Span<const char> str);
 
     /**
      * @brief

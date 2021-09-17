@@ -5,11 +5,6 @@
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/util/basic-types.h>
-#include <array>
-#include <lib/core/CHIPTLV.h>
-#include <string>
-#include <type_traits>
-#include <vector>
 
 namespace chip {
 namespace app {
@@ -111,21 +106,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-} // namespace NestedStructList
 
-namespace DecodableNestedStructList {
-enum FieldId
-{
-    kAFieldId = 0,
-    kBFieldId = 1,
-    kCFieldId = 2,
-    kDFieldId = 3,
-    kEFieldId = 4,
-    kFFieldId = 5,
-    kGFieldId = 6
-};
-
-struct Type
+struct DecodableType
 {
 public:
     uint8_t a = 0;
@@ -139,7 +121,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-} // namespace DecodableNestedStructList
+
+} // namespace NestedStructList
 
 namespace DoubleNestedStructList {
 enum FieldId
@@ -155,23 +138,18 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-} // namespace DoubleNestedStructList
 
-namespace DecodableDoubleNestedStructList {
-enum FieldId
-{
-    kAFieldId = 0,
-};
-
-struct Type
+struct DecodableType
 {
 public:
-    DataModel::DecodableList<DecodableNestedStructList::Type> a;
+    DataModel::DecodableList<NestedStructList::DecodableType> a;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-} // namespace DecodableDoubleNestedStructList
+
+} // namespace DoubleNestedStructList
+
 } // namespace TestCluster
 } // namespace clusters
 } // namespace app

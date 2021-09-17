@@ -2353,13 +2353,15 @@ void CheckCHIPTLVPutStringSpan(nlTestSuite * inSuite, void * inContext)
     Span<char> strSpan;
 
     //
-    // Write a string that has a size that exceeds 32-bits. Should error out.
+    // Write a string that has a size that exceeds 32-bits. This is only possible
+    // on platforms where size_t is bigger than uint32_t.
     //
+    if (sizeof(size_t) > sizeof(uint32_t))
     {
         writer.Init(backingStore, bufsize);
         snprintf(strBuffer, sizeof(strBuffer), "Sample string");
 
-        strSpan = { strBuffer, 0xffffffffff };
+        strSpan = { strBuffer, static_cast<size_t>(0xffffffffff) };
 
         err = writer.PutString(ProfileTag(TestProfile_1, 1), strSpan);
         NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);

@@ -18,12 +18,7 @@
 
 #pragma once
 
-#include <iterator>
-#include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
-#include <lib/core/Optional.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
@@ -51,7 +46,7 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, ByteSpan x)
     return writer.Put(tag, x);
 }
 
-inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, const Span<const char> x)
+inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, Span<const char> x)
 {
     return writer.PutString(tag, x);
 }
@@ -60,10 +55,10 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, const Span<const
  * @brief
  *
  * This specific variant that encodes cluster objects (like structs, commands, events) to TLV
- * depends on the presence of an Encode method on the object to present. The signature of that method
+ * depends on the presence of an Encode method on the object. The signature of that method
  * is as follows:
  *
- * CHIP_ERROR <Object>::Encode(TLVWriter &writer, uint64_t tag);
+ * CHIP_ERROR <Object>::Encode(TLVWriter &writer, uint64_t tag) const;
  *
  *
  */
@@ -72,7 +67,7 @@ template <
     typename std::enable_if_t<std::is_class<X>::value &&
                                   std::is_same<decltype(&X::Encode), CHIP_ERROR (X::*)(TLV::TLVWriter &, uint64_t) const>::value,
                               X> * = nullptr>
-CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, X & x)
+CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, const X & x)
 {
     return x.Encode(writer, tag);
 }
