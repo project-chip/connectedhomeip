@@ -47,8 +47,8 @@
 #include <app/util/af.h>
 #include <app/util/common.h>
 #include <array>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #if CHIP_DEVICE_LAYER_NONE
 #error "identify requrires a device layer"
