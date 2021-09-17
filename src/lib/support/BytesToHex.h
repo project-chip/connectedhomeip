@@ -88,8 +88,7 @@ CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_he
  * On success, number of bytes written to destination is always
  *   output_size = 16 + ((flags & HexFlags::kNullTerminate) ? 1 : 0);
  *
- * @param src_bytes Pointer to non-null buffer to convert
- * @param src_size Number of bytes to convert from src_bytes
+ * @param src 64-bit number to convert
  * @param [out] dest_hex Destination buffer to receive hex encoding
  * @param dest_size_max Maximum buffer size for the hex encoded `dest_hex` buffer
  *                      including null-terminator if needed.
