@@ -120,7 +120,7 @@ static void scheduleIdentifyTick(EndpointId endpoint)
             /* finish identify process */
             if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT == identify->mCurrentEffectIdentifier && identifyTime > 0)
             {
-                (void) chip::DeviceLayer::SystemLayer.StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick, identify);
+                (void) chip::DeviceLayer::SystemLayer().StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick, identify);
                 return;
             }
             /* stop identify process */
@@ -153,7 +153,7 @@ static void scheduleIdentifyTick(EndpointId endpoint)
                 identify->mOnIdentifyStart(identify);
             }
 
-            (void) chip::DeviceLayer::SystemLayer.StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick, identify);
+            (void) chip::DeviceLayer::SystemLayer().StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick, identify);
             return;
         }
         else
@@ -163,7 +163,7 @@ static void scheduleIdentifyTick(EndpointId endpoint)
         }
     }
 
-    (void) chip::DeviceLayer::SystemLayer.CancelTimer(onIdentifyClusterTick, identify);
+    (void) chip::DeviceLayer::SystemLayer().CancelTimer(onIdentifyClusterTick, identify);
 }
 
 void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
