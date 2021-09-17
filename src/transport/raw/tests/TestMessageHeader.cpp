@@ -139,7 +139,6 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(88ull));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
 
-
     // Verify Group Id helpers
     header.SetMessageCounter(234).SetSourceNodeId(77).SetDestinationGroupId(45);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_ERROR_INTERNAL);
@@ -151,11 +150,8 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationGroupId(2);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 234);
-    NL_TEST_ASSERT(inSuite, header.GetDestinationGroupId() == Optional<uint16_t>::Value((uint16_t)45));
+    NL_TEST_ASSERT(inSuite, header.GetDestinationGroupId() == Optional<uint16_t>::Value((uint16_t) 45));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
-
-
-
 }
 
 void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)

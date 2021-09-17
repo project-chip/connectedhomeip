@@ -180,7 +180,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     {
         mSourceNodeId.ClearValue();
     }
-    if(mFlags.HasAll(Header::FlagValues::kDestinationNodeIdPresent, Header::FlagValues::kDestinationGroupIdPresent))
+    if (mFlags.HasAll(Header::FlagValues::kDestinationNodeIdPresent, Header::FlagValues::kDestinationGroupIdPresent))
     {
         // Reserved.
         err = CHIP_ERROR_INTERNAL;
@@ -289,7 +289,6 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
 {
     VerifyOrReturnError(size >= EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!(mDestinationNodeId.HasValue() && mDestinationGroupId.HasValue()), CHIP_ERROR_INTERNAL);
-
 
     Header::Flags encodeFlags = mFlags;
     encodeFlags.Set(Header::FlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())

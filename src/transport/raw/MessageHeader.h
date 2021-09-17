@@ -29,9 +29,9 @@
 #include <type_traits>
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/GroupId.h>
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
-#include <lib/core/GroupId.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
