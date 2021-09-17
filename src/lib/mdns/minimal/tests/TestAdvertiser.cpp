@@ -65,7 +65,12 @@ const FullQName kInstanceName2                  = FullQName(kInstanceNameParts2)
 const QNamePart kTxtRecordEmptyParts[]          = { "=" };
 const FullQName kTxtRecordEmptyName             = FullQName(kTxtRecordEmptyParts);
 OperationalAdvertisingParameters operationalParams1 =
-    OperationalAdvertisingParameters().SetPeerId(kPeerId1).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+    OperationalAdvertisingParameters()
+        .SetPeerId(kPeerId1)
+        .SetMac(ByteSpan(kMac))
+        .SetPort(CHIP_PORT)
+        .EnableIpV4(true)
+        .SetMRPRetryIntervals(chip::Optional<uint32_t>(32), chip::Optional<uint32_t>(33));
 OperationalAdvertisingParameters operationalParams2 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams3 =
@@ -76,10 +81,11 @@ OperationalAdvertisingParameters operationalParams5 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId5).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams6 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId6).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+const QNamePart txtOperational1Parts[]  = { "CRI=32", "CRA=33" };
 PtrResourceRecord ptrOperationalService = PtrResourceRecord(kDnsSdQueryName, kMatterOperationalQueryName);
 PtrResourceRecord ptrOperational1       = PtrResourceRecord(kMatterOperationalQueryName, kInstanceName1);
 SrvResourceRecord srvOperational1       = SrvResourceRecord(kInstanceName1, kHostnameName, CHIP_PORT);
-TxtResourceRecord txtOperational1       = TxtResourceRecord(kInstanceName1, kTxtRecordEmptyName);
+TxtResourceRecord txtOperational1       = TxtResourceRecord(kInstanceName1, txtOperational1Parts);
 PtrResourceRecord ptrOperational2       = PtrResourceRecord(kMatterOperationalQueryName, kInstanceName2);
 SrvResourceRecord srvOperational2       = SrvResourceRecord(kInstanceName2, kHostnameName, CHIP_PORT);
 TxtResourceRecord txtOperational2       = TxtResourceRecord(kInstanceName2, kTxtRecordEmptyName);
@@ -162,9 +168,12 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetPairingHint(chip::Optional<uint16_t>(3))
         .SetPairingInstr(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingId(chip::Optional<const char *>("id_that_spins"));
+        .SetRotatingId(chip::Optional<const char *>("id_that_spins"))
+        .SetMRPRetryIntervals(chip::Optional<uint32_t>(3600000),
+                              chip::Optional<uint32_t>(3600005)); // 3600005 is more than the max so should be adjusted down
 QNamePart txtCommissionableNodeParamsLargeEnhancedParts[] = { "D=22",          "VP=555+897",       "CM=2",       "DT=25",
-                                                              "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3" };
+                                                              "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3",
+                                                              "CRA=3600000",   "CRI=3600000" };
 FullQName txtCommissionableNodeParamsLargeEnhancedName    = FullQName(txtCommissionableNodeParamsLargeEnhancedParts);
 TxtResourceRecord txtCommissionableNodeParamsLargeEnhanced =
     TxtResourceRecord(instanceName, txtCommissionableNodeParamsLargeEnhancedName);
