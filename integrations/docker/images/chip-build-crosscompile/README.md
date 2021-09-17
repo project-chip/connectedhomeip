@@ -47,7 +47,7 @@ image yet), the following symlinks are required:
 Once the sysroot is on the host machine, create the corresponding tar.xz file:
 
 ```
-tar cvfJ ubuntu-21.04-aarch64-sysroot.tar.gz ubuntu-21.04-aarch64-sysroot
+tar cvfJ ubuntu-21.04-aarch64-sysroot.tar.xz ubuntu-21.04-aarch64-sysroot
 ```
 
 #### CIPD image
