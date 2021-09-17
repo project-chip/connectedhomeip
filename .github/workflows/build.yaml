@@ -174,7 +174,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.0
+            image: connectedhomeip/chip-build:latest
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
