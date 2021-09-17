@@ -20,7 +20,7 @@ set -x
 env
 
 app="$1"
-root=examples/$app/Ameba/
+root=examples/$app/ameba/
 
 if [ -z "$app" ]; then
     echo "No mandatory app argument supplied!"

@@ -44,7 +44,6 @@ void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, 
     CHIPDeviceManagerCallbacks * cb = reinterpret_cast<CHIPDeviceManagerCallbacks *>(arg);
     if (cb != nullptr)
     {
-        printf("Common EventHandler hit!");
         cb->DeviceEventCallback(event, reinterpret_cast<intptr_t>(cb));
     }
 }
@@ -67,14 +66,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        printf("StartEventLoopTask() - ERROR!\r\n");
-    }
-    else
-    {
-        printf("StartEventLoopTask() - OK\r\n");
-    }
+    SuccessOrExit(err);
 
 exit:
     return err;
