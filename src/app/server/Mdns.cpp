@@ -256,8 +256,7 @@ CHIP_ERROR MdnsServer::AdvertiseOperational()
                     .SetPeerId(fabricInfo.GetPeerId())
                     .SetMac(FillMAC(mac))
                     .SetPort(GetSecuredPort())
-                    // TODO: This uses active twice, but we don't have an idle default. Is this as-intended?
-                    .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL),
+                    .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
                                           Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
                     .EnableIpV4(true);
 
@@ -334,8 +333,7 @@ CHIP_ERROR MdnsServer::Advertise(bool commissionableNode, chip::Mdns::Commission
     advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
 
-    // TODO: Set same as operational - this uses active twice, but we don't have an idle default. Is this as-intended?
-    advertiseParameters.SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL),
+    advertiseParameters.SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
                                              Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL));
 
     if (mode != chip::Mdns::CommissioningMode::kEnabledEnhanced)
