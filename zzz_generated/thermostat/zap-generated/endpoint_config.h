@@ -2370,6 +2370,9 @@
     const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {                                                             \
         (EmberAfGenericClusterFunction) emberAfBasicClusterServerInitCallback,                                                     \
     };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayEthernetNetworkDiagnosticsServer[] = {                                        \
+        (EmberAfGenericClusterFunction) emberAfEthernetNetworkDiagnosticsClusterServerInitCallback,                                \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayIdentifyServer[] = {                                                          \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
         (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerAttributeChangedCallback,                                      \
@@ -2438,9 +2441,12 @@
             {                                                                                                                      \
                 0x0036, ZAP_ATTRIBUTE_INDEX(95), 13, 46, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                       \
-            {                                                                                                                      \
-                0x0037, ZAP_ATTRIBUTE_INDEX(108), 6, 42, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
-            }, /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                   \
+            { 0x0037,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(108),                                                                                            \
+              6,                                                                                                                   \
+              42,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayEthernetNetworkDiagnosticsServer }, /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */   \
             {                                                                                                                      \
                 0x003C, ZAP_ATTRIBUTE_INDEX(114), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                     \
