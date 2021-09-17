@@ -951,7 +951,7 @@ using chip::Callback::Cancelable;
 
 - (void)stepHue:(uint8_t)stepMode
            stepSize:(uint8_t)stepSize
-     transitionTime:(uint8_t)transitionTime
+     transitionTime:(uint16_t)transitionTime
         optionsMask:(uint8_t)optionsMask
     optionsOverride:(uint8_t)optionsOverride
     responseHandler:(ResponseHandler)responseHandler
@@ -963,7 +963,7 @@ using chip::Callback::Cancelable;
 
 - (void)stepSaturation:(uint8_t)stepMode
               stepSize:(uint8_t)stepSize
-        transitionTime:(uint8_t)transitionTime
+        transitionTime:(uint16_t)transitionTime
            optionsMask:(uint8_t)optionsMask
        optionsOverride:(uint8_t)optionsOverride
        responseHandler:(ResponseHandler)responseHandler

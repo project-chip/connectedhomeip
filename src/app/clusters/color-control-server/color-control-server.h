@@ -154,7 +154,7 @@ public:
                         bool isEnhanced);
     bool moveSaturationCommand(uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride);
     bool moveToSaturationCommand(uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    bool stepSaturationCommand(uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
+    bool stepSaturationCommand(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
                                uint8_t optionsOverride);
     bool colorLoopCommand(uint8_t updateFlags, uint8_t action, uint8_t direction, uint16_t time, uint16_t startHue,
                           uint8_t optionsMask, uint8_t optionsOverride);
