@@ -42,6 +42,7 @@ class AmebaApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
+
 class AmebaBuilder(Builder):
 
     def __init__(self,
