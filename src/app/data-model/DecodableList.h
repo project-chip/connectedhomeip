@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "Decode.h"
 #include "Encode.h"
 #include <iterator>
 #include <lib/core/CHIPCore.h>
