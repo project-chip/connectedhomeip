@@ -33,7 +33,7 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
+CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
@@ -41,7 +41,6 @@ CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, Interaction
     VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     mpExchangeMgr = apExchangeMgr;
-    mpDelegate    = apDelegate;
     err           = Reset();
     SuccessOrExit(err);
 
@@ -121,25 +120,6 @@ CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload,
 
 exit:
     return err;
-}
-
-void Command::Shutdown()
-{
-    VerifyOrReturn(mState != CommandState::Uninitialized);
-    AbortExistingExchangeContext();
-    ShutdownInternal();
-}
-
-void Command::ShutdownInternal()
-{
-    mCommandMessageWriter.Reset();
-
-    mpExchangeMgr = nullptr;
-    mpExchangeCtx = nullptr;
-    mpDelegate    = nullptr;
-    ClearState();
-
-    mCommandIndex = 0;
 }
 
 CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus)
