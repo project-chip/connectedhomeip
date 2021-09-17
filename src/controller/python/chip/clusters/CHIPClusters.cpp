@@ -4501,6 +4501,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_ActiveBatteryCha
         .AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_FeatureMap(chip::Controller::Device * device,
+                                                                           chip::EndpointId ZCLendpointId,
+                                                                           chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeFeatureMap(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_ClusterRevision(chip::Controller::Device * device,
                                                                                 chip::EndpointId ZCLendpointId,
                                                                                 chip::GroupId /* ZCLgroupId */)

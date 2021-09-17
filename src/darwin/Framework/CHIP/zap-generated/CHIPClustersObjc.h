@@ -1220,6 +1220,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveBatteryChargeFaultsWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

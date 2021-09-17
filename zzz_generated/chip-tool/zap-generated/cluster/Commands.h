@@ -15777,6 +15777,7 @@ private:
 | * BatteryFunctionalWhileCharging                                    | 0x001C |
 | * BatteryChargingCurrent                                            | 0x001D |
 | * ActiveBatteryChargeFaults                                         | 0x001E |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -16863,6 +16864,40 @@ private:
     chip::Callback::Callback<PowerSourceActiveBatteryChargeFaultsListAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>(
             OnPowerSourceActiveBatteryChargeFaultsListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadPowerSourceFeatureMap : public ModelCommand
+{
+public:
+    ReadPowerSourceFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -27239,6 +27274,7 @@ void registerClusterPowerSource(Commands & commands)
         make_unique<ReadPowerSourceBatteryFunctionalWhileCharging>(), //
         make_unique<ReadPowerSourceBatteryChargingCurrent>(),         //
         make_unique<ReadPowerSourceActiveBatteryChargeFaults>(),      //
+        make_unique<ReadPowerSourceFeatureMap>(),                     //
         make_unique<ReadPowerSourceClusterRevision>(),                //
     };
 

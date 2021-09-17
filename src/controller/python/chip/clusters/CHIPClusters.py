@@ -2537,6 +2537,11 @@ class ChipClusters:
                     "attributeId": 0x0000001E,
                     "type": "int",
                 },
+                0x0000FFFC: {
+                    "attributeName": "FeatureMap",
+                    "attributeId": 0x0000FFFC,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -5164,6 +5169,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryChargingCurrent(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeActiveBatteryChargeFaults(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveBatteryChargeFaults(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPowerSource_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PowerSource_FeatureMap(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterPressureMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -6838,6 +6845,9 @@ class ChipClusters:
         # Cluster PowerSource ReadAttribute ActiveBatteryChargeFaults
         self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveBatteryChargeFaults.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveBatteryChargeFaults.restype = ctypes.c_uint32
+        # Cluster PowerSource ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_PowerSource_FeatureMap.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PowerSource_FeatureMap.restype = ctypes.c_uint32
         # Cluster PowerSource ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_PowerSource_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PowerSource_ClusterRevision.restype = ctypes.c_uint32

@@ -424,6 +424,59 @@ EmberAfStatus SetBatteryChargingCurrent(chip::EndpointId endpoint, uint32_t batt
 } // namespace Attributes
 } // namespace PowerSource
 
+namespace PowerSource {
+namespace Attributes {
+EmberAfStatus GetStatus(chip::EndpointId endpoint, uint8_t * status); // enum8
+EmberAfStatus SetStatus(chip::EndpointId endpoint, uint8_t status);
+EmberAfStatus GetOrder(chip::EndpointId endpoint, uint8_t * order); // int8u
+EmberAfStatus SetOrder(chip::EndpointId endpoint, uint8_t order);
+EmberAfStatus GetWiredAssessedInputVoltage(chip::EndpointId endpoint, uint32_t * wiredAssessedInputVoltage); // int32u
+EmberAfStatus SetWiredAssessedInputVoltage(chip::EndpointId endpoint, uint32_t wiredAssessedInputVoltage);
+EmberAfStatus GetWiredAssessedInputFrequency(chip::EndpointId endpoint, uint16_t * wiredAssessedInputFrequency); // int16u
+EmberAfStatus SetWiredAssessedInputFrequency(chip::EndpointId endpoint, uint16_t wiredAssessedInputFrequency);
+EmberAfStatus GetWiredCurrentType(chip::EndpointId endpoint, uint8_t * wiredCurrentType); // enum8
+EmberAfStatus SetWiredCurrentType(chip::EndpointId endpoint, uint8_t wiredCurrentType);
+EmberAfStatus GetWiredAssessedCurrent(chip::EndpointId endpoint, uint32_t * wiredAssessedCurrent); // int32u
+EmberAfStatus SetWiredAssessedCurrent(chip::EndpointId endpoint, uint32_t wiredAssessedCurrent);
+EmberAfStatus GetWiredNominalVoltage(chip::EndpointId endpoint, uint32_t * wiredNominalVoltage); // int32u
+EmberAfStatus SetWiredNominalVoltage(chip::EndpointId endpoint, uint32_t wiredNominalVoltage);
+EmberAfStatus GetWiredMaximumCurrent(chip::EndpointId endpoint, uint32_t * wiredMaximumCurrent); // int32u
+EmberAfStatus SetWiredMaximumCurrent(chip::EndpointId endpoint, uint32_t wiredMaximumCurrent);
+EmberAfStatus GetWiredPresent(chip::EndpointId endpoint, bool * wiredPresent); // boolean
+EmberAfStatus SetWiredPresent(chip::EndpointId endpoint, bool wiredPresent);
+EmberAfStatus GetBatteryVoltage(chip::EndpointId endpoint, uint32_t * batteryVoltage); // int32u
+EmberAfStatus SetBatteryVoltage(chip::EndpointId endpoint, uint32_t batteryVoltage);
+EmberAfStatus GetBatteryPercentRemaining(chip::EndpointId endpoint, uint8_t * batteryPercentRemaining); // int8u
+EmberAfStatus SetBatteryPercentRemaining(chip::EndpointId endpoint, uint8_t batteryPercentRemaining);
+EmberAfStatus GetBatteryTimeRemaining(chip::EndpointId endpoint, uint32_t * batteryTimeRemaining); // int32u
+EmberAfStatus SetBatteryTimeRemaining(chip::EndpointId endpoint, uint32_t batteryTimeRemaining);
+EmberAfStatus GetBatteryChargeLevel(chip::EndpointId endpoint, uint8_t * batteryChargeLevel); // enum8
+EmberAfStatus SetBatteryChargeLevel(chip::EndpointId endpoint, uint8_t batteryChargeLevel);
+EmberAfStatus GetBatteryReplacementNeeded(chip::EndpointId endpoint, bool * batteryReplacementNeeded); // boolean
+EmberAfStatus SetBatteryReplacementNeeded(chip::EndpointId endpoint, bool batteryReplacementNeeded);
+EmberAfStatus GetBatteryReplaceability(chip::EndpointId endpoint, uint8_t * batteryReplaceability); // enum8
+EmberAfStatus SetBatteryReplaceability(chip::EndpointId endpoint, uint8_t batteryReplaceability);
+EmberAfStatus GetBatteryPresent(chip::EndpointId endpoint, bool * batteryPresent); // boolean
+EmberAfStatus SetBatteryPresent(chip::EndpointId endpoint, bool batteryPresent);
+EmberAfStatus GetBatteryCommonDesignation(chip::EndpointId endpoint, uint32_t * batteryCommonDesignation); // int32u
+EmberAfStatus SetBatteryCommonDesignation(chip::EndpointId endpoint, uint32_t batteryCommonDesignation);
+EmberAfStatus GetBatteryApprovedChemistry(chip::EndpointId endpoint, uint32_t * batteryApprovedChemistry); // int32u
+EmberAfStatus SetBatteryApprovedChemistry(chip::EndpointId endpoint, uint32_t batteryApprovedChemistry);
+EmberAfStatus GetBatteryCapacity(chip::EndpointId endpoint, uint32_t * batteryCapacity); // int32u
+EmberAfStatus SetBatteryCapacity(chip::EndpointId endpoint, uint32_t batteryCapacity);
+EmberAfStatus GetBatteryQuantity(chip::EndpointId endpoint, uint8_t * batteryQuantity); // int8u
+EmberAfStatus SetBatteryQuantity(chip::EndpointId endpoint, uint8_t batteryQuantity);
+EmberAfStatus GetBatteryChargeState(chip::EndpointId endpoint, uint8_t * batteryChargeState); // enum8
+EmberAfStatus SetBatteryChargeState(chip::EndpointId endpoint, uint8_t batteryChargeState);
+EmberAfStatus GetBatteryTimeToFullCharge(chip::EndpointId endpoint, uint32_t * batteryTimeToFullCharge); // int32u
+EmberAfStatus SetBatteryTimeToFullCharge(chip::EndpointId endpoint, uint32_t batteryTimeToFullCharge);
+EmberAfStatus GetBatteryFunctionalWhileCharging(chip::EndpointId endpoint, bool * batteryFunctionalWhileCharging); // boolean
+EmberAfStatus SetBatteryFunctionalWhileCharging(chip::EndpointId endpoint, bool batteryFunctionalWhileCharging);
+EmberAfStatus GetBatteryChargingCurrent(chip::EndpointId endpoint, uint32_t * batteryChargingCurrent); // int32u
+EmberAfStatus SetBatteryChargingCurrent(chip::EndpointId endpoint, uint32_t batteryChargingCurrent);
+} // namespace Attributes
+} // namespace PowerSource
+
 namespace GeneralCommissioning {
 namespace Attributes {
 EmberAfStatus GetBreadcrumb(chip::EndpointId endpoint, uint64_t * breadcrumb); // int64u

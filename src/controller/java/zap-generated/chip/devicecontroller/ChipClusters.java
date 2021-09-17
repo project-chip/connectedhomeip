@@ -4227,6 +4227,10 @@ public class ChipClusters {
       readActiveBatteryChargeFaultsAttribute(chipClusterPtr, callback);
     }
 
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -4321,6 +4325,9 @@ public class ChipClusters {
 
     private native void readActiveBatteryChargeFaultsAttribute(
         long chipClusterPtr, ActiveBatteryChargeFaultsAttributeCallback callback);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

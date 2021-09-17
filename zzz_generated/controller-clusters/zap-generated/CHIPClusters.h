@@ -1073,6 +1073,7 @@ public:
                                                    Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeActiveBatteryChargeFaults(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
