@@ -305,6 +305,40 @@ public:
     static void OnSuccessFn(void * context, uint16_t count, _FabricDescriptor * entries);
 };
 
+class CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceActiveWiredFaultsListAttributeCallback>
+{
+public:
+    CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceActiveWiredFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, uint16_t count, uint8_t * entries);
+};
+
+class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>
+{
+public:
+    CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, uint16_t count, uint8_t * entries);
+};
+
+class CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>
+{
+public:
+    CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context, uint16_t count, uint8_t * entries);
+};
+
 class CHIPTvChannelTvChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>
 {
 public:

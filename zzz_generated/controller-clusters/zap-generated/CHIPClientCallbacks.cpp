@@ -893,7 +893,10 @@ void PowerSourceClusterActiveWiredFaultsListAttributeFilter(TLV::TLVReader * tlv
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     uint8_t data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -922,7 +925,10 @@ void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(TLV::TLVReader * t
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     uint8_t data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);
@@ -952,7 +958,10 @@ void PowerSourceClusterActiveBatteryChargeFaultsListAttributeFilter(TLV::TLVRead
 
     CHECK_MESSAGE_LENGTH_VOID(2);
     uint16_t count = Encoding::LittleEndian::Read16(message);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
     uint8_t data[count];
+#pragma GCC diagnostic pop
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(1);

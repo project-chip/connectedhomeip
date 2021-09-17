@@ -80,14 +80,14 @@ typedef struct _BatChargeFaultChangeType
 {
     /* TYPE WARNING: array array defaults to */ uint8_t * current;
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
-} EmberAfBatChargeFaultChangeType;
+} BatChargeFaultChangeType;
 
 // Struct for BatFaultChangeType
 typedef struct _BatFaultChangeType
 {
     /* TYPE WARNING: array array defaults to */ uint8_t * current;
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
-} EmberAfBatFaultChangeType;
+} BatFaultChangeType;
 
 // Struct for ConfigureReportingRecord
 typedef struct _ConfigureReportingRecord
@@ -473,7 +473,7 @@ typedef struct _WiredFaultChangeType
 {
     /* TYPE WARNING: array array defaults to */ uint8_t * current;
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
-} EmberAfWiredFaultChangeType;
+} WiredFaultChangeType;
 
 // Struct for WriteAttributeRecord
 typedef struct _WriteAttributeRecord
