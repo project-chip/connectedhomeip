@@ -2489,5 +2489,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+ *
+ * @brief If true, VerifyOrDie() calls with no message will use an
+ *        automatically generated message that makes it clear what failed.
+ */
+#ifndef CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE 0
+#endif
+
+/**
  * @}
  */
