@@ -568,7 +568,7 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)(JNIEnv * env, jobject self, jlong
     CHIP_ERROR err      = CHIP_NO_ERROR;
     Device * chipDevice = nullptr;
     std::string QRCode;
-    std::string manualPairingCode;    
+    std::string manualPairingCode;
     chip::SetupPayload setupPayload;
     setupPayload.discriminator = discriminator;
     setupPayload.setUpPINCode = setupPinCode;
