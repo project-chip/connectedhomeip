@@ -495,7 +495,7 @@ inline void chipDie(void)
  *
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
-#define VerifyOrDie(aCondition) \
+#define VerifyOrDie(aCondition)                                                                                                    \
     nlABORT_ACTION(aCondition, ChipLogDetail(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition) nlABORT(aCondition)
