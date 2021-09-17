@@ -43,7 +43,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 {
     *olen = 0;
 
-    if (len < sizeof(unsigned char))
+    if (len == 0)
         return (0);
 
     rtw_get_random_bytes(output, len);
