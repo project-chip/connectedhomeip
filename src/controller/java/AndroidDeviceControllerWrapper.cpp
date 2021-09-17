@@ -25,6 +25,7 @@
 #include "JniReferences.h"
 #include <lib/support/CodeUtils.h>
 
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <lib/core/CHIPTLV.h>
@@ -205,19 +206,20 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller), stackLock));
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
-    wrapper->Controller()->SetUdpListenPort(CHIP_PORT + 1);
 
     // Initialize device attestation verifier
     SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
 
-    chip::Controller::CommissionerInitParams initParams;
+    chip::Controller::FactoryInitParams initParams;
+    chip::Controller::SetupParams setupParams;
 
-    initParams.storageDelegate                = wrapper.get();
-    initParams.pairingDelegate                = wrapper.get();
-    initParams.operationalCredentialsDelegate = wrapper.get();
-    initParams.systemLayer                    = systemLayer;
-    initParams.inetLayer                      = inetLayer;
-    initParams.bleLayer                       = GetJNIBleLayer();
+    initParams.storageDelegate                 = wrapper.get();
+    initParams.systemLayer                     = systemLayer;
+    initParams.inetLayer                       = inetLayer;
+    initParams.bleLayer                        = GetJNIBleLayer();
+    initParams.listenPort                      = CHIP_PORT + 1;
+    setupParams.pairingDelegate                = wrapper.get();
+    setupParams.operationalCredentialsDelegate = wrapper.get();
 
     wrapper->InitializeOperationalCredentialsIssuer();
 
@@ -252,13 +254,17 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         return nullptr;
     }
 
-    initParams.ephemeralKeypair = &ephemeralKey;
-    initParams.controllerRCAC   = rcacSpan;
-    initParams.controllerICAC   = icacSpan;
-    initParams.controllerNOC    = nocSpan;
+    setupParams.ephemeralKeypair = &ephemeralKey;
+    setupParams.controllerRCAC   = rcacSpan;
+    setupParams.controllerICAC   = icacSpan;
+    setupParams.controllerNOC    = nocSpan;
 
-    *errInfoOnFailure = wrapper->Controller()->Init(initParams);
-
+    *errInfoOnFailure = DeviceControllerFactory::GetInstance().Init(initParams);
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+    *errInfoOnFailure = DeviceControllerFactory::GetInstance().SetupCommissioner(setupParams, *wrapper->Controller());
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;

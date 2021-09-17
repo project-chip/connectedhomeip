@@ -32,6 +32,7 @@
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
+#include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/DeviceControllerInteractionModelDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
@@ -82,15 +83,9 @@ void BasicFailure(void * context, uint8_t status);
 struct ControllerInitParams
 {
     PersistentStorageDelegate * storageDelegate = nullptr;
-    System::Layer * systemLayer                 = nullptr;
-    Inet::InetLayer * inetLayer                 = nullptr;
-
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * bleLayer = nullptr;
-#endif
-    DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
+    DeviceControllerSystemState * systemState   = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
+    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate = nullptr;
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
@@ -108,6 +103,8 @@ struct ControllerInitParams
     /* The port used for operational communication to listen for and send messages over UDP/TCP.
      * The default value of `0` will pick any available port. */
     uint16_t listenPort = 0;
+
+    FabricId fabricId = kUndefinedFabricId;
 };
 
 enum CommissioningStage : uint8_t
@@ -247,21 +244,11 @@ public:
 
     void PersistDevice(Device * device);
 
-    CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
-
     virtual void ReleaseDevice(Device * device);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
 #endif
-
-    // ----- IO -----
-    /**
-     * @brief
-     * Start the event loop task within the CHIP stack
-     * @return CHIP_ERROR   The return status
-     */
-    CHIP_ERROR ServiceEvents();
 
     /**
      * @brief Get the Compressed Fabric ID assigned to the device.
@@ -273,7 +260,14 @@ public:
      */
     uint64_t GetFabricId() const { return mFabricId; }
 
-    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() { return mInteractionModelDelegate; }
+    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate()
+    {
+        if (mSystemState != nullptr)
+        {
+            return mSystemState->IMDelegate();
+        }
+        return nullptr;
+    }
 
 protected:
     enum class State
@@ -296,24 +290,14 @@ protected:
     PeerId mLocalId    = PeerId();
     FabricId mFabricId = kUndefinedFabricId;
 
-    DeviceTransportMgr * mTransportMgr                             = nullptr;
-    SessionManager * mSessionManager                               = nullptr;
-    Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
-    secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
-    PersistentStorageDelegate * mStorageDelegate                   = nullptr;
-    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate  = nullptr;
+    PersistentStorageDelegate * mStorageDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Mdns::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
 #endif
-    Inet::InetLayer * mInetLayer = nullptr;
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * mBleLayer = nullptr;
-#endif
-    System::Layer * mSystemLayer                                         = nullptr;
-    DeviceControllerInteractionModelDelegate * mInteractionModelDelegate = nullptr;
+    DeviceControllerSystemState * mSystemState = nullptr;
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
@@ -328,7 +312,6 @@ protected:
     void PersistNextKeyId();
 
     FabricIndex mFabricIndex = Transport::kMinValidFabricIndex;
-    Transport::FabricTable mFabrics;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 

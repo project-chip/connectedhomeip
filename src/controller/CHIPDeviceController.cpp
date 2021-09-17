@@ -109,8 +109,6 @@ constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondsPerSecond;
 DeviceController::DeviceController()
 {
     mState                    = State::NotInitialized;
-    mSessionManager           = nullptr;
-    mExchangeMgr              = nullptr;
     mStorageDelegate          = nullptr;
     mPairedDevicesInitialized = false;
 }
@@ -118,95 +116,42 @@ DeviceController::DeviceController()
 CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 {
     VerifyOrReturnError(mState == State::NotInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(params.systemState != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (params.systemLayer != nullptr && params.inetLayer != nullptr)
-    {
-        mSystemLayer = params.systemLayer;
-        mInetLayer   = params.inetLayer;
-        mListenPort  = params.listenPort;
-    }
-    else
-    {
-#if CONFIG_DEVICE_LAYER
-        ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
+    VerifyOrReturnError(params.systemState->SystemLayer() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.systemState->InetLayer() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-        mSystemLayer = &DeviceLayer::SystemLayer();
-        mInetLayer   = &DeviceLayer::InetLayer;
-#endif // CONFIG_DEVICE_LAYER
-    }
-
-    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mInetLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mListenPort = params.listenPort;
 
     mStorageDelegate = params.storageDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
-#if CONFIG_DEVICE_LAYER
-    if (params.bleLayer == nullptr)
-    {
-        params.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
-    }
-#endif // CONFIG_DEVICE_LAYER
-    mBleLayer = params.bleLayer;
-    VerifyOrReturnError(mBleLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.systemState->BleLayer() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 #endif
 
-    mTransportMgr          = chip::Platform::New<DeviceTransportMgr>();
-    mSessionManager        = chip::Platform::New<SessionManager>();
-    mExchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
-    mMessageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
+    VerifyOrReturnError(params.systemState->TransportMgr() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(mTransportMgr->Init(
-        Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
-#if INET_CONFIG_ENABLE_IPV4
-            ,
-        Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(mListenPort)
-#endif
-#if CONFIG_NETWORK_LAYER_BLE
-            ,
-        Transport::BleListenParameters(mBleLayer)
-#endif
-            ));
-
-    ReturnErrorOnFailure(mFabrics.Init(mStorageDelegate));
-
-    ReturnErrorOnFailure(mSessionManager->Init(mSystemLayer, mTransportMgr, &mFabrics, mMessageCounterManager));
-
-    ReturnErrorOnFailure(mExchangeMgr->Init(mSessionManager));
-
-    ReturnErrorOnFailure(mMessageCounterManager->Init(mExchangeMgr));
-
-    ReturnErrorOnFailure(mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this));
-
-    if (params.imDelegate != nullptr)
-    {
-        mInteractionModelDelegate = params.imDelegate;
-    }
-    else
-    {
-        mDefaultIMDelegate        = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
-        mInteractionModelDelegate = mDefaultIMDelegate;
-    }
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, mInteractionModelDelegate));
-
-    mExchangeMgr->SetDelegate(this);
+    // TODO Exchange Mgr needs to be able to track multiple delegates. Delegate API should be able to query for the right delegate
+    // to handle events.
+    ReturnErrorOnFailure(
+        params.systemState->ExchangeMgr()->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this));
+    params.systemState->ExchangeMgr()->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     ReturnErrorOnFailure(Mdns::Resolver::Instance().SetResolverDelegate(this));
-    RegisterDeviceAddressUpdateDelegate(params.mDeviceAddressUpdateDelegate);
-    Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort);
+    RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
+    Mdns::Resolver::Instance().StartResolver(params.systemState->InetLayer(), kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
-    InitDataModelHandler(mExchangeMgr);
+    InitDataModelHandler(params.systemState->ExchangeMgr());
 
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
     ReturnErrorOnFailure(ProcessControllerNOCChain(params));
 
-    mState = State::Initialized;
-
+    mSystemState = params.systemState->Retain();
+    mState       = State::Initialized;
     ReleaseAllDevices();
-
     return CHIP_NO_ERROR;
 }
 
@@ -244,7 +189,7 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     ReturnErrorOnFailure(newFabric.SetNOCCert(chipCertSpan));
     newFabric.SetVendorId(params.controllerVendorId);
 
-    Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
+    Transport::FabricInfo * fabric = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
@@ -272,97 +217,23 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mState = State::NotInitialized;
 
-    // Shut down the interaction model before we try shuttting down the exchange
-    // manager.
-    app::InteractionModelEngine::GetInstance()->Shutdown();
-
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     Mdns::Resolver::Instance().ShutdownResolver();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
-
-    // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
-    // if (mExchangeMgr != nullptr)
-    // {
-    //     mExchangeMgr->Shutdown();
-    // }
-    if (mSessionManager != nullptr)
-    {
-        mSessionManager->Shutdown();
-    }
 
     mStorageDelegate = nullptr;
 
     ReleaseAllDevices();
 
-#if CONFIG_DEVICE_LAYER
-    //
-    // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
-    // expects to be called with external thread synchronization and will not try to acquire the
-    // stack lock.
-    //
-    // Actually stopping the event queue is a separable call that applications will have to sequence.
-    // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
-    // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
-    //
-    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
-#else
-    ReturnErrorOnFailure(mInetLayer->Shutdown());
-    ReturnErrorOnFailure(mSystemLayer->Shutdown());
-    chip::Platform::Delete(mInetLayer);
-    chip::Platform::Delete(mSystemLayer);
-#endif // CONFIG_DEVICE_LAYER
-
-    mSystemLayer = nullptr;
-    mInetLayer   = nullptr;
-
-    if (mMessageCounterManager != nullptr)
-    {
-        chip::Platform::Delete(mMessageCounterManager);
-        mMessageCounterManager = nullptr;
-    }
-
-    if (mExchangeMgr != nullptr)
-    {
-        chip::Platform::Delete(mExchangeMgr);
-        mExchangeMgr = nullptr;
-    }
-
-    if (mSessionManager != nullptr)
-    {
-        chip::Platform::Delete(mSessionManager);
-        mSessionManager = nullptr;
-    }
-
-    if (mTransportMgr != nullptr)
-    {
-        chip::Platform::Delete(mTransportMgr);
-        mTransportMgr = nullptr;
-    }
-
-    if (mDefaultIMDelegate != nullptr)
-    {
-        chip::Platform::Delete(mDefaultIMDelegate);
-        mDefaultIMDelegate = nullptr;
-    }
-
-    mFabrics.ReleaseFabricIndex(mFabricIndex);
+    mSystemState->Fabrics()->ReleaseFabricIndex(mFabricIndex);
+    mSystemState->Release();
+    mSystemState = nullptr;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     Mdns::Resolver::Instance().SetResolverDelegate(nullptr);
     mDeviceAddressUpdateDelegate = nullptr;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceController::SetUdpListenPort(uint16_t listenPort)
-{
-    if (mState == State::Initialized)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    mListenPort = listenPort;
     return CHIP_NO_ERROR;
 }
 
@@ -473,17 +344,6 @@ void DeviceController::PersistDevice(Device * device)
     {
         ChipLogError(Controller, "Failed to persist device. Controller not initialized.");
     }
-}
-
-CHIP_ERROR DeviceController::ServiceEvents()
-{
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-
-#if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().StartEventLoopTask());
-#endif // CONFIG_DEVICE_LAYER
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -719,14 +579,14 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
     return ControllerDeviceInitParams{
-        .transportMgr    = mTransportMgr,
-        .sessionManager  = mSessionManager,
-        .exchangeMgr     = mExchangeMgr,
-        .inetLayer       = mInetLayer,
+        .transportMgr    = mSystemState->TransportMgr(),
+        .sessionManager  = mSystemState->SessionMgr(),
+        .exchangeMgr     = mSystemState->ExchangeMgr(),
+        .inetLayer       = mSystemState->InetLayer(),
         .storageDelegate = mStorageDelegate,
         .idAllocator     = &mIDAllocator,
-        .fabricsTable    = &mFabrics,
-        .imDelegate      = mInteractionModelDelegate,
+        .fabricsTable    = mSystemState->Fabrics(),
+        .imDelegate      = mSystemState->IMDelegate(),
     };
 }
 
@@ -761,18 +621,18 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
-    ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mInetLayer)
+    ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->InetLayer())
                                                     .SetAddressType(Inet::kIPAddressType_IPv6)
                                                     .SetListenPort((uint16_t)(mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
-                                                Transport::UdpListenParameters(mInetLayer)
+                                                Transport::UdpListenParameters(mSystemState->InetLayer())
                                                     .SetAddressType(Inet::kIPAddressType_IPv4)
                                                     .SetListenPort((uint16_t)(mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
 #if CONFIG_NETWORK_LAYER_BLE
                                                     ,
-                                                Transport::BleListenParameters(mBleLayer)
+                                                Transport::BleListenParameters(mSystemState->BleLayer())
 #endif // CONFIG_NETWORK_LAYER_BLE
                                                     ));
 
@@ -825,7 +685,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     uint16_t keyID = 0;
 
-    Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
+    Transport::FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
 
     VerifyOrExit(IsOperationalNodeId(remoteDeviceId), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
@@ -884,12 +744,12 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
-    err = mPairingSession.MessageDispatch().Init(mSessionManager);
+    err = mPairingSession.MessageDispatch().Init(mSystemState->SessionMgr());
     SuccessOrExit(err);
 
     device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, fabric->GetFabricIndex());
 
-    mSystemLayer->StartTimer(kSessionEstablishmentTimeout, OnSessionEstablishmentTimeoutCallback, this);
+    mSystemState->SystemLayer()->StartTimer(kSessionEstablishmentTimeout, OnSessionEstablishmentTimeoutCallback, this);
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
         device->SetAddress(params.GetPeerAddress().GetIPAddress());
@@ -899,11 +759,11 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     {
         if (params.HasConnectionObject())
         {
-            SuccessOrExit(err = mBleLayer->NewBleConnectionByObject(params.GetConnectionObject()));
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetConnectionObject()));
         }
         else if (params.HasDiscriminator())
         {
-            SuccessOrExit(err = mBleLayer->NewBleConnectionByDiscriminator(params.GetDiscriminator()));
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetDiscriminator()));
         }
         else
         {
@@ -911,10 +771,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         }
     }
 #endif
-    session = mSessionManager->CreateUnauthenticatedSession(params.GetPeerAddress());
+    session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress());
     VerifyOrExit(session.HasValue(), CHIP_ERROR_NO_MEMORY);
 
-    exchangeCtxt = mExchangeMgr->NewContext(session.Value(), &mPairingSession);
+    exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &mPairingSession);
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     err = mIDAllocator.Allocate(keyID);
@@ -972,8 +832,8 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     device->Serialize(serialized);
 
-    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(peerAddress), device->GetDeviceId(),
-                                      testSecurePairingSecret, CryptoContext::SessionRole::kInitiator, mFabricIndex);
+    err = mSystemState->SessionMgr()->NewPairing(Optional<Transport::PeerAddress>::Value(peerAddress), device->GetDeviceId(),
+                                                 testSecurePairingSecret, CryptoContext::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1163,7 +1023,7 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 
 void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
+    mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
     if (mPairingDelegate != nullptr)
     {
@@ -1182,9 +1042,9 @@ void DeviceCommissioner::OnSessionEstablished()
     // TODO: the session should know which peer we are trying to connect to when started
     mPairingSession.SetPeerNodeId(device->GetDeviceId());
 
-    CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()),
-                                                 mPairingSession.GetPeerNodeId(), &mPairingSession,
-                                                 CryptoContext::SessionRole::kInitiator, mFabricIndex);
+    CHIP_ERROR err = mSystemState->SessionMgr()->NewPairing(
+        Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
+        &mPairingSession, CryptoContext::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1351,7 +1211,7 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
     DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
 
     // Retrieve attestation challenge
-    ByteSpan attestationChallenge = mSessionManager
+    ByteSpan attestationChallenge = mSystemState->SessionMgr()
                                         ->GetSecureSession({ mPairingSession.GetPeerNodeId(), mPairingSession.GetLocalSessionId(),
                                                              mPairingSession.GetPeerSessionId(), mFabricIndex })
                                         ->GetCryptoContext()
@@ -1688,7 +1548,7 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
 #endif
     {
         mPairingSession.ToSerializable(device->GetPairing());
-        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
+        mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
         mPairedDevices.Insert(device->GetDeviceId());
         mPairedDevicesUpdated = true;
@@ -1735,7 +1595,7 @@ CHIP_ERROR DeviceCommissioner::CloseBleConnection()
     // It is fine since we can only commission one device at the same time.
     // We should be able to distinguish different BLE connections if we want
     // to commission multiple devices at the same time over BLE.
-    return mBleLayer->CloseAllBleConnections();
+    return mSystemState->BleLayer()->CloseAllBleConnections();
 }
 #endif
 
@@ -2171,7 +2031,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
     case CommissioningStage::kCleanup:
         ChipLogProgress(Controller, "Rendezvous cleanup");
         mPairingSession.ToSerializable(device->GetPairing());
-        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
+        mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
         mPairedDevices.Insert(device->GetDeviceId());
         mPairedDevicesUpdated = true;

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
@@ -30,13 +30,14 @@ using chip::Controller::DeviceController;
 using chip::Controller::ExampleOperationalCredentialsIssuer;
 
 CHIP_ERROR DoExampleSelfCommissioning(DeviceController & controller, ExampleOperationalCredentialsIssuer * opCredsIssuer,
-                                      PersistentStorageDelegate * storage, chip::NodeId localNodeId)
+                                      PersistentStorageDelegate * storage, chip::NodeId localNodeId, uint16_t listenPort)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
     chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
-    chip::Controller::ControllerInitParams initParams;
+    chip::Controller::FactoryInitParams initParams;
+    chip::Controller::SetupParams setupParams;
 
     VerifyOrExit(storage != nullptr && opCredsIssuer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -61,15 +62,21 @@ CHIP_ERROR DoExampleSelfCommissioning(DeviceController & controller, ExampleOper
         err = opCredsIssuer->GenerateNOCChainAfterValidation(localNodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
         SuccessOrExit(err);
 
-        initParams.ephemeralKeypair               = &ephemeralKey;
-        initParams.controllerRCAC                 = rcacSpan;
-        initParams.controllerICAC                 = icacSpan;
-        initParams.controllerNOC                  = nocSpan;
-        initParams.operationalCredentialsDelegate = opCredsIssuer;
+        setupParams.ephemeralKeypair               = &ephemeralKey;
+        setupParams.controllerRCAC                 = rcacSpan;
+        setupParams.controllerICAC                 = icacSpan;
+        setupParams.controllerNOC                  = nocSpan;
+        setupParams.operationalCredentialsDelegate = opCredsIssuer;
 
         initParams.storageDelegate = storage;
+        initParams.listenPort      = listenPort;
 
-        err = controller.Init(initParams);
+        auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
+
+        err = factory.Init(initParams);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Controller Factory init failure! %s", chip::ErrorStr(err)));
+
+        err = factory.SetupController(setupParams, controller);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Controller init failure! %s", chip::ErrorStr(err)));
     }
 
