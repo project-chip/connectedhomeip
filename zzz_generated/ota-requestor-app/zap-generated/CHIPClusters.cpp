@@ -99,7 +99,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancel
                                          OtaSoftwareUpdateProvider::Commands::Ids::ApplyUpdateRequest,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -120,7 +120,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -144,7 +144,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::NotifyUpdateApplied(Callback::Cance
                                          OtaSoftwareUpdateProvider::Commands::Ids::NotifyUpdateApplied,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -165,7 +165,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -192,7 +192,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
                                          OtaSoftwareUpdateProvider::Commands::Ids::QueryImage,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -227,7 +227,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
