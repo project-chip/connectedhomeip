@@ -403,6 +403,23 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
         ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
         ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
         ChipLogProgress(Discovery, "\tPairing Hint\t\t0x%x", dnsSdInfo->pairingHint);
+        if (dnsSdInfo->GetMrpRetryIntervalIdle().HasValue())
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle().Value());
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval idle\tNot present");
+        }
+        if (dnsSdInfo->GetMrpRetryIntervalActive().HasValue())
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", dnsSdInfo->GetMrpRetryIntervalActive().Value());
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
+        }
+        ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
         for (int j = 0; j < dnsSdInfo->numIPs; ++j)
         {
             char buf[chip::Inet::kMaxIPAddressStringLength];
