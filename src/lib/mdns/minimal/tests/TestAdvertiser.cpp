@@ -64,6 +64,13 @@ const QNamePart kInstanceNameParts2[]           = { "5555666677778888-1212343456
 const FullQName kInstanceName2                  = FullQName(kInstanceNameParts2);
 const QNamePart kTxtRecordEmptyParts[]          = { "=" };
 const FullQName kTxtRecordEmptyName             = FullQName(kTxtRecordEmptyParts);
+const QNamePart kCompressedIdSubParts1[]        = { "_IBEEFBEEFF00DF00D", "_sub", "_matter", "_tcp", "local" };
+FullQName kCompressedIdSubName1                 = FullQName(kCompressedIdSubParts1);
+const QNamePart kCompressedIdSubParts2[]        = { "_I5555666677778888", "_sub", "_matter", "_tcp", "local" };
+FullQName kCompressedIdSubName2                 = FullQName(kCompressedIdSubParts2);
+PtrResourceRecord ptrServiceSubCompressedId1    = PtrResourceRecord(kDnsSdQueryName, kCompressedIdSubName1);
+PtrResourceRecord ptrServiceSubCompressedId2    = PtrResourceRecord(kDnsSdQueryName, kCompressedIdSubName2);
+
 OperationalAdvertisingParameters operationalParams1 =
     OperationalAdvertisingParameters()
         .SetPeerId(kPeerId1)
@@ -215,6 +222,7 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     // Test for PTR response to _services request.
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
     server.AddExpectedRecord(&ptrOperationalService);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId1);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
 
     // These check that the requested records added are sent out correctly.
@@ -251,6 +259,7 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
     server.Reset();
     server.AddExpectedRecord(&ptrOperationalService);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId1);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -275,6 +284,8 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
     server.AddExpectedRecord(&ptrOperationalService);
     server.AddExpectedRecord(&ptrOperationalService);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId1);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId2);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -456,6 +467,8 @@ void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext
     server.AddExpectedRecord(&ptrServiceSubCM);
     server.AddExpectedRecord(&ptrServiceSubVendor);
     server.AddExpectedRecord(&ptrServiceSubDeviceType);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId1);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId2);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());

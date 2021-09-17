@@ -382,6 +382,10 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     MdnsService service;
     CHIP_ERROR error = CHIP_NO_ERROR;
 
+    char compressedFabricIdSub[kSubTypeCompressedFabricIdMaxLength + 1];
+    const char * subTypes[1];
+    size_t subTypeSize = 0;
+
     mOperationalAdvertisingParams = params;
     // TODO: There may be multilple device/fabric ids after multi-admin.
 
@@ -393,6 +397,12 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     ReturnLogErrorOnFailure(
         AddCommonTxtElements(params, mrpRetryIntervalIdleBuf, mrpRetryIntervalActiveBuf, txtEntries, textEntrySize));
 
+    if (MakeServiceSubtype(compressedFabricIdSub, sizeof(compressedFabricIdSub),
+                           DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, params.GetPeerId().GetCompressedFabricId())) ==
+        CHIP_NO_ERROR)
+    {
+        subTypes[subTypeSize++] = compressedFabricIdSub;
+    }
     error = MakeHostName(service.mHostName, sizeof(service.mHostName), params.GetMac());
     if (error != CHIP_NO_ERROR)
     {
@@ -407,7 +417,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     service.mTextEntrySize = textEntrySize;
     service.mInterface     = INET_NULL_INTERFACEID;
     service.mAddressType   = Inet::kIPAddressType_Any;
-    service.mSubTypeSize   = 0;
+    service.mSubTypes      = subTypes;
+    service.mSubTypeSize   = subTypeSize;
     error                  = ChipMdnsPublishService(&service);
 
     if (error == CHIP_NO_ERROR)

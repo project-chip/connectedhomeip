@@ -43,7 +43,8 @@ test::ExpectedCall operationalCall1 = test::ExpectedCall()
                                           .SetProtocol(MdnsServiceProtocol::kMdnsProtocolTcp)
                                           .SetServiceName("_matter")
                                           .SetInstanceName("BEEFBEEFF00DF00D-1111222233334444")
-                                          .SetHostName(host);
+                                          .SetHostName(host)
+                                          .AddSubtype("_IBEEFBEEFF00DF00D");
 OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingParameters()
                                                           .SetPeerId(kPeerId2)
                                                           .SetMac(ByteSpan(kMac))
@@ -55,6 +56,7 @@ test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetServiceName("_matter")
                                           .SetInstanceName("5555666677778888-1212343456567878")
                                           .SetHostName(host)
+                                          .AddSubtype("_I5555666677778888")
                                           .AddTxt("CRI", "32")
                                           .AddTxt("CRA", "33");
 

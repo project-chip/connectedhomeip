@@ -206,8 +206,8 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    // Max number of records for operational = PTR, SRV, TXT, A, AAAA, no subtypes.
-    static constexpr size_t kMaxOperationalRecords  = 5;
+    // Max number of records for operational = PTR, SRV, TXT, A, AAAA, I subtype.
+    static constexpr size_t kMaxOperationalRecords  = 6;
     static constexpr size_t kMaxOperationalNetworks = 5;
     QueryResponderAllocator<kMaxOperationalRecords> mQueryResponderAllocatorOperational[kMaxOperationalNetworks];
     // Max number of records for commissionable = 7 x PTR (base + 6 sub types - _S, _L, _D, _T, _C, _A), SRV, TXT, A, AAAA
@@ -342,22 +342,21 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         }
     }
 
-    FullQName operationalServiceName =
-        operationalAllocator->AllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
-    FullQName operationalServerName =
+    FullQName serviceName = operationalAllocator->AllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
+    FullQName instanceName =
         operationalAllocator->AllocateQName(nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain);
 
     ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
-    FullQName serverName = operationalAllocator->AllocateQName(nameBuffer, kLocalDomain);
+    FullQName hostName = operationalAllocator->AllocateQName(nameBuffer, kLocalDomain);
 
-    if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
+    if ((serviceName.nameCount == 0) || (instanceName.nameCount == 0) || (hostName.nameCount == 0))
     {
         ChipLogError(Discovery, "Failed to allocate QNames.");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!operationalAllocator->AddResponder<PtrResponder>(operationalServiceName, operationalServerName)
-             .SetReportAdditional(operationalServerName)
+    if (!operationalAllocator->AddResponder<PtrResponder>(serviceName, instanceName)
+             .SetReportAdditional(instanceName)
              .SetReportInServiceListing(true)
              .IsValid())
     {
@@ -365,24 +364,23 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!operationalAllocator->AddResponder<SrvResponder>(SrvResourceRecord(operationalServerName, serverName, params.GetPort()))
-             .SetReportAdditional(serverName)
+    if (!operationalAllocator->AddResponder<SrvResponder>(SrvResourceRecord(instanceName, hostName, params.GetPort()))
+             .SetReportAdditional(hostName)
              .IsValid())
     {
         ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!operationalAllocator
-             ->AddResponder<TxtResponder>(TxtResourceRecord(operationalServerName, GetOperationalTxtEntries(params)))
-             .SetReportAdditional(serverName)
+    if (!operationalAllocator->AddResponder<TxtResponder>(TxtResourceRecord(instanceName, GetOperationalTxtEntries(params)))
+             .SetReportAdditional(hostName)
              .IsValid())
     {
         ChipLogError(Discovery, "Failed to add TXT record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!operationalAllocator->AddResponder<IPv6Responder>(serverName).IsValid())
+    if (!operationalAllocator->AddResponder<IPv6Responder>(hostName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add IPv6 mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
@@ -390,11 +388,25 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     if (params.IsIPv4Enabled())
     {
-        if (!operationalAllocator->AddResponder<IPv4Responder>(serverName).IsValid())
+        if (!operationalAllocator->AddResponder<IPv4Responder>(hostName).IsValid())
         {
             ChipLogError(Discovery, "Failed to add IPv4 mDNS responder");
             return CHIP_ERROR_NO_MEMORY;
         }
+    }
+    MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                       DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, params.GetPeerId().GetCompressedFabricId()));
+    FullQName compressedFabricIdSubtype = operationalAllocator->AllocateQName(
+        nameBuffer, kSubtypeServiceNamePart, kOperationalServiceName, kOperationalProtocol, kLocalDomain);
+    ReturnErrorCodeIf(compressedFabricIdSubtype.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+
+    if (!operationalAllocator->AddResponder<PtrResponder>(compressedFabricIdSubtype, instanceName)
+             .SetReportAdditional(instanceName)
+             .SetReportInServiceListing(true)
+             .IsValid())
+    {
+        ChipLogError(Discovery, "Failed to add device type PTR record mDNS responder");
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Operational device'.");

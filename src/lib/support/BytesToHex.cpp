@@ -18,7 +18,7 @@
 #include "BytesToHex.h"
 
 #include <cstring>
-
+#include <stdio.h>
 namespace chip {
 namespace Encoding {
 
@@ -109,6 +109,18 @@ CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_he
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BytesToHex(uint64_t src, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags)
+{
+    uint8_t buf[8];
+    for (int i = 7; i >= 0; --i)
+    {
+        buf[i] = src & 0xFF;
+        src    = src >> 8;
+    }
+
+    return BytesToHex(buf, 8, dest_hex, dest_size_max, flags);
 }
 
 size_t HexToBytes(const char * srcHex, const size_t srcLen, uint8_t * destBytes, size_t destMaxLen)

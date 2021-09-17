@@ -65,7 +65,7 @@ static CHIP_ERROR discover(bool printHeader)
         streamer_printf(sout, "Discover:        ");
     }
 
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint16_t) 0);
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint64_t) 0);
     gCommissioner->DiscoverCommissionableNodes(filter);
 
     streamer_printf(sout, "done\r\n");
