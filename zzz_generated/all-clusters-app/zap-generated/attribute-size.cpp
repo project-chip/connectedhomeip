@@ -522,6 +522,26 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
+    case 0x002F: // Power Source Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0012: // Active Battery Faults
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENUM8
+            break;
+        }
+        }
+        break;
+    }
     case 0x0504: // TV Channel Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -959,6 +979,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0004: // TrustedRootCertificates
             // chip::ByteSpan
             return GetByteSpanOffsetFromIndex(buffer, 402, entryCount);
+            break;
+        }
+        break;
+    case 0x002F: // Power Source Cluster
+        switch (attributeId)
+        {
+        case 0x0012: // Active Battery Faults
+            // uint8_t
+            entryLength = 1;
             break;
         }
         break;

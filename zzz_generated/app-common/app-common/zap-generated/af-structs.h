@@ -75,6 +75,20 @@ typedef struct _BasicCommissioningInfoType
     uint32_t FailSafeExpiryLengthMs;
 } BasicCommissioningInfoType;
 
+// Struct for BatChargeFaultChangeType
+typedef struct _BatChargeFaultChangeType
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * current;
+    /* TYPE WARNING: array array defaults to */ uint8_t * previous;
+} EmberAfBatChargeFaultChangeType;
+
+// Struct for BatFaultChangeType
+typedef struct _BatFaultChangeType
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * current;
+    /* TYPE WARNING: array array defaults to */ uint8_t * previous;
+} EmberAfBatFaultChangeType;
+
 // Struct for ConfigureReportingRecord
 typedef struct _ConfigureReportingRecord
 {
@@ -453,6 +467,13 @@ typedef struct _WiFiInterfaceScanResult
     uint8_t Channel;
     uint32_t FrequencyBand;
 } WiFiInterfaceScanResult;
+
+// Struct for WiredFaultChangeType
+typedef struct _WiredFaultChangeType
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * current;
+    /* TYPE WARNING: array array defaults to */ uint8_t * previous;
+} EmberAfWiredFaultChangeType;
 
 // Struct for WriteAttributeRecord
 typedef struct _WriteAttributeRecord

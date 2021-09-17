@@ -1153,6 +1153,47 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Power Source
+ *
+ */
+@interface CHIPPowerSource : CHIPCluster
+
+- (void)readAttributeStatusWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOrderWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWiredAssessedInputVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWiredAssessedInputFrequencyWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWiredCurrentTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWiredAssessedCurrentWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWiredNominalVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWiredMaximumCurrentWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeWiredPresentWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActiveWiredFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryPercentRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryTimeRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryChargeLevelWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryReplacementNeededWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryReplaceabilityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryPresentWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActiveBatteryFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryReplacementDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryCommonDesignationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryAnsiDesignationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryIecDesignationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryApprovedChemistryWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryCapacityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryQuantityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryChargeStateWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryTimeToFullChargeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryFunctionalWhileChargingWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryChargingCurrentWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeActiveBatteryChargeFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Pressure Measurement
  *
  */
