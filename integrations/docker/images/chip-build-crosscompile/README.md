@@ -33,9 +33,9 @@ or you can copy directly to your host machine via
 export PI="ip-of-raspberry-pi"
 ssh-copy-id ubuntu@$PI
 
-rsync -aVL ubuntu@$PI:/lib ubuntu-21.04-aarch64-sysroot
-rsync -aVL ubuntu@$PI:/usr/lib ubuntu-21.04-aarch64-sysroot/usr
-rsync -aVL ubuntu@$PI:/include/lib ubuntu-21.04-aarch64-sysroot/usr
+rsync -avL ubuntu@$PI:/lib ubuntu-21.04-aarch64-sysroot
+rsync -avL ubuntu@$PI:/usr/lib ubuntu-21.04-aarch64-sysroot/usr
+rsync -avL ubuntu@$PI:/include/lib ubuntu-21.04-aarch64-sysroot/usr
 ```
 
 NOTE: in the future, if creating a 32-bit image (not covered by this docker
