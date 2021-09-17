@@ -93,7 +93,7 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
 }
 
 EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel,
-                          const Crypto::P256PublicKey & rootPubkey, uint8_t index)
+                          Credentials::P256PublicKeySpan rootPubkey, uint8_t index)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -101,7 +101,7 @@ EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nod
     VerifyOrReturnError(fabricDescriptor != nullptr, EMBER_ZCL_STATUS_FAILURE);
 
     fabricDescriptor->FabricIndex   = fabricIndex;
-    fabricDescriptor->RootPublicKey = ByteSpan(rootPubkey.ConstBytes(), rootPubkey.Length());
+    fabricDescriptor->RootPublicKey = ByteSpan(rootPubkey.data(), rootPubkey.size());
 
     fabricDescriptor->VendorId = vendorId;
     fabricDescriptor->FabricId = fabricId;
@@ -391,8 +391,9 @@ bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(EndpointId end
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCArray,
-                                                        ByteSpan IPKValue, NodeId adminNodeId, uint16_t adminVendorId)
+bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCValue,
+                                                        ByteSpan ICACValue, ByteSpan IPKValue, NodeId adminNodeId,
+                                                        uint16_t adminVendorId)
 {
     EmberAfNodeOperationalCertStatus nocResponse = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
 
@@ -401,7 +402,10 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added an Op Cert");
 
-    err = gFabricBeingCommissioned.SetOperationalCertsFromCertArray(NOCArray);
+    err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+    err = gFabricBeingCommissioned.SetICACert(ICACValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     gFabricBeingCommissioned.SetVendorId(adminVendorId);
@@ -413,7 +417,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.
-    chip::app::Mdns::AdvertiseOperational();
+    app::MdnsServer::Instance().AdvertiseOperational();
 
 exit:
 
@@ -428,7 +432,8 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterUpdateNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCArray)
+bool emberAfOperationalCredentialsClusterUpdateNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCValue,
+                                                           ByteSpan ICACValue)
 {
     EmberAfNodeOperationalCertStatus nocResponse = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
 
@@ -441,7 +446,10 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(EndpointId endpoint, 
     FabricInfo * fabric = retrieveCurrentFabric();
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_ID));
 
-    err = fabric->SetOperationalCertsFromCertArray(NOCArray);
+    err = fabric->SetNOCCert(NOCValue);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+    err = fabric->SetICACert(ICACValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     fabricIndex = fabric->GetFabricIndex();
@@ -450,7 +458,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(EndpointId endpoint, 
     // can't just wait until we get network configuration commands, because we
     // might be on the operational network already, in which case we are
     // expected to be live with our new identity at this point.
-    app::Mdns::AdvertiseOperational();
+    app::MdnsServer::Instance().AdvertiseOperational();
 
 exit:
 

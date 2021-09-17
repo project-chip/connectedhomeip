@@ -37,8 +37,9 @@ class MessagingContext
 {
 public:
     MessagingContext() :
-        mInitialized(false), mAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)),
-        mPairingAliceToBob(GetBobKeyId(), GetAliceKeyId()), mPairingBobToAlice(GetAliceKeyId(), GetBobKeyId())
+        mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
+        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingAliceToBob(GetBobKeyId(), GetAliceKeyId()),
+        mPairingBobToAlice(GetAliceKeyId(), GetBobKeyId())
     {}
     ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 
@@ -80,6 +81,9 @@ public:
     SessionHandle GetSessionBobToAlice();
     SessionHandle GetSessionAliceToBob();
 
+    Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
+
     Messaging::ExchangeContext * NewExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate);
 
@@ -98,7 +102,8 @@ private:
     NodeId mAliceNodeId  = 111222333;
     uint16_t mBobKeyId   = 1;
     uint16_t mAliceKeyId = 2;
-    Optional<Transport::PeerAddress> mAddress;
+    Transport::PeerAddress mAliceAddress;
+    Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;
     SecurePairingUsingTestSecret mPairingBobToAlice;
     Transport::FabricTable mFabrics;

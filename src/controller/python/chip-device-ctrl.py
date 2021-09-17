@@ -451,32 +451,33 @@ class DeviceMgrCmd(Cmd):
         # Devices may be uncommissioned, or may already be on the network. Need to check both ways.
         # TODO(cecille): implement soft-ap connection.
 
-        if int(setupPayload.attributes["RendezvousInformation"]) & onnetwork:
-            print("Attempting to find device on Network")
-            longDiscriminator = ctypes.c_uint16(
-                int(setupPayload.attributes['Discriminator']))
-            self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
-                longDiscriminator)
-            print("Waiting for device responses...")
-            strlen = 100
-            addrStrStorage = ctypes.create_string_buffer(strlen)
-            # If this device is on the network and we're looking specifically for 1 device,
-            # expect a quick response.
-            if self.wait_for_one_discovered_device():
-                self.devCtrl.GetIPForDiscoveredDevice(
-                    0, addrStrStorage, strlen)
-                addrStr = addrStrStorage.value.decode('utf-8')
-                print("Connecting to device at " + addrStr)
-                pincode = ctypes.c_uint32(
-                    int(setupPayload.attributes['SetUpPINCode']))
-                try:
-                    self.devCtrl.ConnectIP(addrStrStorage, pincode, nodeid)
-                    print("Connected")
-                    return 0
-                except Exception as ex:
-                    print(f"Unable to connect on network: {ex}")
-            else:
-                print("Unable to locate device on network")
+        # Any device that is already commissioned into a fabric needs to use on-network
+        # pairing, so look first on the network regardless of the QR code contents.
+        print("Attempting to find device on Network")
+        longDiscriminator = ctypes.c_uint16(
+            int(setupPayload.attributes['Discriminator']))
+        self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
+            longDiscriminator)
+        print("Waiting for device responses...")
+        strlen = 100
+        addrStrStorage = ctypes.create_string_buffer(strlen)
+        # If this device is on the network and we're looking specifically for 1 device,
+        # expect a quick response.
+        if self.wait_for_one_discovered_device():
+            self.devCtrl.GetIPForDiscoveredDevice(
+                0, addrStrStorage, strlen)
+            addrStr = addrStrStorage.value.decode('utf-8')
+            print("Connecting to device at " + addrStr)
+            pincode = ctypes.c_uint32(
+                int(setupPayload.attributes['SetUpPINCode']))
+            try:
+                self.devCtrl.ConnectIP(addrStrStorage, pincode, nodeid)
+                print("Connected")
+                return 0
+            except Exception as ex:
+                print(f"Unable to connect on network: {ex}")
+        else:
+            print("Unable to locate device on network")
 
         if int(setupPayload.attributes["RendezvousInformation"]) & ble:
             print("Attempting to connect via BLE")
@@ -617,8 +618,7 @@ class DeviceMgrCmd(Cmd):
         discover -s short_discriminator
         discover -v vendor_id
         discover -t device_type
-        discover -c commissioning_enabled
-        discover -a
+        discover -c
 
         discover command is used to discover available devices.
         """
@@ -643,9 +643,7 @@ class DeviceMgrCmd(Cmd):
             group.add_argument(
                 '-t', help='discover commissionable nodes with given device type', type=int)
             group.add_argument(
-                '-c', help='discover commissionable nodes with given commissioning mode', type=int)
-            group.add_argument(
-                '-a', help='discover commissionable nodes put in commissioning mode from command', action='store_true')
+                '-c', help='discover commissionable nodes in commissioning mode', action='store_true')
             args = parser.parse_args(arglist)
             if args.all:
                 self.commissionableNodeCtrl.DiscoverCommissioners()
@@ -677,11 +675,7 @@ class DeviceMgrCmd(Cmd):
                     ctypes.c_uint16(args.t))
                 self.wait_for_many_discovered_devices()
             elif args.c is not None:
-                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled(
-                    ctypes.c_uint16(args.c))
-                self.wait_for_many_discovered_devices()
-            elif args.a is not None:
-                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabledFromCommand()
+                self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled()
                 self.wait_for_many_discovered_devices()
             else:
                 self.do_help("discover")

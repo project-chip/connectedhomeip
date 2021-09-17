@@ -26,7 +26,7 @@ const path              = require('path');
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
-const { TestSuiteHelperCluster }        = require('./TestSuiteHelperCluster.js');
+const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
 
 const kClusterName       = 'cluster';
@@ -75,8 +75,12 @@ function setDefaultType(test)
 
   case 'subscribeAttribute':
     test.isAttribute          = true;
-    test.isReadAttribute      = true;
     test.isSubscribeAttribute = true;
+    break;
+
+  case 'waitForReport':
+    test.isAttribute     = true;
+    test.isWaitForReport = true;
     break;
 
   default:
@@ -137,12 +141,16 @@ function setDefaultResponse(test)
     throwError(test, errorStr);
   }
 
-  if (test.isWriteAttribute && hasResponseValueOrConstraints) {
-    const errorStr = 'Attribute write test has a "value" or a "constraints" defined.';
-    throwError(test, errorStr);
+  if (!test.isAttribute) {
+    return;
   }
 
-  if (!test.isReadAttribute) {
+  if (test.isWriteAttribute || test.isSubscribeAttribute) {
+    if (hasResponseValueOrConstraints) {
+      const errorStr = 'Attribute test has a "value" or a "constraints" defined.';
+      throwError(test, errorStr);
+    }
+
     return;
   }
 
@@ -191,6 +199,34 @@ function parse(filename)
   const data = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
   const yaml = YAML.parse(data);
 
+  // "subscribeAttribute" command expects a report to be acked before
+  // it got a success response.
+  // In order to validate that the report has been received with the proper value
+  // a "subscribeAttribute" command can have a response configured into the test step
+  // definition. In this case, a new async "waitForReport" test step will be synthesized
+  // and added to the list of tests.
+  yaml.tests.forEach((test, index) => {
+    if (test.command == "subscribeAttribute" && test.response) {
+      // Create a new report test where the expected response is the response argument
+      // for the "subscribeAttributeTest"
+      const reportTest = {
+        label : "Report: " + test.label,
+        command : "waitForReport",
+        attribute : test.attribute,
+        response : test.response,
+        async : true
+      };
+      delete test.response;
+
+      // insert the new report test into the tests list
+      yaml.tests.splice(index, 0, reportTest);
+
+      // Associate the "subscribeAttribute" test with the synthesized report test
+      test.hasWaitForReport = true;
+      test.waitForReport    = reportTest;
+    }
+  });
+
   const defaultConfig = yaml.config || [];
   yaml.tests.forEach(test => {
     test.filename = filename;
@@ -221,19 +257,18 @@ function getClusters()
 {
   // Create a new array to merge the configured clusters list and test
   // simulated clusters.
-  return Clusters.getClusters().then(clusters => clusters.concat(TestSuiteHelperCluster));
+  return Clusters.getClusters().then(clusters => clusters.concat(DelayCommands));
 }
 
 function getCommands(clusterName)
 {
-  return (clusterName == TestSuiteHelperCluster.name) ? Promise.resolve(TestSuiteHelperCluster.commands)
-                                                      : Clusters.getClientCommands(clusterName);
+  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.commands) : Clusters.getClientCommands(clusterName);
 }
 
 function getAttributes(clusterName)
 {
-  return (clusterName == TestSuiteHelperCluster.name) ? Promise.resolve(TestSuiteHelperCluster.attributes)
-                                                      : Clusters.getServerAttributes(clusterName);
+  return (clusterName == DelayCommands.name) ? Promise.resolve(DelayCommands.attributes)
+                                             : Clusters.getServerAttributes(clusterName);
 }
 
 function assertCommandOrAttribute(context)
@@ -299,7 +334,7 @@ function chip_tests_items(options)
 
 function isTestOnlyCluster(name)
 {
-  return name == TestSuiteHelperCluster.name;
+  return name == DelayCommands.name;
 }
 
 function chip_tests_with_command_attribute_info(options)
@@ -315,6 +350,10 @@ function chip_tests_item_parameters(options)
   const commandValues = this.arguments.values;
 
   const promise = assertCommandOrAttribute(this).then(item => {
+    if (this.isAttribute && !this.isWriteAttribute) {
+      return [];
+    }
+
     const commandArgs = item.arguments;
     const commands    = commandArgs.map(commandArg => {
       commandArg = JSON.parse(JSON.stringify(commandArg));

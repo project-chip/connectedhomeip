@@ -30,7 +30,7 @@ CHIP_ERROR ApplicationExchangeDispatch::PrepareMessage(SessionHandle session, Pa
                                                        System::PacketBufferHandle && message,
                                                        EncryptedPacketBufferHandle & preparedMessage)
 {
-    return mSessionMgr->BuildEncryptedMessagePayload(session, payloadHeader, std::move(message), preparedMessage);
+    return mSessionMgr->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage);
 }
 
 CHIP_ERROR ApplicationExchangeDispatch::SendPreparedMessage(SessionHandle session,

@@ -107,7 +107,11 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                         ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", name,
                                       event.InternetConnectivityChange.address);
 
-                        PlatformMgr().PostEvent(&event);
+                        CHIP_ERROR status = PlatformMgr().PostEvent(&event);
+                        if (status != CHIP_NO_ERROR)
+                        {
+                            ChipLogDetail(DeviceLayer, "Failed to report IP address: %" CHIP_ERROR_FORMAT, status.Format());
+                        }
                     }
                     routeInfo = RTA_NEXT(routeInfo, rtl);
                 }

@@ -19,40 +19,38 @@
 
 #include <app/server/AppDelegate.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/SessionIDAllocator.h>
 
 namespace chip {
-
-enum class ResetFabrics
-{
-    kYes,
-    kNo,
-};
 
 constexpr uint16_t kNoCommissioningTimeout = UINT16_MAX;
 
 enum class CommissioningWindowAdvertisement
 {
-    kBle,
-    kMdns,
+    kAllSupported,
+    kMdnsOnly,
 };
 
 class Server;
 
-class CommissionManager : public RendezvousAdvertisementDelegate
+class CommissioningWindowManager : public SessionEstablishmentDelegate
 {
 public:
-    CommissionManager(Server * server) : mAppDelegate(nullptr), mServer(server) {}
+    CommissioningWindowManager(Server * server) : mAppDelegate(nullptr), mServer(server) {}
 
     void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
 
     void SetBLE(bool ble) { mIsBLE = ble; }
 
+    void SetSessionIDAllocator(SessionIDAllocator * idAllocator) { mIDAllocator = idAllocator; }
+
     /**
      * Open the pairing window using default configured parameters.
      */
     CHIP_ERROR
-    OpenBasicCommissioningWindow(ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds = kNoCommissioningTimeout,
-                                 CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kBle);
+    OpenBasicCommissioningWindow(
+        uint16_t commissioningTimeoutSeconds               = kNoCommissioningTimeout,
+        CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
 
     CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
                                                PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
@@ -60,16 +58,26 @@ public:
 
     void CloseCommissioningWindow();
 
-    bool IsPairingWindowOpen() { return mCommissioningWindowOpen; }
+    bool IsCommissioningWindowOpen() { return mCommissioningWindowOpen; }
 
-    CHIP_ERROR StartAdvertisement() override;
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablished() override;
 
-    CHIP_ERROR StopAdvertisement() override;
+    void Cleanup();
+
+    void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event);
 
 private:
     CHIP_ERROR SetTemporaryDiscriminator(uint16_t discriminator);
 
     CHIP_ERROR RestoreDiscriminator();
+
+    CHIP_ERROR StartAdvertisement();
+
+    CHIP_ERROR StopAdvertisement();
+
+    CHIP_ERROR PrepareCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t & allocatedSessionID);
 
     AppDelegate * mAppDelegate = nullptr;
     Server * mServer           = nullptr;
@@ -79,6 +87,9 @@ private:
 
     bool mOriginalDiscriminatorCached = false;
     uint16_t mOriginalDiscriminator   = 0;
+
+    SessionIDAllocator * mIDAllocator = nullptr;
+    PASESession mPairingSession;
 };
 
 } // namespace chip

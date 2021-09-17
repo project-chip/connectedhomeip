@@ -222,7 +222,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChipDeviceEvent connectionEvent;
             connectionEvent.Type = DeviceEventType::kCHIPoBLEConnectionEstablished;
-            PlatformMgr().PostEvent(&connectionEvent);
+            PlatformMgr().PostEventOrDie(&connectionEvent);
         }
         break;
 
@@ -439,7 +439,7 @@ void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId)
         ChipDeviceEvent event;
         event.Type                                     = DeviceEventType::kPlatformLinuxBLECentralConnected;
         event.Platform.BLECentralConnected.mConnection = conId;
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
     }
 }
 
@@ -450,7 +450,7 @@ void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error)
         ChipDeviceEvent event;
         event.Type                                    = DeviceEventType::kPlatformLinuxBLECentralConnectFailed;
         event.Platform.BLECentralConnectFailed.mError = error;
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
     }
 }
 
@@ -459,7 +459,7 @@ void BLEManagerImpl::HandleWriteComplete(BLE_CONNECTION_OBJECT conId)
     ChipDeviceEvent event;
     event.Type                                  = DeviceEventType::kPlatformLinuxBLEWriteComplete;
     event.Platform.BLEWriteComplete.mConnection = conId;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed)
@@ -468,7 +468,7 @@ void BLEManagerImpl::HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool
     event.Type                                          = DeviceEventType::kPlatformLinuxBLESubscribeOpComplete;
     event.Platform.BLESubscribeOpComplete.mConnection   = conId;
     event.Platform.BLESubscribeOpComplete.mIsSubscribed = subscribed;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
@@ -484,7 +484,7 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     event.Type                                       = DeviceEventType::kPlatformLinuxBLEIndicationReceived;
     event.Platform.BLEIndicationReceived.mConnection = conId;
     event.Platform.BLEIndicationReceived.mData       = std::move(buf).UnsafeRelease();
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -507,7 +507,7 @@ void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_
         ChipLogProgress(Ble, "Write request received debug %p", conId);
         event.CHIPoBLEWriteReceived.ConId = conId;
         event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
     }
 
 exit:
@@ -527,7 +527,7 @@ void BLEManagerImpl::CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT conId)
         event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
         event.CHIPoBLEConnectionError.ConId  = conId;
         event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
     }
 }
 
@@ -546,7 +546,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
         ChipDeviceEvent event;
         event.Type = connection->mIsNotify ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = connection;
-        PlatformMgr().PostEvent(&event);
+        PlatformMgr().PostEventOrDie(&event);
     }
 
     ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", connection->mIsNotify ? "subscribe" : "unsubscribe");
@@ -565,7 +565,7 @@ void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::DriveBLEState()
@@ -745,7 +745,7 @@ void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, voi
     event.Type                                                 = DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete;
     event.Platform.BLEPeripheralRegisterAppComplete.mIsSuccess = aIsSuccess;
     event.Platform.BLEPeripheralRegisterAppComplete.mpAppstate = apAppstate;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate)
@@ -754,7 +754,7 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, v
     event.Type = DeviceEventType::kPlatformLinuxBLEPeripheralAdvConfiguredComplete;
     event.Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess = aIsSuccess;
     event.Platform.BLEPeripheralAdvConfiguredComplete.mpAppstate = apAppstate;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate)
@@ -763,7 +763,7 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void *
     event.Type                                              = DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete;
     event.Platform.BLEPeripheralAdvStartComplete.mIsSuccess = aIsSuccess;
     event.Platform.BLEPeripheralAdvStartComplete.mpAppstate = apAppstate;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate)
@@ -772,7 +772,7 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * 
     event.Type                                             = DeviceEventType::kPlatformLinuxBLEPeripheralAdvStopComplete;
     event.Platform.BLEPeripheralAdvStopComplete.mIsSuccess = aIsSuccess;
     event.Platform.BLEPeripheralAdvStopComplete.mpAppstate = apAppstate;
-    PlatformMgr().PostEvent(&event);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)

@@ -1316,13 +1316,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_RETRANS_TABLE_FULL                          CHIP_CORE_ERROR(0x64)
 
 /**
- *  @def CHIP_ERROR_INVALID_ACK_ID
+ *  @def CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER
  *
  *  @brief
  *    An acknowledgment id is invalid.
  *
  */
-#define CHIP_ERROR_INVALID_ACK_ID                              CHIP_CORE_ERROR(0x65)
+#define CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER                 CHIP_CORE_ERROR(0x65)
 
 /**
  *  @def CHIP_ERROR_SEND_THROTTLED
@@ -2171,7 +2171,15 @@ using CHIP_ERROR = ::chip::ChipError;
  * @brief
  *   The fabric ID in ICA certificate doesn't match the one in NOC.
  */
-#define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                          CHIP_CORE_ERROR(0xc6)
+#define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                      CHIP_CORE_ERROR(0xc6)
+
+/**
+ * @def CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW
+ *
+ * @brief
+ *   The message counter of the received message is out of receiving window
+ */
+#define CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW               CHIP_CORE_ERROR(0xc7)
 
 /**
  *  @}

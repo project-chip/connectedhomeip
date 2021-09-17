@@ -20,7 +20,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/Mdns.h>
-#include <app/server/RendezvousServer.h>
 #include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
@@ -82,7 +81,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     chip::Platform::MemoryInit();
 
-    mCommissionManager.SetAppDelegate(delegate);
+    mCommissioningWindowManager.SetAppDelegate(delegate);
+    mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
     InitDataModelHandler(&mExchangeMgr);
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -91,9 +91,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #elif CHIP_DEVICE_LAYER_TARGET_LINUX
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 #endif
-
-    err = mRendezvousServer.Init(mAppDelegate, &mSessionIDAllocator);
-    SuccessOrExit(err);
 
     err = mFabrics.Init(&mServerStorage);
     SuccessOrExit(err);
@@ -147,20 +144,21 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     else
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
-        SuccessOrExit(err = mCommissionManager.OpenBasicCommissioningWindow(ResetFabrics::kYes));
+        GetFabricTable().DeleteAllFabrics();
+        SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow());
 #endif
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    app::Mdns::SetSecuredPort(mSecuredServicePort);
-    app::Mdns::SetUnsecuredPort(mUnsecuredServicePort);
+    app::MdnsServer::Instance().SetSecuredPort(mSecuredServicePort);
+    app::MdnsServer::Instance().SetUnsecuredPort(mUnsecuredServicePort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     // TODO @bzbarsky-apple @cecille Move to examples
     // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED
     // StartServer only enables commissioning mode if device has not been commissioned
-    app::Mdns::StartServer();
+    app::MdnsServer::Instance().StartServer();
 #endif
 
     // TODO @pan-apple Use IM protocol ID.
@@ -196,7 +194,7 @@ void Server::Shutdown()
     mExchangeMgr.Shutdown();
     mSessions.Shutdown();
     mTransports.Close();
-    mRendezvousServer.Cleanup();
+    mCommissioningWindowManager.Cleanup();
     chip::Platform::MemoryShutdown();
 }
 
@@ -210,7 +208,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
 
     CHIP_ERROR err;
     char nameBuffer[chip::Mdns::kMaxInstanceNameSize + 1];
-    err = app::Mdns::GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
+    err = app::MdnsServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to get mdns instance name error: %s", ErrorStr(err));

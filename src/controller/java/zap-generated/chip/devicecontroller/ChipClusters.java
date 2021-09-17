@@ -3632,6 +3632,61 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
+  public static class OtaSoftwareUpdateRequestorCluster extends BaseChipCluster {
+    public OtaSoftwareUpdateRequestorCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void announceOtaProvider(
+        DefaultClusterCallback callback,
+        byte[] serverLocation,
+        int vendorId,
+        int announcementReason,
+        byte[] metadataForNode) {
+      announceOtaProvider(
+          chipClusterPtr, callback, serverLocation, vendorId, announcementReason, metadataForNode);
+    }
+
+    private native void announceOtaProvider(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        byte[] serverLocation,
+        int vendorId,
+        int announcementReason,
+        byte[] metadataForNode);
+
+    public void readDefaultOtaProviderAttribute(OctetStringAttributeCallback callback) {
+      readDefaultOtaProviderAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeDefaultOtaProviderAttribute(DefaultClusterCallback callback, byte[] value) {
+      writeDefaultOtaProviderAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readUpdatePossibleAttribute(BooleanAttributeCallback callback) {
+      readUpdatePossibleAttribute(chipClusterPtr, callback);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readDefaultOtaProviderAttribute(
+        long chipClusterPtr, OctetStringAttributeCallback callback);
+
+    private native void writeDefaultOtaProviderAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, byte[] value);
+
+    private native void readUpdatePossibleAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class OccupancySensingCluster extends BaseChipCluster {
     public OccupancySensingCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -3837,11 +3892,12 @@ public class ChipClusters {
 
     public void addNOC(
         NOCResponseCallback callback,
-        byte[] nOCArray,
+        byte[] nOCValue,
+        byte[] iCACValue,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId) {
-      addNOC(chipClusterPtr, callback, nOCArray, iPKValue, caseAdminNode, adminVendorId);
+      addNOC(chipClusterPtr, callback, nOCValue, iCACValue, iPKValue, caseAdminNode, adminVendorId);
     }
 
     public void addTrustedRootCertificate(DefaultClusterCallback callback, byte[] rootCertificate) {
@@ -3873,14 +3929,15 @@ public class ChipClusters {
       updateFabricLabel(chipClusterPtr, callback, label);
     }
 
-    public void updateNOC(NOCResponseCallback callback, byte[] nOCArray) {
-      updateNOC(chipClusterPtr, callback, nOCArray);
+    public void updateNOC(NOCResponseCallback callback, byte[] nOCValue, byte[] iCACValue) {
+      updateNOC(chipClusterPtr, callback, nOCValue, iCACValue);
     }
 
     private native void addNOC(
         long chipClusterPtr,
         NOCResponseCallback callback,
-        byte[] nOCArray,
+        byte[] nOCValue,
+        byte[] iCACValue,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId);
@@ -3907,7 +3964,7 @@ public class ChipClusters {
         long chipClusterPtr, NOCResponseCallback callback, String label);
 
     private native void updateNOC(
-        long chipClusterPtr, NOCResponseCallback callback, byte[] nOCArray);
+        long chipClusterPtr, NOCResponseCallback callback, byte[] nOCValue, byte[] iCACValue);
 
     public interface AttestationResponseCallback {
       void onSuccess(byte[] AttestationElements, byte[] Signature);

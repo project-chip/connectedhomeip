@@ -107,13 +107,21 @@ void ThreadStackManagerImpl::ThreadDevcieRoleChangedHandler(const gchar * role)
         event.Type = DeviceEventType::kThreadConnectivityChange;
         event.ThreadConnectivityChange.Result =
             attached ? ConnectivityChange::kConnectivity_Established : ConnectivityChange::kConnectivity_Lost;
-        PlatformMgr().PostEvent(&event);
+        CHIP_ERROR status = PlatformMgr().PostEvent(&event);
+        if (status != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to post thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+        }
     }
     mAttached = attached;
 
     event.Type                          = DeviceEventType::kThreadStateChange;
     event.ThreadStateChange.RoleChanged = true;
-    PlatformMgr().PostEvent(&event);
+    CHIP_ERROR status                   = PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post thread state change: %" CHIP_ERROR_FORMAT, status.Format());
+    }
 }
 
 void ThreadStackManagerImpl::_ProcessThreadActivity() {}
@@ -212,9 +220,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
     ChipDeviceEvent event;
     event.Type                                           = DeviceEventType::kServiceProvisioningChange;
     event.ServiceProvisioningChange.IsServiceProvisioned = true;
-    PlatformMgr().PostEvent(&event);
-
-    return CHIP_NO_ERROR;
+    return PlatformMgr().PostEvent(&event);
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)

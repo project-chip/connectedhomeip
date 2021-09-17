@@ -180,7 +180,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest);
 
     EncryptedPacketBufferHandle preparedMessage;
-    err = secureSessionMgr.BuildEncryptedMessagePayload(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
@@ -194,8 +194,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     callback.LargeMessageSent = true;
 
-    err = secureSessionMgr.BuildEncryptedMessagePayload(localToRemoteSession, payloadHeader, std::move(large_buffer),
-                                                        preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(large_buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
@@ -211,8 +210,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     callback.LargeMessageSent = true;
 
-    err = secureSessionMgr.BuildEncryptedMessagePayload(localToRemoteSession, payloadHeader, std::move(extra_large_buffer),
-                                                        preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(extra_large_buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_MESSAGE_TOO_LONG);
 }
 
@@ -272,7 +270,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     payloadHeader.SetInitiator(true);
 
-    err = secureSessionMgr.BuildEncryptedMessagePayload(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
@@ -346,7 +344,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     payloadHeader.SetInitiator(true);
 
-    err = secureSessionMgr.BuildEncryptedMessagePayload(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
@@ -364,14 +362,14 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     // Change Message ID
-    EncryptedPacketBufferHandle badMessageIdMsg = preparedMessage.CloneData();
-    NL_TEST_ASSERT(inSuite, badMessageIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
+    EncryptedPacketBufferHandle badMessageCounterMsg = preparedMessage.CloneData();
+    NL_TEST_ASSERT(inSuite, badMessageCounterMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
-    uint32_t msgID = packetHeader.GetMessageId();
-    packetHeader.SetMessageId(msgID + 1);
-    NL_TEST_ASSERT(inSuite, badMessageIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
+    uint32_t messageCounter = packetHeader.GetMessageCounter();
+    packetHeader.SetMessageCounter(messageCounter + 1);
+    NL_TEST_ASSERT(inSuite, badMessageCounterMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badMessageIdMsg);
+    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badMessageCounterMsg);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
@@ -384,7 +382,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, badKeyIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     // the secure channel is setup to use key ID 1, and 2. So let's use 3 here.
-    packetHeader.SetEncryptionKeyID(3);
+    packetHeader.SetSessionId(3);
     NL_TEST_ASSERT(inSuite, badKeyIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badKeyIdMsg);

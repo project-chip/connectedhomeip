@@ -1,0 +1,28 @@
+{
+    "name": "CHIP Tests templates",
+    "version": "chip-v1",
+    "helpers": [
+        "../../../zap-templates/common/StringHelper.js",
+        "../../../zap-templates/templates/app/helper.js",
+        "../../../zap-templates/templates/chip/helper.js"
+    ],
+    "override": "../../../zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../zap-templates/partials/header.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "../../../zap-templates/templates/app/tests/CHIPClusters.zapt",
+            "name": "Tests C++ API Header",
+            "output": "tests/CHIPClusters.h"
+        },
+        {
+            "path": "../../../zap-templates/templates/app/tests/CHIPClusters-src.zapt",
+            "name": "Tests C++ API",
+            "output": "tests/CHIPClusters.cpp"
+        }
+    ]
+}

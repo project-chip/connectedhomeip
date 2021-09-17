@@ -283,10 +283,10 @@
 // Attribute ids for cluster: OTA Software Update Requestor
 
 // Client attributes
-#define ZCL_DEFAULT_OTA_PROVIDER_ATTRIBUTE_ID (0x0000)
-#define ZCL_UPDATE_POSSIBLE_ATTRIBUTE_ID (0x0001)
 
 // Server attributes
+#define ZCL_DEFAULT_OTA_PROVIDER_ATTRIBUTE_ID (0x0001)
+#define ZCL_UPDATE_POSSIBLE_ATTRIBUTE_ID (0x0002)
 
 // Attribute ids for cluster: General Commissioning
 

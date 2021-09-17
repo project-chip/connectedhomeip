@@ -115,8 +115,8 @@ jobs:
                      --volume /dev/pts:/dev/pts \
                      -- scripts/tests/cirque_tests.sh run_all_tests
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v1
-              if: ${{ always() }}
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name:
                       cirque_log-${{steps.outsuffix.outputs.value}}-logs

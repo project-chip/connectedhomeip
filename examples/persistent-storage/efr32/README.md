@@ -29,7 +29,7 @@ platforms.
 ## EFR32
 
 The EFR32 platform KVS is fully implemented, the KVS is enabled and configured
-using theese defines:
+using these defines:
 
 ```
 defines = [
