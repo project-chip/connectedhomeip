@@ -134,7 +134,7 @@ static void scheduleIdentifyTick(EndpointId endpoint)
             /* change from e.g. Breathe to Blink during identify */
             else
             {
-                /* cancle identify */
+                /* cancel identify */
                 Clusters::Identify::Attributes::SetIdentifyTime(endpoint, 0);
                 if (nullptr != identify->mOnIdentifyStop)
                     identify->mOnIdentifyStop(identify);
