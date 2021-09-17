@@ -39,6 +39,9 @@
 #include <lib/mdns/Advertiser.h>
 #include <lib/mdns/platform/Mdns.h>
 
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -92,6 +95,8 @@ protected:
     CHIP_ERROR _GetAndLogThreadTopologyFull(void);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR _GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength,
+                                                        chip::TLV::TLVType & type);
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);

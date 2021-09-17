@@ -2661,6 +2661,51 @@
               "reportableChange": 0
             },
             {
+              "name": "ActiveTimestamp",
+              "code": 56,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0000000000000000",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "PendingTimestamp",
+              "code": 57,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0000000000000000",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "delay",
+              "code": 58,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0000",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "SecurityPolicy",
               "code": 59,
               "mfgCode": null,
@@ -7828,7 +7873,7 @@
               "reportableChange": 0
             },
             {
-              "name": "updated at",
+              "name": "position updated at",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -7843,7 +7888,7 @@
               "reportableChange": 0
             },
             {
-              "name": "posistion",
+              "name": "position",
               "code": 4,
               "mfgCode": null,
               "side": "server",
