@@ -17,6 +17,7 @@
 #include <memory>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -26,6 +27,8 @@
 #include <platform/KeyValueStoreManager.h>
 
 #include "ChipThreadWork.h"
+
+using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
 namespace {
 
@@ -95,12 +98,11 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
         // System and Inet layers explicitly passed to indicate that the CHIP stack is
         // already assumed initialized
-        chip::Controller::CommissionerInitParams params;
+        chip::Controller::SetupParams commissionerParams;
+        chip::Controller::FactoryInitParams factoryParams;
 
-        params.storageDelegate = &gServerStorage;
-        params.systemLayer     = &chip::DeviceLayer::SystemLayer();
-        params.inetLayer       = &chip::DeviceLayer::InetLayer;
-        params.pairingDelegate = &gPairingDelegate;
+        commissionerParams.pairingDelegate = &gPairingDelegate;
+        factoryParams.storageDelegate      = &gServerStorage;
 
         chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
         chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
@@ -129,13 +131,14 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
                                                                                 icacSpan, nocSpan);
             SuccessOrExit(err);
 
-            params.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;
-            params.ephemeralKeypair               = &ephemeralKey;
-            params.controllerRCAC                 = rcacSpan;
-            params.controllerICAC                 = icacSpan;
-            params.controllerNOC                  = nocSpan;
+            commissionerParams.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;
+            commissionerParams.ephemeralKeypair               = &ephemeralKey;
+            commissionerParams.controllerRCAC                 = rcacSpan;
+            commissionerParams.controllerICAC                 = icacSpan;
+            commissionerParams.controllerNOC                  = nocSpan;
 
-            err = result->Init(params);
+            SuccessOrExit(DeviceControllerFactory::GetInstance().Init(factoryParams));
+            err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *result);
         }
     exit:
         ChipLogProgress(Controller, "Commissioner initialization status: %s", chip::ErrorStr(err));

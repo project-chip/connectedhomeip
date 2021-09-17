@@ -50,6 +50,7 @@
 #include <app/InteractionModelEngine.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <inet/IPAddress.h>
 #include <lib/mdns/Resolver.h>
@@ -204,9 +205,10 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
                                                                         nocSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
-    CommissionerInitParams initParams;
-    initParams.storageDelegate                = &sStorageDelegate;
-    initParams.mDeviceAddressUpdateDelegate   = &sDeviceAddressUpdateDelegate;
+    FactoryInitParams factoryParams;
+    SetupParams initParams;
+    factoryParams.storageDelegate             = &sStorageDelegate;
+    initParams.deviceAddressUpdateDelegate    = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;
     initParams.imDelegate                     = &PythonInteractionModelDelegate::Instance();
@@ -215,8 +217,8 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
 
-    (*outDevCtrl)->SetUdpListenPort(0);
-    err = (*outDevCtrl)->Init(initParams);
+    ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
+    err = DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, **outDevCtrl);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     return CHIP_NO_ERROR.AsInteger();

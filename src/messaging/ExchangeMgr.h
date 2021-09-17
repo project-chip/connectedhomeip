@@ -184,6 +184,8 @@ public:
      */
     void CloseAllContextsForDelegate(const ExchangeDelegate * delegate);
 
+    // TODO Store more than one delegate and add API to query delegates to check if incoming messages are for them.
+    // Do the same for the UMHs as well
     void SetDelegate(ExchangeMgrDelegate * delegate) { mDelegate = delegate; }
 
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }

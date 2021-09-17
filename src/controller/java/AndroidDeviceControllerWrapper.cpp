@@ -25,6 +25,7 @@
 #include "JniReferences.h"
 #include <lib/support/CodeUtils.h>
 
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
@@ -204,14 +205,15 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
     wrapper->Controller()->SetUdpListenPort(CHIP_PORT + 1);
 
-    chip::Controller::CommissionerInitParams initParams;
+    chip::Controller::factoryInitParams initParams;
+    chip::Controller::factorySetupParams setupParams;
 
-    initParams.storageDelegate                = wrapper.get();
-    initParams.pairingDelegate                = wrapper.get();
-    initParams.operationalCredentialsDelegate = wrapper.get();
-    initParams.systemLayer                    = systemLayer;
-    initParams.inetLayer                      = inetLayer;
-    initParams.bleLayer                       = GetJNIBleLayer();
+    initParams.storageDelegate                 = wrapper.get();
+    initParams.systemLayer                     = systemLayer;
+    initParams.inetLayer                       = inetLayer;
+    initParams.bleLayer                        = GetJNIBleLayer();
+    setupParams.pairingDelegate                = wrapper.get();
+    setupParams.operationalCredentialsDelegate = wrapper.get();
 
     wrapper->InitializeOperationalCredentialsIssuer();
 
@@ -246,13 +248,17 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         return nullptr;
     }
 
-    initParams.ephemeralKeypair = &ephemeralKey;
-    initParams.controllerRCAC   = rcacSpan;
-    initParams.controllerICAC   = icacSpan;
-    initParams.controllerNOC    = nocSpan;
+    setupParams.ephemeralKeypair = &ephemeralKey;
+    setupParams.controllerRCAC   = rcacSpan;
+    setupParams.controllerICAC   = icacSpan;
+    setupParams.controllerNOC    = nocSpan;
 
-    *errInfoOnFailure = wrapper->Controller()->Init(initParams);
-
+    *errInfoOnFailure = DeviceControllerFactory::GetInstance().Init(initParams);
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+    *errInfoOnFailure = DeviceControllerFactory::GetInstance().VendCommissioner(setupParams, *wrapper->Controller());
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;

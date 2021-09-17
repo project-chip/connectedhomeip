@@ -26,10 +26,12 @@
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
-
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+
+using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {
@@ -42,7 +44,8 @@ void Commands::Register(const char * clusterName, commands_list commandsList)
 int Commands::Run(int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Controller::CommissionerInitParams initParams;
+    chip::Controller::FactoryInitParams factoryInitParams;
+    chip::Controller::SetupParams commissionerParams;
     Command * command = nullptr;
     NodeId localId;
     NodeId remoteId;
@@ -69,14 +72,14 @@ int Commands::Run(int argc, char ** argv)
     ChipLogProgress(Controller, "Read local id 0x" ChipLogFormatX64 ", remote id 0x" ChipLogFormatX64, ChipLogValueX64(localId),
                     ChipLogValueX64(remoteId));
 
-    initParams.storageDelegate = &mStorage;
+    factoryInitParams.storageDelegate = &mStorage;
+    factoryInitParams.listenPort      = mStorage.GetListenPort();
 
     err = mOpCredsIssuer.Initialize(mStorage);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", chip::ErrorStr(err)));
 
-    initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
+    commissionerParams.operationalCredentialsDelegate = &mOpCredsIssuer;
 
-    err = mController.SetUdpListenPort(mStorage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
 
     VerifyOrExit(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
@@ -97,19 +100,22 @@ int Commands::Run(int argc, char ** argv)
         err = mOpCredsIssuer.GenerateNOCChainAfterValidation(localId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
         SuccessOrExit(err);
 
-        initParams.ephemeralKeypair = &ephemeralKey;
-        initParams.controllerRCAC   = rcacSpan;
-        initParams.controllerICAC   = icacSpan;
-        initParams.controllerNOC    = nocSpan;
+        commissionerParams.ephemeralKeypair = &ephemeralKey;
+        commissionerParams.controllerRCAC   = rcacSpan;
+        commissionerParams.controllerICAC   = icacSpan;
+        commissionerParams.controllerNOC    = nocSpan;
 
-        err = mController.Init(initParams);
+        // init the factory, then setup the Controller
+        err = DeviceControllerFactory::GetInstance().Init(factoryInitParams);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Controller Factory failed to initialize"));
+        err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, mController);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
     }
 
 #if CONFIG_USE_SEPARATE_EVENTLOOP
     // ServiceEvents() calls StartEventLoopTask(), which is paired with the
     // StopEventLoopTask() below.
-    err = mController.ServiceEvents();
+    err = DeviceControllerFactory::GetInstance().ServiceEvents();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
