@@ -77,8 +77,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse),
                  err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId);
-    SuccessOrExit(err);
+    SuccessOrExit(err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId));
 
 exit:
 
@@ -86,11 +85,7 @@ exit:
     {
         if (err != CHIP_NO_ERROR)
         {
-            mpDelegate->CommandResponseError(this, err);
-        }
-        else
-        {
-            mpDelegate->CommandResponseProcessed(this);
+            mpDelegate->OnError(this, err);
         }
     }
 
@@ -105,7 +100,7 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
 
     if (mpDelegate != nullptr)
     {
-        mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
+        mpDelegate->OnError(this, CHIP_ERROR_TIMEOUT);
     }
 
     ShutdownInternal();
@@ -114,54 +109,52 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CommandPath::Parser commandPath;
-    chip::TLV::TLVReader commandDataReader;
-    chip::ClusterId clusterId;
-    chip::CommandId commandId;
-    chip::EndpointId endpointId;
-    Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
-    uint32_t protocolId                                     = 0;
-    uint16_t protocolCode                                   = 0;
-    StatusElement::Parser statusElementParser;
-
     mCommandIndex++;
-    err = aCommandElement.GetCommandPath(&commandPath);
-    SuccessOrExit(err);
 
-    err = commandPath.GetClusterId(&clusterId);
-    SuccessOrExit(err);
-    err = commandPath.GetCommandId(&commandId);
-    SuccessOrExit(err);
-
-    err = commandPath.GetEndpointId(&endpointId);
-    SuccessOrExit(err);
-
-    err = aCommandElement.GetStatusElement(&statusElementParser);
-    if (CHIP_NO_ERROR == err)
+    CommandPath::Type commandPath;
     {
-        err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
-        SuccessOrExit(err);
-        if (mpDelegate != nullptr)
-        {
-            mpDelegate->CommandResponseStatus(this, generalCode, protocolId, protocolCode, endpointId, clusterId, commandId,
-                                              mCommandIndex);
-        }
+        TLV::TLVReader commandPathReader;
+        SuccessOrExit(err = aCommandElement.GetReaderOnTag(CommandDataElement::kCsTag_CommandPath, &commandPathReader));
+        SuccessOrExit(err = commandPath.Decode(commandPathReader));
     }
-    else if (CHIP_END_OF_TLV == err)
+
     {
-        // TODO(Spec#3258): The endpoint id in response command is not clear, so we cannot do "ClientClusterCommandExists" check.
-        err = aCommandElement.GetData(&commandDataReader);
+        chip::TLV::TLVReader commandDataReader;
+
+        // Default to success when command specify response is received.
+        StatusElement::Type statusElement{ chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                           chip::Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(),
+                                           to_underlying(Protocols::InteractionModel::ProtocolCode::Success) };
+        StatusElement::Parser statusElementParser;
+        err = aCommandElement.GetStatusElement(&statusElementParser);
+        if (CHIP_NO_ERROR == err)
+        {
+            err = statusElementParser.DecodeStatusElement(statusElement);
+        }
+        else if (CHIP_END_OF_TLV == err)
+        {
+            err = aCommandElement.GetData(&commandDataReader);
+        }
         SuccessOrExit(err);
-        // TODO(#4503): Should call callbacks of cluster that sends the command.
-        DispatchSingleClusterResponseCommand(clusterId, commandId, endpointId, commandDataReader, this);
+        mpDelegate->OnResponse(this, commandPath, statusElement, commandDataReader);
     }
 
 exit:
     if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
     {
-        mpDelegate->CommandResponseProtocolError(this, mCommandIndex);
+        mpDelegate->OnError(this, err);
     }
     return err;
+}
+
+void CommandSender::ShutdownInternal()
+{
+    // For CommandSender, ExchangeContext is the only thing it holds ownership by pointer.
+    AbortExistingExchangeContext();
+    if (mpDelegate != nullptr)
+    {
+        mpDelegate->ReleaseCommandSender(this);
+    }
 }
 
 } // namespace app

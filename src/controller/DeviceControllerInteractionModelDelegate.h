@@ -11,19 +11,16 @@ namespace Controller {
  * Used for make current OnSuccessCallback & OnFailureCallback works when interaction model landed, it will be removed
  * after #6308 is landed.
  */
-class DeviceControllerInteractionModelDelegate : public chip::app::InteractionModelDelegate
+class DeviceControllerInteractionModelDelegate : public chip::app::InteractionModelDelegate,
+                                                 public chip::app::CommandSender::Delegate
 {
 public:
-    CHIP_ERROR CommandResponseStatus(const app::CommandSender * apCommandSender,
-                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                     const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
-                                     chip::CommandId aCommandId, uint8_t aCommandIndex) override;
+    void OnResponse(const app::CommandSender * apCommandSender, const app::CommandPath::Type & aPath,
+                    const app::StatusElement::Type & aStatus, TLV::TLVReader & aData) override;
+    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
+    void ReleaseCommandSender(app::CommandSender * apCommandSender) override;
 
-    CHIP_ERROR CommandResponseProtocolError(const app::CommandSender * apCommandSender, uint8_t aCommandIndex) override;
-
-    CHIP_ERROR CommandResponseError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
-
-    CHIP_ERROR CommandResponseProcessed(const app::CommandSender * apCommandSender) override;
+    app::CommandSender * NewCommandSender();
 
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
                       Protocols::InteractionModel::ProtocolCode status) override;

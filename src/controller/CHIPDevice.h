@@ -450,6 +450,9 @@ public:
     CHIP_ERROR EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
+    CHIP_ERROR NewCommandSender(app::CommandSender ** commandSender);
+    void ReleaseCommandSender(app::CommandSender * commandSender);
+
 private:
     enum class ConnectionState
     {

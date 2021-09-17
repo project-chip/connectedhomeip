@@ -47,9 +47,11 @@ public:
     CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
                              const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
                              const Protocols::InteractionModel::ProtocolCode aProtocolCode) override;
+    void Shutdown();
 
 private:
     friend class TestCommandInteraction;
+    void ShutdownInternal();
     CHIP_ERROR SendCommandResponse();
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 };

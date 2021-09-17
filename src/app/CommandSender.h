@@ -36,15 +36,69 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/Command.h>
+#include <app/MessageDef/CommandPath.h>
+#include <app/MessageDef/StatusElement.h>
 
 #define COMMON_STATUS_SUCCESS 0
 
 namespace chip {
 namespace app {
 
-class CommandSender : public Command, public Messaging::ExchangeDelegate
+class CommandSender final : public Command, public Messaging::ExchangeDelegate
 {
 public:
+    // TODO: Move various CommandResponse related callbacks to this delegate.
+    class Delegate
+    {
+    public:
+        virtual ~Delegate() = default;
+
+        /**
+         * OnResponse will be called when the response from server arrived.
+         *  - When StatusElement is received, aStatus will be filled with the content of the StatusElement, aData will be a
+         * uninitialized TLVReader.
+         *  - When command specific response is received, aStatus will be filled with success status, aData will be initialized with
+         * a struct of command specify response.
+         *
+         * @param[in] apCommandSender: The command sender object that initialized the command transaction, MUST NOT be freed in this
+         * callback.
+         * @param[in] aPath: The command path field in invoke command response.
+         * @param[in] aStatus: The status element, filled with actual StatusElement when a StatusElement is received, when command
+         * specific response is received, aStatus will always be filled with success status code.
+         * @param[in] aData: The command data, or a uninitialized TLVReader if a StatusElement is received.
+         */
+        virtual void OnResponse(const CommandSender * apCommandSender, const CommandPath::Type & aPath,
+                                const StatusElement::Type & aStatus, TLV::TLVReader & aData)
+        {}
+
+        /**
+         * OnError will be called when error occurred when receiving / handling response from server:
+         * - CHIP_ERROR_TIMEOUT: The CommandSender failed to receive a expected response.
+         * - TLV Related erros: The CommandSender received a malformed response from server.
+         *
+         * @param[in] apCommandSender: The command sender object that initialized the command transaction, MUST NOT be freed in this
+         * callback.
+         * @param[in] aError: The error occurred during the invoke command interaction.
+         */
+        virtual void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) {}
+
+        /**
+         * ReleaseCommandSender will be called when CommandSender has finished all the works, and it is safe to release the
+         * allocated CommandSender object.
+         *
+         * This function is marked as must be implemented to make application aware of releasing the object.
+         *
+         * This function will always be called eaxctly once for a single command sender.
+         *
+         * @param[in] apCommandSender: The command sender object of the terminated invoke command transaction.
+         */
+        virtual void ReleaseCommandSender(CommandSender * apCommandSender) = 0;
+    };
+
+    CommandSender(Delegate * apDelegate) : mpDelegate(apDelegate){};
+
+    ~CommandSender() { AbortExistingExchangeContext(); }
+
     // TODO: issue #6792 - the secure session parameter should be made non-optional and passed by reference.
     // Once SendCommandRequest returns successfully, the CommandSender will
     // handle calling Shutdown on itself once it decides it's done with waiting
@@ -66,7 +120,12 @@ private:
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
+    // CommandSender does not have "Shutdown" method, the user will destruct it directly.
+    void ShutdownInternal();
+
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
+
+    Delegate * mpDelegate = nullptr;
 };
 
 } // namespace app

@@ -45,6 +45,13 @@ enum
     kCsTag_ClusterId    = 4
 };
 
+struct Type
+{
+    Protocols::SecureChannel::GeneralStatusCode generalCode;
+    uint32_t protocolId;
+    uint16_t protocolCode;
+};
+
 class Parser : public ListParser
 {
 public:
@@ -87,6 +94,11 @@ public:
      */
     CHIP_ERROR DecodeStatusElement(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode, uint32_t * apProtocolId,
                                    uint16_t * apProtocolCode) const;
+
+    inline CHIP_ERROR DecodeStatusElement(Type & aStatusElement)
+    {
+        return DecodeStatusElement(&aStatusElement.generalCode, &aStatusElement.protocolId, &aStatusElement.protocolCode);
+    };
 };
 
 class Builder : public ListBuilder
@@ -125,6 +137,11 @@ public:
      */
     StatusElement::Builder & EncodeStatusElement(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                                  const uint32_t aProtocolId, const uint16_t aProtocolCode);
+
+    inline StatusElement::Builder & EncodeStatusElement(const Type & aStatusElement)
+    {
+        return EncodeStatusElement(aStatusElement.generalCode, aStatusElement.protocolId, aStatusElement.protocolCode);
+    }
 
     /**
      *  @brief Mark the end of this StatusElement
