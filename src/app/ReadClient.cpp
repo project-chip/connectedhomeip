@@ -25,7 +25,6 @@
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
-#include <protocols/secure_channel/StatusReport.h>
 
 namespace chip {
 namespace app {
@@ -189,25 +188,25 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadClient::SendStatusReport(CHIP_ERROR aError)
+CHIP_ERROR ReadClient::SendStatusResponse(CHIP_ERROR aError)
 {
-    Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
-    uint32_t protocolId                                     = Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm();
-    uint16_t protocolCode                                   = to_underlying(Protocols::InteractionModel::ProtocolCode::Success);
-    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
+    VerifyOrReturnLogError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
 
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(msgBuf));
+
+    StatusResponse::Builder response;
+    ReturnLogErrorOnFailure(response.Init(&writer));
+    Protocols::InteractionModel::ProtocolCode statusCode = Protocols::InteractionModel::ProtocolCode::Success;
     if (aError != CHIP_NO_ERROR)
     {
-        generalCode  = Protocols::SecureChannel::GeneralStatusCode::kFailure;
-        protocolCode = to_underlying(Protocols::InteractionModel::ProtocolCode::InvalidSubscription);
+        statusCode = Protocols::InteractionModel::ProtocolCode::InvalidSubscription;
     }
-
-    Protocols::SecureChannel::StatusReport report(generalCode, protocolId, protocolCode);
-
-    Encoding::LittleEndian::PacketBufferWriter buf(System::PacketBufferHandle::New(kMaxSecureSduLengthBytes));
-    report.WriteToBuffer(buf);
-    System::PacketBufferHandle msgBuf = buf.Finalize();
-    VerifyOrReturnLogError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
+    response.Status(statusCode);
+    ReturnLogErrorOnFailure(response.GetError());
+    ReturnLogErrorOnFailure(writer.Finalize(&msgBuf));
+    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     if (IsSubscriptionType())
     {
@@ -221,7 +220,7 @@ CHIP_ERROR ReadClient::SendStatusReport(CHIP_ERROR aError)
         }
     }
     ReturnLogErrorOnFailure(
-        mpExchangeCtx->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msgBuf),
+        mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::StatusResponse, std::move(msgBuf),
                                    Messaging::SendFlags(IsAwaitingSubscribeResponse() ? Messaging::SendMessageFlags::kExpectResponse
                                                                                       : Messaging::SendMessageFlags::kNone)));
     return CHIP_NO_ERROR;
@@ -439,7 +438,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         mpDelegate->ReportProcessed(this);
     }
 exit:
-    SendStatusReport(err);
+    SendStatusResponse(err);
     if (!mInitialReport)
     {
         mpExchangeCtx = nullptr;

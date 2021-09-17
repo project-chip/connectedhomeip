@@ -44,6 +44,7 @@ public:
 
     // LayerLwIP overrides.
     CHIP_ERROR AddEventHandlerDelegate(EventHandlerDelegate & aDelegate);
+    CHIP_ERROR ScheduleLambdaBridge(const LambdaBridge & bridge) override;
     CHIP_ERROR PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
 
 public:
@@ -55,12 +56,8 @@ public:
 private:
     friend class PlatformEventing;
 
-    static CHIP_ERROR HandleSystemLayerEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
-
     CHIP_ERROR DispatchEvent(Event aEvent);
     CHIP_ERROR StartPlatformTimer(uint32_t aDelayMilliseconds);
-
-    static EventHandlerDelegate sSystemEventHandlerDelegate;
 
     Timer::MutexedList mTimerList;
     bool mHandlingTimerComplete; // true while handling any timer completion

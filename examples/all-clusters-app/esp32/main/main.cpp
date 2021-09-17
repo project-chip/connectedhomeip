@@ -346,7 +346,8 @@ public:
         if (i == 0)
         {
             ConnectivityMgr().ClearWiFiStationProvision();
-            chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(ResetFabrics::kYes);
+            chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+            chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
         }
         else if (i == 1)
         {
@@ -355,9 +356,9 @@ public:
         else if (i == 2)
         {
             app::MdnsServer::Instance().StartServer(Mdns::CommissioningMode::kEnabledBasic);
-
-            chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(
-                ResetFabrics::kYes, kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdns);
+            chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+            chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
+                kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdnsOnly);
         }
     }
 

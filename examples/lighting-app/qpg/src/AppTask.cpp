@@ -111,7 +111,7 @@ CHIP_ERROR AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     // Enable BLE advertisements
-    chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(chip::ResetFabrics::kNo);
+    chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
 
     return err;

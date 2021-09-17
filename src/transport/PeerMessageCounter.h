@@ -97,7 +97,7 @@ public:
             uint32_t offset = mSynced.mMaxCounter - counter;
             if (offset >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
             {
-                return CHIP_ERROR_MESSAGE_ID_OUT_OF_WINDOW; // outside valid range
+                return CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW; // outside valid range
             }
             if (mSynced.mWindow.test(offset))
             {
@@ -118,7 +118,7 @@ public:
             return CHIP_NO_ERROR;
         case Status::Synced: {
             CHIP_ERROR err = Verify(counter);
-            if (err == CHIP_ERROR_MESSAGE_ID_OUT_OF_WINDOW)
+            if (err == CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW)
             {
                 // According to chip spec, when global unencrypted message
                 // counter is out of window, the peer may have reset and is

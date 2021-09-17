@@ -149,13 +149,12 @@ public:
      *  Iterate through active exchange contexts and retrans table entries. Clear the entry matching
      *  the specified ExchangeContext and the message ID from the retransmision table.
      *
-     *  @param[in]    rc        A pointer to the ExchangeContext object.
-     *
-     *  @param[in]    messageCounter     message ID which has been acked.
+     *  @param[in]    rc                 A pointer to the ExchangeContext object.
+     *  @param[in]    ackMessageCounter  The acknowledged message counter of the received packet.
      *
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t messageCounter);
+    bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t ackMessageCounter);
 
     /**
      *  Send the specified entry from the retransmission table.

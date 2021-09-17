@@ -38,8 +38,8 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING 0
 #define CHIP_SYSTEM_CONFIG_NO_LOCKING 1
 #define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 0
-
 #define CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS 1
+#define CHIP_SYSTEM_CONFIG_POOL_USE_HEAP 1
 
 // ========== Platform-specific Configuration Overrides =========
 

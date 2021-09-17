@@ -1,0 +1,32 @@
+{{#if (chip_has_client_clusters)}}
+{{> header}}
+
+#pragma once
+
+#include <zap-generated/CHIPClusters.h>
+
+namespace chip {
+namespace Controller {
+
+{{#chip_client_clusters}}
+class DLL_EXPORT {{asUpperCamelCase name}}ClusterTest : public {{asUpperCamelCase name}}Cluster
+{
+public:
+    {{asUpperCamelCase name}}ClusterTest() : {{asUpperCamelCase name}}Cluster() {}
+    ~{{asUpperCamelCase name}}ClusterTest() {}
+
+    {{#chip_server_cluster_attributes}}
+    {{#unless isWritableAttribute}}
+    {{#unless isList}}
+    {{#unless isStruct}}
+    CHIP_ERROR WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value);
+    {{/unless}}
+    {{/unless}}
+    {{/unless}}
+    {{/chip_server_cluster_attributes}}
+};
+
+{{/chip_client_clusters}}
+} // namespace Controller
+} // namespace chip
+{{/if}}

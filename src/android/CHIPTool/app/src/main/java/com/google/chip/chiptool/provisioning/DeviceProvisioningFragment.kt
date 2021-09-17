@@ -158,6 +158,13 @@ class DeviceProvisioningFragment : Fragment() {
     override fun onPairingComplete(code: Int) {
       Log.d(TAG, "onPairingComplete: $code")
 
+      // In IP commissioning, commissioning complete will already be called at this point, and the
+      // next fragment will be shown. As a result, this fragment will be in a destroyed state and
+      // should not be operated on.
+      if (deviceInfo.ipAddress != null) {
+        return
+      }
+
       if (code == STATUS_PAIRING_SUCCESS) {
         childFragmentManager.beginTransaction()
             .add(R.id.fragment_container, EnterNetworkFragment.newInstance(networkType))

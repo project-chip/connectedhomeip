@@ -1,0 +1,33 @@
+{{#if (chip_has_client_clusters)}}
+{{> header}}
+
+#import <CHIP/CHIPClustersObjc.h>
+
+@class CHIPDevice;
+
+NS_ASSUME_NONNULL_BEGIN
+
+{{#chip_client_clusters}}
+
+/**
+ * Cluster {{name}}
+ *    {{description}}
+ */
+@interface CHIPTest{{asUpperCamelCase name}} : CHIP{{asUpperCamelCase name}}
+
+{{#chip_server_cluster_attributes}}
+{{#unless isWritableAttribute}}
+{{#unless isList}}
+{{#unless isStruct}}
+- (void)writeAttribute{{asUpperCamelCase name}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
+{{/unless}}
+{{/unless}}
+{{/unless}}
+{{/chip_server_cluster_attributes}}
+
+@end
+
+{{/chip_client_clusters}}
+
+NS_ASSUME_NONNULL_END
+{{/if}}
