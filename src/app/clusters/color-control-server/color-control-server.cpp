@@ -232,7 +232,7 @@ uint16_t ColorControlServer::computeTransitionTimeFromStateAndRate(ColorControlS
     }
 
     // If currentValue == finalValue, force 1 step
-    if(max == min)
+    if (max == min)
     {
         transitionTime = 1;
     }
