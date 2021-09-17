@@ -232,6 +232,10 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
         Impl()->DispatchEventToSystemLayer(event);
         break;
 
+    case DeviceEventType::kChipLambdaEvent:
+        event->LambdaEvent.LambdaProxy(static_cast<const void *>(event->LambdaEvent.LambdaBody));
+        break;
+
     case DeviceEventType::kCallWorkFunct:
         // If the event is a "call work function" event, call the specified function.
         event->CallWorkFunct.WorkFunct(event->CallWorkFunct.Arg);

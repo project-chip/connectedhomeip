@@ -1282,14 +1282,14 @@ static constexpr AttributeId CurrentNavigatorTarget = 0x00000001;
 namespace MediaPlayback {
 namespace Attributes {
 namespace Ids {
-static constexpr AttributeId PlaybackState  = 0x00000000;
-static constexpr AttributeId StartTime      = 0x00000001;
-static constexpr AttributeId Duration       = 0x00000002;
-static constexpr AttributeId UpdatedAt      = 0x00000003;
-static constexpr AttributeId Posistion      = 0x00000004;
-static constexpr AttributeId PlaybackSpeed  = 0x00000005;
-static constexpr AttributeId SeekRangeEnd   = 0x00000006;
-static constexpr AttributeId SeekRangeStart = 0x00000007;
+static constexpr AttributeId PlaybackState     = 0x00000000;
+static constexpr AttributeId StartTime         = 0x00000001;
+static constexpr AttributeId Duration          = 0x00000002;
+static constexpr AttributeId PositionUpdatedAt = 0x00000003;
+static constexpr AttributeId Position          = 0x00000004;
+static constexpr AttributeId PlaybackSpeed     = 0x00000005;
+static constexpr AttributeId SeekRangeEnd      = 0x00000006;
+static constexpr AttributeId SeekRangeStart    = 0x00000007;
 } // namespace Ids
 } // namespace Attributes
 } // namespace MediaPlayback

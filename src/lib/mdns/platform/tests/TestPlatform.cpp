@@ -37,30 +37,26 @@ const char host[]               = "0102030405060708";
 
 const PeerId kPeerId1 = PeerId().SetCompressedFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
 const PeerId kPeerId2 = PeerId().SetCompressedFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
-OperationalAdvertisingParameters operationalParams1 = OperationalAdvertisingParameters()
-                                                          .SetPeerId(kPeerId1)
-                                                          .SetMac(ByteSpan(kMac))
-                                                          .SetPort(CHIP_PORT)
-                                                          .EnableIpV4(true)
-                                                          .SetMRPRetryIntervals(32, 33);
+OperationalAdvertisingParameters operationalParams1 =
+    OperationalAdvertisingParameters().SetPeerId(kPeerId1).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 test::ExpectedCall operationalCall1 = test::ExpectedCall()
                                           .SetProtocol(MdnsServiceProtocol::kMdnsProtocolTcp)
                                           .SetServiceName("_matter")
                                           .SetInstanceName("BEEFBEEFF00DF00D-1111222233334444")
                                           .SetHostName(host)
-                                          .AddTxt("CRI", "32")
-                                          .AddTxt("CRA", "33");
+                                          .AddSubtype("_IBEEFBEEFF00DF00D");
 OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingParameters()
                                                           .SetPeerId(kPeerId2)
                                                           .SetMac(ByteSpan(kMac))
                                                           .SetPort(CHIP_PORT)
                                                           .EnableIpV4(true)
-                                                          .SetMRPRetryIntervals(32, 33);
+                                                          .SetMRPRetryIntervals(Optional<uint32_t>(32), Optional<uint32_t>(33));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(MdnsServiceProtocol::kMdnsProtocolTcp)
                                           .SetServiceName("_matter")
                                           .SetInstanceName("5555666677778888-1212343456567878")
                                           .SetHostName(host)
+                                          .AddSubtype("_I5555666677778888")
                                           .AddTxt("CRI", "32")
                                           .AddTxt("CRA", "33");
 
@@ -93,7 +89,10 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetPairingHint(chip::Optional<uint16_t>(3))
         .SetPairingInstr(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingId(chip::Optional<const char *>("id_that_spins"));
+        .SetRotatingId(chip::Optional<const char *>("id_that_spins"))
+        .SetMRPRetryIntervals(
+            chip::Optional<uint32_t>(3600000),
+            chip::Optional<uint32_t>(3600005)); // 3600005 is over the max, so this should be adjusted by the platform
 
 test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .SetProtocol(MdnsServiceProtocol::kMdnsProtocolUdp)
@@ -107,6 +106,8 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddTxt("RI", "id_that_spins")
                                                   .AddTxt("PI", "Pair me")
                                                   .AddTxt("PH", "3")
+                                                  .AddTxt("CRI", "3600000")
+                                                  .AddTxt("CRA", "3600000")
                                                   .AddSubtype("_S2")
                                                   .AddSubtype("_L22")
                                                   .AddSubtype("_V555")

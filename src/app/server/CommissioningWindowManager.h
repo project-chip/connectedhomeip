@@ -77,7 +77,7 @@ private:
 
     CHIP_ERROR StopAdvertisement();
 
-    CHIP_ERROR PrepareCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t & allocatedSessionID);
+    CHIP_ERROR OpenCommissioningWindow();
 
     AppDelegate * mAppDelegate = nullptr;
     Server * mServer           = nullptr;
@@ -90,6 +90,18 @@ private:
 
     SessionIDAllocator * mIDAllocator = nullptr;
     PASESession mPairingSession;
+
+    uint16_t mCommissioningTimeoutSeconds = 0;
+
+    uint8_t mFailedCommissioningAttempts = 0;
+
+    bool mUseECM = false;
+    PASEVerifier mECMPASEVerifier;
+    uint16_t mECMDiscriminator = 0;
+    uint16_t mECMPasscodeID    = 0;
+    uint32_t mECMIterations    = 0;
+    uint32_t mECMSaltLength    = 0;
+    uint8_t mECMSalt[kPBKDFMaximumSaltLen];
 };
 
 } // namespace chip

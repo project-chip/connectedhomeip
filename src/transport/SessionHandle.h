@@ -17,7 +17,12 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
+#include <lib/core/NodeId.h>
+#include <lib/core/Optional.h>
+#include <transport/FabricTable.h>
 #include <transport/UnauthenticatedSessionTable.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 
@@ -67,7 +72,12 @@ public:
     const Optional<uint16_t> & GetPeerSessionId() const { return mPeerSessionId; }
     const Optional<uint16_t> & GetLocalSessionId() const { return mLocalSessionId; }
 
-    Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession() { return mUnauthenticatedSessionHandle.Value(); }
+    // Return the peer address for this session.  May return null if the peer
+    // address is not known.  This can happen for secure sessions that have been
+    // torn down, at the very least.
+    const Transport::PeerAddress * GetPeerAddress(SecureSessionMgr * ssm) const;
+
+    Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession() const { return mUnauthenticatedSessionHandle.Value(); }
 
 private:
     friend class SecureSessionMgr;

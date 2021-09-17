@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,27 +15,28 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <lib/core/CHIPError.h>
-#include <system/SystemEvent.h>
-#include <system/SystemLayer.h>
+#include <transport/PeerConnectionState.h>
+#include <transport/SecureSessionMgr.h>
+#include <transport/SessionHandle.h>
 
 namespace chip {
-namespace System {
 
-class Layer;
-class Object;
+using namespace Transport;
 
-class PlatformEventing
+const PeerAddress * SessionHandle::GetPeerAddress(SecureSessionMgr * ssm) const
 {
-public:
-    static CHIP_ERROR ScheduleLambdaBridge(System::Layer & aLayer, const LambdaBridge & bridge);
-    static CHIP_ERROR PostEvent(System::Layer & aLayer, Object & aTarget, EventType aType, uintptr_t aArgument);
-    static CHIP_ERROR DispatchEvents(System::Layer & aLayer);
-    static CHIP_ERROR DispatchEvent(System::Layer & aLayer, Event aEvent);
-    static CHIP_ERROR StartTimer(System::Layer & aLayer, uint32_t aMilliseconds);
-};
+    if (IsSecure())
+    {
+        PeerConnectionState * state = ssm->GetPeerConnectionState(*this);
+        if (state == nullptr)
+        {
+            return nullptr;
+        }
 
-} // namespace System
+        return &state->GetPeerAddress();
+    }
+
+    return &GetUnauthenticatedSession()->GetPeerAddress();
+}
+
 } // namespace chip

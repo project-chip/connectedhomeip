@@ -88,6 +88,10 @@ public:
         if (!header.GetFlags().IsTruncated())
         {
             NL_TEST_ASSERT(mInSuite, mTotalRecords == GetNumExpectedRecords());
+            if (mTotalRecords != GetNumExpectedRecords())
+            {
+                ChipLogError(Discovery, "Received %d records, expected %d", mTotalRecords, GetNumExpectedRecords());
+            }
             mHeaderFound = true;
         }
     }

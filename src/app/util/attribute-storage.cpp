@@ -42,6 +42,7 @@
 #include "app/util/common.h"
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
@@ -108,6 +109,10 @@ const uint16_t attributeManufacturerCodeCount                   = GENERATED_ATTR
 #define endpointTypeMacro(x) (EmberAfEndpointType *) &(generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[x]])
 #define endpointNetworkIndex(x) fixedNetworks[x]
 #endif
+
+namespace {
+app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
+} // anonymous namespace
 
 //------------------------------------------------------------------------------
 // Forward declarations
@@ -980,6 +985,34 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                     endpoint, cluster->clusterId,
                     (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
             }
+
+            // Clear out any attribute access overrides registered for this
+            // endpoint.
+            app::AttributeAccessInterface * prev = nullptr;
+            app::AttributeAccessInterface * cur  = gAttributeAccessOverrides;
+            while (cur)
+            {
+                app::AttributeAccessInterface * next = cur->GetNext();
+                if (cur->MatchesExactly(endpoint))
+                {
+                    // Remove it from the list
+                    if (prev)
+                    {
+                        prev->SetNext(next);
+                    }
+                    else
+                    {
+                        gAttributeAccessOverrides = next;
+                    }
+
+                    // Do not change prev in this case.
+                }
+                else
+                {
+                    prev = cur;
+                }
+                cur = next;
+            }
         }
     }
 
@@ -1411,3 +1444,31 @@ bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, Cluste
     return true;
 }
 #endif
+
+bool registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverride)
+{
+    for (auto * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(*attrOverride))
+        {
+            ChipLogError(Zcl, "Duplicate attribute override registration failed");
+            return false;
+        }
+    }
+    attrOverride->SetNext(gAttributeAccessOverrides);
+    gAttributeAccessOverrides = attrOverride;
+    return true;
+}
+
+app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
+{
+    for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(endpointId, clusterId))
+        {
+            return cur;
+        }
+    }
+
+    return nullptr;
+}
