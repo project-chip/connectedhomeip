@@ -43,17 +43,6 @@ class AmebaApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
 
-def DefaultsFileName(board: AmebaBoard, app: AmebaApp):
-    if app != AmebaApp.ALL_CLUSTERS:
-        # only all-clusters has a specific defaults name
-        return None
-
-    if board == AmebaBoard.AMEBAD:
-        return 'sdkconfig.defaults'
-    else:
-        raise Exception('Unknown board type')
-
-
 class AmebaBuilder(Builder):
 
     def __init__(self,
