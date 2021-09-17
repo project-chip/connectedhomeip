@@ -60,6 +60,8 @@ using namespace chip::Inet;
 using namespace chip::System;
 using namespace chip::Callback;
 
+using namespace chip::app;
+
 namespace chip {
 namespace Controller {
 CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, Messaging::SendFlags sendFlags,
@@ -156,6 +158,31 @@ CHIP_ERROR Device::SendCommands(app::CommandSender * commandObj)
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return commandObj->SendCommandRequest(mDeviceId, mFabricIndex, mSecureSession);
+}
+
+CHIP_ERROR Device::NewCommandSender(app::CommandSender ** commandSender)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    {
+        auto ret = mpIMDelegate->NewCommandSender();
+        VerifyOrReturnError(ret != nullptr, CHIP_ERROR_NO_MEMORY);
+        err = ret->Init(mExchangeMgr);
+        if (err != CHIP_NO_ERROR)
+        {
+            mpIMDelegate->OnFinal(ret);
+        }
+        else
+        {
+            *commandSender = ret;
+        }
+    }
+    return err;
+}
+
+void Device::ReleaseCommandSender(app::CommandSender * commandSender)
+{
+    mpIMDelegate->OnFinal(commandSender);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)

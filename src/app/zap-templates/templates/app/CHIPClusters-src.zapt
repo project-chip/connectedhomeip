@@ -84,7 +84,7 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, {{asUpperCamelCase parent.name}}::Commands::Ids::{{asUpperCamelCase name}},
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -109,7 +109,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }

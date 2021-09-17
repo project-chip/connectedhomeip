@@ -61,14 +61,6 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
 void InteractionModelEngine::Shutdown()
 {
-    for (auto & commandSender : mCommandSenderObjs)
-    {
-        if (!commandSender.IsFree())
-        {
-            commandSender.Shutdown();
-        }
-    }
-
     for (auto & commandHandler : mCommandHandlerObjs)
     {
         if (!commandHandler.IsFree())
@@ -116,26 +108,6 @@ void InteractionModelEngine::Shutdown()
     mpNextAvailableClusterInfo = nullptr;
 
     mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
-}
-
-CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCommandSender)
-{
-    *apCommandSender = nullptr;
-
-    for (auto & commandSender : mCommandSenderObjs)
-    {
-        if (commandSender.IsFree())
-        {
-            const CHIP_ERROR err = commandSender.Init(mpExchangeMgr, mpDelegate);
-            if (err == CHIP_NO_ERROR)
-            {
-                *apCommandSender = &commandSender;
-            }
-            return err;
-        }
-    }
-
-    return CHIP_ERROR_NO_MEMORY;
 }
 
 CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
@@ -210,7 +182,7 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
     {
         if (commandHandler.IsFree())
         {
-            err = commandHandler.Init(mpExchangeMgr, mpDelegate);
+            err = commandHandler.Init(mpExchangeMgr);
             SuccessOrExit(err);
             err               = commandHandler.OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
             apExchangeContext = nullptr;

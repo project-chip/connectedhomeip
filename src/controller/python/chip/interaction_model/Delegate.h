@@ -95,16 +95,10 @@ void pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(PythonInte
 class PythonInteractionModelDelegate : public chip::Controller::DeviceControllerInteractionModelDelegate
 {
 public:
-    CHIP_ERROR CommandResponseStatus(const app::CommandSender * apCommandSender,
-                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                     const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
-                                     chip::CommandId aCommandId, uint8_t aCommandIndex) override;
-
-    CHIP_ERROR CommandResponseProtocolError(const app::CommandSender * apCommandSender, uint8_t aCommandIndex) override;
-
-    CHIP_ERROR CommandResponseError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
-
-    CHIP_ERROR CommandResponseProcessed(const app::CommandSender * apCommandSender) override;
+    void OnResponse(const app::CommandSender * apCommandSender, const app::CommandPath::Type & aPath,
+                    TLV::TLVReader * aData) override;
+    void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::ProtocolCode aProtocolCode,
+                 CHIP_ERROR aError) override;
 
     CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient,
                                    const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,

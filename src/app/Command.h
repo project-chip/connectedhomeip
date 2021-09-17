@@ -75,13 +75,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
-
-    /**
-     *  Shutdown the Command. This terminates this instance
-     *  of the object and releases all held resources.
-     */
-    void Shutdown();
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr);
 
     /**
      * Finalize Command Message TLV Builder and finalize command message
@@ -125,23 +119,16 @@ protected:
     void ClearState();
     const char * GetStateStr() const;
 
-    /**
-     * Internal shutdown method that we use when we know what's going on with
-     * our exchange and don't need to manually close it.
-     */
-    void ShutdownInternal();
-
     InvokeCommand::Builder mInvokeCommandBuilder;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
     uint8_t mCommandIndex                      = 0;
     CommandState mState                        = CommandState::Uninitialized;
+    chip::System::PacketBufferTLVWriter mCommandMessageWriter;
 
 private:
     friend class TestCommandInteraction;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
-    chip::System::PacketBufferTLVWriter mCommandMessageWriter;
 };
 } // namespace app
 } // namespace chip

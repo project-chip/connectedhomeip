@@ -92,17 +92,6 @@ public:
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
     /**
-     *  Retrieve a CommandSender that the SDK consumer can use to send a set of commands.  If the call succeeds,
-     *  see CommandSender documentation for lifetime handling.
-     *
-     *  @param[out]    apCommandSender    A pointer to the CommandSender object.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no CommandSender available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR NewCommandSender(CommandSender ** const apCommandSender);
-
-    /**
      *  Creates a new read client and send ReadRequest message to the node using the read client,
      *  shutdown if fail to send it out
      *
@@ -200,7 +189,6 @@ private:
     // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
     // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
     CommandHandler mCommandHandlerObjs[CHIP_IM_MAX_NUM_COMMAND_HANDLER];
-    CommandSender mCommandSenderObjs[CHIP_IM_MAX_NUM_COMMAND_SENDER];
     ReadClient mReadClients[CHIP_IM_MAX_NUM_READ_CLIENT];
     ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
     WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];
