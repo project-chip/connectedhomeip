@@ -140,7 +140,7 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, bool val)
         value = 0;
     success = setPref(key.Namespace, key.Name, kPrefsTypeBoolean, &value, 1);
     if (!success)
-        printf("setPref: %s/%s = %s failed\n", key.Namespace, key.Name, value ? "true" : "false");
+        ChipLogError(DeviceLayer, "setPref: %s/%s = %s failed\n", key.Namespace, key.Name, value ? "true" : "false");
 
     return CHIP_NO_ERROR;
 }
@@ -151,7 +151,7 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint32_t val)
 
     success = setPref(key.Namespace, key.Name, kPrefsTypeInteger, (uint8_t *) &val, sizeof(uint32_t));
     if (!success)
-        printf("setPref: %s/%s = %d(0x%x) failed\n", key.Namespace, key.Name, val, val);
+        ChipLogError(DeviceLayer, "setPref: %s/%s = %d(0x%x) failed\n", key.Namespace, key.Name, val, val);
 
     return CHIP_NO_ERROR;
 }
@@ -162,7 +162,7 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint64_t val)
 
     success = setPref(key.Namespace, key.Name, kPrefsTypeInteger, (uint8_t *) &val, sizeof(uint64_t));
     if (!success)
-        printf("setPref: %s/%s = %d(0x%x) failed\n", key.Namespace, key.Name, val, val);
+        ChipLogError(DeviceLayer, "setPref: %s/%s = %d(0x%x) failed\n", key.Namespace, key.Name, val, val);
 
     return CHIP_NO_ERROR;
 }
@@ -181,7 +181,7 @@ CHIP_ERROR AmebaConfig::WriteConfigValueStr(Key key, const char * str)
 
     success = setPref(key.Namespace, key.Name, kPrefsTypeString, (uint8_t *) _str, strlen(_str) + 1);
     if (!success)
-        printf("setPref: %s/%s = %s failed\n", key.Namespace, key.Name, _str);
+        ChipLogError(DeviceLayer, "setPref: %s/%s = %s failed\n", key.Namespace, key.Name, _str);
 
     free(_str);
     return CHIP_NO_ERROR;
@@ -230,7 +230,7 @@ CHIP_ERROR AmebaConfig::EnsureNamespace(const char * ns)
 
     ret = initPref(ns);
     if (ret != 0)
-        printf("dct_register_module failed\n");
+        ChipLogError(DeviceLayer, "dct_register_module failed\n");
 
     return CHIP_NO_ERROR;
 }
@@ -241,7 +241,7 @@ CHIP_ERROR AmebaConfig::ClearNamespace(const char * ns)
 
     ret = clearPref(ns);
     if (ret != 0)
-        printf("ClearNamespace failed\n");
+        ChipLogError(DeviceLayer, "ClearNamespace failed\n");
 
     return CHIP_NO_ERROR;
 }
