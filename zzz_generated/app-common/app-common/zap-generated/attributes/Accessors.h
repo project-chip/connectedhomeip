@@ -167,8 +167,8 @@ namespace Identify {
 namespace Attributes {
 EmberAfStatus GetIdentifyTime(chip::EndpointId endpoint, uint16_t * identifyTime); // int16u
 EmberAfStatus SetIdentifyTime(chip::EndpointId endpoint, uint16_t identifyTime);
-EmberAfStatus GetCommissionState(chip::EndpointId endpoint, uint8_t * commissionState); // bitmap8
-EmberAfStatus SetCommissionState(chip::EndpointId endpoint, uint8_t commissionState);
+EmberAfStatus GetIdentifyType(chip::EndpointId endpoint, uint8_t * identifyType); // enum8
+EmberAfStatus SetIdentifyType(chip::EndpointId endpoint, uint8_t identifyType);
 } // namespace Attributes
 } // namespace Identify
 

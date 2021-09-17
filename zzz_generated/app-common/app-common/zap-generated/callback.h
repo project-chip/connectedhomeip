@@ -15033,19 +15033,10 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::EndpointId endpoi
  */
 bool emberAfIdentifyClusterIdentifyQueryCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj);
 /**
- * @brief  Cluster EZModeInvoke Command callback (from client)
- */
-bool emberAfIdentifyClusterEZModeInvokeCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint8_t action);
-/**
- * @brief  Cluster UpdateCommissionState Command callback (from client)
- */
-bool emberAfIdentifyClusterUpdateCommissionStateCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                         uint8_t action, uint8_t commissionStateMask);
-/**
  * @brief  Cluster TriggerEffect Command callback (from client)
  */
 bool emberAfIdentifyClusterTriggerEffectCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                 uint8_t effectId, uint8_t effectVariant);
+                                                 uint8_t effectIdentifier, uint8_t effectVariant);
 /**
  * @brief  Cluster AddGroup Command callback (from client)
  */
