@@ -69,6 +69,7 @@ jobs:
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
+              if: ${{ !env.ACT }}
               with:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
