@@ -16,16 +16,16 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/enums.h>
 #include <app/util/util.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/RandUtils.h>
-#include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeDelegate.h>
@@ -38,6 +38,7 @@
 #include <zap-generated/CHIPClusters.h>
 
 #include "BDXDownloader.h"
+#include "ExampleSelfCommissioning.h"
 #include "PersistentStorage.h"
 
 #include <fstream>
@@ -53,6 +54,8 @@ using chip::ArgParser::PrintArgError;
 using chip::bdx::TransferSession;
 using chip::Callback::Callback;
 using chip::Controller::Device;
+using chip::Controller::DeviceController;
+using chip::Controller::ExampleOperationalCredentialsIssuer;
 using chip::Controller::OnDeviceConnected;
 using chip::Controller::OnDeviceConnectionFailure;
 
@@ -109,17 +112,18 @@ void OnConnection(void * context, Device * device)
     chip::Callback::Cancelable * successCallback = mQueryImageResponseCallback.Cancel();
     chip::Callback::Cancelable * failureCallback = mOnQueryFailureCallback.Cancel();
 
-    // QueryImage params
-    constexpr VendorId testVendorId          = VendorId::Common;
-    constexpr uint16_t testProductId         = 77;
-    constexpr uint16_t testImageType         = 0;
-    constexpr uint16_t testHWVersion         = 3;
-    constexpr uint16_t testCurrentVersion    = 101;
-    constexpr uint8_t testProtocolsSupported = 0; // TODO: blocked because arrays are being generated as uint8_t
-    uint8_t locationBuf[3]                   = { 'U', 'S', '\0' };
-    ByteSpan location(locationBuf);
-    constexpr bool clientCanConsent = false;
-    ByteSpan metadata(locationBuf);
+    // These QueryImage params have been chosen arbitrarily
+    constexpr VendorId kExampleVendorId      = VendorId::Common;
+    constexpr uint16_t kExampleProductId     = 77;
+    constexpr uint16_t kExampleImageType     = 0;
+    constexpr uint16_t kExampleHWVersion     = 3;
+    constexpr uint16_t kExampleCurentVersion = 0;
+    constexpr uint8_t kExampleProtocolsSupported =
+        EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS; // TODO: support this as a list once ember adds list support
+    const uint8_t locationBuf[] = { 'U', 'S' };
+    ByteSpan exampleLocation(locationBuf);
+    constexpr bool kExampleClientCanConsent = false;
+    ByteSpan metadata;
 
     err = cluster.Associate(device, kOtaProviderEndpoint);
     if (err != CHIP_NO_ERROR)
@@ -127,8 +131,9 @@ void OnConnection(void * context, Device * device)
         ChipLogError(SoftwareUpdate, "Associate() failed: %s", chip::ErrorStr(err));
         return;
     }
-    err = cluster.QueryImage(successCallback, failureCallback, testVendorId, testProductId, testImageType, testHWVersion,
-                             testCurrentVersion, testProtocolsSupported, location, clientCanConsent, metadata);
+    err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleImageType,
+                             kExampleHWVersion, kExampleCurentVersion, kExampleProtocolsSupported, exampleLocation,
+                             kExampleClientCanConsent, metadata);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "QueryImage() failed: %s", chip::ErrorStr(err));
@@ -144,9 +149,8 @@ Callback<OnDeviceConnected> mConnectionCallback(OnConnection, nullptr);
 Callback<OnDeviceConnectionFailure> mConnectFailCallback(OnConnectFail, nullptr);
 
 PersistentStorage mStorage;
-chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
-chip::Controller::DeviceController mController;
-chip::Controller::ControllerInitParams initParams;
+DeviceController mController;
+ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
 chip::Protocols::Id FromFullyQualified(uint32_t rawProtocolId)
 {
@@ -155,8 +159,8 @@ chip::Protocols::Id FromFullyQualified(uint32_t rawProtocolId)
     return chip::Protocols::Id(vendorId, protocolId);
 }
 
-constexpr uint16_t kOptionPeerId = 'p';
-chip::NodeId providerNodeId      = 0x0;
+constexpr uint16_t kOptionProviderLocation = 'p';
+chip::NodeId providerNodeId                = 0x0;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -164,7 +168,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
     switch (aIdentifier)
     {
-    case kOptionPeerId:
+    case kOptionProviderLocation:
         if (1 != sscanf(aValue, "%" PRIX64, &providerNodeId))
         {
             PrintArgError("%s: unable to parse Node ID: %s\n", aProgram, aValue);
@@ -180,14 +184,16 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 }
 
 OptionDef cmdLineOptionsDef[] = {
-    { "peerId", chip::ArgParser::kArgumentRequired, kOptionPeerId },
+    { "providerLocation", chip::ArgParser::kArgumentRequired, kOptionProviderLocation },
     {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -p <peer ID>\n"
-                             "  --peerId <peer ID>\n"
-                             "        Node ID of the OTA Provider to connect to (hex)\n" };
+                             "  -p <node ID>\n"
+                             "  --providerLocation <node ID>\n"
+                             "        Node ID of the OTA Provider to connect to (hex format)\n\n"
+                             "        This assumes that you've already commissioned the OTA Provider node with chip-tool.\n"
+                             "        See README.md for more info.\n" };
 
 HelpOptions helpOptions("ota-requestor-app", "Usage: ota-requestor-app [options]", "1.0");
 
@@ -196,10 +202,6 @@ OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
 
     // NOTE: most of the following Init() calls were just copied from chip-tool code
 
@@ -227,50 +229,22 @@ int main(int argc, char * argv[])
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
-    initParams.storageDelegate = &mStorage;
-
-    err = mOpCredsIssuer.Initialize(mStorage);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", chip::ErrorStr(err)));
-
-    initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
-
     err = mController.SetUdpListenPort(mStorage.GetListenPort());
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", chip::ErrorStr(err)));
 
-    VerifyOrExit(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
-
-    {
-        chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
-        chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-        chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-
-        chip::Crypto::P256Keypair ephemeralKey;
-        SuccessOrExit(err = ephemeralKey.Initialize());
-
-        // TODO - OpCreds should only be generated for pairing command
-        //        store the credentials in persistent storage, and
-        //        generate when not available in the storage.
-        err = mOpCredsIssuer.GenerateNOCChainAfterValidation(mStorage.GetLocalNodeId(), 0, ephemeralKey.Pubkey(), rcacSpan,
-                                                             icacSpan, nocSpan);
-        SuccessOrExit(err);
-
-        initParams.ephemeralKeypair = &ephemeralKey;
-        initParams.controllerRCAC   = rcacSpan;
-        initParams.controllerICAC   = icacSpan;
-        initParams.controllerNOC    = nocSpan;
-
-        err = mController.Init(initParams);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
-    }
+    // Until #9518 is fixed, the only way to open a CASE session to another node is to commission it first using the
+    // DeviceController API. Thus, the ota-requestor-app must do self commissioning and then read CASE credentials from persistent
+    // storage to connect to the Provider node. See README.md for instructions.
+    // NOTE: Controller is initialized in this call
+    err = DoExampleSelfCommissioning(mController, &mOpCredsIssuer, &mStorage, mStorage.GetLocalNodeId());
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "example self-commissioning failed: %s", chip::ErrorStr(err)));
 
     err = mController.ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "ServiceEvents() failed: %s", chip::ErrorStr(err)));
 
     ChipLogProgress(SoftwareUpdate, "Attempting to connect to device 0x%" PRIX64, providerNodeId);
 
-    // WARNING: In order for this to work, you must first pair to the OTA Provider device using chip-tool.
+    // WARNING: In order for this to work, you must first commission the OTA Provider device using chip-tool.
     // Currently, that pairing action will persist the CASE session in persistent memory, which will then be read by the following
     // call.
     err = mController.GetDevice(providerNodeId, &providerDevice);
