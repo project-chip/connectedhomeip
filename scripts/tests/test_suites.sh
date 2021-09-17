@@ -121,7 +121,7 @@ for j in "${iter_array[@]}"; do
         # the data is there yet.
         background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing onnetwork-long 20202021 3840
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode MT:D8XA0CQM00KA0648G00
         echo "          * Starting test run: $i"
         "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i"
         # Prevent cleanup trying to kill a process we already killed.

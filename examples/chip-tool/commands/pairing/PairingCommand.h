@@ -86,7 +86,6 @@ public:
             break;
         case PairingMode::QRCode:
         case PairingMode::ManualCode:
-            AddArgument("fabric-id", 0, UINT64_MAX, &mFabricId);
             AddArgument("payload", &mOnboardingPayload);
             break;
         case PairingMode::Ble:

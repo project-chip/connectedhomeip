@@ -374,17 +374,18 @@ CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
     return err;
 }
 
-CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(uint16_t connDiscriminator)
+CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(uint16_t connDiscriminator, void * appState,
+                                                     BleConnectionDelegate::OnConnectionCompleteFunct onSuccess,
+                                                     BleConnectionDelegate::OnConnectionErrorFunct onError)
 {
-
     VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mConnectionDelegate->OnConnectionComplete = OnConnectionComplete;
-    mConnectionDelegate->OnConnectionError    = OnConnectionError;
-    // TODO: We are passing the same parameter two times, should take a look at it to see if we can remove one of them.
-    mConnectionDelegate->NewConnection(this, this, connDiscriminator);
+    mConnectionDelegate->OnConnectionComplete = onSuccess;
+    mConnectionDelegate->OnConnectionError    = onError;
+
+    mConnectionDelegate->NewConnection(this, appState == nullptr ? this : appState, connDiscriminator);
 
     return CHIP_NO_ERROR;
 }

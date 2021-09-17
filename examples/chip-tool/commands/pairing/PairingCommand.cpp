@@ -131,30 +131,12 @@ void PairingCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId
 
 CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
 {
-    SetupPayload payload;
-    ReturnErrorOnFailure(QRCodeSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
-
-    chip::RendezvousInformationFlags rendezvousInformation = payload.rendezvousInformation;
-    ReturnErrorCodeIf(rendezvousInformation != RendezvousInformationFlag::kBLE, CHIP_ERROR_INVALID_ARGUMENT);
-
-    return PairWithCode(remoteId, payload);
+    return GetExecContext()->commissioner->PairDevice(remoteId, mOnboardingPayload);
 }
 
 CHIP_ERROR PairingCommand::PairWithManualCode(NodeId remoteId)
 {
-    SetupPayload payload;
-    ReturnErrorOnFailure(ManualSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
-    return PairWithCode(remoteId, payload);
-}
-
-CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId, SetupPayload payload)
-{
-    RendezvousParameters params = RendezvousParameters()
-                                      .SetSetupPINCode(payload.setUpPINCode)
-                                      .SetDiscriminator(payload.discriminator)
-                                      .SetPeerAddress(PeerAddress::BLE());
-
-    return GetExecContext()->commissioner->PairDevice(remoteId, params);
+    return GetExecContext()->commissioner->PairDevice(remoteId, mOnboardingPayload);
 }
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)

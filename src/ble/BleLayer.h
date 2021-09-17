@@ -247,7 +247,9 @@ public:
     CHIP_ERROR Shutdown();
 
     CHIP_ERROR CancelBleIncompleteConnection();
-    CHIP_ERROR NewBleConnectionByDiscriminator(uint16_t connDiscriminator);
+    CHIP_ERROR NewBleConnectionByDiscriminator(uint16_t connDiscriminator, void * appState = nullptr,
+                                               BleConnectionDelegate::OnConnectionCompleteFunct onSucess = OnConnectionComplete,
+                                               BleConnectionDelegate::OnConnectionErrorFunct onError     = OnConnectionError);
     CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
     CHIP_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 

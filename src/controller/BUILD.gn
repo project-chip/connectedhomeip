@@ -41,6 +41,8 @@ static_library("controller") {
     "EmptyDataModelHandler.cpp",
     "ExampleOperationalCredentialsIssuer.cpp",
     "ExampleOperationalCredentialsIssuer.h",
+    "SetUpCodePairer.cpp",
+    "SetUpCodePairer.h",
   ]
 
   cflags = [ "-Wconversion" ]
