@@ -19,4 +19,3 @@ RUN set -x \
 
 
 ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
-
