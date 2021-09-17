@@ -223,8 +223,10 @@ public class ChipDeviceController {
     return openPairingWindow(deviceControllerPtr, deviceId, duration);
   }
 
-  public boolean openPairingWindowWithPIN(long deviceId, int duration, int iteration, int discriminator, long setupPinCode) {
-    return openPairingWindowWithPIN(deviceControllerPtr, deviceId, duration, iteration, discriminator, setupPinCode);
+  public boolean openPairingWindowWithPIN(
+      long deviceId, int duration, int iteration, int discriminator, long setupPinCode) {
+    return openPairingWindowWithPIN(
+        deviceControllerPtr, deviceId, duration, iteration, discriminator, setupPinCode);
   }
 
   public boolean isActive(long deviceId) {
@@ -270,7 +272,13 @@ public class ChipDeviceController {
 
   private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
 
-  private native boolean openPairingWindowWithPIN(long deviceControllerPtr, long deviceId, int duration, int iteration, int discriminator, long setupPinCode);
+  private native boolean openPairingWindowWithPIN(
+      long deviceControllerPtr,
+      long deviceId,
+      int duration,
+      int iteration,
+      int discriminator,
+      long setupPinCode);
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
 
