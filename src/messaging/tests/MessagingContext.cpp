@@ -32,17 +32,16 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
 
     mFabrics.Reset();
 
-    ReturnErrorOnFailure(mSecureSessionMgr.Init(&GetSystemLayer(), transport, &mFabrics, &mMessageCounterManager));
+    ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mFabrics, &mMessageCounterManager));
 
-    ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
+    ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mAliceAddress), GetAliceNodeId(),
-                                                      &mPairingBobToAlice, SecureSession::SessionRole::kInitiator,
-                                                      mSrcFabricIndex));
+    ReturnErrorOnFailure(mSessionManager.NewPairing(Optional<Transport::PeerAddress>::Value(mAliceAddress), GetAliceNodeId(),
+                                                    &mPairingBobToAlice, CryptoContext::SessionRole::kInitiator, mSrcFabricIndex));
 
-    return mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mBobAddress), GetBobNodeId(), &mPairingAliceToBob,
-                                        SecureSession::SessionRole::kResponder, mDestFabricIndex);
+    return mSessionManager.NewPairing(Optional<Transport::PeerAddress>::Value(mBobAddress), GetBobNodeId(), &mPairingAliceToBob,
+                                      CryptoContext::SessionRole::kResponder, mDestFabricIndex);
 }
 
 // Shutdown all layers, finalize operations
@@ -52,7 +51,7 @@ CHIP_ERROR MessagingContext::Shutdown()
     mInitialized = false;
 
     mExchangeManager.Shutdown();
-    mSecureSessionMgr.Shutdown();
+    mSessionManager.Shutdown();
     return CHIP_NO_ERROR;
 }
 
@@ -70,12 +69,12 @@ SessionHandle MessagingContext::GetSessionAliceToBob()
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
-    return mExchangeManager.NewContext(mSecureSessionMgr.CreateUnauthenticatedSession(mAliceAddress).Value(), delegate);
+    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mAliceAddress).Value(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate)
 {
-    return mExchangeManager.NewContext(mSecureSessionMgr.CreateUnauthenticatedSession(mBobAddress).Value(), delegate);
+    return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mBobAddress).Value(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)

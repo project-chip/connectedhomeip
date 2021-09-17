@@ -533,7 +533,7 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
     CancelLivenessCheckTimer();
     ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %d seconds", mMaxIntervalCeilingSeconds);
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->StartTimer(
+    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         mMaxIntervalCeilingSeconds * kMillisecondsPerSecond, OnLivenessTimeoutCallback, this);
 
     if (err != CHIP_NO_ERROR)
@@ -545,7 +545,7 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 
 void ReadClient::CancelLivenessCheckTimer()
 {
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->CancelTimer(
+    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnLivenessTimeoutCallback, this);
 }
 

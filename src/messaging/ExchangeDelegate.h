@@ -27,7 +27,7 @@
 #include <messaging/ApplicationExchangeDispatch.h>
 #include <messaging/ExchangeMessageDispatch.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -97,7 +97,7 @@ public:
      */
     virtual void OnExchangeClosing(ExchangeContext * ec) {}
 
-    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * reliableMessageMgr, SecureSessionMgr * sessionMgr)
+    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * reliableMessageMgr, SessionManager * sessionManager)
     {
         return nullptr;
     }

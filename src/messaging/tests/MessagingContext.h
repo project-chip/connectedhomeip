@@ -22,7 +22,7 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <transport/FabricTable.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
@@ -74,7 +74,7 @@ public:
         mDestFabricIndex = id;
     }
 
-    SecureSessionMgr & GetSecureSessionManager() { return mSecureSessionMgr; }
+    SessionManager & GetSecureSessionManager() { return mSessionManager; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
     secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
 
@@ -93,7 +93,7 @@ public:
 
 private:
     bool mInitialized;
-    SecureSessionMgr mSecureSessionMgr;
+    SessionManager mSessionManager;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
     IOContext * mIOContext;

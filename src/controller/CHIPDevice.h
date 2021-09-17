@@ -46,7 +46,7 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
 #include <setup_payload/SetupPayload.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
@@ -80,7 +80,7 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 struct ControllerDeviceInitParams
 {
     DeviceTransportMgr * transportMgr           = nullptr;
-    SecureSessionMgr * sessionMgr               = nullptr;
+    SessionManager * sessionManager             = nullptr;
     Messaging::ExchangeManager * exchangeMgr    = nullptr;
     Inet::InetLayer * inetLayer                 = nullptr;
     PersistentStorageDelegate * storageDelegate = nullptr;
@@ -194,7 +194,7 @@ public:
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, FabricIndex fabric)
     {
         mTransportMgr    = params.transportMgr;
-        mSessionManager  = params.sessionMgr;
+        mSessionManager  = params.sessionManager;
         mExchangeMgr     = params.exchangeMgr;
         mInetLayer       = params.inetLayer;
         mListenPort      = listenPort;
@@ -483,7 +483,7 @@ private:
 
     DeviceStatusDelegate * mStatusDelegate = nullptr;
 
-    SecureSessionMgr * mSessionManager = nullptr;
+    SessionManager * mSessionManager = nullptr;
 
     DeviceTransportMgr * mTransportMgr = nullptr;
 

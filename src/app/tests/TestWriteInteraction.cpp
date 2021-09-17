@@ -32,7 +32,7 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/UDP.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
@@ -360,7 +360,7 @@ int Initialize(void * aContext)
     auto * ctx = static_cast<TestContext *>(aContext);
     VerifyOrReturnError(ctx->Init(&sSuite, &gTransportManager, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
-    gTransportManager.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
+    gTransportManager.SetSessionManager(&ctx->GetSecureSessionManager());
     return SUCCESS;
 }
 

@@ -26,7 +26,7 @@
 
 namespace chip {
 
-class SecureSessionMgr;
+class SessionManager;
 
 class SessionHandle
 {
@@ -75,12 +75,12 @@ public:
     // Return the peer address for this session.  May return null if the peer
     // address is not known.  This can happen for secure sessions that have been
     // torn down, at the very least.
-    const Transport::PeerAddress * GetPeerAddress(SecureSessionMgr * ssm) const;
+    const Transport::PeerAddress * GetPeerAddress(SessionManager * sessionManager) const;
 
     Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession() const { return mUnauthenticatedSessionHandle.Value(); }
 
 private:
-    friend class SecureSessionMgr;
+    friend class SessionManager;
 
     // Fields for secure session
     NodeId mPeerNodeId;

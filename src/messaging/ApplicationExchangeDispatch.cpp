@@ -30,13 +30,13 @@ CHIP_ERROR ApplicationExchangeDispatch::PrepareMessage(SessionHandle session, Pa
                                                        System::PacketBufferHandle && message,
                                                        EncryptedPacketBufferHandle & preparedMessage)
 {
-    return mSessionMgr->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage);
+    return mSessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage);
 }
 
 CHIP_ERROR ApplicationExchangeDispatch::SendPreparedMessage(SessionHandle session,
                                                             const EncryptedPacketBufferHandle & preparedMessage) const
 {
-    return mSessionMgr->SendPreparedMessage(session, preparedMessage);
+    return mSessionManager->SendPreparedMessage(session, preparedMessage);
 }
 
 bool ApplicationExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)

@@ -110,7 +110,7 @@ public:
         CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&mContext.GetInetLayer()).SetAddressType(addr.Type()));
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
-        mTransportMgrBase.SetSecureSessionMgr(this);
+        mTransportMgrBase.SetSessionManager(this);
         mTransportMgrBase.Init(&tcp);
 
         mReceiveHandlerCallCount = 0;

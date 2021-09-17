@@ -25,7 +25,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
-#include <transport/SecureSession.h>
+#include <transport/CryptoContext.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <string.h>
@@ -54,9 +54,9 @@ using HKDF_sha_crypto = HKDF_shaHSM;
 using HKDF_sha_crypto = HKDF_sha;
 #endif
 
-SecureSession::SecureSession() : mKeyAvailable(false) {}
+CryptoContext::CryptoContext() : mKeyAvailable(false) {}
 
-CHIP_ERROR SecureSession::InitFromSecret(const ByteSpan & secret, const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
+CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
 {
     HKDF_sha_crypto mHKDF;
     VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
@@ -82,7 +82,7 @@ CHIP_ERROR SecureSession::InitFromSecret(const ByteSpan & secret, const ByteSpan
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SecureSession::Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
+CHIP_ERROR CryptoContext::Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
                                const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
 {
 
@@ -94,7 +94,7 @@ CHIP_ERROR SecureSession::Init(const Crypto::P256Keypair & local_keypair, const 
     return InitFromSecret(ByteSpan(secret, secret.Length()), salt, infoType, role);
 }
 
-CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_t len)
+CHIP_ERROR CryptoContext::GetIV(const PacketHeader & header, uint8_t * iv, size_t len)
 {
 
     VerifyOrReturnError(len == kAESCCMIVLen, CHIP_ERROR_INVALID_ARGUMENT);
@@ -107,7 +107,7 @@ CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, uint8_t * aad, uint16_t & len)
+CHIP_ERROR CryptoContext::GetAdditionalAuthData(const PacketHeader & header, uint8_t * aad, uint16_t & len)
 {
     VerifyOrReturnError(len >= header.EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -123,7 +123,7 @@ CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, uin
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
                                   MessageAuthenticationCode & mac) const
 {
 
@@ -163,7 +163,7 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                                   const MessageAuthenticationCode & mac) const
 {
     const size_t taglen = MessageAuthenticationCode::TagLenForSessionType(header.GetSessionType());

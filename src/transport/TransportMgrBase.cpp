@@ -46,8 +46,8 @@ CHIP_ERROR TransportMgrBase::Init(Transport::Base * transport)
 
 void TransportMgrBase::Close()
 {
-    mSecureSessionMgr = nullptr;
-    mTransport        = nullptr;
+    mSessionManager = nullptr;
+    mTransport      = nullptr;
 }
 
 void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
@@ -61,9 +61,9 @@ void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer
         return;
     }
 
-    if (mSecureSessionMgr != nullptr)
+    if (mSessionManager != nullptr)
     {
-        mSecureSessionMgr->OnMessageReceived(peerAddress, std::move(msg));
+        mSessionManager->OnMessageReceived(peerAddress, std::move(msg));
     }
     else
     {
