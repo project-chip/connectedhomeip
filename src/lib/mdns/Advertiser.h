@@ -24,6 +24,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
+#include <lib/mdns/TxtFields.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeString.h>
 #include <lib/support/Span.h>
@@ -34,22 +35,6 @@ namespace Mdns {
 static constexpr uint16_t kMdnsPort = 5353;
 // Need 8 bytes to fit a thread mac.
 static constexpr size_t kMaxMacSize = 8;
-
-// Operational node TXT entries
-static constexpr size_t kTxtRetryIntervalIdleMaxLength   = 7; // [CRI] 0-3600000
-static constexpr size_t kTxtRetryIntervalActiveMaxLength = 7; // [CRA] 0-3600000
-static constexpr size_t kMaxRetryInterval                = 3600000;
-
-// Commissionable/commissioner node TXT entries
-static constexpr size_t kKeyDiscriminatorMaxLength           = 5;
-static constexpr size_t kKeyVendorProductMaxLength           = 11;
-static constexpr size_t kKeyAdditionalCommissioningMaxLength = 1;
-static constexpr size_t kKeyCommissioningModeMaxLength       = 1;
-static constexpr size_t kKeyDeviceTypeMaxLength              = 5;
-static constexpr size_t kKeyDeviceNameMaxLength              = 32;
-static constexpr size_t kKeyRotatingIdMaxLength              = 100;
-static constexpr size_t kKeyPairingInstructionMaxLength      = 128;
-static constexpr size_t kKeyPairingHintMaxLength             = 10;
 
 // Commissionable/commissioner node subtypes
 static constexpr size_t kSubTypeShortDiscriminatorMaxLength      = 4;  // _S<dd>
@@ -82,11 +67,11 @@ template <class Derived>
 class BaseAdvertisingParams
 {
 public:
-    static constexpr uint8_t kCommonTxtMaxNumber   = 2;
-    static constexpr size_t kCommonTxtMaxKeySize   = MaxStringLength("CRI", "CRA"); // possible keys
-    static constexpr size_t kCommonTxtMaxValueSize = std::max({ kTxtRetryIntervalIdleMaxLength, kTxtRetryIntervalActiveMaxLength });
-    static constexpr size_t kCommonTxtTotalKeySize = TotalStringLength("CRI", "CRA"); // possible keys
-    static constexpr size_t kCommonTxtTotalValueSize = kTxtRetryIntervalIdleMaxLength + kTxtRetryIntervalActiveMaxLength;
+    static constexpr uint8_t kCommonTxtMaxNumber     = KeyCount(TxtKeyUse::kCommon);
+    static constexpr size_t kCommonTxtMaxKeySize     = MaxKeyLen(TxtKeyUse::kCommon);
+    static constexpr size_t kCommonTxtMaxValueSize   = MaxValueLen(TxtKeyUse::kCommon);
+    static constexpr size_t kCommonTxtTotalKeySize   = TotalKeyLen(TxtKeyUse::kCommon);
+    static constexpr size_t kCommonTxtTotalValueSize = TotalValueLen(TxtKeyUse::kCommon);
 
     Derived & SetPort(uint16_t port)
     {
@@ -121,6 +106,12 @@ public:
         intervalIdle   = mMrpRetryIntervalIdle;
         intervalActive = mMrpRetryIntervalActive;
     }
+    Derived & SetTcpSupported(Optional<bool> tcpSupported)
+    {
+        mTcpSupported = tcpSupported;
+        return *reinterpret_cast<Derived *>(this);
+    }
+    Optional<bool> GetTcpSupported() const { return mTcpSupported; }
 
 private:
     uint16_t mPort                   = CHIP_PORT;
@@ -129,7 +120,8 @@ private:
     size_t mMacLength                = 0;
     Optional<uint32_t> mMrpRetryIntervalIdle;
     Optional<uint32_t> mMrpRetryIntervalActive;
-}; // namespace Mdns
+    Optional<bool> mTcpSupported;
+};
 
 /// Defines parameters required for advertising a CHIP node
 /// over mDNS as an 'operationally ready' node.
@@ -157,19 +149,11 @@ private:
 class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionAdvertisingParameters>
 {
 public:
-    static constexpr uint8_t kTxtMaxNumber = kCommonTxtMaxNumber + 9;
-    static constexpr uint8_t kTxtMaxKeySize =
-        std::max(kCommonTxtMaxKeySize, MaxStringLength("D", "VP", "CM", "AP", "DT", "DN", "RI", "PI", "PH")); // possible keys
-    static constexpr uint8_t kTxtMaxValueSize =
-        std::max({ kKeyDiscriminatorMaxLength, kKeyVendorProductMaxLength, kKeyAdditionalCommissioningMaxLength,
-                   kKeyCommissioningModeMaxLength, kKeyDeviceTypeMaxLength, kKeyDeviceNameMaxLength, kKeyRotatingIdMaxLength,
-                   kKeyPairingInstructionMaxLength, kKeyPairingHintMaxLength, kCommonTxtMaxValueSize });
-    static constexpr size_t kTxtTotalKeySize =
-        kCommonTxtTotalKeySize + TotalStringLength("D", "VP", "CM", "AP", "DT", "DN", "RI", "PI", "PH"); // possible keys
-    static constexpr size_t kTxtTotalValueSize = kCommonTxtTotalValueSize + kKeyDiscriminatorMaxLength +
-        kKeyVendorProductMaxLength + kKeyAdditionalCommissioningMaxLength + kKeyCommissioningModeMaxLength +
-        kKeyDeviceTypeMaxLength + kKeyDeviceNameMaxLength + kKeyRotatingIdMaxLength + kKeyPairingInstructionMaxLength +
-        kKeyPairingHintMaxLength;
+    static constexpr uint8_t kTxtMaxNumber     = kCommonTxtMaxNumber + KeyCount(TxtKeyUse::kCommission);
+    static constexpr uint8_t kTxtMaxKeySize    = std::max(kCommonTxtMaxKeySize, MaxKeyLen(TxtKeyUse::kCommission));
+    static constexpr uint8_t kTxtMaxValueSize  = std::max(kCommonTxtMaxValueSize, MaxValueLen(TxtKeyUse::kCommission));
+    static constexpr size_t kTxtTotalKeySize   = kCommonTxtTotalKeySize + TotalKeyLen(TxtKeyUse::kCommission);
+    static constexpr size_t kTxtTotalValueSize = kCommonTxtTotalValueSize + TotalValueLen(TxtKeyUse::kCommission);
 
     CommissionAdvertisingParameters & SetShortDiscriminator(uint8_t discriminator)
     {

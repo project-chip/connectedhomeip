@@ -144,9 +144,11 @@ private:
 
     struct CommonTxtEntryStorage
     {
-        // CRA and CRI are both 3 chars + '=' = 4 + 1 for nullchar
-        char mrpRetryIntervalIdleBuf[kTxtRetryIntervalIdleMaxLength + 4 + 1];
-        char mrpRetryIntervalActiveBuf[kTxtRetryIntervalActiveMaxLength + 4 + 1];
+        // +2 for all to account for '=' and terminating nullchar
+        char mrpRetryIntervalIdleBuf[KeySize(TxtFieldKey::kMrpRetryIntervalIdle) + ValSize(TxtFieldKey::kMrpRetryIntervalIdle) + 2];
+        char mrpRetryIntervalActiveBuf[KeySize(TxtFieldKey::kMrpRetryIntervalActive) +
+                                       ValSize(TxtFieldKey::kMrpRetryIntervalActive) + 2];
+        char tcpSupportedBuf[KeySize(TxtFieldKey::kTcpSupport) + ValSize(TxtFieldKey::kTcpSupport) + 2];
     };
     template <class Derived>
     CHIP_ERROR AddCommonTxtEntries(const BaseAdvertisingParams<Derived> & params, CommonTxtEntryStorage & storage,
@@ -202,6 +204,14 @@ private:
                                     (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalActiveBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.mrpRetryIntervalActiveBuf;
+        }
+        if (params.GetTcpSupported().HasValue())
+        {
+            size_t writtenCharactersNumber =
+                snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf), "T=%d", params.GetTcpSupported().Value());
+            VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.tcpSupportedBuf)),
+                                CHIP_ERROR_INVALID_STRING_LENGTH);
+            txtFields[numTxtFields++] = storage.tcpSupportedBuf;
         }
         return CHIP_NO_ERROR;
     }

@@ -260,6 +260,7 @@ CHIP_ERROR MdnsServer::AdvertiseOperational()
                     .SetPort(GetSecuredPort())
                     .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
                                           Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
+                    .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
                     .EnableIpV4(true);
 
             auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
@@ -335,8 +336,10 @@ CHIP_ERROR MdnsServer::Advertise(bool commissionableNode, chip::Mdns::Commission
     advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
 
-    advertiseParameters.SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
-                                             Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL));
+    advertiseParameters
+        .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
+                              Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
+        .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
 
     if (mode != chip::Mdns::CommissioningMode::kEnabledEnhanced)
     {
