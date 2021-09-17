@@ -226,7 +226,7 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 }
 } // namespace NestedStructList
 
-namespace IteratableNestedStructList {
+namespace DecodableNestedStructList {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
 {
     return CHIP_ERROR_BAD_REQUEST;
@@ -277,7 +277,7 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace IteratableNestedStructList
+} // namespace DecodableNestedStructList
 
 namespace DoubleNestedStructList {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
@@ -318,7 +318,7 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 }
 } // namespace DoubleNestedStructList
 
-namespace IteratableDoubleNestedStructList {
+namespace DecodableDoubleNestedStructList {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
 {
     return CHIP_ERROR_BAD_REQUEST;
@@ -345,7 +345,7 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace IteratableDoubleNestedStructList
+} // namespace DecodableDoubleNestedStructList
 } // namespace TestCluster
 } // namespace clusters
 } // namespace app

@@ -39,7 +39,7 @@ namespace DataModel {
  *
  */
 template <typename T>
-class IteratableList
+class DecodableList
 {
 public:
     /*
@@ -98,23 +98,17 @@ public:
          */
         bool Next()
         {
-            if (mStatus != CHIP_NO_ERROR)
+            if (mStatus == CHIP_NO_ERROR)
             {
-                return false;
+                mStatus = mReader.Next();
             }
-
-            mStatus = mReader.Next();
 
             if (mStatus == CHIP_NO_ERROR)
             {
                 mStatus = Decode(mReader, mValue);
-                if (mStatus == CHIP_NO_ERROR)
-                {
-                    return true;
-                }
             }
 
-            return false;
+            return (mStatus == CHIP_NO_ERROR);
         }
 
         /*
@@ -156,7 +150,7 @@ private:
 };
 
 template <typename X>
-CHIP_ERROR Decode(TLV::TLVReader & reader, IteratableList<X> & x)
+CHIP_ERROR Decode(TLV::TLVReader & reader, DecodableList<X> & x)
 {
     TLV::TLVType type;
 

@@ -92,26 +92,6 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
     return x.Decode(reader);
 }
 
-template <typename X>
-CHIP_ERROR Decode(TLV::TLVReader & reader, Span<X> & x)
-{
-    TLV::TLVType outer1;
-    size_t destBufSize = x.size();
-    uint32_t i         = 0;
-    CHIP_ERROR err;
-
-    ReturnErrorOnFailure(reader.EnterContainer(outer1));
-
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(destBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(DataModel::Decode(reader, x.data()[i]));
-        destBufSize--;
-    }
-
-    return reader.ExitContainer(outer1);
-}
-
 } // namespace DataModel
 } // namespace app
 } // namespace chip

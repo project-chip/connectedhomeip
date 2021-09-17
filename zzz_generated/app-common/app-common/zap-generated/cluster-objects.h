@@ -1,9 +1,9 @@
 #pragma once
 
+#include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
-#include <app/data-model/IteratableList.h>
-#include <app/data-model/Uint8Span.h>
+#include <app/data-model/List.h>
 #include <app/util/basic-types.h>
 #include <array>
 #include <lib/core/CHIPTLV.h>
@@ -15,7 +15,7 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace TestCluster {
-constexpr chip::ClusterId kClusterId = 0x0000050F;
+constexpr ClusterId kClusterId = 0x0000050F;
 
 enum class SimpleEnum : uint8_t
 {
@@ -35,7 +35,7 @@ enum FieldId
 struct Type
 {
     int64_t fabricIndex;
-    chip::ByteSpan operationalCert;
+    ByteSpan operationalCert;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -57,8 +57,8 @@ struct Type
     uint8_t a    = 0;
     bool b       = false;
     SimpleEnum c = SimpleEnum::UNSPECIFIED;
-    chip::ByteSpan d;
-    chip::Span<const char> e;
+    ByteSpan d;
+    Span<const char> e;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -103,17 +103,17 @@ public:
     uint8_t a = 0;
     bool b    = false;
     SimpleStruct::Type c;
-    chip::Span<SimpleStruct::Type> d;
-    chip::Span<uint32_t> e;
-    chip::Span<chip::ByteSpan> f;
-    DataModel::Uint8Span g;
+    DataModel::List<SimpleStruct::Type> d;
+    DataModel::List<uint32_t> e;
+    DataModel::List<ByteSpan> f;
+    DataModel::List<uint8_t> g;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace NestedStructList
 
-namespace IteratableNestedStructList {
+namespace DecodableNestedStructList {
 enum FieldId
 {
     kAFieldId = 0,
@@ -131,15 +131,15 @@ public:
     uint8_t a = 0;
     bool b    = false;
     SimpleStruct::Type c;
-    DataModel::IteratableList<SimpleStruct::Type> d;
-    DataModel::IteratableList<uint32_t> e;
-    DataModel::IteratableList<chip::ByteSpan> f;
-    DataModel::IteratableList<uint8_t> g;
+    DataModel::DecodableList<SimpleStruct::Type> d;
+    DataModel::DecodableList<uint32_t> e;
+    DataModel::DecodableList<ByteSpan> f;
+    DataModel::DecodableList<uint8_t> g;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-} // namespace IteratableNestedStructList
+} // namespace DecodableNestedStructList
 
 namespace DoubleNestedStructList {
 enum FieldId
@@ -150,14 +150,14 @@ enum FieldId
 struct Type
 {
 public:
-    chip::Span<NestedStructList::Type> a;
+    DataModel::List<NestedStructList::Type> a;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace DoubleNestedStructList
 
-namespace IteratableDoubleNestedStructList {
+namespace DecodableDoubleNestedStructList {
 enum FieldId
 {
     kAFieldId = 0,
@@ -166,12 +166,12 @@ enum FieldId
 struct Type
 {
 public:
-    DataModel::IteratableList<IteratableNestedStructList::Type> a;
+    DataModel::DecodableList<DecodableNestedStructList::Type> a;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-} // namespace IteratableDoubleNestedStructList
+} // namespace DecodableDoubleNestedStructList
 } // namespace TestCluster
 } // namespace clusters
 } // namespace app

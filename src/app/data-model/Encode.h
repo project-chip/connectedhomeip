@@ -53,7 +53,7 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, ByteSpan x)
 
 inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, const Span<const char> x)
 {
-    return writer.PutString(tag, x.data(), static_cast<uint32_t>(x.size()));
+    return writer.PutString(tag, x);
 }
 
 /*
@@ -75,20 +75,6 @@ template <
 CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, X & x)
 {
     return x.Encode(writer, tag);
-}
-
-template <typename X>
-CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, const Span<X> & x)
-{
-    TLV::TLVType type;
-
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
-    for (auto & item : x)
-    {
-        ReturnErrorOnFailure(Encode(writer, TLV::AnonymousTag, item));
-    }
-
-    return writer.EndContainer(type);
 }
 
 } // namespace DataModel

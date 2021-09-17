@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "Decode.h"
 #include "Encode.h"
 #include <iterator>
 #include <lib/core/CHIPCore.h>
@@ -31,20 +32,23 @@ namespace app {
 namespace DataModel {
 
 /*
- * Span<const uint8_t> serves as the underlying type
- * for both octstr and list<uint8> data model types. However, these two
- * data model types have very different encodings (TLV ByteString and TLV Array respectively).
+ * Dedicated type for list<T> that is at its base, just a Span.
  *
- * To permit that distinction, this Uint8Span type has been created for list<uint8> to be distinct in type
- * from ByteSpan, which is to be used for octstr.
+ * Motivated by the need to create distinction between Lists that use Spans
+ * vs. other data model types that use Spans (like octetstr). These have different
+ * encodings. Consequently, there needs to be an actual C++ type distinction to ensure
+ * correct specialization of the Encode/Decode methods.
+ *
  */
-struct Uint8Span : public Span<const uint8_t>
+template <typename T>
+struct List : public Span<T>
 {
-    using Span::Span;
-    using Span::operator=;
+    using Span<T>::Span;
+    using Span<T>::operator=;
 };
 
-inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, Uint8Span x)
+template <typename X>
+inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, List<X> x)
 {
     TLV::TLVType type;
 
@@ -56,6 +60,26 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag, Uint8Span x)
     ReturnErrorOnFailure(writer.EndContainer(type));
 
     return CHIP_NO_ERROR;
+}
+
+template <typename X>
+CHIP_ERROR Decode(TLV::TLVReader & reader, List<X> & x)
+{
+    TLV::TLVType outer1;
+    size_t destBufSize = x.size();
+    uint32_t i         = 0;
+    CHIP_ERROR err;
+
+    ReturnErrorOnFailure(reader.EnterContainer(outer1));
+
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(destBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(DataModel::Decode(reader, x.data()[i]));
+        destBufSize--;
+    }
+
+    return reader.ExitContainer(outer1);
 }
 
 } // namespace DataModel

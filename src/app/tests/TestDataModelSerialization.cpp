@@ -61,8 +61,8 @@ public:
     static void TestDataModelSerialization_EncAndDecSimpleStruct(nlTestSuite * apSuite, void * apContext);
     static void TestDataModelSerialization_EncAndDecNestedStruct(nlTestSuite * apSuite, void * apContext);
     static void TestDataModelSerialization_EncAndDecNestedStructList(nlTestSuite * apSuite, void * apContext);
-    static void TestDataModelSerialization_EncAndDecIterableNestedStructList(nlTestSuite * apSuite, void * apContext);
-    static void TestDataModelSerialization_EncAndDecIterableDoubleNestedStructList(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_EncAndDecDecodableNestedStructList(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList(nlTestSuite * apSuite, void * apContext);
 
     static void TestDataModelSerialization_OptionalFields(nlTestSuite * apSuite, void * apContext);
     static void TestDataModelSerialization_ExtraField(nlTestSuite * apSuite, void * apContext);
@@ -275,8 +275,8 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
     }
 }
 
-void TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableNestedStructList(nlTestSuite * apSuite,
-                                                                                              void * apContext)
+void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNestedStructList(nlTestSuite * apSuite,
+                                                                                               void * apContext)
 {
     CHIP_ERROR err;
     auto * _this = static_cast<TestDataModelSerialization *>(apContext);
@@ -336,7 +336,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableNes
     // Decode
     //
     {
-        clusters::TestCluster::IteratableNestedStructList::Type t;
+        clusters::TestCluster::DecodableNestedStructList::Type t;
         int i;
 
         _this->SetupReader();
@@ -363,6 +363,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableNes
             }
 
             NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(apSuite, i == 4);
         }
 
         {
@@ -376,6 +377,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableNes
             }
 
             NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(apSuite, i == 4);
         }
 
         {
@@ -386,15 +388,18 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableNes
             {
                 auto & item = iter.GetValue();
 
-                for (unsigned int j = 0; j < item.size(); j++)
+                unsigned int j = 0;
+                for (; j < item.size(); j++)
                 {
                     NL_TEST_ASSERT(apSuite, item.data()[j] == j);
                 }
 
+                NL_TEST_ASSERT(apSuite, j == 4);
                 i++;
             }
 
             NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(apSuite, i == 4);
         }
 
         {
@@ -409,12 +414,13 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableNes
             }
 
             NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(apSuite, i == 4);
         }
     }
 }
 
-void TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableDoubleNestedStructList(nlTestSuite * apSuite,
-                                                                                                    void * apContext)
+void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList(nlTestSuite * apSuite,
+                                                                                                     void * apContext)
 {
     CHIP_ERROR err;
     auto * _this = static_cast<TestDataModelSerialization *>(apContext);
@@ -458,7 +464,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableDou
     // Decode
     //
     {
-        clusters::TestCluster::IteratableDoubleNestedStructList::Type t;
+        clusters::TestCluster::DecodableDoubleNestedStructList::Type t;
 
         _this->SetupReader();
 
@@ -473,17 +479,21 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableDou
             auto & item     = iter.GetValue();
             auto nestedIter = item.d.begin();
 
-            i = 0;
+            unsigned int j = 0;
             while (nestedIter.Next())
             {
                 auto & nestedItem = nestedIter.GetValue();
 
-                NL_TEST_ASSERT(apSuite, nestedItem.a == ((uint8_t) 35 + i));
-                i++;
+                NL_TEST_ASSERT(apSuite, nestedItem.a == ((uint8_t) 35 + j));
+                j++;
             }
+
+            NL_TEST_ASSERT(apSuite, j == 4);
+            i++;
         }
 
         NL_TEST_ASSERT(apSuite, iter.GetError() == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, i == 4);
     }
 }
 
@@ -777,7 +787,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
     // Decode
     //
     {
-        clusters::TestCluster::IteratableNestedStructList::Type t;
+        clusters::TestCluster::DecodableNestedStructList::Type t;
 
         _this->SetupReader();
 
@@ -828,8 +838,8 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("TestDataModelSerialization_EncAndDecSimple", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruct),
     NL_TEST_DEF("TestDataModelSerialization_EncAndDecNestedStruct", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruct),
-    NL_TEST_DEF("TestDataModelSerialization_EncAndDecIterableNestedStructList", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableNestedStructList),
-    NL_TEST_DEF("TestDataModelSerialization_EncAndDecIterableDoubleNestedStructList", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecIterableDoubleNestedStructList),
+    NL_TEST_DEF("TestDataModelSerialization_EncAndDecDecodableNestedStructList", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNestedStructList),
+    NL_TEST_DEF("TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList", chip::app::TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList),
     NL_TEST_DEF("TestDataModelSerialization_OptionalFields", chip::app::TestDataModelSerialization::TestDataModelSerialization_OptionalFields),
     NL_TEST_DEF("TestDataModelSerialization_ExtraField", chip::app::TestDataModelSerialization::TestDataModelSerialization_ExtraField),
     NL_TEST_DEF("TestDataModelSerialization_InvalidSimpleFieldTypes", chip::app::TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTypes),
