@@ -523,6 +523,22 @@ public:
     MediaPlaybackClusterTest() : MediaPlaybackCluster() {}
     ~MediaPlaybackClusterTest() {}
 
+    CHIP_ERROR WriteAttributePlaybackState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint8_t value);
+    CHIP_ERROR WriteAttributeStartTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint64_t value);
+    CHIP_ERROR WriteAttributeDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint64_t value);
+    CHIP_ERROR WriteAttributePositionUpdatedAt(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint64_t value);
+    CHIP_ERROR WriteAttributePosition(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint64_t value);
+    CHIP_ERROR WriteAttributePlaybackSpeed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint64_t value);
+    CHIP_ERROR WriteAttributeSeekRangeEnd(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint64_t value);
+    CHIP_ERROR WriteAttributeSeekRangeStart(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint64_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

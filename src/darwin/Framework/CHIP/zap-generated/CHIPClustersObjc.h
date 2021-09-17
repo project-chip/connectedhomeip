@@ -935,6 +935,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mediaStartOver:(ResponseHandler)responseHandler;
 - (void)mediaStop:(ResponseHandler)responseHandler;
 
+- (void)readAttributePlaybackStateWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeStartTimeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDurationWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePositionUpdatedAtWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePositionWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePlaybackSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeSeekRangeEndWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeSeekRangeStartWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
