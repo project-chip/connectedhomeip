@@ -29,7 +29,9 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
+#endif
 #include <system/TimeSource.h>
 #include <transport/FabricTable.h>
 
@@ -475,9 +477,9 @@ CHIP_ERROR MdnsServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[]
     ReturnErrorOnFailure(
         chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
     ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
-    return AdditionalDataPayloadGenerator().generateRotatingDeviceId(lifetimeCounter, serialNumber, serialNumberSize,
-                                                                     rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
-                                                                     rotatingDeviceIdValueOutputSize);
+    return AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
+        lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+        rotatingDeviceIdValueOutputSize);
 }
 #endif
 
