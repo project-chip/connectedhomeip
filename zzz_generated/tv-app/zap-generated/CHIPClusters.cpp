@@ -98,7 +98,7 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuc
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, GeneralCommissioning::Commands::Ids::ArmFailSafe,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -121,7 +121,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -144,7 +144,7 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelab
                                          GeneralCommissioning::Commands::Ids::CommissioningComplete,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -161,7 +161,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -185,7 +185,7 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable
                                          GeneralCommissioning::Commands::Ids::SetRegulatoryConfig,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -210,7 +210,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -297,7 +297,7 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
                                          NetworkCommissioning::Commands::Ids::DisableNetwork,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -320,7 +320,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -344,7 +344,7 @@ CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onS
                                          NetworkCommissioning::Commands::Ids::EnableNetwork,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -367,7 +367,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -391,7 +391,7 @@ CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callba
                                          NetworkCommissioning::Commands::Ids::GetLastNetworkCommissioningResult,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -410,7 +410,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -434,7 +434,7 @@ CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onS
                                          NetworkCommissioning::Commands::Ids::RemoveNetwork,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -457,7 +457,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -480,7 +480,7 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, NetworkCommissioning::Commands::Ids::ScanNetworks,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -503,7 +503,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -548,7 +548,7 @@ CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSucces
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OperationalCredentials::Commands::Ids::AddNOC,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -575,7 +575,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -599,7 +599,7 @@ CHIP_ERROR OperationalCredentialsCluster::AddTrustedRootCertificate(Callback::Ca
                                          OperationalCredentials::Commands::Ids::AddTrustedRootCertificate,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -618,7 +618,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -641,7 +641,7 @@ CHIP_ERROR OperationalCredentialsCluster::OpCSRRequest(Callback::Cancelable * on
                                          OperationalCredentials::Commands::Ids::OpCSRRequest,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -660,7 +660,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -683,7 +683,7 @@ CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * on
                                          OperationalCredentials::Commands::Ids::RemoveFabric,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -702,7 +702,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
@@ -725,7 +725,7 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
                                          OperationalCredentials::Commands::Ids::UpdateFabricLabel,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = mDevice->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -744,7 +744,7 @@ exit:
     // On error, we are responsible to close the sender.
     if (err != CHIP_NO_ERROR && sender != nullptr)
     {
-        sender->Shutdown();
+        mDevice->ReleaseCommandSender(sender);
     }
     return err;
 }
