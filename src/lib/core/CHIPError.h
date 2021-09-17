@@ -2198,6 +2198,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_NO_SHARED_TRUSTED_ROOT                      CHIP_CORE_ERROR(0xc9)
 
+/*
+ * @def CHIP_ERROR_IM
+ *
+ * @brief
+ *   General error code when a interaction model error is received, usually
+ * comes with a interaction model status code beside.
+ */
+#define CHIP_ERROR_IM                                          CHIP_CORE_ERROR(0xca)
+
 /**
  *  @}
  */

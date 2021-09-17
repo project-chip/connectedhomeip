@@ -9,10 +9,13 @@
 #include <app/InteractionModelEngine.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/basic-types.h>
+#include <app/CommandSender.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <controller/CommandSenderAllocator.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
@@ -36,7 +39,6 @@ namespace Controller {
 CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}})
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
 
@@ -49,8 +51,11 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, {{asUpperCamelCase parent.name}}::Commands::Ids::{{asUpperCamelCase name}},
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
 
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
 {{#chip_cluster_command_arguments}}
@@ -66,16 +71,13 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    err = mDevice->SendCommands(sender);
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
 
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object now.
+    sender.release();
 exit:
-    // On error, we are responsible to close the sender.
-    if (err != CHIP_NO_ERROR && sender != nullptr)
-    {
-        sender->Shutdown();
-    }
     return err;
 }
 

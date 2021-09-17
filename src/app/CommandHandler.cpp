@@ -155,5 +155,23 @@ exit:
     return err;
 }
 
+void CommandHandler::ShutdownInternal()
+{
+    mCommandMessageWriter.Reset();
+
+    mpExchangeMgr = nullptr;
+    mpExchangeCtx = nullptr;
+    ClearState();
+
+    mCommandIndex = 0;
+}
+
+void CommandHandler::Shutdown()
+{
+    VerifyOrReturn(mState != CommandState::Uninitialized);
+    AbortExistingExchangeContext();
+    ShutdownInternal();
+}
+
 } // namespace app
 } // namespace chip
