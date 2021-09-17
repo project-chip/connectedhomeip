@@ -25,13 +25,27 @@ namespace chip {
 // methods.
 using GroupId = uint16_t;
 
-constexpr GroupId kUndefinedGroupId = 0ULL;
+constexpr GroupId kUndefinedGroupId = 0;
 
-constexpr GroupId kMaxOperationalGroupId = 0xFFFFULL;
+constexpr GroupId kMinUniversalGroupId = 0x8000;
+constexpr GroupId kMaxUniversalGroupId = 0xFFFF;
+
+constexpr GroupId kMinFabricGroupId = 0x0001;
+constexpr GroupId kMaxFabricGroupId = 0x7FFF;
 
 constexpr bool IsOperationalGroupId(GroupId aGroupId)
 {
-    return (aGroupId != kUndefinedGroupId) && (aGroupId <= kMaxOperationalGroupId);
+    return (aGroupId != kUndefinedGroupId);
+}
+
+constexpr bool IsFabricGroupId(GroupId aGroupId)
+{
+    return (aGroupId <= kMaxFabricGroupId) && (aGroupId >= kMinFabricGroupId);
+}
+
+constexpr bool IsUniversalGroupId(GroupId aGroupId)
+{
+    return (aGroupId >= kMinUniversalGroupId);
 }
 
 } // namespace chip
