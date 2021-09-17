@@ -157,6 +157,8 @@ private:
 
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
     static struct GDBusWpaSupplicant mWpaSupplicant;
+    static std::mutex mWpaSupplicantMutex;
+
 #endif
 
     // ==================== ConnectivityManager Private Methods ====================
