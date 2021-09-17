@@ -71,6 +71,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 void CommissioningWindowManager::Cleanup()
 {
     mServer->GetExchangManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
+    mPairingSession.Clear();
     StopAdvertisement();
 
     // reset all advertising

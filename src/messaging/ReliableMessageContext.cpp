@@ -150,10 +150,10 @@ uint64_t ReliableMessageContext::GetActiveRetransmitTimeoutTick()
  *  @note
  *    This message is part of the CHIP Reliable Messaging protocol.
  *
- *  @param[in]    ackMessageCounter         The messageCounter of incoming Ack message.
+ *  @param[in]    ackMessageCounter         The acknowledged message counter of the incoming message.
  *
- *  @retval  #CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER                 if the messageCounter of received Ack is not in the
- * RetransTable.
+ *  @retval  #CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER    if acknowledged message counter of received packet is not in the
+ *                                                      RetransTable.
  *  @retval  #CHIP_NO_ERROR                             if the context was removed.
  *
  */

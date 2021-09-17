@@ -53,6 +53,7 @@ constexpr uint16_t kVersion = 0;
  */
 enum class MsgType : uint8_t
 {
+    StatusResponse        = 0x01,
     ReadRequest           = 0x02,
     SubscribeRequest      = 0x03,
     SubscribeResponse     = 0x04,

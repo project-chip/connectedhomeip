@@ -10807,7 +10807,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Subscribe OnOff Attribute: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10926,7 +10926,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check for attribute report: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10995,7 +10995,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Turn Off the light to see attribute change: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11053,7 +11053,7 @@ private:
     {
         ChipLogProgress(chipTool, "On/Off - Check for attribute report: Sending command...");
 
-        chip::Controller::OnOffCluster cluster;
+        chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;

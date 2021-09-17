@@ -787,18 +787,15 @@ CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint1
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, uint8_t * derSig, const uint16_t derSigBufSize,
-                                         uint16_t & derSigLen)
+CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, MutableByteSpan & derSig)
 {
     ASN1Writer writer;
 
-    VerifyOrReturnError(derSig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    writer.Init(derSig, derSigBufSize);
+    writer.Init(derSig);
 
     ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(rawSig, writer));
 
-    derSigLen = writer.GetLengthWritten();
+    derSig.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
 }

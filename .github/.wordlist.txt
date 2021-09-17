@@ -28,6 +28,7 @@ AE
 aef
 algs
 alloc
+AnnounceOTAProvider
 APIs
 apk
 AppConfig
@@ -493,6 +494,7 @@ libwebkitgtk
 lifecycle
 lightbulb
 lightin
+LightingColor
 LinkSoftwareAndDocumentationPack
 LocalConfigDisabled
 localhost
@@ -702,6 +704,7 @@ qrcodetool
 QRCodeUrl
 QSPI
 QueryImage
+QueryImageResponse
 qvCHIP
 RADVD
 raspberryPi
@@ -759,6 +762,7 @@ ScriptBinding
 SDC
 SDHC
 SDK
+sdkconfig
 SDK's
 SDKs
 SDKTARGETSYSROOT
