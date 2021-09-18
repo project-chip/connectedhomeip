@@ -26,6 +26,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import chip.devicecontroller.ChipDeviceController
+import chip.platform.AndroidBLEManager
+import chip.platform.AndroidChipPlatform
+import chip.platform.DefaultConfigurationManager
+import chip.platform.NsdManagerServiceResolver
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
@@ -53,6 +58,11 @@ class CHIPToolActivity :
     setContentView(R.layout.top_activity)
 
     if (savedInstanceState == null) {
+      ChipDeviceController.load()
+      AndroidChipPlatform.getInstance().setConfigurationManager(DefaultConfigurationManager(this))
+      AndroidChipPlatform.getInstance().setKeyValueStoreManager(chip.platform.PreferencesKeyValueStoreManager(this))
+      AndroidChipPlatform.getInstance().setServiceResolver(NsdManagerServiceResolver(this))
+      AndroidChipPlatform.getInstance().bleManager = AndroidBLEManager()
       val fragment = SelectActionFragment.newInstance()
       supportFragmentManager
           .beginTransaction()

@@ -178,18 +178,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         ChipLogError(Controller, "Missing error info");
         return nullptr;
     }
-    if (systemLayer == nullptr)
-    {
-        ChipLogError(Controller, "Missing system layer");
-        *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
-        return nullptr;
-    }
-    if (inetLayer == nullptr)
-    {
-        ChipLogError(Controller, "Missing inet layer");
-        *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
-        return nullptr;
-    }
 
     *errInfoOnFailure = CHIP_NO_ERROR;
 

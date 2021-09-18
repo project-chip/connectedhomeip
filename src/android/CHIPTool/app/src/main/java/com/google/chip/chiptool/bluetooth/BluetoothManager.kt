@@ -1,12 +1,6 @@
 package com.google.chip.chiptool.bluetooth
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattDescriptor
-import android.bluetooth.BluetoothProfile
+import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
@@ -14,20 +8,26 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
-import com.google.chip.chiptool.ChipClient
+import chip.platform.AndroidBLEManager
+import chip.platform.AndroidChipPlatform
+import chip.platform.BLEConnection
+import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import kotlinx.coroutines.CancellableContinuation
-import java.util.UUID
-import kotlin.coroutines.resume
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
+import java.util.*
+import kotlin.coroutines.resume
 
 @ExperimentalCoroutinesApi
-class BluetoothManager {
+class BluetoothManager : BLEConnection {
   private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+  private var bleGatt: BluetoothGatt? = null
+  var connectionId = 0
+    private set
 
   private fun getServiceData(discriminator: Int): ByteArray {
     val opcode = 0
@@ -43,6 +43,8 @@ class BluetoothManager {
     if (! bluetoothAdapter.isEnabled) {
       bluetoothAdapter.enable();
     }
+
+    connectionId = AndroidChipPlatform.getInstance().bleManager.addConnection(this)
 
     val scanner = bluetoothAdapter.bluetoothLeScanner ?: run {
       Log.e(TAG, "No bluetooth scanner found")
@@ -89,8 +91,8 @@ class BluetoothManager {
       val bluetoothGattCallback = getBluetoothGattCallback(context, continuation)
 
       Log.i(TAG, "Connecting")
-      val gatt = device.connectGatt(context, false, bluetoothGattCallback)
-      continuation.invokeOnCancellation { gatt.disconnect() }
+      bleGatt = device.connectGatt(context, false, bluetoothGattCallback)
+      continuation.invokeOnCancellation { bleGatt?.disconnect() }
     }
   }
 
@@ -99,7 +101,7 @@ class BluetoothManager {
     continuation: CancellableContinuation<BluetoothGatt?>
   ): BluetoothGattCallback {
     return object : BluetoothGattCallback() {
-      private val wrappedCallback = ChipClient.getDeviceController(context).callback
+      private val wrappedCallback = AndroidChipPlatform.getInstance().bleManager.callback;
       private val coroutineContinuation = continuation
 
       override fun onConnectionStateChange(
@@ -108,6 +110,7 @@ class BluetoothManager {
           newState: Int
       ) {
         super.onConnectionStateChange(gatt, status, newState)
+        Log.i(TAG, "${gatt?.device?.name}.onConnectionStateChange status = $status, newState=$newState")
         wrappedCallback.onConnectionStateChange(gatt, status, newState)
 
         if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
@@ -117,6 +120,7 @@ class BluetoothManager {
       }
 
       override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+        Log.d(TAG, "${gatt?.device?.name}.onServicesDiscovered status = $status")
         wrappedCallback.onServicesDiscovered(gatt, status)
 
         Log.i("$TAG|onServicesDiscovered", "Services Discovered")
@@ -124,10 +128,9 @@ class BluetoothManager {
       }
 
       override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
+        Log.d(TAG, "${gatt?.device?.name}.onMtuChanged: connecting to CHIP device")
         super.onMtuChanged(gatt, mtu, status)
         wrappedCallback.onMtuChanged(gatt, mtu, status)
-
-        Log.d(TAG, "MTU changed: connecting to CHIP device")
         if (coroutineContinuation.isActive) {
           coroutineContinuation.resume(gatt)
         }
@@ -192,5 +195,22 @@ class BluetoothManager {
   companion object {
     private const val TAG = "chip.BluetoothManager"
     private const val CHIP_UUID = "0000FFF6-0000-1000-8000-00805F9B34FB"
+  }
+
+  override fun getBluetoothGatt(): BluetoothGatt? {
+    return bleGatt;
+  }
+
+  override fun onCloseBleComplete(connId: Int) {
+    bleGatt?.close();
+    AndroidChipPlatform.getInstance().bleManager.removeConnection(connectionId)
+    connectionId = 0
+    //todo: notify DeviceProvisiongFragment
+    Log.d(TAG, "onCloseBleComplete")
+  }
+
+  override fun onNotifyChipConnectionClosed(connId: Int) {
+    Log.d(TAG, "onNotifyChipConnectionClosed")
+    onCloseBleComplete(connId)
   }
 }
