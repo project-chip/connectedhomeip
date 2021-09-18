@@ -16,13 +16,13 @@
  *
  */
 #include "AndroidDeviceControllerWrapper.h"
-#include "CHIPJNIError.h"
-#include "StackLock.h"
+#include <lib/support/CHIPJNIError.h>
+#include <lib/support/StackLock.h>
 
 #include <algorithm>
 #include <memory>
 
-#include "JniReferences.h"
+#include <lib/support/JniReferences.h>
 #include <lib/support/CodeUtils.h>
 
 #include <lib/core/CHIPTLV.h>
@@ -35,8 +35,6 @@
 using namespace chip;
 using namespace chip::Controller;
 using namespace TLV;
-
-extern chip::Ble::BleLayer * GetJNIBleLayer();
 
 constexpr const char kOperationalCredentialsIssuerKeypairStorage[]   = "AndroidDeviceControllerKey";
 constexpr const char kOperationalCredentialsRootCertificateStorage[] = "AndroidCARootCert";
@@ -209,9 +207,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.storageDelegate                = wrapper.get();
     initParams.pairingDelegate                = wrapper.get();
     initParams.operationalCredentialsDelegate = wrapper.get();
+    //if is null, Controller will get form src/platform/Globals.cpp
     initParams.systemLayer                    = systemLayer;
     initParams.inetLayer                      = inetLayer;
-    initParams.bleLayer                       = GetJNIBleLayer();
 
     wrapper->InitializeOperationalCredentialsIssuer();
 
