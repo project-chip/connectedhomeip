@@ -35,11 +35,7 @@ object ChipClient {
 
   fun getDeviceController(context: Context): ChipDeviceController {
     if (!this::chipDeviceController.isInitialized) {
-      chipDeviceController = ChipDeviceController(
-        PreferencesKeyValueStoreManager(context),
-        NsdManagerServiceResolver(context),
-        ChipMdnsCallbackImpl()
-      )
+      chipDeviceController = ChipDeviceController()
     }
     return chipDeviceController
   }
