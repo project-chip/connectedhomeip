@@ -18,11 +18,8 @@
 package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
 import android.util.Log;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
-import chip.devicecontroller.mdns.ChipMdnsCallback;
-import chip.devicecontroller.mdns.ServiceResolver;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -30,28 +27,23 @@ public class ChipDeviceController {
 
   private long deviceControllerPtr;
   private int connectionId;
-  private BluetoothGatt bleGatt;
   private CompletionListener completionListener;
 
-  public ChipDeviceController(
-      KeyValueStoreManager manager, ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback) {
-    deviceControllerPtr = newDeviceController(manager, resolver, chipMdnsCallback);
+  /** To load class and jni */
+  public static void load() {
+    return;
+  }
+
+  public ChipDeviceController() {
+    deviceControllerPtr = newDeviceController();
   }
 
   public void setCompletionListener(CompletionListener listener) {
     completionListener = listener;
   }
 
-  public BluetoothGatt getBluetoothGatt() {
-    return bleGatt;
-  }
-
-  public BluetoothGattCallback getCallback() {
-    return AndroidChipStack.getInstance().getCallback();
-  }
-
-  public void pairDevice(BluetoothGatt bleServer, long deviceId, long setupPincode) {
-    pairDevice(bleServer, deviceId, setupPincode, null);
+  public void pairDevice(BluetoothGatt bleServer, int connId, long deviceId, long setupPincode) {
+    pairDevice(bleServer, connId, deviceId, setupPincode, null);
   }
 
   /**
@@ -66,11 +58,10 @@ public class ChipDeviceController {
    *     generated CSR nonce.
    */
   public void pairDevice(
-      BluetoothGatt bleServer, long deviceId, long setupPincode, byte[] csrNonce) {
+      BluetoothGatt bleServer, int connId, long deviceId, long setupPincode, byte[] csrNonce) {
     if (connectionId == 0) {
-      bleGatt = bleServer;
+      connectionId = connId;
 
-      connectionId = AndroidChipStack.getInstance().addConnection(this);
       if (connectionId == 0) {
         Log.e(TAG, "Failed to add Bluetooth connection.");
         completionListener.onError(new Exception("Failed to add Bluetooth connection."));
@@ -156,10 +147,7 @@ public class ChipDeviceController {
   }
 
   public void onNotifyChipConnectionClosed(int connId) {
-    // Clear connection state.
-    AndroidChipStack.getInstance().removeConnection(connId);
     connectionId = 0;
-    bleGatt = null;
 
     Log.d(TAG, "Calling onNotifyChipConnectionClosed()");
     completionListener.onNotifyChipConnectionClosed();
@@ -189,13 +177,7 @@ public class ChipDeviceController {
 
     Log.d(TAG, "Closing GATT and removing connection for " + connId);
 
-    // Close gatt
-    bleGatt.close();
-
-    // Clear connection state.
-    AndroidChipStack.getInstance().removeConnection(connId);
     connectionId = 0;
-    bleGatt = null;
     return true;
   }
 
@@ -215,8 +197,7 @@ public class ChipDeviceController {
     return isActive(deviceControllerPtr, deviceId);
   }
 
-  private native long newDeviceController(
-      KeyValueStoreManager manager, ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
+  private native long newDeviceController();
 
   private native void pairDevice(
       long deviceControllerPtr, long deviceId, int connectionId, long pinCode, byte[] csrNonce);

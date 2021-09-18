@@ -227,6 +227,10 @@ public class AndroidBLEManager implements BLEManager {
     @Override
     public boolean onSubscribeCharacteristic(int connId, byte[] svcId, byte[] charId) {
         BLEConnection connObj = getConnection(connId);
+        if (connObj == null) {
+            Log.i(TAG, "Tried to send characteristic, but BLE connection was not found.");
+            return false;
+        }
         BluetoothGatt bluetoothGatt = connObj.getBluetoothGatt();
         if (bluetoothGatt == null) {
             return false;
@@ -264,6 +268,10 @@ public class AndroidBLEManager implements BLEManager {
     @Override
     public boolean onUnsubscribeCharacteristic(int connId, byte[] svcId, byte[] charId) {
         BLEConnection connObj = getConnection(connId);
+        if (connObj == null) {
+            Log.i(TAG, "Tried to unsubscribe characteristic, but BLE connection was not found.");
+            return false;
+        }
         BluetoothGatt bluetoothGatt = connObj.getBluetoothGatt();
         if (bluetoothGatt == null) {
             return false;
@@ -301,7 +309,11 @@ public class AndroidBLEManager implements BLEManager {
     @Override
     public boolean onCloseConnection(int connId) {
         BLEConnection connObj = getConnection(connId);
-        connObj.onCloseBleComplete(connId);
+        if (connObj != null) {
+            connObj.onCloseBleComplete(connId);
+        } else {
+            Log.i(TAG, "Tried to close BLE connection, but connection was not found.");
+        }
         return true;
     }
 
@@ -325,6 +337,10 @@ public class AndroidBLEManager implements BLEManager {
     public boolean onSendWriteRequest(int connId, byte[] svcId, byte[] charId, byte[] characteristicData) {
         //onSendCharacteristic
         BLEConnection connObj = getConnection(connId);
+        if (connObj == null) {
+            Log.i(TAG, "Tried to send characteristic, but BLE connection was not found.");
+            return false;
+            }
         BluetoothGatt bluetoothGatt = connObj.getBluetoothGatt();
         if (bluetoothGatt == null) {
             return false;
@@ -357,7 +373,11 @@ public class AndroidBLEManager implements BLEManager {
     @Override
     public void onNotifyChipConnectionClosed(int connId) {
         BLEConnection connObj = getConnection(connId);
-        connObj.onNotifyChipConnectionClosed(connId);
+        if (connObj != null) {
+            connObj.onNotifyChipConnectionClosed(connId);
+        } else {
+            Log.i(TAG, "Tried to notify connection closed, but BLE connection was not found.");
+        }   
     }
 
     @Override
