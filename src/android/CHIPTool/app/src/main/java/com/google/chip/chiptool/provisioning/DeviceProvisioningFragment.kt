@@ -26,6 +26,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import chip.platform.AndroidChipPlatform
+import chip.platform.BLEConnection
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -122,7 +124,8 @@ class DeviceProvisioningFragment : Fragment() {
       deviceController.setCompletionListener(ConnectionCallback())
 
       val deviceId = DeviceIdUtil.getNextAvailableId(requireContext())
-      deviceController.pairDevice(gatt, deviceId, deviceInfo.setupPinCode)
+      var connId = bluetoothManager.connectionId
+      deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }
   }
@@ -130,7 +133,9 @@ class DeviceProvisioningFragment : Fragment() {
   private fun showMessage(msgResId: Int, stringArgs: String? = null) {
     requireActivity().runOnUiThread {
       val context = requireContext()
-      Toast.makeText(context, context.getString(msgResId, stringArgs), Toast.LENGTH_SHORT)
+      var msg = context.getString(msgResId, stringArgs)
+      Log.i(TAG, "showMessage:$msg")
+      Toast.makeText(context, msg, Toast.LENGTH_SHORT)
         .show()
     }
   }
