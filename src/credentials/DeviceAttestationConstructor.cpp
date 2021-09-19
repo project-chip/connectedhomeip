@@ -56,7 +56,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
 
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    // TODO: per conversation with Tennessee, shold be two consecutive loops (rather than one big 
+    // TODO: per conversation with Tennessee, shold be two consecutive loops (rather than one big
     // loop, since the contextTags come before the profileTags)
     while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
     {
