@@ -3899,7 +3899,7 @@
               "outgoing": 1
             },
             {
-              "name": "CertChainRequest",
+              "name": "CertificateChainRequest",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -3998,7 +3998,7 @@
               "outgoing": 0
             },
             {
-              "name": "CertChainResponse",
+              "name": "CertificateChainResponse",
               "code": 3,
               "mfgCode": null,
               "source": "server",

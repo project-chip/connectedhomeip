@@ -48,7 +48,6 @@
 #include <app/util/error-mapping.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -733,10 +732,10 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 }
 
 DeviceCommissioner::DeviceCommissioner() :
-    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this), mCertChainResponseCallback(OnCertificateChainResponse, this),
+    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this), mCertificateChainResponseCallback(OnCertificateChainResponse, this),
     mAttestationResponseCallback(OnAttestationResponse, this), mOpCSRResponseCallback(OnOperationalCertificateSigningRequest, this),
     mNOCResponseCallback(OnOperationalCertificateAddResponse, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
-    mOnCertChainFailureCallback(OnCertChainFailureResponse, this),
+    mOnCertificateChainFailureCallback(OnCertificateChainFailureResponse, this),
     mOnAttestationFailureCallback(OnAttestationFailureResponse, this), mOnCSRFailureCallback(OnCSRFailureResponse, this),
     mOnCertFailureCallback(OnAddNOCFailureResponse, this), mOnRootCertFailureCallback(OnRootCertFailureResponse, this),
     mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
@@ -760,6 +759,8 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     }
     ReturnErrorOnFailure(mIDAllocator.ReserveUpTo(nextKeyID));
     mPairingDelegate = params.pairingDelegate;
+
+    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
@@ -1199,14 +1200,14 @@ void DeviceCommissioner::OnSessionEstablished()
     // TODO: Add code to receive OpCSR from the device, and process the signing request
     // For IP rendezvous, this is sent as part of the state machine.
 #if CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING
-    bool sendOperationalCertsImmediately = !mIsIPRendezvous;
+    bool sendCertificateChainImmediately = !mIsIPRendezvous;
 #else
-    bool sendOperationalCertsImmediately = true;
+    bool sendCertificateChainImmediately = true;
 #endif
 
-    if (sendOperationalCertsImmediately)
+    if (sendCertificateChainImmediately)
     {
-        err = SendCertificateChainRequestCommand(device, CertificateChainType::kPAI);
+        err = SendCertificateChainRequestCommand(device, CertificateType::kPAI);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Ble, "Failed in sending 'Certificate Chain request' command to the device: err %s", ErrorStr(err));
@@ -1220,29 +1221,29 @@ void DeviceCommissioner::OnSessionEstablished()
     }
 }
 
-CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(Device * device, CertificateChainType certificateChainType)
+CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(Device * device, Credentials::CertificateType certificateType)
 {
     ChipLogDetail(Controller, "Sending Certificate Chain request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-    mCertificateChainBeingRequested = certificateChainType;
+    mCertificateTypeBeingRequested = certificateType;
 
-    Callback::Cancelable * successCallback = mCertChainResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnCertChainFailureCallback.Cancel();
+    Callback::Cancelable * successCallback = mCertificateChainResponseCallback.Cancel();
+    Callback::Cancelable * failureCallback = mOnCertificateChainFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(cluster.CertChainRequest(successCallback, failureCallback, certificateChainType));
+    ReturnErrorOnFailure(cluster.CertificateChainRequest(successCallback, failureCallback, certificateType));
     ChipLogDetail(Controller, "Sent Certificate Chain request, waiting for the DAC Certificate");
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::OnCertChainFailureResponse(void * context, uint8_t status)
+void DeviceCommissioner::OnCertificateChainFailureResponse(void * context, uint8_t status)
 {
     ChipLogProgress(Controller, "Device failed to receive the Certificate Chain request Response: 0x%02x", status);
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
-    commissioner->mCertChainResponseCallback.Cancel();
-    commissioner->mOnCertChainFailureCallback.Cancel();
+    commissioner->mCertificateChainResponseCallback.Cancel();
+    commissioner->mOnCertificateChainFailureCallback.Cancel();
     // TODO: Map error status to correct error code
     commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
 }
@@ -1252,8 +1253,8 @@ void DeviceCommissioner::OnCertificateChainResponse(void * context, ByteSpan cer
     ChipLogProgress(Controller, "Received certificate chain from the device");
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
 
-    commissioner->mCertChainResponseCallback.Cancel();
-    commissioner->mOnCertChainFailureCallback.Cancel();
+    commissioner->mCertificateChainResponseCallback.Cancel();
+    commissioner->mOnCertificateChainFailureCallback.Cancel();
 
     if (commissioner->ProcessCertificateChain(certificate) != CHIP_NO_ERROR)
     {
@@ -1271,17 +1272,18 @@ CHIP_ERROR DeviceCommissioner::ProcessCertificateChain(const ByteSpan & certific
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-    switch (mCertificateChainBeingRequested)
+    // PAI is being requested first - If PAI is not present, DAC will be requested next anyway.
+    switch (mCertificateTypeBeingRequested)
     {
-    case CertificateChainType::kDAC: {
+    case CertificateType::kDAC: {
         device->SetDAC(certificate);
         break;
     }
-    case CertificateChainType::kPAI: {
+    case CertificateType::kPAI: {
         device->SetPAI(certificate);
         break;
     }
-    case CertificateChainType::kUnknown:
+    case CertificateType::kUnknown:
     default: {
         return CHIP_ERROR_INTERNAL;
     }
@@ -1290,11 +1292,11 @@ CHIP_ERROR DeviceCommissioner::ProcessCertificateChain(const ByteSpan & certific
     if (device->AreCredentialsAvailable())
     {
         ChipLogProgress(Controller, "Sending Attestation Request to the device.");
-        ReturnErrorOnFailure(SendAttestationRequestCommand(device));
+        ReturnErrorOnFailure(SendAttestationRequestCommand(device, device->GetAttestationNonce()));
     }
     else
     {
-        CHIP_ERROR err = SendCertificateChainRequestCommand(device, CertificateChainType::kDAC);
+        CHIP_ERROR err = SendCertificateChainRequestCommand(device, CertificateType::kDAC);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Failed in sending Certificate Chain request command to the device: err %s", ErrorStr(err));
@@ -1306,7 +1308,7 @@ CHIP_ERROR DeviceCommissioner::ProcessCertificateChain(const ByteSpan & certific
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(Device * device)
+CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(Device * device, const ByteSpan & attestationNonce)
 {
     ChipLogDetail(Controller, "Sending Attestation request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -1316,7 +1318,7 @@ CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(Device * device)
     Callback::Cancelable * successCallback = mAttestationResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnAttestationFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(cluster.AttestationRequest(successCallback, failureCallback, device->GetAttestationNonce()));
+    ReturnErrorOnFailure(cluster.AttestationRequest(successCallback, failureCallback, attestationNonce));
     ChipLogDetail(Controller, "Sent Attestation request, waiting for the Attestation Information");
     return CHIP_NO_ERROR;
 }
@@ -1339,49 +1341,67 @@ void DeviceCommissioner::OnAttestationResponse(void * context, chip::ByteSpan at
     commissioner->mAttestationResponseCallback.Cancel();
     commissioner->mOnAttestationFailureCallback.Cancel();
 
-    CHIP_ERROR err = commissioner->ValidateAttestationInfo(attestationElements, signature);
-    if (err != CHIP_NO_ERROR)
-    {
-        // Handle error, and notify session failure to the commissioner application.
-        ChipLogError(Controller, "Failed to validate the Attestation Information");
-        // TODO: Map error status to correct error code
-        commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
-    }
+    commissioner->HandleAttestationResult(commissioner->ValidateAttestationInfo(attestationElements, signature));
 }
 
-CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(chip::ByteSpan attestationElements, chip::ByteSpan signature)
+CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mDeviceBeingPaired < kNumMaxActiveDevices, CHIP_ERROR_INCORRECT_STATE);
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
     DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
 
     // Retrieve attestation challenge
     PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(
-        { mPairingSession.GetPeerNodeId(), mPairingSession.GetLocalKeyId(), mPairingSession.GetPeerKeyId(), mFabricIndex });
+        { mPairingSession.GetPeerNodeId(), mPairingSession.GetLocalSessionId(), mPairingSession.GetPeerSessionId(), mFabricIndex });
     VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
 
-    VerifyOrReturnError(dac_verifier->VerifyAttestationInformation(
-                            attestationElements, state->GetSecureSession().GetAttestationChallenge(), signature, device->GetPAI(),
-                            device->GetDAC(), device->GetAttestationNonce()) == AttestationVerificationResult::kSuccess,
-                        CHIP_ERROR_INTERNAL);
-
-    // TODO: Step g/h validate CertDeclaration
-    // TODO: Step i: validate firmware information
-
-    ChipLogProgress(Controller, "Sending 'CSR request' command to the device.");
-    CHIP_ERROR error = SendOperationalCertificateSigningRequestCommand(device);
-    if (error != CHIP_NO_ERROR)
+    AttestationVerificationResult result =
+        dac_verifier->VerifyAttestationInformation(attestationElements, state->GetSecureSession().GetAttestationChallenge(),
+                                                   signature, device->GetPAI(), device->GetDAC(), device->GetAttestationNonce());
+    if (result != AttestationVerificationResult::kSuccess)
     {
-        ChipLogError(Controller, "Failed in sending 'CSR request' command to the device: err %s", ErrorStr(error));
-        OnSessionEstablishmentError(error);
-        return error;
+        ChipLogError(Controller, "Failed in verifying 'Attestation Information' command received from the device: err %hu",
+                     static_cast<uint16_t>(result));
+        return CHIP_ERROR_INTERNAL;
     }
 
+    // TODO: Validate Certification Declaration
+    // TODO: Validate Firmware Information
+
     return CHIP_NO_ERROR;
+}
+
+void DeviceCommissioner::HandleAttestationResult(CHIP_ERROR err)
+{
+    // Here we assume the Attestation Information validation always succeeds.
+    // Spec mandates that commissioning shall continue despite attestation fails (in some cases).
+    // TODO: Handle failure scenarios where commissioning may progress regardless.
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturn(mState == State::Initialized);
+        VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices);
+
+        Device * device = &mActiveDevices[mDeviceBeingPaired];
+
+        ChipLogProgress(Controller, "Sending 'CSR request' command to the device.");
+        CHIP_ERROR error = SendOperationalCertificateSigningRequestCommand(device);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed in sending 'CSR request' command to the device: err %s", ErrorStr(error));
+            OnSessionEstablishmentError(error);
+            return;
+        }
+    }
+    else
+    {
+        // Handle error, and notify session failure to the commissioner application.
+        ChipLogError(Controller, "Failed to validate the Attestation Information");
+        // TODO: Map error status to correct error code
+        OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
+    }
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(Device * device)
@@ -1895,7 +1915,7 @@ void BasicSuccess(void * context, uint16_t val)
 
 void BasicFailure(void * context, uint8_t status)
 {
-    ChipLogProgress(Controller, "Received failure response %d\n", (int) status);
+    ChipLogProgress(Controller, "Received failure response %d\n", (int)status);
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->OnSessionEstablishmentError(static_cast<CHIP_ERROR>(status));
 }
@@ -1961,6 +1981,8 @@ CommissioningStage DeviceCommissioner::GetNextCommissioningStage()
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
+        return CommissioningStage::kDeviceAttestation;
+    case CommissioningStage::kDeviceAttestation:
         return CommissioningStage::kCheckCertificates;
     case CommissioningStage::kCheckCertificates:
         return CommissioningStage::kNetworkEnable; // TODO : for softAP, this needs to be network setup
@@ -2071,6 +2093,17 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         genCom.Associate(device, 0);
         genCom.SetRegulatoryConfig(mSuccess.Cancel(), mFailure.Cancel(), static_cast<uint8_t>(regulatoryLocation), countryCode,
                                    breadcrumb, kCommandTimeoutMs);
+    }
+    break;
+    case CommissioningStage::kDeviceAttestation: {
+        ChipLogProgress(Controller, "Exchanging vendor certificates");
+        CHIP_ERROR status = SendCertificateChainRequestCommand(device, CertificateType::kPAI);
+        if (status != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed in sending 'Certificate Chain Request' command to the device: err %s", ErrorStr(err));
+            OnSessionEstablishmentError(err);
+            return;
+        }
     }
     break;
     case CommissioningStage::kCheckCertificates: {

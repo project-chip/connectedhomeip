@@ -648,7 +648,7 @@ CHIP_ERROR Device::SetDAC(const ByteSpan & dac)
         return CHIP_NO_ERROR;
     }
 
-    VerifyOrReturnError(dac.size() <= Crypto::kMax_x509_Certificate_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(dac.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
     if (mDACLen != 0)
     {
         ReleaseDAC();
@@ -684,7 +684,7 @@ CHIP_ERROR Device::SetPAI(const chip::ByteSpan & pai)
         return CHIP_NO_ERROR;
     }
 
-    VerifyOrReturnError(pai.size() <= Crypto::kMax_x509_Certificate_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(pai.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
     if (mPAILen != 0)
     {
         ReleasePAI();

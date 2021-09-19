@@ -35,6 +35,7 @@
 #include <controller/DeviceControllerInteractionModelDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
+#include <credentials/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPTLV.h>
@@ -118,6 +119,7 @@ enum CommissioningStage : uint8_t
     // kConfigTimeZone,  // NOT YET IMPLEMENTED
     // kConfigDST,  // NOT YET IMPLEMENTED
     kConfigRegulatory,
+    kDeviceAttestation,
     kCheckCertificates,
     kConfigACL,
     kNetworkSetup,
@@ -572,14 +574,7 @@ private:
        If no device is currently being paired, this value will be kNumMaxPairedDevices.  */
     uint16_t mDeviceBeingPaired;
 
-    enum CertificateChainType : uint16_t
-    {
-        kUnknown = 0,
-        kDAC     = 1,
-        kPAI     = 2,
-    };
-
-    CertificateChainType mCertificateChainBeingRequested = CertificateChainType::kUnknown;
+    Credentials::CertificateType mCertificateTypeBeingRequested = Credentials::CertificateType::kUnknown;
 
     /* TODO: BLE rendezvous and IP rendezvous should share the same procedure, so this is just a
        workaround-like flag and should be removed in the future.
@@ -614,11 +609,11 @@ private:
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendCertificateChainRequestCommand(Device * device, CertificateChainType certificateChainType);
-    /* This function sends a Device Attestation Certificate chain request to the device.
+    CHIP_ERROR SendCertificateChainRequestCommand(Device * device, Credentials::CertificateType certificateType);
+    /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendAttestationRequestCommand(Device * device);
+    CHIP_ERROR SendAttestationRequestCommand(Device * device, const ByteSpan & attestationNonce);
     /* This function sends an OpCSR request to the device.
        The function does not hold a refernce to the device object.
      */
@@ -641,7 +636,7 @@ private:
     /* Callback when the previously sent CSR request results in failure */
     static void OnCSRFailureResponse(void * context, uint8_t status);
 
-    static void OnCertChainFailureResponse(void * context, uint8_t status);
+    static void OnCertificateChainFailureResponse(void * context, uint8_t status);
     static void OnCertificateChainResponse(void * context, ByteSpan certificate);
 
     static void OnAttestationFailureResponse(void * context, uint8_t status);
@@ -684,9 +679,22 @@ private:
      */
     CHIP_ERROR ProcessOpCSR(const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature);
 
+    /**
+     * @brief
+     *   This function processes the DAC or PAI certificate sent by the device.
+     */
     CHIP_ERROR ProcessCertificateChain(const ByteSpan & certificate);
 
-    CHIP_ERROR ValidateAttestationInfo(chip::ByteSpan attestationElements, chip::ByteSpan signature);
+    /**
+     * @brief
+     *   This function validates the Attestation Information sent by the device.
+     *
+     * @param[in] attestationElements Attestation Elements TLV.
+     * @param[in] signature           Attestation signature generated for all the above fields + Attestation Challenge.
+     */
+    CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature);
+
+    void HandleAttestationResult(CHIP_ERROR err);
 
     // Cluster callbacks for advancing commissioning flows
     Callback::Callback<BasicSuccessCallback> mSuccess;
@@ -695,12 +703,12 @@ private:
     CommissioningStage GetNextCommissioningStage();
     static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
-    Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback> mCertChainResponseCallback;
+    Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback> mCertificateChainResponseCallback;
     Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> mAttestationResponseCallback;
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
     Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
     Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
-    Callback::Callback<DefaultFailureCallback> mOnCertChainFailureCallback;
+    Callback::Callback<DefaultFailureCallback> mOnCertificateChainFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnAttestationFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
