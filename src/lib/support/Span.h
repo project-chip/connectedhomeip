@@ -46,6 +46,14 @@ public:
     constexpr explicit Span(T (&databuf)[N]) : Span(databuf, N)
     {}
 
+    template <size_t N>
+    constexpr Span & operator=(T (&databuf)[N])
+    {
+        mDataBuf = databuf;
+        mDataLen = N;
+        return (*this);
+    }
+
     // Allow implicit construction from a Span over a type that matches our
     // type, up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>

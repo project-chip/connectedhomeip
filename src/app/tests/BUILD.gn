@@ -27,6 +27,7 @@ chip_test_suite("tests") {
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
+    "TestDataModelSerialization.cpp",
     "TestEventLogging.cpp",
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
@@ -41,6 +42,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging/tests:helpers",
