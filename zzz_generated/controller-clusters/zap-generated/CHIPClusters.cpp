@@ -8550,8 +8550,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR OperationalCredentialsCluster::CertChainRequest(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t certChainType)
+CHIP_ERROR OperationalCredentialsCluster::CertificateChainRequest(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint8_t certificateType)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -8565,7 +8565,7 @@ CHIP_ERROR OperationalCredentialsCluster::CertChainRequest(Callback::Cancelable 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OperationalCredentials::Commands::Ids::CertChainRequest,
+                                         OperationalCredentials::Commands::Ids::CertificateChainRequest,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
@@ -8573,8 +8573,8 @@ CHIP_ERROR OperationalCredentialsCluster::CertChainRequest(Callback::Cancelable 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // certChainType: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), certChainType));
+    // certificateType: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), certificateType));
 
     SuccessOrExit(err = sender->FinishCommand());
 

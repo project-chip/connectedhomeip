@@ -931,7 +931,8 @@ void CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge::OnSucce
     });
 };
 
-void CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge::OnSuccessFn(void * context, chip::ByteSpan Certificate)
+void CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge::OnSuccessFn(
+    void * context, chip::ByteSpan Certificate)
 {
     DispatchSuccess(context, @ {
         @"Certificate" : [NSData dataWithBytes:Certificate.data() length:Certificate.size()],

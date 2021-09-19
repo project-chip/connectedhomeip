@@ -3908,8 +3908,9 @@ public class ChipClusters {
       attestationRequest(chipClusterPtr, callback, attestationNonce);
     }
 
-    public void certChainRequest(CertChainResponseCallback callback, int certChainType) {
-      certChainRequest(chipClusterPtr, callback, certChainType);
+    public void certificateChainRequest(
+        CertificateChainResponseCallback callback, int certificateType) {
+      certificateChainRequest(chipClusterPtr, callback, certificateType);
     }
 
     public void opCSRRequest(OpCSRResponseCallback callback, byte[] cSRNonce) {
@@ -3948,8 +3949,8 @@ public class ChipClusters {
     private native void attestationRequest(
         long chipClusterPtr, AttestationResponseCallback callback, byte[] attestationNonce);
 
-    private native void certChainRequest(
-        long chipClusterPtr, CertChainResponseCallback callback, int certChainType);
+    private native void certificateChainRequest(
+        long chipClusterPtr, CertificateChainResponseCallback callback, int certificateType);
 
     private native void opCSRRequest(
         long chipClusterPtr, OpCSRResponseCallback callback, byte[] cSRNonce);
@@ -3972,7 +3973,7 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface CertChainResponseCallback {
+    public interface CertificateChainResponseCallback {
       void onSuccess(byte[] Certificate);
 
       void onError(Exception error);

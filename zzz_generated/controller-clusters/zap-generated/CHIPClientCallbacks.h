@@ -116,7 +116,7 @@ typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(void 
                                                                            chip::ByteSpan metadataForRequestor);
 typedef void (*OperationalCredentialsClusterAttestationResponseCallback)(void * context, chip::ByteSpan AttestationElements,
                                                                          chip::ByteSpan Signature);
-typedef void (*OperationalCredentialsClusterCertChainResponseCallback)(void * context, chip::ByteSpan Certificate);
+typedef void (*OperationalCredentialsClusterCertificateChainResponseCallback)(void * context, chip::ByteSpan Certificate);
 typedef void (*OperationalCredentialsClusterNOCResponseCallback)(void * context, uint8_t StatusCode, uint8_t FabricIndex,
                                                                  chip::ByteSpan DebugText);
 typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan NOCSRElements,

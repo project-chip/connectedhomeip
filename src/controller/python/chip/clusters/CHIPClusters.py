@@ -2285,9 +2285,9 @@ class ChipClusters:
                 },
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "CertChainRequest",
+                    "commandName": "CertificateChainRequest",
                     "args": {
-                        "certChainType": "int",
+                        "certificateType": "int",
                     },
                 },
             0x00000004: {
@@ -4264,9 +4264,9 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AttestationRequest(
                 device, ZCLendpoint, ZCLgroupid, attestationNonce, len(attestationNonce)
         )
-    def ClusterOperationalCredentials_CommandCertChainRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, certChainType: int):
-        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_CertChainRequest(
-                device, ZCLendpoint, ZCLgroupid, certChainType
+    def ClusterOperationalCredentials_CommandCertificateChainRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, certificateType: int):
+        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_CertificateChainRequest(
+                device, ZCLendpoint, ZCLgroupid, certificateType
         )
     def ClusterOperationalCredentials_CommandOpCSRRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, cSRNonce: bytes):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(
@@ -6408,9 +6408,9 @@ class ChipClusters:
         # Cluster OperationalCredentials Command AttestationRequest
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AttestationRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AttestationRequest.restype = ctypes.c_uint32
-        # Cluster OperationalCredentials Command CertChainRequest
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_CertChainRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_CertChainRequest.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials Command CertificateChainRequest
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_CertificateChainRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_CertificateChainRequest.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command OpCSRRequest
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest.restype = ctypes.c_uint32

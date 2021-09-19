@@ -15764,15 +15764,17 @@ bool emberAfOperationalCredentialsClusterAttestationResponseCallback(chip::Endpo
                                                                      chip::app::CommandSender * commandObj,
                                                                      chip::ByteSpan AttestationElements, chip::ByteSpan Signature);
 /**
- * @brief  Cluster CertChainRequest Command callback (from client)
+ * @brief  Cluster CertificateChainRequest Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterCertChainRequestCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                                  uint16_t CertChainType);
+bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(chip::EndpointId endpoint,
+                                                                         chip::app::CommandHandler * commandObj,
+                                                                         uint8_t CertificateType);
 /**
- * @brief  Cluster CertChainResponse Command callback (from server)
+ * @brief  Cluster CertificateChainResponse Command callback (from server)
  */
-bool emberAfOperationalCredentialsClusterCertChainResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                   chip::ByteSpan Certificate);
+bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(chip::EndpointId endpoint,
+                                                                          chip::app::CommandSender * commandObj,
+                                                                          chip::ByteSpan Certificate);
 /**
  * @brief  Cluster OpCSRRequest Command callback (from client)
  */

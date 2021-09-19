@@ -2268,27 +2268,27 @@
                                                                                                                                    \
                                   ZCL_ATTESTATION_RESPONSE_COMMAND_ID, "uu", AttestationElements, Signature);
 
-/** @brief Command description for CertChainRequest
+/** @brief Command description for CertificateChainRequest
  *
- * Command: CertChainRequest
- * @param CertChainType INT16U
+ * Command: CertificateChainRequest
+ * @param CertificateType INT8U
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterCertChainRequest(CertChainType)                                                                              \
+    CredentialsClusterCertificateChainRequest(CertificateType)                                                                     \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_CERT_CHAIN_REQUEST_COMMAND_ID, "u", CertChainType);
+                                  ZCL_CERTIFICATE_CHAIN_REQUEST_COMMAND_ID, "u", CertificateType);
 
-/** @brief Command description for CertChainResponse
+/** @brief Command description for CertificateChainResponse
  *
- * Command: CertChainResponse
+ * Command: CertificateChainResponse
  * @param Certificate OCTET_STRING
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterCertChainResponse(Certificate)                                                                               \
+    CredentialsClusterCertificateChainResponse(Certificate)                                                                        \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_CERT_CHAIN_RESPONSE_COMMAND_ID, "u", Certificate);
+                                  ZCL_CERTIFICATE_CHAIN_RESPONSE_COMMAND_ID, "u", Certificate);
 
 /** @brief Command description for OpCSRRequest
  *

@@ -2489,16 +2489,16 @@ bool emberAfOperationalCredentialsClusterAttestationResponseCallback(EndpointId 
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterCertChainResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                   chip::ByteSpan Certificate)
+bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                                          chip::ByteSpan Certificate)
 {
-    ChipLogProgress(Zcl, "CertChainResponse:");
+    ChipLogProgress(Zcl, "CertificateChainResponse:");
     ChipLogProgress(Zcl, "  Certificate: %zu", Certificate.size());
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterCertChainResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterCertificateChainResponseCallback");
 
-    Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback> * cb =
-        Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, Certificate);
     return true;
 }

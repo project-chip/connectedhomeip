@@ -3970,14 +3970,13 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_Attes
     cluster.Associate(device, ZCLendpointId);
     return cluster.AttestationRequest(nullptr, nullptr, chip::ByteSpan(attestationNonce, attestationNonce_Len)).AsInteger();
 }
-chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_CertChainRequest(chip::Controller::Device * device,
-                                                                                            chip::EndpointId ZCLendpointId,
-                                                                                            chip::GroupId, uint16_t certChainType)
+chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_CertificateChainRequest(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint8_t certificateType)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.CertChainRequest(nullptr, nullptr, certChainType).AsInteger();
+    return cluster.CertificateChainRequest(nullptr, nullptr, certificateType).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(chip::Controller::Device * device,
                                                                                         chip::EndpointId ZCLendpointId,

@@ -617,9 +617,9 @@ static void OnOperationalCredentialsClusterAttestationResponse(void * context, c
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnOperationalCredentialsClusterCertChainResponse(void * context, chip::ByteSpan Certificate)
+static void OnOperationalCredentialsClusterCertificateChainResponse(void * context, chip::ByteSpan Certificate)
 {
-    ChipLogProgress(chipTool, "OperationalCredentialsClusterCertChainResponse");
+    ChipLogProgress(chipTool, "OperationalCredentialsClusterCertificateChainResponse");
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
@@ -15001,7 +15001,7 @@ private:
 | * AddNOC                                                            |   0x06 |
 | * AddTrustedRootCertificate                                         |   0x0B |
 | * AttestationRequest                                                |   0x00 |
-| * CertChainRequest                                                  |   0x02 |
+| * CertificateChainRequest                                           |   0x02 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveFabric                                                      |   0x0A |
 | * RemoveTrustedRootCertificate                                      |   0x0C |
@@ -15129,17 +15129,17 @@ private:
 };
 
 /*
- * Command CertChainRequest
+ * Command CertificateChainRequest
  */
-class OperationalCredentialsCertChainRequest : public ModelCommand
+class OperationalCredentialsCertificateChainRequest : public ModelCommand
 {
 public:
-    OperationalCredentialsCertChainRequest() : ModelCommand("cert-chain-request")
+    OperationalCredentialsCertificateChainRequest() : ModelCommand("certificate-chain-request")
     {
-        AddArgument("CertChainType", 0, UINT16_MAX, &mCertChainType);
+        AddArgument("CertificateType", 0, UINT8_MAX, &mCertificateType);
         ModelCommand::AddArguments();
     }
-    ~OperationalCredentialsCertChainRequest()
+    ~OperationalCredentialsCertificateChainRequest()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -15151,16 +15151,16 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.CertChainRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mCertChainType);
+        return cluster.CertificateChainRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mCertificateType);
     }
 
 private:
-    chip::Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback>(
-            OnOperationalCredentialsClusterCertChainResponse, this);
+    chip::Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback>(
+            OnOperationalCredentialsClusterCertificateChainResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint16_t mCertChainType;
+    uint8_t mCertificateType;
 };
 
 /*
@@ -25652,7 +25652,7 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<OperationalCredentialsAddNOC>(),                       //
         make_unique<OperationalCredentialsAddTrustedRootCertificate>(),    //
         make_unique<OperationalCredentialsAttestationRequest>(),           //
-        make_unique<OperationalCredentialsCertChainRequest>(),             //
+        make_unique<OperationalCredentialsCertificateChainRequest>(),      //
         make_unique<OperationalCredentialsOpCSRRequest>(),                 //
         make_unique<OperationalCredentialsRemoveFabric>(),                 //
         make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(), //

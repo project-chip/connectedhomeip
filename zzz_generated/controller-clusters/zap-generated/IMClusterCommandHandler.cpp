@@ -4219,7 +4219,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::CertChainResponse: {
+        case Clusters::OperationalCredentials::Commands::Ids::CertificateChainResponse: {
             expectArgumentCount = 1;
             chip::ByteSpan Certificate;
             bool argExists[1];
@@ -4273,7 +4273,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterCertChainResponseCallback(aEndpointId, apCommandObj, Certificate);
+                wasHandled =
+                    emberAfOperationalCredentialsClusterCertificateChainResponseCallback(aEndpointId, apCommandObj, Certificate);
             }
             break;
         }

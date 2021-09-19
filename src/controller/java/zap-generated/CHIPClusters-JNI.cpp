@@ -4942,12 +4942,12 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPOperationalCredentialsClusterCertChainResponseCallback
-    : public Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback>
+class CHIPOperationalCredentialsClusterCertificateChainResponseCallback
+    : public Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback>
 {
 public:
-    CHIPOperationalCredentialsClusterCertChainResponseCallback(jobject javaCallback) :
-        Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback>(CallbackFn, this)
+    CHIPOperationalCredentialsClusterCertificateChainResponseCallback(jobject javaCallback) :
+        Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback>(CallbackFn, this)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -4962,7 +4962,7 @@ public:
             ChipLogError(Zcl, "Could not create global reference for Java callback");
         }
     }
-    ~CHIPOperationalCredentialsClusterCertChainResponseCallback()
+    ~CHIPOperationalCredentialsClusterCertificateChainResponseCallback()
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -4980,12 +4980,12 @@ public:
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
         jmethodID javaMethod;
-        CHIPOperationalCredentialsClusterCertChainResponseCallback * cppCallback = nullptr;
+        CHIPOperationalCredentialsClusterCertificateChainResponseCallback * cppCallback = nullptr;
         jbyteArray CertificateArr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
-        cppCallback = reinterpret_cast<CHIPOperationalCredentialsClusterCertChainResponseCallback *>(context);
+        cppCallback = reinterpret_cast<CHIPOperationalCredentialsClusterCertificateChainResponseCallback *>(context);
         VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
 
         javaCallbackRef = cppCallback->javaCallbackRef;
@@ -21937,25 +21937,25 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
-JNI_METHOD(void, OperationalCredentialsCluster, certChainRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint certChainType)
+JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint certificateType)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
-    CHIPOperationalCredentialsClusterCertChainResponseCallback * onSuccess;
+    CHIPOperationalCredentialsClusterCertificateChainResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
     cppCluster = reinterpret_cast<OperationalCredentialsCluster *>(clusterPtr);
     VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    onSuccess = new CHIPOperationalCredentialsClusterCertChainResponseCallback(callback);
+    onSuccess = new CHIPOperationalCredentialsClusterCertificateChainResponseCallback(callback);
     VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->CertChainRequest(onSuccess->Cancel(), onFailure->Cancel(), certChainType);
+    err = cppCluster->CertificateChainRequest(onSuccess->Cancel(), onFailure->Cancel(), certificateType);
     SuccessOrExit(err);
 
 exit:

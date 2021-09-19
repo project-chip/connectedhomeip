@@ -3203,11 +3203,11 @@ using chip::Callback::Cancelable;
         });
 }
 
-- (void)certChainRequest:(uint16_t)certChainType responseHandler:(ResponseHandler)responseHandler
+- (void)certificateChainRequest:(uint8_t)certificateType responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge(
+    new CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.CertChainRequest(success, failure, certChainType);
+            return self.cppCluster.CertificateChainRequest(success, failure, certificateType);
         });
 }
 

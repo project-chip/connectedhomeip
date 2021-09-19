@@ -3489,9 +3489,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::CertChainRequest: {
+        case Clusters::OperationalCredentials::Commands::Ids::CertificateChainRequest: {
             expectArgumentCount = 1;
-            uint16_t CertChainType;
+            uint8_t CertificateType;
             bool argExists[1];
 
             memset(argExists, 0, sizeof argExists);
@@ -3522,7 +3522,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(CertChainType);
+                    TLVUnpackError = aDataTlv.Get(CertificateType);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -3543,7 +3543,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterCertChainRequestCallback(aEndpointId, apCommandObj, CertChainType);
+                wasHandled =
+                    emberAfOperationalCredentialsClusterCertificateChainRequestCallback(aEndpointId, apCommandObj, CertificateType);
             }
             break;
         }
