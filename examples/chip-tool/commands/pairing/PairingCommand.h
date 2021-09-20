@@ -55,7 +55,8 @@ class PairingCommand : public Command,
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType) :
-        Command(commandName), mPairingMode(mode), mNetworkType(networkType), mRemoteAddr{ IPAddress::Any, INET_NULL_INTERFACEID }
+        Command(commandName), mPairingMode(mode), mNetworkType(networkType), mRemoteAddr{ IPAddress::Any, INET_NULL_INTERFACEID },
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
         switch (networkType)
         {
@@ -139,8 +140,7 @@ private:
     CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
     CHIP_ERROR PairWithoutSecurity(NodeId remoteId, PeerAddress address);
     CHIP_ERROR Unpair(NodeId remoteId);
-    CHIP_ERROR OpenCommissioningWindow(NodeId remoteId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
-                                       uint8_t option);
+    CHIP_ERROR OpenCommissioningWindow();
 
     void InitCallbacks();
     CHIP_ERROR SetupNetwork();
@@ -177,4 +177,10 @@ private:
     chip::Controller::NetworkCommissioningCluster mCluster;
     chip::EndpointId mEndpointId = 0;
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
+
+    static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
+    static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+
+    chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 };
