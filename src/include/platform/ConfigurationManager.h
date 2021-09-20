@@ -69,6 +69,7 @@ public:
     CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize);
     CHIP_ERROR GetProductRevision(uint16_t & productRev);
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen);
+    CHIP_ERROR GetPrimaryMACAddress(uint8_t (&buf)[8]);
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf);
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
@@ -263,6 +264,11 @@ inline CHIP_ERROR ConfigurationManager::GetProductRevision(uint16_t & productRev
 inline CHIP_ERROR ConfigurationManager::GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)
 {
     return static_cast<ImplClass *>(this)->_GetSerialNumber(buf, bufSize, serialNumLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetPrimaryMACAddress(uint8_t (&buf)[8])
+{
+    return static_cast<ImplClass *>(this)->_GetPrimaryMACAddress(buf);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetPrimaryWiFiMACAddress(uint8_t * buf)

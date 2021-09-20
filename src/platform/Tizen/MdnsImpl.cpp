@@ -28,6 +28,7 @@ namespace Mdns {
 
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback successCallback, MdnsAsyncReturnCallback errorCallback, void * context)
 {
+    successCallback(context, CHIP_ERROR_NOT_IMPLEMENTED);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
