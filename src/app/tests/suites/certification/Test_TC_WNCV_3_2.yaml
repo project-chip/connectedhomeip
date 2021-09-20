@@ -52,10 +52,6 @@ tests:
     ### MANDATORY Command
     - label: "2a: TH sends DownOrClose command to DUT"
       command: "DownOrClose"
-      response:
-          values:
-              - name: "returnValue"
-                value: 0
 
     ### Depends on the FeatureMap
     - label:

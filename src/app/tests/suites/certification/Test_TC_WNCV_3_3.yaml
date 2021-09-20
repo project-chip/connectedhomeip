@@ -34,9 +34,6 @@ tests:
     ### MANDATORY Command
     - label: "2a: TH sends StopMotion command to DUT"
       command: "StopMotion"
-      response:
-          values:
-              - name: "returnValue"
 
     ### MANDATORY reads
     - label: "2b: TH reads OperationalStatus attribute from DUT"
