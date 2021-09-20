@@ -29,7 +29,6 @@ tests:
     - label:
           "write the default values to mandatory global attribute:
           ClusterRevision"
-      disabled: true
       command: "writeAttribute"
       attribute: "ClusterRevision"
       arguments:
@@ -38,8 +37,8 @@ tests:
           error: 1
 
     - label: "reads back global attribute: ClusterRevision"
-      command: "readAttribute"
       disabled: true
+      command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           value: 2
