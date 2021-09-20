@@ -49,7 +49,6 @@ CHIP_ERROR DiscoveryImplPlatform::Init()
     {
         ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
         mCommissionInstanceName = GetRandU64();
-        mMdnsInitialized        = true;
     }
 
     return CHIP_NO_ERROR;
@@ -57,16 +56,7 @@ CHIP_ERROR DiscoveryImplPlatform::Init()
 
 CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t port)
 {
-    ReturnErrorOnFailure(Init());
-
-    CHIP_ERROR error = ChipMdnsStopPublish();
-
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to initialize platform mdns: %s", ErrorStr(error));
-    }
-
-    return error;
+    return Init();
 }
 
 void DiscoveryImplPlatform::HandleMdnsInit(void * context, CHIP_ERROR initError)
@@ -76,6 +66,18 @@ void DiscoveryImplPlatform::HandleMdnsInit(void * context, CHIP_ERROR initError)
     if (initError == CHIP_NO_ERROR)
     {
         publisher->mMdnsInitialized = true;
+
+#if !CHIP_DEVICE_LAYER_NONE
+        // Post an event that will start advertising
+        chip::DeviceLayer::ChipDeviceEvent event;
+        event.Type = chip::DeviceLayer::DeviceEventType::kMdnsPlatformInitialized;
+
+        CHIP_ERROR error = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Posting mDNS platform initialized event failed with %s", chip::ErrorStr(error));
+        }
+#endif
     }
     else
     {

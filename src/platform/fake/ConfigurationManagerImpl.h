@@ -49,6 +49,7 @@ private:
     }
     CHIP_ERROR _GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreSerialNumber(const char * serialNum, size_t serialNumLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _GetPrimaryMACAddress(uint8_t (&buf)[8]) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StorePrimaryWiFiMACAddress(const uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf) { return CHIP_ERROR_NOT_IMPLEMENTED; }

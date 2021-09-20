@@ -28,8 +28,14 @@ namespace Mdns {
 
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
 {
-    // Intentionally empty
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(ThreadStackMgr().SetSrpDnsCallbacks(initCallback, errorCallback, context));
+
+    uint8_t mac[8];
+    char hostname[kMdnsHostNameMaxSize + 1] = "";
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac));
+    MakeHostName(hostname, sizeof(hostname), chip::ByteSpan(mac, 8));
+
+    return ThreadStackMgr().ClearSrpHost(hostname);
 }
 
 CHIP_ERROR ChipMdnsShutdown()
