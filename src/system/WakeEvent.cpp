@@ -64,13 +64,13 @@ CHIP_ERROR WakeEvent::Open(LayerSockets & systemLayer)
     int fds[2];
 
     if (::pipe(fds) < 0)
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
 
     if (SetNonBlockingMode(fds[FD_READ]) < 0)
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
 
     if (SetNonBlockingMode(fds[FD_WRITE]) < 0)
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
 
     mReadFD  = fds[FD_READ];
     mWriteFD = fds[FD_WRITE];
@@ -101,7 +101,7 @@ void WakeEvent::Confirm()
         res = ::read(mReadFD, buffer, sizeof(buffer));
         if (res < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
         {
-            ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(chip::System::MapErrorPOSIX(errno)));
+            ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(CHIP_ERROR_POSIX(errno)));
             return;
         }
     } while (res == sizeof(buffer));
@@ -113,7 +113,7 @@ CHIP_ERROR WakeEvent::Notify()
 
     if (::write(mWriteFD, &byte, 1) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
 
     return CHIP_NO_ERROR;
@@ -126,7 +126,7 @@ CHIP_ERROR WakeEvent::Open(LayerSockets & systemLayer)
     mReadFD = ::eventfd(0, 0);
     if (mReadFD == -1)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
 
     ReturnErrorOnFailure(systemLayer.StartWatchingSocket(mReadFD, &mReadWatch));
@@ -149,7 +149,7 @@ void WakeEvent::Confirm()
 
     if (::read(mReadFD, &value, sizeof(value)) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
-        ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(chip::System::MapErrorPOSIX(errno)));
+        ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(CHIP_ERROR_POSIX(errno)));
     }
 }
 
@@ -159,7 +159,7 @@ CHIP_ERROR WakeEvent::Notify()
 
     if (::write(mReadFD, &value, sizeof(value)) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
 
     return CHIP_NO_ERROR;

@@ -179,7 +179,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     // Create and start the IO thread.
     sShutdown  = false;
     pthreadErr = pthread_create(&sIOThread, NULL, IOThreadMain, NULL);
-    VerifyOrExit(pthreadErr == 0, err = System::MapErrorPOSIX(pthreadErr));
+    VerifyOrExit(pthreadErr == 0, err = CHIP_ERROR_POSIX(pthreadErr));
 
 exit:
     if (err != CHIP_NO_ERROR)

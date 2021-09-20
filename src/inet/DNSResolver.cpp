@@ -477,7 +477,7 @@ CHIP_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
             err = INET_ERROR_DNS_TRY_AGAIN;
             break;
         case EAI_SYSTEM:
-            err = chip::System::MapErrorPOSIX(errno);
+            err = CHIP_ERROR_POSIX(errno);
             break;
         default:
             err = INET_ERROR_DNS_NO_RECOVERY;
