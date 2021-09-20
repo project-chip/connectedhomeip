@@ -35,6 +35,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/PASEUtils.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"
@@ -289,6 +290,12 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
+        if (getInstance()->pFlags.Has(getInstance()->PASEFlags::kPASESessionFailed))
+        {
+            CloseConnection(event->CHIPoBLEWriteReceived.ConId);
+            getInstance()->pFlags.Set(getInstance()->PASEFlags::kPASESessionNone);
+            getInstance()->pFlags.Clear(getInstance()->PASEFlags::kPASESessionFailed);
+        }
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
                             PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
         break;

@@ -46,6 +46,7 @@
 #include <setup_payload/SetupPayload.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
+#include <platform/PASEUpdates.h>
 
 namespace chip {
 
@@ -892,6 +893,7 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
         break;
 
     case MsgType::PASE_Pake1:
+        getInstance()->pFlags.Set(getInstance()->PASEFlags::kPASESessionEnabled);
         err = HandleMsg1_and_SendMsg2(std::move(msg));
         break;
 
@@ -922,6 +924,8 @@ exit:
         mExchangeCtxt = nullptr;
         Clear();
         ChipLogError(SecureChannel, "Failed during PASE session setup. %s", ErrorStr(err));
+        getInstance()->pFlags.Set(getInstance()->PASEFlags::kPASESessionFailed);
+        getInstance()->pFlags.Clear(getInstance()->PASEFlags::kPASESessionEnabled);
         mDelegate->OnSessionEstablishmentError(err);
     }
     return err;

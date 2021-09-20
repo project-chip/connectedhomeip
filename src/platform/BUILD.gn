@@ -274,6 +274,7 @@ if (chip_device_platform != "none") {
       "LwIPEventSupport.cpp",
       "PersistedStorage.cpp",
       "TestIdentity.cpp",
+      "PASEUtils.cpp"
     ]
 
     cflags = [ "-Wconversion" ]
