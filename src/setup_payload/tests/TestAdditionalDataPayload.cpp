@@ -47,8 +47,10 @@ constexpr char kAdditionalDataPayloadWithoutRotatingDeviceId[]           = "1518
 constexpr char kAdditionalDataPayloadWithRotatingDeviceId[]              = "153000120A001998AB7130E38B7E9A401CFE9F7B79AF18";
 constexpr char kAdditionalDataPayloadWithInvalidRotatingDeviceIdLength[] = "153000FF0A001998AB7130E38B7E9A401CFE9F7B79AF18";
 constexpr char kAdditionalDataPayloadWithLongRotatingDeviceId[]          = "153000130A00191998AB7130E38B7E9A401CFE9F7B79AF18";
+constexpr char kAdditionalDataPayloadWithShortRotatingDeviceId[]         = "153000110A001998AB7130E38B7E9A401CFE9F7B7918";
 constexpr char kAdditionalDataPayloadWithRotatingDeviceIdAndMaxLifetimeCounter[] = "15300012FFFFFC1670A9F9666D1C4587FCBC4811549018";
 constexpr char kRotatingDeviceId[]                                               = "0A001998AB7130E38B7E9A401CFE9F7B79AF";
+constexpr char kShortRotatingDeviceId[]                                          = "0A001998AB7130E38B7E9A401CFE9F7B79";
 constexpr uint16_t kLifetimeCounter                                              = 10;
 constexpr uint16_t kAdditionalDataPayloadLength                                  = 51;
 constexpr uint16_t kShortRotatingIdLength                                        = 5;
@@ -221,6 +223,16 @@ void TestParsingAdditionalDataPayloadWithLongRotatingDeviceId(nlTestSuite * inSu
                                               resultPayload) == CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
+void TestParsingAdditionalDataPayloadWithShortRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
+{
+    chip::SetupPayloadData::AdditionalDataPayload resultPayload;
+    NL_TEST_ASSERT(inSuite,
+                   ParseAdditionalDataPayload(kAdditionalDataPayloadWithShortRotatingDeviceId,
+                                              strlen(kAdditionalDataPayloadWithShortRotatingDeviceId),
+                                              resultPayload) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(resultPayload.rotatingDeviceId.c_str(), kShortRotatingDeviceId) == 0);
+}
+
 /**
  *  Test Suite that lists all the Test functions.
  */
@@ -238,6 +250,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test Parsing Additional Data Payload without Rotating Device Id", TestParsingAdditionalDataPayloadWithoutRotatingDeviceId),
     NL_TEST_DEF("Test Parsing Additional Data Payload with Invalid Rotating Device Id Length", TestParsingAdditionalDataPayloadWithInvalidRotatingDeviceIdLength),
     NL_TEST_DEF("Test Parsing Additional Data Payload with Long Rotating Device Id", TestParsingAdditionalDataPayloadWithLongRotatingDeviceId),
+    NL_TEST_DEF("Test Parsing Additional Data Payload with Short Rotating Device Id", TestParsingAdditionalDataPayloadWithShortRotatingDeviceId),
     NL_TEST_SENTINEL()
 };
 // clang-format on
