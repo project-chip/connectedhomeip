@@ -20232,13 +20232,14 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterWindowCoveringCommandDownOrClose_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandDownOrClose_0()
     {
         ChipLogProgress(chipTool, "Window Covering - 1a: TH adjusts the the DUT to a non-open position: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20288,13 +20289,14 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterWindowCoveringCommandUpOrOpen_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandUpOrOpen_1()
     {
         ChipLogProgress(chipTool, "Window Covering - 2a: TH sends UpOrOpen command to DUT: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20344,13 +20346,14 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterWindowCoveringCommandReadAttribute_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_2()
     {
         ChipLogProgress(chipTool, "Window Covering - 3a: TH reads OperationalStatus attribute from DUT: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20456,13 +20459,14 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterWindowCoveringCommandUpOrOpen_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandUpOrOpen_0()
     {
         ChipLogProgress(chipTool, "Window Covering - 1a: TH adjusts the the DUT to a non-closed position: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20512,13 +20516,14 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterWindowCoveringCommandDownOrClose_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandDownOrClose_1()
     {
         ChipLogProgress(chipTool, "Window Covering - 2a: TH sends DownOrClose command to DUT: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20568,13 +20573,14 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterWindowCoveringCommandReadAttribute_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_2()
     {
         ChipLogProgress(chipTool, "Window Covering - 3a: TH reads OperationalStatus attribute from DUT: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20680,13 +20686,14 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
         OnTestSendClusterWindowCoveringCommandUpOrOpen_0_FailureResponse, this
     };
+
     bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandUpOrOpen_0()
     {
         ChipLogProgress(chipTool, "Window Covering - 1a: TH adjusts the the DUT to a non-open position: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20736,13 +20743,14 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
         OnTestSendClusterWindowCoveringCommandStopMotion_1_FailureResponse, this
     };
+
     bool mIsFailureExpected_1 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandStopMotion_1()
     {
         ChipLogProgress(chipTool, "Window Covering - 2a: TH sends StopMotion command to DUT: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20792,13 +20800,14 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
         OnTestSendClusterWindowCoveringCommandReadAttribute_2_FailureResponse, this
     };
+
     bool mIsFailureExpected_2 = 0;
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_2()
     {
         ChipLogProgress(chipTool, "Window Covering - 2b: TH reads OperationalStatus attribute from DUT: Sending command...");
 
-        chip::Controller::WindowCoveringCluster cluster;
+        chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
