@@ -23,6 +23,8 @@
 #include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPTLVTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -65,15 +67,56 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLV
 
 CHIP_ERROR ThreadDiagosticsAttrAccess::ReadIfSupported(chip::AttributeId attributeId, TLV::TLVWriter * aWriter)
 {
-    uint8_t * pData = nullptr;
+    uint8_t * pData;
     uint16_t dataLen;
+    TLVType valueType;
 
     // GetThreadNetworkDiagnosticAttributeInfo will alloc memory for the data returned.
-    CHIP_ERROR err = ThreadStackMgr().GetThreadNetworkDiagnosticAttributeInfo(attributeId, pData, dataLen);
+    CHIP_ERROR err = ThreadStackMgr().GetThreadNetworkDiagnosticAttributeInfo(attributeId, &pData, dataLen, valueType);
 
     if (err == CHIP_NO_ERROR)
     {
-        aWriter->PutBytes(TLV::ContextTag(AttributeDataElement::kCsTag_Data), pData, dataLen);
+        switch (valueType)
+        {
+        case kTLVType_UnsignedInteger: {
+            if (dataLen == sizeof(uint8_t))
+            {
+                aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), Encoding::Get8(pData));
+            }
+            else if (dataLen == sizeof(uint16_t))
+            {
+                aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::Encoding::LittleEndian::Get16(pData));
+            }
+            else if (dataLen == sizeof(uint32_t))
+            {
+                aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::Encoding::LittleEndian::Get32(pData));
+            }
+            else if (dataLen == sizeof(uint64_t))
+            {
+                aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::Encoding::LittleEndian::Get64(pData));
+            }
+            else
+            {
+                err = CHIP_ERROR_INVALID_INTEGER_VALUE;
+            }
+        }
+        break;
+
+        case kTLVType_UTF8String: {
+            aWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), reinterpret_cast<char *>(pData), dataLen);
+        }
+        break;
+
+        case kTLVType_ByteString: {
+            aWriter->PutBytes(TLV::ContextTag(AttributeDataElement::kCsTag_Data), pData, dataLen);
+        }
+        break;
+
+        default: {
+            err = CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+        break;
+        }
     }
 
     if (pData != nullptr)

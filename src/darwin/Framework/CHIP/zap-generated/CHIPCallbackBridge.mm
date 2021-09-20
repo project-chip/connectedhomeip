@@ -396,7 +396,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSu
     for (uint16_t i = 0; i < count; i++) {
         array[i] = @ {
             @"RotationTime" : [NSNumber numberWithUnsignedShort:entries[i].RotationTime],
-            @"Flags" : [NSNumber numberWithUnsignedChar:entries[i].Flags],
+            @"Flags" : [NSNumber numberWithUnsignedShort:entries[i].Flags],
         };
     }
 

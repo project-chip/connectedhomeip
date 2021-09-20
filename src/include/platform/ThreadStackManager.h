@@ -25,6 +25,7 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -108,7 +109,8 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
-    CHIP_ERROR GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t * buffer, uint16_t & ReadLength);
+    CHIP_ERROR GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength,
+                                                       chip::TLV::TLVType & type);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -372,10 +374,10 @@ inline CHIP_ERROR ThreadStackManager::JoinerStart()
 {
     return static_cast<ImplClass *>(this)->_JoinerStart();
 }
-inline CHIP_ERROR ThreadStackManager::GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t * buffer,
-                                                                              uint16_t & ReadLength)
+inline CHIP_ERROR ThreadStackManager::GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer,
+                                                                              uint16_t & ReadLength, chip::TLV::TLVType & type)
 {
-    return static_cast<ImplClass *>(this)->_GetThreadNetworkDiagnosticAttributeInfo(attributeId, buffer, ReadLength);
+    return static_cast<ImplClass *>(this)->_GetThreadNetworkDiagnosticAttributeInfo(attributeId, buffer, ReadLength, type);
 }
 
 } // namespace DeviceLayer

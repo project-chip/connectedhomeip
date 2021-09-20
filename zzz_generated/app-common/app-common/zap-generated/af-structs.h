@@ -388,7 +388,7 @@ typedef struct _ScheduledPhase
 typedef struct _SecurityPolicy
 {
     uint16_t RotationTime;
-    uint8_t Flags;
+    uint16_t Flags;
 } SecurityPolicy;
 
 // Struct for TestListStructOctet

@@ -806,655 +806,712 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadNetworkDiagnosticAttributeInfo(
-    chip::AttributeId attributeId, uint8_t * buffer, uint16_t & ReadLength)
+    chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength, chip::TLV::TLVType & type)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     switch (attributeId)
     {
     case ZCL_CHANNEL_ATTRIBUTE_ID: {
-        ReadLength = sizeof(uint8_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        type       = kTLVType_UnsignedInteger;
+        ReadLength = sizeof(uint16_t);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-        uint8_t channel = otLinkGetChannel(mOTInst);
-
-        ChipLogProgress(DeviceLayer, "Read Channel = %d", channel);
-        memcpy(buffer, &channel, ReadLength);
-        ChipLogProgress(DeviceLayer, "Copied value Channel = %d", *buffer);
+        uint16_t channel = static_cast<uint16_t>(otLinkGetChannel(mOTInst));
+        Encoding::LittleEndian::Put16(*buffer, channel);
     }
     break;
 
     case ZCL_ROUTING_ROLE_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(otDeviceRole);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         otDeviceRole role = otThreadGetDeviceRole(mOTInst);
-        ChipLogProgress(DeviceLayer, "Read role = %d", role);
-        memcpy(buffer, &role, ReadLength);
-        ChipLogProgress(DeviceLayer, "Copied Read role = %d", *buffer);
+        Encoding::LittleEndian::Put16(*buffer, role);
     }
     break;
 
     case ZCL_NETWORK_NAME_ATTRIBUTE_ID: {
+        type       = kTLVType_UTF8String;
         ReadLength = OT_NETWORK_NAME_MAX_SIZE + 1;
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         ChipLogProgress(DeviceLayer, "Read NetworkName= %s", otThreadGetNetworkName(mOTInst));
-        strncpy(reinterpret_cast<char *>(buffer), otThreadGetNetworkName(mOTInst), ReadLength);
-        ChipLogProgress(DeviceLayer, "Copied NetworkName= %s", buffer);
+        strncpy(reinterpret_cast<char *>(*buffer), otThreadGetNetworkName(mOTInst), ReadLength);
+        ChipLogProgress(DeviceLayer, "Copied NetworkName= %s", *buffer);
     }
     break;
 
     case ZCL_DIAG_PAN_ID_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(otPanId);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         otPanId panId = otLinkGetPanId(mOTInst);
-        memcpy(buffer, &panId, ReadLength);
+        Encoding::LittleEndian::Put16(*buffer, panId);
     }
     break;
 
     case ZCL_DIAG_EXTENDED_PAN_ID_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint64_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otExtendedPanId * pExtendedPanid = otThreadGetExtendedPanId(mOTInst);
-        // TODO check endianess
-        memcpy(buffer, pExtendedPanid->m8, ReadLength);
+        Encoding::LittleEndian::Put64(*buffer, Encoding::BigEndian::Get64(pExtendedPanid->m8));
     }
     break;
 
     case ZCL_MESH_LOCAL_PREFIX_ATTRIBUTE_ID: {
-        ReadLength = OT_EXT_PAN_ID_SIZE;
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        const uint8_t kOctStrPrefixLen = (OT_MESH_LOCAL_PREFIX_SIZE+1)*2+1; // For each hex character of Len + Prefix + NULL char
+        type       = kTLVType_ByteString;
+        ReadLength = kOctStrPrefixLen;
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMeshLocalPrefix * pMeshLocalPrefix = otThreadGetMeshLocalPrefix(mOTInst);
-        // TODO check prefix type
-        chip::Encoding::BytesToUppercaseHexString(pMeshLocalPrefix->m8, OT_EXT_PAN_ID_SIZE, reinterpret_cast<char *>(buffer),
+        uint8_t formattedIpv6Prefix[OT_MESH_LOCAL_PREFIX_SIZE+1] = {0};
+        formattedIpv6Prefix [0] = OT_IP6_PREFIX_BITSIZE;
+        memcpy(&formattedIpv6Prefix[1], pMeshLocalPrefix->m8, OT_MESH_LOCAL_PREFIX_SIZE);
+
+        chip::Encoding::BytesToUppercaseHexString(formattedIpv6Prefix, OT_MESH_LOCAL_PREFIX_SIZE+1, reinterpret_cast<char *>(*buffer),
                                                   ReadLength);
-        memcpy(buffer, pMeshLocalPrefix->m8, ReadLength);
     }
     break;
 
     case ZCL_DIAG_OVERRUN_COUNT_ATTRIBUTE_ID: {
-        // TODO
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        // TO DO
+        type = kTLVType_UnsignedInteger;
+        err  = CHIP_ERROR_NOT_IMPLEMENTED;
     }
     break;
 
     case ZCL_NEIGHBOR_TABLE_ATTRIBUTE_ID: {
-        ReadLength = sizeof(otNeighborInfo) * 20; // TODO
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        type = kTLVType_List;
+        // List not yet functionnal
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        // TO DO When list is functionnal.
+        // Determined limit of otNeighborInfo list
+        // ReadLength = sizeof(otNeighborInfo) * 20;
+        // *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        // VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-        otNeighborInfoIterator iterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
-        otNeighborInfo neighInfo;
+        // otNeighborInfoIterator iterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
+        // otNeighborInfo neighInfo;
 
-        uint16_t remainingSize = ReadLength;
-        uint16_t offset        = 0;
-        while (otThreadGetNextNeighborInfo(mOTInst, &iterator, &neighInfo) == OT_ERROR_NONE)
-        {
-            if (remainingSize < sizeof(otNeighborInfo))
-            {
-                break;
-            }
+        // uint16_t remainingSize = ReadLength;
+        // uint16_t offset        = 0;
+        // while (otThreadGetNextNeighborInfo(mOTInst, &iterator, &neighInfo) == OT_ERROR_NONE)
+        // {
+        //     if (remainingSize < sizeof(otNeighborInfo))
+        //     {
+        //         break;
+        //     }
 
-            memcpy(buffer + offset, &neighInfo, sizeof(otNeighborInfo));
-            remainingSize -= sizeof(otNeighborInfo);
-            offset += sizeof(otNeighborInfo);
-        }
+        //     memcpy(*buffer + offset, &neighInfo, sizeof(otNeighborInfo));
+        //     remainingSize -= sizeof(otNeighborInfo);
+        //     offset += sizeof(otNeighborInfo);
+        // }
     }
     break;
 
     case ZCL_ROUTE_TABLE_ATTRIBUTE_ID: {
-        // otNetworkDiagRouteData
-        // TODO
+        type = kTLVType_List;
+        // List not yet functionnal
         err = CHIP_ERROR_NOT_IMPLEMENTED;
     }
     break;
 
     case ZCL_PARTITION_ID_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-        uint32_t partitionId = otThreadGetPartitionId(mOTInst);
-        memcpy(buffer, &partitionId, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, otThreadGetPartitionId(mOTInst));
     }
     break;
 
     case ZCL_WEIGHTING_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint8_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-        uint8_t weighting = otThreadGetLeaderWeight(mOTInst);
-        memcpy(buffer, &weighting, ReadLength);
+        Encoding::Put8(*buffer, otThreadGetLeaderWeight(mOTInst));
     }
     break;
 
     case ZCL_DATA_VERSION_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint8_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-        uint8_t version = otNetDataGetVersion(mOTInst);
-        memcpy(buffer, &version, ReadLength);
+        Encoding::Put8(*buffer, otNetDataGetVersion(mOTInst));
     }
     break;
 
     case ZCL_STABLE_DATA_VERSION_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint8_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-        uint8_t stableVersion = otNetDataGetStableVersion(mOTInst);
-        memcpy(buffer, &stableVersion, ReadLength);
+        Encoding::Put8(*buffer, otNetDataGetStableVersion(mOTInst));
     }
     break;
 
     case ZCL_LEADER_ROUTER_ID_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint8_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-        uint8_t leaderRouterId = otThreadGetLeaderRouterId(mOTInst);
-        memcpy(buffer, &leaderRouterId, ReadLength);
+        Encoding::Put8(*buffer, otThreadGetLeaderRouterId(mOTInst));
     }
     break;
 
     case ZCL_DETACHED_ROLE_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint16_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        memcpy(buffer, &mleCounters->mDetachedRole, ReadLength);
+        Encoding::LittleEndian::Put16(*buffer, mleCounters->mDetachedRole);
     }
     break;
 
     case ZCL_CHILD_ROLE_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint16_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        memcpy(buffer, &mleCounters->mChildRole, ReadLength);
+        Encoding::LittleEndian::Put16(*buffer, mleCounters->mChildRole);
     }
     break;
 
     case ZCL_ROUTER_ROLE_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint16_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        memcpy(buffer, &mleCounters->mRouterRole, ReadLength);
+        Encoding::LittleEndian::Put16(*buffer, mleCounters->mRouterRole);
     }
     break;
 
     case ZCL_LEADER_ROLE_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint16_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        memcpy(buffer, &mleCounters->mLeaderRole, ReadLength);
+        Encoding::LittleEndian::Put16(*buffer, mleCounters->mLeaderRole);
         break;
     }
 
     case ZCL_ATTACH_ATTEMPT_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint16_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        memcpy(buffer, &mleCounters->mAttachAttempts, ReadLength);
+        Encoding::LittleEndian::Put16(*buffer, mleCounters->mAttachAttempts);
     }
     break;
 
     case ZCL_PARTITION_ID_CHANGE_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint16_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        memcpy(buffer, &mleCounters->mPartitionIdChanges, ReadLength);
+        Encoding::LittleEndian::Put16(*buffer, mleCounters->mPartitionIdChanges);
     }
     break;
 
     case ZCL_BETTER_PARTITION_ATTACH_ATTEMPT_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint16_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        memcpy(buffer, &mleCounters->mBetterPartitionAttachAttempts, ReadLength);
+        Encoding::LittleEndian::Put16(*buffer, mleCounters->mBetterPartitionAttachAttempts);
     }
     break;
 
     case ZCL_PARENT_CHANGE_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint16_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        memcpy(buffer, &mleCounters->mParentChanges, ReadLength);
+        Encoding::LittleEndian::Put16(*buffer, mleCounters->mParentChanges);
     }
     break;
 
     case ZCL_TX_TOTAL_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxTotal, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxTotal);
     }
     break;
 
     case ZCL_TX_UNICAST_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxUnicast, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxUnicast);
     }
     break;
 
     case ZCL_TX_BROADCAST_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxBroadcast, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxBroadcast);
     }
     break;
 
     case ZCL_TX_ACK_REQUESTED_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxAckRequested, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxAckRequested);
     }
     break;
 
     case ZCL_TX_ACKED_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxAcked, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxAcked);
     }
     break;
 
     case ZCL_TX_NO_ACK_REQUESTED_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxNoAckRequested, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxNoAckRequested);
     }
     break;
 
     case ZCL_TX_DATA_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxData, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxData);
     }
     break;
 
     case ZCL_TX_DATA_POLL_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxDataPoll, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxDataPoll);
     }
     break;
 
     case ZCL_TX_BEACON_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxBeacon, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxBeacon);
     }
     break;
 
     case ZCL_TX_BEACON_REQUEST_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxBeaconRequest, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxBeaconRequest);
     }
     break;
 
     case ZCL_TX_OTHER_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxOther, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxOther);
     }
     break;
 
     case ZCL_TX_RETRY_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxRetry, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxRetry);
     }
     break;
 
     case ZCL_TX_DIRECT_MAX_RETRY_EXPIRY_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxDirectMaxRetryExpiry, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxDirectMaxRetryExpiry);
     }
     break;
 
     case ZCL_TX_INDIRECT_MAX_RETRY_EXPIRY_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxIndirectMaxRetryExpiry, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxIndirectMaxRetryExpiry);
     }
     break;
 
     case ZCL_TX_ERR_CCA_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxErrCca, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxErrCca);
     }
     break;
 
     case ZCL_TX_ERR_ABORT_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxErrAbort, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxErrAbort);
     }
     break;
 
     case ZCL_TX_ERR_BUSY_CHANNEL_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mTxErrBusyChannel, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxErrBusyChannel);
     }
     break;
 
     case ZCL_RX_TOTAL_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxTotal, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxTotal);
     }
     break;
 
     case ZCL_RX_UNICAST_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxUnicast, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxUnicast);
     }
     break;
 
     case ZCL_RX_BROADCAST_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxBroadcast, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxBroadcast);
     }
     break;
 
     case ZCL_RX_DATA_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxData, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxData);
     }
     break;
 
     case ZCL_RX_DATA_POLL_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxDataPoll, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxDataPoll);
     }
     break;
 
     case ZCL_RX_BEACON_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxBeacon, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxBeacon);
     }
     break;
 
     case ZCL_RX_BEACON_REQUEST_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxBeaconRequest, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxBeaconRequest);
     }
     break;
 
     case ZCL_RX_OTHER_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxOther, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxOther);
     }
     break;
 
     case ZCL_RX_ADDRESS_FILTERED_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxAddressFiltered, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxAddressFiltered);
     }
     break;
 
     case ZCL_RX_DESTADDR_FILTERED_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxDestAddrFiltered, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxDestAddrFiltered);
     }
     break;
 
     case ZCL_RX_DUPLICATED_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxDuplicated, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxDuplicated);
     }
     break;
 
     case ZCL_RX_ERR_NO_FRAME_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxErrNoFrame, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrNoFrame);
     }
     break;
 
     case ZCL_RX_ERR_UNKNOWN_NEIGHBOR_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxErrUnknownNeighbor, ReadLength);
+        memcpy(*buffer, &macCounters->mRxErrUnknownNeighbor, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrUnknownNeighbor);
     }
     break;
 
     case ZCL_RX_ERR_INVALID_SRC_ADDR_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxErrInvalidSrcAddr, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrInvalidSrcAddr);
     }
     break;
 
     case ZCL_RX_ERR_SEC_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxErrSec, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrSec);
     }
     break;
 
     case ZCL_RX_ERR_FCS_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxErrFcs, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrFcs);
     }
     break;
 
     case ZCL_RX_ERR_OTHER_COUNT_ATTRIBUTE_ID: {
+        type       = kTLVType_UnsignedInteger;
         ReadLength = sizeof(uint32_t);
-        buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(buffer, &macCounters->mRxErrOther, ReadLength);
+        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrOther);
     }
     break;
 
     case ZCL_ACTIVE_TIMESTAMP_ATTRIBUTE_ID: {
+        type = kTLVType_UnsignedInteger;
         if (otDatasetIsCommissioned(mOTInst))
         {
             ReadLength = sizeof(uint64_t);
-            buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            memcpy(buffer, &activeDataset.mActiveTimestamp, ReadLength);
+            Encoding::LittleEndian::Put64(*buffer, activeDataset.mActiveTimestamp);
         }
     }
     break;
 
     case ZCL_PENDING_TIMESTAMP_ATTRIBUTE_ID: {
+        type = kTLVType_UnsignedInteger;
         if (otDatasetIsCommissioned(mOTInst))
         {
             ReadLength = sizeof(uint64_t);
-            buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            memcpy(buffer, &activeDataset.mPendingTimestamp, ReadLength);
+            Encoding::LittleEndian::Put64(*buffer, activeDataset.mPendingTimestamp);
         }
     }
     break;
 
     case ZCL_DELAY_ATTRIBUTE_ID: {
+        type = kTLVType_UnsignedInteger;
         if (otDatasetIsCommissioned(mOTInst))
         {
             ReadLength = sizeof(uint32_t);
-            buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            memcpy(buffer, &activeDataset.mDelay, ReadLength);
+            Encoding::LittleEndian::Put32(*buffer, activeDataset.mDelay);
         }
     }
     break;
 
     case ZCL_SECURITY_POLICY_ATTRIBUTE_ID: {
+        type = kTLVType_Structure;
         if (otDatasetIsCommissioned(mOTInst))
         {
             ReadLength = sizeof(otSecurityPolicy);
-            buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            memcpy(buffer, &activeDataset.mSecurityPolicy, sizeof(otSecurityPolicy));
+            memcpy(*buffer, &activeDataset.mSecurityPolicy, sizeof(otSecurityPolicy));
         }
     }
     break;
 
     case ZCL_DIAG_CHANNEL_MASK_ATTRIBUTE_ID: {
+        type = kTLVType_ByteString;
         if (otDatasetIsCommissioned(mOTInst))
         {
-            ReadLength = sizeof(uint32_t);
-            buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+            ReadLength = (sizeof(uint32_t)*2)+1; // For all Hex characters + NULL
+            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
@@ -1463,27 +1520,30 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadNetwor
             // In the resultant Octet string, the most significant bit of the left-most byte indicates channel 0
             uint32_t swapedChannelMask = Encoding::Swap32(activeDataset.mChannelMask);
             chip::Encoding::BytesToUppercaseHexString(reinterpret_cast<uint8_t *>(&swapedChannelMask), sizeof(uint32_t),
-                                                      reinterpret_cast<char *>(buffer), ReadLength);
+                                                      reinterpret_cast<char *>(*buffer), ReadLength);
         }
     }
     break;
 
     case ZCL_OPERATIONAL_DATASET_COMPONENTS_ATTRIBUTE_ID: {
+        type = kTLVType_Structure;
         if (otDatasetIsCommissioned(mOTInst))
         {
             ReadLength = sizeof(otOperationalDatasetComponents);
-            buffer     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            memcpy(buffer, &activeDataset.mComponents, sizeof(otOperationalDatasetComponents));
+            memcpy(*buffer, &activeDataset.mComponents, sizeof(otOperationalDatasetComponents));
         }
     }
     break;
 
     case ZCL_ACTIVE_THREAD_NETWORK_FAULTS_ATTRIBUTE_ID: {
+        type = kTLVType_List;
+        // List not yet supported
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         break;
     }
@@ -1497,7 +1557,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadNetwor
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "_GetThreadNetworkDiagnosticAttributeInfo failed: %s", ErrorStr(err));
     }
     return err;
 }

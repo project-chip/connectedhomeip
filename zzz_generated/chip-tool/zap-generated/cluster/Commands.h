@@ -1075,7 +1075,7 @@ static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(void *
     {
         ChipLogProgress(chipTool, "SecurityPolicy[%" PRIu16 "]:", i);
         ChipLogProgress(chipTool, "  RotationTime: %" PRIu16 "", entries[i].RotationTime);
-        ChipLogProgress(chipTool, "  Flags: %" PRIu8 "", entries[i].Flags);
+        ChipLogProgress(chipTool, "  Flags: %" PRIu16 "", entries[i].Flags);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);

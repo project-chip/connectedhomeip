@@ -18,6 +18,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include <lib/core/CHIPTLVTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
@@ -462,7 +463,8 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t * buffer, uint16_t & ReadLength)
+CHIP_ERROR ThreadStackManagerImpl::_GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer,
+                                                                            uint16_t & ReadLength, chip::TLV::TLVType & type)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

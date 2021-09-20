@@ -1471,9 +1471,9 @@ void ThreadNetworkDiagnosticsClusterSecurityPolicyListAttributeFilter(TLV::TLVRe
         CHECK_MESSAGE_LENGTH_VOID(2);
         data[i].RotationTime = emberAfGetInt16u(message, 0, 2);
         message += 2;
-        CHECK_MESSAGE_LENGTH_VOID(1);
-        data[i].Flags = emberAfGetInt8u(message, 0, 1);
-        message += 1;
+        CHECK_MESSAGE_LENGTH_VOID(2);
+        data[i].Flags = emberAfGetInt16u(message, 0, 2);
+        message += 2;
     }
     Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback> * cb =
         Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>::FromCancelable(onSuccessCallback);
