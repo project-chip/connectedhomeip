@@ -55,6 +55,9 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
     CHIP_ERROR error = CHIP_NO_ERROR;
+
+    // TODO: per conversation with Tennessee, shold be two consecutive loops (rather than one big 
+    // loop, since the contextTags come before the profileTags)
     while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
     {
         uint64_t tag = tlvReader.GetTag();
@@ -139,6 +142,8 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
 }
 
 // TODO: have independent vendorId and profileNum entries map to each vendor Reserved entry
+// Have a class for vendor reserved data, discussed in:
+// https://github.com/project-chip/connectedhomeip/issues/9825
 CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaration, const ByteSpan & attestationNonce,
                                         uint32_t timestamp, const ByteSpan & firmwareInfo, ByteSpan * vendorReservedArray,
                                         size_t vendorReservedArraySize, uint16_t vendorId, uint16_t profileNum,
