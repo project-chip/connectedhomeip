@@ -1915,7 +1915,7 @@ void BasicSuccess(void * context, uint16_t val)
 
 void BasicFailure(void * context, uint8_t status)
 {
-    ChipLogProgress(Controller, "Received failure response %d\n", (int)status);
+    ChipLogProgress(Controller, "Received failure response %d\n", (int) status);
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->OnSessionEstablishmentError(static_cast<CHIP_ERROR>(status));
 }

@@ -120,7 +120,7 @@ EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nod
                    "OpCreds: Writing fabric into attribute store at index %d: fabricId 0x" ChipLogFormatX64
                    ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                    index, ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
-    status = writeFabricAttribute((uint8_t *)fabricDescriptor, static_cast<int32_t>(index));
+    status = writeFabricAttribute((uint8_t *) fabricDescriptor, static_cast<int32_t>(index));
     chip::Platform::Delete(fabricDescriptor);
     return status;
 }
