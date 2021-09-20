@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #include <sys/select.h>
