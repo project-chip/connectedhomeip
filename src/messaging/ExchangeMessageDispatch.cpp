@@ -81,7 +81,7 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
 
         ReturnErrorOnFailure(PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
         CHIP_ERROR err = SendPreparedMessage(session, entryOwner->retainedBuf);
-        if (err == System::MapErrorPOSIX(ENOBUFS))
+        if (err == CHIP_ERROR_POSIX(ENOBUFS))
         {
             // sendmsg on BSD-based systems never blocks, no matter how the
             // socket is configured, and will return ENOBUFS in situation in
