@@ -29,7 +29,9 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
+#endif
 #include <system/TimeSource.h>
 #include <transport/FabricTable.h>
 
@@ -251,13 +253,15 @@ CHIP_ERROR MdnsServer::AdvertiseOperational()
         {
             uint8_t mac[8];
 
-            const auto advertiseParameters = chip::Mdns::OperationalAdvertisingParameters()
-                                                 .SetPeerId(fabricInfo.GetPeerId())
-                                                 .SetMac(FillMAC(mac))
-                                                 .SetPort(GetSecuredPort())
-                                                 .SetMRPRetryIntervals(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL,
-                                                                       CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)
-                                                 .EnableIpV4(true);
+            const auto advertiseParameters =
+                chip::Mdns::OperationalAdvertisingParameters()
+                    .SetPeerId(fabricInfo.GetPeerId())
+                    .SetMac(FillMAC(mac))
+                    .SetPort(GetSecuredPort())
+                    .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
+                                          Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
+                    .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
+                    .EnableIpV4(true);
 
             auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
@@ -331,6 +335,11 @@ CHIP_ERROR MdnsServer::Advertise(bool commissionableNode, chip::Mdns::Commission
     ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
     advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
+
+    advertiseParameters
+        .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
+                              Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
+        .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
 
     if (mode != chip::Mdns::CommissioningMode::kEnabledEnhanced)
     {
@@ -475,9 +484,9 @@ CHIP_ERROR MdnsServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[]
     ReturnErrorOnFailure(
         chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
     ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
-    return AdditionalDataPayloadGenerator().generateRotatingDeviceId(lifetimeCounter, serialNumber, serialNumberSize,
-                                                                     rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
-                                                                     rotatingDeviceIdValueOutputSize);
+    return AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
+        lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+        rotatingDeviceIdValueOutputSize);
 }
 #endif
 

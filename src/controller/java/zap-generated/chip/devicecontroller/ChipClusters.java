@@ -3331,9 +3331,62 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
+    public void readPlaybackStateAttribute(IntegerAttributeCallback callback) {
+      readPlaybackStateAttribute(chipClusterPtr, callback);
+    }
+
+    public void readStartTimeAttribute(LongAttributeCallback callback) {
+      readStartTimeAttribute(chipClusterPtr, callback);
+    }
+
+    public void readDurationAttribute(LongAttributeCallback callback) {
+      readDurationAttribute(chipClusterPtr, callback);
+    }
+
+    public void readPositionUpdatedAtAttribute(LongAttributeCallback callback) {
+      readPositionUpdatedAtAttribute(chipClusterPtr, callback);
+    }
+
+    public void readPositionAttribute(LongAttributeCallback callback) {
+      readPositionAttribute(chipClusterPtr, callback);
+    }
+
+    public void readPlaybackSpeedAttribute(LongAttributeCallback callback) {
+      readPlaybackSpeedAttribute(chipClusterPtr, callback);
+    }
+
+    public void readSeekRangeEndAttribute(LongAttributeCallback callback) {
+      readSeekRangeEndAttribute(chipClusterPtr, callback);
+    }
+
+    public void readSeekRangeStartAttribute(LongAttributeCallback callback) {
+      readSeekRangeStartAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
+
+    private native void readPlaybackStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readStartTimeAttribute(long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readDurationAttribute(long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readPositionUpdatedAtAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readPositionAttribute(long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readPlaybackSpeedAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readSeekRangeEndAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readSeekRangeStartAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

@@ -2471,5 +2471,33 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_LAMBDA_EVENT_SIZE
+ *
+ * @brief The maximum size of the lambda which can be post into system event queue.
+ */
+#ifndef CHIP_CONFIG_LAMBDA_EVENT_SIZE
+#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (16)
+#endif
+
+/**
+ * @def CHIP_CONFIG_LAMBDA_EVENT_ALIGN
+ *
+ * @brief The maximum alignment of the lambda which can be post into system event queue.
+ */
+#ifndef CHIP_CONFIG_LAMBDA_EVENT_ALIGN
+#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (sizeof(void *))
+#endif
+
+/**
+ * @def CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+ *
+ * @brief If true, VerifyOrDie() calls with no message will use an
+ *        automatically generated message that makes it clear what failed.
+ */
+#ifndef CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE 0
+#endif
+
+/**
  * @}
  */

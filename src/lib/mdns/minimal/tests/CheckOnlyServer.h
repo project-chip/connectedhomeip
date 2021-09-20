@@ -88,6 +88,10 @@ public:
         if (!header.GetFlags().IsTruncated())
         {
             NL_TEST_ASSERT(mInSuite, mTotalRecords == GetNumExpectedRecords());
+            if (mTotalRecords != GetNumExpectedRecords())
+            {
+                ChipLogError(Discovery, "Received %d records, expected %d", mTotalRecords, GetNumExpectedRecords());
+            }
             mHeaderFound = true;
         }
     }
@@ -299,7 +303,7 @@ private:
             found = false;
         }
     };
-    static constexpr size_t kMaxExpectedTxt = 10;
+    static constexpr size_t kMaxExpectedTxt = 11;
     KV mExpectedTxt[kMaxExpectedTxt];
     size_t mNumExpectedTxtRecords = 0;
     size_t mNumReceivedTxtRecords = 0;

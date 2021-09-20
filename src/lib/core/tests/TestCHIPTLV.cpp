@@ -2341,6 +2341,55 @@ void CheckCHIPTLVPutStringF(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, 256) == 0);
 }
 
+void CheckCHIPTLVPutStringSpan(nlTestSuite * inSuite, void * inContext)
+{
+    const size_t bufsize    = 24;
+    char strBuffer[bufsize] = "Sample string";
+    char valStr[bufsize];
+    uint8_t backingStore[bufsize];
+    TLVWriter writer;
+    TLVReader reader;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Span<char> strSpan;
+
+    //
+    // Write a string that has a size that exceeds 32-bits. This is only possible
+    // on platforms where size_t is bigger than uint32_t.
+    //
+    if (sizeof(size_t) > sizeof(uint32_t))
+    {
+        writer.Init(backingStore, bufsize);
+        snprintf(strBuffer, sizeof(strBuffer), "Sample string");
+
+        strSpan = { strBuffer, static_cast<size_t>(0xffffffffff) };
+
+        err = writer.PutString(ProfileTag(TestProfile_1, 1), strSpan);
+        NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    }
+
+    {
+        writer.Init(backingStore, bufsize);
+        snprintf(strBuffer, sizeof(strBuffer), "Sample string");
+
+        strSpan = { strBuffer, strlen("Sample string") };
+
+        err = writer.PutString(ProfileTag(TestProfile_1, 1), strSpan);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = reader.GetString(valStr, 256);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, 256) == 0);
+    }
+}
+
 void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize = 40;
@@ -4027,6 +4076,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("CHIP Circular TLV buffer, straddle",  CheckCircularTLVBufferEvictStraddlingEvent),
     NL_TEST_DEF("CHIP Circular TLV buffer, edge",      CheckCircularTLVBufferEdge),
     NL_TEST_DEF("CHIP TLV Printf",                     CheckCHIPTLVPutStringF),
+    NL_TEST_DEF("CHIP TLV String Span",                CheckCHIPTLVPutStringSpan),
     NL_TEST_DEF("CHIP TLV Printf, Circular TLV buf",   CheckCHIPTLVPutStringFCircular),
     NL_TEST_DEF("CHIP TLV Skip non-contiguous",        CheckCHIPTLVSkipCircular),
     NL_TEST_DEF("CHIP TLV ByteSpan",                   CheckCHIPTLVByteSpan),

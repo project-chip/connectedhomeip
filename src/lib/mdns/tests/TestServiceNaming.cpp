@@ -99,7 +99,7 @@ void TestExtractIdFromInstanceName(nlTestSuite * inSuite, void * inContext)
 
 void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr size_t kSize = 17;
+    constexpr size_t kSize = 19;
     char buffer[kSize];
     DiscoveryFilter filter;
 
@@ -137,6 +137,8 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     filter.code = 0xFFFF;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_V65535") == 0);
+    filter.code = 1 << 16;
+    NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) != CHIP_NO_ERROR);
 
     // Device Type tests
     filter.type = DiscoveryFilterType::kDeviceType;
@@ -149,6 +151,12 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     filter.type = DiscoveryFilterType::kCommissioningMode;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_CM") == 0);
+
+    // Compressed fabric ID tests.
+    filter.type = DiscoveryFilterType::kCompressedFabricId;
+    filter.code = 0xABCD12341111BBBB;
+    NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_IABCD12341111BBBB") == 0);
 
     // None tests.
     filter.type = DiscoveryFilterType::kNone;
@@ -207,7 +215,15 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_V3._sub._matterc") == 0);
-    // TODO:add tests for longer vendor codes once the leading zero issue is fixed.
+
+    filter.code = (1 << 16) - 1;
+    NL_TEST_ASSERT(inSuite,
+                   MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_V65535._sub._matterc") == 0);
+
+    filter.code = 1 << 16;
+    NL_TEST_ASSERT(inSuite,
+                   MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) != CHIP_NO_ERROR);
 
     // Device Type tests
     filter.type = DiscoveryFilterType::kDeviceType;
@@ -215,13 +231,18 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_T3._sub._matterc") == 0);
-    // TODO: Add tests for longer device types once the leadng zero issue is fixed.
 
     // Commisioning mode tests
     filter.type = DiscoveryFilterType::kCommissioningMode;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_CM._sub._matterc") == 0);
+
+    // Compressed fabric ID tests
+    filter.type = DiscoveryFilterType::kCompressedFabricId;
+    filter.code = 0x1234ABCD0000AAAA;
+    NL_TEST_ASSERT(inSuite, MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kOperational) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_I1234ABCD0000AAAA._sub._matter") == 0);
 
     // None tests
     filter.type = DiscoveryFilterType::kNone;

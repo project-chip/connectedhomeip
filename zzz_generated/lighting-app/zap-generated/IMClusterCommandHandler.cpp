@@ -1459,7 +1459,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
-            uint8_t transitionTime;
+            uint16_t transitionTime;
             uint8_t optionsMask;
             uint8_t optionsOverride;
             bool argExists[5];
@@ -1534,7 +1534,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
-            uint8_t transitionTime;
+            uint16_t transitionTime;
             uint8_t optionsMask;
             uint8_t optionsOverride;
             bool argExists[5];

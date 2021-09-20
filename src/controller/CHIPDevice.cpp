@@ -818,7 +818,8 @@ CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath,
 
     // The application context is used to identify different requests from client application the type of it is intptr_t, here we
     // use the seqNum.
-    app::ReadPrepareParams params(GetSecureSession());
+    VerifyOrReturnError(GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    app::ReadPrepareParams params(GetSecureSession().Value());
     params.mpAttributePathParamsList    = path;
     params.mAttributePathParamsListSize = 1;
     params.mMinIntervalFloorSeconds     = mMinIntervalFloorSeconds;

@@ -1631,22 +1631,25 @@ enum
     EMBER_APPLICATION_ERROR_15 = 0xFF,
 };
 
+/**
+ * @brief Function pointer for timer callback
+ */
+typedef void (*TimerCallback)(chip::EndpointId);
+
 /** @brief The control structure for events.
  *
- * This structure should not be accessed directly.
  * It holds the event status (one of the @e EMBER_EVENT_ values)
- * and the time left before the event fires.
+ * and the callback and it's parameters
  */
 typedef struct
 {
     /** The event's status, either inactive or the units for timeToExecute. */
     EmberEventUnits status;
-    /** The ID of the task this event belongs to. */
-    EmberTaskId taskid;
-    /** Indicates how long before the event fires.
-     *  Units are milliseconds.
-     */
-    uint32_t timeToExecute;
+
+    /* Callback information */
+    TimerCallback callback;
+    chip::EndpointId endpoint;
+
 } EmberEventControl;
 
 /**

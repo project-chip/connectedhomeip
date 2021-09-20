@@ -25,12 +25,12 @@
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPath.h>
+#include <app/MessageDef/StatusResponse.h>
 #include <app/MessageDef/SubscribeRequest.h>
 #include <app/MessageDef/SubscribeResponse.h>
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
 #include <lib/support/RandUtils.h>
-#include <protocols/secure_channel/StatusReport.h>
 
 namespace chip {
 namespace app {
@@ -120,17 +120,28 @@ CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayl
     return err;
 }
 
-CHIP_ERROR ReadHandler::OnStatusReport(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Protocols::SecureChannel::StatusReport statusReport;
-    err = statusReport.Parse(std::move(aPayload));
+    Protocols::InteractionModel::ProtocolCode statusCode;
+    StatusResponse::Parser response;
+    System::PacketBufferTLVReader reader;
+    reader.Init(std::move(aPayload));
+    reader.Next();
+    err = response.Init(reader);
     SuccessOrExit(err);
-    ChipLogProgress(DataManagement, "in state %s, receive status report, protocol id is %" PRIu32 ", protocol code is %" PRIu16,
-                    GetStateStr(), statusReport.GetProtocolId(), statusReport.GetProtocolCode());
-    VerifyOrExit((statusReport.GetProtocolId() == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm()) &&
-                     (statusReport.GetProtocolCode() == to_underlying(Protocols::InteractionModel::ProtocolCode::Success)),
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
+
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = response.CheckSchemaValidity();
+    SuccessOrExit(err);
+#endif
+
+    err = response.GetStatus(statusCode);
+    SuccessOrExit(err);
+
+    ChipLogProgress(DataManagement, "In state %s, receive status response, status code is %" PRIu16, GetStateStr(),
+                    to_underlying(statusCode));
+    VerifyOrExit((statusCode == Protocols::InteractionModel::ProtocolCode::Success), err = CHIP_ERROR_INVALID_ARGUMENT);
     switch (mState)
     {
     case HandlerState::AwaitingReportResponse:
@@ -201,9 +212,9 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (aPayloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        err = OnStatusReport(apExchangeContext, std::move(aPayload));
+        err = OnStatusResponse(apExchangeContext, std::move(aPayload));
     }
     else
     {
@@ -477,7 +488,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     SubscribeResponse::Builder response;
     ReturnLogErrorOnFailure(response.Init(&writer));
     response.SubscriptionId(mSubscriptionId)
-        .MinIntervalFloorSeconds(mMaxIntervalCeilingSeconds)
+        .MinIntervalFloorSeconds(mMinIntervalFloorSeconds)
         .MaxIntervalCeilingSeconds(mMaxIntervalCeilingSeconds)
         .EndOfSubscribeResponse();
     ReturnLogErrorOnFailure(response.GetError());

@@ -375,7 +375,9 @@ public:
 
     bool MatchesSession(SessionHandle session) const { return mSecureSession.HasValue() && mSecureSession.Value() == session; }
 
-    SessionHandle GetSecureSession() const { return mSecureSession.Value(); }
+    chip::Optional<SessionHandle> GetSecureSession() const { return mSecureSession; }
+
+    Messaging::ExchangeManager * GetExchangeManager() const { return mExchangeMgr; }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
