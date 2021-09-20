@@ -119,12 +119,10 @@ allows us to directly edit core CHIP code in-IDE.
 
 3. Open the project in Android Studio and run **Sync Project with Gradle
    Files**.
-   ![image](https://user-images.githubusercontent.com/77706079/133158760-021c8144-c314-4c5d-a2af-71a2dcdcfc0c.png)
 
 4. Use one of the following options to build an Android package:
 
     - Click **Make Project** in Android Studio.
-      ![image](https://user-images.githubusercontent.com/77706079/133158991-943aeca7-eb1f-4abe-a28c-c80533faa0d5.png)
     - Run the following command in the command line:
 
         ```shell
