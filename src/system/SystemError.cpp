@@ -61,6 +61,12 @@ DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
 {
     return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError)));
 }
+
+DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, const char * file, unsigned int line)
+{
+    return (aError == 0 ? CHIP_NO_ERROR
+                        : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError), file, line));
+}
 } // namespace Internal
 
 /**
