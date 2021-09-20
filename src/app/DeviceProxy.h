@@ -87,6 +87,8 @@ public:
 
     virtual bool IsActive() const { return true; }
 
+    uint32_t GetMRPIdleInterval() const { return mMrpIdleInterval; }
+    uint32_t GetMRPActiveInterval() const { return mMrpActiveInterval; }
     void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval) const
     {
         idleInterval   = mMrpIdleInterval;

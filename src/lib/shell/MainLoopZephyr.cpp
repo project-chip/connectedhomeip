@@ -37,7 +37,7 @@ static int RegisterCommands(const struct device * dev)
 
 SYS_INIT(RegisterCommands, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
 
-SHELL_CMD_ARG_REGISTER(matter, NULL, "Matter commands", cmd_matter, 1, 4);
+SHELL_CMD_ARG_REGISTER(matter, NULL, "Matter commands", cmd_matter, 1, 10);
 
 namespace chip {
 namespace Shell {
