@@ -61,6 +61,7 @@ target_compile_options(app PRIVATE -Werror)
 target_include_directories(app PRIVATE
                            main/include
                            ${LIGHTING_COMMON}
+                           ${GEN_DIR}
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/lighting-app
                            ${NLIO_ROOT}
@@ -74,13 +75,16 @@ target_sources(app PRIVATE
                main/ZclCallbacks.cpp
                ${GEN_DIR}/lighting-app/zap-generated/attribute-size.cpp
                ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/lighting-app/zap-generated/CHIPClusters.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
 
 chip_configure_data_model(app
+    INCLUDE_CLIENT_CALLBACKS
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
+    GEN_DIR ${GEN_DIR}/lock-app/zap-generated
 )
 
 if(BUILD_WITH_DFU)
