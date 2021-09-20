@@ -112,6 +112,9 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     );
 
+#if CONFIG_NETWORK_LAYER_BLE
+    mBleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
+#endif
     SuccessOrExit(err);
 
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mFabrics, &mMessageCounterManager);
