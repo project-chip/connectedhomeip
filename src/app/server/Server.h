@@ -71,6 +71,10 @@ public:
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * getBleLayerObject() { return mBleLayer; }
+#endif
+
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
     void Shutdown();
@@ -112,6 +116,10 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     AppDelegate * mAppDelegate = nullptr;
+
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * mBleLayer = nullptr;
+#endif
 
     ServerTransportMgr mTransports;
     SessionManager mSessions;
