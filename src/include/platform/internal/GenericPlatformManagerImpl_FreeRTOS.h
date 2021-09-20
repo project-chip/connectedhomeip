@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
 #if defined(ESP_PLATFORM)

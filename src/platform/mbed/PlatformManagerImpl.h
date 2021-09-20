@@ -36,12 +36,19 @@
 #undef SUCCESS
 #endif
 #include <mstd_atomic>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 #include <sys/select.h>
 
 namespace chip {
 namespace DeviceLayer {
+
+namespace Internal {
+
+class GapEventHandler;
+class CHIPService;
+} // namespace Internal
 
 /**
  * Concrete implementation of the PlatformManager singleton object for the nRF Connect SDK platforms.
