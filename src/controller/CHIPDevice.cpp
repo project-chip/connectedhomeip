@@ -63,60 +63,6 @@ using namespace chip::Callback;
 
 namespace chip {
 namespace Controller {
-CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, Messaging::SendFlags sendFlags,
-                               System::PacketBufferHandle && buffer)
-{
-    System::PacketBufferHandle resend;
-    bool loadedSecureSession = false;
-
-    VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
-
-    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(mSecureSession.Value(), nullptr);
-    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    if (!loadedSecureSession)
-    {
-        // Secure connection already existed
-        // Hold on to the buffer, in case session resumption and resend is needed
-        // Cloning data, instead of increasing the ref count, as the original
-        // buffer might get modified by lower layers before the send fails. So,
-        // that buffer cannot be used for resends.
-        resend = buffer.CloneData();
-    }
-
-    // TODO(#5675): This code is temporary, and must be updated to use the IM API. Currently, we use a temporary Protocol
-    // TempZCL to carry over legacy ZCL messages.  We need to set flag kFromInitiator to allow receiver to deliver message to
-    // corresponding unsolicited message handler.
-    sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator);
-    exchange->SetDelegate(this);
-
-    CHIP_ERROR err = exchange->SendMessage(protocolId, msgType, std::move(buffer), sendFlags);
-
-    buffer = nullptr;
-    ChipLogDetail(Controller, "SendMessage returned %s", ErrorStr(err));
-
-    // The send could fail due to network timeouts (e.g. broken pipe)
-    // Try session resumption if needed
-    if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
-    {
-        mState = ConnectionState::NotConnected;
-
-        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
-
-        err = exchange->SendMessage(protocolId, msgType, std::move(resend), sendFlags);
-        ChipLogDetail(Controller, "Re-SendMessage returned %s", ErrorStr(err));
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        exchange->Close();
-    }
-
-    return err;
-}
-
 CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
 {
     didLoad = false;
@@ -124,7 +70,7 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
     // If there is no secure connection to the device, try establishing it
     if (mState != ConnectionState::SecureConnected)
     {
-        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+        ReturnErrorOnFailure(LoadSecureSessionParameters());
         didLoad = true;
     }
     else
@@ -136,14 +82,14 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
             if (connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
             {
                 mState = ConnectionState::NotConnected;
-                ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+                ReturnErrorOnFailure(LoadSecureSessionParameters());
                 didLoad = true;
             }
         }
         else
         {
             mState = ConnectionState::NotConnected;
-            ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+            ReturnErrorOnFailure(LoadSecureSessionParameters());
             didLoad = true;
         }
     }
@@ -477,7 +423,7 @@ void Device::Reset()
     mExchangeMgr = nullptr;
 }
 
-CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
+CHIP_ERROR Device::LoadSecureSessionParameters()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PASESession pairingSession;
@@ -490,22 +436,6 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
     if (mState == ConnectionState::Connecting)
     {
         ExitNow(err = CHIP_NO_ERROR);
-    }
-
-    if (resetNeeded == ResetTransport::kYes)
-    {
-        err = mTransportMgr->ResetTransport(
-            Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(mListenPort)
-#if INET_CONFIG_ENABLE_IPV4
-                ,
-            Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(mListenPort)
-#endif
-#if CONFIG_NETWORK_LAYER_BLE
-                ,
-            Transport::BleListenParameters(mBleLayer)
-#endif
-        );
-        SuccessOrExit(err);
     }
 
     if (IsOperationalCertProvisioned())

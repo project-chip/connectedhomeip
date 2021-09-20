@@ -44,7 +44,6 @@ public:
                                    uint8_t location, chip::ByteSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 
     // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeBasicCommissioningInfoList(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback);
@@ -74,7 +73,6 @@ public:
                             uint64_t breadcrumb, uint32_t timeoutMs);
 
     // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
@@ -99,7 +97,6 @@ public:
                                  chip::ByteSpan label);
 
     // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);

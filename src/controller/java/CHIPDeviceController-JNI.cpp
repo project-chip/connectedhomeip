@@ -475,33 +475,23 @@ JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong f
 JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring messageObj)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    Device * chipDevice = nullptr;
-
     ChipLogProgress(Controller, "sendMessage() called with device id and message object");
 
+    Device * chipDevice = nullptr;
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
 
-    const char * messageStr = env->GetStringUTFChars(messageObj, 0);
-    size_t messageLen       = strlen(messageStr);
+    JniUtfString jniMessage(env, messageObj);
+    System::PacketBufferHandle buffer = System::PacketBufferHandle::NewWithData(jniMessage.c_str(), strlen(jniMessage.c_str()));
+    VerifyOrReturn(!buffer.IsNull(), ThrowError(env, CHIP_ERROR_NO_MEMORY));
 
-    System::PacketBufferHandle buffer = System::PacketBufferHandle::NewWithData(messageStr, messageLen);
-    if (buffer.IsNull())
-    {
-        buffer = System::PacketBufferHandle::NewWithData(messageStr, messageLen);
-        if (buffer.IsNull())
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-        }
-        else
-        {
-            // We don't install a response handler, so aren't waiting for a response
-            err = chipDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, Messaging::SendMessageFlags::kNone,
-                                          std::move(buffer));
-        }
-    }
+    const Optional<SessionHandle> & sessionHandle = chipDevice->GetSecureSession();
+    VerifyOrReturn(sessionHandle.HasValue(), ThrowError(env, CHIP_ERROR_INCORRECT_STATE));
+    Messaging::ExchangeContext * exchange = chipDevice->GetExchangeManager()->NewContext(sessionHandle.Value(), nullptr);
+    VerifyOrReturn(exchange != nullptr, ThrowError(env, CHIP_ERROR_NO_MEMORY));
 
-    env->ReleaseStringUTFChars(messageObj, messageStr);
+    // We don't install a response handler, so aren't waiting for a response
+    CHIP_ERROR err = exchange->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, std::move(buffer),
+                                           Messaging::SendMessageFlags::kFromInitiator);
 
     if (err != CHIP_NO_ERROR)
     {

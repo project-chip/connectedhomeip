@@ -32,42 +32,7 @@
 #include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
-#define COMMAND_HEADER(name, clusterId)                                                                                            \
-    const char * kName = name;                                                                                                     \
-    uint8_t seqNum     = mDevice->GetNextSequenceNumber();                                                                         \
-                                                                                                                                   \
-    PacketBufferWriter buf(System::PacketBufferHandle::New(kMaxBufferSize));                                                       \
-    if (buf.IsNull())                                                                                                              \
-    {                                                                                                                              \
-        ChipLogError(Zcl, "Could not allocate packet buffer while trying to encode %s command", kName);                            \
-        return CHIP_ERROR_INTERNAL;                                                                                                \
-    }                                                                                                                              \
-                                                                                                                                   \
-    if (doEncodeApsFrame(buf, clusterId, kSourceEndpoint, mEndpoint, 0, 0, 0, 0, false))                                           \
-    {
-
-#define COMMAND_FOOTER()                                                                                                           \
-    }                                                                                                                              \
-    if (!buf.Fit())                                                                                                                \
-    {                                                                                                                              \
-        ChipLogError(Zcl, "Command %s can't fit in the allocated buffer", kName);                                                  \
-    }                                                                                                                              \
-    return SendCommand(seqNum, buf.Finalize(), onSuccessCallback, onFailureCallback);
-
 namespace chip {
-namespace {
-// TODO: Find a way to calculate maximum message length for clusters
-//       https://github.com/project-chip/connectedhomeip/issues/965
-constexpr uint16_t kMaxBufferSize = 1024;
-
-// This is a global command, so the low bits are 0b00.  The command is
-// standard, so does not need a manufacturer code, and we're sending client
-// to server, so all the remaining bits are 0.
-constexpr uint8_t kFrameControlGlobalCommand = 0x00;
-
-// Pick source endpoint as 1 for now
-constexpr EndpointId kSourceEndpoint = 1;
-} // namespace
 
 using namespace app::Clusters;
 using namespace System;
@@ -165,14 +130,6 @@ exit:
 }
 
 // AccountLogin Cluster Attributes
-CHIP_ERROR AccountLoginCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverAccountLoginAttributes", AccountLogin::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR AccountLoginCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback)
 {
@@ -325,14 +282,6 @@ exit:
 }
 
 // AdministratorCommissioning Cluster Attributes
-CHIP_ERROR AdministratorCommissioningCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverAdministratorCommissioningAttributes", AdministratorCommissioning::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR AdministratorCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback)
 {
@@ -388,14 +337,6 @@ exit:
 }
 
 // ApplicationBasic Cluster Attributes
-CHIP_ERROR ApplicationBasicCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverApplicationBasicAttributes", ApplicationBasic::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR ApplicationBasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback)
 {
@@ -539,14 +480,6 @@ exit:
 }
 
 // ApplicationLauncher Cluster Attributes
-CHIP_ERROR ApplicationLauncherCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverApplicationLauncherAttributes", ApplicationLauncher::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR ApplicationLauncherCluster::ReadAttributeApplicationLauncherList(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback)
 {
@@ -681,14 +614,6 @@ exit:
 }
 
 // AudioOutput Cluster Attributes
-CHIP_ERROR AudioOutputCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverAudioOutputAttributes", AudioOutput::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR AudioOutputCluster::ReadAttributeAudioOutputList(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback)
 {
@@ -808,14 +733,6 @@ exit:
 }
 
 // BarrierControl Cluster Attributes
-CHIP_ERROR BarrierControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverBarrierControlAttributes", BarrierControl::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierMovingState(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
@@ -916,13 +833,6 @@ exit:
 }
 
 // Basic Cluster Attributes
-CHIP_ERROR BasicCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverBasicAttributes", Basic::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR BasicCluster::ReadAttributeInteractionModelVersion(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback)
 {
@@ -1196,14 +1106,6 @@ CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
 
 // BinaryInputBasic Cluster Commands
 // BinaryInputBasic Cluster Attributes
-CHIP_ERROR BinaryInputBasicCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverBinaryInputBasicAttributes", BinaryInputBasic::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR BinaryInputBasicCluster::ReadAttributeOutOfService(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback)
 {
@@ -1421,13 +1323,6 @@ exit:
 }
 
 // Binding Cluster Attributes
-CHIP_ERROR BindingCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverBindingAttributes", Binding::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR BindingCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
@@ -1442,14 +1337,6 @@ CHIP_ERROR BindingCluster::ReadAttributeClusterRevision(Callback::Cancelable * o
 
 // BridgedDeviceBasic Cluster Commands
 // BridgedDeviceBasic Cluster Attributes
-CHIP_ERROR BridgedDeviceBasicCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverBridgedDeviceBasicAttributes", BridgedDeviceBasic::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback)
 {
@@ -2592,14 +2479,6 @@ exit:
 }
 
 // ColorControl Cluster Attributes
-CHIP_ERROR ColorControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverColorControlAttributes", ColorControl::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR ColorControlCluster::ReadAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
@@ -3641,14 +3520,6 @@ exit:
 }
 
 // ContentLauncher Cluster Attributes
-CHIP_ERROR ContentLauncherCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverContentLauncherAttributes", ContentLauncher::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR ContentLauncherCluster::ReadAttributeAcceptsHeaderList(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
@@ -3687,13 +3558,6 @@ CHIP_ERROR ContentLauncherCluster::ReadAttributeClusterRevision(Callback::Cancel
 
 // Descriptor Cluster Commands
 // Descriptor Cluster Attributes
-CHIP_ERROR DescriptorCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverDescriptorAttributes", Descriptor::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR DescriptorCluster::ReadAttributeDeviceList(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
@@ -3803,13 +3667,6 @@ exit:
 }
 
 // DiagnosticLogs Cluster Attributes
-CHIP_ERROR DiagnosticLogsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverDiagnosticLogsAttributes", DiagnosticLogs::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
 
 // DoorLock Cluster Commands
 CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -4800,13 +4657,6 @@ exit:
 }
 
 // DoorLock Cluster Attributes
-CHIP_ERROR DoorLockCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverDoorLockAttributes", DoorLock::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR DoorLockCluster::ReadAttributeLockState(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
 {
@@ -4876,14 +4726,6 @@ CHIP_ERROR DoorLockCluster::ReadAttributeClusterRevision(Callback::Cancelable * 
 
 // ElectricalMeasurement Cluster Commands
 // ElectricalMeasurement Cluster Attributes
-CHIP_ERROR ElectricalMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverElectricalMeasurementAttributes", ElectricalMeasurement::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeMeasurementType(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback)
 {
@@ -5070,14 +4912,6 @@ exit:
 }
 
 // EthernetNetworkDiagnostics Cluster Attributes
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverEthernetNetworkDiagnosticsAttributes", EthernetNetworkDiagnostics::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributePacketRxCount(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback)
 {
@@ -5152,13 +4986,6 @@ CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeClusterRevision(Callb
 
 // FixedLabel Cluster Commands
 // FixedLabel Cluster Attributes
-CHIP_ERROR FixedLabelCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverFixedLabelAttributes", FixedLabel::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR FixedLabelCluster::ReadAttributeLabelList(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback)
 {
@@ -5185,14 +5012,6 @@ CHIP_ERROR FixedLabelCluster::ReadAttributeClusterRevision(Callback::Cancelable 
 
 // FlowMeasurement Cluster Commands
 // FlowMeasurement Cluster Attributes
-CHIP_ERROR FlowMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverFlowMeasurementAttributes", FlowMeasurement::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR FlowMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback)
 {
@@ -5378,14 +5197,6 @@ exit:
 }
 
 // GeneralCommissioning Cluster Attributes
-CHIP_ERROR GeneralCommissioningCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverGeneralCommissioningAttributes", GeneralCommissioning::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
 {
@@ -5441,14 +5252,6 @@ CHIP_ERROR GeneralCommissioningCluster::ReadAttributeClusterRevision(Callback::C
 
 // GeneralDiagnostics Cluster Commands
 // GeneralDiagnostics Cluster Attributes
-CHIP_ERROR GeneralDiagnosticsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverGeneralDiagnosticsAttributes", GeneralDiagnostics::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeNetworkInterfaces(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback)
 {
@@ -5487,14 +5290,6 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Can
 
 // GroupKeyManagement Cluster Commands
 // GroupKeyManagement Cluster Attributes
-CHIP_ERROR GroupKeyManagementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverGroupKeyManagementAttributes", GroupKeyManagement::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR GroupKeyManagementCluster::ReadAttributeGroups(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
@@ -5782,13 +5577,6 @@ exit:
 }
 
 // Groups Cluster Attributes
-CHIP_ERROR GroupsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverGroupsAttributes", Groups::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR GroupsCluster::ReadAttributeNameSupport(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback)
 {
@@ -5894,13 +5682,6 @@ exit:
 }
 
 // Identify Cluster Attributes
-CHIP_ERROR IdentifyCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverIdentifyAttributes", Identify::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR IdentifyCluster::ReadAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
@@ -5985,14 +5766,6 @@ exit:
 }
 
 // KeypadInput Cluster Attributes
-CHIP_ERROR KeypadInputCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverKeypadInputAttributes", KeypadInput::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR KeypadInputCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback)
 {
@@ -6364,14 +6137,6 @@ exit:
 }
 
 // LevelControl Cluster Attributes
-CHIP_ERROR LevelControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverLevelControlAttributes", LevelControl::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR LevelControlCluster::ReadAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
@@ -6455,13 +6220,6 @@ exit:
 }
 
 // LowPower Cluster Attributes
-CHIP_ERROR LowPowerCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverLowPowerAttributes", LowPower::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR LowPowerCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
@@ -6636,13 +6394,6 @@ exit:
 }
 
 // MediaInput Cluster Attributes
-CHIP_ERROR MediaInputCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverMediaInputAttributes", MediaInput::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR MediaInputCluster::ReadAttributeMediaInputList(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
@@ -7109,14 +6860,6 @@ exit:
 }
 
 // MediaPlayback Cluster Attributes
-CHIP_ERROR MediaPlaybackCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverMediaPlaybackAttributes", MediaPlayback::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR MediaPlaybackCluster::ReadAttributePlaybackState(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback)
 {
@@ -7650,14 +7393,6 @@ exit:
 }
 
 // NetworkCommissioning Cluster Attributes
-CHIP_ERROR NetworkCommissioningCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverNetworkCommissioningAttributes", NetworkCommissioning::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR NetworkCommissioningCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
 {
@@ -7836,14 +7571,6 @@ exit:
 }
 
 // OtaSoftwareUpdateProvider Cluster Attributes
-CHIP_ERROR OtaSoftwareUpdateProviderCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverOtaSoftwareUpdateProviderAttributes", OtaSoftwareUpdateProvider::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback)
 {
@@ -7908,14 +7635,6 @@ exit:
 }
 
 // OtaSoftwareUpdateRequestor Cluster Attributes
-CHIP_ERROR OtaSoftwareUpdateRequestorCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverOtaSoftwareUpdateRequestorAttributes", OtaSoftwareUpdateRequestor::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR OtaSoftwareUpdateRequestorCluster::ReadAttributeDefaultOtaProvider(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback)
 {
@@ -7972,14 +7691,6 @@ CHIP_ERROR OtaSoftwareUpdateRequestorCluster::ReadAttributeClusterRevision(Callb
 
 // OccupancySensing Cluster Commands
 // OccupancySensing Cluster Attributes
-CHIP_ERROR OccupancySensingCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverOccupancySensingAttributes", OccupancySensing::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR OccupancySensingCluster::ReadAttributeOccupancy(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback)
 {
@@ -8289,13 +8000,6 @@ exit:
 }
 
 // OnOff Cluster Attributes
-CHIP_ERROR OnOffCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverOnOffAttributes", OnOff::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
@@ -8448,14 +8152,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
 
 // OnOffSwitchConfiguration Cluster Commands
 // OnOffSwitchConfiguration Cluster Attributes
-CHIP_ERROR OnOffSwitchConfigurationCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverOnOffSwitchConfigurationAttributes", OnOffSwitchConfiguration::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR OnOffSwitchConfigurationCluster::ReadAttributeSwitchType(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback)
 {
@@ -8817,14 +8513,6 @@ exit:
 }
 
 // OperationalCredentials Cluster Attributes
-CHIP_ERROR OperationalCredentialsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverOperationalCredentialsAttributes", OperationalCredentials::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR OperationalCredentialsCluster::ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback)
 {
@@ -8875,14 +8563,6 @@ CHIP_ERROR OperationalCredentialsCluster::ReadAttributeClusterRevision(Callback:
 
 // PressureMeasurement Cluster Commands
 // PressureMeasurement Cluster Attributes
-CHIP_ERROR PressureMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverPressureMeasurementAttributes", PressureMeasurement::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR PressureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
@@ -8952,14 +8632,6 @@ CHIP_ERROR PressureMeasurementCluster::ReadAttributeClusterRevision(Callback::Ca
 
 // PumpConfigurationAndControl Cluster Commands
 // PumpConfigurationAndControl Cluster Attributes
-CHIP_ERROR PumpConfigurationAndControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverPumpConfigurationAndControlAttributes", PumpConfigurationAndControl::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxPressure(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback)
 {
@@ -9095,14 +8767,6 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeClusterRevision(Call
 
 // RelativeHumidityMeasurement Cluster Commands
 // RelativeHumidityMeasurement Cluster Attributes
-CHIP_ERROR RelativeHumidityMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverRelativeHumidityMeasurementAttributes", RelativeHumidityMeasurement::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR RelativeHumidityMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback)
 {
@@ -9483,13 +9147,6 @@ exit:
 }
 
 // Scenes Cluster Attributes
-CHIP_ERROR ScenesCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverScenesAttributes", Scenes::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR ScenesCluster::ReadAttributeSceneCount(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
 {
@@ -9604,14 +9261,6 @@ exit:
 }
 
 // SoftwareDiagnostics Cluster Attributes
-CHIP_ERROR SoftwareDiagnosticsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverSoftwareDiagnosticsAttributes", SoftwareDiagnostics::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeCurrentHeapHighWatermark(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback)
 {
@@ -9638,13 +9287,6 @@ CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Ca
 
 // Switch Cluster Commands
 // Switch Cluster Attributes
-CHIP_ERROR SwitchCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverSwitchAttributes", Switch::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR SwitchCluster::ReadAttributeNumberOfPositions(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
@@ -9828,13 +9470,6 @@ exit:
 }
 
 // TvChannel Cluster Attributes
-CHIP_ERROR TvChannelCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverTvChannelAttributes", TvChannel::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR TvChannelCluster::ReadAttributeTvChannelList(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
@@ -9928,14 +9563,6 @@ exit:
 }
 
 // TargetNavigator Cluster Attributes
-CHIP_ERROR TargetNavigatorCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverTargetNavigatorAttributes", TargetNavigator::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR TargetNavigatorCluster::ReadAttributeTargetNavigatorList(Callback::Cancelable * onSuccessCallback,
                                                                     Callback::Cancelable * onFailureCallback)
 {
@@ -9962,14 +9589,6 @@ CHIP_ERROR TargetNavigatorCluster::ReadAttributeClusterRevision(Callback::Cancel
 
 // TemperatureMeasurement Cluster Commands
 // TemperatureMeasurement Cluster Attributes
-CHIP_ERROR TemperatureMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverTemperatureMeasurementAttributes", TemperatureMeasurement::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback)
 {
@@ -10236,14 +9855,6 @@ exit:
 }
 
 // TestCluster Cluster Attributes
-CHIP_ERROR TestClusterCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverTestClusterAttributes", TestCluster::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR TestClusterCluster::ReadAttributeBoolean(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
 {
@@ -11085,13 +10696,6 @@ exit:
 }
 
 // Thermostat Cluster Attributes
-CHIP_ERROR ThermostatCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverThermostatAttributes", Thermostat::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR ThermostatCluster::ReadAttributeLocalTemperature(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback)
 {
@@ -11465,14 +11069,6 @@ CHIP_ERROR ThermostatCluster::ReadAttributeClusterRevision(Callback::Cancelable 
 
 // ThermostatUserInterfaceConfiguration Cluster Commands
 // ThermostatUserInterfaceConfiguration Cluster Attributes
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverThermostatUserInterfaceConfigurationAttributes", ThermostatUserInterfaceConfiguration::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR
 ThermostatUserInterfaceConfigurationCluster::ReadAttributeTemperatureDisplayMode(Callback::Cancelable * onSuccessCallback,
                                                                                  Callback::Cancelable * onFailureCallback)
@@ -11617,14 +11213,6 @@ exit:
 }
 
 // ThreadNetworkDiagnostics Cluster Attributes
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverThreadNetworkDiagnosticsAttributes", ThreadNetworkDiagnostics::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeChannel(Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
@@ -12359,13 +11947,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeClusterRevision(Callbac
 
 // WakeOnLan Cluster Commands
 // WakeOnLan Cluster Attributes
-CHIP_ERROR WakeOnLanCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverWakeOnLanAttributes", WakeOnLan::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR WakeOnLanCluster::ReadAttributeWakeOnLanMacAddress(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback)
 {
@@ -12432,14 +12013,6 @@ exit:
 }
 
 // WiFiNetworkDiagnostics Cluster Attributes
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverWiFiNetworkDiagnosticsAttributes", WiFiNetworkDiagnostics::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeBssid(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback)
 {
@@ -12798,14 +12371,6 @@ exit:
 }
 
 // WindowCovering Cluster Attributes
-CHIP_ERROR WindowCoveringCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverWindowCoveringAttributes", WindowCovering::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR WindowCoveringCluster::ReadAttributeType(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback)
 {
