@@ -41,10 +41,15 @@
 
 #ifdef __cplusplus
 
+#define CHIP_ERROR_POSIX(code) chip::System::Internal::MapErrorPOSIX(code)
+
 namespace chip {
 namespace System {
 
+namespace Internal {
 extern CHIP_ERROR MapErrorPOSIX(int code);
+} // namespace Internal
+
 extern const char * DescribeErrorPOSIX(CHIP_ERROR code);
 extern void RegisterPOSIXErrorFormatter();
 extern bool FormatPOSIXError(char * buf, uint16_t bufSize, CHIP_ERROR err);

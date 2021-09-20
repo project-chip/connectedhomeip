@@ -375,7 +375,7 @@ void LayerImplSelect::HandleEvents()
 
     if (mSelectResult < 0)
     {
-        ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
+        ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(CHIP_ERROR_POSIX(errno)));
         return;
     }
 
