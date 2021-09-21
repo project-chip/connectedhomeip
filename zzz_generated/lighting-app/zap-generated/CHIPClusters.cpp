@@ -99,24 +99,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCall
                                              BasicAttributeFilter<BooleanAttributeCallback>);
 }
 
-CHIP_ERROR OnOffCluster::ConfigureAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval)
-{
-
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OnOff::Attributes::Ids::OnOff;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OnOff::Attributes::Ids::OnOff, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
 CHIP_ERROR OnOffCluster::ReadAttributeGlobalSceneControl(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
