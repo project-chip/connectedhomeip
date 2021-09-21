@@ -60,14 +60,13 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeC
     if (additionalDataFields.Has(AdditionalDataFields::RotatingDeviceId))
     {
         uint8_t rotatingDeviceIdInternalBuffer[RotatingDeviceId::kMaxLength];
-        MutableByteSpan rotatingDeviceIdBuffer = MutableByteSpan(rotatingDeviceIdInternalBuffer);
+        MutableByteSpan rotatingDeviceIdBuffer(rotatingDeviceIdInternalBuffer);
 
         // Generating Device Rotating Id
         ReturnErrorOnFailure(
             generateRotatingDeviceIdAsBinary(lifetimeCounter, serialNumberBuffer, serialNumberBufferSize, rotatingDeviceIdBuffer));
         // Adding the rotating device id to the TLV data
-        ReturnErrorOnFailure(innerWriter.PutBytes(ContextTag(kRotatingDeviceIdTag), rotatingDeviceIdBuffer.data(),
-                                                  static_cast<uint32_t>(rotatingDeviceIdBuffer.size())));
+        ReturnErrorOnFailure(innerWriter.Put(ContextTag(kRotatingDeviceIdTag), rotatingDeviceIdBuffer));
     }
 
     ReturnErrorOnFailure(writer.CloseContainer(innerWriter));
@@ -114,7 +113,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceIdAsHexString(
     size_t rotatingDeviceIdBufferSize, size_t & rotatingDeviceIdValueOutputSize)
 {
     uint8_t rotatingDeviceIdInternalBuffer[RotatingDeviceId::kMaxLength];
-    MutableByteSpan rotatingDeviceIdBufferTemp = MutableByteSpan(rotatingDeviceIdInternalBuffer);
+    MutableByteSpan rotatingDeviceIdBufferTemp(rotatingDeviceIdInternalBuffer);
     ReturnErrorOnFailure(
         generateRotatingDeviceIdAsBinary(lifetimeCounter, serialNumberBuffer, serialNumberBufferSize, rotatingDeviceIdBufferTemp));
 

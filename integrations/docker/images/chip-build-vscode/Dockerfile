@@ -7,6 +7,7 @@ FROM connectedhomeip/chip-build-mbed-os:${VERSION} AS mbedos
 FROM connectedhomeip/chip-build-telink:${VERSION} AS telink
 FROM connectedhomeip/chip-build-infineon:${VERSION} AS p6
 FROM connectedhomeip/chip-build-tizen:${VERSION} AS tizen
+FROM connectedhomeip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM connectedhomeip/chip-build:${VERSION}
 
 # qemu-src copied over because qemu directory contains symlinks to the src
@@ -32,6 +33,8 @@ COPY --from=telink /opt/telink/zephyrproject /opt/telink/zephyrproject
 COPY --from=telink /opt/telink/zephyr-sdk-0.13.0 /opt/telink/zephyr-sdk-0.13.0
 
 COPY --from=tizen /opt/tizen_sdk /opt/tizen_sdk
+
+COPY --from=crosscompile /opt/ubuntu-21.04-aarch64-sysroot /opt/ubuntu-21.04-aarch64-sysroot
 
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
@@ -59,3 +62,4 @@ ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.0
 ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"
 ENV TIZEN_HOME /opt/tizen_sdk
+ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot

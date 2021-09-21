@@ -1369,6 +1369,34 @@ public:
     CHIP_ERROR PutString(uint64_t tag, const char * buf, uint32_t len);
 
     /**
+     * Encodes a TLV UTF8 string value that's passed in as a Span.
+     *
+     * @param[in]   tag             The TLV tag to be encoded with the value, or @p AnonymousTag if the
+     *                              value should be encoded without a tag.  Tag values should be
+     *                              constructed with one of the tag definition functions ProfileTag(),
+     *                              ContextTag() or CommonTag().
+     * @param[in]   str             A Span containing a pointer and a length of the string to be encoded.
+     *
+     * @retval #CHIP_NO_ERROR      If the method succeeded.
+     * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
+     *                              If a container writer has been opened on the current writer and not
+     *                              yet closed.
+     * @retval #CHIP_ERROR_INVALID_TLV_TAG
+     *                              If the specified tag value is invalid or inappropriate in the context
+     *                              in which the value is being written.
+     * @retval #CHIP_ERROR_BUFFER_TOO_SMALL
+     *                              If writing the value would exceed the limit on the maximum number of
+     *                              bytes specified when the writer was initialized.
+     * @retval #CHIP_ERROR_NO_MEMORY
+     *                              If an attempt to allocate an output buffer failed due to lack of
+     *                              memory.
+     * @retval other                Other CHIP or platform-specific errors returned by the configured
+     *                              TLVBackingStore.
+     *
+     */
+    CHIP_ERROR PutString(uint64_t tag, Span<const char> str);
+
+    /**
      * @brief
      *   Encode the string output formatted according to the format in the TLV element.
      *
@@ -2321,6 +2349,7 @@ public:
     CHIP_ERROR Get(float & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(double & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(chip::ByteSpan & v) { return mUpdaterReader.Get(v); }
+
     CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize) { return mUpdaterReader.GetBytes(buf, bufSize); }
     CHIP_ERROR DupBytes(uint8_t *& buf, uint32_t & dataLen) { return mUpdaterReader.DupBytes(buf, dataLen); }
     CHIP_ERROR GetString(char * buf, uint32_t bufSize) { return mUpdaterReader.GetString(buf, bufSize); }

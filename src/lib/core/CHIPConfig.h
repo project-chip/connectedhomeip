@@ -2038,8 +2038,8 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE)                                                                         \
-    ((CODE) == chip::System::MapErrorPOSIX(EHOSTUNREACH) || (CODE) == chip::System::MapErrorPOSIX(ENETUNREACH) ||                  \
-     (CODE) == chip::System::MapErrorPOSIX(EADDRNOTAVAIL) || (CODE) == chip::System::MapErrorPOSIX(EPIPE))
+    ((CODE) == CHIP_ERROR_POSIX(EHOSTUNREACH) || (CODE) == CHIP_ERROR_POSIX(ENETUNREACH) ||                                        \
+     (CODE) == CHIP_ERROR_POSIX(EADDRNOTAVAIL) || (CODE) == CHIP_ERROR_POSIX(EPIPE))
 #else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) 0
 #endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS

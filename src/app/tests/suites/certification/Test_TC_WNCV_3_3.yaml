@@ -1,0 +1,87 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Window Covering [TC-WNCV-3.3] StopMotion Verification with server as DUT
+
+# TODO: WindowCovering tests TC-WNCV-3.3 finalize featuremap conditional dependencies
+
+config:
+    cluster: "Window Covering"
+    endpoint: 1
+
+tests:
+    ### Step 1x -> Initialize Position
+    ### MANDATORY Command
+    - label: "1a: TH adjusts the the DUT to a non-open position"
+      command: "UpOrOpen"
+
+    ### Depends on a sleep/wait command how to do this with a real device
+    - label: "1b: Wait for the movement to start and go on for a few seconds"
+      disabled: true
+
+    ### Step 2x -> Check Command instant effects + longer effects
+    ### MANDATORY Command
+    - label: "2a: TH sends StopMotion command to DUT"
+      command: "StopMotion"
+
+    ### MANDATORY reads
+    - label: "2b: TH reads OperationalStatus attribute from DUT"
+      command: "readAttribute"
+      attribute: "OperationalStatus"
+      response:
+          value: 0
+
+    ### 2c Check equality with a tolerance between Target & Current for Lift
+    ### Depends on the FeatureMap
+    - label:
+          "2c-1: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute
+          from DUT"
+      disabled: true # Step applied conditionnally with an !expected response value
+      command: "readAttribute"
+      attribute: "TargetPositionLiftPercent100ths"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "2c-2: If (PA & LF) TH reads CurrentPositionLiftPercent100ths
+          attribute from DUT"
+      disabled: true # Step applied conditionnally with an !expected response value
+      command: "readAttribute"
+      attribute: "CurrentPositionLiftPercent100ths"
+      response:
+          constraints:
+              type: uint16
+
+    ### 2d Check equality with a tolerance between Target & Current for Tilt
+    ### Depends on the FeatureMap
+    - label:
+          "2d-1: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
+          from DUT"
+      disabled: true # Step applied conditionnally with an !expected response value
+      command: "readAttribute"
+      attribute: "TargetPositionTiltPercent100ths"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "2d-2: If (PA & TL) TH reads CurrentPositionTiltPercent100ths
+          attribute from DUT"
+      disabled: true # Step applied conditionnally with an !expected response value
+      command: "readAttribute"
+      attribute: "CurrentPositionTiltPercent100ths"
+      response:
+          constraints:
+              type: uint16

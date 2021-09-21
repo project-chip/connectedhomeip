@@ -59,6 +59,10 @@ private:
     void _UnlockChipStack() {}
     CHIP_ERROR _Shutdown() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
+    CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
+    CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
+    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
+
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr();

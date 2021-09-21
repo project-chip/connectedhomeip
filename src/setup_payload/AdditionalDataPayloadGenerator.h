@@ -78,11 +78,9 @@ public:
      * @param lifetimeCounter lifetime counter
      * @param serialNumberBuffer null-terminated serial number buffer
      * @param serialNumberBufferSize size of the serial number buffer supplied.
-     * @param rotatingDeviceIdBuffer rotating device id mutable byte span, it will be resized to the actual size used upon
-     * successful generation
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise.
-     *
+     * @param [in,out] rotatingDeviceIdBuffer as input, the buffer to use for
+     *                 the binary data.  As output, will have its size set to
+     *                 the actual size used upon successful generation
      */
     CHIP_ERROR generateRotatingDeviceIdAsBinary(uint16_t lifetimeCounter, const char * serialNumberBuffer,
                                                 size_t serialNumberBufferSize, MutableByteSpan & rotatingDeviceIdBuffer);

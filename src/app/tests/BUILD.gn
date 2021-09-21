@@ -25,22 +25,29 @@ chip_test_suite("tests") {
   test_sources = [
     "TestCHIPDeviceCallbacksMgr.cpp",
     "TestClusterInfo.cpp",
-    "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
+    "TestDataModelSerialization.cpp",
     "TestEventLogging.cpp",
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
-    "TestReadInteraction.cpp",
-    "TestReportingEngine.cpp",
     "TestStatusResponse.cpp",
-    "TestWriteInteraction.cpp",
   ]
+
+  if (chip_device_platform != "efr32") {
+    test_sources += [
+      "TestCommandInteraction.cpp",
+      "TestReadInteraction.cpp",
+      "TestReportingEngine.cpp",
+      "TestWriteInteraction.cpp",
+    ]
+  }
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging/tests:helpers",

@@ -37,6 +37,7 @@ using namespace chip::Transport;
 using namespace chip::Controller;
 using namespace chip::Messaging;
 
+#if INET_CONFIG_ENABLE_IPV4
 namespace {
 
 using TestTransportMgr = TransportMgr<Transport::UDP>;
@@ -124,3 +125,5 @@ int TestDevice()
 }
 
 CHIP_REGISTER_TEST_SUITE(TestDevice)
+
+#endif // INET_CONFIG_ENABLE_IPV4
