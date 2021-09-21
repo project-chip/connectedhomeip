@@ -479,8 +479,8 @@ inline bool ConnectivityManager::HaveServiceConnectivityViaThread()
     return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaThread();
 }
 
-inline CHIP_ERROR ConnectivityManager::GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength,
-                                                       chip::TLV::TLVType & type)
+inline CHIP_ERROR ConnectivityManager::GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer,
+                                                                               uint16_t & ReadLength, chip::TLV::TLVType & type)
 {
     return static_cast<ImplClass *>(this)->_GetThreadNetworkDiagnosticAttributeInfo(attributeId, buffer, ReadLength, type);
 }
