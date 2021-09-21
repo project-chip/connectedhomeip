@@ -76,6 +76,9 @@ COMPONENT_ADD_INCLUDEDIRS 	 = project-config \
                                $(REL_CHIP_ROOT)/src/lib \
                                $(REL_CHIP_ROOT)/src/ \
                                $(REL_CHIP_ROOT)/src/system \
+															 $(REL_CHIP_ROOT)/zzz_generated \
+															 $(REL_CHIP_ROOT)/zzz_generated/app-common \
+															 $(REL_CHIP_ROOT)/zzz_generated/app-common\zap-generated \
                                $(IDF_PATH)/components/mbedtls/mbedtls/include \
                                $(REL_CHIP_ROOT)/src/app
 

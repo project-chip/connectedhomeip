@@ -17,6 +17,7 @@ cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
+get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
@@ -33,6 +34,7 @@ target_compile_options(app PRIVATE -Werror)
 
 target_include_directories(app PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
+                           ${GEN_DIR}/app-common
                            ${APP_ROOT}/shell_common/include)
 
 target_sources(app PRIVATE

@@ -67,9 +67,9 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLV
 
 CHIP_ERROR ThreadDiagosticsAttrAccess::ReadIfSupported(chip::AttributeId attributeId, TLV::TLVWriter * aWriter)
 {
-    uint8_t * pData;
-    uint16_t dataLen;
-    TLVType valueType;
+    uint8_t * pData   = nullptr;
+    uint16_t dataLen  = 0;
+    TLVType valueType = kTLVType_NotSpecified;
 
     // GetThreadNetworkDiagnosticAttributeInfo will alloc memory for the data returned.
     CHIP_ERROR err = ConnectivityMgr().GetThreadNetworkDiagnosticAttributeInfo(attributeId, &pData, dataLen, valueType);
