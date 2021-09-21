@@ -58,7 +58,8 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
         if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
         {
             ChipLogDetail(ExchangeManager,
-                          "Piggybacking Ack for MessageCounter:%08" PRIX32 " on exchange: " ChipLogFormatExchangeId,
+                          "Piggybacking Ack for MessageCounter:" ChipLogFormatMessageCounter
+                          " on exchange: " ChipLogFormatExchangeId,
                           payloadHeader.GetAckMessageCounter().Value(), ChipLogValueExchangeId(exchangeId, isInitiator));
         }
 #endif
