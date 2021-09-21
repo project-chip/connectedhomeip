@@ -174,7 +174,6 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         chip::Controller::FactoryInitParams params;
         chip::Controller::SetupParams commissionerParams;
 
-
         if (_listenPort) {
             params.listenPort = _listenPort;
         }
