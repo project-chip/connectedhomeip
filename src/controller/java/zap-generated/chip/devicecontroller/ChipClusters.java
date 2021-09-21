@@ -3693,18 +3693,23 @@ public class ChipClusters {
 
     public void announceOtaProvider(
         DefaultClusterCallback callback,
-        byte[] serverLocation,
+        byte[] providerLocation,
         int vendorId,
         int announcementReason,
         byte[] metadataForNode) {
       announceOtaProvider(
-          chipClusterPtr, callback, serverLocation, vendorId, announcementReason, metadataForNode);
+          chipClusterPtr,
+          callback,
+          providerLocation,
+          vendorId,
+          announcementReason,
+          metadataForNode);
     }
 
     private native void announceOtaProvider(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        byte[] serverLocation,
+        byte[] providerLocation,
         int vendorId,
         int announcementReason,
         byte[] metadataForNode);

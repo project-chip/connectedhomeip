@@ -900,7 +900,7 @@ public:
 
     // Cluster Commands
     CHIP_ERROR AnnounceOtaProvider(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::ByteSpan serverLocation, uint16_t vendorId, uint8_t announcementReason,
+                                   chip::ByteSpan providerLocation, uint16_t vendorId, uint8_t announcementReason,
                                    chip::ByteSpan metadataForNode);
 
     // Cluster Attributes

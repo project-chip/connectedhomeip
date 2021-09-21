@@ -2944,7 +2944,7 @@ using chip::Callback::Cancelable;
     return &_cppCluster;
 }
 
-- (void)announceOtaProvider:(NSData *)serverLocation
+- (void)announceOtaProvider:(NSData *)providerLocation
                    vendorId:(uint16_t)vendorId
          announcementReason:(uint8_t)announcementReason
             metadataForNode:(NSData *)metadataForNode
@@ -2952,7 +2952,7 @@ using chip::Callback::Cancelable;
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.AnnounceOtaProvider(
-            success, failure, [self asSpan:serverLocation], vendorId, announcementReason, [self asSpan:metadataForNode]);
+            success, failure, [self asSpan:providerLocation], vendorId, announcementReason, [self asSpan:metadataForNode]);
     });
 }
 

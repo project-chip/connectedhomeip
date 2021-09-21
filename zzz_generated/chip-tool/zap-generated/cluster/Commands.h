@@ -14033,7 +14033,7 @@ class OtaSoftwareUpdateRequestorAnnounceOtaProvider : public ModelCommand
 public:
     OtaSoftwareUpdateRequestorAnnounceOtaProvider() : ModelCommand("announce-ota-provider")
     {
-        AddArgument("ServerLocation", &mServerLocation);
+        AddArgument("ProviderLocation", &mProviderLocation);
         AddArgument("VendorId", 0, UINT16_MAX, &mVendorId);
         AddArgument("AnnouncementReason", 0, UINT8_MAX, &mAnnouncementReason);
         AddArgument("MetadataForNode", &mMetadataForNode);
@@ -14051,7 +14051,7 @@ public:
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AnnounceOtaProvider(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mServerLocation, mVendorId,
+        return cluster.AnnounceOtaProvider(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mProviderLocation, mVendorId,
                                            mAnnouncementReason, mMetadataForNode);
     }
 
@@ -14060,7 +14060,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mServerLocation;
+    chip::ByteSpan mProviderLocation;
     uint16_t mVendorId;
     uint8_t mAnnouncementReason;
     chip::ByteSpan mMetadataForNode;

@@ -1033,7 +1033,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOtaSoftwareUpdateRequestor : CHIPCluster
 
-- (void)announceOtaProvider:(NSData *)serverLocation
+- (void)announceOtaProvider:(NSData *)providerLocation
                    vendorId:(uint16_t)vendorId
          announcementReason:(uint8_t)announcementReason
             metadataForNode:(NSData *)metadataForNode

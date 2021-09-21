@@ -2126,7 +2126,7 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "AnnounceOtaProvider",
                     "args": {
-                        "serverLocation": "bytes",
+                        "providerLocation": "bytes",
                         "vendorId": "int",
                         "announcementReason": "int",
                         "metadataForNode": "bytes",
@@ -4249,9 +4249,9 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
                 device, ZCLendpoint, ZCLgroupid, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported, location, len(location), requestorCanConsent, metadataForProvider, len(metadataForProvider)
         )
-    def ClusterOtaSoftwareUpdateRequestor_CommandAnnounceOtaProvider(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, serverLocation: bytes, vendorId: int, announcementReason: int, metadataForNode: bytes):
+    def ClusterOtaSoftwareUpdateRequestor_CommandAnnounceOtaProvider(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, providerLocation: bytes, vendorId: int, announcementReason: int, metadataForNode: bytes):
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider(
-                device, ZCLendpoint, ZCLgroupid, serverLocation, len(serverLocation), vendorId, announcementReason, metadataForNode, len(metadataForNode)
+                device, ZCLendpoint, ZCLgroupid, providerLocation, len(providerLocation), vendorId, announcementReason, metadataForNode, len(metadataForNode)
         )
     def ClusterOnOff_CommandOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_Off(

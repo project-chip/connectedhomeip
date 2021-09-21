@@ -7856,7 +7856,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReadAttributeClusterRevision(Callba
 // OtaSoftwareUpdateRequestor Cluster Commands
 CHIP_ERROR OtaSoftwareUpdateRequestorCluster::AnnounceOtaProvider(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback,
-                                                                  chip::ByteSpan serverLocation, uint16_t vendorId,
+                                                                  chip::ByteSpan providerLocation, uint16_t vendorId,
                                                                   uint8_t announcementReason, chip::ByteSpan metadataForNode)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
@@ -7879,8 +7879,8 @@ CHIP_ERROR OtaSoftwareUpdateRequestorCluster::AnnounceOtaProvider(Callback::Canc
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // serverLocation: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), serverLocation));
+    // providerLocation: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), providerLocation));
     // vendorId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
     // announcementReason: oTAAnnouncementReason
