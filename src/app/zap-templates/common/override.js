@@ -59,6 +59,10 @@ function atomicType(arg)
     return 'chip::Percent';
   case 'percent100ths':
     return 'chip::Percent100ths';
+  case 'epoch_us':
+    return 'uint64_t';
+  case 'epoch_s':
+    return 'uint32_t';
   default:
     throw 'not overriding';
   }

@@ -750,6 +750,70 @@ tests:
                   { fabricIndex: 3, operationalCert: "Test3" },
               ]
 
+    # Tests for Epoch Microseconds
+
+    - label: "Read attribute EPOCH_US Default Value"
+      command: "readAttribute"
+      attribute: "epoch_us"
+      response:
+          value: 0
+
+    - label: "Write attribute EPOCH_US Max Value"
+      command: "writeAttribute"
+      attribute: "epoch_us"
+      arguments:
+          value: "18446744073709551615"
+
+    - label: "Read attribute EPOCH_US Max Value"
+      command: "readAttribute"
+      attribute: "epoch_us"
+      response:
+          value: "18446744073709551615"
+
+    - label: "Write attribute EPOCH_US Min Value"
+      command: "writeAttribute"
+      attribute: "epoch_us"
+      arguments:
+          value: 0
+
+    - label: "Read attribute EPOCH_US Min Value"
+      command: "readAttribute"
+      attribute: "epoch_us"
+      response:
+          value: 0
+
+    # Tests for Epoch Seconds
+
+    - label: "Read attribute EPOCH_S Default Value"
+      command: "readAttribute"
+      attribute: "epoch_s"
+      response:
+          value: 0
+
+    - label: "Write attribute EPOCH_S Max Value"
+      command: "writeAttribute"
+      attribute: "epoch_s"
+      arguments:
+          value: 4294967295
+
+    - label: "Read attribute EPOCH_S Max Value"
+      command: "readAttribute"
+      attribute: "epoch_s"
+      response:
+          value: 4294967295
+
+    - label: "Write attribute EPOCH_S Min Value"
+      command: "writeAttribute"
+      attribute: "epoch_s"
+      arguments:
+          value: 0
+
+    - label: "Read attribute EPOCH_S Min Value"
+      command: "readAttribute"
+      attribute: "epoch_s"
+      response:
+          value: 0
+
     # Tests for Unsupported attribute
 
     - label: "Read attribute UNSUPPORTED"

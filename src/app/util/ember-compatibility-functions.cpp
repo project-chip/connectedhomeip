@@ -92,6 +92,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_STATUS_ATTRIBUTE_TYPE:     // Status Code
     case ZCL_DATA_VER_ATTRIBUTE_TYPE:   // Data Version
     case ZCL_BITMAP32_ATTRIBUTE_TYPE:   // 32-bit bitmap
+    case ZCL_EPOCH_S_ATTRIBUTE_TYPE:    // Epoch Seconds
         static_assert(std::is_same<chip::ClusterId, uint32_t>::value,
                       "chip::Cluster is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::AttributeId, uint32_t>::value,
@@ -116,6 +117,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_FABRIC_ID_ATTRIBUTE_TYPE: // Fabric Id
     case ZCL_NODE_ID_ATTRIBUTE_TYPE:   // Node Id
     case ZCL_BITMAP64_ATTRIBUTE_TYPE:  // 64-bit bitmap
+    case ZCL_EPOCH_US_ATTRIBUTE_TYPE:  // Epoch Microseconds
         static_assert(std::is_same<chip::EventNumber, uint64_t>::value,
                       "chip::EventNumber is expected to be uint64_t, change this when necessary");
         static_assert(std::is_same<chip::FabricId, uint64_t>::value,
