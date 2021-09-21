@@ -472,65 +472,6 @@ JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong f
     }
 }
 
-JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring messageObj)
-{
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    ChipLogProgress(Controller, "sendMessage() called with device id and message object");
-
-    Device * chipDevice = nullptr;
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
-
-    JniUtfString jniMessage(env, messageObj);
-    System::PacketBufferHandle buffer = System::PacketBufferHandle::NewWithData(jniMessage.c_str(), strlen(jniMessage.c_str()));
-    VerifyOrReturn(!buffer.IsNull(), ThrowError(env, CHIP_ERROR_NO_MEMORY));
-
-    const Optional<SessionHandle> & sessionHandle = chipDevice->GetSecureSession();
-    VerifyOrReturn(sessionHandle.HasValue(), ThrowError(env, CHIP_ERROR_INCORRECT_STATE));
-    Messaging::ExchangeContext * exchange = chipDevice->GetExchangeManager()->NewContext(sessionHandle.Value(), nullptr);
-    VerifyOrReturn(exchange != nullptr, ThrowError(env, CHIP_ERROR_NO_MEMORY));
-
-    // We don't install a response handler, so aren't waiting for a response
-    CHIP_ERROR err = exchange->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, std::move(buffer),
-                                           Messaging::SendMessageFlags::kFromInitiator);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to send message.");
-        ThrowError(env, err);
-    }
-}
-
-JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jobject commandObj, jint aValue)
-{
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    Device * chipDevice = nullptr;
-
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
-
-    ChipLogProgress(Controller, "sendCommand() called");
-
-    jclass commandCls         = env->GetObjectClass(commandObj);
-    jmethodID commandMethodID = env->GetMethodID(commandCls, "getValue", "()I");
-    jint commandID            = env->CallIntMethod(commandObj, commandMethodID);
-
-    System::PacketBufferHandle buffer;
-
-    switch (commandID)
-    {
-    default:
-        ChipLogError(Controller, "Unknown command: %d", commandID);
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
-        break;
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to send CHIP command.");
-        ThrowError(env, err);
-    }
-}
-
 JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint duration)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
