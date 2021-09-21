@@ -21,6 +21,7 @@
  *          Platform-specific key value storage implementation for Tizen.
  */
 
+#include "AppPreference.h"
 #include <platform/KeyValueStoreManager.h>
 
 namespace chip {
@@ -29,20 +30,25 @@ namespace PersistedStorage {
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
+CHIP_ERROR KeyValueStoreManagerImpl::_Check(const char * key)
+{
+    return Internal::AppPreference::CheckData(key);
+}
+
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return Internal::AppPreference::GetData(key, value, value_size, read_bytes_size, offset_bytes);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return Internal::AppPreference::SaveData(key, reinterpret_cast<const uint8_t *>(value), value_size);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return Internal::AppPreference::RemoveData(key);
 }
 
 } // namespace PersistedStorage
