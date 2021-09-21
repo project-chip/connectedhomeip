@@ -1157,6 +1157,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
+| OtaSoftwareUpdateRequestor                                          | 0x002A |
 | OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
 | OnOffSwitchConfiguration                                            | 0x0007 |
@@ -1210,6 +1211,7 @@ constexpr chip::ClusterId kMediaInputClusterId                           = 0x050
 constexpr chip::ClusterId kMediaPlaybackClusterId                        = 0x0506;
 constexpr chip::ClusterId kNetworkCommissioningClusterId                 = 0x0031;
 constexpr chip::ClusterId kOtaSoftwareUpdateProviderClusterId            = 0x0029;
+constexpr chip::ClusterId kOtaSoftwareUpdateRequestorClusterId           = 0x002A;
 constexpr chip::ClusterId kOccupancySensingClusterId                     = 0x0406;
 constexpr chip::ClusterId kOnOffClusterId                                = 0x0006;
 constexpr chip::ClusterId kOnOffSwitchConfigurationClusterId             = 0x0007;
@@ -5333,7 +5335,7 @@ public:
     {
         AddArgument("StepMode", 0, UINT8_MAX, &mStepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mStepSize);
-        AddArgument("TransitionTime", 0, UINT8_MAX, &mTransitionTime);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
         ModelCommand::AddArguments();
@@ -5361,7 +5363,7 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mStepMode;
     uint8_t mStepSize;
-    uint8_t mTransitionTime;
+    uint16_t mTransitionTime;
     uint8_t mOptionsMask;
     uint8_t mOptionsOverride;
 };
@@ -5376,7 +5378,7 @@ public:
     {
         AddArgument("StepMode", 0, UINT8_MAX, &mStepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mStepSize);
-        AddArgument("TransitionTime", 0, UINT8_MAX, &mTransitionTime);
+        AddArgument("TransitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
         ModelCommand::AddArguments();
@@ -5404,7 +5406,7 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mStepMode;
     uint8_t mStepSize;
-    uint8_t mTransitionTime;
+    uint16_t mTransitionTime;
     uint8_t mOptionsMask;
     uint8_t mOptionsOverride;
 };
@@ -12649,6 +12651,14 @@ private:
 | * MediaStop                                                         |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * PlaybackState                                                     | 0x0000 |
+| * StartTime                                                         | 0x0001 |
+| * Duration                                                          | 0x0002 |
+| * PositionUpdatedAt                                                 | 0x0003 |
+| * Position                                                          | 0x0004 |
+| * PlaybackSpeed                                                     | 0x0005 |
+| * SeekRangeEnd                                                      | 0x0006 |
+| * SeekRangeStart                                                    | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -13019,6 +13029,278 @@ public:
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute PlaybackState
+ */
+class ReadMediaPlaybackPlaybackState : public ModelCommand
+{
+public:
+    ReadMediaPlaybackPlaybackState() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "playback-state");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaPlaybackPlaybackState()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributePlaybackState(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute StartTime
+ */
+class ReadMediaPlaybackStartTime : public ModelCommand
+{
+public:
+    ReadMediaPlaybackStartTime() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "start-time");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaPlaybackStartTime()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeStartTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Duration
+ */
+class ReadMediaPlaybackDuration : public ModelCommand
+{
+public:
+    ReadMediaPlaybackDuration() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "duration");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaPlaybackDuration()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeDuration(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute PositionUpdatedAt
+ */
+class ReadMediaPlaybackPositionUpdatedAt : public ModelCommand
+{
+public:
+    ReadMediaPlaybackPositionUpdatedAt() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "position-updated-at");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaPlaybackPositionUpdatedAt()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributePositionUpdatedAt(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Position
+ */
+class ReadMediaPlaybackPosition : public ModelCommand
+{
+public:
+    ReadMediaPlaybackPosition() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "position");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaPlaybackPosition()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributePosition(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute PlaybackSpeed
+ */
+class ReadMediaPlaybackPlaybackSpeed : public ModelCommand
+{
+public:
+    ReadMediaPlaybackPlaybackSpeed() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "playback-speed");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaPlaybackPlaybackSpeed()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributePlaybackSpeed(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute SeekRangeEnd
+ */
+class ReadMediaPlaybackSeekRangeEnd : public ModelCommand
+{
+public:
+    ReadMediaPlaybackSeekRangeEnd() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "seek-range-end");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaPlaybackSeekRangeEnd()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSeekRangeEnd(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute SeekRangeStart
+ */
+class ReadMediaPlaybackSeekRangeStart : public ModelCommand
+{
+public:
+    ReadMediaPlaybackSeekRangeStart() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "seek-range-start");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaPlaybackSeekRangeStart()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSeekRangeStart(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -13720,6 +14002,224 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0029) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster OtaSoftwareUpdateRequestor                                  | 0x002A |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AnnounceOtaProvider                                               |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * DefaultOtaProvider                                                | 0x0001 |
+| * UpdatePossible                                                    | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command AnnounceOtaProvider
+ */
+class OtaSoftwareUpdateRequestorAnnounceOtaProvider : public ModelCommand
+{
+public:
+    OtaSoftwareUpdateRequestorAnnounceOtaProvider() : ModelCommand("announce-ota-provider")
+    {
+        AddArgument("ServerLocation", &mServerLocation);
+        AddArgument("VendorId", 0, UINT16_MAX, &mVendorId);
+        AddArgument("AnnouncementReason", 0, UINT8_MAX, &mAnnouncementReason);
+        AddArgument("MetadataForNode", &mMetadataForNode);
+        ModelCommand::AddArguments();
+    }
+    ~OtaSoftwareUpdateRequestorAnnounceOtaProvider()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.AnnounceOtaProvider(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mServerLocation, mVendorId,
+                                           mAnnouncementReason, mMetadataForNode);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::ByteSpan mServerLocation;
+    uint16_t mVendorId;
+    uint8_t mAnnouncementReason;
+    chip::ByteSpan mMetadataForNode;
+};
+
+/*
+ * Discover Attributes
+ */
+class DiscoverOtaSoftwareUpdateRequestorAttributes : public ModelCommand
+{
+public:
+    DiscoverOtaSoftwareUpdateRequestorAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverOtaSoftwareUpdateRequestorAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute DefaultOtaProvider
+ */
+class ReadOtaSoftwareUpdateRequestorDefaultOtaProvider : public ModelCommand
+{
+public:
+    ReadOtaSoftwareUpdateRequestorDefaultOtaProvider() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "default-ota-provider");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOtaSoftwareUpdateRequestorDefaultOtaProvider()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeDefaultOtaProvider(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteOtaSoftwareUpdateRequestorDefaultOtaProvider : public ModelCommand
+{
+public:
+    WriteOtaSoftwareUpdateRequestorDefaultOtaProvider() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "default-ota-provider");
+        AddArgument("attr-value", &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteOtaSoftwareUpdateRequestorDefaultOtaProvider()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeDefaultOtaProvider(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::ByteSpan mValue;
+};
+
+/*
+ * Attribute UpdatePossible
+ */
+class ReadOtaSoftwareUpdateRequestorUpdatePossible : public ModelCommand
+{
+public:
+    ReadOtaSoftwareUpdateRequestorUpdatePossible() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "update-possible");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOtaSoftwareUpdateRequestorUpdatePossible()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeUpdatePossible(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadOtaSoftwareUpdateRequestorClusterRevision : public ModelCommand
+{
+public:
+    ReadOtaSoftwareUpdateRequestorClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOtaSoftwareUpdateRequestorClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -14783,7 +15283,8 @@ class OperationalCredentialsAddNOC : public ModelCommand
 public:
     OperationalCredentialsAddNOC() : ModelCommand("add-noc")
     {
-        AddArgument("NOCArray", &mNOCArray);
+        AddArgument("NOCValue", &mNOCValue);
+        AddArgument("ICACValue", &mICACValue);
         AddArgument("IPKValue", &mIPKValue);
         AddArgument("CaseAdminNode", 0, UINT64_MAX, &mCaseAdminNode);
         AddArgument("AdminVendorId", 0, UINT16_MAX, &mAdminVendorId);
@@ -14801,8 +15302,8 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.AddNOC(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNOCArray, mIPKValue, mCaseAdminNode,
-                              mAdminVendorId);
+        return cluster.AddNOC(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNOCValue, mICACValue, mIPKValue,
+                              mCaseAdminNode, mAdminVendorId);
     }
 
 private:
@@ -14811,7 +15312,8 @@ private:
                                                                                        this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mNOCArray;
+    chip::ByteSpan mNOCValue;
+    chip::ByteSpan mICACValue;
     chip::ByteSpan mIPKValue;
     chip::NodeId mCaseAdminNode;
     uint16_t mAdminVendorId;
@@ -15000,7 +15502,8 @@ class OperationalCredentialsUpdateNOC : public ModelCommand
 public:
     OperationalCredentialsUpdateNOC() : ModelCommand("update-noc")
     {
-        AddArgument("NOCArray", &mNOCArray);
+        AddArgument("NOCValue", &mNOCValue);
+        AddArgument("ICACValue", &mICACValue);
         ModelCommand::AddArguments();
     }
     ~OperationalCredentialsUpdateNOC()
@@ -15015,7 +15518,7 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.UpdateNOC(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNOCArray);
+        return cluster.UpdateNOC(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNOCValue, mICACValue);
     }
 
 private:
@@ -15024,7 +15527,8 @@ private:
                                                                                        this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::ByteSpan mNOCArray;
+    chip::ByteSpan mNOCValue;
+    chip::ByteSpan mICACValue;
 };
 
 /*
@@ -25207,19 +25711,27 @@ void registerClusterMediaPlayback(Commands & commands)
     const char * clusterName = "MediaPlayback";
 
     commands_list clusterCommands = {
-        make_unique<MediaPlaybackMediaFastForward>(),    //
-        make_unique<MediaPlaybackMediaNext>(),           //
-        make_unique<MediaPlaybackMediaPause>(),          //
-        make_unique<MediaPlaybackMediaPlay>(),           //
-        make_unique<MediaPlaybackMediaPrevious>(),       //
-        make_unique<MediaPlaybackMediaRewind>(),         //
-        make_unique<MediaPlaybackMediaSeek>(),           //
-        make_unique<MediaPlaybackMediaSkipBackward>(),   //
-        make_unique<MediaPlaybackMediaSkipForward>(),    //
-        make_unique<MediaPlaybackMediaStartOver>(),      //
-        make_unique<MediaPlaybackMediaStop>(),           //
-        make_unique<DiscoverMediaPlaybackAttributes>(),  //
-        make_unique<ReadMediaPlaybackClusterRevision>(), //
+        make_unique<MediaPlaybackMediaFastForward>(),      //
+        make_unique<MediaPlaybackMediaNext>(),             //
+        make_unique<MediaPlaybackMediaPause>(),            //
+        make_unique<MediaPlaybackMediaPlay>(),             //
+        make_unique<MediaPlaybackMediaPrevious>(),         //
+        make_unique<MediaPlaybackMediaRewind>(),           //
+        make_unique<MediaPlaybackMediaSeek>(),             //
+        make_unique<MediaPlaybackMediaSkipBackward>(),     //
+        make_unique<MediaPlaybackMediaSkipForward>(),      //
+        make_unique<MediaPlaybackMediaStartOver>(),        //
+        make_unique<MediaPlaybackMediaStop>(),             //
+        make_unique<DiscoverMediaPlaybackAttributes>(),    //
+        make_unique<ReadMediaPlaybackPlaybackState>(),     //
+        make_unique<ReadMediaPlaybackStartTime>(),         //
+        make_unique<ReadMediaPlaybackDuration>(),          //
+        make_unique<ReadMediaPlaybackPositionUpdatedAt>(), //
+        make_unique<ReadMediaPlaybackPosition>(),          //
+        make_unique<ReadMediaPlaybackPlaybackSpeed>(),     //
+        make_unique<ReadMediaPlaybackSeekRangeEnd>(),      //
+        make_unique<ReadMediaPlaybackSeekRangeStart>(),    //
+        make_unique<ReadMediaPlaybackClusterRevision>(),   //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -25255,6 +25767,21 @@ void registerClusterOtaSoftwareUpdateProvider(Commands & commands)
         make_unique<OtaSoftwareUpdateProviderQueryImage>(),          //
         make_unique<DiscoverOtaSoftwareUpdateProviderAttributes>(),  //
         make_unique<ReadOtaSoftwareUpdateProviderClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterOtaSoftwareUpdateRequestor(Commands & commands)
+{
+    const char * clusterName = "OtaSoftwareUpdateRequestor";
+
+    commands_list clusterCommands = {
+        make_unique<OtaSoftwareUpdateRequestorAnnounceOtaProvider>(),     //
+        make_unique<DiscoverOtaSoftwareUpdateRequestorAttributes>(),      //
+        make_unique<ReadOtaSoftwareUpdateRequestorDefaultOtaProvider>(),  //
+        make_unique<WriteOtaSoftwareUpdateRequestorDefaultOtaProvider>(), //
+        make_unique<ReadOtaSoftwareUpdateRequestorUpdatePossible>(),      //
+        make_unique<ReadOtaSoftwareUpdateRequestorClusterRevision>(),     //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -25779,6 +26306,7 @@ void registerClusters(Commands & commands)
     registerClusterMediaPlayback(commands);
     registerClusterNetworkCommissioning(commands);
     registerClusterOtaSoftwareUpdateProvider(commands);
+    registerClusterOtaSoftwareUpdateRequestor(commands);
     registerClusterOccupancySensing(commands);
     registerClusterOnOff(commands);
     registerClusterOnOffSwitchConfiguration(commands);

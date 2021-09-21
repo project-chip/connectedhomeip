@@ -371,6 +371,13 @@ EmberAfStatus SetReachable(chip::EndpointId endpoint, bool reachable);
 } // namespace Attributes
 } // namespace Basic
 
+namespace OtaSoftwareUpdateRequestor {
+namespace Attributes {
+EmberAfStatus GetUpdatePossible(chip::EndpointId endpoint, bool * updatePossible); // boolean
+EmberAfStatus SetUpdatePossible(chip::EndpointId endpoint, bool updatePossible);
+} // namespace Attributes
+} // namespace OtaSoftwareUpdateRequestor
+
 namespace GeneralCommissioning {
 namespace Attributes {
 EmberAfStatus GetBreadcrumb(chip::EndpointId endpoint, uint64_t * breadcrumb); // int64u
@@ -1774,10 +1781,10 @@ EmberAfStatus GetStartTime(chip::EndpointId endpoint, uint64_t * startTime); // 
 EmberAfStatus SetStartTime(chip::EndpointId endpoint, uint64_t startTime);
 EmberAfStatus GetDuration(chip::EndpointId endpoint, uint64_t * duration); // int64u
 EmberAfStatus SetDuration(chip::EndpointId endpoint, uint64_t duration);
-EmberAfStatus GetUpdatedAt(chip::EndpointId endpoint, uint64_t * updatedAt); // int64u
-EmberAfStatus SetUpdatedAt(chip::EndpointId endpoint, uint64_t updatedAt);
-EmberAfStatus GetPosistion(chip::EndpointId endpoint, uint64_t * posistion); // int64u
-EmberAfStatus SetPosistion(chip::EndpointId endpoint, uint64_t posistion);
+EmberAfStatus GetPositionUpdatedAt(chip::EndpointId endpoint, uint64_t * positionUpdatedAt); // int64u
+EmberAfStatus SetPositionUpdatedAt(chip::EndpointId endpoint, uint64_t positionUpdatedAt);
+EmberAfStatus GetPosition(chip::EndpointId endpoint, uint64_t * position); // int64u
+EmberAfStatus SetPosition(chip::EndpointId endpoint, uint64_t position);
 EmberAfStatus GetPlaybackSpeed(chip::EndpointId endpoint, uint64_t * playbackSpeed); // int64u
 EmberAfStatus SetPlaybackSpeed(chip::EndpointId endpoint, uint64_t playbackSpeed);
 EmberAfStatus GetSeekRangeEnd(chip::EndpointId endpoint, uint64_t * seekRangeEnd); // int64u

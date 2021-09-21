@@ -33,6 +33,7 @@ class MockResolver : public Resolver
 public:
     CHIP_ERROR SetResolverDelegate(ResolverDelegate *) override { return SetResolverDelegateStatus; }
     CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) override { return StartResolverStatus; }
+    void ShutdownResolver() override {}
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override { return ResolveNodeIdStatus; }
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return FindCommissionersStatus; }
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -49,6 +50,7 @@ public:
 
 namespace {
 
+#if INET_CONFIG_ENABLE_IPV4
 void TestGetDiscoveredCommissioner_HappyCase(nlTestSuite * inSuite, void * inContext)
 {
     MockResolver resolver;
@@ -66,17 +68,6 @@ void TestGetDiscoveredCommissioner_HappyCase(nlTestSuite * inSuite, void * inCon
     NL_TEST_ASSERT(inSuite, inNodeData.ipAddress[0] == controller.GetDiscoveredCommissioner(0)->ipAddress[0]);
     NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->port == 5540);
     NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->numIPs == 1);
-}
-
-void TestGetDiscoveredCommissioner_NoNodesDiscovered_ReturnsNullptr(nlTestSuite * inSuite, void * inContext)
-{
-    MockResolver resolver;
-    CommissionableNodeController controller(&resolver);
-
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
-    {
-        NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(i) == nullptr);
-    }
 }
 
 void TestGetDiscoveredCommissioner_InvalidNodeDiscovered_ReturnsNullptr(nlTestSuite * inSuite, void * inContext)
@@ -123,6 +114,19 @@ void TestGetDiscoveredCommissioner_HappyCase_OneValidOneInvalidNode(nlTestSuite 
     NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(1) == nullptr);
 }
 
+#endif // INET_CONFIG_ENABLE_IPV4
+
+void TestGetDiscoveredCommissioner_NoNodesDiscovered_ReturnsNullptr(nlTestSuite * inSuite, void * inContext)
+{
+    MockResolver resolver;
+    CommissionableNodeController controller(&resolver);
+
+    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
+    {
+        NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(i) == nullptr);
+    }
+}
+
 void TestDiscoverCommissioners_HappyCase(nlTestSuite * inSuite, void * inContext)
 {
     MockResolver resolver;
@@ -166,10 +170,12 @@ void TestDiscoverCommissioners_FindCommissionersError_ReturnsError(nlTestSuite *
 // clang-format off
 const nlTest sTests[] =
 {
+#if INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("TestGetDiscoveredCommissioner_HappyCase", TestGetDiscoveredCommissioner_HappyCase),
-    NL_TEST_DEF("TestGetDiscoveredCommissioner_NoNodesDiscovered_ReturnsNullptr", TestGetDiscoveredCommissioner_NoNodesDiscovered_ReturnsNullptr),
-    NL_TEST_DEF("TestGetDiscoveredCommissioner_InvalidNodeDiscovered_ReturnsNullptr", TestGetDiscoveredCommissioner_InvalidNodeDiscovered_ReturnsNullptr),
     NL_TEST_DEF("TestGetDiscoveredCommissioner_HappyCase_OneValidOneInvalidNode", TestGetDiscoveredCommissioner_HappyCase_OneValidOneInvalidNode),
+    NL_TEST_DEF("TestGetDiscoveredCommissioner_InvalidNodeDiscovered_ReturnsNullptr", TestGetDiscoveredCommissioner_InvalidNodeDiscovered_ReturnsNullptr),
+#endif // INET_CONFIG_ENABLE_IPV4
+    NL_TEST_DEF("TestGetDiscoveredCommissioner_NoNodesDiscovered_ReturnsNullptr", TestGetDiscoveredCommissioner_NoNodesDiscovered_ReturnsNullptr),
     NL_TEST_DEF("TestDiscoverCommissioners_HappyCase", TestDiscoverCommissioners_HappyCase),
     NL_TEST_DEF("TestDiscoverCommissioners_HappyCaseWithDiscoveryFilter", TestDiscoverCommissioners_HappyCaseWithDiscoveryFilter),
     NL_TEST_DEF("TestDiscoverCommissioners_SetResolverDelegateError_ReturnsError", TestDiscoverCommissioners_SetResolverDelegateError_ReturnsError),

@@ -140,11 +140,6 @@ uint16_t GetLongDiscriminator(const ByteSpan & value)
     return MakeU16FromAsciiDecimal(value);
 }
 
-uint8_t GetAdditionalPairing(const ByteSpan & value)
-{
-    return MakeU8FromAsciiDecimal(value);
-}
-
 uint8_t GetCommissioningMode(const ByteSpan & value)
 {
     return MakeU8FromAsciiDecimal(value);
@@ -188,102 +183,55 @@ uint32_t GetRetryInterval(const ByteSpan & value)
 
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 {
-    if (IsKey(key, "D"))
+    for (auto & info : txtFieldInfo)
     {
-        return TxtFieldKey::kLongDiscriminator;
+        if (IsKey(key, info.keyStr))
+        {
+            return info.key;
+        }
     }
-    else if (IsKey(key, "VP"))
-    {
-        return TxtFieldKey::kVendorProduct;
-    }
-    else if (IsKey(key, "AP"))
-    {
-        return TxtFieldKey::kAdditionalPairing;
-    }
-    else if (IsKey(key, "CM"))
-    {
-        return TxtFieldKey::kCommissioningMode;
-    }
-    else if (IsKey(key, "DT"))
-    {
-        return TxtFieldKey::kDeviceType;
-    }
-    else if (IsKey(key, "DN"))
-    {
-        return TxtFieldKey::kDeviceName;
-    }
-    else if (IsKey(key, "RI"))
-    {
-        return TxtFieldKey::kRotatingDeviceId;
-    }
-    else if (IsKey(key, "PI"))
-    {
-        return TxtFieldKey::kPairingInstruction;
-    }
-    else if (IsKey(key, "PH"))
-    {
-        return TxtFieldKey::kPairingHint;
-    }
-    else if (IsKey(key, "CRI"))
-    {
-        return TxtFieldKey::kMrpRetryIntervalIdle;
-    }
-    else if (IsKey(key, "CRA"))
-    {
-        return TxtFieldKey::kMrpRetryIntervalActive;
-    }
-    else if (IsKey(key, "T"))
-    {
-        return TxtFieldKey::kTcpSupport;
-    }
-    else
-    {
-        return TxtFieldKey::kUnknown;
-    }
+    return TxtFieldKey::kUnknown;
 }
 
 } // namespace Internal
 
 void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredNodeData & nodeData)
 {
-    Internal::TxtFieldKey keyType = Internal::GetTxtFieldKey(key);
+    TxtFieldKey keyType = Internal::GetTxtFieldKey(key);
     switch (keyType)
     {
-    case Internal::TxtFieldKey::kLongDiscriminator:
+    case TxtFieldKey::kLongDiscriminator:
         nodeData.longDiscriminator = Internal::GetLongDiscriminator(val);
         break;
-    case Internal::TxtFieldKey::kVendorProduct:
+    case TxtFieldKey::kVendorProduct:
         nodeData.vendorId  = Internal::GetVendor(val);
         nodeData.productId = Internal::GetProduct(val);
         break;
-    case Internal::TxtFieldKey::kAdditionalPairing:
-        nodeData.additionalPairing = Internal::GetAdditionalPairing(val);
-        break;
-    case Internal::TxtFieldKey::kCommissioningMode:
+    case TxtFieldKey::kCommissioningMode:
         nodeData.commissioningMode = Internal::GetCommissioningMode(val);
         break;
-    case Internal::TxtFieldKey::kDeviceType:
+    case TxtFieldKey::kDeviceType:
         nodeData.deviceType = Internal::GetDeviceType(val);
         break;
-    case Internal::TxtFieldKey::kDeviceName:
+    case TxtFieldKey::kDeviceName:
         Internal::GetDeviceName(val, nodeData.deviceName);
         break;
-    case Internal::TxtFieldKey::kRotatingDeviceId:
+    case TxtFieldKey::kRotatingDeviceId:
         Internal::GetRotatingDeviceId(val, nodeData.rotatingId, &nodeData.rotatingIdLen);
         break;
-    case Internal::TxtFieldKey::kPairingInstruction:
+    case TxtFieldKey::kPairingInstruction:
         Internal::GetPairingInstruction(val, nodeData.pairingInstruction);
         break;
-    case Internal::TxtFieldKey::kPairingHint:
+    case TxtFieldKey::kPairingHint:
         nodeData.pairingHint = Internal::GetPairingHint(val);
         break;
-    case Internal::TxtFieldKey::kMrpRetryIntervalIdle:
+    case TxtFieldKey::kMrpRetryIntervalIdle:
         nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(val);
         break;
-    case Internal::TxtFieldKey::kMrpRetryIntervalActive:
+    case TxtFieldKey::kMrpRetryIntervalActive:
         nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(val);
         break;
-    case Internal::TxtFieldKey::kTcpSupport:
+    case TxtFieldKey::kTcpSupport:
         nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(val);
         break;
     default:
@@ -295,13 +243,13 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedN
 {
     switch (Internal::GetTxtFieldKey(key))
     {
-    case Internal::TxtFieldKey::kMrpRetryIntervalIdle:
+    case TxtFieldKey::kMrpRetryIntervalIdle:
         nodeData.mMrpRetryIntervalIdle = Internal::GetRetryInterval(value);
         break;
-    case Internal::TxtFieldKey::kMrpRetryIntervalActive:
+    case TxtFieldKey::kMrpRetryIntervalActive:
         nodeData.mMrpRetryIntervalActive = Internal::GetRetryInterval(value);
         break;
-    case Internal::TxtFieldKey::kTcpSupport:
+    case TxtFieldKey::kTcpSupport:
         nodeData.mSupportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
         break;
     default:

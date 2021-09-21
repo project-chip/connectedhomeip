@@ -38,7 +38,7 @@ class AdditionalDataPayloadParser
 {
 private:
     const uint8_t * mPayloadBufferData;
-    const uint32_t mPayloadBufferLength;
+    const size_t mPayloadBufferLength;
 
 public:
     /**
@@ -49,7 +49,7 @@ public:
      *                                     it needs to outlive the lifetime of this parse.
      * @param[in] payloadBufferLength      The buffer data length for the additional data payload.
      */
-    AdditionalDataPayloadParser(const uint8_t * payloadBufferData, const uint32_t payloadBufferLength) :
+    AdditionalDataPayloadParser(const uint8_t * payloadBufferData, const size_t payloadBufferLength) :
         mPayloadBufferData(payloadBufferData), mPayloadBufferLength(payloadBufferLength)
     {}
 

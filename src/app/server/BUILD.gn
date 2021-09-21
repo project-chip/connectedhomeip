@@ -27,14 +27,14 @@ static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "CommissioningWindowManager.cpp",
+    "CommissioningWindowManager.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
     "Mdns.cpp",
     "Mdns.h",
     "OnboardingCodesUtil.cpp",
     "OnboardingCodesUtil.h",
-    "RendezvousServer.cpp",
-    "RendezvousServer.h",
     "Server.cpp",
     "Server.h",
   ]

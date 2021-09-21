@@ -47,6 +47,7 @@
 namespace chip {
 namespace System {
 
+namespace Internal {
 /**
  * This implements a mapping function for CHIP System Layer errors that allows mapping integers in the number space of the
  * underlying POSIX network and OS stack errors into a platform- or system-specific range. Error codes beyond those currently
@@ -60,6 +61,13 @@ DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
 {
     return (aError == 0 ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError)));
 }
+
+DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError, const char * file, unsigned int line)
+{
+    return (aError == 0 ? CHIP_NO_ERROR
+                        : CHIP_ERROR(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError), file, line));
+}
+} // namespace Internal
 
 /**
  * This implements a function to return an NULL-terminated OS-specific descriptive C string, associated with the specified, mapped
@@ -124,7 +132,7 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, CHIP_ERROR err)
  */
 DLL_EXPORT CHIP_ERROR MapErrorZephyr(int aError)
 {
-    return MapErrorPOSIX(-aError);
+    return Internal::MapErrorPOSIX(-aError);
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

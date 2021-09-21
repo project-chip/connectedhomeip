@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/src/platform/device.gni")
 
 chip_test_suite("tests") {
   output_name = "libAppTests"
@@ -24,21 +25,29 @@ chip_test_suite("tests") {
   test_sources = [
     "TestCHIPDeviceCallbacksMgr.cpp",
     "TestClusterInfo.cpp",
-    "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
+    "TestDataModelSerialization.cpp",
     "TestEventLogging.cpp",
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
-    "TestReadInteraction.cpp",
-    "TestReportingEngine.cpp",
-    "TestWriteInteraction.cpp",
+    "TestStatusResponse.cpp",
   ]
+
+  if (chip_device_platform != "efr32") {
+    test_sources += [
+      "TestCommandInteraction.cpp",
+      "TestReadInteraction.cpp",
+      "TestReportingEngine.cpp",
+      "TestWriteInteraction.cpp",
+    ]
+  }
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging/tests:helpers",
@@ -46,4 +55,10 @@ chip_test_suite("tests") {
     "${chip_root}/src/transport/raw/tests:helpers",
     "${nlunit_test_root}:nlunit-test",
   ]
+
+  if (chip_config_network_layer_ble &&
+      (chip_device_platform == "linux" || chip_device_platform == "Darwin")) {
+    test_sources += [ "TestCommissionManager.cpp" ]
+    public_deps += [ "${chip_root}/src/app/server" ]
+  }
 }

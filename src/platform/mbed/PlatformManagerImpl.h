@@ -36,12 +36,19 @@
 #undef SUCCESS
 #endif
 #include <mstd_atomic>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 #include <sys/select.h>
 
 namespace chip {
 namespace DeviceLayer {
+
+namespace Internal {
+
+class GapEventHandler;
+class CHIPService;
+} // namespace Internal
 
 /**
  * Concrete implementation of the PlatformManager singleton object for the nRF Connect SDK platforms.
@@ -77,7 +84,7 @@ private:
     void _LockChipStack();
     bool _TryLockChipStack();
     void _UnlockChipStack();
-    void _PostEvent(const ChipDeviceEvent * event);
+    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop();
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
@@ -96,6 +103,7 @@ private:
     friend class Internal::CHIPService;
 
     using PlatformManager::PostEvent;
+    using PlatformManager::PostEventOrDie;
     static PlatformManagerImpl sInstance;
 
     // ===== Members for internal use.

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <platform/CHIPDeviceConfig.h>
+
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>

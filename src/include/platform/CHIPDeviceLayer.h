@@ -28,6 +28,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/GeneralUtils.h>
+#include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayerImpl.h>
@@ -44,9 +45,29 @@
 namespace chip {
 namespace DeviceLayer {
 
+namespace Internal {
+extern chip::System::Layer * gSystemLayer;
+} // namespace Internal
+
 struct ChipDeviceEvent;
-extern chip::System::LayerImpl SystemLayer;
 extern Inet::InetLayer InetLayer;
+
+inline chip::System::Layer & SystemLayer()
+{
+    return *Internal::gSystemLayer;
+}
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+inline chip::System::LayerSockets & SystemLayerSockets()
+{
+    return *static_cast<chip::System::LayerSockets *>(Internal::gSystemLayer);
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+inline void SetSystemLayerForTesting(System::Layer * layer)
+{
+    Internal::gSystemLayer = layer;
+}
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -142,6 +142,12 @@ private:
     uint32_t _GetWiFiAPIdleTimeoutMS();
     void _SetWiFiAPIdleTimeoutMS(uint32_t val);
 
+    CHIP_ERROR _GetEthPacketRxCount(uint64_t & packetRxCount);
+    CHIP_ERROR _GetEthPacketTxCount(uint64_t & packetTxCount);
+    CHIP_ERROR _GetEthTxErrCount(uint64_t & txErrCount);
+    CHIP_ERROR _GetEthCollisionCount(uint64_t & collisionCount);
+    CHIP_ERROR _GetEthOverrunCount(uint64_t & overrunCount);
+
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                        gpointer user_data);
@@ -151,6 +157,8 @@ private:
 
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
     static struct GDBusWpaSupplicant mWpaSupplicant;
+    static std::mutex mWpaSupplicantMutex;
+
 #endif
 
     // ==================== ConnectivityManager Private Methods ====================

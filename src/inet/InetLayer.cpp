@@ -93,10 +93,6 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
     UDPEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumUDPEps],
                                      aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumUDPEps]);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    RawEndPoint::sPool.GetStatistics(aSnapshot.mResourcesInUse[chip::System::Stats::kInetLayer_NumRawEps],
-                                     aSnapshot.mHighWatermarks[chip::System::Stats::kInetLayer_NumRawEps]);
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 }
 
 /**
@@ -188,7 +184,7 @@ CHIP_ERROR InetLayer::InitQueueLimiter(void)
 {
     if (sem_init(&mDroppableEvents, 0, INET_CONFIG_MAX_DROPPABLE_EVENTS) != 0)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
     return CHIP_NO_ERROR;
 }
@@ -331,17 +327,6 @@ CHIP_ERROR InetLayer::Shutdown()
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        // Close all raw endpoints owned by this Inet layer instance.
-        RawEndPoint::sPool.ForEachActiveObject([&](RawEndPoint * lEndPoint) {
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->Close();
-            }
-            return true;
-        });
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         // Abort all TCP endpoints owned by this instance.
@@ -501,50 +486,6 @@ CHIP_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
 
     return CHIP_NO_ERROR;
 }
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-/**
- *  Creates a new RawEndPoint object for a specific IP version and protocol.
- *
- *  @note
- *    This function gets a free RawEndPoint object from a pre-allocated pool
- *    and also calls the explicit initializer on the new object.
- *
- *  @param[in]      ipVer          IPv4 or IPv6.
- *
- *  @param[in]      ipProto        A protocol within the IP family (e.g., ICMPv4 or ICMPv6).
- *
- *  @param[in,out]  retEndPoint    A pointer to a pointer of the RawEndPoint object that is
- *                                 a return parameter upon completion of the object creation.
- *                                 *retEndPoint is NULL if creation fails.
- *
- *  @retval  #CHIP_ERROR_INCORRECT_STATE    If the InetLayer object is not initialized.
- *  @retval  #CHIP_ERROR_ENDPOINT_POOL_FULL If the InetLayer RawEndPoint pool is full and no new
- *                                          endpoints can be created.
- *  @retval  #CHIP_NO_ERROR                 On success.
- *
- */
-CHIP_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEndPoint ** retEndPoint)
-{
-    assertChipStackLockedByCurrentThread();
-
-    *retEndPoint = nullptr;
-
-    VerifyOrReturnError(State == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
-
-    *retEndPoint = RawEndPoint::sPool.TryCreate();
-    if (*retEndPoint == nullptr)
-    {
-        ChipLogError(Inet, "%s endpoint pool FULL", "Raw");
-        return CHIP_ERROR_ENDPOINT_POOL_FULL;
-    }
-
-    (*retEndPoint)->Inet::RawEndPoint::Init(this, ipVer, ipProto);
-    SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumRawEps);
-
-    return CHIP_NO_ERROR;
-}
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 /**
@@ -1034,13 +975,6 @@ CHIP_ERROR InetLayer::HandleInetLayerEvent(chip::System::Object & aTarget, chip:
         static_cast<TCPEndPoint &>(aTarget).HandleError(static_cast<CHIP_ERROR>(aArgument));
         break;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    case kInetEvent_RawDataReceived:
-        static_cast<RawEndPoint &>(aTarget).HandleDataReceived(
-            System::PacketBufferHandle::Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
-        break;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     case kInetEvent_UDPDataReceived:

@@ -133,18 +133,10 @@ void ChipCertificateSet::Clear()
 CHIP_ERROR ChipCertificateSet::LoadCert(const ByteSpan chipCert, BitFlags<CertDecodeFlags> decodeFlags)
 {
     TLVReader reader;
-    TLVType type;
-    uint64_t tag;
 
     reader.Init(chipCert);
 
-    ReturnErrorOnFailure(reader.Next());
-
-    type = reader.GetType();
-    tag  = reader.GetTag();
-
-    VerifyOrReturnError((type == kTLVType_Structure || type == kTLVType_Array) && (tag == AnonymousTag),
-                        CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag));
 
     return LoadCert(reader, decodeFlags, chipCert);
 }
@@ -231,73 +223,6 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
     mCertCount++;
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ChipCertificateSet::LoadCerts(const ByteSpan chipCert, BitFlags<CertDecodeFlags> decodeFlags)
-{
-    TLVReader reader;
-    TLVType type;
-    uint64_t tag;
-
-    reader.Init(chipCert);
-
-    ReturnErrorOnFailure(reader.Next());
-
-    type = reader.GetType();
-    tag  = reader.GetTag();
-
-    VerifyOrReturnError((type == kTLVType_Structure || type == kTLVType_Array) && (tag == AnonymousTag),
-                        CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-
-    return LoadCerts(reader, decodeFlags);
-}
-
-CHIP_ERROR ChipCertificateSet::LoadCerts(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags)
-{
-    CHIP_ERROR err;
-    uint8_t initialCertCount = mCertCount;
-
-    // If positioned on a structure, we assume that structure is a single certificate.
-    if (reader.GetType() == kTLVType_Structure)
-    {
-        err = LoadCert(reader, decodeFlags);
-        SuccessOrExit(err);
-    }
-
-    // Other we expect to be positioned on an Array that contains a sequence of
-    // zero or more certificates...
-    else
-    {
-        TLVType containerType;
-
-        err = reader.EnterContainer(containerType);
-        SuccessOrExit(err);
-
-        while ((err = reader.Next()) == CHIP_NO_ERROR)
-        {
-            VerifyOrExit(reader.GetTag() == AnonymousTag, err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-
-            err = LoadCert(reader, decodeFlags);
-            SuccessOrExit(err);
-        }
-        err = reader.VerifyEndOfContainer();
-        SuccessOrExit(err);
-
-        err = reader.ExitContainer(containerType);
-        SuccessOrExit(err);
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        for (uint8_t i = initialCertCount; i < mCertCount; i++)
-        {
-            mCerts[i].~ChipCertificateData();
-        }
-        mCertCount = initialCertCount;
-    }
-
-    return err;
 }
 
 CHIP_ERROR ChipCertificateSet::ReleaseLastCert()
@@ -862,18 +787,15 @@ CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint1
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, uint8_t * derSig, const uint16_t derSigBufSize,
-                                         uint16_t & derSigLen)
+CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, MutableByteSpan & derSig)
 {
     ASN1Writer writer;
 
-    VerifyOrReturnError(derSig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    writer.Init(derSig, derSigBufSize);
+    writer.Init(derSig);
 
     ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(rawSig, writer));
 
-    derSigLen = writer.GetLengthWritten();
+    derSig.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
 }
@@ -972,13 +894,30 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nod
     return ExtractNodeIdFabricIdFromOpCert(certSet.GetCertSet()[0], nodeId, fabricId);
 }
 
-CHIP_ERROR ExtractNodeIdFabricIdFromOpCertArray(const ByteSpan & opcertarray, NodeId * nodeId, FabricId * fabricId)
+CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKeySpan & publicKey)
 {
-    ByteSpan noc;
-    ByteSpan icac;
-    ReturnErrorOnFailure(ExtractCertsFromCertArray(opcertarray, noc, icac));
+    ChipCertificateSet certSet;
 
-    return ExtractNodeIdFabricIdFromOpCert(noc, nodeId, fabricId);
+    ReturnErrorOnFailure(certSet.Init(1));
+
+    ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
+
+    publicKey = certSet.GetLastCert()->mPublicKey;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId & skid)
+{
+    ChipCertificateSet certSet;
+
+    ReturnErrorOnFailure(certSet.Init(1));
+
+    ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
+
+    skid = certSet.GetLastCert()->mSubjectKeyId;
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Credentials

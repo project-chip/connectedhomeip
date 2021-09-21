@@ -20,6 +20,7 @@
 
 #include "../common/Command.h"
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <zap-generated/tests/CHIPClusters.h>
 
 class TestCommand : public Command
 {

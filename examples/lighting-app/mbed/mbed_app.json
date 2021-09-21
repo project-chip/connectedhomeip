@@ -30,11 +30,11 @@
                 "NL_ASSERT_EXPECT_FLAGS=NL_ASSERT_FLAG_LOG",
                 "WHD_PRINT_DISABLE"
             ],
+            "target.components_add": ["capsense"],
             "led-active-state": 0,
             "system-state-led": "LED1",
             "lighting-state-led": "P9_6",
-            "lighting-button": "USER_BUTTON",
-            "function-button": "P9_7"
+            "lighting-button": "USER_BUTTON"
         }
     },
     "config": {

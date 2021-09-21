@@ -1459,7 +1459,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
-            uint8_t transitionTime;
+            uint16_t transitionTime;
             uint8_t optionsMask;
             uint8_t optionsOverride;
             bool argExists[5];
@@ -1534,7 +1534,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
-            uint8_t transitionTime;
+            uint16_t transitionTime;
             uint8_t optionsMask;
             uint8_t optionsOverride;
             bool argExists[5];
@@ -3297,12 +3297,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Clusters::OperationalCredentials::Commands::Ids::AddNOC: {
-            expectArgumentCount = 4;
-            chip::ByteSpan NOCArray;
+            expectArgumentCount = 5;
+            chip::ByteSpan NOCValue;
+            chip::ByteSpan ICACValue;
             chip::ByteSpan IPKValue;
             chip::NodeId CaseAdminNode;
             uint16_t AdminVendorId;
-            bool argExists[4];
+            bool argExists[5];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -3315,7 +3316,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 4)
+                if (currentDecodeTagId < 5)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -3332,15 +3333,18 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(NOCArray);
+                    TLVUnpackError = aDataTlv.Get(NOCValue);
                     break;
                 case 1:
-                    TLVUnpackError = aDataTlv.Get(IPKValue);
+                    TLVUnpackError = aDataTlv.Get(ICACValue);
                     break;
                 case 2:
-                    TLVUnpackError = aDataTlv.Get(CaseAdminNode);
+                    TLVUnpackError = aDataTlv.Get(IPKValue);
                     break;
                 case 3:
+                    TLVUnpackError = aDataTlv.Get(CaseAdminNode);
+                    break;
+                case 4:
                     TLVUnpackError = aDataTlv.Get(AdminVendorId);
                     break;
                 default:
@@ -3360,10 +3364,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(aEndpointId, apCommandObj, NOCArray, IPKValue,
-                                                                                CaseAdminNode, AdminVendorId);
+                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(aEndpointId, apCommandObj, NOCValue, ICACValue,
+                                                                                IPKValue, CaseAdminNode, AdminVendorId);
             }
             break;
         }
@@ -3662,9 +3666,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             break;
         }
         case Clusters::OperationalCredentials::Commands::Ids::UpdateNOC: {
-            expectArgumentCount = 1;
-            chip::ByteSpan NOCArray;
-            bool argExists[1];
+            expectArgumentCount = 2;
+            chip::ByteSpan NOCValue;
+            chip::ByteSpan ICACValue;
+            bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -3677,7 +3682,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 1)
+                if (currentDecodeTagId < 2)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -3694,7 +3699,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(NOCArray);
+                    TLVUnpackError = aDataTlv.Get(NOCValue);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(ICACValue);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -3713,9 +3721,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(aEndpointId, apCommandObj, NOCArray);
+                wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(aEndpointId, apCommandObj, NOCValue, ICACValue);
             }
             break;
         }

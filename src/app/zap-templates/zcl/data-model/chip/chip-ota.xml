@@ -91,8 +91,8 @@ limitations under the License.
         <define>OTA_REQUESTOR_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
-        <attribute side="client" code="0" define="DEFAULT_OTA_PROVIDER" type="OCTET_STRING" length="16" writable="true" optional="false" default="0">default ota provider</attribute>
-        <attribute side="client" code="1" define="UPDATE_POSSIBLE" type="BOOLEAN" length="32" writable="false" optional="false" default="true">update possible</attribute>
+        <attribute side="server" code="0x0001" define="DEFAULT_OTA_PROVIDER" type="OCTET_STRING" length="16" writable="true"  optional="false">default ota provider</attribute>
+        <attribute side="server" code="0x0002" define="UPDATE_POSSIBLE"      type="BOOLEAN"                  writable="false" optional="false">update possible</attribute>
         <command source="client" code="0" name="AnnounceOtaProvider" optional="true" cli="chip ota announceotaprovider">
             <description>Notify OTA Provider that an update was applied</description>
             <arg name="providerLocation" type="OCTET_STRING" length="16"/>

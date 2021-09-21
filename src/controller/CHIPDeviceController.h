@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -32,6 +32,7 @@
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
+#include <controller/DeviceControllerInteractionModelDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <lib/core/CHIPCore.h>
@@ -86,7 +87,7 @@ struct ControllerInitParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
-    app::InteractionModelDelegate * imDelegate = nullptr;
+    DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
@@ -171,39 +172,6 @@ public:
 struct CommissionerInitParams : public ControllerInitParams
 {
     DevicePairingDelegate * pairingDelegate = nullptr;
-};
-
-/**
- * @brief
- * Used for make current OnSuccessCallback & OnFailureCallback works when interaction model landed, it will be removed
- * after #6308 is landed.
- */
-class DeviceControllerInteractionModelDelegate : public chip::app::InteractionModelDelegate
-{
-public:
-    CHIP_ERROR CommandResponseStatus(const app::CommandSender * apCommandSender,
-                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                     const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
-                                     chip::CommandId aCommandId, uint8_t aCommandIndex) override;
-
-    CHIP_ERROR CommandResponseProtocolError(const app::CommandSender * apCommandSender, uint8_t aCommandIndex) override;
-
-    CHIP_ERROR CommandResponseError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
-
-    CHIP_ERROR CommandResponseProcessed(const app::CommandSender * apCommandSender) override;
-
-    void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
-                      Protocols::InteractionModel::ProtocolCode status) override;
-    CHIP_ERROR ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
-
-    CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                   const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                   const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
-                                   uint8_t aCommandIndex) override;
-
-    CHIP_ERROR WriteResponseProtocolError(const app::WriteClient * apWriteClient, uint8_t aAttributeIndex) override;
-
-    CHIP_ERROR WriteResponseError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override;
 };
 
 /**
@@ -303,6 +271,8 @@ public:
      */
     uint64_t GetFabricId() const { return mFabricId; }
 
+    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() { return mInteractionModelDelegate; }
+
 protected:
     enum class State
     {
@@ -340,7 +310,8 @@ protected:
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
-    System::Layer * mSystemLayer = nullptr;
+    System::Layer * mSystemLayer                                         = nullptr;
+    DeviceControllerInteractionModelDelegate * mInteractionModelDelegate = nullptr;
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
@@ -372,8 +343,8 @@ protected:
 
 private:
     //////////// ExchangeDelegate Implementation ///////////////
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && msgBuf) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
@@ -383,27 +354,6 @@ private:
     void ReleaseAllDevices();
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
-};
-
-/**
- * @brief
- *   The commissioner applications doesn't advertise itself as an available device for rendezvous
- *   process. This delegate class provides no-op functions for the advertisement delegate.
- */
-class DeviceCommissionerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
-{
-public:
-    /**
-     * @brief
-     *   Starts advertisement of the device for rendezvous availability.
-     */
-    CHIP_ERROR StartAdvertisement() const override { return CHIP_NO_ERROR; }
-
-    /**
-     * @brief
-     *   Stops advertisement of the device for rendezvous availability.
-     */
-    CHIP_ERROR StopAdvertisement() const override { return CHIP_NO_ERROR; }
 };
 
 /**
@@ -635,8 +585,6 @@ private:
 
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
 
-    DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
@@ -661,7 +609,7 @@ private:
     /* This function sends the operational credentials to the device.
        The function does not hold a refernce to the device object.
      */
-    CHIP_ERROR SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf);
+    CHIP_ERROR SendOperationalCertificate(Device * device, const ByteSpan & nocCertBuf, const ByteSpan & icaCertBuf);
     /* This function sends the trusted root certificate to the device.
        The function does not hold a refernce to the device object.
      */

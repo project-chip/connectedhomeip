@@ -98,7 +98,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         chip::Controller::CommissionerInitParams params;
 
         params.storageDelegate = &gServerStorage;
-        params.systemLayer     = &chip::DeviceLayer::SystemLayer;
+        params.systemLayer     = &chip::DeviceLayer::SystemLayer();
         params.inetLayer       = &chip::DeviceLayer::InetLayer;
         params.pairingDelegate = &gPairingDelegate;
 
@@ -173,7 +173,7 @@ pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommis
     chip::python::ChipMainThreadScheduleAndWait([&]() {
         chip::RendezvousParameters params;
 
-        params.SetDiscriminator(discriminator).SetSetupPINCode(pinCode).SetRemoteNodeId(remoteNodeId);
+        params.SetDiscriminator(discriminator).SetSetupPINCode(pinCode);
 #if CONFIG_NETWORK_LAYER_BLE
         params.SetBleLayer(chip::DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(chip::Transport::PeerAddress::BLE());
 #endif

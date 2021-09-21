@@ -32,6 +32,7 @@ bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfSta
 bool IMReadReportAttributesResponseCallback(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath,
                                             chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::ProtocolCode status);
 bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, EmberAfStatus status);
+bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient, EmberAfStatus status);
 void LogStatus(uint8_t status);
 
 // Global Response Callbacks

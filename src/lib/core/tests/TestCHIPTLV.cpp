@@ -1967,7 +1967,7 @@ void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
 
     ReadEncoding1(inSuite, reader);
 
-    reader.Init(buf.Retain(), buf->MaxDataLength());
+    reader.Init(buf.Retain());
     reader.ImplicitProfileId = TestProfile_2;
 
     ReadEncoding1(inSuite, reader);
@@ -2341,6 +2341,55 @@ void CheckCHIPTLVPutStringF(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, 256) == 0);
 }
 
+void CheckCHIPTLVPutStringSpan(nlTestSuite * inSuite, void * inContext)
+{
+    const size_t bufsize    = 24;
+    char strBuffer[bufsize] = "Sample string";
+    char valStr[bufsize];
+    uint8_t backingStore[bufsize];
+    TLVWriter writer;
+    TLVReader reader;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Span<char> strSpan;
+
+    //
+    // Write a string that has a size that exceeds 32-bits. This is only possible
+    // on platforms where size_t is bigger than uint32_t.
+    //
+    if (sizeof(size_t) > sizeof(uint32_t))
+    {
+        writer.Init(backingStore, bufsize);
+        snprintf(strBuffer, sizeof(strBuffer), "Sample string");
+
+        strSpan = { strBuffer, static_cast<size_t>(0xffffffffff) };
+
+        err = writer.PutString(ProfileTag(TestProfile_1, 1), strSpan);
+        NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    }
+
+    {
+        writer.Init(backingStore, bufsize);
+        snprintf(strBuffer, sizeof(strBuffer), "Sample string");
+
+        strSpan = { strBuffer, strlen("Sample string") };
+
+        err = writer.PutString(ProfileTag(TestProfile_1, 1), strSpan);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = reader.GetString(valStr, 256);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, 256) == 0);
+    }
+}
+
 void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize = 40;
@@ -2477,7 +2526,6 @@ void CheckCHIPTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
  */
 void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
 {
-    System::PacketBufferTLVWriter writer;
     System::PacketBufferTLVReader reader;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
@@ -2485,25 +2533,34 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
     uint16_t reserve = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
 
     // Repeatedly write and read a TLV encoding to a chain of PacketBuffers. Use progressively larger
-    // and larger amounts of space in the first buffer to force the encoding/decoding to overlap the
+    // and larger amounts of space in the first buffer to force the encoding to overlap the
     // end of the buffer and the beginning of the next.
     for (; reserve < maxDataLen; reserve++)
     {
         buf->SetStart(buf->Start() + reserve);
 
-        writer.Init(buf.Retain(), /* useChainedBuffers = */ true);
-        writer.ImplicitProfileId = TestProfile_2;
+        {
+            System::PacketBufferTLVWriter writer;
+            // Scope for writer because we want it to go out of scope before we
+            // mess with the chain after writing is done.
+            writer.Init(buf.Retain(), /* useChainedBuffers = */ true);
+            writer.ImplicitProfileId = TestProfile_2;
 
-        WriteEncoding1(inSuite, writer);
+            WriteEncoding1(inSuite, writer);
+        }
 
         TestBufferContents(inSuite, buf, Encoding1, sizeof(Encoding1));
 
-        reader.Init(buf.Retain(), /* useChainedBuffers = */ true);
+        // Compact the buffer, since we don't allow reading from chained
+        // buffers.
+        buf->CompactHead();
+
+        reader.Init(buf.Retain());
         reader.ImplicitProfileId = TestProfile_2;
 
         ReadEncoding1(inSuite, reader);
 
-        buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+        buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
     }
 }
 
@@ -3013,7 +3070,7 @@ void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
 void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
 {
     CHIP_ERROR err;
-    uint8_t buf[2048];
+    uint8_t buf[2048] = { 0 };
     TLVReader reader;
 
     reader.Init(buf);
@@ -4019,6 +4076,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("CHIP Circular TLV buffer, straddle",  CheckCircularTLVBufferEvictStraddlingEvent),
     NL_TEST_DEF("CHIP Circular TLV buffer, edge",      CheckCircularTLVBufferEdge),
     NL_TEST_DEF("CHIP TLV Printf",                     CheckCHIPTLVPutStringF),
+    NL_TEST_DEF("CHIP TLV String Span",                CheckCHIPTLVPutStringSpan),
     NL_TEST_DEF("CHIP TLV Printf, Circular TLV buf",   CheckCHIPTLVPutStringFCircular),
     NL_TEST_DEF("CHIP TLV Skip non-contiguous",        CheckCHIPTLVSkipCircular),
     NL_TEST_DEF("CHIP TLV ByteSpan",                   CheckCHIPTLVByteSpan),

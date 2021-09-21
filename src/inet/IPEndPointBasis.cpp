@@ -198,7 +198,7 @@ static CHIP_ERROR SocketsSetMulticastLoopback(int aSocket, bool aLoopback, int a
     const unsigned int lValue = aLoopback;
     if (setsockopt(aSocket, aProtocol, aOption, &lValue, sizeof(lValue)) != 0)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
 
     return CHIP_NO_ERROR;
@@ -265,7 +265,7 @@ static CHIP_ERROR SocketsIPv4JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
 
     if (setsockopt(aSocket, IPPROTO_IP, aCommand, &lMulticastRequest, sizeof(lMulticastRequest)) != 0)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
     return CHIP_NO_ERROR;
 }
@@ -287,7 +287,7 @@ static CHIP_ERROR SocketsIPv6JoinLeaveMulticastGroup(int aSocket, InterfaceId aI
 
     if (setsockopt(aSocket, IPPROTO_IPV6, aCommand, &lMulticastRequest, sizeof(lMulticastRequest)) != 0)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
     return CHIP_NO_ERROR;
 }
@@ -344,12 +344,6 @@ CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
         switch (mLwIPEndPointType)
         {
 
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        case kLwIPEndPointType_Raw:
-            raw_set_flags(mRaw, RAW_FLAGS_MULTICAST_LOOP);
-            break;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         case kLwIPEndPointType_UDP:
             udp_set_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
@@ -365,12 +359,6 @@ CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
     {
         switch (mLwIPEndPointType)
         {
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        case kLwIPEndPointType_Raw:
-            raw_clear_flags(mRaw, RAW_FLAGS_MULTICAST_LOOP);
-            break;
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         case kLwIPEndPointType_UDP:
@@ -696,7 +684,7 @@ CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & a
         sa.sin6_scope_id = static_cast<decltype(sa.sin6_scope_id)>(aInterfaceId);
 
         if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
-            lRetval = chip::System::MapErrorPOSIX(errno);
+            lRetval = CHIP_ERROR_POSIX(errno);
 
             // Instruct the kernel that any messages to multicast destinations should be
             // sent down the interface specified by the caller.
@@ -725,7 +713,7 @@ CHIP_ERROR IPEndPointBasis::Bind(IPAddressType aAddressType, const IPAddress & a
         sa.sin_addr   = aAddress.ToIPv4();
 
         if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
-            lRetval = chip::System::MapErrorPOSIX(errno);
+            lRetval = CHIP_ERROR_POSIX(errno);
 
             // Instruct the kernel that any messages to multicast destinations should be
             // sent down the interface to which the specified IPv4 address is bound.
@@ -762,7 +750,7 @@ CHIP_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
         // Stop interface-based filtering.
         if (setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, "", 0) == -1)
         {
-            lRetval = chip::System::MapErrorPOSIX(errno);
+            lRetval = CHIP_ERROR_POSIX(errno);
         }
     }
     else
@@ -772,13 +760,13 @@ CHIP_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
 
         if (if_indextoname(aInterfaceId, lInterfaceName) == NULL)
         {
-            lRetval = chip::System::MapErrorPOSIX(errno);
+            lRetval = CHIP_ERROR_POSIX(errno);
         }
 
         if (lRetval == CHIP_NO_ERROR &&
             setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, lInterfaceName, socklen_t(strlen(lInterfaceName))) == -1)
         {
-            lRetval = chip::System::MapErrorPOSIX(errno);
+            lRetval = CHIP_ERROR_POSIX(errno);
         }
     }
 
@@ -911,7 +899,7 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     // Send IP packet.
     const ssize_t lenSent = sendmsg(mSocket, &msgHeader, 0);
     if (lenSent == -1)
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     if (lenSent != aBuffer->DataLength())
         return CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG;
     return CHIP_NO_ERROR;
@@ -942,13 +930,13 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
 
         mSocket = ::socket(family, aType, aProtocol);
         if (mSocket == -1)
-            return chip::System::MapErrorPOSIX(errno);
+            return CHIP_ERROR_POSIX(errno);
         ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->StartWatchingSocket(mSocket, &mWatch));
 
         mAddrType = aAddressType;
 
         // NOTE WELL: the errors returned by setsockopt() here are not
-        // returned as Inet layer chip::System::MapErrorPOSIX(errno)
+        // returned as Inet layer CHIP_ERROR_POSIX(errno)
         // codes because they are normally expected to fail on some
         // platforms where the socket option code is defined in the
         // header files but not [yet] implemented. Certainly, there is
@@ -1064,7 +1052,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 
         if (rcvLen < 0)
         {
-            lStatus = chip::System::MapErrorPOSIX(errno);
+            lStatus = CHIP_ERROR_POSIX(errno);
         }
         else if (rcvLen > lBuffer->AvailableDataLength())
         {
@@ -1143,7 +1131,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     }
     else
     {
-        if (OnReceiveError != nullptr && lStatus != chip::System::MapErrorPOSIX(EAGAIN))
+        if (OnReceiveError != nullptr && lStatus != CHIP_ERROR_POSIX(EAGAIN))
         {
             OnReceiveError(this, lStatus, nullptr);
         }
@@ -1239,7 +1227,7 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     nw_connection_send(mConnection, content, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t error) {
         if (error)
         {
-            res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
+            res = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
         }
         else
         {
@@ -1270,7 +1258,7 @@ void IPEndPointBasis::HandleDataReceived(const nw_connection_t & aConnection)
                     errno                          = nw_error_get_error_code(receive_error);
                     if (!(error_domain == nw_error_domain_posix && errno == ECANCELED))
                     {
-                        CHIP_ERROR error = chip::System::MapErrorPOSIX(errno);
+                        CHIP_ERROR error = CHIP_ERROR_POSIX(errno);
                         IPPacketInfo packetInfo;
                         GetPacketInfo(aConnection, packetInfo);
                         dispatch_async(mDispatchQueue, ^{
@@ -1414,7 +1402,7 @@ CHIP_ERROR IPEndPointBasis::StartListener()
 
         case nw_listener_state_failed:
             ChipLogDetail(Inet, "Listener: Failed");
-            res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
+            res = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
             break;
 
         case nw_listener_state_ready:
@@ -1470,7 +1458,7 @@ CHIP_ERROR IPEndPointBasis::StartConnection(nw_connection_t & aConnection)
 
         case nw_connection_state_failed:
             ChipLogDetail(Inet, "Connection: Failed");
-            res = chip::System::MapErrorPOSIX(nw_error_get_error_code(error));
+            res = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
             break;
 
         case nw_connection_state_ready:

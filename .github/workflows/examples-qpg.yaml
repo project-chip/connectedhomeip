@@ -29,6 +29,9 @@ jobs:
 
         env:
             BUILD_TYPE: gn_qpg
+            GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
+            GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+            GH_EVENT_PARENT: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -48,7 +51,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -56,25 +59,40 @@ jobs:
                    .environment/pigweed-venv/*.log
             - name: Build example QPG6100 Lock App
               timeout-minutes: 5
-              run: scripts/examples/gn_build_example.sh
-                   examples/lock-app/qpg out/lock_app_debug qpg_target_ic=\"qpg6100\"
+              run: |
+                  scripts/examples/gn_build_example.sh examples/lock-app/qpg out/lock_app_debug qpg_target_ic=\"qpg6100\"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    qpg qpg6100+debug lock-app \
+                    out/lock_app_debug/chip-qpg6100-lock-example.out \
+                    /tmp/bloat_reports/
             - name: Build example QPG6100 Lighting App
               timeout-minutes: 5
-              run: scripts/examples/gn_build_example.sh
-                   examples/lighting-app/qpg out/lighting_app_debug qpg_target_ic=\"qpg6100\"
+              run: |
+                  scripts/examples/gn_build_example.sh examples/lighting-app/qpg out/lighting_app_debug qpg_target_ic=\"qpg6100\"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    qpg qpg6100+debug lighting-app \
+                    out/lighting_app_debug/chip-qpg6100-lighting-example.out \
+                    /tmp/bloat_reports/
             - name: Build example QPG6100 persistent-storage
               timeout-minutes: 5
-              run: scripts/examples/gn_build_example.sh
-                   examples/persistent-storage/qpg out/persistent-storage_app_debug qpg_target_ic=\"qpg6100\"
+              run: |
+                  scripts/examples/gn_build_example.sh examples/persistent-storage/qpg out/persistent-storage_app_debug \
+                    qpg_target_ic=\"qpg6100\"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    qpg qpg6100+debug persistent-storage-app \
+                    out/persistent-storage_app_debug/chip-qpg6100-persistent_storage-example.out \
+                    /tmp/bloat_reports/
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
+              if: ${{ !env.ACT }}
               with:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Uploading Binaries
               uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
               with:
                   name:
                       ${{ env.BUILD_TYPE }}-example-build-${{
@@ -82,3 +100,10 @@ jobs:
                   path: |
                       out/lighting_app_debug/chip-qpg6100-lighting-example.out
                       out/lighting_app_debug/chip-qpg6100-lighting-example.out.map
+            - name: Uploading Size Reports
+              uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
+              with:
+                  name: Size,QPG-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
+                  path: |
+                      /tmp/bloat_reports/

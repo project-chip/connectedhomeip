@@ -16,85 +16,16 @@
  *    limitations under the License.
  */
 
-#include "Rpc.h"
-
-#include "LightingManager.h"
-#include <platform/CHIPDeviceError.h>
-
-/* ignore GCC Wconversion warnings for pigweed */
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-#include "button_service/button_service.rpc.pb.h"
-#include "device_service/device_service.rpc.pb.h"
-#include "lighting_service/lighting_service.rpc.pb.h"
-#include "pw_hdlc/rpc_channel.h"
-#include "pw_hdlc/rpc_packets.h"
 #include "pw_rpc/server.h"
 #include "pw_rpc_system_server/rpc_server.h"
-#include "pw_stream/sys_io_stream.h"
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+#include "rpc_services/Button.h"
+#include "rpc_services/Device.h"
+#include "rpc_services/Lighting.h"
 
 #include <thread>
 
 namespace chip {
 namespace rpc {
-
-class Lighting final : public generated::Lighting<Lighting>
-{
-public:
-    pw::Status Set(ServerContext &, const chip_rpc_LightingState & request, pw_protobuf_Empty & response)
-    {
-        LightingMgr().InitiateAction(request.on ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
-        return pw::OkStatus();
-    }
-
-    pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LightingState & response)
-    {
-        response.on = LightingMgr().IsTurnedOn();
-        return pw::OkStatus();
-    }
-};
-
-class Button final : public generated::Button<Button>
-{
-public:
-    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
-    {
-        return pw::Status::Unavailable();
-    }
-};
-
-class Device final : public generated::Device<Device>
-{
-public:
-    pw::Status FactoryReset(ServerContext &, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
-    {
-        return pw::Status::Unimplemented();
-    }
-
-    pw::Status Reboot(ServerContext &, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
-    {
-        return pw::Status::Unimplemented();
-    }
-
-    pw::Status TriggerOta(ServerContext &, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
-    {
-        return pw::Status::Unimplemented();
-    }
-
-    pw::Status GetDeviceInfo(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
-    {
-        // Temporary fake values used for testing.
-        response.vendor_id        = 1234;
-        response.product_id       = 5678;
-        response.software_version = 1;
-        return pw::OkStatus();
-    }
-};
 
 namespace {
 

@@ -386,13 +386,13 @@ NS_ASSUME_NONNULL_BEGIN
              responseHandler:(ResponseHandler)responseHandler;
 - (void)stepHue:(uint8_t)stepMode
            stepSize:(uint8_t)stepSize
-     transitionTime:(uint8_t)transitionTime
+     transitionTime:(uint16_t)transitionTime
         optionsMask:(uint8_t)optionsMask
     optionsOverride:(uint8_t)optionsOverride
     responseHandler:(ResponseHandler)responseHandler;
 - (void)stepSaturation:(uint8_t)stepMode
               stepSize:(uint8_t)stepSize
-        transitionTime:(uint8_t)transitionTime
+        transitionTime:(uint16_t)transitionTime
            optionsMask:(uint8_t)optionsMask
        optionsOverride:(uint8_t)optionsOverride
        responseHandler:(ResponseHandler)responseHandler;
@@ -935,6 +935,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mediaStartOver:(ResponseHandler)responseHandler;
 - (void)mediaStop:(ResponseHandler)responseHandler;
 
+- (void)readAttributePlaybackStateWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeStartTimeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDurationWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePositionUpdatedAtWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePositionWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePlaybackSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeSeekRangeEndWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeSeekRangeStartWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1006,6 +1022,27 @@ NS_ASSUME_NONNULL_BEGIN
     requestorCanConsent:(bool)requestorCanConsent
     metadataForProvider:(NSData *)metadataForProvider
         responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster OTA Software Update Requestor
+ *
+ */
+@interface CHIPOtaSoftwareUpdateRequestor : CHIPCluster
+
+- (void)announceOtaProvider:(NSData *)serverLocation
+                   vendorId:(uint16_t)vendorId
+         announcementReason:(uint8_t)announcementReason
+            metadataForNode:(NSData *)metadataForNode
+            responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDefaultOtaProviderWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeDefaultOtaProviderWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeUpdatePossibleWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -1091,7 +1128,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOperationalCredentials : CHIPCluster
 
-- (void)addNOC:(NSData *)nOCArray
+- (void)addNOC:(NSData *)nOCValue
+          iCACValue:(NSData *)iCACValue
            iPKValue:(NSData *)iPKValue
       caseAdminNode:(uint64_t)caseAdminNode
       adminVendorId:(uint16_t)adminVendorId
@@ -1101,7 +1139,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeFabric:(uint8_t)fabricIndex responseHandler:(ResponseHandler)responseHandler;
 - (void)removeTrustedRootCertificate:(NSData *)trustedRootIdentifier responseHandler:(ResponseHandler)responseHandler;
 - (void)updateFabricLabel:(NSString *)label responseHandler:(ResponseHandler)responseHandler;
-- (void)updateNOC:(NSData *)nOCArray responseHandler:(ResponseHandler)responseHandler;
+- (void)updateNOC:(NSData *)nOCValue iCACValue:(NSData *)iCACValue responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeFabricsListWithResponseHandler:(ResponseHandler)responseHandler;
 

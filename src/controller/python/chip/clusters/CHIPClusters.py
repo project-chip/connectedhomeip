@@ -1929,6 +1929,46 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x00000000: {
+                    "attributeName": "PlaybackState",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000001: {
+                    "attributeName": "StartTime",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                },
+                0x00000002: {
+                    "attributeName": "Duration",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
+                0x00000003: {
+                    "attributeName": "PositionUpdatedAt",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                },
+                0x00000004: {
+                    "attributeName": "Position",
+                    "attributeId": 0x00000004,
+                    "type": "int",
+                },
+                0x00000005: {
+                    "attributeName": "PlaybackSpeed",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                },
+                0x00000006: {
+                    "attributeName": "SeekRangeEnd",
+                    "attributeId": 0x00000006,
+                    "type": "int",
+                },
+                0x00000007: {
+                    "attributeName": "SeekRangeStart",
+                    "attributeId": 0x00000007,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2071,6 +2111,40 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
+    _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO = {
+            "clusterName": "OtaSoftwareUpdateRequestor",
+            "clusterId": 0x0000002A,
+            "commands": {
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "AnnounceOtaProvider",
+                    "args": {
+                        "serverLocation": "bytes",
+                        "vendorId": "int",
+                        "announcementReason": "int",
+                        "metadataForNode": "bytes",
+                    },
+                },
+            },
+            "attributes": {
+                0x00000001: {
+                    "attributeName": "DefaultOtaProvider",
+                    "attributeId": 0x00000001,
+                    "type": "bytes",
+                    "writable": True,
+                },
+                0x00000002: {
+                    "attributeName": "UpdatePossible",
+                    "attributeId": 0x00000002,
+                    "type": "bool",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2227,7 +2301,8 @@ class ChipClusters:
                     "commandId": 0x00000006,
                     "commandName": "AddNOC",
                     "args": {
-                        "nOCArray": "bytes",
+                        "nOCValue": "bytes",
+                        "iCACValue": "bytes",
                         "iPKValue": "bytes",
                         "caseAdminNode": "int",
                         "adminVendorId": "int",
@@ -2272,7 +2347,8 @@ class ChipClusters:
                     "commandId": 0x00000007,
                     "commandName": "UpdateNOC",
                     "args": {
-                        "nOCArray": "bytes",
+                        "nOCValue": "bytes",
+                        "iCACValue": "bytes",
                     },
                 },
             },
@@ -3588,6 +3664,7 @@ class ChipClusters:
     0x00000506: _MEDIA_PLAYBACK_CLUSTER_INFO,
     0x00000031: _NETWORK_COMMISSIONING_CLUSTER_INFO,
     0x00000029: _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
+    0x0000002A: _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
     0x00000406: _OCCUPANCY_SENSING_CLUSTER_INFO,
     0x00000006: _ON_OFF_CLUSTER_INFO,
     0x00000007: _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
@@ -3642,6 +3719,7 @@ class ChipClusters:
         "MediaPlayback": _MEDIA_PLAYBACK_CLUSTER_INFO,
         "NetworkCommissioning": _NETWORK_COMMISSIONING_CLUSTER_INFO,
         "OtaSoftwareUpdateProvider": _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
+        "OtaSoftwareUpdateRequestor": _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
         "OccupancySensing": _OCCUPANCY_SENSING_CLUSTER_INFO,
         "OnOff": _ON_OFF_CLUSTER_INFO,
         "OnOffSwitchConfiguration": _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
@@ -4171,6 +4249,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
                 device, ZCLendpoint, ZCLgroupid, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported, location, len(location), requestorCanConsent, metadataForProvider, len(metadataForProvider)
         )
+    def ClusterOtaSoftwareUpdateRequestor_CommandAnnounceOtaProvider(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, serverLocation: bytes, vendorId: int, announcementReason: int, metadataForNode: bytes):
+        return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider(
+                device, ZCLendpoint, ZCLgroupid, serverLocation, len(serverLocation), vendorId, announcementReason, metadataForNode, len(metadataForNode)
+        )
     def ClusterOnOff_CommandOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_Off(
                 device, ZCLendpoint, ZCLgroupid
@@ -4195,9 +4277,9 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
                 device, ZCLendpoint, ZCLgroupid
         )
-    def ClusterOperationalCredentials_CommandAddNOC(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nOCArray: bytes, iPKValue: bytes, caseAdminNode: int, adminVendorId: int):
+    def ClusterOperationalCredentials_CommandAddNOC(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nOCValue: bytes, iCACValue: bytes, iPKValue: bytes, caseAdminNode: int, adminVendorId: int):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC(
-                device, ZCLendpoint, ZCLgroupid, nOCArray, len(nOCArray), iPKValue, len(iPKValue), caseAdminNode, adminVendorId
+                device, ZCLendpoint, ZCLgroupid, nOCValue, len(nOCValue), iCACValue, len(iCACValue), iPKValue, len(iPKValue), caseAdminNode, adminVendorId
         )
     def ClusterOperationalCredentials_CommandAddTrustedRootCertificate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, rootCertificate: bytes):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate(
@@ -4220,9 +4302,9 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel(
                 device, ZCLendpoint, ZCLgroupid, label, len(label)
         )
-    def ClusterOperationalCredentials_CommandUpdateNOC(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nOCArray: bytes):
+    def ClusterOperationalCredentials_CommandUpdateNOC(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nOCValue: bytes, iCACValue: bytes):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateNOC(
-                device, ZCLendpoint, ZCLgroupid, nOCArray, len(nOCArray)
+                device, ZCLendpoint, ZCLgroupid, nOCValue, len(nOCValue), iCACValue, len(iCACValue)
         )
     def ClusterScenes_CommandAddScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: bytes, clusterId: int, length: int, value: int):
         sceneName = sceneName.encode("utf-8") + b'\x00'
@@ -4757,6 +4839,22 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_MediaInput_CurrentMediaInput(device, ZCLendpoint, ZCLgroupid)
     def ClusterMediaInput_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_MediaInput_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterMediaPlayback_ReadAttributePlaybackState(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_PlaybackState(device, ZCLendpoint, ZCLgroupid)
+    def ClusterMediaPlayback_ReadAttributeStartTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_StartTime(device, ZCLendpoint, ZCLgroupid)
+    def ClusterMediaPlayback_ReadAttributeDuration(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_Duration(device, ZCLendpoint, ZCLgroupid)
+    def ClusterMediaPlayback_ReadAttributePositionUpdatedAt(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_PositionUpdatedAt(device, ZCLendpoint, ZCLgroupid)
+    def ClusterMediaPlayback_ReadAttributePosition(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_Position(device, ZCLendpoint, ZCLgroupid)
+    def ClusterMediaPlayback_ReadAttributePlaybackSpeed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_PlaybackSpeed(device, ZCLendpoint, ZCLgroupid)
+    def ClusterMediaPlayback_ReadAttributeSeekRangeEnd(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_SeekRangeEnd(device, ZCLendpoint, ZCLgroupid)
+    def ClusterMediaPlayback_ReadAttributeSeekRangeStart(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_SeekRangeStart(device, ZCLendpoint, ZCLgroupid)
     def ClusterMediaPlayback_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterNetworkCommissioning_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -4765,6 +4863,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOtaSoftwareUpdateProvider_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOtaSoftwareUpdateRequestor_ReadAttributeDefaultOtaProvider(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOtaSoftwareUpdateRequestor_WriteAttributeDefaultOtaProvider(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+        return self._chipLib.chip_ime_WriteAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider(device, ZCLendpoint, ZCLgroupid, value, len(value))
+    def ClusterOtaSoftwareUpdateRequestor_ReadAttributeUpdatePossible(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_UpdatePossible(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOtaSoftwareUpdateRequestor_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOccupancySensing_ReadAttributeOccupancy(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OccupancySensing_Occupancy(device, ZCLendpoint, ZCLgroupid)
     def ClusterOccupancySensing_ConfigureAttributeOccupancy(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
@@ -5570,10 +5676,10 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_ColorControl_StepColorTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_StepColorTemperature.restype = ctypes.c_uint32
         # Cluster ColorControl Command StepHue
-        self._chipLib.chip_ime_AppendCommand_ColorControl_StepHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_StepHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_StepHue.restype = ctypes.c_uint32
         # Cluster ColorControl Command StepSaturation
-        self._chipLib.chip_ime_AppendCommand_ColorControl_StepSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_StepSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_StepSaturation.restype = ctypes.c_uint32
         # Cluster ColorControl Command StopMoveStep
         self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
@@ -6178,6 +6284,30 @@ class ChipClusters:
         # Cluster MediaPlayback Command MediaStop
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStop.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStop.restype = ctypes.c_uint32
+        # Cluster MediaPlayback ReadAttribute PlaybackState
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_PlaybackState.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_PlaybackState.restype = ctypes.c_uint32
+        # Cluster MediaPlayback ReadAttribute StartTime
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_StartTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_StartTime.restype = ctypes.c_uint32
+        # Cluster MediaPlayback ReadAttribute Duration
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_Duration.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_Duration.restype = ctypes.c_uint32
+        # Cluster MediaPlayback ReadAttribute PositionUpdatedAt
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_PositionUpdatedAt.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_PositionUpdatedAt.restype = ctypes.c_uint32
+        # Cluster MediaPlayback ReadAttribute Position
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_Position.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_Position.restype = ctypes.c_uint32
+        # Cluster MediaPlayback ReadAttribute PlaybackSpeed
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_PlaybackSpeed.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_PlaybackSpeed.restype = ctypes.c_uint32
+        # Cluster MediaPlayback ReadAttribute SeekRangeEnd
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_SeekRangeEnd.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_SeekRangeEnd.restype = ctypes.c_uint32
+        # Cluster MediaPlayback ReadAttribute SeekRangeStart
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_SeekRangeStart.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_MediaPlayback_SeekRangeStart.restype = ctypes.c_uint32
         # Cluster MediaPlayback ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision.restype = ctypes.c_uint32
@@ -6228,6 +6358,22 @@ class ChipClusters:
         # Cluster OtaSoftwareUpdateProvider ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateRequestor
+        # Cluster OtaSoftwareUpdateRequestor Command AnnounceOtaProvider
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateRequestor ReadAttribute DefaultOtaProvider
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateRequestor WriteAttribute DefaultOtaProvider
+        self._chipLib.chip_ime_WriteAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_OtaSoftwareUpdateRequestor_DefaultOtaProvider.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateRequestor ReadAttribute UpdatePossible
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_UpdatePossible.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_UpdatePossible.restype = ctypes.c_uint32
+        # Cluster OtaSoftwareUpdateRequestor ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateRequestor_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OccupancySensing
         # Cluster OccupancySensing ReadAttribute Occupancy
         self._chipLib.chip_ime_ReadAttribute_OccupancySensing_Occupancy.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -6311,7 +6457,7 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OperationalCredentials
         # Cluster OperationalCredentials Command AddNOC
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command AddTrustedRootCertificate
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
@@ -6329,7 +6475,7 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command UpdateNOC
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateNOC.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateNOC.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateNOC.restype = ctypes.c_uint32
         # Cluster OperationalCredentials ReadAttribute FabricsList
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

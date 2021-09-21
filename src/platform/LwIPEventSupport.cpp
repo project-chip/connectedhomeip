@@ -34,6 +34,15 @@ namespace System {
 
 using namespace ::chip::DeviceLayer;
 
+CHIP_ERROR PlatformEventing::ScheduleLambdaBridge(System::Layer & aLayer, const LambdaBridge & bridge)
+{
+    ChipDeviceEvent event;
+    event.Type        = DeviceEventType::kChipLambdaEvent;
+    event.LambdaEvent = bridge;
+
+    return PlatformMgr().PostEvent(&event);
+}
+
 CHIP_ERROR PlatformEventing::PostEvent(System::Layer & aLayer, System::Object & aTarget, System::EventType aType,
                                        uintptr_t aArgument)
 {
@@ -43,9 +52,7 @@ CHIP_ERROR PlatformEventing::PostEvent(System::Layer & aLayer, System::Object & 
     event.ChipSystemLayerEvent.Target   = &aTarget;
     event.ChipSystemLayerEvent.Argument = aArgument;
 
-    PlatformMgr().PostEvent(&event);
-
-    return CHIP_NO_ERROR;
+    return PlatformMgr().PostEvent(&event);
 }
 
 CHIP_ERROR PlatformEventing::DispatchEvents(System::Layer & aLayer)

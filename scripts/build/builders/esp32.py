@@ -64,6 +64,9 @@ class Esp32App(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
+    def FlashBundleName(self):
+        return self.AppNamePrefix + '.flashbundle.txt'
+
 
 def DefaultsFileName(board: Esp32Board, app: Esp32App):
     if app != Esp32App.ALL_CLUSTERS:
@@ -129,3 +132,9 @@ class Esp32Builder(Builder):
             self.app.AppNamePrefix + '.map':
                 os.path.join(self.output_dir, self.app.AppNamePrefix + '.map'),
         }
+
+    def flashbundle(self):
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName()), 'r') as fp:
+            return {
+                l.strip(): os.path.join(self.output_dir, l.strip()) for l in fp.readlines() if l.strip()
+            }

@@ -30,17 +30,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
-namespace chip {
-namespace Mdns {
-void GetMdnsTimeout(timeval & timeout);
-void HandleMdnsTimeout();
-} // namespace Mdns
-} // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
 #ifndef CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
 #define CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS 1
 #endif
@@ -356,7 +345,7 @@ CHIP_ERROR LayerImplLibevent::UpdateWatch(SocketWatch * watch, short eventFlags)
         if ((flags & O_NONBLOCK) == 0)
         {
             int status = ::fcntl(watch->mFD, F_SETFL, flags | O_NONBLOCK);
-            VerifyOrReturnError(status == 0, chip::System::MapErrorPOSIX(errno));
+            VerifyOrReturnError(status == 0, CHIP_ERROR_POSIX(errno));
         }
         watch->mEvent = event_new(mEventBase, watch->mFD, eventFlags, SocketCallbackHandler, watch);
         VerifyOrReturnError(watch->mEvent != nullptr, CHIP_ERROR_NO_MEMORY);

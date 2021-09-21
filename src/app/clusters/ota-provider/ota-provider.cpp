@@ -35,7 +35,6 @@ using namespace chip;
 using chip::app::clusters::OTAProviderDelegate;
 
 namespace {
-constexpr uint8_t kLocationParamLength = 2;   // The expected length of the Location parameter in QueryImage
 constexpr size_t kMaxMetadataLen       = 512; // The maximum length of Metadata in any OTA Provider command
 constexpr size_t kUpdateTokenMaxLength = 32;  // The expected length of the Update Token parameter used in multiple commands
 constexpr size_t kUpdateTokenMinLength = 8;   // The expected length of the Update Token parameter used in multiple commands
@@ -168,20 +167,16 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::EndpointId 
 
     ChipLogDetail(Zcl, "OTA Provider received QueryImage");
 
-    // TODO: (#7112) change location size checking once CHAR_STRING is supported
-    const uint8_t locationLen = emberAfStringLength(location);
-    if (locationLen != kLocationParamLength)
-    {
-        ChipLogError(Zcl, "expected location length %" PRIu8 ", got %" PRIu8, locationLen, kLocationParamLength);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
-    }
-    else if (metadataForProvider.size() > kMaxMetadataLen)
+    // TODO: (#7112) support location param and verify length once CHAR_STRING is supported
+    // Using location parameter is blocked by #5542 (use Span for string arguments). For now, there is no way to safely get the
+    // length of the location string because it is not guaranteed to be null-terminated.
+    Span<const char> locationSpan;
+
+    if (metadataForProvider.size() > kMaxMetadataLen)
     {
         ChipLogError(Zcl, "metadata size %zu exceeds max %zu", metadataForProvider.size(), kMaxMetadataLen);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
-
-    ByteSpan locationSpan(location, locationLen);
 
     status = delegate->HandleQueryImage(commandObj, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
                                         locationSpan, requestorCanConsent, metadataForProvider);

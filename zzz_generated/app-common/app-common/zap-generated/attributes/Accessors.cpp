@@ -1348,6 +1348,21 @@ EmberAfStatus SetReachable(chip::EndpointId endpoint, bool reachable)
 } // namespace Attributes
 } // namespace Basic
 
+namespace OtaSoftwareUpdateRequestor {
+namespace Attributes {
+EmberAfStatus GetUpdatePossible(chip::EndpointId endpoint, bool * updatePossible)
+{
+    return emberAfReadServerAttribute(endpoint, OtaSoftwareUpdateRequestor::Id, Ids::UpdatePossible, (uint8_t *) updatePossible,
+                                      sizeof(*updatePossible));
+}
+EmberAfStatus SetUpdatePossible(chip::EndpointId endpoint, bool updatePossible)
+{
+    return emberAfWriteServerAttribute(endpoint, OtaSoftwareUpdateRequestor::Id, Ids::UpdatePossible, (uint8_t *) &updatePossible,
+                                       ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+}
+} // namespace Attributes
+} // namespace OtaSoftwareUpdateRequestor
+
 namespace GeneralCommissioning {
 namespace Attributes {
 EmberAfStatus GetBreadcrumb(chip::EndpointId endpoint, uint64_t * breadcrumb)
@@ -6494,22 +6509,23 @@ EmberAfStatus SetDuration(chip::EndpointId endpoint, uint64_t duration)
     return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Ids::Duration, (uint8_t *) &duration,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetUpdatedAt(chip::EndpointId endpoint, uint64_t * updatedAt)
+EmberAfStatus GetPositionUpdatedAt(chip::EndpointId endpoint, uint64_t * positionUpdatedAt)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, Ids::UpdatedAt, (uint8_t *) updatedAt, sizeof(*updatedAt));
+    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, Ids::PositionUpdatedAt, (uint8_t *) positionUpdatedAt,
+                                      sizeof(*positionUpdatedAt));
 }
-EmberAfStatus SetUpdatedAt(chip::EndpointId endpoint, uint64_t updatedAt)
+EmberAfStatus SetPositionUpdatedAt(chip::EndpointId endpoint, uint64_t positionUpdatedAt)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Ids::UpdatedAt, (uint8_t *) &updatedAt,
+    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Ids::PositionUpdatedAt, (uint8_t *) &positionUpdatedAt,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetPosistion(chip::EndpointId endpoint, uint64_t * posistion)
+EmberAfStatus GetPosition(chip::EndpointId endpoint, uint64_t * position)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, Ids::Posistion, (uint8_t *) posistion, sizeof(*posistion));
+    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, Ids::Position, (uint8_t *) position, sizeof(*position));
 }
-EmberAfStatus SetPosistion(chip::EndpointId endpoint, uint64_t posistion)
+EmberAfStatus SetPosition(chip::EndpointId endpoint, uint64_t position)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Ids::Posistion, (uint8_t *) &posistion,
+    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Ids::Position, (uint8_t *) &position,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 EmberAfStatus GetPlaybackSpeed(chip::EndpointId endpoint, uint64_t * playbackSpeed)

@@ -246,7 +246,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
         ChipDeviceEvent event;
         event.Type                          = DeviceEventType::kWiFiConnectivityChange;
         event.WiFiConnectivityChange.Result = kConnectivity_Established;
-        PlatformMgr().PostEvent(&event);
+        ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
         ChipLogProgress(DeviceLayer, "Event - StationConnected");
     }
 
@@ -263,7 +263,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
             event.Type                            = DeviceEventType::kInternetConnectivityChange;
             event.InternetConnectivityChange.IPv4 = kConnectivity_Lost;
             event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-            PlatformMgr().PostEvent(&event);
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
             ChipLogError(DeviceLayer, "Unnexpected loss of Ip4 address");
         }
     }
@@ -277,7 +277,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
             event.Type                            = DeviceEventType::kInternetConnectivityChange;
             event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
             event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-            PlatformMgr().PostEvent(&event);
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
             ChipLogProgress(DeviceLayer, "New Ip4 address set: %s", address.get_ip_address());
         }
     }
@@ -294,7 +294,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
             event.Type                            = DeviceEventType::kInternetConnectivityChange;
             event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
             event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
-            PlatformMgr().PostEvent(&event);
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
             ChipLogError(DeviceLayer, "Unnexpected loss of Ip6 address");
         }
     }
@@ -308,7 +308,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
             event.Type                            = DeviceEventType::kInternetConnectivityChange;
             event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
             event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
-            PlatformMgr().PostEvent(&event);
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
             ChipLogProgress(DeviceLayer, "New Ip6 address set %s", address.get_ip_address());
         }
     }
@@ -326,7 +326,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationDisconnected()
         ChipDeviceEvent event;
         event.Type                          = DeviceEventType::kWiFiConnectivityChange;
         event.WiFiConnectivityChange.Result = kConnectivity_Lost;
-        PlatformMgr().PostEvent(&event);
+        ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
         ChipLogProgress(DeviceLayer, "Event - StationDisconnected");
     }
 
@@ -339,7 +339,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationDisconnected()
         event.Type                            = DeviceEventType::kInternetConnectivityChange;
         event.InternetConnectivityChange.IPv4 = kConnectivity_Lost;
         event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-        PlatformMgr().PostEvent(&event);
+        ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
         ChipLogError(DeviceLayer, "Loss of Ip4 address");
     }
 
@@ -351,7 +351,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationDisconnected()
         event.Type                            = DeviceEventType::kInternetConnectivityChange;
         event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
         event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
-        PlatformMgr().PostEvent(&event);
+        ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
         ChipLogError(DeviceLayer, "Loss of Ip6 address");
     }
 

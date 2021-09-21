@@ -49,6 +49,12 @@
 namespace chip {
 namespace System {
 
+struct LambdaBridge
+{
+    void (*LambdaProxy)(const void * context);
+    alignas(CHIP_CONFIG_LAMBDA_EVENT_ALIGN) char LambdaBody[CHIP_CONFIG_LAMBDA_EVENT_SIZE];
+};
+
 class Layer;
 using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
 
@@ -127,24 +133,17 @@ public:
      * @note
      *   This function could, in principle, be implemented as `StartTimer`. The specification for `SystemTimer` however
      *   permits certain optimizations that might make that implementation impossible. Specifically, `SystemTimer`
-     *   API may only be called from the thread owning the particular `SystemLayer`, whereas the `ScheduleWork` may be
+     *   API may only be called from the thread owning the particular `System::Layer`, whereas the `ScheduleWork` may be
      *   called from any thread. Additionally, whereas the `SystemTimer` API permits the invocation of the already
      *   expired handler in line, `ScheduleWork` guarantees that the handler function will be called only after the
      *   current CHIP event completes.
      *
-     * @param[in] aComplete A pointer to a callback function to be called
-     *                      when this timer fires.
+     * @param[in] aComplete     A pointer to a callback function to be called when this timer fires.
+     * @param[in] aAppState     A pointer to an application state object to be passed to the callback function as argument.
      *
-     * @param[in] aAppState A pointer to an application state object to be
-     *                      passed to the callback function as argument.
-     *
-     * @retval CHIP_ERROR_INCORRECT_STATE If the SystemLayer has
-     *                      not been initialized.
-     *
-     * @retval CHIP_ERROR_NO_MEMORY If the SystemLayer cannot
-     *                      allocate a new timer.
-     *
-     * @retval CHIP_NO_ERROR On success.
+     * @retval CHIP_ERROR_INCORRECT_STATE   If the System::Layer has not been initialized.
+     * @retval CHIP_ERROR_NO_MEMORY         If the SystemLayer cannot allocate a new timer.
+     * @retval CHIP_NO_ERROR                On success.
      */
     virtual CHIP_ERROR ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) = 0;
 
@@ -201,6 +200,36 @@ public:
      *  @retval    other Platform-specific errors generated indicating the reason for failure.
      */
     virtual CHIP_ERROR PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument) = 0;
+
+    /**
+     * This posts an event / message of the specified type with the provided argument to this instance's platform-specific event
+     * queue.
+     *
+     *  @param[in] event   A object encapsulate the context of a lambda
+     *
+     *  @retval    CHIP_NO_ERROR                  On success.
+     *  @retval    CHIP_ERROR_INCORRECT_STATE     If the state of the Layer object is incorrect.
+     *  @retval    CHIP_ERROR_NO_MEMORY           If the event queue is already full.
+     *  @retval    other Platform-specific errors generated indicating the reason for failure.
+     */
+    virtual CHIP_ERROR ScheduleLambdaBridge(const LambdaBridge & event) = 0;
+
+    template <typename Lambda>
+    CHIP_ERROR ScheduleLambda(const Lambda & lambda)
+    {
+        LambdaBridge event;
+
+        // memcpy is used to move the lambda into the event queue, so it must be trivially copyable
+        static_assert(std::is_trivially_copyable<Lambda>::value);
+        static_assert(sizeof(Lambda) <= CHIP_CONFIG_LAMBDA_EVENT_SIZE);
+        static_assert(alignof(Lambda) <= CHIP_CONFIG_LAMBDA_EVENT_ALIGN);
+
+        // Implicit cast a capture-less lambda into a raw function pointer.
+        event.LambdaProxy = [](const void * body) { (*static_cast<const Lambda *>(body))(); };
+        memcpy(event.LambdaBody, &lambda, sizeof(Lambda));
+
+        return ScheduleLambdaBridge(event);
+    }
 
 protected:
     // Provide access to private members of EventHandlerDelegate.

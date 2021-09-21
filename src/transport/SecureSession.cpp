@@ -94,12 +94,6 @@ CHIP_ERROR SecureSession::Init(const Crypto::P256Keypair & local_keypair, const 
     return InitFromSecret(ByteSpan(secret, secret.Length()), salt, infoType, role);
 }
 
-void SecureSession::Reset()
-{
-    mKeyAvailable = false;
-    memset(mKeys, 0, sizeof(mKeys));
-}
-
 CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_t len)
 {
 
@@ -108,7 +102,7 @@ CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_
     Encoding::LittleEndian::BufferWriter bbuf(iv, len);
 
     bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
-    bbuf.Put32(header.GetMessageId());
+    bbuf.Put32(header.GetMessageCounter());
 
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
@@ -133,9 +127,9 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
                                   MessageAuthenticationCode & mac) const
 {
 
-    constexpr Header::EncryptionType encType = Header::EncryptionType::kAESCCMTagLen16;
+    constexpr Header::SessionType sessionType = Header::SessionType::kAESCCMTagLen16;
 
-    const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(encType);
+    const size_t taglen = MessageAuthenticationCode::TagLenForSessionType(sessionType);
     VerifyOrDie(taglen <= kMaxTagLen);
 
     VerifyOrReturnError(mKeyAvailable, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
@@ -164,7 +158,7 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], kAES_CCM128_Key_Length, IV, sizeof(IV),
                                          output, tag, taglen));
 
-    mac.SetTag(&header, encType, tag, taglen);
+    mac.SetTag(&header, sessionType, tag, taglen);
 
     return CHIP_NO_ERROR;
 }
@@ -172,7 +166,7 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
 CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                                   const MessageAuthenticationCode & mac) const
 {
-    const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(header.GetEncryptionType());
+    const size_t taglen = MessageAuthenticationCode::TagLenForSessionType(header.GetSessionType());
     const uint8_t * tag = mac.GetTag();
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
