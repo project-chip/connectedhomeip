@@ -814,7 +814,6 @@ tests:
       response:
           value: 0
 
-
     # Tests for Unsupported attribute
 
     - label: "Read attribute UNSUPPORTED"
