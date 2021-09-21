@@ -57,8 +57,9 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
 #if !defined(NDEBUG)
         if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
         {
-            ChipLogDetail(ExchangeManager, "Piggybacking Ack for MessageCounter:%08" PRIX32 " with msg",
-                          payloadHeader.GetAckMessageCounter().Value());
+            ChipLogDetail(ExchangeManager,
+                          "Piggybacking Ack for MessageCounter:%08" PRIX32 " on exchange: " ChipLogFormatExchangeId,
+                          payloadHeader.GetAckMessageCounter().Value(), ChipLogValueExchangeId(exchangeId, isInitiator));
         }
 #endif
     }
@@ -90,7 +91,8 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
             // This is typically a transient situation, so we pretend like this
             // packet drop happened somewhere on the network instead of inside
             // sendmsg and will just resend it in the normal MRP way later.
-            ChipLogError(ExchangeManager, "Ignoring ENOBUFS: %" CHIP_ERROR_FORMAT, err.Format());
+            ChipLogError(ExchangeManager, "Ignoring ENOBUFS: %" CHIP_ERROR_FORMAT " on exchange " ChipLogFormatExchangeId,
+                         err.Format(), ChipLogValueExchangeId(exchangeId, isInitiator));
             err = CHIP_NO_ERROR;
         }
         ReturnErrorOnFailure(err);

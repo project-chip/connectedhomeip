@@ -233,8 +233,8 @@ CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchange
 
 void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: %d",
-                    apExchangeContext->GetExchangeId());
+    ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
+                    ChipLogValueExchange(apExchangeContext));
     Shutdown();
 }
 
