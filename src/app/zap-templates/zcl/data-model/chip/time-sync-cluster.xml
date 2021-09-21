@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <enum name="TimeSyncTimeSource" type="enum8">
+    <item value="00" name="None"/>
+    <item value="01" name="Unknown"/>
+    <item value="02" name="Admin"/>
+    <item value="03" name="NodeTimeCluster"/>
+    <item value="04" name="NonFabricSntp"/>
+    <item value="05" name="NonFabricNtp"/>
+    <item value="06" name="FabricSntp"/>
+    <item value="07" name="FabricNtp"/>
+    <item value="08" name="MixedNtp"/>
+    <item value="09" name="NonFabricSntpNts"/>
+    <item value="10" name="NonFabricNtpNts"/>
+    <item value="11" name="FabricSntpNts"/>
+    <item value="12" name="FabricNtpNts"/>
+    <item value="13" name="MixedNtpNts"/>
+    <item value="14" name="CloudSource"/>
+    <item value="15" name="Ptp"/>
+    <item value="16" name="Gnss"/>
+  </enum>
+
+  <enum name="TimeSyncGranularity" type="enum8">
+    <item value="00" name="NoTimeGranularity"/>
+    <item value="01" name="MinutesGranularity"/>
+    <item value="02" name="SecondsGranularity"/>
+    <item value="03" name="MillisecondsGranularity"/>
+    <item value="04" name="MicrosecondsGranularity"/>
+  </enum>
+
+  <struct name="TimeSyncTimeZoneType">
+    <item name="Offset" type="int32s" min="-43200" max="50400"/>
+    <item name="ValidAt" type="epoch_us"/>
+    <item name="Name" type="octet_string" length="64"/>
+  </struct>
+
+  <struct name="TimeSyncDstOffsetType">
+    <item name="Offset" type="int32s"/>
+    <item name="ValidStarting" type="epoch_us"/>
+    <item name="ValidUntil" type="epoch_us"/>
+  </struct>
+
+  <cluster singleton="true">
+    <name>Time Sync</name>
+    <domain>General</domain>
+    <description>Accurate time is required for a number of reasons, including scheduling, display and validating security materials.</description>
+    <code>0x0038</code>
+    <define>TIME_SYNC_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <attribute side="server" code="0x0000" define="UTC_TIME" type="epoch_us" writable="false" optional="false">UTCTime</attribute>
+    <attribute side="server" code="0x0001" define="GRANULARITY" type="enum8" writable="false" optional="false">Granularity</attribute>
+    <attribute side="server" code="0x0002" define="TIME_SOURCE" type="enum8" writable="false" optional="true">TimeSource</attribute>
+    <attribute side="server" code="0x0003" define="TRUSTED_TIME_NODEID" type="node_id" writable="true" optional="false">TrustedTimeNodeId</attribute>
+    <attribute side="server" code="0x0004" define="DEFAULT_NTP" type="octet_string" length="128" writable="true" optional="true">DefaultNtp</attribute>
+    <attribute side="server" code="0x0005" define="TIME_ZONE" type="array" entryType="TimeSyncTimeZoneType" length="2" writable="true" optional="true">TimeZone</attribute>
+    <attribute side="server" code="0x0006" define="DST_OFFSET" type="array" entryType="TimeSyncDstOffsetType" length="20" writable="true" optional="true">DstOffset</attribute>
+    <attribute side="server" code="0x0007" define="LOCAL_TIME" type="epoch_us" writable="false" optional="true">LocalTime</attribute>
+    <attribute side="server" code="0x0008" define="TIME_ZONE_DATABASE" type="boolean" writable="false" optional="true">TimeZoneDatabase</attribute>
+    <attribute side="server" code="0x0009" define="NTP_SERVER_PORT" type="int16s" writable="false" optional="true">NtpServerPort</attribute>
+
+    <command source="client" code="0x00" name="SetUtcTime" optional="false">
+      <description>This Command MAY be issued by Administrator to set the time.</description>
+      <arg name="UtcTime" type="epoch_us" optional="false"/>
+      <arg name="Granularity" type="TimeSyncGranularity" optional="false"/>
+      <arg name="TimeSource" type="TimeSyncTimeSource" optional="true"/>
+    </command>
+
+  </cluster>
+</configurator>

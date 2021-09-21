@@ -520,26 +520,6 @@ limitations under the License.
       <arg name="timeStamp" type="epoch_s"/>
     </command>
   </cluster>
-  <cluster singleton="true">
-    <name>Time</name>
-    <domain>General</domain>
-    <description>Attributes and commands that provide a basic interface to a real-time clock.</description>
-    <code>0x000A</code>
-    <define>TIME_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="TIME" type="epoch_s" min="0x00000000" max="0xFFFFFFFE" writable="true" optional="false">time</attribute>
-    <attribute side="server" code="0x0001" define="TIME_STATUS" type="BITMAP8" min="0x00" max="0x0F" writable="true" default="0x00" optional="false">time status</attribute>
-    <attribute side="server" code="0x0002" define="TIME_ZONE" type="INT32S" min="0xFFFEAE80" max="0x00015180" writable="true" default="0x00000000" optional="true">time zone</attribute>
-    <attribute side="server" code="0x0003" define="DST_START" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="true" optional="true">dst start</attribute>
-    <attribute side="server" code="0x0004" define="DST_END" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="true" optional="true">dst end</attribute>
-    <attribute side="server" code="0x0005" define="DST_SHIFT" type="INT32S" min="0xFFFEAE80" max="0x00015180" writable="true" default="0x00000000" optional="true">dst shift</attribute>
-    <attribute side="server" code="0x0006" define="STANDARD_TIME" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="false" optional="true">standard time</attribute>
-    <attribute side="server" code="0x0007" define="LOCAL_TIME" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="false" optional="true">local time</attribute>
-    <attribute side="server" code="0x0008" define="LAST_SET_TIME" type="epoch_s" min="0x00000000" max="0xFFFFFFFE" writable="false" default="0xFFFFFFFF" optional="true">last set time</attribute>
-    <attribute side="server" code="0x0009" define="VALID_UNTIL_TIME" type="epoch_s" min="0x00000000" max="0xFFFFFFFE" writable="true" default="0xFFFFFFFF" optional="true">valid until time</attribute>
-  </cluster>
   <cluster>
     <name>Binary Input (Basic)</name>
     <domain>General</domain>
