@@ -21,8 +21,6 @@
 
 namespace chip {
 
-// TODO: Consider making this a class and the various utility methods static
-// methods.
 using GroupId = uint16_t;
 
 constexpr GroupId kUndefinedGroupId = 0;
@@ -33,9 +31,17 @@ constexpr GroupId kMaxUniversalGroupId = 0xFFFF;
 constexpr GroupId kMinFabricGroupId = 0x0001;
 constexpr GroupId kMaxFabricGroupId = 0x7FFF;
 
+constexpr GroupId kAllNodes     = 0xFFFF;
+constexpr GroupId kAllNonSleepy = 0xFFFE;
+constexpr GroupId kAllProxies   = 0xFFFD;
+
+constexpr GroupId kMinUniversalGroupIdReserved = 0x8000;
+constexpr GroupId kMaxUniversalGroupIdReserved = 0xFFFC;
+
 constexpr bool IsOperationalGroupId(GroupId aGroupId)
 {
-    return (aGroupId != kUndefinedGroupId);
+    return (aGroupId != kUndefinedGroupId) &&
+        ((aGroupId < kMinUniversalGroupIdReserved) || (aGroupId > kMaxUniversalGroupIdReserved));
 }
 
 constexpr bool IsFabricGroupId(GroupId aGroupId)

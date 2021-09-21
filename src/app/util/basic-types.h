@@ -25,10 +25,8 @@
 
 #include <stdint.h>
 
-// Pull in NodeId
-#include <lib/core/NodeId.h>
-// Pull in GroupId
 #include <lib/core/GroupId.h>
+#include <lib/core/NodeId.h>
 
 // Pull in VendorId
 #include <lib/core/CHIPVendorIdentifiers.hpp>
