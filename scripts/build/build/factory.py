@@ -17,7 +17,7 @@ from typing import Set
 from builders.android import AndroidBoard, AndroidBuilder
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
-from builders.host import HostBuilder, HostApp
+from builders.host import HostBuilder, HostApp, HostBoard
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
 from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
@@ -93,7 +93,8 @@ _MATCHERS = {
 
 # Matrix of what can be compiled and what build options are required
 # by such compilation
-_MATCHERS[Platform.HOST].AcceptBoard(Board.NATIVE)
+_MATCHERS[Platform.HOST].AcceptBoard(Board.NATIVE, board=HostBoard.NATIVE)
+_MATCHERS[Platform.HOST].AcceptBoard(Board.ARM64, board=HostBoard.CROSS_COMPILE_ARM64)
 _MATCHERS[Platform.HOST].AcceptApplication(
     Application.ALL_CLUSTERS, app=HostApp.ALL_CLUSTERS)
 _MATCHERS[Platform.HOST].AcceptApplication(
