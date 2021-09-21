@@ -14,7 +14,7 @@
 
 import os
 
-from platform import uname, release
+from platform import uname
 from enum import Enum, auto
 
 from .gn import GnBuilder
@@ -53,6 +53,7 @@ class HostBoard(Enum):
 
     def PlatformName(self):
         if self == HostBoard.NATIVE:
+            uname_result = uname()
             return '-'.join([uname_result.system.lower(), uname_result.machine])
         elif self == HostBoard.CROSS_COMPILE_ARM64:
             return 'linux-rpi'

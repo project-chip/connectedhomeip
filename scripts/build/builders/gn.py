@@ -30,6 +30,20 @@ class GnBuilder(Builder):
         """
         super(GnBuilder, self).__init__(root, runner, output_prefix)
 
+    def GnBuildArgs(self):
+        """Extra gn build `--args`
+
+        If used, returns a list of arguments.
+        """
+        return None
+
+    def GnBuildEnv(self):
+        """Extra environment variables needed for the GN build to run.
+
+        If used, returns a dictionary of environment variables.
+        """
+        return None
+
     def generate(self):
         if not os.path.exists(self.output_dir):
             cmd = [

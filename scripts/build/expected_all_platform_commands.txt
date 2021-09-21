@@ -7,6 +7,21 @@ gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool {out}/{rea
 # Generating {real_platform}-native-thermostat
 gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux {out}/{real_platform}-native-thermostat
 
+# Generating linux-rpi-arm64-all_clusters
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-rpi-arm64-all_clusters'
+
+# Generating linux-rpi-arm64-chip_tool
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-rpi-arm64-chip_tool'
+
+# Generating linux-rpi-arm64-thermostat
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-rpi-arm64-thermostat'
+
 # Generating qpg-qpg6100-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
 
@@ -143,6 +158,15 @@ ninja -C {out}/{real_platform}-native-chip_tool
 
 # Building {real_platform}-native-thermostat
 ninja -C {out}/{real_platform}-native-thermostat
+
+# Building linux-rpi-arm64-all_clusters
+ninja -C {out}/linux-rpi-arm64-all_clusters
+
+# Building linux-rpi-arm64-chip_tool
+ninja -C {out}/linux-rpi-arm64-chip_tool
+
+# Building linux-rpi-arm64-thermostat
+ninja -C {out}/linux-rpi-arm64-thermostat
 
 # Building qpg-qpg6100-lock
 ninja -C {out}/qpg-qpg6100-lock
