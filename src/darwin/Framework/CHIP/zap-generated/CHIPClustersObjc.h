@@ -1676,6 +1676,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeActiveTimestampWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePendingTimestampWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDelayWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeSecurityPolicyWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeChannelMaskWithResponseHandler:(ResponseHandler)responseHandler;

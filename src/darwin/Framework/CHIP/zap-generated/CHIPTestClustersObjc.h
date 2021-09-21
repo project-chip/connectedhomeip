@@ -741,7 +741,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeRxErrSecCountWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeRxErrFcsCountWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeRxErrOtherCountWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeChannelMaskWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeActiveTimestampWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePendingTimestampWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeDelayWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeChannelMaskWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end
