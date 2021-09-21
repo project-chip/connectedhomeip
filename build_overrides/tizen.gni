@@ -12,27 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
-
-executable("chip-ota-requestor-app") {
-  sources = [
-    "ExampleSelfCommissioning.h",
-    "PersistentStorage.cpp",
-    "main.cpp",
-  ]
-
-  deps = [
-    "${chip_root}/examples/ota-requestor-app/ota-requestor-common",
-    "${chip_root}/examples/platform/linux:app-main",
-    "${chip_root}/src/lib",
-  ]
-
-  cflags = [ "-Wconversion" ]
-
-  output_dir = root_out_dir
-}
-
-group("linux") {
-  deps = [ ":chip-ota-requestor-app" ]
+declare_args() {
+  # Root directory for tizen.
+  tizen_root = "//config/tizen/chip-gn/platform"
 }

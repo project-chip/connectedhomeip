@@ -107,10 +107,11 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     uint32_t delayedActionTimeSec = 0;
     uint32_t newSoftwareVersion   = softwareVersion + 1; // This implementation will always indicate that an update is available
                                                          // (if the user provides a file).
-    bool userConsentNeeded               = false;
-    uint8_t updateToken[kUpdateTokenLen] = { 0 };
-    char strBuf[kUpdateTokenStrLen]      = { 0 };
-    char uriBuf[kUriMaxLen]              = { 0 };
+    constexpr char kExampleSoftwareString[] = "Example-Image-V0.1";
+    bool userConsentNeeded                  = false;
+    uint8_t updateToken[kUpdateTokenLen]    = { 0 };
+    char strBuf[kUpdateTokenStrLen]         = { 0 };
+    char uriBuf[kUriMaxLen]                 = { 0 };
 
     GenerateUpdateToken(updateToken, kUpdateTokenLen);
     GetUpdateTokenString(ByteSpan(updateToken), strBuf, kUpdateTokenStrLen);
@@ -133,6 +134,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     VerifyOrReturnError(writer->Put(ContextTag(tagNum++), delayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->PutString(ContextTag(tagNum++), uriBuf) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(tagNum++), newSoftwareVersion) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrReturnError(writer->PutString(ContextTag(tagNum++), kExampleSoftwareString) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->PutBytes(ContextTag(tagNum++), updateToken, kUpdateTokenLen) == CHIP_NO_ERROR,
                         EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(tagNum++), userConsentNeeded) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);

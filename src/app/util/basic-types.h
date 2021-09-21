@@ -25,7 +25,7 @@
 
 #include <stdint.h>
 
-// Pull in NodeId
+#include <lib/core/GroupId.h>
 #include <lib/core/NodeId.h>
 
 // Pull in VendorId
@@ -44,7 +44,6 @@ typedef uint64_t EventNumber;
 typedef uint64_t FabricId;
 typedef uint8_t FabricIndex;
 typedef uint32_t FieldId;
-typedef uint16_t GroupId;
 typedef uint16_t ListIndex;
 typedef uint32_t TransactionId;
 typedef uint32_t StatusCode;
