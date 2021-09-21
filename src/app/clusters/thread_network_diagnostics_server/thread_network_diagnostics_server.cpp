@@ -72,7 +72,7 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::ReadIfSupported(chip::AttributeId attribu
     TLVType valueType;
 
     // GetThreadNetworkDiagnosticAttributeInfo will alloc memory for the data returned.
-    CHIP_ERROR err = ThreadStackMgr().GetThreadNetworkDiagnosticAttributeInfo(attributeId, &pData, dataLen, valueType);
+    CHIP_ERROR err = ConnectivityMgr().GetThreadNetworkDiagnosticAttributeInfo(attributeId, &pData, dataLen, valueType);
 
     if (err == CHIP_NO_ERROR)
     {

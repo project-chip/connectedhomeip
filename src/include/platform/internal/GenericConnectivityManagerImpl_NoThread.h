@@ -54,6 +54,8 @@ protected:
     bool _IsThreadProvisioned(void);
     void _ErasePersistentInfo(void);
     bool _HaveServiceConnectivityViaThread(void);
+    CHIP_ERROR _GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength,
+                                                       chip::TLV::TLVType & type);
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
@@ -129,6 +131,13 @@ template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_HaveServiceConnectivityViaThread(void)
 {
     return false;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength,
+                                                       chip::TLV::TLVType & type)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace Internal
