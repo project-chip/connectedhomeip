@@ -2499,5 +2499,29 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+ *
+ * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
+ *
+ * Binds to number of GroupState entries to support per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 5
+#endif
+
+// TODO: Need to cap number of KeySets
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+ *
+ * @brief Defines the number of "endpoint->controlling group" mappings per fabric.
+ *
+ * Binds to number of GroupMapping entries per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 8
+#endif
+
+/**
  * @}
  */

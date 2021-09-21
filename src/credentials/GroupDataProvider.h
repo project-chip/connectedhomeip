@@ -27,21 +27,29 @@ namespace Credentials {
 class GroupDataProvider
 {
 public:
-    static constexpr size_t kGroupNameLengthMax = 16;
-    static constexpr size_t kGroupEndpointsMax  = 16;
-
+    // An EpochKey is a single key usable to determine an operational group key
     struct EpochKey
     {
-        static constexpr size_t kLengthBytes = 16;
+        static constexpr size_t kLengthBytes = (128 / 8);
+        // Validity start time in microseconds since 2000-01-01T00:00:00 UTC ("the Epoch")
         uint64_t start_time;
+        // Actual key bits. Depending on context, it may be a raw epoch key (as seen within `SetKeySet` calls)
+        // or it may be the derived operational group key (as seen in any other usage).
         uint8_t key[kLengthBytes];
     };
 
+    // A GroupMapping maps a controlling GroupId to a given EndpointId. There may be
+    // multiple GroupMapping having the same `group` value, but each with different
+    // `endpoint` value.
     struct GroupMapping
     {
+        // The endpoint to which a GroupId is mapped.
         EndpointId endpoint;
+        // The GroupId, which, when received in a message will map the the `endpoint`.
         GroupId group;
+
         bool operator==(const GroupMapping & other) { return this->endpoint == other.endpoint && this->group == other.group; }
+
         GroupMapping & operator=(const GroupMapping & other)
         {
             if (this == &other)
@@ -52,18 +60,28 @@ public:
         }
     };
 
+    // A group state maps the group key set to use for encryption/decryption for a given group.
     struct GroupState
     {
-        uint16_t state_index;
         chip::GroupId group;
         uint16_t key_set_index;
+
         bool operator==(const GroupState & other)
         {
-            return this->state_index == other.state_index && this->group == other.group &&
-                this->key_set_index == other.key_set_index;
+            return this->group == other.group && this->key_set_index == other.key_set_index;
         }
     };
 
+    // A group state list entry has the data for a list read operation, including during iteration.
+    struct GroupStateListEntry : public GroupState
+    {
+        // Fabric Index associated with the group state entry's fabric scoping
+        chip::FabricIndex fabric_index;
+        // Positional index within the overall list.
+        uint16_t list_index;
+    };
+
+    // A operational group key set, usable by many GroupState mappings
     struct KeySet
     {
         enum class SecurityPolicy : uint8_t
@@ -72,9 +90,15 @@ public:
             kLowLatency = 1
         };
 
+        // Logical index provided by the Administrator that configured the entry
         uint16_t key_set_index;
+        // Security policy to use for groups that use this keyset
         SecurityPolicy policy;
+        // The actual keys for the group key set
         EpochKey epoch_keys[3];
+        // TODO: Move fields around to reduce padding loss
+        // Number of keys present
+        uint8_t num_keys_used;
     };
 
     class GroupMappingIterator
@@ -82,8 +106,8 @@ public:
     public:
         virtual ~GroupMappingIterator() = default;
         virtual uint16_t Count()        = 0;
-        virtual bool HasNext()          = 0;
-        virtual GroupId Next() const    = 0;
+        virtual GroupId Next()          = 0;
+        virtual void Release()          = 0;
 
     protected:
         GroupMappingIterator() = default;
@@ -92,10 +116,10 @@ public:
     class GroupStateIterator
     {
     public:
-        virtual ~GroupStateIterator()           = default;
-        virtual uint16_t Count()                = 0;
-        virtual bool HasNext()                  = 0;
-        virtual const GroupState * Next() const = 0;
+        virtual ~GroupStateIterator()                    = default;
+        virtual uint16_t Count()                         = 0;
+        virtual const GroupStateListEntry * Next()       = 0;
+        virtual void Release()                           = 0;
 
     protected:
         GroupStateIterator() = default;
@@ -106,16 +130,18 @@ public:
     public:
         virtual ~KeySetIterator()           = default;
         virtual uint16_t Count()            = 0;
-        virtual bool HasNext()              = 0;
-        virtual const KeySet * Next() const = 0;
+        virtual const KeySet * Next()       = 0;
+        virtual void Release()              = 0;
 
     protected:
         KeySetIterator() = default;
     };
 
-    struct GroupListener
+    class GroupListener
     {
-        void OnStateChanged(GroupState & old_state, GroupState & new_state);
+        virtual ~GroupListener() = default;
+        virtual void OnGroupStateChanged(const GroupState & old_state, const GroupState & new_state) = 0;
+        virtual void OnGroupStateRemoved(const GroupState & removed_state) = 0;
     };
 
     GroupDataProvider()          = default;
@@ -129,27 +155,28 @@ public:
     virtual void Finish()     = 0;
 
     // Endpoints
-    virtual bool ExistsGroupMapping(chip::FabricIndex fabric, GroupMapping & mapping)                       = 0;
-    virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric, GroupMapping & mapping, const char * name) = 0;
-    virtual CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric, GroupMapping & mapping)                 = 0;
-    virtual CHIP_ERROR RemoveGroupAllMappings(chip::FabricIndex fabric, EndpointId endpoint)                = 0;
-    virtual GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric, EndpointId endpoint)      = 0;
+    virtual bool GroupMappingExists(chip::FabricIndex fabric_index, GroupMapping & mapping)                       = 0;
+    virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, GroupMapping & mapping, const char * name) = 0;
+    virtual CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, GroupMapping & mapping)                 = 0;
+    virtual CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint)                = 0;
+    virtual GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint)      = 0;
 
     // States
-    virtual CHIP_ERROR SetGroupState(chip::FabricIndex fabric, GroupState & state)      = 0;
-    virtual CHIP_ERROR GetGroupState(chip::FabricIndex fabric, GroupState & state)      = 0;
-    virtual CHIP_ERROR RemoveGroupState(chip::FabricIndex fabric, uint16_t state_index) = 0;
-    virtual GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric)           = 0;
+    virtual CHIP_ERROR SetGroupState(chip::FabricIndex fabric_index, uint16_t state_index, const GroupState & state)    = 0;
+    virtual CHIP_ERROR GetGroupState(chip::FabricIndex fabric_index, uint16_t state_index, GroupStateListEntry & state) = 0;
+    virtual CHIP_ERROR RemoveGroupState(chip::FabricIndex fabric_index, uint16_t state_index)                           = 0;
+    virtual GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric_index)                                     = 0;
 
     // Keys
-    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric, KeySet & keys)             = 0;
-    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric, KeySet & keys)             = 0;
-    virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric, uint16_t key_set_index) = 0;
-    virtual KeySetIterator * IterateKeySets(chip::FabricIndex fabric)                 = 0;
+    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, KeySet & keys)             = 0;
+    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, KeySet & keys)             = 0;
+    virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index) = 0;
+    virtual KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index)                 = 0;
 
     void SetListener(GroupListener * listener) { mListener = listener; };
     void RemoveListener() { mListener = nullptr; };
 
+    // TODO: handle fabric deletion (reindex fabric entries!)
 private:
     GroupListener * mListener = nullptr;
 };
