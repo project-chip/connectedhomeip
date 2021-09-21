@@ -2480,6 +2480,216 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 }
 - (void)testSendClusterTestCluster_000109_ReadAttribute
 {
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_US Default Value"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEpochUsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read attribute EPOCH_US Default Value Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000110_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_US Max Value"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint64_t epochUsArgument = 18446744073709551615ULL;
+    [cluster writeAttributeEpochUsWithValue:epochUsArgument
+                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                NSLog(@"Write attribute EPOCH_US Max Value Error: %@", err);
+
+                                XCTAssertEqual(err.code, 0);
+
+                                [expectation fulfill];
+                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000111_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_US Max Value"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEpochUsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read attribute EPOCH_US Max Value Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 18446744073709551615);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000112_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_US Min Value"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint64_t epochUsArgument = 0ULL;
+    [cluster writeAttributeEpochUsWithValue:epochUsArgument
+                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                NSLog(@"Write attribute EPOCH_US Min Value Error: %@", err);
+
+                                XCTAssertEqual(err.code, 0);
+
+                                [expectation fulfill];
+                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000113_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_US Min Value"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEpochUsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read attribute EPOCH_US Min Value Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedLongLongValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000114_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_S Default Value"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEpochSWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read attribute EPOCH_S Default Value Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedLongValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000115_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_S Max Value"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint32_t epochSArgument = 4294967295UL;
+    [cluster writeAttributeEpochSWithValue:epochSArgument
+                           responseHandler:^(NSError * err, NSDictionary * values) {
+                               NSLog(@"Write attribute EPOCH_S Max Value Error: %@", err);
+
+                               XCTAssertEqual(err.code, 0);
+
+                               [expectation fulfill];
+                           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000116_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_S Max Value"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEpochSWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read attribute EPOCH_S Max Value Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedLongValue], 4294967295);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000117_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_S Min Value"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint32_t epochSArgument = 0UL;
+    [cluster writeAttributeEpochSWithValue:epochSArgument
+                           responseHandler:^(NSError * err, NSDictionary * values) {
+                               NSLog(@"Write attribute EPOCH_S Min Value Error: %@", err);
+
+                               XCTAssertEqual(err.code, 0);
+
+                               [expectation fulfill];
+                           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000118_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_S Min Value"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEpochSWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Read attribute EPOCH_S Min Value Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedLongValue], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000119_ReadAttribute
+{
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute UNSUPPORTED"];
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -2504,7 +2714,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000110_WriteAttribute
+- (void)testSendClusterTestCluster_000120_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Writeattribute UNSUPPORTED"];
 
@@ -2530,7 +2740,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000111_Test
+- (void)testSendClusterTestCluster_000121_Test
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command to unsupported endpoint"];
 

@@ -10831,6 +10831,64 @@ CHIP_ERROR TestClusterCluster::WriteAttributeLongCharString(Callback::Cancelable
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR TestClusterCluster::ReadAttributeEpochUs(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000020;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int64uAttributeCallback>);
+}
+
+CHIP_ERROR TestClusterCluster::WriteAttributeEpochUs(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint64_t value)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000020;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::ReadAttributeEpochS(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000021;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
+CHIP_ERROR TestClusterCluster::WriteAttributeEpochS(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint32_t value)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000021;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, value));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
 CHIP_ERROR TestClusterCluster::ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {

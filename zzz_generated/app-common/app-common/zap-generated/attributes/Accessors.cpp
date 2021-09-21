@@ -6789,6 +6789,22 @@ EmberAfStatus SetEnum16(chip::EndpointId endpoint, uint16_t enum16)
 {
     return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Ids::Enum16, (uint8_t *) &enum16, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
+EmberAfStatus GetEpochUs(chip::EndpointId endpoint, uint64_t * epochUs)
+{
+    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Ids::EpochUs, (uint8_t *) epochUs, sizeof(*epochUs));
+}
+EmberAfStatus SetEpochUs(chip::EndpointId endpoint, uint64_t epochUs)
+{
+    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Ids::EpochUs, (uint8_t *) &epochUs, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetEpochS(chip::EndpointId endpoint, uint32_t * epochS)
+{
+    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Ids::EpochS, (uint8_t *) epochS, sizeof(*epochS));
+}
+EmberAfStatus SetEpochS(chip::EndpointId endpoint, uint32_t epochS)
+{
+    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Ids::EpochS, (uint8_t *) &epochS, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
+}
 EmberAfStatus GetUnsupported(chip::EndpointId endpoint, bool * unsupported)
 {
     return emberAfReadServerAttribute(endpoint, TestCluster::Id, Ids::Unsupported, (uint8_t *) unsupported, sizeof(*unsupported));
