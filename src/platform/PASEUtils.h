@@ -29,7 +29,6 @@ private:
     PASEStatus();
 
 public:
-
     enum class PASEFlags : uint8_t
     {
         kPASESessionNone      = 0x00,

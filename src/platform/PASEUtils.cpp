@@ -22,11 +22,11 @@ PASEStatus * PASEStatus::instance = 0;
 
 PASEStatus * getInstance()
 {
-    if(PASEStatus::instance == 0)
+    if (PASEStatus::instance == 0)
     {
         PASEStatus::instance = new PASEStatus();
     }
     return PASEStatus::instance;
 }
 
-PASEStatus::PASEStatus(){}
+PASEStatus::PASEStatus() {}

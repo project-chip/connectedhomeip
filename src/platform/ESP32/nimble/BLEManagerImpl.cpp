@@ -33,9 +33,9 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PASEUtils.h>
 #include <platform/internal/BLEManager.h>
 #include <system/SystemTimer.h>
-#include <platform/PASEUtils.h>
 
 #include "esp_log.h"
 #include "esp_nimble_hci.h"
