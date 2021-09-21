@@ -24,9 +24,13 @@
 #pragma once
 #include <memory>
 
+#include <lib/core/CHIPTLVTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 
 namespace chip {
 
@@ -162,6 +166,8 @@ public:
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
     bool HaveServiceConnectivityViaThread();
+    CHIP_ERROR GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength,
+                                                       chip::TLV::TLVType & type);
 
     // Internet connectivity methods
     bool HaveIPv4InternetConnectivity();
@@ -471,6 +477,12 @@ inline void ConnectivityManager::ErasePersistentInfo()
 inline bool ConnectivityManager::HaveServiceConnectivityViaThread()
 {
     return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaThread();
+}
+
+inline CHIP_ERROR ConnectivityManager::GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength,
+                                                       chip::TLV::TLVType & type)
+{
+    return static_cast<ImplClass *>(this)->_GetThreadNetworkDiagnosticAttributeInfo(attributeId, buffer, ReadLength, type);
 }
 
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()

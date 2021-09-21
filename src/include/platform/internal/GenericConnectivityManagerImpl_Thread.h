@@ -68,6 +68,8 @@ protected:
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
     bool _HaveServiceConnectivityViaThread();
+    CHIP_ERROR _GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength,
+                                                       chip::TLV::TLVType & type);
 
     // ===== Members for use by the implementation subclass.
 
@@ -154,6 +156,13 @@ template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_HaveServiceConnectivityViaThread()
 {
     return mFlags.Has(Flags::kHaveServiceConnectivity);
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength,
+                                                       chip::TLV::TLVType & type)
+{
+    return ThreadStackMgrImpl().GetThreadNetworkDiagnosticAttributeInfo(attributeId, buffer, ReadLength, type);
 }
 
 } // namespace Internal
