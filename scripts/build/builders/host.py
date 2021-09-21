@@ -45,6 +45,7 @@ class HostApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
+
 class HostBoard(Enum):
     NATIVE = auto()
 
@@ -60,9 +61,10 @@ class HostBoard(Enum):
         else:
             raise Exception('Unknown host board type: %r' % self)
 
+
 class HostBuilder(GnBuilder):
 
-    def __init__(self, root, runner, output_prefix: str, app: HostApp, board = HostBoard.NATIVE):
+    def __init__(self, root, runner, output_prefix: str, app: HostApp, board=HostBoard.NATIVE):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner,
@@ -83,7 +85,7 @@ class HostBuilder(GnBuilder):
                 'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64'),
             ]
         else:
-           raise Exception('Unknown host board type: %r' % self)
+            raise Exception('Unknown host board type: %r' % self)
 
     def GnBuildEnv(self):
         if self.board == HostBoard.NATIVE:
@@ -93,13 +95,12 @@ class HostBuilder(GnBuilder):
                 'PKG_CONFIG_PATH': self.SysRootPath('SYSROOT_AARCH64') + '/lib/aarch64-linux-gnu/pkgconfig',
             }
         else:
-           raise Exception('Unknown host board type: %r' % self)
+            raise Exception('Unknown host board type: %r' % self)
 
     def SysRootPath(self, name):
         if not name in os.environ:
             raise Exception('Missing environment variable "%s"' % name)
         return os.environ[name]
-
 
     def build_outputs(self):
         return {
@@ -108,4 +109,5 @@ class HostBuilder(GnBuilder):
         }
 
     def SetIdentifier(self, platform: str, board: str, app: str):
-        super(HostBuilder, self).SetIdentifier(self.board.PlatformName(), board, app)
+        super(HostBuilder, self).SetIdentifier(
+            self.board.PlatformName(), board, app)
