@@ -522,8 +522,6 @@ EmberAfStatus GetPendingTimestamp(chip::EndpointId endpoint, uint64_t * pendingT
 EmberAfStatus SetPendingTimestamp(chip::EndpointId endpoint, uint64_t pendingTimestamp);
 EmberAfStatus GetDelay(chip::EndpointId endpoint, uint32_t * delay); // int32u
 EmberAfStatus SetDelay(chip::EndpointId endpoint, uint32_t delay);
-EmberAfStatus GetChannelMask(chip::EndpointId endpoint, uint8_t * channelMask); // int8u
-EmberAfStatus SetChannelMask(chip::EndpointId endpoint, uint8_t channelMask);
 } // namespace Attributes
 } // namespace ThreadNetworkDiagnostics
 

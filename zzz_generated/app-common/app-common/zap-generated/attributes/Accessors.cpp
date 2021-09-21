@@ -2006,16 +2006,6 @@ EmberAfStatus SetDelay(chip::EndpointId endpoint, uint32_t delay)
     return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Ids::Delay, (uint8_t *) &delay,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetChannelMask(chip::EndpointId endpoint, uint8_t * channelMask)
-{
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Ids::ChannelMask, (uint8_t *) channelMask,
-                                      sizeof(*channelMask));
-}
-EmberAfStatus SetChannelMask(chip::EndpointId endpoint, uint8_t channelMask)
-{
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Ids::ChannelMask, (uint8_t *) &channelMask,
-                                       ZCL_INT8U_ATTRIBUTE_TYPE);
-}
 } // namespace Attributes
 } // namespace ThreadNetworkDiagnostics
 

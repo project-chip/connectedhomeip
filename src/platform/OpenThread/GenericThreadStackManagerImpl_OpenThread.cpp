@@ -869,19 +869,20 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadNetwor
     break;
 
     case ZCL_MESH_LOCAL_PREFIX_ATTRIBUTE_ID: {
-        const uint8_t kOctStrPrefixLen = (OT_MESH_LOCAL_PREFIX_SIZE+1)*2+1; // For each hex character of Len + Prefix + NULL char
+        const uint8_t kOctStrPrefixLen =
+            (OT_MESH_LOCAL_PREFIX_SIZE + 1) * 2 + 1; // For each hex character of Len + Prefix + NULL char
         type       = kTLVType_ByteString;
         ReadLength = kOctStrPrefixLen;
         *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
         VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-        const otMeshLocalPrefix * pMeshLocalPrefix = otThreadGetMeshLocalPrefix(mOTInst);
-        uint8_t formattedIpv6Prefix[OT_MESH_LOCAL_PREFIX_SIZE+1] = {0};
-        formattedIpv6Prefix [0] = OT_IP6_PREFIX_BITSIZE;
+        const otMeshLocalPrefix * pMeshLocalPrefix                 = otThreadGetMeshLocalPrefix(mOTInst);
+        uint8_t formattedIpv6Prefix[OT_MESH_LOCAL_PREFIX_SIZE + 1] = { 0 };
+        formattedIpv6Prefix[0]                                     = OT_IP6_PREFIX_BITSIZE;
         memcpy(&formattedIpv6Prefix[1], pMeshLocalPrefix->m8, OT_MESH_LOCAL_PREFIX_SIZE);
 
-        chip::Encoding::BytesToUppercaseHexString(formattedIpv6Prefix, OT_MESH_LOCAL_PREFIX_SIZE+1, reinterpret_cast<char *>(*buffer),
-                                                  ReadLength);
+        chip::Encoding::BytesToUppercaseHexString(formattedIpv6Prefix, OT_MESH_LOCAL_PREFIX_SIZE + 1,
+                                                  reinterpret_cast<char *>(*buffer), ReadLength);
     }
     break;
 
@@ -1509,7 +1510,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadNetwor
         type = kTLVType_ByteString;
         if (otDatasetIsCommissioned(mOTInst))
         {
-            ReadLength = (sizeof(uint32_t)*2)+1; // For all Hex characters + NULL
+            ReadLength = (sizeof(uint32_t) * 2) + 1; // For all Hex characters + NULL
             *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
             VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
