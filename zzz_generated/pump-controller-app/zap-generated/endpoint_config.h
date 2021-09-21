@@ -944,7 +944,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (54)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (58)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -1009,6 +1009,10 @@
             { 0x003C, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RevokeCommissioning */                                         \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
+            { 0x003E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AttestationRequest */                                          \
+            { 0x003E, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* AttestationResponse */                                         \
+            { 0x003E, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* CertificateChainRequest */                                     \
+            { 0x003E, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* CertificateChainResponse */                                    \
             { 0x003E, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* OpCSRRequest */                                                \
             { 0x003E, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* OpCSRResponse */                                               \
             { 0x003E, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddNOC */                                                      \

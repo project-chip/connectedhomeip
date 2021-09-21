@@ -48,8 +48,6 @@
 #include <app/util/error-mapping.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
@@ -759,8 +757,6 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     }
     ReturnErrorOnFailure(mIDAllocator.ReserveUpTo(nextKeyID));
     mPairingDelegate = params.pairingDelegate;
-
-    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
