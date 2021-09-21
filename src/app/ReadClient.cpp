@@ -449,8 +449,8 @@ exit:
 
 void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: %d",
-                    apExchangeContext->GetExchangeId());
+    ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: " ChipLogFormatExchange,
+                    ChipLogValueExchange(apExchangeContext));
     ShutdownInternal(CHIP_ERROR_TIMEOUT);
 }
 
