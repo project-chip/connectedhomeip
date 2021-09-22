@@ -154,26 +154,19 @@ uint64_t ReliableMessageContext::GetActiveRetransmitTimeoutTick()
  *    This message is part of the CHIP Reliable Messaging protocol.
  *
  *  @param[in]    ackMessageCounter         The acknowledged message counter of the incoming message.
- *
- *  @retval  #CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER    if acknowledged message counter of received packet is not in the
- *                                                      RetransTable.
- *  @retval  #CHIP_NO_ERROR                             if the context was removed.
- *
  */
-CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
+void ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Msg is an Ack; Check Retrans Table and remove message context
     if (!GetReliableMessageMgr()->CheckAndRemRetransTable(this, ackMessageCounter))
     {
+        // This can happen quite easily due to a packet with a piggyback ack
+        // being lost and retransmitted.
 #if !defined(NDEBUG)
-        ChipLogError(ExchangeManager,
-                     "CHIP MessageCounter:" ChipLogFormatMessageCounter " not in RetransTable on exchange " ChipLogFormatExchange,
-                     ackMessageCounter, ChipLogValueExchange(GetExchangeContext()));
+        ChipLogDetail(ExchangeManager,
+                      "CHIP MessageCounter:" ChipLogFormatMessageCounter " not in RetransTable on exchange " ChipLogFormatExchange,
+                      ackMessageCounter, ChipLogValueExchange(GetExchangeContext()));
 #endif
-        err = CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER;
-        // Optionally call an application callback with this error.
     }
     else
     {
@@ -184,8 +177,6 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
                       ackMessageCounter, ChipLogValueExchange(GetExchangeContext()));
 #endif
     }
-
-    return err;
 }
 
 CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags)
