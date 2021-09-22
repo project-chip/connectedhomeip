@@ -21,9 +21,6 @@ import android.content.Context
 import android.util.Log
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
-import chip.devicecontroller.PreferencesKeyValueStoreManager
-import chip.devicecontroller.mdns.ChipMdnsCallbackImpl
-import chip.devicecontroller.mdns.NsdManagerServiceResolver
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
