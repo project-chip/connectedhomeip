@@ -71,8 +71,8 @@ limitations under the License.
     <attribute side="server" code="0x0002" define="TIME_SOURCE" type="enum8" writable="false" optional="true">TimeSource</attribute>
     <attribute side="server" code="0x0003" define="TRUSTED_TIME_NODEID" type="node_id" writable="true" optional="false">TrustedTimeNodeId</attribute>
     <attribute side="server" code="0x0004" define="DEFAULT_NTP" type="octet_string" length="128" writable="true" optional="true">DefaultNtp</attribute>
-    <attribute side="server" code="0x0005" define="TIME_ZONE" type="array" entryType="TimeSyncTimeZoneType" length="2" writable="true" optional="true">TimeZone</attribute>
-    <attribute side="server" code="0x0006" define="DST_OFFSET" type="array" entryType="TimeSyncDstOffsetType" length="20" writable="true" optional="true">DstOffset</attribute>
+    <!-- <attribute side="server" code="0x0005" define="TIME_ZONE" type="array" entryType="TimeSyncTimeZoneType" length="2" writable="true" optional="true">TimeZone</attribute> -->
+    <!-- <attribute side="server" code="0x0006" define="DST_OFFSET" type="array" entryType="TimeSyncDstOffsetType" length="20" writable="true" optional="true">DstOffset</attribute> -->
     <attribute side="server" code="0x0007" define="LOCAL_TIME" type="epoch_us" writable="false" optional="true">LocalTime</attribute>
     <attribute side="server" code="0x0008" define="TIME_ZONE_DATABASE" type="boolean" writable="false" optional="true">TimeZoneDatabase</attribute>
     <attribute side="server" code="0x0009" define="NTP_SERVER_PORT" type="int16s" writable="false" optional="true">NtpServerPort</attribute>
