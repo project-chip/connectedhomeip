@@ -118,9 +118,85 @@ void TestRescheduleSamePeerId(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse() == Optional<uint32_t>::Value(1000));
 }
 
+void TestLRU(nlTestSuite * inSuite, void * inContext)
+{
+    // validates that the LRU logic is working
+    MockClock mockClock;
+    mdns::Minimal::ActiveResolveAttempts attempts(&mockClock);
+
+    mockClock.AdvanceMs(334455);
+
+    // add a single very old peer
+    attempts.MarkPending(MakePeerId(9999));
+    NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(9999)));
+    NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
+
+    mockClock.AdvanceMs(1000);
+    NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(9999)));
+    NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
+
+    mockClock.AdvanceMs(2000);
+    NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(9999)));
+    NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
+
+    // at this point, peer 9999 has a delay of 4 seconds. Fill up the rest of the table
+
+    for (uint32_t i = 1; i < mdns::Minimal::ActiveResolveAttempts::kRetryQueueSize; i++)
+    {
+        attempts.MarkPending(MakePeerId(i));
+        mockClock.AdvanceMs(1);
+
+        NL_TEST_ASSERT(inSuite, attempts.NextScheduledPeer() == Optional<PeerId>::Value(MakePeerId(i)));
+        NL_TEST_ASSERT(inSuite, !attempts.NextScheduledPeer().HasValue());
+    }
+
+    // +2 because: 1 element skipped, one element is the "current" that has a delay of 1000ms
+    NL_TEST_ASSERT(
+        inSuite,
+        attempts.GetMsUntilNextExpectedResponse() ==
+            Optional<uint32_t>::Value(static_cast<uint32_t>(1000 - mdns::Minimal::ActiveResolveAttempts::kRetryQueueSize + 2)));
+
+    // add another element - this should overwrite peer 9999
+    attempts.MarkPending(MakePeerId(mdns::Minimal::ActiveResolveAttempts::kRetryQueueSize));
+    mockClock.AdvanceSec(32);
+
+    for (Optional<PeerId> peerId = attempts.NextScheduledPeer(); peerId.HasValue(); peerId = attempts.NextScheduledPeer())
+    {
+        NL_TEST_ASSERT(inSuite, peerId.Value().GetNodeId() != 9999);
+    }
+
+    // Still have active pending items (queue is full)
+    NL_TEST_ASSERT(inSuite, attempts.GetMsUntilNextExpectedResponse().HasValue());
+
+    // expire all of them. Since we double timeout every expiry, we expect a
+    // few iteratios to be able to expire the entire queue
+    constexpr int kMaxIterations = 10;
+
+    int i = 0;
+    for (; i < kMaxIterations; i++)
+    {
+        Optional<uint32_t> ms = attempts.GetMsUntilNextExpectedResponse();
+        if (!ms.HasValue())
+        {
+            break;
+        }
+
+        mockClock.AdvanceMs(ms.Value());
+
+        Optional<PeerId> peerId = attempts.NextScheduledPeer();
+        while (peerId.HasValue())
+        {
+            NL_TEST_ASSERT(inSuite, peerId.Value().GetNodeId() != 9999);
+            peerId = attempts.NextScheduledPeer();
+        }
+    }
+    NL_TEST_ASSERT(inSuite, i < kMaxIterations);
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestSinglePeerAddRemove", TestSinglePeerAddRemove),   //
     NL_TEST_DEF("TestRescheduleSamePeerId", TestRescheduleSamePeerId), //
+    NL_TEST_DEF("TestLRU", TestLRU),                                   //
     NL_TEST_SENTINEL()                                                 //
 };
 
