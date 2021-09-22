@@ -1370,6 +1370,8 @@ static constexpr AttributeId ListStructOctetString = 0x0000001C;
 static constexpr AttributeId LongOctetString       = 0x0000001D;
 static constexpr AttributeId CharString            = 0x0000001E;
 static constexpr AttributeId LongCharString        = 0x0000001F;
+static constexpr AttributeId EpochUs               = 0x00000020;
+static constexpr AttributeId EpochS                = 0x00000021;
 static constexpr AttributeId Unsupported           = 0x000000FF;
 } // namespace Ids
 } // namespace Attributes

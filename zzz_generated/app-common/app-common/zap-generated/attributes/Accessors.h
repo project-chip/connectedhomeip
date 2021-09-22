@@ -1867,6 +1867,10 @@ EmberAfStatus GetEnum8(chip::EndpointId endpoint, uint8_t * enum8); // enum8
 EmberAfStatus SetEnum8(chip::EndpointId endpoint, uint8_t enum8);
 EmberAfStatus GetEnum16(chip::EndpointId endpoint, uint16_t * enum16); // enum16
 EmberAfStatus SetEnum16(chip::EndpointId endpoint, uint16_t enum16);
+EmberAfStatus GetEpochUs(chip::EndpointId endpoint, uint64_t * epochUs); // epoch_us
+EmberAfStatus SetEpochUs(chip::EndpointId endpoint, uint64_t epochUs);
+EmberAfStatus GetEpochS(chip::EndpointId endpoint, uint32_t * epochS); // epoch_s
+EmberAfStatus SetEpochS(chip::EndpointId endpoint, uint32_t epochS);
 EmberAfStatus GetUnsupported(chip::EndpointId endpoint, bool * unsupported); // boolean
 EmberAfStatus SetUnsupported(chip::EndpointId endpoint, bool unsupported);
 } // namespace Attributes
