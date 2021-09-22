@@ -226,7 +226,6 @@ private:
     CHIP_ERROR ConstructSaltSigma3(const ByteSpan & ipk, MutableByteSpan & salt);
     CHIP_ERROR RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk);
 
-    CHIP_ERROR ConstructSaltSigmaResume(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID, MutableByteSpan & salt);
     CHIP_ERROR ConstructSigmaResumeKey(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID, const ByteSpan & skInfo,
                                        const ByteSpan & nonce, MutableByteSpan & resumeKey);
 

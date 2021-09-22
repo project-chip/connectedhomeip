@@ -1159,22 +1159,6 @@ CHIP_ERROR CASESession::ConstructSaltSigma3(const ByteSpan & ipk, MutableByteSpa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::ConstructSaltSigmaResume(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID,
-                                                 MutableByteSpan & salt)
-{
-    memset(salt.data(), 0, salt.size());
-    Encoding::LittleEndian::BufferWriter bbuf(salt.data(), salt.size());
-
-    bbuf.Put(initiatorRandom.data(), initiatorRandom.size());
-    bbuf.Put(resumptionID.data(), resumptionID.size());
-
-    size_t saltWritten = 0;
-    VerifyOrReturnError(bbuf.Fit(saltWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
-    salt = salt.SubSpan(0, saltWritten);
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR CASESession::ConstructSigmaResumeKey(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID,
                                                 const ByteSpan & skInfo, const ByteSpan & nonce, MutableByteSpan & resumeKey)
 {
@@ -1192,9 +1176,6 @@ CHIP_ERROR CASESession::ConstructSigmaResumeKey(const ByteSpan & initiatorRandom
 
     size_t saltWritten = 0;
     VerifyOrReturnError(bbuf.Fit(saltWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    //    MutableByteSpan saltSpan(msg_salt.Get(), kSigmaParamRandomNumberSize + kCASEResumptionIDSize);
-    //    ReturnErrorOnFailure(ConstructSaltSigmaResume(initiatorRandom, resumptionID, saltSpan));
 
     HKDF_sha_crypto mHKDF;
     ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), salt.Get(), saltWritten, skInfo.data(),
