@@ -41,7 +41,7 @@ public:
     static constexpr size_t kRetryQueueSize     = 4;
     static constexpr uint32_t kMaxRetryDelaySec = 16;
 
-    ActiveResolveAttempts() { Reset(); }
+    ActiveResolveAttempts(chip::System::ClockBase * clock) : mClock(clock) { Reset(); }
 
     /// Clear out the internal queue
     void Reset();
@@ -88,6 +88,7 @@ private:
         uint32_t nextRetryDelaySec = 1;
     };
 
+    chip::System::ClockBase * mClock;
     RetryEntry mRetryQueue[kRetryQueueSize];
 };
 

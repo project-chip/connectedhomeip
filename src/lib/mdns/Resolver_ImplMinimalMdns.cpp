@@ -332,7 +332,10 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
 class MinMdnsResolver : public Resolver, public MdnsPacketDelegate
 {
 public:
-    MinMdnsResolver() { GlobalMinimalMdnsServer::Instance().SetResponseDelegate(this); }
+    MinMdnsResolver() : mActiveResolves(chip::System::Internal::gClockBase)
+    {
+        GlobalMinimalMdnsServer::Instance().SetResponseDelegate(this);
+    }
 
     //// MdnsPacketDelegate implementation
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;

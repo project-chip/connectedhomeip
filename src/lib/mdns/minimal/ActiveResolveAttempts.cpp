@@ -108,7 +108,7 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
     }
 
     entryToUse->peerId            = peerId;
-    entryToUse->queryDueTimeMs    = chip::System::Clock::GetMonotonicMilliseconds();
+    entryToUse->queryDueTimeMs    = mClock->GetMonotonicMilliseconds();
     entryToUse->nextRetryDelaySec = 1;
 }
 
@@ -116,7 +116,7 @@ Optional<uint32_t> ActiveResolveAttempts::GetMsUntilNextExpectedResponse() const
 {
     Optional<uint32_t> minDelay = Optional<uint32_t>::Missing();
 
-    chip::System::Clock::MonotonicMilliseconds nowMs = System::Clock::GetMonotonicMilliseconds();
+    chip::System::Clock::MonotonicMilliseconds nowMs = mClock->GetMonotonicMilliseconds();
 
     for (auto & entry : mRetryQueue)
     {
@@ -143,7 +143,7 @@ Optional<uint32_t> ActiveResolveAttempts::GetMsUntilNextExpectedResponse() const
 
 Optional<PeerId> ActiveResolveAttempts::NextScheduledPeer()
 {
-    chip::System::Clock::MonotonicMilliseconds nowMs = System::Clock::GetMonotonicMilliseconds();
+    chip::System::Clock::MonotonicMilliseconds nowMs = mClock->GetMonotonicMilliseconds();
 
     for (auto & entry : mRetryQueue)
     {
