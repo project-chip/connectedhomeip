@@ -112,9 +112,9 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
     entryToUse->nextRetryDelaySec = 1;
 }
 
-int ActiveResolveAttempts::GetMsUntilNextExpectedResponse() const
+Optional<uint32_t> ActiveResolveAttempts::GetMsUntilNextExpectedResponse() const
 {
-    int minDelay = kInvalidNextMs;
+    Optional<uint32_t> minDelay = Optional<uint32_t>::Missing();
 
     chip::System::Clock::MonotonicMilliseconds nowMs = System::Clock::GetMonotonicMilliseconds();
 
@@ -127,17 +127,21 @@ int ActiveResolveAttempts::GetMsUntilNextExpectedResponse() const
 
         if (nowMs >= entry.queryDueTimeMs)
         {
-            minDelay = 0;
-            break;
+            // found an entry that needs processing right now
+            return Optional<uint32_t>::Value(0);
         }
 
-        minDelay = std::min(minDelay, static_cast<int>(entry.queryDueTimeMs - minDelay));
+        uint32_t entryDelay = static_cast<int>(entry.queryDueTimeMs - nowMs);
+        if (!minDelay.HasValue() || (minDelay.Value() > entryDelay))
+        {
+            minDelay.SetValue(entryDelay);
+        }
     }
 
     return minDelay;
 }
 
-PeerId ActiveResolveAttempts::NextScheduledPeer()
+Optional<PeerId> ActiveResolveAttempts::NextScheduledPeer()
 {
     chip::System::Clock::MonotonicMilliseconds nowMs = System::Clock::GetMonotonicMilliseconds();
 
@@ -162,9 +166,11 @@ PeerId ActiveResolveAttempts::NextScheduledPeer()
 
         entry.queryDueTimeMs = nowMs + entry.nextRetryDelaySec * 1000L;
         entry.nextRetryDelaySec *= 2;
-        return entry.peerId;
+
+        return Optional<PeerId>::Value(entry.peerId);
     }
-    return PeerId();
+
+    return Optional<PeerId>::Missing();
 }
 
 } // namespace Minimal

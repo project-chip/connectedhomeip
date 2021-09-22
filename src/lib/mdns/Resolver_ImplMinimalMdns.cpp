@@ -516,14 +516,14 @@ CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&ResolveRetryCallback, this);
 
-    int delayMs = mActiveResolves.GetMsUntilNextExpectedResponse();
+    Optional<uint32_t> delayMs = mActiveResolves.GetMsUntilNextExpectedResponse();
 
-    if (delayMs < 0)
+    if (!delayMs.HasValue())
     {
         return CHIP_NO_ERROR;
     }
 
-    return mSystemLayer->StartTimer(delayMs, &ResolveRetryCallback, this);
+    return mSystemLayer->StartTimer(delayMs.Value(), &ResolveRetryCallback, this);
 }
 
 void MinMdnsResolver::ResolveRetryCallback(System::Layer *, void * self)
@@ -535,9 +535,9 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
 {
     while (true)
     {
-        PeerId peerId = mActiveResolves.NextScheduledPeer();
+        Optional<PeerId> peerId = mActiveResolves.NextScheduledPeer();
 
-        if (peerId.GetNodeId() == kUndefinedNodeId)
+        if (!peerId.HasValue())
         {
             break;
         }
@@ -552,7 +552,7 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
             char nameBuffer[64] = "";
 
             // Node and fabricid are encoded in server names.
-            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId));
+            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId.Value()));
 
             const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
             Query query(instanceQName);

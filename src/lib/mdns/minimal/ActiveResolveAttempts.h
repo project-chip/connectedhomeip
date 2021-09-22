@@ -20,6 +20,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <system/SystemClock.h>
 
@@ -27,36 +28,45 @@ namespace mdns {
 namespace Minimal {
 
 /// Keeps track of active resolve attempts
+///
+/// Maintains a list of 'pending mdns resolve queries' and provides operations
+/// for:
+///    - add/remove to the list
+///    - figuring out a 'next query time' for items in the list
+///    - iterating through the 'schedule now' items of the list
+///
 class ActiveResolveAttempts
 {
 public:
-    static constexpr int kInvalidNextMs = 1;
+    static constexpr size_t kRetryQueueSize     = 4;
+    static constexpr uint32_t kMaxRetryDelaySec = 16;
 
     ActiveResolveAttempts() { Reset(); }
 
+    /// Clear out the internal queue
     void Reset();
 
+    /// Mark a resolution as a success, removing it from the internal list
     void Complete(const chip::PeerId & peerId);
 
+    /// Mark that a resolution is pending, adding it to the internal list
+    ///
+    /// Once this complete, this peer id will be returned immediately
+    /// by NextScheduledPeer (potentially with others as well)
     void MarkPending(const chip::PeerId & peerId);
 
     // Get minimum milliseconds until the next pending reply is required.
     //
-    // Returns -1 if no active resolve entries exist, >= 0 if a delay is expected
-    int GetMsUntilNextExpectedResponse() const;
+    // Returns missing if no actively tracked elements exist.
+    chip::Optional<uint32_t> GetMsUntilNextExpectedResponse() const;
 
     // Get the peer Id that needs scheduling for a query
     //
     // Assumes that the resolution is being sent and will apply internal
     // query logic.
-    //
-    // Returns kUndefinedNodeId if no peer scheduled.
-    chip::PeerId NextScheduledPeer();
+    chip::Optional<chip::PeerId> NextScheduledPeer();
 
 private:
-    static constexpr uint32_t kMaxRetryDelaySec = 16;
-    static constexpr size_t kRetryQueueSize     = 4;
-
     struct RetryEntry
     {
         // What peer id is pending discovery.
