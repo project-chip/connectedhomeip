@@ -210,7 +210,7 @@ static void TestInetError(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = MapErrorPOSIX(EPERM);
+    err = CHIP_ERROR_POSIX(EPERM);
     NL_TEST_ASSERT(inSuite, DescribeErrorPOSIX(err));
     NL_TEST_ASSERT(inSuite, err.IsRange(ChipError::Range::kPOSIX));
 }

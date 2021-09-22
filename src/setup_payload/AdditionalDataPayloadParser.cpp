@@ -53,12 +53,12 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayloadData::Additi
         ByteSpan rotatingDeviceId;
         ReturnErrorOnFailure(innerReader.GetByteView(rotatingDeviceId));
 
-        VerifyOrReturnError(rotatingDeviceId.size() == RotatingDeviceId::kMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+        VerifyOrReturnError(rotatingDeviceId.size() <= RotatingDeviceId::kMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
         char rotatingDeviceIdBufferTemp[RotatingDeviceId::kHexMaxLength];
 
         ReturnErrorOnFailure(Encoding::BytesToUppercaseHexString(rotatingDeviceId.data(), rotatingDeviceId.size(),
                                                                  rotatingDeviceIdBufferTemp, RotatingDeviceId::kHexMaxLength));
-        outPayload.rotatingDeviceId = std::string(rotatingDeviceIdBufferTemp, RotatingDeviceId::kHexMaxLength);
+        outPayload.rotatingDeviceId = std::string(rotatingDeviceIdBufferTemp, rotatingDeviceId.size() * 2);
     }
     else
     {

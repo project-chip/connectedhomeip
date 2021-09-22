@@ -78,22 +78,6 @@ public:
         return *this;
     }
 
-    bool HasLocalNodeId() const { return mLocalNodeId.HasValue(); }
-    const Optional<NodeId> GetLocalNodeId() const { return mLocalNodeId; }
-    RendezvousParameters & SetLocalNodeId(NodeId nodeId)
-    {
-        mLocalNodeId.SetValue(nodeId);
-        return *this;
-    }
-
-    bool HasRemoteNodeId() const { return mRemoteNodeId.HasValue(); }
-    const Optional<NodeId> GetRemoteNodeId() const { return mRemoteNodeId; }
-    RendezvousParameters & SetRemoteNodeId(NodeId nodeId)
-    {
-        mRemoteNodeId.SetValue(nodeId);
-        return *this;
-    }
-
     bool HasPASEVerifier() const { return mHasPASEVerifier; }
     bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
     bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
@@ -126,9 +110,7 @@ public:
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
-    Optional<NodeId> mLocalNodeId;        ///< the local node id
     Transport::PeerAddress mPeerAddress;  ///< the peer node address
-    Optional<NodeId> mRemoteNodeId;       ///< the remote node id
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner

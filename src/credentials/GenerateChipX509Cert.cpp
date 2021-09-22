@@ -26,6 +26,7 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include <algorithm>
 #include <inttypes.h>
 #include <stddef.h>
 

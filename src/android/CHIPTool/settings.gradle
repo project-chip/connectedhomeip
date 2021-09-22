@@ -1,2 +1,5 @@
 include ':app'
+if (!matterBuildSrcDir.isEmpty()) {
+    include ':chip-library'
+}
 rootProject.name = "CHIPTool"

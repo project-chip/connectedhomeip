@@ -127,7 +127,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
     int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &aSleepTime);
     if (selectRes < 0)
     {
-        LOG_INF("select failed: %s", ErrorStr(System::MapErrorPOSIX(errno)));
+        LOG_INF("select failed: %s", ErrorStr(CHIP_ERROR_POSIX(errno)));
         return;
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
