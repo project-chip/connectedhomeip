@@ -70,6 +70,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'THREAD_NETWORK_DIAGNOSTICS_CLUSTER': ['thread_network_diagnostics_server'],
     'WINDOW_COVERING_CLUSTER': ['window-covering-server'],
     'THERMOSTAT_UI_CONFIG_CLUSTER': ['thermostat-user-interface-configuration-server'],
+    'TIME_SYNC_CLUSTER': ['time-sync-server'],
     'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': ['wifi_network_diagnostics_server'],
     'WAKE_ON_LAN_CLUSTER': [],
     'ZLL_COMMISSIONING_CLUSTER': []
@@ -137,6 +138,7 @@ CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'TV_CHANNEL_CLUSTER': [],
     'THERMOSTAT_CLUSTER': ['thermostat-client'],
     'THERMOSTAT_UI_CONFIG_CLUSTER': [],
+    'TIME_SYNC_CLUSTER': [],
     'THREAD_NETWORK_DIAGNOSTICS_CLUSTER': [],
     'WINDOW_COVERING_CLUSTER': [],
     'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': [],
