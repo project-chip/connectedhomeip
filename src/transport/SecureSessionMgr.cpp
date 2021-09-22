@@ -182,7 +182,7 @@ CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SessionHandle session, const En
 
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " at utc time: %" PRId64 " msec",
+                        " at monotonic time: %" PRId64 " msec",
                         "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(state->GetPeerNodeId()),
                         System::Clock::GetMonotonicMilliseconds());
     }
@@ -194,7 +194,7 @@ CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SessionHandle session, const En
 
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " at utc time: %" PRId64 " msec",
+                        " at monotonic time: %" PRId64 " msec",
                         "plaintext", &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(kUndefinedNodeId),
                         System::Clock::GetMonotonicMilliseconds());
     }
