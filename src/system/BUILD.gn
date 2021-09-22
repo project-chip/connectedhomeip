@@ -37,8 +37,7 @@ declare_args() {
 if (chip_project_config_include_dirs == [] &&
     chip_project_config_include == "<CHIPProjectConfig.h>" &&
     chip_system_project_config_include == "<SystemProjectConfig.h>") {
-  chip_project_config_include_dirs +=
-      [ "${chip_root}/${chip_system_project_config_include_dirs}" ]
+  chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 }
 
 buildconfig_header("system_buildconfig") {
