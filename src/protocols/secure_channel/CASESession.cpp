@@ -1313,6 +1313,7 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
 
     case kProtocolCodeNoSharedRoot:
         err = CHIP_ERROR_CERT_NOT_TRUSTED;
+        break;
 
     default:
         err = CHIP_ERROR_INTERNAL;
