@@ -52,7 +52,6 @@
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/Protocols.h>
-#include <protocols/service_provisioning/ServiceProvisioning.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
