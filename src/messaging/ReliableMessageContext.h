@@ -58,15 +58,23 @@ public:
     CHIP_ERROR FlushAcks();
 
     /**
-     * Take the pending peer ack message counter from the context.  This must only be called
-     * when IsAckPending() is true.  After this call, IsAckPending() will be
-     * false; it's the caller's responsibility to send the ack.
+     * Take the pending peer ack message counter from the context.  This must
+     * only be called when ShouldPiggybackAck() is true.  After this call,
+     * IsAckPending() will be false; it's the caller's responsibility to send
+     * the ack.
      */
     uint32_t TakePendingPeerAckMessageCounter()
     {
         SetAckPending(false);
         return mPendingPeerAckMessageCounter;
     }
+
+    /**
+     * Check whether we have an ack to piggyback on the message we are sending.
+     * If true, TakePendingPeerAckMessageCounter will return a valid value that
+     * should be included as an ack in the message.
+     */
+    bool ShouldPiggybackAck() const;
 
     /**
      *  Get the initial retransmission interval. It would be the time to wait before
@@ -200,16 +208,22 @@ protected:
         /// When set, signifies that there is an acknowledgment pending to be sent back.
         kFlagAckPending = 0x0020,
 
+        /// When set, signifies that there has once been an acknowledgment
+        /// pending to be sent back.  In that case,
+        /// mPendingPeerAckMessageCounter is a valid message counter value for
+        /// some message we have needed to acknowledge in the past.
+        kFlagHasHadAckPending = 0x0040,
+
         /// When set, signifies that at least one message has been received from peer on this exchange context.
-        kFlagMsgRcvdFromPeer = 0x0040,
+        kFlagMsgRcvdFromPeer = 0x0080,
 
         /// When set, signifies that this exchange is waiting for a call to SendMessage.
-        kFlagWillSendMessage = 0x0080,
+        kFlagWillSendMessage = 0x00100,
 
         /// When set, signifies that we are currently in the middle of HandleMessage.
-        kFlagHandlingMessage = 0x0100,
+        kFlagHandlingMessage = 0x0200,
         /// When set, we have had Close() or Abort() called on us already.
-        kFlagClosed = 0x0200,
+        kFlagClosed = 0x0400,
     };
 
     BitFlags<Flags> mFlags; // Internal state flags

@@ -136,6 +136,11 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
     return err;
 }
 
+bool ReliableMessageContext::ShouldPiggybackAck() const
+{
+    return mFlags.Has(Flags::kFlagHasHadAckPending);
+}
+
 uint64_t ReliableMessageContext::GetInitialRetransmitTimeoutTick()
 {
     return mConfig.mInitialRetransTimeoutTick;
@@ -228,6 +233,10 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
             // Restore previously pending ack message counter.
             SetPendingPeerAckMessageCounter(tempAckMessageCounter);
         }
+        // Otherwise don't restore the old (possibly not valid)
+        // mPendingPeerAckMessageCounter value, so we preserve the invariant
+        // that once we have had an ack pending we always have a valid
+        // mPendingPeerAckMessageCounter.
 
         return err;
     }
@@ -296,6 +305,7 @@ void ReliableMessageContext::SetPendingPeerAckMessageCounter(uint32_t aPeerAckMe
 {
     mPendingPeerAckMessageCounter = aPeerAckMessageCounter;
     SetAckPending(true);
+    mFlags.Set(Flags::kFlagHasHadAckPending);
 }
 
 } // namespace Messaging
