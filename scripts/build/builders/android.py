@@ -162,6 +162,8 @@ class AndroidBuilder(Builder):
         outputs = {
             'CHIPController.jar':
                 os.path.join(self.output_dir, 'lib', 'CHIPController.jar'),
+            'AndroidPlatform.jar':
+                os.path.join(self.output_dir, 'lib', 'AndroidPlatform.jar'),
             'SetupPayloadParser.jar':
                 os.path.join(self.output_dir, 'lib', 'SetupPayloadParser.jar'),
             'ChipTool-debug.apk':
