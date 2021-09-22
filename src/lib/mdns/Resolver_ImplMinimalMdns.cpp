@@ -30,6 +30,7 @@
 #include <lib/mdns/minimal/core/FlatAllocatedQName.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemClock.h>
 
 // MDNS servers will receive all broadcast packets over the network.
 // Disable 'invalid packet' messages because the are expected and common
@@ -65,6 +66,192 @@ constexpr uint16_t kMdnsPort        = 5353;
 using namespace mdns::Minimal;
 using MdnsCacheType = Mdns::MdnsCache<CHIP_CONFIG_MDNS_CACHE_SIZE>;
 
+/// Keeps track of active resolve attempts
+class ActiveResolveAttempts
+{
+public:
+    ActiveResolveAttempts() { Reset(); }
+
+    void Reset()
+    {
+        for (auto & item : mRetryQueue)
+        {
+            item.peerId.SetNodeId(kUndefinedNodeId);
+        }
+    }
+
+    void Complete(const PeerId & peerId)
+    {
+        for (auto & item : mRetryQueue)
+        {
+            if (item.peerId == peerId)
+            {
+                item.peerId.SetNodeId(kUndefinedNodeId);
+                return;
+            }
+        }
+
+        // This may happen during boot time adverisements: nodes come online
+        // and advertise their IP without any explicit queries for them
+        ChipLogProgress(Discovery, "Discovered node without a pending query");
+    }
+
+    void MarkPending(const PeerId & peerId)
+    {
+        // Strategy when picking the peer id to use:
+        //   1 if a matching peer id is already found, use that one
+        //   2 if an 'unused' entry is found, use that
+        //   3 otherwise expire the one with the largest nextRetryDelaySec
+        //     or if equal nextRetryDelaySec, pick the one with the oldest
+        //     queryDueTimeMs
+
+        RetryEntry * entryToUse = &mRetryQueue[0];
+
+        for (size_t i = 1; i < kRetryQueueSize; i++)
+        {
+            if (entryToUse->peerId == peerId)
+            {
+                break; // best match possible
+            }
+
+            RetryEntry * entry = mRetryQueue + i;
+
+            // Rule 1: peer id match always matches
+            if (entry->peerId == peerId)
+            {
+                entryToUse = entry;
+                continue;
+            }
+
+            // Rule 2: select unused entries
+            if ((entryToUse->peerId.GetNodeId() != kUndefinedNodeId) && (entry->peerId.GetNodeId() == kUndefinedNodeId))
+            {
+                entryToUse = entry;
+                continue;
+            }
+            else if (entryToUse->peerId.GetNodeId() == kUndefinedNodeId)
+            {
+                continue;
+            }
+
+            // Rule 2: both choices are used (have a defined node id),
+            // pick the one with most queryDueTimeMs
+            if (entry->nextRetryDelaySec > entryToUse->nextRetryDelaySec)
+            {
+                entryToUse = entry;
+            }
+            else if ((entry->nextRetryDelaySec == entryToUse->nextRetryDelaySec) &&
+                     (entry->queryDueTimeMs < entryToUse->queryDueTimeMs))
+            {
+                entryToUse = entry;
+            }
+        }
+
+        if ((entryToUse->peerId.GetNodeId() != kUndefinedNodeId) && (entryToUse->peerId != peerId))
+        {
+            ChipLogError(Discovery, "Re-using pending resolve entry before reply was received.");
+        }
+
+        entryToUse->peerId            = peerId;
+        entryToUse->queryDueTimeMs    = chip::System::Clock::GetMonotonicMilliseconds();
+        entryToUse->nextRetryDelaySec = 1;
+    }
+
+    static constexpr int kInvalidNextMs = 1;
+
+    // Get minimum milliseconds until the next pending reply is required.
+    //
+    // Returns -1 if no active resolve entries exist, >= 0 if a delay is expected
+    int GetMsUntilNextExpectedResponse() const
+    {
+        int minDelay = kInvalidNextMs;
+
+        chip::System::Clock::MonotonicMilliseconds nowMs = System::Clock::GetMonotonicMilliseconds();
+
+        for (auto & entry : mRetryQueue)
+        {
+            if (entry.peerId.GetNodeId() == kUndefinedNodeId)
+            {
+                continue;
+            }
+
+            if (nowMs >= entry.queryDueTimeMs)
+            {
+                minDelay = 0;
+                break;
+            }
+
+            minDelay = std::min(minDelay, static_cast<int>(entry.queryDueTimeMs - minDelay));
+        }
+
+        return minDelay;
+    }
+
+    // Get the peer Id that needs scheduling for a query
+    //
+    // Assumes that the resolution is being sent and will apply internal
+    // query logic.
+    //
+    // Returns kUndefinedNodeId if no peer scheduled.
+    PeerId NextScheduledPeer()
+    {
+        chip::System::Clock::MonotonicMilliseconds nowMs = System::Clock::GetMonotonicMilliseconds();
+
+        for (auto & entry : mRetryQueue)
+        {
+            if (entry.peerId.GetNodeId() == kUndefinedNodeId)
+            {
+                continue; // not a pending item
+            }
+
+            if (entry.queryDueTimeMs > nowMs)
+            {
+                continue; // not yet due
+            }
+
+            if (entry.nextRetryDelaySec > kMaxRetryDelaySec)
+            {
+                ChipLogError(Discovery, "Timeout waiting for mDNS resolution.");
+                entry.peerId.SetNodeId(kUndefinedNodeId);
+                continue;
+            }
+
+            entry.queryDueTimeMs = nowMs + entry.nextRetryDelaySec * 1000L;
+            entry.nextRetryDelaySec *= 2;
+            return entry.peerId;
+        }
+        return PeerId();
+    }
+
+private:
+    static constexpr uint32_t kMaxRetryDelaySec = 16;
+
+    struct RetryEntry
+    {
+        // What peer id is pending discovery.
+        //
+        // Inactive entries are marked by having NodeId == kUndefinedNodeId
+        PeerId peerId;
+
+        // When a reply is expected for this item
+        chip::System::Clock::MonotonicMilliseconds queryDueTimeMs;
+
+        // Next expected delay for sending if reply is not reached by
+        // 'queryDueTimeMs'
+        //
+        // Based on RFC 6762 expectations are:
+        //    - the interval between the first two queries MUST be at least
+        //      one second
+        //    - the intervals between successive queries MUST increase by at
+        //      least a factor of two
+        uint32_t nextRetryDelaySec = 1;
+    };
+
+    static constexpr size_t kRetryQueueSize = 4;
+
+    RetryEntry mRetryQueue[kRetryQueueSize];
+};
+
 class PacketDataReporter : public ParserDelegate
 {
 public:
@@ -82,9 +269,10 @@ public:
     void OnHeader(ConstHeaderRef & header) override;
     void OnQuery(const QueryData & data) override;
     void OnResource(ResourceType type, const ResourceData & data) override;
+
     // Called after ParsePacket is complete to send final notifications to the delegate.
     // Used to ensure all the available IP addresses are attached before completion.
-    void OnComplete();
+    void OnComplete(ActiveResolveAttempts & ActiveResolveAttempts);
 
 private:
     ResolverDelegate * mDelegate = nullptr;
@@ -311,7 +499,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
     }
 }
 
-void PacketDataReporter::OnComplete()
+void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
 {
     if ((mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode) &&
         mDiscoveredNodeData.IsValid())
@@ -320,6 +508,8 @@ void PacketDataReporter::OnComplete()
     }
     else if (mDiscoveryType == DiscoveryType::kOperational && mHasIP && mHasNodePort)
     {
+        activeAttempts.Complete(mNodeData.mPeerId);
+
         mNodeData.LogNodeIdResolved();
         mDelegate->OnNodeIdResolved(mNodeData);
     }
@@ -344,6 +534,13 @@ public:
 private:
     ResolverDelegate * mDelegate = nullptr;
     DiscoveryType mDiscoveryType = DiscoveryType::kUnknown;
+    System::Layer * mSystemLayer = nullptr;
+    ActiveResolveAttempts mActiveResolves;
+
+    CHIP_ERROR SendPendingResolveQueries();
+    CHIP_ERROR ScheduleResolveRetries();
+
+    static void ResolveRetryCallback(System::Layer *, void * self);
 
     CHIP_ERROR SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type);
     CHIP_ERROR BrowseNodes(DiscoveryType type, DiscoveryFilter subtype);
@@ -379,7 +576,8 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
     }
     else
     {
-        reporter.OnComplete();
+        reporter.OnComplete(mActiveResolves);
+        ScheduleResolveRetries();
     }
 }
 
@@ -391,6 +589,8 @@ CHIP_ERROR MinMdnsResolver::StartResolver(chip::Inet::InetLayer * inetLayer, uin
     {
         return CHIP_NO_ERROR;
     }
+
+    mSystemLayer = inetLayer->SystemLayer();
 
     return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, port);
 }
@@ -491,47 +691,86 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
 
 CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
-    mDiscoveryType                    = DiscoveryType::kOperational;
-    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
-    ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+    mDiscoveryType = DiscoveryType::kOperational;
+    mActiveResolves.MarkPending(peerId);
 
-    QueryBuilder builder(std::move(buffer));
-    builder.Header().SetMessageId(0);
+    return SendPendingResolveQueries();
+}
 
+CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
+{
+    ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mSystemLayer->CancelTimer(&ResolveRetryCallback, this);
+
+    int delayMs = mActiveResolves.GetMsUntilNextExpectedResponse();
+
+    if (delayMs < 0)
     {
-        char nameBuffer[64] = "";
-
-        // Node and fabricid are encoded in server names.
-        ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId));
-
-        const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
-        Query query(instanceQName);
-
-        query
-            .SetClass(QClass::IN)       //
-            .SetType(QType::ANY)        //
-            .SetAnswerViaUnicast(false) //
-            ;
-
-        // NOTE: type above is NOT A or AAAA because the name searched for is
-        // a SRV record. The layout is:
-        //    SRV -> hostname
-        //    Hostname -> A
-        //    Hostname -> AAAA
-        //
-        // Query is sent for ANY and expectation is to receive A/AAAA records
-        // in the additional section of the reply.
-        //
-        // Sending a A/AAAA query will return no results
-        // Sending a SRV query will return the srv only and an additional query
-        // would be needed to resolve the host name to an IP address
-
-        builder.AddQuery(query);
+        return CHIP_NO_ERROR;
     }
 
-    ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
+    return mSystemLayer->StartTimer(delayMs, &ResolveRetryCallback, this);
+}
 
-    return GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort);
+void MinMdnsResolver::ResolveRetryCallback(System::Layer *, void * self)
+{
+    reinterpret_cast<MinMdnsResolver *>(self)->SendPendingResolveQueries();
+}
+
+CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
+{
+    while (true)
+    {
+        PeerId peerId = mActiveResolves.NextScheduledPeer();
+
+        if (peerId.GetNodeId() == kUndefinedNodeId)
+        {
+            break;
+        }
+
+        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
+        ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+        QueryBuilder builder(std::move(buffer));
+        builder.Header().SetMessageId(0);
+
+        {
+            char nameBuffer[64] = "";
+
+            // Node and fabricid are encoded in server names.
+            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId));
+
+            const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
+            Query query(instanceQName);
+
+            query
+                .SetClass(QClass::IN)       //
+                .SetType(QType::ANY)        //
+                .SetAnswerViaUnicast(false) //
+                ;
+
+            // NOTE: type above is NOT A or AAAA because the name searched for is
+            // a SRV record. The layout is:
+            //    SRV -> hostname
+            //    Hostname -> A
+            //    Hostname -> AAAA
+            //
+            // Query is sent for ANY and expectation is to receive A/AAAA records
+            // in the additional section of the reply.
+            //
+            // Sending a A/AAAA query will return no results
+            // Sending a SRV query will return the srv only and an additional query
+            // would be needed to resolve the host name to an IP address
+
+            builder.AddQuery(query);
+        }
+
+        ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
+
+        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+    }
+
+    return ScheduleResolveRetries();
 }
 
 MinMdnsResolver gResolver;
