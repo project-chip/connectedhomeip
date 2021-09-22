@@ -541,8 +541,6 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(EndpointId e
     size_t attestationElementsLen;
     Crypto::P256ECDSASignature signature;
     PeerConnectionState * state;
-    uint8_t md[Crypto::kSHA256_Hash_Length];
-    MutableByteSpan messageDigestSpan(md);
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Attestation");
 
@@ -585,6 +583,9 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(EndpointId e
     VerifyOrExit(state != nullptr, err = CHIP_ERROR_INTERNAL);
 
     {
+        uint8_t md[Crypto::kSHA256_Hash_Length];
+        MutableByteSpan messageDigestSpan(md);
+
         Hash_SHA256_stream hashStream;
         SuccessOrExit(err = hashStream.Begin());
         SuccessOrExit(err = hashStream.AddData(ByteSpan(attestationElements.Get(), attestationElementsLen)));
