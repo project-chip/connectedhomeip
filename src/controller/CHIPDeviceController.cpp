@@ -1180,12 +1180,7 @@ void DeviceCommissioner::OnSessionEstablished()
 
     // TODO: Add code to receive OpCSR from the device, and process the signing request
     // For IP rendezvous, this is sent as part of the state machine.
-#if CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING
     bool sendOperationalCertsImmediately = !mIsIPRendezvous;
-#else
-    bool sendOperationalCertsImmediately = true;
-#endif
-
     if (sendOperationalCertsImmediately)
     {
         err = SendOperationalCertificateSigningRequestCommand(device);
@@ -1468,13 +1463,11 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
     ChipLogProgress(Controller, "Operational credentials provisioned on device %p", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-#if CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING
     if (mIsIPRendezvous)
     {
         AdvanceCommissioningStage(CHIP_NO_ERROR);
     }
     else
-#endif
     {
         mPairingSession.ToSerializable(device->GetPairing());
         mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
@@ -1750,6 +1743,7 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Device * device)
         if (device == deviceBeingPaired && commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
         {
             commissioner->AdvanceCommissioningStage(CHIP_NO_ERROR);
+            return;
         }
     }
 
@@ -1960,7 +1954,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         PersistDeviceList();
         if (mPairingDelegate != nullptr)
         {
-            mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
+            mPairingDelegate->OnCommissioningComplete(device->GetDeviceId(), CHIP_NO_ERROR);
         }
         RendezvousCleanup(CHIP_NO_ERROR);
         break;
