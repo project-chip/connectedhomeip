@@ -178,6 +178,18 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         ChipLogError(Controller, "Missing error info");
         return nullptr;
     }
+    if (systemLayer == nullptr)
+    {
+        ChipLogError(Controller, "Missing system layer");
+        *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+        return nullptr;
+    }
+    if (inetLayer == nullptr)
+    {
+        ChipLogError(Controller, "Missing inet layer");
+        *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+        return nullptr;
+    }
 
     *errInfoOnFailure = CHIP_NO_ERROR;
 
@@ -201,9 +213,10 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.storageDelegate                = wrapper.get();
     initParams.pairingDelegate                = wrapper.get();
     initParams.operationalCredentialsDelegate = wrapper.get();
-    //if is null, Controller will get form src/platform/Globals.cpp
     initParams.systemLayer                    = systemLayer;
     initParams.inetLayer                      = inetLayer;
+    //move bleLayer into platform/android to share with app server
+    initParams.bleLayer                       = DeviceLayer::ConnectivityMgr().GetBleLayer();
 
     wrapper->InitializeOperationalCredentialsIssuer();
 
@@ -242,6 +255,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.controllerRCAC   = rcacSpan;
     initParams.controllerICAC   = icacSpan;
     initParams.controllerNOC    = nocSpan;
+
 
     *errInfoOnFailure = wrapper->Controller()->Init(initParams);
 
