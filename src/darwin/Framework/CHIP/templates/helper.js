@@ -43,6 +43,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'TrustedRootCertificates':
   case 'OtaSoftwareUpdateProvider':
   case 'OtaSoftwareUpdateRequestor':
+  case 'TimeSync':
     return 0;
   }
   return 1;
