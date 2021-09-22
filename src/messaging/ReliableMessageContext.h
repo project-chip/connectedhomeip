@@ -59,7 +59,7 @@ public:
 
     /**
      * Take the pending peer ack message counter from the context.  This must
-     * only be called when ShouldPiggybackAck() is true.  After this call,
+     * only be called when HasPiggybackAckPending() is true.  After this call,
      * IsAckPending() will be false; it's the caller's responsibility to send
      * the ack.
      */
@@ -74,7 +74,7 @@ public:
      * If true, TakePendingPeerAckMessageCounter will return a valid value that
      * should be included as an ack in the message.
      */
-    bool ShouldPiggybackAck() const;
+    bool HasPiggybackAckPending() const;
 
     /**
      *  Get the initial retransmission interval. It would be the time to wait before
@@ -191,39 +191,39 @@ protected:
     enum class Flags : uint16_t
     {
         /// When set, signifies that this context is the initiator of the exchange.
-        kFlagInitiator = 0x0001,
+        kFlagInitiator = (1u << 0),
 
         /// When set, signifies that a response is expected for a message that is being sent.
-        kFlagResponseExpected = 0x0002,
+        kFlagResponseExpected = (1u << 1),
 
         /// When set, automatically request an acknowledgment whenever a message is sent via UDP.
-        kFlagAutoRequestAck = 0x0004,
+        kFlagAutoRequestAck = (1u << 2),
 
         /// Internal and debug only: when set, the exchange layer does not send an acknowledgment.
-        kFlagDropAckDebug = 0x0008,
+        kFlagDropAckDebug = (1u << 3),
 
         /// When set, signifies current reliable message context is in usage.
-        kFlagOccupied = 0x0010,
+        kFlagOccupied = (1u << 4),
 
         /// When set, signifies that there is an acknowledgment pending to be sent back.
-        kFlagAckPending = 0x0020,
+        kFlagAckPending = (1u << 5),
 
         /// When set, signifies that there has once been an acknowledgment
         /// pending to be sent back.  In that case,
         /// mPendingPeerAckMessageCounter is a valid message counter value for
         /// some message we have needed to acknowledge in the past.
-        kFlagHasHadAckPending = 0x0040,
+        kFlagAckMessageCounterIsValid = (1u << 6),
 
         /// When set, signifies that at least one message has been received from peer on this exchange context.
-        kFlagMsgRcvdFromPeer = 0x0080,
+        kFlagMsgRcvdFromPeer = (1u << 7),
 
         /// When set, signifies that this exchange is waiting for a call to SendMessage.
-        kFlagWillSendMessage = 0x00100,
+        kFlagWillSendMessage = (1u << 8),
 
         /// When set, signifies that we are currently in the middle of HandleMessage.
-        kFlagHandlingMessage = 0x0200,
+        kFlagHandlingMessage = (1u << 9),
         /// When set, we have had Close() or Abort() called on us already.
-        kFlagClosed = 0x0400,
+        kFlagClosed = (1u << 10),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags

@@ -76,7 +76,7 @@ public:
         if (mDropAckResponse)
         {
             auto * rc = ec->GetReliableMessageContext();
-            if (rc->ShouldPiggybackAck())
+            if (rc->HasPiggybackAckPending())
             {
                 (void) rc->TakePendingPeerAckMessageCounter();
             }
@@ -1253,6 +1253,9 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
      * 2) The responder sends a standalone ack, which is lost.
      * 3) The responder sends an application-level response.
      * 4) The initiator sends a reliable response to the app-level response.
+     *
+     * This should succeed, with all application-level messages being delivered
+     * and no crashes.
      */
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -1361,6 +1364,21 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     // And that there are no un-acked messages left.
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
+
+/**
+ * TODO: A test that we should have but can't write with the existing
+ * infrastructure we have:
+ *
+ * 1. A sends message 1 to B
+ * 2. B is slow to respond, A does a resend and the resend is delayed in the network.
+ * 3. B responds with message 2, which acks message 1.
+ * 4. A sends message 3 to B
+ * 5. B sends standalone ack to message 3, which is lost
+ * 6. The duplicate message from step 3 is delivered and triggers a standalone ack.
+ * 7. B responds with message 4, which should carry a piggyback ack for message 3
+ *    (this is the part that needs testing!)
+ * 8. A sends message 5 to B.
+ */
 
 // Test Suite
 
