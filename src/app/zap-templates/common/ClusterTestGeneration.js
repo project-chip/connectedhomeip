@@ -64,27 +64,32 @@ function setDefaultType(test)
   const type = test[kCommandName];
   switch (type) {
   case 'readAttribute':
+    test.commandName     = 'Read';
     test.isAttribute     = true;
     test.isReadAttribute = true;
     break;
 
   case 'writeAttribute':
+    test.commandName      = 'Write';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
     break;
 
   case 'subscribeAttribute':
+    test.commandName          = 'Configure';
     test.isAttribute          = true;
     test.isSubscribeAttribute = true;
     break;
 
   case 'waitForReport':
+    test.commandName     = 'Report';
     test.isAttribute     = true;
     test.isWaitForReport = true;
     break;
 
   default:
-    test.isCommand = true;
+    test.commandName = test.command;
+    test.isCommand   = true;
     break;
   }
 }
@@ -351,6 +356,11 @@ function chip_tests_item_parameters(options)
 
   const promise = assertCommandOrAttribute(this).then(item => {
     if (this.isAttribute && !this.isWriteAttribute) {
+      if (this.isSubscribeAttribute) {
+        const minInterval = { name : 'minInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.minInterval };
+        const maxInterval = { name : 'maxInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.maxInterval };
+        return [ minInterval, maxInterval ];
+      }
       return [];
     }
 
