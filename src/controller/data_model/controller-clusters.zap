@@ -9757,6 +9757,36 @@
               "reportableChange": 0
             },
             {
+              "name": "epoch_us",
+              "code": 32,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "epoch_s",
+              "code": 33,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "unsupported",
               "code": 255,
               "mfgCode": null,
@@ -10169,5 +10199,6 @@
       "endpointVersion": null,
       "deviceIdentifier": null
     }
-  ]
+  ],
+  "log": []
 }

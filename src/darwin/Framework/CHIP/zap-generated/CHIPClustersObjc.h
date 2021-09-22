@@ -1429,6 +1429,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLongCharStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLongCharStringWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeEpochUsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeEpochUsWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeEpochSWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeEpochSWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
 

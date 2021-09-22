@@ -125,7 +125,10 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
         if (err == CHIP_NO_ERROR)
         {
 #if !defined(NDEBUG)
-            ChipLogDetail(ExchangeManager, "Flushed pending ack for MessageCounter:%08" PRIX32, mPendingPeerAckMessageCounter);
+            ChipLogDetail(ExchangeManager,
+                          "Flushed pending ack for MessageCounter:" ChipLogFormatMessageCounter
+                          " on exchange " ChipLogFormatExchange,
+                          mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
 #endif
         }
     }
@@ -165,7 +168,9 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
     if (!GetReliableMessageMgr()->CheckAndRemRetransTable(this, ackMessageCounter))
     {
 #if !defined(NDEBUG)
-        ChipLogError(ExchangeManager, "CHIP MessageCounter:%08" PRIX32 " not in RetransTable", ackMessageCounter);
+        ChipLogError(ExchangeManager,
+                     "CHIP MessageCounter:" ChipLogFormatMessageCounter " not in RetransTable on exchange " ChipLogFormatExchange,
+                     ackMessageCounter, ChipLogValueExchange(GetExchangeContext()));
 #endif
         err = CHIP_ERROR_INVALID_ACK_MESSAGE_COUNTER;
         // Optionally call an application callback with this error.
@@ -173,7 +178,10 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
     else
     {
 #if !defined(NDEBUG)
-        ChipLogDetail(ExchangeManager, "Removed CHIP MessageCounter:%08" PRIX32 " from RetransTable", ackMessageCounter);
+        ChipLogDetail(ExchangeManager,
+                      "Removed CHIP MessageCounter:" ChipLogFormatMessageCounter
+                      " from RetransTable on exchange " ChipLogFormatExchange,
+                      ackMessageCounter, ChipLogValueExchange(GetExchangeContext()));
 #endif
     }
 
@@ -206,7 +214,10 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
     if (messageFlags.Has(MessageFlagValues::kDuplicateMessage))
     {
 #if !defined(NDEBUG)
-        ChipLogDetail(ExchangeManager, "Forcing tx of solitary ack for duplicate MessageCounter:%08" PRIX32, messageCounter);
+        ChipLogDetail(ExchangeManager,
+                      "Forcing tx of solitary ack for duplicate MessageCounter:" ChipLogFormatMessageCounter
+                      " on exchange " ChipLogFormatExchange,
+                      messageCounter, ChipLogValueExchange(GetExchangeContext()));
 #endif
         // Is there pending ack for a different message counter.
         bool wasAckPending = IsAckPending() && mPendingPeerAckMessageCounter != messageCounter;
@@ -235,8 +246,10 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
         if (IsAckPending())
         {
 #if !defined(NDEBUG)
-            ChipLogDetail(ExchangeManager, "Pending ack queue full; forcing tx of solitary ack for MessageCounter:%08" PRIX32,
-                          mPendingPeerAckMessageCounter);
+            ChipLogDetail(ExchangeManager,
+                          "Pending ack queue full; forcing tx of solitary ack for MessageCounter:" ChipLogFormatMessageCounter
+                          " on exchange " ChipLogFormatExchange,
+                          mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
 #endif
             // Send the Ack for the currently pending Ack in a SecureChannel::StandaloneAck message.
             ReturnErrorOnFailure(SendStandaloneAckMessage());
@@ -262,20 +275,27 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
 
     // Send the null message
 #if !defined(NDEBUG)
-    ChipLogDetail(ExchangeManager, "Sending Standalone Ack for MessageCounter:%08" PRIX32, mPendingPeerAckMessageCounter);
+    ChipLogDetail(ExchangeManager,
+                  "Sending Standalone Ack for MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange,
+                  mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
 #endif
 
     CHIP_ERROR err = GetExchangeContext()->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf),
                                                        BitFlags<SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
     if (IsSendErrorNonCritical(err))
     {
-        ChipLogError(ExchangeManager, "Non-crit err %" CHIP_ERROR_FORMAT " sending solitary ack", err.Format());
+        ChipLogError(ExchangeManager,
+                     "Non-crit err %" CHIP_ERROR_FORMAT " sending solitary ack for MessageCounter:" ChipLogFormatMessageCounter
+                     " on exchange " ChipLogFormatExchange,
+                     err.Format(), mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
         return CHIP_NO_ERROR;
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(ExchangeManager, "Failed to send Solitary ack for MessageCounter:%08" PRIX32 ":%" CHIP_ERROR_FORMAT,
-                     mPendingPeerAckMessageCounter, err.Format());
+        ChipLogError(ExchangeManager,
+                     "Failed to send Solitary ack for MessageCounter:" ChipLogFormatMessageCounter
+                     " on exchange " ChipLogFormatExchange ":%" CHIP_ERROR_FORMAT,
+                     mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()), err.Format());
     }
 
     return err;

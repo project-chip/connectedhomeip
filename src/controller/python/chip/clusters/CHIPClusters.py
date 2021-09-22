@@ -2916,6 +2916,18 @@ class ChipClusters:
                     "type": "str",
                     "writable": True,
                 },
+                0x00000020: {
+                    "attributeName": "EpochUs",
+                    "attributeId": 0x00000020,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000021: {
+                    "attributeName": "EpochS",
+                    "attributeId": 0x00000021,
+                    "type": "int",
+                    "writable": True,
+                },
                 0x000000FF: {
                     "attributeName": "Unsupported",
                     "attributeId": 0x000000FF,
@@ -5112,6 +5124,14 @@ class ChipClusters:
     def ClusterTestCluster_WriteAttributeLongCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
         value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_LongCharString(device, ZCLendpoint, ZCLgroupid, value, len(value))
+    def ClusterTestCluster_ReadAttributeEpochUs(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_EpochUs(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeEpochUs(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_EpochUs(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterTestCluster_ReadAttributeEpochS(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_EpochS(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeEpochS(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_EpochS(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterTestCluster_ReadAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid)
     def ClusterTestCluster_WriteAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bool):
@@ -6831,6 +6851,18 @@ class ChipClusters:
         # Cluster TestCluster WriteAttribute LongCharString
         self._chipLib.chip_ime_WriteAttribute_TestCluster_LongCharString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_WriteAttribute_TestCluster_LongCharString.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute EpochUs
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_EpochUs.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_EpochUs.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute EpochUs
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_EpochUs.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_EpochUs.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute EpochS
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_EpochS.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_EpochS.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute EpochS
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_EpochS.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_EpochS.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Unsupported
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.restype = ctypes.c_uint32

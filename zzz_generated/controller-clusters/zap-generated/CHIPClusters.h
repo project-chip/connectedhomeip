@@ -1247,6 +1247,8 @@ public:
     CHIP_ERROR ReadAttributeLongOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCharString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeLongCharString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeEpochUs(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeEpochS(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1287,6 +1289,10 @@ public:
                                         chip::ByteSpan value);
     CHIP_ERROR WriteAttributeLongCharString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                             chip::ByteSpan value);
+    CHIP_ERROR WriteAttributeEpochUs(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint64_t value);
+    CHIP_ERROR WriteAttributeEpochS(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint32_t value);
     CHIP_ERROR WriteAttributeUnsupported(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          bool value);
 
