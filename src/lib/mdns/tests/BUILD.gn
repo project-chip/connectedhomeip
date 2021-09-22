@@ -22,10 +22,13 @@ chip_test_suite("tests") {
   output_name = "libMdnsTests"
 
   test_sources = [
-    "TestMdnsCache.cpp",
     "TestServiceNaming.cpp",
     "TestTxtFields.cpp",
   ]
+
+  if (chip_device_platform != "efr32") {
+    test_sources += [ "TestMdnsCache.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 

@@ -505,7 +505,8 @@ exit:
 
 void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(Controller, "Time out! failed to receive response from Exchange: %p", ec);
+    ChipLogProgress(Controller, "Time out! failed to receive response from Exchange: " ChipLogFormatExchange,
+                    ChipLogValueExchange(ec));
 }
 
 void DeviceController::OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr)

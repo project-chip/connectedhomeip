@@ -56,7 +56,7 @@ CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeConte
 
 void TransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogError(BDX, "%s, ec: %d", __FUNCTION__, ec->GetExchangeId());
+    ChipLogError(BDX, "%s, ec: " ChipLogFormatExchange, __FUNCTION__, ChipLogValueExchange(ec));
     mExchangeCtx = nullptr;
     mTransfer.Reset();
 }
