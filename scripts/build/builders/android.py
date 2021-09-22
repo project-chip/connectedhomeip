@@ -155,7 +155,9 @@ class AndroidBuilder(Builder):
 
         jars = {
             'CHIPController.jar': 'src/controller/java/CHIPController.jar',
-            'SetupPayloadParser.jar': 'src/setup_payload/java/SetupPayloadParser.jar'
+            'SetupPayloadParser.jar': 'src/setup_payload/java/SetupPayloadParser.jar',
+            'AndroidPlatform.jar': 'src/platform/android/AndroidPlatform.jar'
+
         }
         for jarName in jars.keys():
             self._Execute(['cp', os.path.join(
@@ -174,6 +176,9 @@ class AndroidBuilder(Builder):
             'CHIPController.jar':
                 os.path.join(self.output_dir, 'lib',
                              'src/controller/java/CHIPController.jar'),
+            'AndroidPlatform.jar':
+                os.path.join(self.output_dir, 'lib',
+                             'src/platform/android/AndroidPlatform.jar'),
             'SetupPayloadParser.jar':
                 os.path.join(self.output_dir, 'lib',
                              'src/setup_payload/java/SetupPayloadParser.jar'),

@@ -64,6 +64,8 @@ static_library("android") {
 android_library("java") {
   output_name = "AndroidPlatform.jar"
 
+  deps = [ ":android_sdk" ]
+
   data_deps = [
     ":android",
   ]
@@ -83,4 +85,8 @@ android_library("java") {
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
+}
+
+java_prebuilt("android_sdk") {
+  jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
 }
