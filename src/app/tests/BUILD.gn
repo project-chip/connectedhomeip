@@ -32,6 +32,7 @@ chip_test_suite("tests") {
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
+    "TestOperationalDeviceProxy.cpp",
     "TestStatusResponse.cpp",
   ]
 
@@ -49,7 +50,9 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/device",
     "${chip_root}/src/app/util:device_callbacks_manager",
+    "${chip_root}/src/controller",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/protocols",
