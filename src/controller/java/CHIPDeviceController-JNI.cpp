@@ -152,14 +152,18 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
 
     ChipLogProgress(Controller, "newDeviceController() called");
 
+    // //move sSystemLayer and sInetLayer into platform/android to share with app server
+    err = DeviceLayer::PlatformMgr().InitChipStack();
+    SuccessOrExit(err);
+
     wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, JniReferences::GetInstance().GetStackLock(), kLocalDeviceId,
-                                                          nullptr, nullptr, &err);
+                                                          &DeviceLayer::SystemLayer(), &DeviceLayer::InetLayer, &err);
     SuccessOrExit(err);
 
     // Create and start the IO thread. Must be called after Controller()->Init
     if (sIOThread == PTHREAD_NULL) {
         int pthreadErr = pthread_create(&sIOThread, NULL, IOThreadMain, NULL);
-        VerifyOrExit(pthreadErr == 0, err = System::MapErrorPOSIX(pthreadErr));
+        VerifyOrExit(pthreadErr == 0, err = CHIP_ERROR_POSIX(pthreadErr));
     }
 
     result = wrapper->ToJNIHandle();
