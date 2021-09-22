@@ -40,16 +40,16 @@ namespace Messaging {
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry() : rc(nullptr), nextRetransTimeTick(0), sendCount(0) {}
 
 ReliableMessageMgr::ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
-    mContextPool(contextPool), mSystemLayer(nullptr), mSessionMgr(nullptr), mCurrentTimerExpiry(0),
+    mContextPool(contextPool), mSystemLayer(nullptr), mSessionManager(nullptr), mCurrentTimerExpiry(0),
     mTimerIntervalShift(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)
 {}
 
 ReliableMessageMgr::~ReliableMessageMgr() {}
 
-void ReliableMessageMgr::Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr)
+void ReliableMessageMgr::Init(chip::System::Layer * systemLayer, SessionManager * sessionManager)
 {
-    mSystemLayer = systemLayer;
-    mSessionMgr  = sessionMgr;
+    mSystemLayer    = systemLayer;
+    mSessionManager = sessionManager;
 
     mTimeStampBase      = System::Clock::GetMonotonicMilliseconds();
     mCurrentTimerExpiry = 0;
@@ -59,8 +59,8 @@ void ReliableMessageMgr::Shutdown()
 {
     StopTimer();
 
-    mSystemLayer = nullptr;
-    mSessionMgr  = nullptr;
+    mSystemLayer    = nullptr;
+    mSessionManager = nullptr;
 
     // Clear the retransmit table
     for (RetransTableEntry & rEntry : mRetransTable)

@@ -48,7 +48,7 @@ bool ChannelContext::MatchNodeId(NodeId nodeId)
     case ChannelState::kPreparing:
         return nodeId == GetPrepareVars().mBuilder.GetPeerNodeId();
     case ChannelState::kReady: {
-        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(GetReadyVars().mSession);
+        auto state = mExchangeManager->GetSessionManager()->GetSecureSession(GetReadyVars().mSession);
         if (state == nullptr)
             return false;
         return nodeId == state->GetPeerNodeId();
@@ -73,7 +73,7 @@ bool ChannelContext::MatchTransport(Transport::Type transport)
         }
         return false;
     case ChannelState::kReady: {
-        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(GetReadyVars().mSession);
+        auto state = mExchangeManager->GetSessionManager()->GetSecureSession(GetReadyVars().mSession);
         if (state == nullptr)
             return false;
         return transport == state->GetPeerAddress().GetTransportType();
@@ -121,7 +121,7 @@ bool ChannelContext::IsCasePairing()
     return mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kCasePairing;
 }
 
-bool ChannelContext::MatchesSession(SessionHandle session, SecureSessionMgr * ssm)
+bool ChannelContext::MatchesSession(SessionHandle session, SessionManager * sessionManager)
 {
     switch (mState)
     {
@@ -129,7 +129,7 @@ bool ChannelContext::MatchesSession(SessionHandle session, SecureSessionMgr * ss
         switch (GetPrepareVars().mState)
         {
         case PrepareState::kCasePairing: {
-            auto state = ssm->GetPeerConnectionState(session);
+            auto state = sessionManager->GetSecureSession(session);
             return (state->GetPeerNodeId() == GetPrepareVars().mBuilder.GetPeerNodeId() &&
                     state->GetPeerSessionId() == GetPrepareVars().mBuilder.GetPeerSessionId());
         }
@@ -181,7 +181,7 @@ void ChannelContext::EnterAddressResolve()
     // The HandleNodeIdResolve may already have been called, recheck the state here before set up the timer
     if (mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kAddressResolving)
     {
-        System::Layer * layer = mExchangeManager->GetSessionMgr()->SystemLayer();
+        System::Layer * layer = mExchangeManager->GetSessionManager()->SystemLayer();
         layer->StartTimer(CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS, AddressResolveTimeout, this);
         Retain(); // Keep the pointer in the timer
     }
@@ -262,7 +262,7 @@ void ChannelContext::EnterCasePairingState()
     Transport::PeerAddress addr;
     addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(prepare.mAddress);
 
-    auto session = mExchangeManager->GetSessionMgr()->CreateUnauthenticatedSession(addr);
+    auto session = mExchangeManager->GetSessionManager()->CreateUnauthenticatedSession(addr);
     if (!session.HasValue())
     {
         ExitCasePairingState();

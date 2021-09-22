@@ -64,13 +64,13 @@ ExchangeManager::ExchangeManager() : mDelegate(nullptr), mReliableMessageMgr(mCo
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
+CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mSessionMgr = sessionMgr;
+    mSessionManager = sessionManager;
 
     mNextExchangeId = GetRandU16();
     mNextKeyId      = 0;
@@ -83,10 +83,10 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
         handler.Reset();
     }
 
-    sessionMgr->SetDelegate(this);
+    sessionManager->SetDelegate(this);
 
-    mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
-    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionMgr));
+    mReliableMessageMgr.Init(sessionManager->SystemLayer(), sessionManager);
+    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionManager));
 
     mState = State::kState_Initialized;
 
@@ -103,10 +103,10 @@ CHIP_ERROR ExchangeManager::Shutdown()
         return true;
     });
 
-    if (mSessionMgr != nullptr)
+    if (mSessionManager != nullptr)
     {
-        mSessionMgr->SetDelegate(nullptr);
-        mSessionMgr = nullptr;
+        mSessionManager->SetDelegate(nullptr);
+        mSessionManager = nullptr;
     }
 
     mState = State::kState_NotInitialized;

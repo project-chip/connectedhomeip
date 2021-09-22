@@ -109,7 +109,7 @@ constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondsPerSecond;
 DeviceController::DeviceController()
 {
     mState                    = State::NotInitialized;
-    mSessionMgr               = nullptr;
+    mSessionManager           = nullptr;
     mExchangeMgr              = nullptr;
     mStorageDelegate          = nullptr;
     mPairedDevicesInitialized = false;
@@ -151,7 +151,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 #endif
 
     mTransportMgr          = chip::Platform::New<DeviceTransportMgr>();
-    mSessionMgr            = chip::Platform::New<SecureSessionMgr>();
+    mSessionManager        = chip::Platform::New<SessionManager>();
     mExchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
     mMessageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
@@ -169,9 +169,9 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     ReturnErrorOnFailure(mFabrics.Init(mStorageDelegate));
 
-    ReturnErrorOnFailure(mSessionMgr->Init(mSystemLayer, mTransportMgr, &mFabrics, mMessageCounterManager));
+    ReturnErrorOnFailure(mSessionManager->Init(mSystemLayer, mTransportMgr, &mFabrics, mMessageCounterManager));
 
-    ReturnErrorOnFailure(mExchangeMgr->Init(mSessionMgr));
+    ReturnErrorOnFailure(mExchangeMgr->Init(mSessionManager));
 
     ReturnErrorOnFailure(mMessageCounterManager->Init(mExchangeMgr));
 
@@ -285,9 +285,9 @@ CHIP_ERROR DeviceController::Shutdown()
     // {
     //     mExchangeMgr->Shutdown();
     // }
-    if (mSessionMgr != nullptr)
+    if (mSessionManager != nullptr)
     {
-        mSessionMgr->Shutdown();
+        mSessionManager->Shutdown();
     }
 
     mStorageDelegate = nullptr;
@@ -327,10 +327,10 @@ CHIP_ERROR DeviceController::Shutdown()
         mExchangeMgr = nullptr;
     }
 
-    if (mSessionMgr != nullptr)
+    if (mSessionManager != nullptr)
     {
-        chip::Platform::Delete(mSessionMgr);
-        mSessionMgr = nullptr;
+        chip::Platform::Delete(mSessionManager);
+        mSessionManager = nullptr;
     }
 
     if (mTransportMgr != nullptr)
@@ -513,7 +513,7 @@ void DeviceController::OnNewConnection(SessionHandle session, Messaging::Exchang
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
 
-    uint16_t index = FindDeviceIndex(mgr->GetSessionMgr()->GetPeerConnectionState(session)->GetPeerNodeId());
+    uint16_t index = FindDeviceIndex(mgr->GetSessionManager()->GetSecureSession(session)->GetPeerNodeId());
     VerifyOrReturn(index < kNumMaxActiveDevices,
                    ChipLogDetail(Controller, "OnNewConnection was called for unknown device, ignoring it."));
 
@@ -720,7 +720,7 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
     return ControllerDeviceInitParams{
         .transportMgr    = mTransportMgr,
-        .sessionMgr      = mSessionMgr,
+        .sessionManager  = mSessionManager,
         .exchangeMgr     = mExchangeMgr,
         .inetLayer       = mInetLayer,
         .storageDelegate = mStorageDelegate,
@@ -777,7 +777,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
                                                     ));
 
     mUdcServer = chip::Platform::New<UserDirectedCommissioningServer>();
-    mUdcTransportMgr->SetSecureSessionMgr(mUdcServer);
+    mUdcTransportMgr->SetSessionManager(mUdcServer);
 
     mUdcServer->SetInstanceNameResolver(this);
     mUdcServer->SetUserConfirmationProvider(this);
@@ -884,7 +884,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
-    err = mPairingSession.MessageDispatch().Init(mSessionMgr);
+    err = mPairingSession.MessageDispatch().Init(mSessionManager);
     SuccessOrExit(err);
 
     device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, fabric->GetFabricIndex());
@@ -911,7 +911,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         }
     }
 #endif
-    session = mSessionMgr->CreateUnauthenticatedSession(params.GetPeerAddress());
+    session = mSessionManager->CreateUnauthenticatedSession(params.GetPeerAddress());
     VerifyOrExit(session.HasValue(), CHIP_ERROR_NO_MEMORY);
 
     exchangeCtxt = mExchangeMgr->NewContext(session.Value(), &mPairingSession);
@@ -972,8 +972,8 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     device->Serialize(serialized);
 
-    err = mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(peerAddress), device->GetDeviceId(),
-                                  testSecurePairingSecret, SecureSession::SessionRole::kInitiator, mFabricIndex);
+    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(peerAddress), device->GetDeviceId(),
+                                      testSecurePairingSecret, CryptoContext::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1182,9 +1182,9 @@ void DeviceCommissioner::OnSessionEstablished()
     // TODO: the session should know which peer we are trying to connect to when started
     mPairingSession.SetPeerNodeId(device->GetDeviceId());
 
-    CHIP_ERROR err = mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()),
-                                             mPairingSession.GetPeerNodeId(), &mPairingSession,
-                                             SecureSession::SessionRole::kInitiator, mFabricIndex);
+    CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()),
+                                                 mPairingSession.GetPeerNodeId(), &mPairingSession,
+                                                 CryptoContext::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));

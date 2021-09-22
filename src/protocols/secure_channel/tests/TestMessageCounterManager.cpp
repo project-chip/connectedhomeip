@@ -31,7 +31,7 @@
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
@@ -81,8 +81,8 @@ void MessageCounterSyncProcess(nlTestSuite * inSuite, void * inContext)
     SessionHandle localSession = ctx.GetSessionBobToAlice();
     SessionHandle peerSession  = ctx.GetSessionAliceToBob();
 
-    Transport::PeerConnectionState * localState = ctx.GetSecureSessionManager().GetPeerConnectionState(localSession);
-    Transport::PeerConnectionState * peerState  = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
+    Transport::SecureSession * localState = ctx.GetSecureSessionManager().GetSecureSession(localSession);
+    Transport::SecureSession * peerState  = ctx.GetSecureSessionManager().GetSecureSession(peerSession);
 
     localState->GetSessionMessageCounter().GetPeerMessageCounter().Reset();
     err = ctx.GetMessageCounterManager().SendMsgCounterSyncReq(localSession, localState);
@@ -99,8 +99,8 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
 
-    SessionHandle peerSession                  = ctx.GetSessionAliceToBob();
-    Transport::PeerConnectionState * peerState = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
+    SessionHandle peerSession            = ctx.GetSessionAliceToBob();
+    Transport::SecureSession * peerState = ctx.GetSecureSessionManager().GetSecureSession(peerSession);
     peerState->GetSessionMessageCounter().GetPeerMessageCounter().Reset();
 
     MockAppDelegate callback;

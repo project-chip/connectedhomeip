@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,16 +15,17 @@
  *    limitations under the License.
  */
 
-#include <Globals.h>
+/**
+ *    @file
+ *      chip::System project configuration for python builds on Linux and OS X.
+ *
+ */
+#ifndef SYSTEMPROJECTCONFIG_H
+#define SYSTEMPROJECTCONFIG_H
 
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
-chip::Messaging::ExchangeManager gExchangeManager;
-chip::SessionManager gSessionManager;
-chip::Inet::IPAddress gDestAddr;
-
-chip::FabricIndex gFabricIndex = 0;
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+// Uncomment this for larger buffers (e.g. to support a bigger CHIP_CONFIG_TUNNEL_INTERFACE_MTU).
+//#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX 9050
 #endif
-chip::TransportMgr<chip::Transport::UDP> gUDPManager;
+
+#endif /* SYSTEMPROJECTCONFIG_H */

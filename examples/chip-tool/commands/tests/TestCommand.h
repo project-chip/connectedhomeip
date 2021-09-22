@@ -46,6 +46,61 @@ protected:
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
     static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
 
+    void Exit(std::string message);
+    void ThrowFailureResponse();
+    void ThrowSuccessResponse();
+
+    bool CheckConstraintType(const char * itemName, const char * current, const char * expected);
+    bool CheckConstraintFormat(const char * itemName, const char * current, const char * expected);
+    bool CheckConstraintMinLength(const char * itemName, uint64_t current, uint64_t expected);
+    bool CheckConstraintMaxLength(const char * itemName, uint64_t current, uint64_t expected);
+    template <typename T>
+    bool CheckConstraintMinValue(const char * itemName, T current, T expected)
+    {
+        if (current < expected)
+        {
+            Exit(std::string(itemName) + " value < minValue: " + std::to_string(current) + " < " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
+    }
+    template <typename T>
+    bool CheckConstraintMaxValue(const char * itemName, T current, T expected)
+    {
+        if (current > expected)
+        {
+            Exit(std::string(itemName) + " value > maxValue: " + std::to_string(current) + " > " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
+    }
+    template <typename T>
+    bool CheckConstraintNotValue(const char * itemName, T current, T expected)
+    {
+        if (current == expected)
+        {
+            Exit(std::string(itemName) + " value == notValue: " + std::to_string(current) + " == " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
+    }
+    template <typename T>
+    bool CheckValue(const char * itemName, T current, T expected)
+    {
+        if (current != expected)
+        {
+            Exit(std::string(itemName) + " value mismatch: " + std::to_string(current) + " != " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
+    }
+    bool CheckValueAsList(const char * itemName, uint64_t current, uint64_t expected);
+    bool CheckValueAsString(const char * itemName, chip::ByteSpan current, const char * expected);
+
     chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 };

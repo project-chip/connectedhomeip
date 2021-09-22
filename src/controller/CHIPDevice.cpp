@@ -130,9 +130,9 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
     {
         if (mSecureSession.HasValue())
         {
-            Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession.Value());
+            Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
             // Check if the connection state has the correct transport information
-            if (connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
+            if (secureSession->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
             {
                 mState = ConnectionState::NotConnected;
                 ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
@@ -179,9 +179,9 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     // trigger the CASE based secure session.
     if (mSecureSession.HasValue())
     {
-        Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession.Value());
-        const uint32_t localMessageCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter().Value();
-        const uint32_t peerMessageCounter  = connectionState->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
+        Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
+        const uint32_t localMessageCounter       = secureSession->GetSessionMessageCounter().GetLocalMessageCounter().Value();
+        const uint32_t peerMessageCounter        = secureSession->GetSessionMessageCounter().GetPeerMessageCounter().GetCounter();
 
         serializable.mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(localMessageCounter);
         serializable.mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(peerMessageCounter);
@@ -315,14 +315,14 @@ void Device::OnNewConnection(SessionHandle session)
     // Reset the message counters here because this is the first time we get a handle to the secure session.
     // Since CHIPDevices can be serialized/deserialized in the middle of what is conceptually a single PASE session
     // we need to restore the session counters along with the session information.
-    Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession.Value());
-    VerifyOrReturn(connectionState != nullptr);
-    MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
+    Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
+    VerifyOrReturn(secureSession != nullptr);
+    MessageCounter & localCounter = secureSession->GetSessionMessageCounter().GetLocalMessageCounter();
     if (localCounter.SetCounter(mLocalMessageCounter) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Unable to restore local counter to %" PRIu32, mLocalMessageCounter);
     }
-    Transport::PeerMessageCounter & peerCounter = connectionState->GetSessionMessageCounter().GetPeerMessageCounter();
+    Transport::PeerMessageCounter & peerCounter = secureSession->GetSessionMessageCounter().GetPeerMessageCounter();
     peerCounter.SetCounter(mPeerMessageCounter);
 }
 
@@ -432,14 +432,14 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
     if (!mSecureSession.HasValue())
     {
         // Nothing needs to be done here.  It's not an error to not have a
-        // connectionState.  For one thing, we could have gotten an different
+        // secureSession.  For one thing, we could have gotten an different
         // UpdateAddress already and that caused connections to be torn down and
         // whatnot.
         return CHIP_NO_ERROR;
     }
 
-    Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession.Value());
-    connectionState->SetPeerAddress(addr);
+    Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
+    secureSession->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
 }
@@ -521,7 +521,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
         SuccessOrExit(err);
 
         err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
-                                          SecureSession::SessionRole::kInitiator, mFabricIndex);
+                                          CryptoContext::SessionRole::kInitiator, mFabricIndex);
         SuccessOrExit(err);
     }
 
@@ -610,7 +610,7 @@ void Device::OnSessionEstablishmentError(CHIP_ERROR error)
 void Device::OnSessionEstablished()
 {
     CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mCASESession,
-                                                 SecureSession::SessionRole::kInitiator, mFabricIndex);
+                                                 CryptoContext::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));

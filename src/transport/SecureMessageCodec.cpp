@@ -36,7 +36,7 @@ using System::PacketBufferHandle;
 
 namespace SecureMessageCodec {
 
-CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+CHIP_ERROR Encode(Transport::SecureSession * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                   System::PacketBufferHandle & msgBuf, MessageCounter & counter)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -72,7 +72,7 @@ CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
+CHIP_ERROR Decode(Transport::SecureSession * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
                   System::PacketBufferHandle & msg)
 {
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);

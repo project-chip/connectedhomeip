@@ -27,7 +27,7 @@
 
 #pragma once
 
-#include <transport/PeerConnectionState.h>
+#include <transport/SecureSession.h>
 
 namespace chip {
 
@@ -49,7 +49,7 @@ namespace SecureMessageCodec {
  * @param counter       The local counter object to be used
  * @ return CHIP_ERROR  The result of the encode operation
  */
-CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+CHIP_ERROR Encode(Transport::SecureSession * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                   System::PacketBufferHandle & msgBuf, MessageCounter & counter);
 
 /**
@@ -66,7 +66,7 @@ CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloa
  *                      unencrypted message.
  * @ return CHIP_ERROR  The result of the decode operation
  */
-CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
+CHIP_ERROR Decode(Transport::SecureSession * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
                   System::PacketBufferHandle & msgBuf);
 } // namespace SecureMessageCodec
 

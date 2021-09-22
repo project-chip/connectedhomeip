@@ -114,7 +114,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::CryptoContext::SessionRole::kResponder,
                                      gFabricIndex);
     SuccessOrExit(err);
 

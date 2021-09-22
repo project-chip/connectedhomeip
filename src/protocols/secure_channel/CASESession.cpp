@@ -37,7 +37,7 @@
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 
@@ -280,7 +280,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     Clear();
 }
 
-CHIP_ERROR CASESession::DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role)
+CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role)
 {
     size_t saltlen;
 
@@ -303,7 +303,7 @@ CHIP_ERROR CASESession::DeriveSecureSession(SecureSession & session, SecureSessi
     }
 
     ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()), ByteSpan(msg_salt.Get(), saltlen),
-                                                SecureSession::SessionInfoType::kSessionEstablishment, role));
+                                                CryptoContext::SessionInfoType::kSessionEstablishment, role));
 
     return CHIP_NO_ERROR;
 }

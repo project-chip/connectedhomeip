@@ -31,7 +31,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 static uint64_t kLivenessDeviceStatus = chip::TLV::ContextTag(1);
 static bool gMockEventStop            = false;
@@ -154,7 +154,7 @@ CHIP_ERROR MockEventGeneratorImpl::Init(chip::Messaging::ExchangeManager * apExc
         mEventsLeft = mpEventGenerator->GetNumStates();
 
     if (mTimeBetweenEvents != 0)
-        mpExchangeMgr->GetSessionMgr()->SystemLayer()->StartTimer(mTimeBetweenEvents, HandleNextEvent, this);
+        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(mTimeBetweenEvents, HandleNextEvent, this);
 
     return err;
 }
@@ -186,7 +186,7 @@ void MockEventGeneratorImpl::SetEventGeneratorStop()
     // This helps quit the standalone app in an orderly way without
     // spurious leaked timers.
     if (mTimeBetweenEvents != 0)
-        mpExchangeMgr->GetSessionMgr()->SystemLayer()->StartTimer(0, HandleNextEvent, this);
+        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(0, HandleNextEvent, this);
 }
 
 bool MockEventGeneratorImpl::IsEventGeneratorStopped()

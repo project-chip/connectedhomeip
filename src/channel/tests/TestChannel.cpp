@@ -31,7 +31,7 @@
 #include <messaging/Flags.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/Protocols.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
