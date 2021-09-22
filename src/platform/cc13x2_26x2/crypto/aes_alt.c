@@ -40,7 +40,7 @@ void mbedtls_aes_init(mbedtls_aes_context * ctx)
 {
     AESECB_Params AESECBParams;
 
-    if (ref_num++ == 0)
+    if (ref_num == 0)
     {
         AESECB_Params_init(&AESECBParams);
         AESECBParams.returnBehavior = AESECB_RETURN_BEHAVIOR_POLLING;
@@ -48,15 +48,20 @@ void mbedtls_aes_init(mbedtls_aes_context * ctx)
 
         // handle will be NULL if open failed, subsequent calls will fail with a generic HW error
     }
+    ref_num++;
 }
 
 void mbedtls_aes_free(mbedtls_aes_context * ctx)
 {
-    if (--ref_num == 0)
+    if (ref_num > 0)
     {
-        AESECB_close(AESECB_handle);
+        ref_num--;
+        if (ref_num == 0)
+        {
+            AESECB_close(AESECB_handle);
 
-        AESECB_handle = NULL;
+            AESECB_handle = NULL;
+        }
     }
 
     memset((void *) ctx, 0x00, sizeof(ctx));
