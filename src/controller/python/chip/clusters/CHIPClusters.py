@@ -2397,46 +2397,6 @@ class ChipClusters:
                     "attributeId": 0x00000002,
                     "type": "str",
                 },
-                0x00000003: {
-                    "attributeName": "WiredAssessedInputVoltage",
-                    "attributeId": 0x00000003,
-                    "type": "int",
-                },
-                0x00000004: {
-                    "attributeName": "WiredAssessedInputFrequency",
-                    "attributeId": 0x00000004,
-                    "type": "int",
-                },
-                0x00000005: {
-                    "attributeName": "WiredCurrentType",
-                    "attributeId": 0x00000005,
-                    "type": "int",
-                },
-                0x00000006: {
-                    "attributeName": "WiredAssessedCurrent",
-                    "attributeId": 0x00000006,
-                    "type": "int",
-                },
-                0x00000007: {
-                    "attributeName": "WiredNominalVoltage",
-                    "attributeId": 0x00000007,
-                    "type": "int",
-                },
-                0x00000008: {
-                    "attributeName": "WiredMaximumCurrent",
-                    "attributeId": 0x00000008,
-                    "type": "int",
-                },
-                0x00000009: {
-                    "attributeName": "WiredPresent",
-                    "attributeId": 0x00000009,
-                    "type": "bool",
-                },
-                0x0000000A: {
-                    "attributeName": "ActiveWiredFaults",
-                    "attributeId": 0x0000000A,
-                    "type": "int",
-                },
                 0x0000000B: {
                     "attributeName": "BatteryVoltage",
                     "attributeId": 0x0000000B,
@@ -2457,84 +2417,14 @@ class ChipClusters:
                     "attributeId": 0x0000000E,
                     "type": "int",
                 },
-                0x0000000F: {
-                    "attributeName": "BatteryReplacementNeeded",
-                    "attributeId": 0x0000000F,
-                    "type": "bool",
-                },
-                0x00000010: {
-                    "attributeName": "BatteryReplaceability",
-                    "attributeId": 0x00000010,
-                    "type": "int",
-                },
-                0x00000011: {
-                    "attributeName": "BatteryPresent",
-                    "attributeId": 0x00000011,
-                    "type": "bool",
-                },
                 0x00000012: {
                     "attributeName": "ActiveBatteryFaults",
                     "attributeId": 0x00000012,
                     "type": "int",
                 },
-                0x00000013: {
-                    "attributeName": "BatteryReplacementDescription",
-                    "attributeId": 0x00000013,
-                    "type": "str",
-                },
-                0x00000014: {
-                    "attributeName": "BatteryCommonDesignation",
-                    "attributeId": 0x00000014,
-                    "type": "int",
-                },
-                0x00000015: {
-                    "attributeName": "BatteryANSIDesignation",
-                    "attributeId": 0x00000015,
-                    "type": "str",
-                },
-                0x00000016: {
-                    "attributeName": "BatteryIECDesignation",
-                    "attributeId": 0x00000016,
-                    "type": "str",
-                },
-                0x00000017: {
-                    "attributeName": "BatteryApprovedChemistry",
-                    "attributeId": 0x00000017,
-                    "type": "int",
-                },
-                0x00000018: {
-                    "attributeName": "BatteryCapacity",
-                    "attributeId": 0x00000018,
-                    "type": "int",
-                },
-                0x00000019: {
-                    "attributeName": "BatteryQuantity",
-                    "attributeId": 0x00000019,
-                    "type": "int",
-                },
                 0x0000001A: {
                     "attributeName": "BatteryChargeState",
                     "attributeId": 0x0000001A,
-                    "type": "int",
-                },
-                0x0000001B: {
-                    "attributeName": "BatteryTimeToFullCharge",
-                    "attributeId": 0x0000001B,
-                    "type": "int",
-                },
-                0x0000001C: {
-                    "attributeName": "BatteryFunctionalWhileCharging",
-                    "attributeId": 0x0000001C,
-                    "type": "bool",
-                },
-                0x0000001D: {
-                    "attributeName": "BatteryChargingCurrent",
-                    "attributeId": 0x0000001D,
-                    "type": "int",
-                },
-                0x0000001E: {
-                    "attributeName": "ActiveBatteryChargeFaults",
-                    "attributeId": 0x0000001E,
                     "type": "int",
                 },
                 0x0000FFFC: {
@@ -5113,22 +5003,6 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_Order(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeDescription(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_Description(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeWiredAssessedInputVoltage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredAssessedInputVoltage(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeWiredAssessedInputFrequency(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredAssessedInputFrequency(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeWiredCurrentType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredCurrentType(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeWiredAssessedCurrent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredAssessedCurrent(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeWiredNominalVoltage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredNominalVoltage(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeWiredMaximumCurrent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredMaximumCurrent(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeWiredPresent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredPresent(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeActiveWiredFaults(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveWiredFaults(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeBatteryVoltage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryVoltage(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeBatteryPercentRemaining(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -5137,38 +5011,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryTimeRemaining(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeBatteryChargeLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryChargeLevel(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryReplacementNeeded(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryReplacementNeeded(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryReplaceability(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryReplaceability(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryPresent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryPresent(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeActiveBatteryFaults(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveBatteryFaults(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryReplacementDescription(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryReplacementDescription(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryCommonDesignation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryCommonDesignation(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryANSIDesignation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryANSIDesignation(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryIECDesignation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryIECDesignation(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryApprovedChemistry(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryApprovedChemistry(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryCapacity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryCapacity(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryQuantity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryQuantity(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeBatteryChargeState(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryChargeState(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryTimeToFullCharge(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryTimeToFullCharge(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryFunctionalWhileCharging(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryFunctionalWhileCharging(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryChargingCurrent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryChargingCurrent(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeActiveBatteryChargeFaults(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveBatteryChargeFaults(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_FeatureMap(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -6761,30 +6607,6 @@ class ChipClusters:
         # Cluster PowerSource ReadAttribute Description
         self._chipLib.chip_ime_ReadAttribute_PowerSource_Description.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PowerSource_Description.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute WiredAssessedInputVoltage
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredAssessedInputVoltage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredAssessedInputVoltage.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute WiredAssessedInputFrequency
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredAssessedInputFrequency.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredAssessedInputFrequency.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute WiredCurrentType
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredCurrentType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredCurrentType.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute WiredAssessedCurrent
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredAssessedCurrent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredAssessedCurrent.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute WiredNominalVoltage
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredNominalVoltage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredNominalVoltage.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute WiredMaximumCurrent
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredMaximumCurrent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredMaximumCurrent.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute WiredPresent
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredPresent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_WiredPresent.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute ActiveWiredFaults
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveWiredFaults.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveWiredFaults.restype = ctypes.c_uint32
         # Cluster PowerSource ReadAttribute BatteryVoltage
         self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryVoltage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryVoltage.restype = ctypes.c_uint32
@@ -6797,54 +6619,12 @@ class ChipClusters:
         # Cluster PowerSource ReadAttribute BatteryChargeLevel
         self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryChargeLevel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryChargeLevel.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryReplacementNeeded
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryReplacementNeeded.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryReplacementNeeded.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryReplaceability
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryReplaceability.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryReplaceability.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryPresent
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryPresent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryPresent.restype = ctypes.c_uint32
         # Cluster PowerSource ReadAttribute ActiveBatteryFaults
         self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveBatteryFaults.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveBatteryFaults.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryReplacementDescription
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryReplacementDescription.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryReplacementDescription.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryCommonDesignation
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryCommonDesignation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryCommonDesignation.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryANSIDesignation
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryANSIDesignation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryANSIDesignation.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryIECDesignation
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryIECDesignation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryIECDesignation.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryApprovedChemistry
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryApprovedChemistry.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryApprovedChemistry.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryCapacity
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryCapacity.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryCapacity.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryQuantity
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryQuantity.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryQuantity.restype = ctypes.c_uint32
         # Cluster PowerSource ReadAttribute BatteryChargeState
         self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryChargeState.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryChargeState.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryTimeToFullCharge
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryTimeToFullCharge.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryTimeToFullCharge.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryFunctionalWhileCharging
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryFunctionalWhileCharging.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryFunctionalWhileCharging.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryChargingCurrent
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryChargingCurrent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryChargingCurrent.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute ActiveBatteryChargeFaults
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveBatteryChargeFaults.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_ActiveBatteryChargeFaults.restype = ctypes.c_uint32
         # Cluster PowerSource ReadAttribute FeatureMap
         self._chipLib.chip_ime_ReadAttribute_PowerSource_FeatureMap.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PowerSource_FeatureMap.restype = ctypes.c_uint32

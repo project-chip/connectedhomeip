@@ -646,20 +646,6 @@ public:
                                    uint8_t value);
     CHIP_ERROR WriteAttributeDescription(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          chip::ByteSpan value);
-    CHIP_ERROR WriteAttributeWiredAssessedInputVoltage(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint32_t value);
-    CHIP_ERROR WriteAttributeWiredAssessedInputFrequency(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, uint16_t value);
-    CHIP_ERROR WriteAttributeWiredCurrentType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint8_t value);
-    CHIP_ERROR WriteAttributeWiredAssessedCurrent(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback, uint32_t value);
-    CHIP_ERROR WriteAttributeWiredNominalVoltage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint32_t value);
-    CHIP_ERROR WriteAttributeWiredMaximumCurrent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint32_t value);
-    CHIP_ERROR WriteAttributeWiredPresent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          bool value);
     CHIP_ERROR WriteAttributeBatteryVoltage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                             uint32_t value);
     CHIP_ERROR WriteAttributeBatteryPercentRemaining(Callback::Cancelable * onSuccessCallback,
@@ -668,34 +654,8 @@ public:
                                                   Callback::Cancelable * onFailureCallback, uint32_t value);
     CHIP_ERROR WriteAttributeBatteryChargeLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                 uint8_t value);
-    CHIP_ERROR WriteAttributeBatteryReplacementNeeded(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, bool value);
-    CHIP_ERROR WriteAttributeBatteryReplaceability(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint8_t value);
-    CHIP_ERROR WriteAttributeBatteryPresent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            bool value);
-    CHIP_ERROR WriteAttributeBatteryReplacementDescription(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, chip::ByteSpan value);
-    CHIP_ERROR WriteAttributeBatteryCommonDesignation(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint32_t value);
-    CHIP_ERROR WriteAttributeBatteryANSIDesignation(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, chip::ByteSpan value);
-    CHIP_ERROR WriteAttributeBatteryIECDesignation(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, chip::ByteSpan value);
-    CHIP_ERROR WriteAttributeBatteryApprovedChemistry(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint32_t value);
-    CHIP_ERROR WriteAttributeBatteryCapacity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint32_t value);
-    CHIP_ERROR WriteAttributeBatteryQuantity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint8_t value);
     CHIP_ERROR WriteAttributeBatteryChargeState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                 uint8_t value);
-    CHIP_ERROR WriteAttributeBatteryTimeToFullCharge(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint32_t value);
-    CHIP_ERROR WriteAttributeBatteryFunctionalWhileCharging(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, bool value);
-    CHIP_ERROR WriteAttributeBatteryChargingCurrent(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint32_t value);
     CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                         uint32_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,

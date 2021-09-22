@@ -3349,63 +3349,6 @@ using chip::Callback::Cancelable;
     });
 }
 
-- (void)readAttributeWiredAssessedInputVoltageWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeWiredAssessedInputVoltage(success, failure);
-    });
-}
-
-- (void)readAttributeWiredAssessedInputFrequencyWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeWiredAssessedInputFrequency(success, failure);
-    });
-}
-
-- (void)readAttributeWiredCurrentTypeWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeWiredCurrentType(success, failure);
-    });
-}
-
-- (void)readAttributeWiredAssessedCurrentWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeWiredAssessedCurrent(success, failure);
-    });
-}
-
-- (void)readAttributeWiredNominalVoltageWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeWiredNominalVoltage(success, failure);
-    });
-}
-
-- (void)readAttributeWiredMaximumCurrentWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeWiredMaximumCurrent(success, failure);
-    });
-}
-
-- (void)readAttributeWiredPresentWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeWiredPresent(success, failure);
-    });
-}
-
-- (void)readAttributeActiveWiredFaultsWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge(
-        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActiveWiredFaults(success, failure);
-        });
-}
-
 - (void)readAttributeBatteryVoltageWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3434,27 +3377,6 @@ using chip::Callback::Cancelable;
     });
 }
 
-- (void)readAttributeBatteryReplacementNeededWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryReplacementNeeded(success, failure);
-    });
-}
-
-- (void)readAttributeBatteryReplaceabilityWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryReplaceability(success, failure);
-    });
-}
-
-- (void)readAttributeBatteryPresentWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryPresent(success, failure);
-    });
-}
-
 - (void)readAttributeActiveBatteryFaultsWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge(
@@ -3463,89 +3385,11 @@ using chip::Callback::Cancelable;
         });
 }
 
-- (void)readAttributeBatteryReplacementDescriptionWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryReplacementDescription(success, failure);
-    });
-}
-
-- (void)readAttributeBatteryCommonDesignationWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryCommonDesignation(success, failure);
-    });
-}
-
-- (void)readAttributeBatteryANSIDesignationWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryANSIDesignation(success, failure);
-    });
-}
-
-- (void)readAttributeBatteryIECDesignationWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryIECDesignation(success, failure);
-    });
-}
-
-- (void)readAttributeBatteryApprovedChemistryWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryApprovedChemistry(success, failure);
-    });
-}
-
-- (void)readAttributeBatteryCapacityWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryCapacity(success, failure);
-    });
-}
-
-- (void)readAttributeBatteryQuantityWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryQuantity(success, failure);
-    });
-}
-
 - (void)readAttributeBatteryChargeStateWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeBatteryChargeState(success, failure);
     });
-}
-
-- (void)readAttributeBatteryTimeToFullChargeWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryTimeToFullCharge(success, failure);
-    });
-}
-
-- (void)readAttributeBatteryFunctionalWhileChargingWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryFunctionalWhileCharging(success, failure);
-    });
-}
-
-- (void)readAttributeBatteryChargingCurrentWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.ReadAttributeBatteryChargingCurrent(success, failure);
-    });
-}
-
-- (void)readAttributeActiveBatteryChargeFaultsWithResponseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge(
-        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReadAttributeActiveBatteryChargeFaults(success, failure);
-        });
 }
 
 - (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler

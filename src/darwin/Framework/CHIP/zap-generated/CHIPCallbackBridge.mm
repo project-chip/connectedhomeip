@@ -275,28 +275,7 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, @ { @"value" : array });
 };
 
-void CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, uint8_t * entries)
-{
-    id array = [NSMutableArray arrayWithCapacity:count];
-    for (uint16_t i = 0; i < count; i++) {
-        array[i] = [NSNumber numberWithUnsignedChar:entries[i]];
-    }
-
-    DispatchSuccess(context, @ { @"value" : array });
-};
-
 void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, uint8_t * entries)
-{
-    id array = [NSMutableArray arrayWithCapacity:count];
-    for (uint16_t i = 0; i < count; i++) {
-        array[i] = [NSNumber numberWithUnsignedChar:entries[i]];
-    }
-
-    DispatchSuccess(context, @ { @"value" : array });
-};
-
-void CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, uint16_t count, uint8_t * entries)
 {
     id array = [NSMutableArray arrayWithCapacity:count];
     for (uint16_t i = 0; i < count; i++) {
