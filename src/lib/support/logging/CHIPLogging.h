@@ -323,5 +323,20 @@ bool IsCategoryEnabled(uint8_t category);
  */
 #define ChipLogValueMEI(aValue) static_cast<uint16_t>(aValue >> 16), static_cast<uint16_t>(aValue)
 
+/**
+ * Logging helpers for exchanges.  For now just log the exchange id and whether
+ * it's an initiator or responder, but eventually we may want to log the peer
+ * node id as well (especially for the responder case).  Some callsites only
+ * have the exchange id and initiator/responder boolean, not an actual exchange,
+ * so we want to have a helper for that case too.
+ */
+#define ChipLogFormatExchangeId "%" PRIu16 "%c"
+#define ChipLogValueExchangeId(id, isInitiator) id, ((isInitiator) ? 'i' : 'r')
+#define ChipLogFormatExchange ChipLogFormatExchangeId
+#define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator())
+// A header's initiator boolean is the inverse of the exchange's.
+#define ChipLogValueExchangeIdFromHeader(payloadHeader)                                                                            \
+    ChipLogValueExchangeId((payloadHeader).GetExchangeID(), !(payloadHeader).IsInitiator())
+
 } // namespace Logging
 } // namespace chip

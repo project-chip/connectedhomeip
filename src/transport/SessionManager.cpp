@@ -124,9 +124,9 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle session, PayloadHeader &
 
         ChipLogProgress(Inet,
                         "Build %s message %p to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
-                        " on exchange %d with MessageCounter %" PRIu32 ".",
+                        " on exchange " ChipLogFormatExchangeId " with MessageCounter %" PRIu32 ".",
                         "encrypted", &preparedMessage, ChipLogValueX64(state->GetPeerNodeId()), payloadHeader.GetMessageType(),
-                        payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), payloadHeader.GetExchangeID(),
+                        payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), ChipLogValueExchangeIdFromHeader(payloadHeader),
                         packetHeader.GetMessageCounter());
     }
     else
@@ -141,9 +141,9 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle session, PayloadHeader &
 
         ChipLogProgress(Inet,
                         "Build %s message %p to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
-                        " on exchange %d with MessageCounter %" PRIu32 ".",
+                        " on exchange " ChipLogFormatExchangeId " with MessageCounter %" PRIu32 ".",
                         "plaintext", &preparedMessage, ChipLogValueX64(kUndefinedNodeId), payloadHeader.GetMessageType(),
-                        payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), payloadHeader.GetExchangeID(),
+                        payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), ChipLogValueExchangeIdFromHeader(payloadHeader),
                         packetHeader.GetMessageCounter());
     }
 

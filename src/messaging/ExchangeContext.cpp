@@ -52,8 +52,8 @@ namespace Messaging {
 
 static void DefaultOnMessageReceived(ExchangeContext * ec, Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && payload)
 {
-    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16, protocolId.ToFullyQualifiedSpecForm(),
-                 msgType, ec->GetExchangeId());
+    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d " ChipLogFormatExchange,
+                 protocolId.ToFullyQualifiedSpecForm(), msgType, ChipLogValueExchange(ec));
 }
 
 bool ExchangeContext::IsInitiator() const
@@ -191,8 +191,8 @@ void ExchangeContext::Close()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (this - mExchangeMgr->mContextPool.begin()), mExchangeId,
-                  __func__);
+    ChipLogDetail(ExchangeManager, "ec id: %d [" ChipLogFormatExchange "], %s", (this - mExchangeMgr->mContextPool.begin()),
+                  ChipLogValueExchange(this), __func__);
 #endif
 
     DoClose(false);
@@ -208,8 +208,8 @@ void ExchangeContext::Abort()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (this - mExchangeMgr->mContextPool.begin()), mExchangeId,
-                  __func__);
+    ChipLogDetail(ExchangeManager, "ec id: %d [" ChipLogFormatExchange "], %s", (this - mExchangeMgr->mContextPool.begin()),
+                  ChipLogValueExchange(this), __func__);
 #endif
 
     DoClose(true);
@@ -254,7 +254,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Sess
     SetAutoRequestAck(true);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec++ id: %d", ExchangeId);
+    ChipLogDetail(ExchangeManager, "ec++ id: " ChipLogFormatExchange, ChipLogValueExchange(this));
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
@@ -284,7 +284,7 @@ ExchangeContext::~ExchangeContext()
     }
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec-- id: %d", mExchangeId);
+    ChipLogDetail(ExchangeManager, "ec-- id: " ChipLogFormatExchange, ChipLogValueExchange(this));
 #endif
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }

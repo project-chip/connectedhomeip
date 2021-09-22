@@ -348,7 +348,8 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(InteractionModel, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
+    ChipLogProgress(InteractionModel, "Time out! failed to receive echo response from Exchange: " ChipLogFormatExchange,
+                    ChipLogValueExchange(ec));
 }
 
 CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier)

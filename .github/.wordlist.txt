@@ -438,6 +438,7 @@ ini
 init
 inlined
 instantiation
+installDebug
 integrations
 IntelliSense
 InteractionModelVersion
@@ -527,6 +528,7 @@ ManualPairingCode
 ManualTest
 ManufacturingDate
 masterkey
+matterBuildSrcDir
 matterc
 matterd
 MatterLock

@@ -166,11 +166,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
     SuccessOrExit(err);
 
-    // TODO @pan-apple Remove service provisioniong, maybe multi-admin?
-    // Register to receive unsolicited Service Provisioning messages from the exchange manager.
-    err = mExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, this);
-    SuccessOrExit(err);
-
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
                                                     &mSessions, &mFabrics, &mSessionIDAllocator);
     SuccessOrExit(err);

@@ -201,9 +201,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 {
     UnsolicitedMessageHandler * matchingUMH = nullptr;
 
-    ChipLogProgress(ExchangeManager, "Received message of type 0x%02x with vendorId 0x%04x and protocolId 0x%04x on exchange %d",
-                    payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().GetVendorId(),
-                    payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetExchangeID());
+    ChipLogProgress(
+        ExchangeManager,
+        "Received message of type 0x%02x with vendorId 0x%04x and protocolId 0x%04x on exchange " ChipLogFormatExchangeId,
+        payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().GetVendorId(), payloadHeader.GetProtocolID().GetProtocolId(),
+        ChipLogValueExchangeIdFromHeader(payloadHeader));
 
     MessageFlags msgFlags;
     if (isDuplicate == DuplicateMessage::Yes)
@@ -288,7 +290,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
 
-        ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
+        ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: 0x%p", ChipLogValueExchange(ec),
+                      ec->GetDelegate());
 
         if (ec->IsEncryptionRequired() != packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
         {
