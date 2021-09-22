@@ -251,7 +251,7 @@ public:
     void OnExchangeClosing(Messaging::ExchangeContext * ec) override
     {
         FabricIndex currentFabricIndex = ec->GetSecureSession().GetFabricIndex();
-        ec->GetExchangeMgr()->GetSessionMgr()->ExpireAllPairingsForFabric(currentFabricIndex);
+        ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
     }
 };
 
@@ -287,7 +287,7 @@ exit:
         }
         else
         {
-            ec->GetExchangeMgr()->GetSessionMgr()->ExpireAllPairingsForFabric(fabricBeingRemoved);
+            ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(fabricBeingRemoved);
         }
     }
     return true;

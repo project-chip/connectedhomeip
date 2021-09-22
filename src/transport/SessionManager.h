@@ -33,11 +33,11 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <protocols/secure_channel/Constants.h>
+#include <transport/CryptoContext.h>
 #include <transport/FabricTable.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/PairingSession.h>
-#include <transport/PeerConnections.h>
-#include <transport/SecureSession.h>
+#include <transport/SecureSessionTable.h>
 #include <transport/SessionHandle.h>
 #include <transport/TransportMgr.h>
 #include <transport/UnauthenticatedSessionTable.h>
@@ -117,11 +117,11 @@ private:
 /**
  * @brief
  *   This class provides a skeleton for the callback functions. The functions will be
- *   called by SecureSssionMgrBase object on specific events. If the user of SecureSessionMgr
+ *   called by SecureSssionMgrBase object on specific events. If the user of SessionManager
  *   is interested in receiving these callbacks, they can specialize this class and handle
  *   each trigger in their implementation of this class.
  */
-class DLL_EXPORT SecureSessionMgrDelegate
+class DLL_EXPORT SessionManagerDelegate
 {
 public:
     enum class DuplicateMessage : uint8_t
@@ -172,14 +172,14 @@ public:
      */
     virtual void OnConnectionExpired(SessionHandle session) {}
 
-    virtual ~SecureSessionMgrDelegate() {}
+    virtual ~SessionManagerDelegate() {}
 };
 
-class DLL_EXPORT SecureSessionMgr : public TransportMgrDelegate
+class DLL_EXPORT SessionManager : public TransportMgrDelegate
 {
 public:
-    SecureSessionMgr();
-    ~SecureSessionMgr() override;
+    SessionManager();
+    ~SessionManager() override;
 
     /**
      * @brief
@@ -201,7 +201,7 @@ public:
      */
     CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage);
 
-    Transport::PeerConnectionState * GetPeerConnectionState(SessionHandle session);
+    Transport::SecureSession * GetSecureSession(SessionHandle session);
 
     /**
      * @brief
@@ -210,7 +210,7 @@ public:
      * @details
      *   Release if there was an existing callback object
      */
-    void SetDelegate(SecureSessionMgrDelegate * cb) { mCB = cb; }
+    void SetDelegate(SessionManagerDelegate * cb) { mCB = cb; }
 
     /**
      * @brief
@@ -222,7 +222,7 @@ public:
      *   peer node.
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
-                          SecureSession::SessionRole direction, FabricIndex fabric);
+                          CryptoContext::SessionRole direction, FabricIndex fabric);
 
     void ExpirePairing(SessionHandle session);
     void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
@@ -230,7 +230,7 @@ public:
 
     /**
      * @brief
-     *   Return the System Layer pointer used by current SecureSessionMgr.
+     *   Return the System Layer pointer used by current SessionManager.
      */
     System::Layer * SystemLayer() { return mSystemLayer; }
 
@@ -291,10 +291,10 @@ private:
 
     System::Layer * mSystemLayer = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
-    Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
-    State mState;                                                                       // < Initialization state of the object
+    Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
+    State mState;                                                                          // < Initialization state of the object
 
-    SecureSessionMgrDelegate * mCB                                     = nullptr;
+    SessionManagerDelegate * mCB                                       = nullptr;
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::FabricTable * mFabrics                                  = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
@@ -311,7 +311,7 @@ private:
     /**
      * Called when a specific connection expires.
      */
-    void HandleConnectionExpired(const Transport::PeerConnectionState & state);
+    void HandleConnectionExpired(const Transport::SecureSession & state);
 
     /**
      * Callback for timer expiry check
@@ -329,7 +329,7 @@ private:
             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
     }
 
-    MessageCounter & GetSendCounterForPacket(PayloadHeader & payloadHeader, Transport::PeerConnectionState & state)
+    MessageCounter & GetSendCounterForPacket(PayloadHeader & payloadHeader, Transport::SecureSession & state)
     {
         if (IsControlMessage(payloadHeader))
         {

@@ -20,7 +20,7 @@
 #include <lib/support/CodeUtils.h>
 #include <system/TimeSource.h>
 #include <transport/FabricTable.h>
-#include <transport/PeerConnectionState.h>
+#include <transport/SecureSession.h>
 
 namespace chip {
 namespace Transport {
@@ -38,7 +38,7 @@ constexpr const uint16_t kAnyKeyId = 0xffff;
  *   - allocate and free space for connection states.
  */
 template <size_t kMaxConnectionCount, Time::Source kTimeSource = Time::Source::kSystem>
-class PeerConnections
+class SecureSessionTable
 {
 public:
     /**
@@ -53,7 +53,7 @@ public:
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR CreateNewPeerConnectionState(const PeerAddress & address, PeerConnectionState ** state)
+    CHIP_ERROR CreateNewPeerConnectionState(const PeerAddress & address, SecureSession ** state)
     {
         CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
@@ -66,7 +66,7 @@ public:
         {
             if (!mStates[i].IsInitialized())
             {
-                mStates[i] = PeerConnectionState(address);
+                mStates[i] = SecureSession(address);
                 mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
 
                 if (state)
@@ -97,7 +97,7 @@ public:
      */
     CHECK_RETURN_VALUE
     CHIP_ERROR CreateNewPeerConnectionState(const Optional<NodeId> & peerNode, uint16_t peerSessionId, uint16_t localSessionId,
-                                            PeerConnectionState ** state)
+                                            SecureSession ** state)
     {
         CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
@@ -110,7 +110,7 @@ public:
         {
             if (!mStates[i].IsInitialized())
             {
-                mStates[i] = PeerConnectionState();
+                mStates[i] = SecureSession();
                 mStates[i].SetPeerSessionId(peerSessionId);
                 mStates[i].SetLocalSessionId(localSessionId);
                 mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
@@ -142,10 +142,10 @@ public:
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    PeerConnectionState * FindPeerConnectionState(const PeerAddress & address, PeerConnectionState * begin)
+    SecureSession * FindPeerConnectionState(const PeerAddress & address, SecureSession * begin)
     {
-        PeerConnectionState * state = nullptr;
-        PeerConnectionState * iter  = &mStates[0];
+        SecureSession * state = nullptr;
+        SecureSession * iter  = &mStates[0];
 
         if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
@@ -173,10 +173,10 @@ public:
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    PeerConnectionState * FindPeerConnectionState(NodeId nodeId, PeerConnectionState * begin)
+    SecureSession * FindPeerConnectionState(NodeId nodeId, SecureSession * begin)
     {
-        PeerConnectionState * state = nullptr;
-        PeerConnectionState * iter  = &mStates[0];
+        SecureSession * state = nullptr;
+        SecureSession * iter  = &mStates[0];
 
         if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
@@ -209,10 +209,10 @@ public:
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    PeerConnectionState * FindPeerConnectionState(Optional<NodeId> nodeId, uint16_t peerSessionId, PeerConnectionState * begin)
+    SecureSession * FindPeerConnectionState(Optional<NodeId> nodeId, uint16_t peerSessionId, SecureSession * begin)
     {
-        PeerConnectionState * state = nullptr;
-        PeerConnectionState * iter  = &mStates[0];
+        SecureSession * state = nullptr;
+        SecureSession * iter  = &mStates[0];
 
         if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
@@ -247,10 +247,10 @@ public:
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    PeerConnectionState * FindPeerConnectionState(uint16_t keyId, PeerConnectionState * begin)
+    SecureSession * FindPeerConnectionState(uint16_t keyId, SecureSession * begin)
     {
-        PeerConnectionState * state = nullptr;
-        PeerConnectionState * iter  = &mStates[0];
+        SecureSession * state = nullptr;
+        SecureSession * iter  = &mStates[0];
 
         VerifyOrDie(begin == nullptr || (begin >= iter && begin < &mStates[kMaxConnectionCount]));
 
@@ -286,11 +286,10 @@ public:
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    PeerConnectionState * FindPeerConnectionStateByLocalKey(Optional<NodeId> nodeId, uint16_t localSessionId,
-                                                            PeerConnectionState * begin)
+    SecureSession * FindPeerConnectionStateByLocalKey(Optional<NodeId> nodeId, uint16_t localSessionId, SecureSession * begin)
     {
-        PeerConnectionState * state = nullptr;
-        PeerConnectionState * iter  = &mStates[0];
+        SecureSession * state = nullptr;
+        SecureSession * iter  = &mStates[0];
 
         if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
@@ -324,7 +323,7 @@ public:
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    PeerConnectionState * FindPeerConnectionStateByFabric(FabricIndex fabric)
+    SecureSession * FindPeerConnectionStateByFabric(FabricIndex fabric)
     {
         for (auto & state : mStates)
         {
@@ -341,17 +340,14 @@ public:
     }
 
     /// Convenience method to mark a peer connection state as active
-    void MarkConnectionActive(PeerConnectionState * state)
-    {
-        state->SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
-    }
+    void MarkConnectionActive(SecureSession * state) { state->SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs()); }
 
     /// Convenience method to expired a peer connection state and fired the related callback
     template <typename Callback>
-    void MarkConnectionExpired(PeerConnectionState * state, Callback callback)
+    void MarkConnectionExpired(SecureSession * state, Callback callback)
     {
         callback(*state);
-        *state = PeerConnectionState(PeerAddress::Uninitialized());
+        *state = SecureSession(PeerAddress::Uninitialized());
     }
 
     /**
@@ -387,7 +383,7 @@ public:
 
 private:
     Time::TimeSource<kTimeSource> mTimeSource;
-    PeerConnectionState mStates[kMaxConnectionCount];
+    SecureSession mStates[kMaxConnectionCount];
 };
 
 } // namespace Transport

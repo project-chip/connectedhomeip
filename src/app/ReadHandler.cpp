@@ -66,7 +66,7 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
 {
     if (IsSubscriptionType())
     {
-        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->CancelTimer(
+        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
             OnRefreshSubscribeTimerSyncCallback, this);
     }
     if (aOptions == ShutdownOptions::AbortCurrentExchange)
@@ -573,10 +573,10 @@ void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLa
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 {
     ChipLogProgress(DataManagement, "ReadHandler::Refresh Subscribe Sync Timer with %d seconds", mMinIntervalFloorSeconds);
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->CancelTimer(
+    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnRefreshSubscribeTimerSyncCallback, this);
     mHoldReport = true;
-    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->StartTimer(
+    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         mMinIntervalFloorSeconds * kMillisecondsPerSecond, OnRefreshSubscribeTimerSyncCallback, this);
 }
 } // namespace app

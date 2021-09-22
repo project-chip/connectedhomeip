@@ -38,14 +38,14 @@
 #include <system/SystemLayerImpl.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/UDP.h>
 
 #include <nlunit-test.h>
 
 namespace {
 static chip::System::LayerImpl gSystemLayer;
-static chip::SecureSessionMgr gSessionManager;
+static chip::SessionManager gSessionManager;
 static chip::Messaging::ExchangeManager gExchangeManager;
 static chip::secure_channel::MessageCounterManager gMessageCounterManager;
 static chip::TransportMgr<chip::Transport::UDP> gTransportManager;

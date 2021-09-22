@@ -20,10 +20,10 @@
 
 #pragma once
 
+#include <transport/CryptoContext.h>
 #include <transport/FabricTable.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
-#include <transport/SecureSession.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>

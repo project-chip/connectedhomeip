@@ -30,7 +30,7 @@
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 
 #include <nlbyteorder.h>
@@ -155,7 +155,7 @@ public:
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
 
-    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr) override
+    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * rmMgr, SessionManager * sessionManager) override
     {
         return &mMessageDispatch;
     }
@@ -640,7 +640,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     // Let's reset the state of transport manager so that other tests are not impacted
     // as those could be using the global test context.
     TestContext & inctx = *static_cast<TestContext *>(inContext);
-    gTransportMgr.SetSecureSessionMgr(&inctx.GetSecureSessionManager());
+    gTransportMgr.SetSessionManager(&inctx.GetSecureSessionManager());
 }
 
 void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
@@ -1301,7 +1301,7 @@ int Initialize(void * aContext)
     auto * ctx = static_cast<TestContext *>(aContext);
     VerifyOrReturnError(ctx->Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
-    gTransportMgr.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
+    gTransportMgr.SetSessionManager(&ctx->GetSecureSessionManager());
     return SUCCESS;
 }
 

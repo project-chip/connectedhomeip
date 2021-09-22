@@ -28,7 +28,7 @@
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <transport/FabricTable.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/TransportMgrBase.h>
 #include <transport/raw/BLE.h>
@@ -67,7 +67,7 @@ public:
 
     SessionIDAllocator & GetSessionIDAllocator() { return mSessionIDAllocator; }
 
-    SecureSessionMgr & GetSecureSessionManager() { return mSessions; }
+    SessionManager & GetSecureSessionManager() { return mSessions; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
@@ -111,7 +111,7 @@ private:
     AppDelegate * mAppDelegate = nullptr;
 
     ServerTransportMgr mTransports;
-    SecureSessionMgr mSessions;
+    SessionManager mSessions;
     CASEServer mCASEServer;
     Messaging::ExchangeManager mExchangeMgr;
     Transport::FabricTable mFabrics;
