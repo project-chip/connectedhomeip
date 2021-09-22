@@ -1233,7 +1233,7 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // 1 tick is 64 ms, sleep 65*3 ms to trigger re-transmit from receiver
-    test_os_sleep_ms(65*3);
+    test_os_sleep_ms(65 * 3);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // We resent our response message, which should show up as an app-level
