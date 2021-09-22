@@ -37,8 +37,8 @@ CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeConte
         mExchangeCtx = ec;
     }
 
-    ChipLogDetail(BDX, "%s: message 0x%x protocol %u", __FUNCTION__, static_cast<uint8_t>(payloadHeader.GetMessageType()),
-                  payloadHeader.GetProtocolID().GetProtocolId());
+    ChipLogDetail(BDX, "%s: message " ChipLogFormatMessageType " protocol " ChipLogFormatProtocolId, __FUNCTION__,
+                  payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
     CHIP_ERROR err = mTransfer.HandleMessageReceived(payloadHeader, std::move(payload), System::Clock::GetMonotonicMilliseconds());
     if (err != CHIP_NO_ERROR)
     {

@@ -4881,6 +4881,22 @@ public class ChipClusters {
       writeLongCharStringAttribute(chipClusterPtr, callback, value);
     }
 
+    public void readEpochUsAttribute(LongAttributeCallback callback) {
+      readEpochUsAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeEpochUsAttribute(DefaultClusterCallback callback, long value) {
+      writeEpochUsAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readEpochSAttribute(LongAttributeCallback callback) {
+      readEpochSAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeEpochSAttribute(DefaultClusterCallback callback, long value) {
+      writeEpochSAttribute(chipClusterPtr, callback, value);
+    }
+
     public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
       readUnsupportedAttribute(chipClusterPtr, callback);
     }
@@ -5003,6 +5019,16 @@ public class ChipClusters {
 
     private native void writeLongCharStringAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, String value);
+
+    private native void readEpochUsAttribute(long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void writeEpochUsAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void readEpochSAttribute(long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void writeEpochSAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, long value);
 
     private native void readUnsupportedAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);

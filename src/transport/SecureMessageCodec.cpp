@@ -68,8 +68,6 @@ CHIP_ERROR Encode(Transport::SecureSession * state, PayloadHeader & payloadHeade
     VerifyOrReturnError(CanCastTo<uint16_t>(totalLen + taglen), CHIP_ERROR_INTERNAL);
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
-    ChipLogDetail(Inet, "Secure message was encrypted: Msg ID %" PRIu32, messageCounter);
-
     ReturnErrorOnFailure(counter.Advance());
     return CHIP_NO_ERROR;
 }

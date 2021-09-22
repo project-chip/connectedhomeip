@@ -111,6 +111,9 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle session, PayloadHeader &
         packetHeader.SetSecureSessionControlMsg(true);
     }
 
+#if CHIP_PROGRESS_LOGGING
+    NodeId destination;
+#endif // CHIP_PROGRESS_LOGGING
     if (session.IsSecure())
     {
         SecureSession * state = GetSecureSession(session);
@@ -122,12 +125,9 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle session, PayloadHeader &
         MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *state);
         ReturnErrorOnFailure(SecureMessageCodec::Encode(state, payloadHeader, packetHeader, message, counter));
 
-        ChipLogProgress(Inet,
-                        "Build %s message %p to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
-                        " on exchange " ChipLogFormatExchangeId " with MessageCounter %" PRIu32 ".",
-                        "encrypted", &preparedMessage, ChipLogValueX64(state->GetPeerNodeId()), payloadHeader.GetMessageType(),
-                        payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), ChipLogValueExchangeIdFromHeader(payloadHeader),
-                        packetHeader.GetMessageCounter());
+#if CHIP_PROGRESS_LOGGING
+        destination = state->GetPeerNodeId();
+#endif // CHIP_PROGRESS_LOGGING
     }
     else
     {
@@ -139,13 +139,18 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle session, PayloadHeader &
 
         packetHeader.SetMessageCounter(messageCounter);
 
-        ChipLogProgress(Inet,
-                        "Build %s message %p to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
-                        " on exchange " ChipLogFormatExchangeId " with MessageCounter %" PRIu32 ".",
-                        "plaintext", &preparedMessage, ChipLogValueX64(kUndefinedNodeId), payloadHeader.GetMessageType(),
-                        payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), ChipLogValueExchangeIdFromHeader(payloadHeader),
-                        packetHeader.GetMessageCounter());
+#if CHIP_PROGRESS_LOGGING
+        destination = kUndefinedNodeId;
+#endif // CHIP_PROGRESS_LOGGING
     }
+
+    ChipLogProgress(Inet,
+                    "Prepared %s message %p to 0x" ChipLogFormatX64 " of type " ChipLogFormatMessageType
+                    " and protocolId " ChipLogFormatProtocolId " on exchange " ChipLogFormatExchangeId
+                    " with MessageCounter:" ChipLogFormatMessageCounter ".",
+                    session.IsSecure() ? "encrypted" : "plaintext", &preparedMessage, ChipLogValueX64(destination),
+                    payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()),
+                    ChipLogValueExchangeIdFromSentHeader(payloadHeader), packetHeader.GetMessageCounter());
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
@@ -175,8 +180,11 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const Encr
 
         destination = &state->GetPeerAddress();
 
-        ChipLogProgress(Inet, "Sending %s msg %p to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec", "encrypted",
-                        &preparedMessage, ChipLogValueX64(state->GetPeerNodeId()), System::Clock::GetMonotonicMilliseconds());
+        ChipLogProgress(Inet,
+                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
+                        " at monotonic time: %" PRId64 " msec",
+                        "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(state->GetPeerNodeId()),
+                        System::Clock::GetMonotonicMilliseconds());
     }
     else
     {
@@ -184,8 +192,11 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const Encr
         mUnauthenticatedSessions.MarkSessionActive(unauthenticated.Get());
         destination = &unauthenticated->GetPeerAddress();
 
-        ChipLogProgress(Inet, "Sending %s msg %p to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec", "plaintext",
-                        &preparedMessage, ChipLogValueX64(kUndefinedNodeId), System::Clock::GetMonotonicMilliseconds());
+        ChipLogProgress(Inet,
+                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
+                        " at monotonic time: %" PRId64 " msec",
+                        "plaintext", &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(kUndefinedNodeId),
+                        System::Clock::GetMonotonicMilliseconds());
     }
 
     PacketBufferHandle msgBuf = preparedMessage.CastToWritable();
@@ -194,7 +205,6 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const Encr
 
     if (mTransportMgr != nullptr)
     {
-        ChipLogProgress(Inet, "Sending msg on generic transport");
         return mTransportMgr->SendMessage(*destination, std::move(msgBuf));
     }
     else
@@ -353,6 +363,14 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
+    if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes)
+    {
+        ChipLogDetail(Inet,
+                      "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
+                      " on exchange " ChipLogFormatExchangeId,
+                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromSentHeader(payloadHeader));
+    }
+
     session->GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
 
     if (mCB != nullptr)
@@ -434,9 +452,16 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
 
     if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {
-        // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
-        // cycles on further message processing.
-        ExitNow(err = CHIP_NO_ERROR);
+        ChipLogDetail(Inet,
+                      "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
+                      " on exchange " ChipLogFormatExchangeId,
+                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromSentHeader(payloadHeader));
+        if (!payloadHeader.NeedsAck())
+        {
+            // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
+            // cycles on further message processing.
+            ExitNow(err = CHIP_NO_ERROR);
+        }
     }
 
     if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))

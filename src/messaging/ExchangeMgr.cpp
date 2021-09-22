@@ -201,11 +201,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 {
     UnsolicitedMessageHandler * matchingUMH = nullptr;
 
-    ChipLogProgress(
-        ExchangeManager,
-        "Received message of type 0x%02x with vendorId 0x%04x and protocolId 0x%04x on exchange " ChipLogFormatExchangeId,
-        payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().GetVendorId(), payloadHeader.GetProtocolID().GetProtocolId(),
-        ChipLogValueExchangeIdFromHeader(payloadHeader));
+    ChipLogProgress(ExchangeManager,
+                    "Received message of type " ChipLogFormatMessageType " with protocolId " ChipLogFormatProtocolId
+                    " and MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchangeId,
+                    payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()),
+                    packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
 
     MessageFlags msgFlags;
     if (isDuplicate == DuplicateMessage::Yes)

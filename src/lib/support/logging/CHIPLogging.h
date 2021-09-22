@@ -334,9 +334,28 @@ bool IsCategoryEnabled(uint8_t category);
 #define ChipLogValueExchangeId(id, isInitiator) id, ((isInitiator) ? 'i' : 'r')
 #define ChipLogFormatExchange ChipLogFormatExchangeId
 #define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator())
-// A header's initiator boolean is the inverse of the exchange's.
-#define ChipLogValueExchangeIdFromHeader(payloadHeader)                                                                            \
+#define ChipLogValueExchangeIdFromSentHeader(payloadHeader)                                                                        \
+    ChipLogValueExchangeId((payloadHeader).GetExchangeID(), (payloadHeader).IsInitiator())
+// A received header's initiator boolean is the inverse of the exchange's.
+#define ChipLogValueExchangeIdFromReceivedHeader(payloadHeader)                                                                    \
     ChipLogValueExchangeId((payloadHeader).GetExchangeID(), !(payloadHeader).IsInitiator())
+
+/**
+ * Logging helpers for protocol ids.  A protocol id is a (vendor-id,
+ * protocol-id) pair.
+ */
+#define ChipLogFormatProtocolId "(%" PRIu16 ", %" PRIu16 ")"
+#define ChipLogValueProtocolId(id) (id).GetVendorId(), (id).GetProtocolId()
+
+/**
+ * Logging helpers for message counters, so we format them consistently.
+ */
+#define ChipLogFormatMessageCounter "%" PRIu32
+
+/**
+ * Logging helpers for message types, so we format them consistently.
+ */
+#define ChipLogFormatMessageType "0x%" PRIx8
 
 } // namespace Logging
 } // namespace chip
