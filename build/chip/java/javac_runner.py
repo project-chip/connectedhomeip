@@ -78,9 +78,11 @@ def FindCommand(command):
 
     return None
 
+
 def ReadBuildConfig(build_config):
     with open(build_config, 'r') as file:
         return json.load(file)
+
 
 def ComputeClasspath(build_config_json):
     unique_jars = build_config_json['deps_info']['deps_jars']
@@ -88,6 +90,7 @@ def ComputeClasspath(build_config_json):
         return ";".join(unique_jars)
     else:
         return ":".join(unique_jars)
+
 
 def main():
     java_path = FindCommand('javac')
@@ -117,7 +120,7 @@ def main():
     args = parser.parse_args()
     if not os.path.isdir(args.classdir):
         os.makedirs(args.classdir, exist_ok=True)
-        
+
     build_config_json = ReadBuildConfig(args.build_config)
     classpath = ComputeClasspath(build_config_json)
     java_args = [java_path]
