@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/device/OperationalDeviceProxy.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <inet/InetConfig.h>
@@ -77,6 +78,8 @@ public:
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
+    chip::app::device::OperationalDeviceProxy & GetOperationalDeviceProxy() { return mOperationalDeviceProxy; }
+
     void Shutdown();
 
     static Server & GetInstance() { return sServer; }
@@ -128,6 +131,9 @@ private:
     FabricTable mFabrics;
     SessionIDAllocator mSessionIDAllocator;
     secure_channel::MessageCounterManager mMessageCounterManager;
+    // TODO: There should be a list of OperationalDeviceProxy
+    // TODO: This may not belong in Server.h
+    chip::app::device::OperationalDeviceProxy mOperationalDeviceProxy;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
