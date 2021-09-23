@@ -117,8 +117,8 @@ static constexpr AttributeId HighTempDwellTripPoint = 0x00000014;
 namespace Identify {
 namespace Attributes {
 namespace Ids {
-static constexpr AttributeId IdentifyTime    = 0x00000000;
-static constexpr AttributeId CommissionState = 0x00000001;
+static constexpr AttributeId IdentifyTime = 0x00000000;
+static constexpr AttributeId IdentifyType = 0x00000001;
 } // namespace Ids
 } // namespace Attributes
 } // namespace Identify

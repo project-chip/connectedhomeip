@@ -750,6 +750,17 @@ enum EmberAfIdentifyEffectVariant : uint8_t
     EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT = 0,
 };
 
+// Enum for IdentifyIdentifyType
+enum EmberAfIdentifyIdentifyType : uint8_t
+{
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE          = 0,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LIGHT = 1,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED   = 2,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_AUDIBLE_BEEP  = 3,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_DISPLAY       = 4,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_ACTUATOR      = 5,
+};
+
 // Enum for InterfaceType
 enum EmberAfInterfaceType : uint8_t
 {

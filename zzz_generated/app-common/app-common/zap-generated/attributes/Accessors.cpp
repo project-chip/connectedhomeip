@@ -664,15 +664,14 @@ EmberAfStatus SetIdentifyTime(chip::EndpointId endpoint, uint16_t identifyTime)
     return emberAfWriteServerAttribute(endpoint, Identify::Id, Ids::IdentifyTime, (uint8_t *) &identifyTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetCommissionState(chip::EndpointId endpoint, uint8_t * commissionState)
+EmberAfStatus GetIdentifyType(chip::EndpointId endpoint, uint8_t * identifyType)
 {
-    return emberAfReadServerAttribute(endpoint, Identify::Id, Ids::CommissionState, (uint8_t *) commissionState,
-                                      sizeof(*commissionState));
+    return emberAfReadServerAttribute(endpoint, Identify::Id, Ids::IdentifyType, (uint8_t *) identifyType, sizeof(*identifyType));
 }
-EmberAfStatus SetCommissionState(chip::EndpointId endpoint, uint8_t commissionState)
+EmberAfStatus SetIdentifyType(chip::EndpointId endpoint, uint8_t identifyType)
 {
-    return emberAfWriteServerAttribute(endpoint, Identify::Id, Ids::CommissionState, (uint8_t *) &commissionState,
-                                       ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Identify::Id, Ids::IdentifyType, (uint8_t *) &identifyType,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 } // namespace Attributes
 } // namespace Identify
