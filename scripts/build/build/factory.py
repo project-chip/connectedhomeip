@@ -94,9 +94,8 @@ _MATCHERS = {
 # Matrix of what can be compiled and what build options are required
 # by such compilation
 _MATCHERS[Platform.HOST].AcceptBoard(Board.NATIVE, board=HostBoard.NATIVE)
-if HostBoard.NATIVE.PlatformName() != HostBoard.CROSS_COMPILE_ARM64.PlatformName():
-    _MATCHERS[Platform.HOST].AcceptBoard(
-        Board.ARM64, board=HostBoard.CROSS_COMPILE_ARM64)
+if HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName():
+    _MATCHERS[Platform.HOST].AcceptBoard(Board.ARM64, board=HostBoard.ARM64)
 
 _MATCHERS[Platform.HOST].AcceptApplication(
     Application.ALL_CLUSTERS, app=HostApp.ALL_CLUSTERS)

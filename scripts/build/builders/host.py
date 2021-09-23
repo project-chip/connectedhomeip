@@ -50,9 +50,9 @@ class HostBoard(Enum):
     NATIVE = auto()
 
     # cross-compile support
-    CROSS_COMPILE_ARM64 = auto()
+    ARM64 = auto()
 
-    def PlatformName(self):
+    def BoardName(self):
         if self == HostBoard.NATIVE:
             uname_result = uname()
             arch = uname_result.machine
@@ -65,11 +65,14 @@ class HostBoard(Enum):
             elif arch == 'aarch64' or arch == 'aarch64_be' or arch == 'armv8b' or arch == 'armv8l':
                 arch = 'arm64'
 
-            return '-'.join([uname_result.system.lower(), arch])
-        elif self == HostBoard.CROSS_COMPILE_ARM64:
-            return 'linux-arm64'
+            return arch
+        elif self == HostBoard.ARM64:
+            return 'arm64'
         else:
             raise Exception('Unknown host board type: %r' % self)
+
+    def PlatformName(self):
+        return uname().system.lower()
 
 
 class HostBuilder(GnBuilder):
@@ -87,7 +90,7 @@ class HostBuilder(GnBuilder):
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
             return None
-        elif self.board == HostBoard.CROSS_COMPILE_ARM64:
+        elif self.board == HostBoard.ARM64:
             return [
                 'target_cpu="arm64"',
                 'is_clang=true',
@@ -100,7 +103,7 @@ class HostBuilder(GnBuilder):
     def GnBuildEnv(self):
         if self.board == HostBoard.NATIVE:
             return None
-        elif self.board == HostBoard.CROSS_COMPILE_ARM64:
+        elif self.board == HostBoard.ARM64:
             return {
                 'PKG_CONFIG_PATH': self.SysRootPath('SYSROOT_AARCH64') + '/lib/aarch64-linux-gnu/pkgconfig',
             }
@@ -120,4 +123,4 @@ class HostBuilder(GnBuilder):
 
     def SetIdentifier(self, platform: str, board: str, app: str):
         super(HostBuilder, self).SetIdentifier(
-            self.board.PlatformName(), board, app)
+            self.board.PlatformName(), self.board.BoardName(), app)
