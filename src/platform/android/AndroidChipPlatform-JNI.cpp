@@ -98,8 +98,10 @@ void AndroidChipPlatformJNI_OnUnload(JavaVM * jvm, void * reserved)
 // for BLEManager
 JNI_METHOD(void, nativeSetBLEManager)(JNIEnv *, jobject, jobject manager)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     chip::DeviceLayer::Internal::BLEMgrImpl().InitializeWithObject(manager);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 }
 
 JNI_METHOD(void, handleWriteConfirmation)
