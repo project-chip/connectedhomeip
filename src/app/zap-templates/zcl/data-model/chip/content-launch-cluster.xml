@@ -134,6 +134,6 @@ limitations under the License.
     <cluster code="0x050a"/>
     <item name="Type" type="ContentLaunchParameterEnum"/>
     <item name="Value" type="CHAR_STRING"/>
-    <item name="ExternalIDList" type="ARRAY" entryType="ContentLaunchAdditionalInfo" length="254"/>
+    <item name="ExternalIDList" type="ContentLaunchAdditionalInfo" array="true" length="254"/>
   </struct>
 </configurator>
