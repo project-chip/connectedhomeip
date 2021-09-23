@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.multi_admin_client_fragment.multiAdminClus
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.multiAdminClusterDeviceIdEd
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.discriminatorEd
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.setupPinCodeEd
-import kotlinx.android.synthetic.main.multi_admin_client_fragment.multiAdminClustCommandStatus
+import kotlinx.android.synthetic.main.multi_admin_client_fragment.multiAdminClusterCommandStatus
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.view.multiAdminClusterUpdateAddressBtn
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.view.basicCommissioningMethodBtn
 import kotlinx.android.synthetic.main.multi_admin_client_fragment.view.enhancedCommissioningMethodBtn
@@ -65,7 +65,7 @@ class MultiAdminClientFragment : Fragment() {
     }
 
     override fun onSendMessageComplete(message: String?) {
-      multiAdminClustCommandStatus.text = requireContext().getString(R.string.echo_status_response, message)
+      multiAdminClusterCommandStatus.text = requireContext().getString(R.string.message_response, message)
     }
 
     override fun onNotifyChipConnectionClosed() {
@@ -131,7 +131,7 @@ class MultiAdminClientFragment : Fragment() {
 
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread {
-      multiAdminClustCommandStatus.text = msg
+      multiAdminClusterCommandStatus.text = msg
     }
   }
 
