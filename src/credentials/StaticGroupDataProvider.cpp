@@ -15,24 +15,21 @@
  *    limitations under the License.
  */
 #include "GroupDataProvider.h"
-#include <CHIPProjectConfig.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-// TODO: Start using pool w/ RAII to avoid heap
-//#include <lib/support/Pool.h>
-#include <string.h>
+#include <lib/support/Pool.h>
 #include <stdlib.h>
+#include <string.h>
 
 namespace chip {
 namespace Credentials {
 namespace {
 
-static constexpr size_t kNumFabrics    = CHIP_CONFIG_MAX_DEVICE_ADMINS;
+static constexpr size_t kNumFabrics         = CHIP_CONFIG_MAX_DEVICE_ADMINS;
 static constexpr size_t kEndpointEntriesMax = CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC;
 static constexpr size_t kStateEntriesMax    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC;
 static constexpr size_t kKeyEntriesMax      = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC;
-
-// TODO: Use VerifyOrReturnError and the likes everywhere possible
+static constexpr size_t kIteratorsMax       = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
 
 class StaticGroupsProvider : public GroupDataProvider
 {
@@ -90,7 +87,7 @@ protected:
         void Invalidate()
         {
             internal_fabric_index = UINT8_MAX;
-            entry_index = 0;
+            entry_index           = 0;
         }
 
         static_assert(kNumFabrics < 255, "StaticGroupDataProvider only supports up to 255 fabrics");
@@ -100,14 +97,16 @@ protected:
     class EndpointIterator : public GroupMappingIterator
     {
     public:
-        EndpointIterator(Fabric * fabric, chip::EndpointId endpoint) : mFabric(fabric), mEndpoint(endpoint) {}
+        EndpointIterator(StaticGroupsProvider & provider, Fabric * fabric, chip::EndpointId endpoint) :
+            mProvider(provider), mFabric(fabric), mEndpoint(endpoint)
+        {}
 
         uint16_t Count() override
         {
             uint16_t count = 0;
             for (uint16_t i = 0; this->mFabric && i < kEndpointEntriesMax; ++i)
             {
-                EndpointEntry & entry = this->mFabric->endpoints[i];
+                const EndpointEntry & entry = this->mFabric->endpoints[i];
                 if (entry.in_use && entry.endpoint == this->mEndpoint)
                 {
                     count++;
@@ -116,48 +115,41 @@ protected:
             return count;
         }
 
-        GroupId Next() override
+        bool Next(GroupId & outGroup) override
         {
-            const EndpointEntry * entry = nullptr;
-            bool entryFound = false;
-
-            while (!entryFound && (this->mFabric != nullptr) && (this->mIndex < kEndpointEntriesMax))
+            while ((this->mFabric != nullptr) && (this->mIndex < kEndpointEntriesMax))
             {
-                entry = &this->mFabric->endpoints[this->mIndex];
-                if (entry->in_use && (entry->endpoint == this->mEndpoint))
+                const EndpointEntry & entry = this->mFabric->endpoints[this->mIndex++];
+                if (entry.in_use && (entry.endpoint == this->mEndpoint))
                 {
-                    entryFound = true;
+                    outGroup = entry.group;
+                    return true;
                 }
-                ++this->mIndex;
             }
 
-            return entryFound ? entry->group : 0;
+            return false;
         }
 
-        void Release() override
-        {
-            chip::Platform::Delete(this);
-        }
+        void Release() override { mProvider.Release(this); }
 
     private:
+        StaticGroupsProvider & mProvider;
         Fabric * mFabric           = nullptr;
         chip::EndpointId mEndpoint = 0;
         uint16_t mIndex            = 0;
     };
 
-    // TODO: Need to add a ListGroupState iterator that allows iteration through the full list of group state
-
     class FabricGroupStateIterator : public GroupStateIterator
     {
     public:
-        FabricGroupStateIterator(Fabric * fabric) : mFabric(fabric) {}
+        FabricGroupStateIterator(StaticGroupsProvider & provider, Fabric * fabric) : mProvider(provider), mFabric(fabric) {}
 
         uint16_t Count() override
         {
             uint16_t count = 0;
             for (uint16_t i = 0; this->mFabric && i < kStateEntriesMax; ++i)
             {
-                StateEntry & entry = this->mFabric->states[i];
+                const StateEntry & entry = this->mFabric->states[i];
                 if (entry.in_use)
                 {
                     count++;
@@ -166,62 +158,106 @@ protected:
             return count;
         }
 
-        // TODO: Consider changing to `bool Next(GroupStateListEntry &outEntry)` so that caller can provide memory
-        const GroupStateListEntry * Next() override
+        bool Next(GroupStateListEntry & outEntry) override
         {
-            const StateEntry * entry = nullptr;
-            bool entryFound = false;
-
-            while (!entryFound && (this->mFabric != nullptr) && (this->mIndex < kStateEntriesMax))
+            while ((this->mFabric != nullptr) && (this->mIndex < kStateEntriesMax))
             {
-                entry = &this->mFabric->states[this->mIndex];
-                if (entry->in_use)
+                const StateEntry & entry = this->mFabric->states[this->mIndex++];
+                if (entry.in_use)
                 {
-                    entryFound = true;
+                    // Iterator has data available, copy the contents of the entry to the output
+                    outEntry.fabric_index  = mFabric->fabric_index;
+                    outEntry.list_index    = mOverallListIndex++;
+                    outEntry.group         = entry.group;
+                    outEntry.key_set_index = entry.key_set_index;
+                    return true;
                 }
-                ++this->mIndex;
             }
-
-            if (!entryFound)
-            {
-                return nullptr;
-            }
-
-            // Iterator has data available, copy the contents of the entry to the iterator slot
-            mCurrentEntry.fabric_index = mFabric->fabric_index;
-            mCurrentEntry.list_index = mOverallListIndex;
-            mCurrentEntry.group = entry->group;
-            mCurrentEntry.key_set_index = entry->key_set_index;
-
-            ++mOverallListIndex;
-
-            return &mCurrentEntry;
+            return false;
         }
 
-        void Release() override
-        {
-            chip::Platform::Delete(this);
-        }
+        void Release() override { mProvider.Release(this); }
 
     private:
-        Fabric * mFabric = nullptr;
-        uint16_t mIndex  = 0;
+        StaticGroupsProvider & mProvider;
+        Fabric * mFabric           = nullptr;
+        uint16_t mIndex            = 0;
         uint16_t mOverallListIndex = 0;
-        // Internal storage for current expanded entry (has additional index in addition to GroupState data)
-        GroupStateListEntry mCurrentEntry{};
+    };
+
+    class AllGroupStateIterator : public GroupStateIterator
+    {
+    public:
+        AllGroupStateIterator(StaticGroupsProvider & provider) : mProvider(provider) {}
+
+        uint16_t Count() override
+        {
+            const Fabric * fabric = nullptr;
+
+            uint16_t count = 0;
+            for (chip::FabricIndex i = 0; i < kNumFabrics; ++i)
+            {
+                fabric = this->mProvider.GetExistingFabric(i);
+                for (uint16_t j = 0; fabric && j < kStateEntriesMax; ++j)
+                {
+                    const StateEntry & entry = fabric->states[j];
+                    if (entry.in_use)
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        bool Next(GroupStateListEntry & outEntry) override
+        {
+            const Fabric * fabric = nullptr;
+
+            while (this->mFabricIndex < kNumFabrics)
+            {
+                fabric = this->mProvider.GetExistingFabric(this->mFabricIndex);
+                while (fabric && (this->mStateIndex < kStateEntriesMax))
+                {
+                    const StateEntry & entry = fabric->states[this->mStateIndex++];
+                    if (entry.in_use)
+                    {
+                        // Iterator has data available, copy the contents of the entry to the output
+                        outEntry.fabric_index  = fabric->fabric_index;
+                        outEntry.list_index    = mOverallListIndex++;
+                        outEntry.group         = entry.group;
+                        outEntry.key_set_index = entry.key_set_index;
+                        return true;
+                    }
+                }
+                this->mStateIndex = 0;
+                ++this->mFabricIndex;
+            }
+
+            return false;
+        }
+
+        void Release() override { mProvider.Release(this); }
+
+    private:
+        StaticGroupsProvider & mProvider;
+        chip::FabricIndex mFabricIndex = 0;
+        uint16_t mStateIndex           = 0;
+        uint16_t mOverallListIndex     = 0;
     };
 
     class KeysIterator : public KeySetIterator
     {
     public:
-        KeysIterator(Fabric * fabric) : mFabric(fabric) {}
+        KeysIterator(StaticGroupsProvider & provider, Fabric * fabric) : mProvider(provider), mFabric(fabric) {}
 
         uint16_t Count() override
         {
             uint16_t count = 0;
             for (uint16_t i = 0; this->mFabric && i < kKeyEntriesMax; ++i)
             {
-                KeysEntry & entry = this->mFabric->keys[i];
+                const KeysEntry & entry = this->mFabric->keys[i];
                 if (entry.in_use)
                 {
                     count++;
@@ -230,30 +266,27 @@ protected:
             return count;
         }
 
-        const KeySet * Next() override
+        bool Next(KeySet & outSet) override
         {
-            const KeysEntry * entry = nullptr;
-            bool entryFound = false;
-
-            while (!entryFound && (this->mFabric != nullptr) && (this->mIndex < kKeyEntriesMax))
+            while ((this->mFabric != nullptr) && (this->mIndex < kKeyEntriesMax))
             {
-                entry = &this->mFabric->keys[this->mIndex];
-                if (entry->in_use)
+                const KeysEntry & entry = this->mFabric->keys[this->mIndex++];
+                if (entry.in_use)
                 {
-                    entryFound = true;
+                    outSet.key_set_index = entry.key_set_index;
+                    outSet.policy        = entry.policy;
+                    outSet.num_keys_used = entry.num_keys_used;
+                    memcpy(outSet.epoch_keys, entry.epoch_keys, sizeof(outSet.epoch_keys));
+                    return true;
                 }
-                ++this->mIndex;
             }
-
-            return entryFound ? entry : nullptr;
+            return false;
         }
 
-        void Release() override
-        {
-            chip::Platform::Delete(this);
-        }
+        void Release() override { mProvider.Release(this); }
 
     private:
+        StaticGroupsProvider & mProvider;
         Fabric * mFabric = nullptr;
         uint16_t mIndex  = 0;
     };
@@ -264,8 +297,8 @@ protected:
     // If no slot is found matching the `fabric_index`, nullptr is returned.
     Fabric * GetFabric(chip::FabricIndex fabric_index, bool allow_allocate)
     {
-        Fabric * fabric = nullptr;
-        Fabric * unused = nullptr;
+        Fabric * fabric      = nullptr;
+        Fabric * unused      = nullptr;
         uint8_t unused_index = 0;
 
         for (uint8_t fabric_slot_idx = 0; fabric_slot_idx < kNumFabrics; fabric_slot_idx++)
@@ -282,7 +315,7 @@ protected:
             else if (nullptr == unused)
             {
                 // Remember the first unused entry
-                unused = fabric;
+                unused       = fabric;
                 unused_index = fabric_slot_idx;
             }
         }
@@ -290,18 +323,15 @@ protected:
         {
             // Use the first available entry
             unused->internal_index = unused_index;
-            unused->fabric_index = fabric_index;
-            unused->in_use       = true;
+            unused->fabric_index   = fabric_index;
+            unused->in_use         = true;
             return unused;
         }
         // Fabric not found, and not allowed to allocate or out of entry
         return nullptr;
     }
 
-    Fabric * GetExistingFabric(chip::FabricIndex fabric_index)
-    {
-        return GetFabric(fabric_index, /* allow_allocate= */ false);
-    }
+    Fabric * GetExistingFabric(chip::FabricIndex fabric_index) { return GetFabric(fabric_index, /* allow_allocate= */ false); }
 
     Fabric * GetExistingFabricOrAllocateNew(chip::FabricIndex fabric_index)
     {
@@ -309,26 +339,26 @@ protected:
     }
 
 public:
-    CHIP_ERROR Init() override {
+    CHIP_ERROR Init() override
+    {
         // Clear-out all entries of index mapping.
-        for (size_t idx; idx < kMaxNumGroupStates; ++idx)
+        for (size_t i = 0; i < kMaxNumGroupStates; ++i)
         {
-            mGroupStateIndices[idx].Invalidate();
+            mGroupStateIndices[i].Invalidate();
         }
+        mInitialized = true;
         return CHIP_NO_ERROR;
     }
 
-    void Finish() override {}
+    void Finish() override { mInitialized = false; }
 
     // Endpoints
     bool GroupMappingExists(chip::FabricIndex fabric_index, GroupMapping & mapping) override
     {
-        // TODO: Add test for fabric_index lookup failure
+        VerifyOrReturnError(mInitialized, false);
+
         Fabric * fabric = GetExistingFabric(fabric_index);
-        if (fabric == nullptr)
-        {
-            return false;
-        }
+        VerifyOrReturnError(fabric, false);
 
         for (uint16_t i = 0; fabric && i < kEndpointEntriesMax; ++i)
         {
@@ -343,13 +373,13 @@ public:
 
     CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, GroupMapping & mapping, const char * name) override
     {
-        (void)name; // Unused!
+        VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+
+        (void) name; // Unused!
 
         Fabric * fabric = GetExistingFabricOrAllocateNew(fabric_index);
-        if (!fabric)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        VerifyOrReturnError(fabric, CHIP_ERROR_NO_MEMORY);
+
         // Search for existing mapping
         for (uint16_t i = 0; i < kEndpointEntriesMax; ++i)
         {
@@ -377,11 +407,10 @@ public:
 
     CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, GroupMapping & mapping) override
     {
+        VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+
         Fabric * fabric = GetExistingFabric(fabric_index);
-        if (fabric == nullptr)
-        {
-            return CHIP_ERROR_INVALID_FABRIC_ID;
-        }
+        VerifyOrReturnError(fabric, CHIP_ERROR_INVALID_FABRIC_ID);
 
         // Search for existing mapping
         for (uint16_t i = 0; fabric && i < kEndpointEntriesMax; ++i)
@@ -395,18 +424,15 @@ public:
             }
         }
 
-        // It is not an error to ask for a removal of a group mapping.
-        // TODO: Determine if this should be CHIP_ERROR_NOT_FOUND.
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
     CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint) override
     {
+        VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+
         Fabric * fabric = GetExistingFabric(fabric_index);
-        if (fabric == nullptr)
-        {
-            return CHIP_ERROR_INVALID_FABRIC_ID;
-        }
+        VerifyOrReturnError(fabric, CHIP_ERROR_INVALID_FABRIC_ID);
 
         // Remove all mappings from fabric
         for (uint16_t i = 0; fabric && i < kEndpointEntriesMax; ++i)
@@ -418,8 +444,11 @@ public:
 
     GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint) override
     {
-        return chip::Platform::New<EndpointIterator>(GetExistingFabric(fabric_index), endpoint);
+        VerifyOrReturnError(mInitialized, nullptr);
+        return mEndpointIterators.CreateObject(*this, GetExistingFabric(fabric_index), endpoint);
     }
+
+    void Release(EndpointIterator * iterator) { mEndpointIterators.ReleaseObject(iterator); }
 
     // States
 
@@ -427,28 +456,24 @@ public:
     // TODO: Consider other internal consistency constraints
     CHIP_ERROR SetGroupState(chip::FabricIndex fabric_index, uint16_t state_index, const GroupState & state) override
     {
+        VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+
         bool appending = false;
         // Append is "add to one past the end". Further than that is not supported.
-        if (static_cast<size_t>(state_index) > mGroupStateEntriesUsed)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        else if (static_cast<size_t>(state_index) == mGroupStateEntriesUsed)
+        VerifyOrReturnError(static_cast<size_t>(state_index) <= mGroupStateEntriesUsed, CHIP_ERROR_INVALID_ARGUMENT);
+
+        if (static_cast<size_t>(state_index) == mGroupStateEntriesUsed)
         {
             // Need to append to end, which impacts indexing
             appending = true;
         }
 
         Fabric * fabric = GetExistingFabricOrAllocateNew(fabric_index);
-        if (fabric == nullptr)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        VerifyOrReturnError(fabric, CHIP_ERROR_NO_MEMORY);
 
         StateEntry * entry = nullptr;
         uint8_t entry_idx;
 
-        // TODO: Add test for append
         // Case 1: appending a new entry altogether
         if (appending)
         {
@@ -465,39 +490,33 @@ public:
         }
         else
         {
-            // TODO: test both correct and incorrect fabric
             // Case 2: replacing an existing entry's contents
             GroupStateIndex candidate_mapping = mGroupStateIndices[state_index];
 
-            if (!candidate_mapping.IsValid())
-            {
-                // Should not happen that our list is inconsistent!
-                return CHIP_ERROR_INTERNAL;
-            }
+            // Should not happen that our list is inconsistent!
+            VerifyOrReturnError(candidate_mapping.IsValid(), CHIP_ERROR_INTERNAL);
             entry_idx = candidate_mapping.entry_index;
 
             Fabric * candidate_fabric = &mFabrics[candidate_mapping.internal_fabric_index];
-            if (!candidate_fabric->in_use || (candidate_fabric->fabric_index != fabric_index))
-            {
-                // Tried to overwrite another fabric's entry
-                return CHIP_ERROR_ACCESS_DENIED;
-            }
+            // Avoid overwrite another fabric's entry
+            VerifyOrReturnError(candidate_fabric->in_use && candidate_fabric->fabric_index == fabric_index,
+                                CHIP_ERROR_ACCESS_DENIED);
 
             entry = &candidate_fabric->states[entry_idx];
-            if (!entry->in_use)
-            {
-                // Should not happen that our list is inconsistent!
-                return CHIP_ERROR_INTERNAL;
-            }
+            // Should not happen that our list is inconsistent!
+            VerifyOrReturnError(entry->in_use, CHIP_ERROR_INTERNAL);
         }
 
         // Now entry and entry_idx both set properly, or entry is null, so we can continue
-        if (entry == nullptr)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        VerifyOrReturnError(entry, CHIP_ERROR_NO_MEMORY);
 
         // Set entry contents proper
+        GroupStateListEntry old_state;
+        old_state.group         = entry->group;
+        old_state.key_set_index = entry->key_set_index;
+        old_state.fabric_index  = fabric->fabric_index;
+        old_state.list_index    = state_index;
+
         entry->group         = state.group;
         entry->key_set_index = state.key_set_index;
         entry->in_use        = true;
@@ -505,90 +524,83 @@ public:
         // Record global index mapping in the groups state list
         GroupStateIndex index_mapping;
         index_mapping.internal_fabric_index = fabric->internal_index;
-        index_mapping.entry_index = entry_idx;
-        mGroupStateIndices[state_index] = index_mapping;
+        index_mapping.entry_index           = entry_idx;
+        mGroupStateIndices[state_index]     = index_mapping;
         if (appending)
         {
             ++mGroupStateEntriesUsed;
         }
 
-        // TODO: add listener updates calls
+        if (!appending && mListener)
+        {
+            GroupStateListEntry new_state;
+            new_state.group         = entry->group;
+            new_state.key_set_index = entry->key_set_index;
+            new_state.fabric_index  = fabric->fabric_index;
+            new_state.list_index    = state_index;
+
+            mListener->OnGroupStateChanged(&old_state, &new_state);
+        }
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR GetGroupState(chip::FabricIndex fabric_index, uint16_t state_index, GroupStateListEntry & state) override
     {
-        if (static_cast<size_t>(state_index) >= mGroupStateEntriesUsed)
-        {
-            return CHIP_ERROR_KEY_NOT_FOUND;
-        }
+        VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(static_cast<size_t>(state_index) < mGroupStateEntriesUsed, CHIP_ERROR_KEY_NOT_FOUND);
 
         // TODO: For read, fabric_index is ignored for now, until we have fabric-limited read
-        (void)fabric_index;
+        (void) fabric_index;
 
         // Get entry mapping from index cache
         GroupStateIndex index_mapping = mGroupStateIndices[state_index];
 
-        if (!index_mapping.IsValid())
-        {
-            // Should not happen that our list is inconsistent!
-            return CHIP_ERROR_INTERNAL;
-        }
+        // Should not happen that our list is inconsistent!
+        VerifyOrReturnError(index_mapping.IsValid(), CHIP_ERROR_INTERNAL);
 
-        uint16_t entry_idx = index_mapping.entry_index;
-        const Fabric * fabric = &mFabrics[index_mapping.internal_fabric_index];
+        uint16_t entry_idx       = index_mapping.entry_index;
+        const Fabric * fabric    = &mFabrics[index_mapping.internal_fabric_index];
         const StateEntry & entry = fabric->states[entry_idx];
 
-        if (!fabric->in_use || !entry.in_use)
-        {
-            // Should not happen that mapped fabric is not allocated!
-            return CHIP_ERROR_INTERNAL;
-        }
+        // Should not happen that mapped fabric is not allocated!
+        VerifyOrReturnError(fabric->in_use && entry.in_use, CHIP_ERROR_INTERNAL);
 
         // Update output mapping entry
-        state.group = entry.group;
+        state.group         = entry.group;
         state.key_set_index = entry.key_set_index;
-        state.fabric_index = fabric->fabric_index;
-        state.list_index = state_index;
+        state.fabric_index  = fabric->fabric_index;
+        state.list_index    = state_index;
 
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR RemoveGroupState(chip::FabricIndex fabric_index, uint16_t state_index) override
     {
-        if (static_cast<size_t>(state_index) >= mGroupStateEntriesUsed)
-        {
-            return CHIP_ERROR_KEY_NOT_FOUND;
-        }
+        VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(static_cast<size_t>(state_index) < mGroupStateEntriesUsed, CHIP_ERROR_KEY_NOT_FOUND);
 
         GroupStateIndex candidate_mapping = mGroupStateIndices[state_index];
-        uint16_t entry_idx = 0;
-        StateEntry * entry = nullptr;
-        // TODO: Refactor common checks bellow to a utility
-        {
-            if (!candidate_mapping.IsValid())
-            {
-                // Should not happen that our list is inconsistent!
-                return CHIP_ERROR_INTERNAL;
-            }
+        uint16_t entry_idx                = 0;
+        StateEntry * entry                = nullptr;
 
-            entry_idx = candidate_mapping.entry_index;
-            Fabric * fabric = &mFabrics[candidate_mapping.internal_fabric_index];
-            if (!fabric->in_use || (fabric->fabric_index != fabric_index))
-            {
-                // Tried to overwrite another fabric's entry
-                return CHIP_ERROR_ACCESS_DENIED;
-            }
+        // Should not happen that our list is inconsistent!
+        VerifyOrReturnError(candidate_mapping.IsValid(), CHIP_ERROR_INTERNAL);
 
-            entry = &fabric->states[entry_idx];
-            if (!entry->in_use)
-            {
-                // Should not happen that removed entry is not allocated!
-                return CHIP_ERROR_INTERNAL;
-            }
-        }
+        entry_idx       = candidate_mapping.entry_index;
+        Fabric * fabric = &mFabrics[candidate_mapping.internal_fabric_index];
+        // Avoid overwrite another fabric's entry
+        VerifyOrReturnError(fabric->in_use && (fabric->fabric_index == fabric_index), CHIP_ERROR_ACCESS_DENIED);
+
+        entry = &fabric->states[entry_idx];
+        // Should not happen that removed entry is not allocated!
+        VerifyOrReturnError(entry->in_use, CHIP_ERROR_INTERNAL);
 
         // `entry` now points to a concrete entry to mark unused.
+        GroupStateListEntry old_state;
+        old_state.group         = entry->group;
+        old_state.key_set_index = entry->key_set_index;
+        old_state.fabric_index  = fabric->fabric_index;
+        old_state.list_index    = state_index;
 
         // Shift rest of the list up
 
@@ -601,7 +613,8 @@ public:
         size_t num_entries_to_shift = mGroupStateEntriesUsed - state_index;
         if (num_entries_to_shift > 0)
         {
-            memmove(&mGroupStateIndices[state_index], &mGroupStateIndices[state_index + 1], num_entries_to_shift * sizeof(mGroupStateIndices[0]));
+            memmove(&mGroupStateIndices[state_index], &mGroupStateIndices[state_index + 1],
+                    num_entries_to_shift * sizeof(mGroupStateIndices[0]));
             // Invalidate entry one past the end of whole used space of table after shift, if any shift occured.
             // This is because the shift left free space at the end of the table which is a copy of the
             // very last entry previously there, and this would break free-space checking assumptions if not
@@ -609,17 +622,34 @@ public:
             mGroupStateIndices[mGroupStateEntriesUsed].Invalidate();
         }
 
+        if (mListener)
+        {
+            mListener->OnGroupStateRemoved(&old_state);
+        }
         return CHIP_NO_ERROR;
     }
 
     GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric_index) override
     {
-        return chip::Platform::New<FabricGroupStateIterator>(GetExistingFabric(fabric_index));
+        VerifyOrReturnError(mInitialized, nullptr);
+        return mFabricStateIterators.CreateObject(*this, GetExistingFabric(fabric_index));
     }
+
+    GroupStateIterator * IterateGroupStates() override
+    {
+        VerifyOrReturnError(mInitialized, nullptr);
+        return mAllStateIterators.CreateObject(*this);
+    }
+
+    void Release(FabricGroupStateIterator * iterator) { mFabricStateIterators.ReleaseObject(iterator); }
+
+    void Release(AllGroupStateIterator * iterator) { mAllStateIterators.ReleaseObject(iterator); }
 
     // Keys
     CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, KeySet & keys) override
     {
+        VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+
         Fabric * fabric   = GetExistingFabric(fabric_index);
         KeysEntry * entry = nullptr;
 
@@ -655,6 +685,7 @@ public:
 
     CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, KeySet & keys) override
     {
+        VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
         Fabric * fabric = GetExistingFabric(fabric_index);
         // Search for existing keys
         for (uint16_t i = 0; fabric && i < kKeyEntriesMax; ++i)
@@ -663,7 +694,7 @@ public:
             if (entry.in_use && entry.key_set_index == keys.key_set_index)
             {
                 // Found
-                keys.policy = entry.policy;
+                keys.policy        = entry.policy;
                 keys.num_keys_used = entry.num_keys_used;
                 memcpy(keys.epoch_keys, entry.epoch_keys, sizeof(keys.epoch_keys[0]) * keys.num_keys_used);
                 return CHIP_NO_ERROR;
@@ -674,6 +705,7 @@ public:
 
     CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index) override
     {
+        VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
         Fabric * fabric = GetExistingFabric(fabric_index);
         // Search for existing keys
         for (uint16_t i = 0; fabric && i < kKeyEntriesMax; ++i)
@@ -691,11 +723,19 @@ public:
 
     KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index) override
     {
-        return chip::Platform::New<KeysIterator>(GetExistingFabric(fabric_index));
+        VerifyOrReturnError(mInitialized, nullptr);
+        return mKeyIterators.CreateObject(*this, GetExistingFabric(fabric_index));
     }
 
+    void Release(KeysIterator * iterator) { return mKeyIterators.ReleaseObject(iterator); }
+
 private:
+    bool mInitialized = false;
     Fabric mFabrics[kNumFabrics];
+    BitMapObjectPool<KeysIterator, kIteratorsMax> mKeyIterators;
+    BitMapObjectPool<EndpointIterator, kIteratorsMax> mEndpointIterators;
+    BitMapObjectPool<FabricGroupStateIterator, kIteratorsMax> mFabricStateIterators;
+    BitMapObjectPool<AllGroupStateIterator, kIteratorsMax> mAllStateIterators;
     static constexpr size_t kMaxNumGroupStates = kNumFabrics * kStateEntriesMax;
     GroupStateIndex mGroupStateIndices[kMaxNumGroupStates];
     size_t mGroupStateEntriesUsed = 0;

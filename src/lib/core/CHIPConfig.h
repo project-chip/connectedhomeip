@@ -2523,5 +2523,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
+ *
+ * @brief Defines the number of simultaneous Group iterators that can be allocated
+ *
+ * Number of iterator instances that can be allocated at any one time
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS 4
+#endif
+
+/**
  * @}
  */
