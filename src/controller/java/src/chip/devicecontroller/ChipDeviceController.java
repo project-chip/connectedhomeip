@@ -52,6 +52,7 @@ public class ChipDeviceController {
    * <p>TODO(#7985): Annotate csrNonce as Nullable.
    *
    * @param bleServer the BluetoothGatt representing the BLE connection to the device
+   * @param connId the BluetoothGatt Id representing the BLE connection to the device
    * @param deviceId the node ID to assign to the device
    * @param setupPincode the pincode for the device
    * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
