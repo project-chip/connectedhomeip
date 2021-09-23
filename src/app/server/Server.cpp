@@ -138,7 +138,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     else if (GetFabricTable().FabricCount() != 0)
     {
         // The device is already commissioned, proactively disable BLE advertisement.
-        ChipLogProgress(AppServer, "Fabric already provisioned. Disabling BLE advertisement");
+        ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
     }
     else
