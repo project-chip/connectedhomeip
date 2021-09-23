@@ -261,9 +261,26 @@ CHIP_ERROR TLVReader::Get(double & v)
 CHIP_ERROR TLVReader::Get(ByteSpan & v)
 {
     const uint8_t * val;
+
+    if (!TLVTypeIsString(ElementType()))
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+
     ReturnErrorOnFailure(GetDataPtr(val));
     v = ByteSpan(val, GetLength());
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TLVReader::Get(Span<const char> & v)
+{
+    const uint8_t * val;
+
+    if (!TLVTypeIsUTF8String(ElementType()))
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+
+    ReturnErrorOnFailure(GetDataPtr(val));
+
+    v = Span<const char>(Uint8::to_const_char(val), GetLength());
     return CHIP_NO_ERROR;
 }
 
@@ -353,7 +370,12 @@ CHIP_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
-    err = EnsureData(CHIP_ERROR_TLV_UNDERRUN);
+    //
+    // To return a data pointer to the underlying data,
+    // we have to ensure there is contiguous data remaining
+    // in the backing buffer.
+    //
+    err = EnsureData(CHIP_ERROR_TLV_UNDERRUN, false);
     if (err != CHIP_NO_ERROR)
         return err;
 
@@ -796,12 +818,17 @@ CHIP_ERROR TLVReader::ReadData(uint8_t * buf, uint32_t len)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::EnsureData(CHIP_ERROR noDataErr)
+CHIP_ERROR TLVReader::EnsureData(CHIP_ERROR noDataErr, bool permitChaining)
 {
     CHIP_ERROR err;
 
     if (mReadPoint == mBufEnd)
     {
+        if (!permitChaining)
+        {
+            return noDataErr;
+        }
+
         if (mLenRead == mMaxLen)
             return noDataErr;
 
@@ -809,6 +836,7 @@ CHIP_ERROR TLVReader::EnsureData(CHIP_ERROR noDataErr)
             return noDataErr;
 
         uint32_t bufLen;
+
         err = mBackingStore->GetNextBuffer(*this, mReadPoint, bufLen);
         if (err != CHIP_NO_ERROR)
             return err;

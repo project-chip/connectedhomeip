@@ -428,7 +428,9 @@ public:
     CHIP_ERROR Get(float & v);
 
     /**
-     * Get the value of the current element as a chip::ByteSpan
+     * Get the value of the current element as a chip::ByteSpan.
+     *
+     * The Span is updated to point to data directly within the backing buffer.
      *
      * @param[out]  v                       Receives the value associated with current TLV element.
      *
@@ -438,6 +440,20 @@ public:
      *
      */
     CHIP_ERROR Get(chip::ByteSpan & v);
+
+    /**
+     * Get the value of the current element as a chip::Span<const char>
+     *
+     * The Span is updated to point to data directly within the backing buffer.
+     *
+     * @param[out]  v                       Receives the value associated with current TLV element.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV bytes array, or
+     *                                      the reader is not positioned on an element.
+     *
+     */
+    CHIP_ERROR Get(chip::Span<const char> & v);
 
     /**
      * Get the value of the current byte or UTF8 string element.
@@ -838,7 +854,7 @@ protected:
     CHIP_ERROR SkipToEndOfContainer();
     CHIP_ERROR VerifyElement();
     uint64_t ReadTag(TLVTagControl tagControl, const uint8_t *& p);
-    CHIP_ERROR EnsureData(CHIP_ERROR noDataErr);
+    CHIP_ERROR EnsureData(CHIP_ERROR noDataErr, bool permitChaining = true);
     CHIP_ERROR ReadData(uint8_t * buf, uint32_t len);
     CHIP_ERROR GetElementHeadLength(uint8_t & elemHeadBytes) const;
     TLVElementType ElementType() const;
