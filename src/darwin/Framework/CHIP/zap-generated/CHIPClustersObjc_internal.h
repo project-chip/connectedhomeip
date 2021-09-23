@@ -165,6 +165,10 @@
 @property (readonly) chip::Controller::OperationalCredentialsCluster cppCluster;
 @end
 
+@interface CHIPPowerSource ()
+@property (readonly) chip::Controller::PowerSourceCluster cppCluster;
+@end
+
 @interface CHIPPressureMeasurement ()
 @property (readonly) chip::Controller::PressureMeasurementCluster cppCluster;
 @end
