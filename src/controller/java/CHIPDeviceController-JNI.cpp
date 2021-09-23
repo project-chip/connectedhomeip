@@ -568,8 +568,6 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err      = CHIP_NO_ERROR;
     Device * chipDevice = nullptr;
-    std::string QRCode;
-    std::string manualPairingCode;
     chip::SetupPayload setupPayload;
     setupPayload.discriminator = discriminator;
     setupPayload.setUpPINCode  = setupPinCode;

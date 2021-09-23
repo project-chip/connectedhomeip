@@ -49,11 +49,11 @@ class MultiAdminClientFragment : Fragment() {
     super.onStart()
     // TODO: use the fabric ID that was used to commission the device
     val testFabricId = "5544332211"
-    val testDiscriminaotr = "3840"
+    val testDiscriminator = "3840"
     val testSetupPinCode = 20202021L
     multiAdminClusterFabricIdEd.setText(testFabricId)
     multiAdminClusterDeviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
-    discriminatorEd.setText(testDiscriminaotr)
+    discriminatorEd.setText(testDiscriminator)
     setupPinCodeEd.setText(testSetupPinCode.toString())
   }
 
