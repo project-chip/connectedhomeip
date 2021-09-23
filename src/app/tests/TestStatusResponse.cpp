@@ -34,9 +34,8 @@
 namespace {
 
 using namespace chip::app;
-constexpr chip::Protocols::InteractionModel::ProtocolCode statusValue = chip::Protocols::InteractionModel::ProtocolCode::Success;
-constexpr chip::Protocols::InteractionModel::ProtocolCode invalidStatusValue =
-    chip::Protocols::InteractionModel::ProtocolCode::Failure;
+constexpr chip::Protocols::InteractionModel::Status statusValue        = chip::Protocols::InteractionModel::Status::Success;
+constexpr chip::Protocols::InteractionModel::Status invalidStatusValue = chip::Protocols::InteractionModel::Status::Failure;
 
 void BuildStatusResponse(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
 {
@@ -55,7 +54,7 @@ void ParseStatusResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader, 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     StatusResponse::Parser statusResponse;
-    chip::Protocols::InteractionModel::ProtocolCode status;
+    chip::Protocols::InteractionModel::Status status;
 
     err = statusResponse.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

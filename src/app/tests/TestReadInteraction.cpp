@@ -181,9 +181,9 @@ public:
     }
 
     void OnReportData(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath,
-                      chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::ProtocolCode status) override
+                      chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::Status status) override
     {
-        if (status == chip::Protocols::InteractionModel::ProtocolCode::Success)
+        if (status == chip::Protocols::InteractionModel::Status::Success)
         {
             mNumAttributeResponse++;
         }
@@ -238,7 +238,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     if (!(aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId))
     {
         return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                             chip::Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute);
+                             chip::Protocols::InteractionModel::Status::UnsupportedAttribute);
     }
 
     ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), kTestFieldValue1));

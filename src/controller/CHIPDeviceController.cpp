@@ -1647,8 +1647,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProcessed(co
 }
 
 void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
-                                                            TLV::TLVReader * apData,
-                                                            Protocols::InteractionModel::ProtocolCode status)
+                                                            TLV::TLVReader * apData, Protocols::InteractionModel::Status status)
 {
     IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, status);
 }
@@ -1657,7 +1656,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(const app::ReadCl
 {
     app::ClusterInfo path;
     path.mNodeId = apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId();
-    IMReadReportAttributesResponseCallback(apReadClient, path, nullptr, Protocols::InteractionModel::ProtocolCode::Failure);
+    IMReadReportAttributesResponseCallback(apReadClient, path, nullptr, Protocols::InteractionModel::Status::Failure);
     return CHIP_NO_ERROR;
 }
 
@@ -1676,7 +1675,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseStatus(
     const uint32_t aProtocolId, const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
     uint8_t aCommandIndex)
 {
-    IMWriteResponseCallback(apWriteClient, chip::app::ToEmberAfStatus(Protocols::InteractionModel::ProtocolCode(aProtocolCode)));
+    IMWriteResponseCallback(apWriteClient, chip::app::ToEmberAfStatus(Protocols::InteractionModel::Status(aProtocolCode)));
     return CHIP_NO_ERROR;
 }
 

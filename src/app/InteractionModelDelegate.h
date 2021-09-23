@@ -79,7 +79,7 @@ public:
      *
      */
     virtual void OnReportData(const ReadClient * apReadClient, const ClusterInfo & aPath, TLV::TLVReader * apData,
-                              Protocols::InteractionModel::ProtocolCode status)
+                              Protocols::InteractionModel::Status status)
     {}
 
     /**
