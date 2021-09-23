@@ -33,6 +33,6 @@ mcuboot_secondary:
     region: external_flash
 external_flash:
     address: 0xec000
-    size: 0x0
+    size: 0x714000
     device: MX25R64
     region: external_flash

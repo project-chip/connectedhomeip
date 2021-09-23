@@ -364,9 +364,6 @@ To build the example with configuration that enables DFU, run the following
 command with _build-target_ replaced with the build target name of the Nordic
 Semiconductor's kit you own (for example `nrf52840dk_nrf52840`):
 
-> **_WARNING:_** Please do remember about replacing _build-target_ also in the
-> PM_STATIC_YML_FILE path.
-
     $ west build -b build-target -- -DBUILD_WITH_DFU=1
 
 #### Changing bootloader configuration
