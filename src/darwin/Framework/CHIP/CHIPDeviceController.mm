@@ -32,10 +32,10 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 
 #include <controller/CHIPDeviceController.h>
-#include <lib/support/CHIPMem.h>
-#include <platform/PlatformManager.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <lib/support/CHIPMem.h>
+#include <platform/PlatformManager.h>
 
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device_id";
 
