@@ -29,7 +29,6 @@ public:
     {{/chip_cluster_commands}}
 
     // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     {{#chip_server_cluster_attributes}}
     CHIP_ERROR ReadAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     {{/chip_server_cluster_attributes}}

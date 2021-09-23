@@ -100,10 +100,6 @@ class OnOffClientFragment : Fragment() {
       Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
     }
 
-    override fun onSendMessageComplete(message: String?) {
-      commandStatusTv.text = requireContext().getString(R.string.echo_status_response, message)
-    }
-
     override fun onNotifyChipConnectionClosed() {
       Log.d(TAG, "onNotifyChipConnectionClosed")
     }
