@@ -340,8 +340,8 @@ class BaseTestHelper:
             # OnOff Cluster, OnOff Attribute
             handler = _subscriptionHandler(subscribedPath, self.logger)
             IM.SetAttributeReportCallback(subscribedPath, handler)
-            self.devCtrl.ZCLConfigureAttribute(
-                "OnOff", "OnOff", nodeid, endpoint, 1, 10, 0)
+            self.devCtrl.ZCLSubscribeAttribute(
+                "OnOff", "OnOff", nodeid, endpoint, 1, 10)
             changeThread = _conductAttributeChange(
                 self.devCtrl, nodeid, endpoint)
             changeThread.start()
