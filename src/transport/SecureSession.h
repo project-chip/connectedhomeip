@@ -62,8 +62,6 @@ public:
     PeerAddress & GetPeerAddress() { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
-    ByteSpan GetAttestationChallenge() const { return ByteSpan(mKeys[kAttestationChallengeKey], kAES_CCM128_Key_Length); }
-
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
 

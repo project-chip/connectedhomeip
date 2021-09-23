@@ -1197,12 +1197,12 @@ void DeviceCommissioner::OnSessionEstablished()
     // TODO: Add code to receive OpCSR from the device, and process the signing request
     // For IP rendezvous, this is sent as part of the state machine.
 #if CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING
-    bool sendCertificateChainImmediately = !mIsIPRendezvous;
+    bool usingLegacyFlowWithImmediateStart = !mIsIPRendezvous;
 #else
-    bool sendCertificateChainImmediately = true;
+    bool usingLegacyFlowWithImmediateStart = true;
 #endif
 
-    if (sendCertificateChainImmediately)
+    if (usingLegacyFlowWithImmediateStart)
     {
         err = SendCertificateChainRequestCommand(device, CertificateType::kPAI);
         if (err != CHIP_NO_ERROR)
@@ -1351,19 +1351,36 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
     DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
 
     // Retrieve attestation challenge
-    PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(
-        { mPairingSession.GetPeerNodeId(), mPairingSession.GetLocalSessionId(), mPairingSession.GetPeerSessionId(), mFabricIndex });
-    VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
+    ByteSpan attestationChallenge = mSessionManager
+                                        ->GetSecureSession({ mPairingSession.GetPeerNodeId(), mPairingSession.GetLocalSessionId(),
+                                                             mPairingSession.GetPeerSessionId(), mFabricIndex })
+                                        ->GetCryptoContext()
+                                        .GetAttestationChallenge();
 
-    AttestationVerificationResult result =
-        dac_verifier->VerifyAttestationInformation(attestationElements, state->GetSecureSession().GetAttestationChallenge(),
-                                                   signature, device->GetPAI(), device->GetDAC(), device->GetAttestationNonce());
+    AttestationVerificationResult result = dac_verifier->VerifyAttestationInformation(
+        attestationElements, attestationChallenge, signature, device->GetPAI(), device->GetDAC(), device->GetAttestationNonce());
     if (result != AttestationVerificationResult::kSuccess)
     {
-        ChipLogError(Controller, "Failed in verifying 'Attestation Information' command received from the device: err %hu",
-                     static_cast<uint16_t>(result));
-        return CHIP_ERROR_INTERNAL;
+        if (result == AttestationVerificationResult::kNotImplemented)
+        {
+            ChipLogError(Controller,
+                         "Failed in verifying 'Attestation Information' command received from the device due to default "
+                         "DeviceAttestationVerifier Class not being overriden by a real implementation.");
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+        else
+        {
+            ChipLogError(Controller,
+                         "Failed in verifying 'Attestation Information' command received from the device: err %hu. Look at "
+                         "AttestationVerificationResult enum to understand the errors",
+                         static_cast<uint16_t>(result));
+            // Go look at AttestationVerificationResult enum in src/credentials/DeviceAttestationVerifier.h to understand the
+            // errors.
+            return CHIP_ERROR_INTERNAL;
+        }
     }
+
+    ChipLogProgress(Controller, "Successfully validated 'Attestation Information' command received from the device.");
 
     // TODO: Validate Certification Declaration
     // TODO: Validate Firmware Information

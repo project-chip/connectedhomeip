@@ -540,7 +540,6 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(EndpointId e
     Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
     size_t attestationElementsLen;
     Crypto::P256ECDSASignature signature;
-    PeerConnectionState * state;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Attestation");
 
@@ -577,19 +576,23 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(EndpointId e
         attestationElementsLen = attestationElementsSpan.size();
     }
 
-    // Retrieve attestation challenge
-    state = commandObj->GetExchangeContext()->GetExchangeMgr()->GetSessionMgr()->GetPeerConnectionState(
-        commandObj->GetExchangeContext()->GetSecureSession());
-    VerifyOrExit(state != nullptr, err = CHIP_ERROR_INTERNAL);
-
     {
         uint8_t md[Crypto::kSHA256_Hash_Length];
         MutableByteSpan messageDigestSpan(md);
 
+        // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
+        // Retrieve attestation challenge
+        ByteSpan attestationChallenge = commandObj->GetExchangeContext()
+                                            ->GetExchangeMgr()
+                                            ->GetSessionManager()
+                                            ->GetSecureSession(commandObj->GetExchangeContext()->GetSecureSession())
+                                            ->GetCryptoContext()
+                                            .GetAttestationChallenge();
+
         Hash_SHA256_stream hashStream;
         SuccessOrExit(err = hashStream.Begin());
         SuccessOrExit(err = hashStream.AddData(ByteSpan(attestationElements.Get(), attestationElementsLen)));
-        SuccessOrExit(err = hashStream.AddData(state->GetSecureSession().GetAttestationChallenge()));
+        SuccessOrExit(err = hashStream.AddData(attestationChallenge));
         SuccessOrExit(err = hashStream.Finish(messageDigestSpan));
 
         MutableByteSpan signatureSpan(signature, signature.Capacity());

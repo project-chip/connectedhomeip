@@ -533,6 +533,7 @@ private:
     CASESession mCASESession;
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
+    // TODO: Offload Nonces and DAC/PAI into a new struct
     uint8_t mCSRNonce[kOpCSRNonceLength];
     uint8_t mAttestationNonce[kAttestationNonceLength];
 
