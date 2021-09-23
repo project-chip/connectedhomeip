@@ -105,7 +105,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     // If sending via UDP and NoAutoRequestAck send flag is not specificed,
     // request reliable transmission.
-    const Transport::PeerAddress * peerAddress = GetSecureSession().GetPeerAddress(mExchangeMgr->GetSessionMgr());
+    const Transport::PeerAddress * peerAddress = GetSecureSession().GetPeerAddress(mExchangeMgr->GetSessionManager());
     // Treat unknown peer address as "not UDP", because we have no idea whether
     // it's safe to do MRP there.
     bool isUDPTransport                = peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
@@ -238,7 +238,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Sess
     ExchangeMessageDispatch * dispatch = nullptr;
     if (delegate != nullptr)
     {
-        dispatch = delegate->GetMessageDispatch(em->GetReliableMessageMgr(), em->GetSessionMgr());
+        dispatch = delegate->GetMessageDispatch(em->GetReliableMessageMgr(), em->GetSessionManager());
         if (dispatch == nullptr)
         {
             dispatch = &em->mDefaultExchangeDispatch;
@@ -337,7 +337,7 @@ void ExchangeContext::OnConnectionExpired()
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
 {
-    System::Layer * lSystemLayer = mExchangeMgr->GetSessionMgr()->SystemLayer();
+    System::Layer * lSystemLayer = mExchangeMgr->GetSessionManager()->SystemLayer();
     if (lSystemLayer == nullptr)
     {
         // this is an assertion error, which shall never happen
@@ -349,7 +349,7 @@ CHIP_ERROR ExchangeContext::StartResponseTimer()
 
 void ExchangeContext::CancelResponseTimer()
 {
-    System::Layer * lSystemLayer = mExchangeMgr->GetSessionMgr()->SystemLayer();
+    System::Layer * lSystemLayer = mExchangeMgr->GetSessionManager()->SystemLayer();
     if (lSystemLayer == nullptr)
     {
         // this is an assertion error, which shall never happen

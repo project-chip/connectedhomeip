@@ -25,7 +25,7 @@
 
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/Flags.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 namespace Messaging {

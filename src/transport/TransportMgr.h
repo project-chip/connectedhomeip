@@ -18,7 +18,7 @@
  * @file
  *   This file implements a stateless TransportMgr, it will took a raw message
  * buffer from transports, and then extract the message header without decode it.
- * For secure messages, it will pass it to the SecureSessionMgr, and for unsecure
+ * For secure messages, it will pass it to the SessionManager, and for unsecure
  * messages (rendezvous messages), it will pass it to RendezvousSession.
  *   When sending messages, it will encode the packet header, and pass it to the
  * transports.

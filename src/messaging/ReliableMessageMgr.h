@@ -69,7 +69,7 @@ public:
     ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageMgr();
 
-    void Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr);
+    void Init(chip::System::Layer * systemLayer, SessionManager * sessionManager);
     void Shutdown();
 
     /**
@@ -226,7 +226,7 @@ public:
 private:
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
-    SecureSessionMgr * mSessionMgr;
+    SessionManager * mSessionManager;
     uint64_t mTimeStampBase; // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
     System::Clock::MonotonicMilliseconds mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
     uint16_t mTimerIntervalShift;                             // ReliableMessageProtocol Timer tick period shift

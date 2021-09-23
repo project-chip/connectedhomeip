@@ -33,7 +33,7 @@
 #include <messaging/ExchangeMgrDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 
 namespace chip {
@@ -50,7 +50,7 @@ static constexpr int16_t kAnyMessageType = -1;
  *    It works on be behalf of higher layers, creating ExchangeContexts and
  *    handling the registration/unregistration of unsolicited message handlers.
  */
-class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate
+class DLL_EXPORT ExchangeManager : public SessionManagerDelegate
 {
     friend class ExchangeContext;
 
@@ -65,14 +65,14 @@ public:
      *  construction until a call to Shutdown is made to terminate the
      *  instance.
      *
-     *  @param[in]    sessionMgr    A pointer to the SecureSessionMgr object.
+     *  @param[in]    sessionManager    A pointer to the SessionManager object.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(SecureSessionMgr * sessionMgr);
+    CHIP_ERROR Init(SessionManager * sessionManager);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -186,7 +186,7 @@ public:
 
     void SetDelegate(ExchangeMgrDelegate * delegate) { mDelegate = delegate; }
 
-    SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
+    SessionManager * GetSessionManager() const { return mSessionManager; }
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
@@ -227,7 +227,7 @@ private:
     State mState;
 
     ExchangeMgrDelegate * mDelegate;
-    SecureSessionMgr * mSessionMgr;
+    SessionManager * mSessionManager;
     ReliableMessageMgr mReliableMessageMgr;
 
     ApplicationExchangeDispatch mDefaultExchangeDispatch;

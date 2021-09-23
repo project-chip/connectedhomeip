@@ -36,10 +36,10 @@ public:
 
     virtual ~SessionEstablishmentExchangeDispatch() {}
 
-    CHIP_ERROR Init(SecureSessionMgr * sessionMgr)
+    CHIP_ERROR Init(SessionManager * sessionManager)
     {
-        ReturnErrorCodeIf(sessionMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mSessionMgr = sessionMgr;
+        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        mSessionManager = sessionManager;
         return ExchangeMessageDispatch::Init();
     }
 
@@ -57,7 +57,7 @@ protected:
     bool IsEncryptionRequired() const override { return false; }
 
 private:
-    SecureSessionMgr * mSessionMgr = nullptr;
+    SessionManager * mSessionManager = nullptr;
 };
 
 } // namespace chip

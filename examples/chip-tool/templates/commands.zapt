@@ -232,37 +232,6 @@ private:
 
 {{/chip_cluster_commands}}
 
-/*
- * Discover Attributes
- */
-class Discover{{asUpperCamelCase name}}Attributes: public ModelCommand
-{
-public:
-    Discover{{asUpperCamelCase name}}Attributes(): ModelCommand("discover")
-    {
-        ModelCommand::AddArguments();
-    }
-
-    ~Discover{{asUpperCamelCase name}}Attributes()
-    {
-      delete onSuccessCallback;
-      delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x0C) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::{{asUpperCamelCase name}}Cluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
 {{#chip_server_cluster_attributes}}
 /*
  * Attribute {{asUpperCamelCase name}}
@@ -406,7 +375,6 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#chip_cluster_commands}}
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
         {{/chip_cluster_commands}}
-        make_unique<Discover{{asUpperCamelCase name}}Attributes>(), //
         {{#chip_server_cluster_attributes}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{#if isWritableAttribute}}

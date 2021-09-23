@@ -18,11 +18,11 @@
 
 /**
  *    @file
- *      This file implements unit tests for the SecureSessionMgr implementation.
+ *      This file implements unit tests for the SessionManager implementation.
  */
 
 #define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API // Up here in case some other header
-                                              // includes SecureSessionMgr.h indirectly
+                                              // includes SessionManager.h indirectly
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -31,7 +31,7 @@
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
@@ -59,7 +59,7 @@ constexpr NodeId kDestinationNodeId = 111222333;
 
 const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
 
-class TestSessMgrCallback : public SecureSessionMgrDelegate
+class TestSessMgrCallback : public SessionManagerDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SessionHandle session,
@@ -113,7 +113,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SecureSessionMgr secureSessionMgr;
+    SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
 
     CHIP_ERROR err;
@@ -122,7 +122,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::FabricTable fabrics;
-    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -142,28 +142,28 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SecureSessionMgr secureSessionMgr;
+    SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::FabricTable fabrics;
-    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
 
-    secureSessionMgr.SetDelegate(&callback);
+    sessionManager.SetDelegate(&callback);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     SecurePairingUsingTestSecret pairing1(1, 2);
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
+    err = sessionManager.NewPairing(peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(2, 1);
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
+    err = sessionManager.NewPairing(peer, kDestinationNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SessionHandle localToRemoteSession = callback.mLocalToRemoteSession.Value();
@@ -180,10 +180,10 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest);
 
     EncryptedPacketBufferHandle preparedMessage;
-    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
+    err = sessionManager.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
+    err = sessionManager.SendPreparedMessage(localToRemoteSession, preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
@@ -194,10 +194,10 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     callback.LargeMessageSent = true;
 
-    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(large_buffer), preparedMessage);
+    err = sessionManager.PrepareMessage(localToRemoteSession, payloadHeader, std::move(large_buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
+    err = sessionManager.SendPreparedMessage(localToRemoteSession, preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
@@ -210,7 +210,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     callback.LargeMessageSent = true;
 
-    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(extra_large_buffer), preparedMessage);
+    err = sessionManager.PrepareMessage(localToRemoteSession, payloadHeader, std::move(extra_large_buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_MESSAGE_TOO_LONG);
 }
 
@@ -230,28 +230,28 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SecureSessionMgr secureSessionMgr;
+    SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::FabricTable fabrics;
-    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
 
-    secureSessionMgr.SetDelegate(&callback);
+    sessionManager.SetDelegate(&callback);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     SecurePairingUsingTestSecret pairing1(1, 2);
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
+    err = sessionManager.NewPairing(peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(2, 1);
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
+    err = sessionManager.NewPairing(peer, kDestinationNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SessionHandle localToRemoteSession = callback.mLocalToRemoteSession.Value();
@@ -270,19 +270,19 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     payloadHeader.SetInitiator(true);
 
-    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
+    err = sessionManager.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
+    err = sessionManager.SendPreparedMessage(localToRemoteSession, preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Reset receive side message counter, or duplicated message will be denied.
-    Transport::PeerConnectionState * state = secureSessionMgr.GetPeerConnectionState(callback.mRemoteToLocalSession.Value());
+    Transport::SecureSession * state = sessionManager.GetSecureSession(callback.mRemoteToLocalSession.Value());
     state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
+    err = sessionManager.SendPreparedMessage(localToRemoteSession, preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
@@ -304,28 +304,28 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SecureSessionMgr secureSessionMgr;
+    SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::FabricTable fabrics;
-    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
 
-    secureSessionMgr.SetDelegate(&callback);
+    sessionManager.SetDelegate(&callback);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     SecurePairingUsingTestSecret pairing1(1, 2);
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
+    err = sessionManager.NewPairing(peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(2, 1);
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
+    err = sessionManager.NewPairing(peer, kDestinationNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SessionHandle localToRemoteSession = callback.mLocalToRemoteSession.Value();
@@ -344,17 +344,17 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     payloadHeader.SetInitiator(true);
 
-    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
+    err = sessionManager.PrepareMessage(localToRemoteSession, payloadHeader, std::move(buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
+    err = sessionManager.SendPreparedMessage(localToRemoteSession, preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     /* -------------------------------------------------------------------------------------------*/
     // Reset receive side message counter, or duplicated message will be denied.
-    Transport::PeerConnectionState * state = secureSessionMgr.GetPeerConnectionState(callback.mRemoteToLocalSession.Value());
+    Transport::SecureSession * state = sessionManager.GetSecureSession(callback.mRemoteToLocalSession.Value());
     state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     PacketHeader packetHeader;
@@ -369,7 +369,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     packetHeader.SetMessageCounter(messageCounter + 1);
     NL_TEST_ASSERT(inSuite, badMessageCounterMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badMessageCounterMsg);
+    err = sessionManager.SendPreparedMessage(localToRemoteSession, badMessageCounterMsg);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
@@ -385,7 +385,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     packetHeader.SetSessionId(3);
     NL_TEST_ASSERT(inSuite, badKeyIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
 
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badKeyIdMsg);
+    err = sessionManager.SendPreparedMessage(localToRemoteSession, badKeyIdMsg);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     /* -------------------------------------------------------------------------------------------*/
@@ -394,7 +394,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
     // Send the correct encrypted msg
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
+    err = sessionManager.SendPreparedMessage(localToRemoteSession, preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
@@ -409,54 +409,54 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
-    SecureSessionMgr secureSessionMgr;
+    SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::FabricTable fabrics;
-    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
 
-    secureSessionMgr.SetDelegate(&callback);
+    sessionManager.SetDelegate(&callback);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     // First pairing
     SecurePairingUsingTestSecret pairing1(1, 1);
     callback.mOldConnectionDropped = false;
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
+    err = sessionManager.NewPairing(peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with different peer node ID and different local key ID (same peer key ID)
     SecurePairingUsingTestSecret pairing2(1, 2);
     callback.mOldConnectionDropped = false;
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
+    err = sessionManager.NewPairing(peer, kSourceNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with undefined node ID and different local key ID (same peer key ID)
     SecurePairingUsingTestSecret pairing3(1, 3);
     callback.mOldConnectionDropped = false;
-    err = secureSessionMgr.NewPairing(peer, kUndefinedNodeId, &pairing3, SecureSession::SessionRole::kResponder, 0);
+    err = sessionManager.NewPairing(peer, kUndefinedNodeId, &pairing3, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and a given node ID
     SecurePairingUsingTestSecret pairing4(1, 2);
     callback.mOldConnectionDropped = false;
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing4, SecureSession::SessionRole::kResponder, 0);
+    err = sessionManager.NewPairing(peer, kSourceNodeId, &pairing4, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and undefined node ID
     SecurePairingUsingTestSecret pairing5(1, 1);
     callback.mOldConnectionDropped = false;
-    err = secureSessionMgr.NewPairing(peer, kUndefinedNodeId, &pairing5, SecureSession::SessionRole::kResponder, 0);
+    err = sessionManager.NewPairing(peer, kUndefinedNodeId, &pairing5, CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
 }
@@ -485,7 +485,7 @@ int Finalize(void * aContext);
 // clang-format off
 nlTestSuite sSuite =
 {
-    "Test-CHIP-SecureSessionMgr",
+    "Test-CHIP-SessionManager",
     &sTests[0],
     Initialize,
     Finalize
@@ -515,7 +515,7 @@ int Finalize(void * aContext)
 /**
  *  Main
  */
-int TestSecureSessionMgr()
+int TestSessionManager()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
@@ -524,4 +524,4 @@ int TestSecureSessionMgr()
     return r;
 }
 
-CHIP_REGISTER_TEST_SUITE(TestSecureSessionMgr);
+CHIP_REGISTER_TEST_SUITE(TestSessionManager);

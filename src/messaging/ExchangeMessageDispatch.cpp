@@ -123,7 +123,7 @@ CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint32_t messageCounter, c
         if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
             payloadHeader.GetAckMessageCounter().HasValue())
         {
-            ReturnErrorOnFailure(reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value()));
+            reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value());
         }
 
         if (payloadHeader.NeedsAck())

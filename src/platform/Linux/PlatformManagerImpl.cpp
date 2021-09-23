@@ -88,7 +88,7 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                 struct rtattr * routeInfo         = IFA_RTA(addressMessage);
                 size_t rtl                        = IFA_PAYLOAD(header);
 
-                while (rtl && RTA_OK(routeInfo, rtl))
+                for (; rtl && RTA_OK(routeInfo, rtl); routeInfo = RTA_NEXT(routeInfo, rtl))
                 {
                     if (routeInfo->rta_type == IFA_LOCAL)
                     {
@@ -115,7 +115,6 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                             ChipLogDetail(DeviceLayer, "Failed to report IP address: %" CHIP_ERROR_FORMAT, status.Format());
                         }
                     }
-                    routeInfo = RTA_NEXT(routeInfo, rtl);
                 }
             }
         }

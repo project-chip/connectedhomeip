@@ -111,7 +111,7 @@ void CommissioningWindowManager::OnSessionEstablished()
 {
     CHIP_ERROR err = mServer->GetSecureSessionManager().NewPairing(
         Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
-        &mPairingSession, SecureSession::SessionRole::kResponder, 0);
+        &mPairingSession, CryptoContext::SessionRole::kResponder, 0);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Commissioning failed while setting up secure channel: err %s", ErrorStr(err));

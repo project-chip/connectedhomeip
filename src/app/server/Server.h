@@ -28,7 +28,7 @@
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <transport/FabricTable.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/TransportMgrBase.h>
 #include <transport/raw/BLE.h>
@@ -67,7 +67,7 @@ public:
 
     SessionIDAllocator & GetSessionIDAllocator() { return mSessionIDAllocator; }
 
-    SecureSessionMgr & GetSecureSessionManager() { return mSessions; }
+    SessionManager & GetSecureSessionManager() { return mSessions; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
@@ -86,20 +86,23 @@ private:
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
         {
-            ChipLogProgress(AppServer, "Retrieved value from server storage.");
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size));
+            ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
+            return CHIP_NO_ERROR;
         }
 
         CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
         {
-            ChipLogProgress(AppServer, "Stored value in server storage");
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size));
+            ChipLogProgress(AppServer, "Saved into server storage: %s", key);
+            return CHIP_NO_ERROR;
         }
 
         CHIP_ERROR SyncDeleteKeyValue(const char * key) override
         {
-            ChipLogProgress(AppServer, "Delete value in server storage");
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key));
+            ChipLogProgress(AppServer, "Deleted from server storage: %s", key);
+            return CHIP_NO_ERROR;
         }
     };
 
@@ -111,7 +114,7 @@ private:
     AppDelegate * mAppDelegate = nullptr;
 
     ServerTransportMgr mTransports;
-    SecureSessionMgr mSessions;
+    SessionManager mSessions;
     CASEServer mCASEServer;
     Messaging::ExchangeManager mExchangeMgr;
     Transport::FabricTable mFabrics;

@@ -20,7 +20,7 @@
 #include <lib/core/CHIPCore.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
@@ -32,7 +32,7 @@ constexpr size_t kResponseTimeOut = 1000;
 
 extern chip::secure_channel::MessageCounterManager gMessageCounterManager;
 extern chip::Messaging::ExchangeManager gExchangeManager;
-extern chip::SecureSessionMgr gSessionManager;
+extern chip::SessionManager gSessionManager;
 extern chip::Inet::IPAddress gDestAddr;
 
 extern chip::FabricIndex gFabricIndex;
