@@ -1,0 +1,122 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 12.2.1. [TC-TSUIC-2.1] Attributes with server as DUT
+
+config:
+    cluster: "Thermostat User Interface Configuration"
+    endpoint: 1
+
+tests:
+    - label: "read the mandatory attribute: TemperatureDisplayMode"
+      command: "readAttribute"
+      attribute: "temperature display mode"
+      response:
+          value: 0
+
+    - label: "read the mandatory attribute: TemperatureDisplayMode"
+      command: "readAttribute"
+      attribute: "temperature display mode"
+      response:
+          constraints:
+              type: enum8
+
+    - label: "write to the mandatory attribute: TemperatureDisplayMode"
+      command: "writeAttribute"
+      attribute: "temperature display mode"
+      arguments:
+          value: 0
+      response:
+          error: 0
+
+    - label: "read the mandatory attribute: TemperatureDisplayMode"
+      command: "readAttribute"
+      attribute: "temperature display mode"
+      response:
+          value: 0
+
+    - label: "read the mandatory attribute: TemperatureDisplayMode"
+      command: "readAttribute"
+      attribute: "temperature display mode"
+      response:
+          constraints:
+              type: enum8
+
+    - label: "read the mandatory attribute: KeypadLockout"
+      command: "readAttribute"
+      attribute: "keypad lockout"
+      response:
+          value: 0
+
+    - label: "read the mandatory attribute: KeypadLockout"
+      command: "readAttribute"
+      attribute: "keypad lockout"
+      response:
+          constraints:
+              type: enum8
+
+    - label: "write to the mandatory attribute: KeypadLockout"
+      command: "writeAttribute"
+      attribute: "keypad lockout"
+      arguments:
+          value: 0
+      response:
+          error: 0
+
+    - label: "read the mandatory attribute: KeypadLockout"
+      command: "readAttribute"
+      attribute: "keypad lockout"
+      response:
+          value: 0
+
+    - label: "read the mandatory attribute: KeypadLockout"
+      command: "readAttribute"
+      attribute: "keypad lockout"
+      response:
+          constraints:
+              type: enum8
+
+    - label: "read the optional attribute: ScheduleProgrammingVisibility"
+      command: "readAttribute"
+      attribute: "schedule programming visibility"
+      response:
+          value: 0
+
+    - label: "read the optional attribute: ScheduleProgrammingVisibility"
+      command: "readAttribute"
+      attribute: "schedule programming visibility"
+      response:
+          constraints:
+              type: enum8
+
+    - label: "write to the mandatory attribute: ScheduleProgrammingVisibility"
+      command: "writeAttribute"
+      attribute: "schedule programming visibility"
+      arguments:
+          value: 0
+      response:
+          error: 0
+
+    - label: "read the optional attribute: ScheduleProgrammingVisibility"
+      command: "readAttribute"
+      attribute: "schedule programming visibility"
+      response:
+          value: 0
+
+    - label: "read the optional attribute: ScheduleProgrammingVisibility"
+      command: "readAttribute"
+      attribute: "schedule programming visibility"
+      response:
+          constraints:
+              type: enum8
