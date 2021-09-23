@@ -65,7 +65,7 @@ class HostBoard(Enum):
             elif arch == 'aarch64' or arch == 'aarch64_be' or arch == 'armv8b' or arch == 'armv8l':
                 arch = 'arm64'
 
-            return '-'.join([uname_result.system.lower(), arch)
+            return '-'.join([uname_result.system.lower(), arch])
         elif self == HostBoard.CROSS_COMPILE_ARM64:
             return 'linux-arm64'
         else:
