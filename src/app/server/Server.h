@@ -63,7 +63,7 @@ public:
 
     Transport::FabricTable & GetFabricTable() { return mFabrics; }
 
-    Messaging::ExchangeManager & GetExchangManager() { return mExchangeMgr; }
+    Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
     SessionIDAllocator & GetSessionIDAllocator() { return mSessionIDAllocator; }
 
