@@ -17,53 +17,61 @@
  */
 package chip.platform;
 
-/**
- * Java interface for ConfigurationManager
- */
+/** Java interface for ConfigurationManager */
 public interface ConfigurationManager {
-    // NVS namespaces used to store device configuration information.
-    String kConfigNamespace_ChipFactory = "chip-factory";
-    String kConfigNamespace_ChipConfig = "chip-config";
-    String kConfigNamespace_ChipCounters = "chip-counters";
+  // NVS namespaces used to store device configuration information.
+  String kConfigNamespace_ChipFactory = "chip-factory";
+  String kConfigNamespace_ChipConfig = "chip-config";
+  String kConfigNamespace_ChipCounters = "chip-counters";
 
-    // Keys stored in the Chip-factory namespace
-    String kConfigKey_SerialNum = "serial-num";
-    String kConfigKey_MfrDeviceId = "device-id";
-    String kConfigKey_MfrDeviceCert = "device-cert";
-    String kConfigKey_MfrDeviceICACerts = "device-ca-certs";
-    String kConfigKey_MfrDevicePrivateKey = "device-key";
-    String kConfigKey_ProductRevision = "product-rev";
-    String kConfigKey_ManufacturingDate = "mfg-date";
-    String kConfigKey_SetupPinCode = "pin-code";
-    String kConfigKey_SetupDiscriminator = "discriminator";
+  // Keys stored in the Chip-factory namespace
+  String kConfigKey_SerialNum = "serial-num";
+  String kConfigKey_MfrDeviceId = "device-id";
+  String kConfigKey_MfrDeviceCert = "device-cert";
+  String kConfigKey_MfrDeviceICACerts = "device-ca-certs";
+  String kConfigKey_MfrDevicePrivateKey = "device-key";
+  String kConfigKey_ProductRevision = "product-rev";
+  String kConfigKey_ManufacturingDate = "mfg-date";
+  String kConfigKey_SetupPinCode = "pin-code";
+  String kConfigKey_SetupDiscriminator = "discriminator";
 
-    // Keys stored in the Chip-config namespace
-    String kConfigKey_FabricId = "fabric-id";
-    String kConfigKey_ServiceConfig = "service-config";
-    String kConfigKey_PairedAccountId = "account-id";
-    String kConfigKey_ServiceId = "service-id";
-    String kConfigKey_FabricSecret = "fabric-secret";
-    String kConfigKey_GroupKeyIndex = "group-key-index";
-    String kConfigKey_LastUsedEpochKeyId = "last-ek-id";
-    String kConfigKey_FailSafeArmed = "fail-safe-armed";
-    String kConfigKey_WiFiStationSecType = "sta-sec-type";
-    String kConfigKey_OperationalDeviceId = "op-device-id";
-    String kConfigKey_OperationalDeviceCert = "op-device-cert";
-    String kConfigKey_OperationalDeviceICACerts = "op-device-ca-certs";
-    String kConfigKey_OperationalDevicePrivateKey = "op-device-key";
-    String kConfigKey_RegulatoryLocation = "regulatory-location";
-    String kConfigKey_CountryCode = "country-code";
-    String kConfigKey_Breadcrumb = "breadcrumb";
+  // Keys stored in the Chip-config namespace
+  String kConfigKey_FabricId = "fabric-id";
+  String kConfigKey_ServiceConfig = "service-config";
+  String kConfigKey_PairedAccountId = "account-id";
+  String kConfigKey_ServiceId = "service-id";
+  String kConfigKey_FabricSecret = "fabric-secret";
+  String kConfigKey_GroupKeyIndex = "group-key-index";
+  String kConfigKey_LastUsedEpochKeyId = "last-ek-id";
+  String kConfigKey_FailSafeArmed = "fail-safe-armed";
+  String kConfigKey_WiFiStationSecType = "sta-sec-type";
+  String kConfigKey_OperationalDeviceId = "op-device-id";
+  String kConfigKey_OperationalDeviceCert = "op-device-cert";
+  String kConfigKey_OperationalDeviceICACerts = "op-device-ca-certs";
+  String kConfigKey_OperationalDevicePrivateKey = "op-device-key";
+  String kConfigKey_RegulatoryLocation = "regulatory-location";
+  String kConfigKey_CountryCode = "country-code";
+  String kConfigKey_Breadcrumb = "breadcrumb";
 
-    // Prefix used for NVS keys that contain Chip group encryption keys.
-    String kGroupKeyNamePrefix = "gk-";
+  // Prefix used for NVS keys that contain Chip group encryption keys.
+  String kGroupKeyNamePrefix = "gk-";
 
-    long readConfigValueLong(String namespace, String name) throws AndroidChipPlatformException;
-    String readConfigValueStr(String namespace, String name) throws AndroidChipPlatformException;
-    byte[] readConfigValueBin(String namespace, String name) throws AndroidChipPlatformException;
-    void writeConfigValueLong(String namespace, String name, long val) throws AndroidChipPlatformException;
-    void writeConfigValueStr(String namespace, String name, String val) throws AndroidChipPlatformException;
-    void writeConfigValueBin(String namespace, String name, byte[] val) throws AndroidChipPlatformException;
-    void clearConfigValue(String namespace, String name) throws AndroidChipPlatformException;
-    boolean configValueExists(String namespace, String name) throws AndroidChipPlatformException;
+  long readConfigValueLong(String namespace, String name) throws AndroidChipPlatformException;
+
+  String readConfigValueStr(String namespace, String name) throws AndroidChipPlatformException;
+
+  byte[] readConfigValueBin(String namespace, String name) throws AndroidChipPlatformException;
+
+  void writeConfigValueLong(String namespace, String name, long val)
+      throws AndroidChipPlatformException;
+
+  void writeConfigValueStr(String namespace, String name, String val)
+      throws AndroidChipPlatformException;
+
+  void writeConfigValueBin(String namespace, String name, byte[] val)
+      throws AndroidChipPlatformException;
+
+  void clearConfigValue(String namespace, String name) throws AndroidChipPlatformException;
+
+  boolean configValueExists(String namespace, String name) throws AndroidChipPlatformException;
 }

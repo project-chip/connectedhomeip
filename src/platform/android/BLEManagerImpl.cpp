@@ -24,12 +24,12 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <ble/CHIPBleServiceData.h>
-#include <platform/internal/BLEManager.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/JniReferences.h>
 #include <lib/support/CHIPJNIError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/StackLock.h>
+#include <platform/internal/BLEManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
@@ -52,7 +52,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void BLEManagerImpl::InitializeWithObject(jobject manager) 
+void BLEManagerImpl::InitializeWithObject(jobject manager)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "Failed to GetEnvForCurrentThread for BLEManager"));
@@ -132,16 +132,15 @@ void BLEManagerImpl::InitializeWithObject(jobject manager)
         ChipLogError(DeviceLayer, "Failed to access BLEManager 'onNewConnection' method");
         env->ExceptionClear();
     }
-
 }
 
-// ===== start impl of BLEManager internal interface, ref BLEManager.h  
+// ===== start impl of BLEManager internal interface, ref BLEManager.h
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
-    
-    //SystemLayer is defined in platform::Globals.cpp
+
+    // SystemLayer is defined in platform::Globals.cpp
     err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
     ReturnLogErrorOnFailure(err);
 
@@ -150,7 +149,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
-
 
     jint ret = env->CallIntMethod(mBLEManagerObject, mInitMethod);
     if (env->ExceptionCheck())
@@ -164,10 +162,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
     return err;
 }
 
-BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode() 
+BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()
 {
-    bool has = false;
-    CHIP_ERROR err = HasFlag(Flags::kServiceModeEnalbe,has);
+    bool has       = false;
+    CHIP_ERROR err = HasFlag(Flags::kServiceModeEnalbe, has);
 
     VerifyOrReturnError(err == CHIP_NO_ERROR, ConnectivityManager::kCHIPoBLEServiceMode_NotSupported);
     return has ? ConnectivityManager::kCHIPoBLEServiceMode_Enabled : ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
@@ -179,12 +177,12 @@ CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 
     bool isSet = (val == ConnectivityManager::kCHIPoBLEServiceMode_Enabled) ? true : false;
 
-    return SetFlag(Flags::kServiceModeEnalbe,isSet);
+    return SetFlag(Flags::kServiceModeEnalbe, isSet);
 }
 
 bool BLEManagerImpl::_IsAdvertisingEnabled()
 {
-    bool has = false;
+    bool has       = false;
     CHIP_ERROR err = HasFlag(Flags::kAdvertisingEnabled, has);
 
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
@@ -193,12 +191,12 @@ bool BLEManagerImpl::_IsAdvertisingEnabled()
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    return SetFlag(Flags::kAdvertisingEnabled,val);
+    return SetFlag(Flags::kAdvertisingEnabled, val);
 }
 
 bool BLEManagerImpl::_IsAdvertising()
 {
-    bool has = false;
+    bool has       = false;
     CHIP_ERROR err = HasFlag(Flags::kAdvertising, has);
 
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
@@ -262,7 +260,8 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnSubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
+    rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnSubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj), svcIdObj,
+                                       charIdObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -299,7 +298,8 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnUnsubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
+    rc         = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnUnsubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj),
+                                       svcIdObj, charIdObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -328,7 +328,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnCloseConnectionMethod, static_cast<jint>(tmpConnObj));
+    rc         = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnCloseConnectionMethod, static_cast<jint>(tmpConnObj));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -351,7 +351,8 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     ChipLogProgress(DeviceLayer, "Received GetMTU");
     VerifyOrExit(mBLEManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mOnGetMTUMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);;
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+    ;
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
@@ -402,8 +403,8 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
-    rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnSendWriteRequestMethod, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj,
-                                             characteristicDataObj);
+    rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnSendWriteRequestMethod, static_cast<jint>(tmpConnObj), svcIdObj,
+                                       charIdObj, characteristicDataObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -492,7 +493,7 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
 
 //== helpers
 
-CHIP_ERROR BLEManagerImpl::HasFlag(BLEManagerImpl::Flags flag, bool& has)
+CHIP_ERROR BLEManagerImpl::HasFlag(BLEManagerImpl::Flags flag, bool & has)
 {
     long f = static_cast<long>(flag);
 
@@ -516,7 +517,7 @@ CHIP_ERROR BLEManagerImpl::HasFlag(BLEManagerImpl::Flags flag, bool& has)
 
 CHIP_ERROR BLEManagerImpl::SetFlag(BLEManagerImpl::Flags flag, bool isSet)
 {
-    long jFlag = static_cast<long>(flag);
+    long jFlag      = static_cast<long>(flag);
     jboolean jIsSet = static_cast<jboolean>(isSet);
 
     VerifyOrReturnLogError(mBLEManagerObject != nullptr, CHIP_ERROR_INCORRECT_STATE);

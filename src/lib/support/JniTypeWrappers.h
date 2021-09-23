@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <cstdint>
 #include "JniReferences.h"
+#include <cstdint>
 
 #include <jni.h>
 #include <lib/support/Span.h>
@@ -88,12 +88,13 @@ class ByteArray
 {
 public:
     ByteArray(JNIEnv * env, const jbyte * data, jsize dataLen) : mEnv(env)
-     { 
-         mArray = data != nullptr ? mEnv->NewByteArray(dataLen) : nullptr; 
-         if(mArray != nullptr) {
-             env->SetByteArrayRegion(mArray, 0, dataLen, data);
-         }
-     }
+    {
+        mArray = data != nullptr ? mEnv->NewByteArray(dataLen) : nullptr;
+        if (mArray != nullptr)
+        {
+            env->SetByteArrayRegion(mArray, 0, dataLen, data);
+        }
+    }
     ~ByteArray() { mEnv->DeleteLocalRef(mArray); }
 
     jbyteArray jniValue() { return mArray; }

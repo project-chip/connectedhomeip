@@ -22,8 +22,8 @@
 #include <algorithm>
 #include <memory>
 
-#include <lib/support/JniReferences.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
 
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/DeviceAttestationVerifier.h>
@@ -214,8 +214,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.storageDelegate                 = wrapper.get();
     initParams.systemLayer                     = systemLayer;
     initParams.inetLayer                       = inetLayer;
-    //move bleLayer into platform/android to share with app server
-    initParams.bleLayer                       = DeviceLayer::ConnectivityMgr().GetBleLayer();
+    // move bleLayer into platform/android to share with app server
+    initParams.bleLayer                        = DeviceLayer::ConnectivityMgr().GetBleLayer();
     initParams.listenPort                      = CHIP_PORT + 1;
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = wrapper.get();

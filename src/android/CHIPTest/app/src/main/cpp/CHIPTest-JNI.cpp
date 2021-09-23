@@ -22,32 +22,32 @@
  *
  */
 
-#include <jni.h>
 #include <dlfcn.h>
+#include <jni.h>
 
 #include <core/CHIPError.h>
+#include <platform/android/AndroidChipPlatform-JNI.h>
+#include <support/CHIPJNIError.h>
 #include <support/CodeUtils.h>
 #include <support/JniReferences.h>
-#include <support/CHIPJNIError.h>
 #include <support/StackLock.h>
 #include <support/UnitTestRegistration.h>
-#include <platform/android/AndroidChipPlatform-JNI.h>
 
 #include <nlunit-test.h>
 
 using namespace chip;
 
 namespace {
-    JavaVM * sJVM;
-    jclass sTestEngineCls = NULL;
-    jclass sTestEngineExceptionCls = NULL;
+JavaVM * sJVM;
+jclass sTestEngineCls          = NULL;
+jclass sTestEngineExceptionCls = NULL;
 } // namespace
 
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
 // static void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName);
 
-jint JNI_OnLoad(JavaVM *jvm, void * reserved)
+jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
@@ -67,8 +67,7 @@ jint JNI_OnLoad(JavaVM *jvm, void * reserved)
     err = JniReferences::GetInstance().GetClassRef(env, "com/tcl/chip/chiptest/TestEngine", sTestEngineCls);
     SuccessOrExit(err);
 
-    err = JniReferences::GetInstance().GetClassRef(env, "com/tcl/chip/chiptest/TestEngineException",
-                                                   sTestEngineExceptionCls);
+    err = JniReferences::GetInstance().GetClassRef(env, "com/tcl/chip/chiptest/TestEngineException", sTestEngineExceptionCls);
     SuccessOrExit(err);
     ChipLogProgress(Test, "Java class references loaded.");
 
@@ -166,8 +165,7 @@ CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
     }
     errStrObj = (errStr != NULL) ? env->NewStringUTF(errStr) : NULL;
 
-    outEx = (jthrowable) env->NewObject(sTestEngineExceptionCls, constructor, static_cast<jint>(inErr.AsInteger()),
-                                        errStrObj);
+    outEx = (jthrowable) env->NewObject(sTestEngineExceptionCls, constructor, static_cast<jint>(inErr.AsInteger()), errStrObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -175,12 +173,12 @@ exit:
     return err;
 }
 
-static void onLog(const char* fmt, ...)
+static void onLog(const char * fmt, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID method;
     jstring strObj = NULL;
-    char str[512] = {0};
+    char str[512]  = { 0 };
     va_list args;
 
     ChipLogProgress(Test, "Received onLog");
@@ -190,8 +188,8 @@ static void onLog(const char* fmt, ...)
     method = env->GetStaticMethodID(sTestEngineCls, "onTestLog", "(Ljava/lang/String;)V");
     VerifyOrExit(method != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    va_start (args, fmt);
-    vsnprintf(str,sizeof(str),fmt, args);
+    va_start(args, fmt);
+    vsnprintf(str, sizeof(str), fmt, args);
     va_end(args);
     strObj = env->NewStringUTF(str);
 
@@ -211,57 +209,51 @@ exit:
     }
 }
 
-static void jni_log_name(struct _nlTestSuite* inSuite)
+static void jni_log_name(struct _nlTestSuite * inSuite)
 {
     onLog("[ %s ]\n", inSuite->name);
 }
 
 static void jni_log_initialize(struct _nlTestSuite * inSuite, int inResult, int inWidth)
 {
-    onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth, "Initialize", inResult==FAILURE ? "FAILED" : "PASSED" );
+    onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth, "Initialize", inResult == FAILURE ? "FAILED" : "PASSED");
 }
 static void jni_log_terminate(struct _nlTestSuite * inSuite, int inResult, int inWidth)
 {
-    onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth,"Terminate", inResult==FAILURE ? "FAILED" : "PASSED" );
+    onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth, "Terminate", inResult == FAILURE ? "FAILED" : "PASSED");
 }
 
-static void jni_log_setup(struct _nlTestSuite* inSuite, int inResult, int inWidth)
+static void jni_log_setup(struct _nlTestSuite * inSuite, int inResult, int inWidth)
 {
     onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth, "Setup", inResult == FAILURE ? "FAILED" : "PASSED");
 }
 
-static void jni_log_test(struct _nlTestSuite *inSuite, int inWidth, int inIndex)
+static void jni_log_test(struct _nlTestSuite * inSuite, int inWidth, int inIndex)
 {
     onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth, inSuite->tests[inIndex].name, inSuite->flagError ? "FAILED" : "PASSED");
 }
 
-static void jni_log_teardown(struct _nlTestSuite* inSuite, int inResult, int inWidth)
+static void jni_log_teardown(struct _nlTestSuite * inSuite, int inResult, int inWidth)
 {
     onLog("[ %s : %-*s ] : %s\n", inSuite->name, inWidth, "TearDown", inResult == FAILURE ? "FAILED" : "PASSED");
 }
 
-static void jni_log_statTest(struct _nlTestSuite* inSuite)
+static void jni_log_statTest(struct _nlTestSuite * inSuite)
 {
     onLog("Failed Tests:   %d / %d\n", inSuite->failedTests, inSuite->runTests);
 }
 
-static void jni_log_statAssert(struct _nlTestSuite* inSuite)
+static void jni_log_statAssert(struct _nlTestSuite * inSuite)
 {
     onLog("Failed Asserts: %d / %d\n", inSuite->failedAssertions, inSuite->performedAssertions);
 }
 
 static nl_test_output_logger_t jni_test_logger = {
-    jni_log_name,
-    jni_log_initialize,
-    jni_log_terminate,
-    jni_log_setup,
-    jni_log_test,
-    jni_log_teardown,
-    jni_log_statTest,
-    jni_log_statAssert,
+    jni_log_name, jni_log_initialize, jni_log_terminate, jni_log_setup,
+    jni_log_test, jni_log_teardown,   jni_log_statTest,  jni_log_statAssert,
 };
 
-extern "C" JNIEXPORT jint Java_com_tcl_chip_chiptest_TestEngine_runTest(JNIEnv *env, jclass clazz)
+extern "C" JNIEXPORT jint Java_com_tcl_chip_chiptest_TestEngine_runTest(JNIEnv * env, jclass clazz)
 {
     nlTestSetLogger(&jni_test_logger);
 

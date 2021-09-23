@@ -22,36 +22,34 @@
  *
  */
 #include <lib/core/CHIPError.h>
-#include <lib/support/JniTypeWrappers.h>
+#include <lib/support/CHIPJNIError.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
-#include <lib/support/CHIPJNIError.h>
+#include <lib/support/JniTypeWrappers.h>
 #include <lib/support/StackLock.h>
-#include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
-#include <platform/KeyValueStoreManager.h>
-#include <platform/ConnectivityManager.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
-#include <lib/support/CHIPMem.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/KeyValueStoreManager.h>
+#include <platform/internal/BLEManager.h>
 
+#include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
 #include "MdnsImpl.h"
-#include "AndroidChipPlatform-JNI.h"
 
 using namespace chip;
 
-#define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
-    extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_AndroidChipPlatform_##METHOD_NAME
+#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_AndroidChipPlatform_##METHOD_NAME
 
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
 static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUUID & uuid);
 
 namespace {
-    JavaVM * sJVM;
-    jclass sAndroidChipPlatformCls = NULL;
-    jclass sAndroidChipPlatformExceptionCls = NULL;
+JavaVM * sJVM;
+jclass sAndroidChipPlatformCls          = NULL;
+jclass sAndroidChipPlatformExceptionCls = NULL;
 } // namespace
 
 CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
@@ -98,7 +96,7 @@ void AndroidChipPlatformJNI_OnUnload(JavaVM * jvm, void * reserved)
 }
 
 // for BLEManager
-JNI_METHOD(void,nativeSetBLEManager)(JNIEnv *, jobject, jobject manager) 
+JNI_METHOD(void, nativeSetBLEManager)(JNIEnv *, jobject, jobject manager)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     chip::DeviceLayer::Internal::BLEMgrImpl().InitializeWithObject(manager);
@@ -180,21 +178,21 @@ JNI_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectionError(connObj, BLE_ERROR_APP_CLOSED_CONNECTION);
 }
 
-//for KeyValueStoreManager
+// for KeyValueStoreManager
 JNI_METHOD(void, setKeyValueStoreManager)(JNIEnv * env, jclass self, jobject manager)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeWithObject(manager);
 }
 
-//for ConfigurationManager
+// for ConfigurationManager
 JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject manager)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     chip::DeviceLayer::ConfigurationMgrImpl().InitializeWithObject(manager);
 }
 
-//for ServiceResolver
+// for ServiceResolver
 JNI_METHOD(void, setServiceResolver)(JNIEnv * env, jclass self, jobject resolver)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -251,8 +249,8 @@ CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
     }
     errStrObj = (errStr != NULL) ? env->NewStringUTF(errStr) : NULL;
 
-    outEx = (jthrowable) env->NewObject(sAndroidChipPlatformExceptionCls, constructor, static_cast<jint>(inErr.AsInteger()),
-                                        errStrObj);
+    outEx =
+        (jthrowable) env->NewObject(sAndroidChipPlatformExceptionCls, constructor, static_cast<jint>(inErr.AsInteger()), errStrObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:

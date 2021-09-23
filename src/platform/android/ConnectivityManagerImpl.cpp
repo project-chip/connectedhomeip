@@ -43,7 +43,7 @@ using namespace ::chip;
 using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 
-#if 0 //CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if 0 // CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
 
 constexpr uint16_t kWiFi_BAND_2_4_GHZ = 2400;
@@ -231,9 +231,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     return CHIP_NO_ERROR;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-}
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -297,7 +295,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled()
 
 bool ConnectivityManagerImpl::_IsWiFiStationConnected()
 {
-    bool ret            = false;
+    bool ret = false;
     // const gchar * state = nullptr;
 
     // if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
@@ -324,7 +322,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 {
-    bool ret          = false;
+    bool ret = false;
     // const gchar * bss = nullptr;
 
     // if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
@@ -450,117 +448,117 @@ void ConnectivityManagerImpl::StartWiFiManagement()
 
 void ConnectivityManagerImpl::DriveAPState()
 {
-//     CHIP_ERROR err = CHIP_NO_ERROR;
-//     WiFiAPState targetState;
-//     uint64_t now;
-//     uint32_t apTimeout;
+    //     CHIP_ERROR err = CHIP_NO_ERROR;
+    //     WiFiAPState targetState;
+    //     uint64_t now;
+    //     uint32_t apTimeout;
 
-//     // If the AP interface is not under application control...
-//     if (mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
-//     {
-//         // Determine the target (desired) state for AP interface...
+    //     // If the AP interface is not under application control...
+    //     if (mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
+    //     {
+    //         // Determine the target (desired) state for AP interface...
 
-//         // The target state is 'NotActive' if the application has expressly disabled the AP interface.
-//         if (mWiFiAPMode == kWiFiAPMode_Disabled)
-//         {
-//             targetState = kWiFiAPState_NotActive;
-//         }
+    //         // The target state is 'NotActive' if the application has expressly disabled the AP interface.
+    //         if (mWiFiAPMode == kWiFiAPMode_Disabled)
+    //         {
+    //             targetState = kWiFiAPState_NotActive;
+    //         }
 
-//         // The target state is 'Active' if the application has expressly enabled the AP interface.
-//         else if (mWiFiAPMode == kWiFiAPMode_Enabled)
-//         {
-//             targetState = kWiFiAPState_Active;
-//         }
+    //         // The target state is 'Active' if the application has expressly enabled the AP interface.
+    //         else if (mWiFiAPMode == kWiFiAPMode_Enabled)
+    //         {
+    //             targetState = kWiFiAPState_Active;
+    //         }
 
-//         // The target state is 'Active' if the AP mode is 'On demand, when no station is available'
-//         // and the station interface is not provisioned or the application has disabled the station
-//         // interface.
-//         else if (mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision &&
-//                  (!IsWiFiStationProvisioned() || GetWiFiStationMode() == kWiFiStationMode_Disabled))
-//         {
-//             targetState = kWiFiAPState_Active;
-//         }
+    //         // The target state is 'Active' if the AP mode is 'On demand, when no station is available'
+    //         // and the station interface is not provisioned or the application has disabled the station
+    //         // interface.
+    //         else if (mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision &&
+    //                  (!IsWiFiStationProvisioned() || GetWiFiStationMode() == kWiFiStationMode_Disabled))
+    //         {
+    //             targetState = kWiFiAPState_Active;
+    //         }
 
-//         // The target state is 'Active' if the AP mode is one of the 'On demand' modes and there
-//         // has been demand for the AP within the idle timeout period.
-//         else if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
-//         {
-//             now = System::Clock::GetMonotonicMilliseconds();
+    //         // The target state is 'Active' if the AP mode is one of the 'On demand' modes and there
+    //         // has been demand for the AP within the idle timeout period.
+    //         else if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
+    //         {
+    //             now = System::Clock::GetMonotonicMilliseconds();
 
-//             if (mLastAPDemandTime != 0 && now < (mLastAPDemandTime + mWiFiAPIdleTimeoutMS))
-//             {
-//                 targetState = kWiFiAPState_Active;
+    //             if (mLastAPDemandTime != 0 && now < (mLastAPDemandTime + mWiFiAPIdleTimeoutMS))
+    //             {
+    //                 targetState = kWiFiAPState_Active;
 
-//                 // Compute the amount of idle time before the AP should be deactivated and
-//                 // arm a timer to fire at that time.
-//                 apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
-//                 err       = SystemLayer.StartTimer(apTimeout, DriveAPState, NULL);
-//                 SuccessOrExit(err);
-//                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s", apTimeout / 1000);
-//             }
-//             else
-//             {
-//                 targetState = kWiFiAPState_NotActive;
-//             }
-//         }
+    //                 // Compute the amount of idle time before the AP should be deactivated and
+    //                 // arm a timer to fire at that time.
+    //                 apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
+    //                 err       = SystemLayer.StartTimer(apTimeout, DriveAPState, NULL);
+    //                 SuccessOrExit(err);
+    //                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s", apTimeout / 1000);
+    //             }
+    //             else
+    //             {
+    //                 targetState = kWiFiAPState_NotActive;
+    //             }
+    //         }
 
-//         // Otherwise the target state is 'NotActive'.
-//         else
-//         {
-//             targetState = kWiFiAPState_NotActive;
-//         }
+    //         // Otherwise the target state is 'NotActive'.
+    //         else
+    //         {
+    //             targetState = kWiFiAPState_NotActive;
+    //         }
 
-//         // If the current AP state does not match the target state...
-//         if (mWiFiAPState != targetState)
-//         {
-//             if (targetState == kWiFiAPState_Active)
-//             {
-//                 err = ConfigureWiFiAP();
-//                 SuccessOrExit(err);
+    //         // If the current AP state does not match the target state...
+    //         if (mWiFiAPState != targetState)
+    //         {
+    //             if (targetState == kWiFiAPState_Active)
+    //             {
+    //                 err = ConfigureWiFiAP();
+    //                 SuccessOrExit(err);
 
-//                 ChangeWiFiAPState(kWiFiAPState_Active);
-//             }
-//             else
-//             {
-//                 if (mWpaSupplicant.networkPath)
-//                 {
-//                     GError * error = nullptr;
+    //                 ChangeWiFiAPState(kWiFiAPState_Active);
+    //             }
+    //             else
+    //             {
+    //                 if (mWpaSupplicant.networkPath)
+    //                 {
+    //                     GError * error = nullptr;
 
-//                     gboolean result = wpa_fi_w1_wpa_supplicant1_interface_call_remove_network_sync(
-//                         mWpaSupplicant.iface, mWpaSupplicant.networkPath, nullptr, &error);
+    //                     gboolean result = wpa_fi_w1_wpa_supplicant1_interface_call_remove_network_sync(
+    //                         mWpaSupplicant.iface, mWpaSupplicant.networkPath, nullptr, &error);
 
-//                     if (result)
-//                     {
-//                         ChipLogProgress(DeviceLayer, "wpa_supplicant: removed network: %s", mWpaSupplicant.networkPath);
-//                         g_free(mWpaSupplicant.networkPath);
-//                         mWpaSupplicant.networkPath = nullptr;
-//                         ChangeWiFiAPState(kWiFiAPState_NotActive);
-//                     }
-//                     else
-//                     {
-//                         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to stop AP mode with error: %s",
-//                                         error ? error->message : "unknown error");
-//                         err = CHIP_ERROR_INTERNAL;
-//                     }
+    //                     if (result)
+    //                     {
+    //                         ChipLogProgress(DeviceLayer, "wpa_supplicant: removed network: %s", mWpaSupplicant.networkPath);
+    //                         g_free(mWpaSupplicant.networkPath);
+    //                         mWpaSupplicant.networkPath = nullptr;
+    //                         ChangeWiFiAPState(kWiFiAPState_NotActive);
+    //                     }
+    //                     else
+    //                     {
+    //                         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to stop AP mode with error: %s",
+    //                                         error ? error->message : "unknown error");
+    //                         err = CHIP_ERROR_INTERNAL;
+    //                     }
 
-//                     if (error != nullptr)
-//                         g_error_free(error);
-//                 }
-//             }
-//         }
-//     }
+    //                     if (error != nullptr)
+    //                         g_error_free(error);
+    //                 }
+    //             }
+    //         }
+    //     }
 
-// exit:
-//     if (err != CHIP_NO_ERROR)
-//     {
-//         SetWiFiAPMode(kWiFiAPMode_Disabled);
-//         ChipLogError(DeviceLayer, "Drive AP state failed: %s", ErrorStr(err));
-//     }
+    // exit:
+    //     if (err != CHIP_NO_ERROR)
+    //     {
+    //         SetWiFiAPMode(kWiFiAPMode_Disabled);
+    //         ChipLogError(DeviceLayer, "Drive AP state failed: %s", ErrorStr(err));
+    //     }
 }
 
 CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 {
-    CHIP_ERROR ret  = CHIP_NO_ERROR;
+    CHIP_ERROR ret = CHIP_NO_ERROR;
     // GError * err    = nullptr;
     // GVariant * args = nullptr;
     // GVariantBuilder builder;
@@ -620,7 +618,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     // }
     // else
     // {
-    //     ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to add network: %s: %s", ssid, err ? err->message : "unknown error");
+    //     ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to add network: %s: %s", ssid, err ? err->message : "unknown
+    //     error");
 
     //     if (mWpaSupplicant.networkPath)
     //     {
@@ -655,147 +654,152 @@ void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    CHIP_ERROR ret  = CHIP_NO_ERROR;
-//     GError * err    = nullptr;
-//     GVariant * args = nullptr;
-//     GVariantBuilder builder;
-//     gboolean result;
+    CHIP_ERROR ret = CHIP_NO_ERROR;
+    //     GError * err    = nullptr;
+    //     GVariant * args = nullptr;
+    //     GVariantBuilder builder;
+    //     gboolean result;
 
-//     // Clean up current network if exists
-//     if (mWpaSupplicant.networkPath)
-//     {
-//         GError * error = nullptr;
+    //     // Clean up current network if exists
+    //     if (mWpaSupplicant.networkPath)
+    //     {
+    //         GError * error = nullptr;
 
-//         result = wpa_fi_w1_wpa_supplicant1_interface_call_remove_network_sync(mWpaSupplicant.iface, mWpaSupplicant.networkPath,
-//                                                                               nullptr, &error);
+    //         result = wpa_fi_w1_wpa_supplicant1_interface_call_remove_network_sync(mWpaSupplicant.iface,
+    //         mWpaSupplicant.networkPath,
+    //                                                                               nullptr, &error);
 
-//         if (result)
-//         {
-//             ChipLogProgress(DeviceLayer, "wpa_supplicant: removed network: %s", mWpaSupplicant.networkPath);
-//             g_free(mWpaSupplicant.networkPath);
-//             mWpaSupplicant.networkPath = nullptr;
-//         }
-//         else
-//         {
-//             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to stop AP mode with error: %s",
-//                             error ? error->message : "unknown error");
-//             ret = CHIP_ERROR_INTERNAL;
-//         }
+    //         if (result)
+    //         {
+    //             ChipLogProgress(DeviceLayer, "wpa_supplicant: removed network: %s", mWpaSupplicant.networkPath);
+    //             g_free(mWpaSupplicant.networkPath);
+    //             mWpaSupplicant.networkPath = nullptr;
+    //         }
+    //         else
+    //         {
+    //             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to stop AP mode with error: %s",
+    //                             error ? error->message : "unknown error");
+    //             ret = CHIP_ERROR_INTERNAL;
+    //         }
 
-//         if (error != nullptr)
-//             g_error_free(error);
+    //         if (error != nullptr)
+    //             g_error_free(error);
 
-//         SuccessOrExit(ret);
-//     }
+    //         SuccessOrExit(ret);
+    //     }
 
-//     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
-//     g_variant_builder_add(&builder, "{sv}", "ssid", g_variant_new_string(ssid));
-//     g_variant_builder_add(&builder, "{sv}", "psk", g_variant_new_string(key));
-//     g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("WPA-PSK"));
-//     args = g_variant_builder_end(&builder);
+    //     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    //     g_variant_builder_add(&builder, "{sv}", "ssid", g_variant_new_string(ssid));
+    //     g_variant_builder_add(&builder, "{sv}", "psk", g_variant_new_string(key));
+    //     g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("WPA-PSK"));
+    //     args = g_variant_builder_end(&builder);
 
-//     result = wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, args, &mWpaSupplicant.networkPath,
-//                                                                        nullptr, &err);
+    //     result = wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, args,
+    //     &mWpaSupplicant.networkPath,
+    //                                                                        nullptr, &err);
 
-//     if (result)
-//     {
-//         GError * error = nullptr;
+    //     if (result)
+    //     {
+    //         GError * error = nullptr;
 
-//         ChipLogProgress(DeviceLayer, "wpa_supplicant: added network: SSID: %s: %s", ssid, mWpaSupplicant.networkPath);
+    //         ChipLogProgress(DeviceLayer, "wpa_supplicant: added network: SSID: %s: %s", ssid, mWpaSupplicant.networkPath);
 
-//         result = wpa_fi_w1_wpa_supplicant1_interface_call_select_network_sync(mWpaSupplicant.iface, mWpaSupplicant.networkPath,
-//                                                                               nullptr, &error);
-//         if (result)
-//         {
-//             GError * gerror = nullptr;
+    //         result = wpa_fi_w1_wpa_supplicant1_interface_call_select_network_sync(mWpaSupplicant.iface,
+    //         mWpaSupplicant.networkPath,
+    //                                                                               nullptr, &error);
+    //         if (result)
+    //         {
+    //             GError * gerror = nullptr;
 
-//             ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to network: SSID: %s", ssid);
+    //             ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to network: SSID: %s", ssid);
 
-//             result = wpa_fi_w1_wpa_supplicant1_interface_call_save_config_sync(mWpaSupplicant.iface, nullptr, &gerror);
+    //             result = wpa_fi_w1_wpa_supplicant1_interface_call_save_config_sync(mWpaSupplicant.iface, nullptr, &gerror);
 
-//             if (result)
-//             {
-//                 ChipLogProgress(DeviceLayer, "wpa_supplicant: save config succeeded!");
-//             }
-//             else
-//             {
-//                 ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to save config: %s",
-//                                 gerror ? gerror->message : "unknown error");
-//             }
+    //             if (result)
+    //             {
+    //                 ChipLogProgress(DeviceLayer, "wpa_supplicant: save config succeeded!");
+    //             }
+    //             else
+    //             {
+    //                 ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to save config: %s",
+    //                                 gerror ? gerror->message : "unknown error");
+    //             }
 
-//             if (gerror != nullptr)
-//                 g_error_free(gerror);
+    //             if (gerror != nullptr)
+    //                 g_error_free(gerror);
 
-//             // Iterate on the network interface to see if we already have beed assigned addresses.
-//             // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
-//             // This should be removed or find a better place once we depercate the rendezvous session.
-//             for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
-//             {
-//                 char ifName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
-//                 if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
-//                     strncmp(ifName, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, sizeof(ifName)) == 0)
-//                 {
-//                     chip::Inet::IPAddress addr = it.GetAddress();
-//                     if (addr.IsIPv4())
-//                     {
-//                         ChipDeviceEvent event;
-//                         event.Type                            = DeviceEventType::kInternetConnectivityChange;
-//                         event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
-//                         event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-//                         addr.ToString(event.InternetConnectivityChange.address);
+    //             // Iterate on the network interface to see if we already have beed assigned addresses.
+    //             // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
+    //             // This should be removed or find a better place once we depercate the rendezvous session.
+    //             for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+    //             {
+    //                 char ifName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+    //                 if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
+    //                     strncmp(ifName, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, sizeof(ifName)) == 0)
+    //                 {
+    //                     chip::Inet::IPAddress addr = it.GetAddress();
+    //                     if (addr.IsIPv4())
+    //                     {
+    //                         ChipDeviceEvent event;
+    //                         event.Type                            = DeviceEventType::kInternetConnectivityChange;
+    //                         event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
+    //                         event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+    //                         addr.ToString(event.InternetConnectivityChange.address);
 
-//                         ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName,
-//                                       event.InternetConnectivityChange.address);
+    //                         ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName,
+    //                                       event.InternetConnectivityChange.address);
 
-//                         PlatformMgr().PostEvent(&event);
-//                     }
-//                 }
-//             }
+    //                         PlatformMgr().PostEvent(&event);
+    //                     }
+    //                 }
+    //             }
 
-//             // Run dhclient for IP on WiFi.
-//             // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
-//             char cmdBuffer[128];
-//             sprintf(cmdBuffer, "dhclient -nw %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
-//             int dhclientSystemRet = system(cmdBuffer);
-//             if (dhclientSystemRet != 0)
-//             {
-//                 ChipLogError(DeviceLayer, "Failed to run dhclient, system() returns %d", dhclientSystemRet);
-//             }
-//             else
-//             {
-//                 ChipLogProgress(DeviceLayer, "dhclient is running on the %s interface.", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
-//             }
+    //             // Run dhclient for IP on WiFi.
+    //             // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
+    //             char cmdBuffer[128];
+    //             sprintf(cmdBuffer, "dhclient -nw %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
+    //             int dhclientSystemRet = system(cmdBuffer);
+    //             if (dhclientSystemRet != 0)
+    //             {
+    //                 ChipLogError(DeviceLayer, "Failed to run dhclient, system() returns %d", dhclientSystemRet);
+    //             }
+    //             else
+    //             {
+    //                 ChipLogProgress(DeviceLayer, "dhclient is running on the %s interface.",
+    //                 CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
+    //             }
 
-//             // Return success as long as the device is connected to the network
-//             ret = CHIP_NO_ERROR;
-//         }
-//         else
-//         {
-//             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to connect to network: SSID: %s: %s", ssid,
-//                             error ? error->message : "unknown error");
+    //             // Return success as long as the device is connected to the network
+    //             ret = CHIP_NO_ERROR;
+    //         }
+    //         else
+    //         {
+    //             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to connect to network: SSID: %s: %s", ssid,
+    //                             error ? error->message : "unknown error");
 
-//             ret = CHIP_ERROR_INTERNAL;
-//         }
+    //             ret = CHIP_ERROR_INTERNAL;
+    //         }
 
-//         if (error != nullptr)
-//             g_error_free(error);
-//     }
-//     else
-//     {
-//         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to add network: %s: %s", ssid, err ? err->message : "unknown error");
+    //         if (error != nullptr)
+    //             g_error_free(error);
+    //     }
+    //     else
+    //     {
+    //         ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to add network: %s: %s", ssid, err ? err->message : "unknown
+    //         error");
 
-//         if (mWpaSupplicant.networkPath)
-//         {
-//             g_object_unref(mWpaSupplicant.networkPath);
-//             mWpaSupplicant.networkPath = nullptr;
-//         }
+    //         if (mWpaSupplicant.networkPath)
+    //         {
+    //             g_object_unref(mWpaSupplicant.networkPath);
+    //             mWpaSupplicant.networkPath = nullptr;
+    //         }
 
-//         ret = CHIP_ERROR_INTERNAL;
-//     }
+    //         ret = CHIP_ERROR_INTERNAL;
+    //     }
 
-// exit:
-//     if (err != nullptr)
-//         g_error_free(err);
+    // exit:
+    //     if (err != nullptr)
+    //         g_error_free(err);
 
     return ret;
 #else

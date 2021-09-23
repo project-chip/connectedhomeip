@@ -37,7 +37,7 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-//Android WPA APIs
+// Android WPA APIs
 #endif
 
 namespace chip {
@@ -68,7 +68,6 @@ struct GDBusWpaSupplicant
         WIFI_SCANNING_IDLE,
         WIFI_SCANNING,
     } scanState;
-
 };
 #endif
 
