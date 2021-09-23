@@ -26,6 +26,11 @@ static_library("android") {
   output_name = "libAndroidPlatform"
 
   sources = [
+    "../DeviceSafeQueue.cpp",
+    "../DeviceSafeQueue.h",
+    "AndroidChipPlatform-JNI.cpp",
+    "AndroidConfig.cpp",
+    "AndroidConfig.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
@@ -38,25 +43,18 @@ static_library("android") {
     "DeviceNetworkProvisioningDelegateImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "PlatformManagerImpl.cpp",
-    "PlatformManagerImpl.h",
-    "AndroidConfig.cpp",
-    "AndroidConfig.h",
     "MdnsImpl.cpp",
     "MdnsImpl.h",
-    "AndroidChipPlatform-JNI.cpp",
-    "../DeviceSafeQueue.cpp",
-    "../DeviceSafeQueue.h",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
   ]
 
-  deps = [ 
-    "${chip_root}/src/setup_payload",
+  deps = [
     "${chip_root}/src/lib/mdns:platform_header",
+    "${chip_root}/src/setup_payload",
   ]
 
-  public_deps = [
-    "${chip_root}/src/platform:platform_base",
-  ]
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   public_configs = []
 }
@@ -65,23 +63,20 @@ android_library("java") {
   output_name = "AndroidPlatform.jar"
 
   deps = [ ":android_sdk" ]
-
-  data_deps = [
-    ":android",
-  ]
+  data_deps = [ ":android" ]
 
   sources = [
+    "java/chip/platform/AndroidBLEManager.java",
     "java/chip/platform/AndroidChipPlatform.java",
     "java/chip/platform/AndroidChipPlatformException.java",
-    "java/chip/platform/BLEManager.java",
-    "java/chip/platform/AndroidBLEManager.java",
     "java/chip/platform/BLEConnection.java",
-    "java/chip/platform/KeyValueStoreManager.java",
-    "java/chip/platform/PreferencesKeyValueStoreManager.java",
+    "java/chip/platform/BLEManager.java",
     "java/chip/platform/ConfigurationManager.java",
     "java/chip/platform/DefaultConfigurationManager.java",
-    "java/chip/platform/ServiceResolver.java",
+    "java/chip/platform/KeyValueStoreManager.java",
     "java/chip/platform/NsdManagerServiceResolver.java",
+    "java/chip/platform/PreferencesKeyValueStoreManager.java",
+    "java/chip/platform/ServiceResolver.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

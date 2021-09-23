@@ -26,11 +26,11 @@
 #include <algorithm>
 #include <string.h>
 
-#include <lib/support/JniTypeWrappers.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPJNIError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/JniTypeWrappers.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -43,17 +43,18 @@ constexpr size_t kMaxKvsValueEncodedChars = BASE64_ENCODED_LEN(kMaxKvsValueBytes
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
-
-void KeyValueStoreManagerImpl::InitializeWithObject(jobject manager) 
+void KeyValueStoreManagerImpl::InitializeWithObject(jobject manager)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "Failed to GetEnvForCurrentThread for KeyValueStoreManagerImpl"));
 
     mKeyValueStoreManagerObject = env->NewGlobalRef(manager);
-    VerifyOrReturn(mKeyValueStoreManagerObject != nullptr, ChipLogError(DeviceLayer, "Failed to NewGlobalRef KeyValueStoreManager"));
+    VerifyOrReturn(mKeyValueStoreManagerObject != nullptr,
+                   ChipLogError(DeviceLayer, "Failed to NewGlobalRef KeyValueStoreManager"));
 
     jclass KeyValueStoreManagerClass = env->GetObjectClass(manager);
-    VerifyOrReturn(KeyValueStoreManagerClass != nullptr, ChipLogError(DeviceLayer, "Failed to get KeyValueStoreManager Java class"));
+    VerifyOrReturn(KeyValueStoreManagerClass != nullptr,
+                   ChipLogError(DeviceLayer, "Failed to get KeyValueStoreManager Java class"));
 
     mGetMethod = env->GetMethodID(KeyValueStoreManagerClass, "get", "(Ljava/lang/String;)Ljava/lang/String;");
     if (mGetMethod == nullptr)
@@ -121,7 +122,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
     ReturnErrorCodeIf(offset_bytes >= decodedLength, CHIP_ERROR_INVALID_ARGUMENT);
     size_t read_size = std::min<size_t>(value_size, decodedLength - offset_bytes);
-    if(value_size + offset_bytes < decodedLength) {
+    if (value_size + offset_bytes < decodedLength)
+    {
         err = CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 

@@ -26,7 +26,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -47,8 +46,8 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-    //Post SystemEvent from Java, like WiFIIPChangeListener in Linux Platform
-    //void PostJavaEvent();
+    // Post SystemEvent from Java, like WiFIIPChangeListener in Linux Platform
+    // void PostJavaEvent();
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
