@@ -55,9 +55,19 @@ class HostBoard(Enum):
     def PlatformName(self):
         if self == HostBoard.NATIVE:
             uname_result = uname()
-            return '-'.join([uname_result.system.lower(), uname_result.machine])
+            arch = uname_result.machine
+
+            # standardize some common platforms
+            if arch == 'x86_64':
+                arch = 'x64'
+            elif arch == 'i386' or arch == 'i686':
+                arch = 'x86'
+            elif arch == 'aarch64' or arch == 'aarch64_be' or arch == 'armv8b' or arch == 'armv8l':
+                arch = 'arm64'
+
+            return '-'.join([uname_result.system.lower(), arch)
         elif self == HostBoard.CROSS_COMPILE_ARM64:
-            return 'linux-rpi'
+            return 'linux-arm64'
         else:
             raise Exception('Unknown host board type: %r' % self)
 
@@ -70,9 +80,9 @@ class HostBuilder(GnBuilder):
             runner=runner,
             output_prefix=output_prefix)
 
-        self.app_name = app.BinaryName()
-        self.map_name = self.app_name + '.map'
-        self.board = board
+        self.app_name= app.BinaryName()
+        self.map_name= self.app_name + '.map'
+        self.board= board
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
