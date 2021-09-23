@@ -21882,6 +21882,1781 @@ private:
     }
 };
 
+class Test_TC_TM_2_1 : public TestCommand
+{
+public:
+    Test_TC_TM_2_1() : TestCommand("Test_TC_TM_2_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "Test_TC_TM_2_1: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterTemperatureMeasurementCommandReadAttribute_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "Test_TC_TM_2_1: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    // Test read the mandatory attribute: MeasuredValue
+    using SuccessCallback_0 = void (*)(void * context, int16_t measuredValue);
+    chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{
+        OnTestSendClusterTemperatureMeasurementCommandReadAttribute_0_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
+        OnTestSendClusterTemperatureMeasurementCommandReadAttribute_0_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_0 = 0;
+
+    CHIP_ERROR TestSendClusterTemperatureMeasurementCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Temperature Measurement - read the mandatory attribute: MeasuredValue: Sending command...");
+
+        chip::Controller::TemperatureMeasurementClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeMeasuredValue(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterTemperatureMeasurementCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Temperature Measurement - read the mandatory attribute: MeasuredValue: Failure Response");
+
+        Test_TC_TM_2_1 * runner = reinterpret_cast<Test_TC_TM_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTemperatureMeasurementCommandReadAttribute_0_SuccessResponse(void * context, int16_t measuredValue)
+    {
+        ChipLogProgress(chipTool, "Temperature Measurement - read the mandatory attribute: MeasuredValue: Success Response");
+
+        Test_TC_TM_2_1 * runner = reinterpret_cast<Test_TC_TM_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: measuredValue type checking is not implemented yet. Expected type: '%s'", "int16");
+
+        runner->NextTest();
+    }
+};
+
+class Test_TC_TSUIC_2_1 : public TestCommand
+{
+public:
+    Test_TC_TSUIC_2_1() : TestCommand("Test_TC_TSUIC_2_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "Test_TC_TSUIC_2_1: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_0();
+            break;
+        case 1:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_1();
+            break;
+        case 2:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_2();
+            break;
+        case 3:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_3();
+            break;
+        case 4:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_4();
+            break;
+        case 5:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_5();
+            break;
+        case 6:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_6();
+            break;
+        case 7:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_7();
+            break;
+        case 8:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_8();
+            break;
+        case 9:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_9();
+            break;
+        case 10:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_10();
+            break;
+        case 11:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_11();
+            break;
+        case 12:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_12();
+            break;
+        case 13:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_13();
+            break;
+        case 14:
+            err = TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_14();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "Test_TC_TSUIC_2_1: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 15;
+
+    //
+    // Tests methods
+    //
+
+    // Test read the mandatory attribute: TemperatureDisplayMode
+    using SuccessCallback_0 = void (*)(void * context, uint8_t temperatureDisplayMode);
+    chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_0_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_0_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_0 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_0()
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeTemperatureDisplayMode(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_0_FailureResponse(void * context,
+                                                                                                            uint8_t status)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void
+    OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_0_SuccessResponse(void * context,
+                                                                                                uint8_t temperatureDisplayMode)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (temperatureDisplayMode != 0)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: TemperatureDisplayMode
+    using SuccessCallback_1 = void (*)(void * context, uint8_t temperatureDisplayMode);
+    chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_1_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_1_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_1 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_1()
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeTemperatureDisplayMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_1_FailureResponse(void * context,
+                                                                                                            uint8_t status)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void
+    OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_1_SuccessResponse(void * context,
+                                                                                                uint8_t temperatureDisplayMode)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: temperatureDisplayMode type checking is not implemented yet. Expected type: '%s'",
+                     "enum8");
+
+        runner->NextTest();
+    }
+
+    // Test write to the mandatory attribute: TemperatureDisplayMode
+    using SuccessCallback_2 = void (*)(void * context, uint8_t temperatureDisplayMode);
+    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_2_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_2_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_2 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_2()
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - write to the mandatory attribute: TemperatureDisplayMode: "
+                        "Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t temperatureDisplayModeArgument = 0;
+        err = cluster.WriteAttributeTemperatureDisplayMode(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(),
+                                                           temperatureDisplayModeArgument);
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_2_FailureResponse(void * context,
+                                                                                                             uint8_t status)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - write to the mandatory attribute: TemperatureDisplayMode: Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void
+    OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_2_SuccessResponse(void * context,
+                                                                                                 uint8_t temperatureDisplayMode)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - write to the mandatory attribute: TemperatureDisplayMode: Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_2 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: TemperatureDisplayMode
+    using SuccessCallback_3 = void (*)(void * context, uint8_t temperatureDisplayMode);
+    chip::Callback::Callback<SuccessCallback_3> mOnSuccessCallback_3{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_3_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_3_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_3 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_3()
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeTemperatureDisplayMode(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_3_FailureResponse(void * context,
+                                                                                                            uint8_t status)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_3 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void
+    OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_3_SuccessResponse(void * context,
+                                                                                                uint8_t temperatureDisplayMode)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_3 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (temperatureDisplayMode != 0)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: TemperatureDisplayMode
+    using SuccessCallback_4 = void (*)(void * context, uint8_t temperatureDisplayMode);
+    chip::Callback::Callback<SuccessCallback_4> mOnSuccessCallback_4{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_4_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_4_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_4 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_4()
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeTemperatureDisplayMode(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_4_FailureResponse(void * context,
+                                                                                                            uint8_t status)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_4 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void
+    OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_4_SuccessResponse(void * context,
+                                                                                                uint8_t temperatureDisplayMode)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - read the mandatory attribute: TemperatureDisplayMode: Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_4 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: temperatureDisplayMode type checking is not implemented yet. Expected type: '%s'",
+                     "enum8");
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: KeypadLockout
+    using SuccessCallback_5 = void (*)(void * context, uint8_t keypadLockout);
+    chip::Callback::Callback<SuccessCallback_5> mOnSuccessCallback_5{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_5_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_5_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_5 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_5()
+    {
+        ChipLogProgress(
+            chipTool, "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeKeypadLockout(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_5_FailureResponse(void * context,
+                                                                                                            uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_5 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_5_SuccessResponse(void * context,
+                                                                                                            uint8_t keypadLockout)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_5 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (keypadLockout != 0)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: KeypadLockout
+    using SuccessCallback_6 = void (*)(void * context, uint8_t keypadLockout);
+    chip::Callback::Callback<SuccessCallback_6> mOnSuccessCallback_6{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_6_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_6_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_6 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_6()
+    {
+        ChipLogProgress(
+            chipTool, "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeKeypadLockout(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_6_FailureResponse(void * context,
+                                                                                                            uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_6 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_6_SuccessResponse(void * context,
+                                                                                                            uint8_t keypadLockout)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_6 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: keypadLockout type checking is not implemented yet. Expected type: '%s'", "enum8");
+
+        runner->NextTest();
+    }
+
+    // Test write to the mandatory attribute: KeypadLockout
+    using SuccessCallback_7 = void (*)(void * context, uint8_t keypadLockout);
+    chip::Callback::Callback<SuccessCallback_7> mOnSuccessCallback_7{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_7_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_7_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_7 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_7()
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - write to the mandatory attribute: KeypadLockout: Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t keypadLockoutArgument = 0;
+        err = cluster.WriteAttributeKeypadLockout(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel(),
+                                                  keypadLockoutArgument);
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_7_FailureResponse(void * context,
+                                                                                                             uint8_t status)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - write to the mandatory attribute: KeypadLockout: Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_7 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_7_SuccessResponse(void * context,
+                                                                                                             uint8_t keypadLockout)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Thermostat User Interface Configuration - write to the mandatory attribute: KeypadLockout: Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_7 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: KeypadLockout
+    using SuccessCallback_8 = void (*)(void * context, uint8_t keypadLockout);
+    chip::Callback::Callback<SuccessCallback_8> mOnSuccessCallback_8{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_8_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_8_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_8 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_8()
+    {
+        ChipLogProgress(
+            chipTool, "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeKeypadLockout(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_8_FailureResponse(void * context,
+                                                                                                            uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_8 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_8_SuccessResponse(void * context,
+                                                                                                            uint8_t keypadLockout)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_8 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (keypadLockout != 0)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: KeypadLockout
+    using SuccessCallback_9 = void (*)(void * context, uint8_t keypadLockout);
+    chip::Callback::Callback<SuccessCallback_9> mOnSuccessCallback_9{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_9_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_9_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_9 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_9()
+    {
+        ChipLogProgress(
+            chipTool, "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeKeypadLockout(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_9_FailureResponse(void * context,
+                                                                                                            uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_9 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_9_SuccessResponse(void * context,
+                                                                                                            uint8_t keypadLockout)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the mandatory attribute: KeypadLockout: Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_9 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: keypadLockout type checking is not implemented yet. Expected type: '%s'", "enum8");
+
+        runner->NextTest();
+    }
+
+    // Test read the optional attribute: ScheduleProgrammingVisibility
+    using SuccessCallback_10 = void (*)(void * context, uint8_t scheduleProgrammingVisibility);
+    chip::Callback::Callback<SuccessCallback_10> mOnSuccessCallback_10{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_10_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_10_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_10 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_10()
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeScheduleProgrammingVisibility(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_10_FailureResponse(void * context,
+                                                                                                             uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_10 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_10_SuccessResponse(
+        void * context, uint8_t scheduleProgrammingVisibility)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_10 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (scheduleProgrammingVisibility != 0)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test read the optional attribute: ScheduleProgrammingVisibility
+    using SuccessCallback_11 = void (*)(void * context, uint8_t scheduleProgrammingVisibility);
+    chip::Callback::Callback<SuccessCallback_11> mOnSuccessCallback_11{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_11_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_11_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_11 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_11()
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeScheduleProgrammingVisibility(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_11_FailureResponse(void * context,
+                                                                                                             uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_11 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_11_SuccessResponse(
+        void * context, uint8_t scheduleProgrammingVisibility)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_11 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: scheduleProgrammingVisibility type checking is not implemented yet. Expected type: '%s'",
+                     "enum8");
+
+        runner->NextTest();
+    }
+
+    // Test write to the mandatory attribute: ScheduleProgrammingVisibility
+    using SuccessCallback_12 = void (*)(void * context, uint8_t scheduleProgrammingVisibility);
+    chip::Callback::Callback<SuccessCallback_12> mOnSuccessCallback_12{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_12_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_12{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_12_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_12 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_12()
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - write to the mandatory attribute: "
+                        "ScheduleProgrammingVisibility: Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        uint8_t scheduleProgrammingVisibilityArgument = 0;
+        err = cluster.WriteAttributeScheduleProgrammingVisibility(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel(),
+                                                                  scheduleProgrammingVisibilityArgument);
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_12_FailureResponse(void * context,
+                                                                                                              uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - write to the mandatory attribute: "
+                        "ScheduleProgrammingVisibility: Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_12 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandWriteAttribute_12_SuccessResponse(
+        void * context, uint8_t scheduleProgrammingVisibility)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - write to the mandatory attribute: "
+                        "ScheduleProgrammingVisibility: Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_12 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test read the optional attribute: ScheduleProgrammingVisibility
+    using SuccessCallback_13 = void (*)(void * context, uint8_t scheduleProgrammingVisibility);
+    chip::Callback::Callback<SuccessCallback_13> mOnSuccessCallback_13{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_13_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_13{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_13_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_13 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_13()
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeScheduleProgrammingVisibility(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_13_FailureResponse(void * context,
+                                                                                                             uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_13 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_13_SuccessResponse(
+        void * context, uint8_t scheduleProgrammingVisibility)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_13 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (scheduleProgrammingVisibility != 0)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test read the optional attribute: ScheduleProgrammingVisibility
+    using SuccessCallback_14 = void (*)(void * context, uint8_t scheduleProgrammingVisibility);
+    chip::Callback::Callback<SuccessCallback_14> mOnSuccessCallback_14{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_14_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_14{
+        OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_14_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_14 = 0;
+
+    CHIP_ERROR TestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_14()
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Sending command...");
+
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeScheduleProgrammingVisibility(mOnSuccessCallback_14.Cancel(), mOnFailureCallback_14.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_14_FailureResponse(void * context,
+                                                                                                             uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Failure Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_14 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterThermostatUserInterfaceConfigurationCommandReadAttribute_14_SuccessResponse(
+        void * context, uint8_t scheduleProgrammingVisibility)
+    {
+        ChipLogProgress(chipTool,
+                        "Thermostat User Interface Configuration - read the optional attribute: ScheduleProgrammingVisibility: "
+                        "Success Response");
+
+        Test_TC_TSUIC_2_1 * runner = reinterpret_cast<Test_TC_TSUIC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_14 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: scheduleProgrammingVisibility type checking is not implemented yet. Expected type: '%s'",
+                     "enum8");
+
+        runner->NextTest();
+    }
+};
+
+class Test_TC_PCC_2_1 : public TestCommand
+{
+public:
+    Test_TC_PCC_2_1() : TestCommand("Test_TC_PCC_2_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "Test_TC_PCC_2_1: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterPumpConfigurationAndControlCommandReadAttribute_0();
+            break;
+        case 1:
+            err = TestSendClusterPumpConfigurationAndControlCommandReadAttribute_1();
+            break;
+        case 2:
+            err = TestSendClusterPumpConfigurationAndControlCommandReadAttribute_2();
+            break;
+        case 3:
+            err = TestSendClusterPumpConfigurationAndControlCommandReadAttribute_3();
+            break;
+        case 4:
+            err = TestSendClusterPumpConfigurationAndControlCommandReadAttribute_4();
+            break;
+        case 5:
+            err = TestSendClusterPumpConfigurationAndControlCommandReadAttribute_5();
+            break;
+        case 6:
+            err = TestSendClusterPumpConfigurationAndControlCommandReadAttribute_6();
+            break;
+        case 7:
+            err = TestSendClusterPumpConfigurationAndControlCommandReadAttribute_7();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "Test_TC_PCC_2_1: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 8;
+
+    //
+    // Tests methods
+    //
+
+    // Test read the mandatory attribute: MaxPressure
+    using SuccessCallback_0 = void (*)(void * context, int16_t maxPressure);
+    chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_0_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_0_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_0 = 0;
+
+    CHIP_ERROR TestSendClusterPumpConfigurationAndControlCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: MaxPressure: Sending command...");
+
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeMaxPressure(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: MaxPressure: Failure Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_0_SuccessResponse(void * context,
+                                                                                                   int16_t maxPressure)
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: MaxPressure: Success Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: maxPressure type checking is not implemented yet. Expected type: '%s'", "int16");
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: EffectiveOperationMode
+    using SuccessCallback_1 = void (*)(void * context, uint8_t effectiveOperationMode);
+    chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_1_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_1_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_1 = 0;
+
+    CHIP_ERROR TestSendClusterPumpConfigurationAndControlCommandReadAttribute_1()
+    {
+        ChipLogProgress(
+            chipTool, "Pump Configuration and Control - read the mandatory attribute: EffectiveOperationMode: Sending command...");
+
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeEffectiveOperationMode(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Pump Configuration and Control - read the mandatory attribute: EffectiveOperationMode: Failure Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_1_SuccessResponse(void * context,
+                                                                                                   uint8_t effectiveOperationMode)
+    {
+        ChipLogProgress(chipTool,
+                        "Pump Configuration and Control - read the mandatory attribute: EffectiveOperationMode: Success Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: effectiveOperationMode type checking is not implemented yet. Expected type: '%s'",
+                     "enum8");
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: EffectiveControlMode
+    using SuccessCallback_2 = void (*)(void * context, uint8_t effectiveControlMode);
+    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_2_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_2_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_2 = 0;
+
+    CHIP_ERROR TestSendClusterPumpConfigurationAndControlCommandReadAttribute_2()
+    {
+        ChipLogProgress(chipTool,
+                        "Pump Configuration and Control - read the mandatory attribute: EffectiveControlMode: Sending command...");
+
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeEffectiveControlMode(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Pump Configuration and Control - read the mandatory attribute: EffectiveControlMode: Failure Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_2_SuccessResponse(void * context,
+                                                                                                   uint8_t effectiveControlMode)
+    {
+        ChipLogProgress(chipTool,
+                        "Pump Configuration and Control - read the mandatory attribute: EffectiveControlMode: Success Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_2 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: effectiveControlMode type checking is not implemented yet. Expected type: '%s'", "enum8");
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: Capacity
+    using SuccessCallback_3 = void (*)(void * context, int16_t capacity);
+    chip::Callback::Callback<SuccessCallback_3> mOnSuccessCallback_3{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_3_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_3_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_3 = 0;
+
+    CHIP_ERROR TestSendClusterPumpConfigurationAndControlCommandReadAttribute_3()
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: Capacity: Sending command...");
+
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeCapacity(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_3_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: Capacity: Failure Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_3 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_3_SuccessResponse(void * context, int16_t capacity)
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: Capacity: Success Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_3 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: capacity type checking is not implemented yet. Expected type: '%s'", "int16");
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: MaxPressure
+    using SuccessCallback_4 = void (*)(void * context, int16_t maxPressure);
+    chip::Callback::Callback<SuccessCallback_4> mOnSuccessCallback_4{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_4_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_4_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_4 = 0;
+
+    CHIP_ERROR TestSendClusterPumpConfigurationAndControlCommandReadAttribute_4()
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: MaxPressure: Sending command...");
+
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeMaxPressure(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_4_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: MaxPressure: Failure Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_4 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_4_SuccessResponse(void * context,
+                                                                                                   int16_t maxPressure)
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: MaxPressure: Success Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_4 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: maxPressure type checking is not implemented yet. Expected type: '%s'", "int16");
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: EffectiveOperationMode
+    using SuccessCallback_5 = void (*)(void * context, uint8_t effectiveOperationMode);
+    chip::Callback::Callback<SuccessCallback_5> mOnSuccessCallback_5{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_5_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_5_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_5 = 0;
+
+    CHIP_ERROR TestSendClusterPumpConfigurationAndControlCommandReadAttribute_5()
+    {
+        ChipLogProgress(
+            chipTool, "Pump Configuration and Control - read the mandatory attribute: EffectiveOperationMode: Sending command...");
+
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeEffectiveOperationMode(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_5_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Pump Configuration and Control - read the mandatory attribute: EffectiveOperationMode: Failure Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_5 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_5_SuccessResponse(void * context,
+                                                                                                   uint8_t effectiveOperationMode)
+    {
+        ChipLogProgress(chipTool,
+                        "Pump Configuration and Control - read the mandatory attribute: EffectiveOperationMode: Success Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_5 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: effectiveOperationMode type checking is not implemented yet. Expected type: '%s'",
+                     "enum8");
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: EffectiveControlMode
+    using SuccessCallback_6 = void (*)(void * context, uint8_t effectiveControlMode);
+    chip::Callback::Callback<SuccessCallback_6> mOnSuccessCallback_6{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_6_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_6_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_6 = 0;
+
+    CHIP_ERROR TestSendClusterPumpConfigurationAndControlCommandReadAttribute_6()
+    {
+        ChipLogProgress(chipTool,
+                        "Pump Configuration and Control - read the mandatory attribute: EffectiveControlMode: Sending command...");
+
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeEffectiveControlMode(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_6_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool,
+                        "Pump Configuration and Control - read the mandatory attribute: EffectiveControlMode: Failure Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_6 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_6_SuccessResponse(void * context,
+                                                                                                   uint8_t effectiveControlMode)
+    {
+        ChipLogProgress(chipTool,
+                        "Pump Configuration and Control - read the mandatory attribute: EffectiveControlMode: Success Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_6 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: effectiveControlMode type checking is not implemented yet. Expected type: '%s'", "enum8");
+
+        runner->NextTest();
+    }
+
+    // Test read the mandatory attribute: Capacity
+    using SuccessCallback_7 = void (*)(void * context, int16_t capacity);
+    chip::Callback::Callback<SuccessCallback_7> mOnSuccessCallback_7{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_7_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
+        OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_7_FailureResponse, this
+    };
+
+    bool mIsFailureExpected_7 = 0;
+
+    CHIP_ERROR TestSendClusterPumpConfigurationAndControlCommandReadAttribute_7()
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: Capacity: Sending command...");
+
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeCapacity(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_7_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: Capacity: Failure Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_7 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterPumpConfigurationAndControlCommandReadAttribute_7_SuccessResponse(void * context, int16_t capacity)
+    {
+        ChipLogProgress(chipTool, "Pump Configuration and Control - read the mandatory attribute: Capacity: Success Response");
+
+        Test_TC_PCC_2_1 * runner = reinterpret_cast<Test_TC_PCC_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_7 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: capacity type checking is not implemented yet. Expected type: '%s'", "int16");
+
+        runner->NextTest();
+    }
+};
+
 void registerCommandsTests(Commands & commands)
 {
     const char * clusterName = "Tests";
@@ -21926,6 +23701,9 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_TSTAT_1_1>(),
         make_unique<Test_TC_PCC_1_1>(),
         make_unique<Test_TC_TSUIC_1_1>(),
+        make_unique<Test_TC_TM_2_1>(),
+        make_unique<Test_TC_TSUIC_2_1>(),
+        make_unique<Test_TC_PCC_2_1>(),
     };
 
     commands.Register(clusterName, clusterCommands);
