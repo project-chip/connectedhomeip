@@ -28,7 +28,7 @@
 #include <jni.h>
 
 /**
-    Load platfrom android jni functions
+    Load platform android jni functions
     To avoid load 2 dynamic librares in one android app and
     each of them have their own matter librares, 
     we build android platform as an static libray and 
