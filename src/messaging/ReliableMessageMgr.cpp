@@ -91,7 +91,7 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
             ChipLogDetail(ExchangeManager,
                           "EC:" ChipLogFormatExchange " MessageCounter:" ChipLogFormatMessageCounter
                           " NextRetransTimeCtr:%04" PRIX16,
-                          ChipLogValueExchange(entry.rc->GetExchangeContext()), entry.messageCounter, entry.nextRetransTimeTick);
+                          ChipLogValueExchange(entry.rc->GetExchangeContext()), entry.retainedBuf.GetMessageCounter(), entry.nextRetransTimeTick);
         }
     }
 }
@@ -205,7 +205,7 @@ void ReliableMessageMgr::ExpireTicks()
     uint64_t deltaTicks = GetTickCounterFromTimeDelta(now);
 
 #if defined(RMP_TICKLESS_DEBUG)
-    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExpireTicks at %" PRIu64 ", %" PRIu64 ", %u", now, mTimeStampBase,
+    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExpireTicks at %" PRIu64 ", %" PRIu64 ", %" PRIu64, now, mTimeStampBase,
                   deltaTicks);
 #endif
 
@@ -462,7 +462,7 @@ void ReliableMessageMgr::StartTimer()
             nextWakeTimeTick = rc->mNextAckTimeTick;
             foundWake        = true;
 #if defined(RMP_TICKLESS_DEBUG)
-            ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer next ACK time %u", nextWakeTimeTick);
+            ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer next ACK time %" PRIu64, nextWakeTimeTick);
 #endif
         }
     });
@@ -478,7 +478,7 @@ void ReliableMessageMgr::StartTimer()
                 nextWakeTimeTick = entry.nextRetransTimeTick;
                 foundWake        = true;
 #if defined(RMP_TICKLESS_DEBUG)
-                ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer RetransTime %u", nextWakeTimeTick);
+                ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer RetransTime %" PRIu64, nextWakeTimeTick);
 #endif
             }
         }
