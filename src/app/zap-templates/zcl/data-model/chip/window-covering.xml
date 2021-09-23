@@ -86,6 +86,7 @@ limitations under the License.
 
   <!-- Window Covering Descriptive Enum Set -->
   <enum name="WcType" type="ENUM8">
+    <cluster code="0x0102"/>
     <item value="00" name="Rollershade"/>
     <item value="01" name="Rollershade2Motor"/>
     <item value="02" name="RollershadeExterior"/>
@@ -100,6 +101,7 @@ limitations under the License.
   </enum>
 
   <enum name="WcEndProductType" type="ENUM8">
+    <cluster code="0x0102"/>
     <item value="00" name="RollerShade"/>  
     <item value="01" name="RomanShade"/>
     <item value="02" name="BalloonShade"/>
