@@ -86,20 +86,23 @@ private:
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
         {
-            ChipLogProgress(AppServer, "Retrieved value from server storage.");
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size));
+            ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
+            return CHIP_NO_ERROR;
         }
 
         CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
         {
-            ChipLogProgress(AppServer, "Stored value in server storage");
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size));
+            ChipLogProgress(AppServer, "Saved into server storage: %s", key);
+            return CHIP_NO_ERROR;
         }
 
         CHIP_ERROR SyncDeleteKeyValue(const char * key) override
         {
-            ChipLogProgress(AppServer, "Delete value in server storage");
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key));
+            ChipLogProgress(AppServer, "Deleted from server storage: %s", key);
+            return CHIP_NO_ERROR;
         }
     };
 

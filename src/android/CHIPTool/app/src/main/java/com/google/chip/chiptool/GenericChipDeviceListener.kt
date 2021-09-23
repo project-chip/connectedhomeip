@@ -7,10 +7,6 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
     // No op
   }
 
-  override fun onSendMessageComplete(message: String?) {
-    // No op
-  }
-
   override fun onStatusUpdate(status: Int) {
     // No op
   }

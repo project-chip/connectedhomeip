@@ -14,12 +14,14 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
   <enum name="NetworkFault" type="ENUM8">
+    <cluster code="0x0035"/>
     <item name="Unspecified" value="0x00"/>
     <item name="LinkDown" value="0x01"/>
     <item name="HardwareFailure" value="0x02"/>
     <item name="NetworkJammed" value="0x03"/>
   </enum>
   <enum name="RoutingRole" type="ENUM8">
+    <cluster code="0x0035"/>
     <item name="Unspecified" value="0x00"/>
     <item name="Unassigned" value="0x01"/>
     <item name="SleepyEndDevice" value="0x02"/>
@@ -29,6 +31,7 @@ limitations under the License.
     <item name="Leader" value="0x06"/>
   </enum>
   <struct name="NeighborTable">
+    <cluster code="0x0035"/>
     <item name="ExtAddress" type="INT64U"/>
     <item name="Age" type="INT32U"/>
     <item name="Rloc16" type="INT16U"/>
@@ -45,6 +48,7 @@ limitations under the License.
     <item name="IsChild" type="BOOLEAN"/>
   </struct>
   <struct name="RouteTable">
+    <cluster code="0x0035"/>
     <item name="ExtAddress" type="INT64U"/>
     <item name="Rloc16" type="INT16U"/>
     <item name="RouterId" type="INT8U"/>
@@ -57,10 +61,12 @@ limitations under the License.
     <item name="LinkEstablished" type="BOOLEAN"/>
   </struct>
   <struct name="SecurityPolicy">
+    <cluster code="0x0035"/>
     <item name="RotationTime" type="INT16U"/>
     <item name="Flags" type="INT8U"/>
   </struct>
   <struct name="OperationalDatasetComponents">
+    <cluster code="0x0035"/>
     <item name="ActiveTimestampPresent" type="BOOLEAN"/>
     <item name="PendingTimestampPresent" type="BOOLEAN"/>
     <item name="MasterKeyPresent" type="BOOLEAN"/>
