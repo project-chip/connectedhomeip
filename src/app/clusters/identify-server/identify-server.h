@@ -55,5 +55,4 @@ struct Identify
     EmberAfIdentifyEffectIdentifier mTargetEffectIdentifier;
     uint8_t mEffectVariant;
     bool mActive = false;
-
 };
