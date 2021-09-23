@@ -145,7 +145,7 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
             DeviceLayer::SystemLayer().StartTimer(mCommissioningTimeoutSeconds * 1000, HandleCommissioningWindowTimeout, this));
     }
 
-    ReturnErrorOnFailure(mServer->GetExchangManager().RegisterUnsolicitedMessageHandlerForType(
+    ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
 
     ReturnErrorOnFailure(StartAdvertisement());
@@ -264,7 +264,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement()
 {
     RestoreDiscriminator();
 
-    mServer->GetExchangManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
+    mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     mPairingSession.Clear();
 
     mCommissioningWindowOpen = false;

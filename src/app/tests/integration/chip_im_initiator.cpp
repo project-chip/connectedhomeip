@@ -653,7 +653,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     // We do not really care about the value, just return a not found status code.
     VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
     return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                         chip::to_underlying(Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute));
+                         Protocols::InteractionModel::Status::UnsupportedAttribute);
 }
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler *)

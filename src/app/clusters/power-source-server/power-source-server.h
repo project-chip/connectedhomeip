@@ -1,4 +1,4 @@
-/**
+/*
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -14,17 +14,3 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#pragma once
-
-#include <app/util/af-enums.h>
-#include <protocols/interaction_model/Constants.h>
-
-namespace chip {
-namespace app {
-
-EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::Status code);
-Protocols::InteractionModel::Status ToInteractionModelStatus(EmberAfStatus code);
-
-} // namespace app
-} // namespace chip

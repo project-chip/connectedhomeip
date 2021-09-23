@@ -20,9 +20,9 @@
 namespace chip {
 namespace app {
 
-EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::ProtocolCode code)
+EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::Status code)
 {
-    using imcode = Protocols::InteractionModel::ProtocolCode;
+    using imcode = Protocols::InteractionModel::Status;
     switch (code)
     {
     case imcode::Success: // 0x00
@@ -112,9 +112,9 @@ EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::ProtocolCode code)
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-Protocols::InteractionModel::ProtocolCode ToInteractionModelProtocolCode(EmberAfStatus code)
+Protocols::InteractionModel::Status ToInteractionModelStatus(EmberAfStatus code)
 {
-    using imcode = Protocols::InteractionModel::ProtocolCode;
+    using imcode = Protocols::InteractionModel::Status;
     switch (code)
     {
     case EMBER_ZCL_STATUS_SUCCESS: // 0x00

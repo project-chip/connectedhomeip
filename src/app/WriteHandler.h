@@ -74,8 +74,7 @@ public:
 
     CHIP_ERROR AddAttributeStatusCode(const AttributePathParams & aAttributePathParams,
                                       const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                      const Protocols::Id aProtocolId,
-                                      const Protocols::InteractionModel::ProtocolCode aProtocolCode);
+                                      const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus);
 
 private:
     enum class State

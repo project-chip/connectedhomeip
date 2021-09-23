@@ -194,6 +194,10 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(chip::TLV::TLVR
                                                                  chip::Callback::Cancelable * onSuccessCallback,
                                                                  chip::Callback::Cancelable * onFailureCallback);
 typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(void * context, uint16_t count, _FabricDescriptor * entries);
+void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                              chip::Callback::Cancelable * onSuccessCallback,
+                                                              chip::Callback::Cancelable * onFailureCallback);
+typedef void (*PowerSourceActiveBatteryFaultsListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);
 void TvChannelClusterTvChannelListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                       chip::Callback::Cancelable * onFailureCallback);
 typedef void (*TvChannelTvChannelListListAttributeCallback)(void * context, uint16_t count, _TvChannelInfo * entries);

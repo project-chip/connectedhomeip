@@ -305,6 +305,17 @@ public:
     static void OnSuccessFn(void * context, uint16_t count, _FabricDescriptor * entries);
 };
 
+class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>
+{
+public:
+    CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, uint16_t count, uint8_t * entries);
+};
+
 class CHIPTvChannelTvChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>
 {
 public:

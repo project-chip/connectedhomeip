@@ -117,8 +117,8 @@ static constexpr AttributeId HighTempDwellTripPoint = 0x00000014;
 namespace Identify {
 namespace Attributes {
 namespace Ids {
-static constexpr AttributeId IdentifyTime    = 0x00000000;
-static constexpr AttributeId CommissionState = 0x00000001;
+static constexpr AttributeId IdentifyTime = 0x00000000;
+static constexpr AttributeId IdentifyType = 0x00000001;
 } // namespace Ids
 } // namespace Attributes
 } // namespace Identify
@@ -306,6 +306,44 @@ static constexpr AttributeId UpdatePossible     = 0x00000002;
 } // namespace Ids
 } // namespace Attributes
 } // namespace OtaSoftwareUpdateRequestor
+
+namespace PowerSource {
+namespace Attributes {
+namespace Ids {
+static constexpr AttributeId Status                         = 0x00000000;
+static constexpr AttributeId Order                          = 0x00000001;
+static constexpr AttributeId Description                    = 0x00000002;
+static constexpr AttributeId WiredAssessedInputVoltage      = 0x00000003;
+static constexpr AttributeId WiredAssessedInputFrequency    = 0x00000004;
+static constexpr AttributeId WiredCurrentType               = 0x00000005;
+static constexpr AttributeId WiredAssessedCurrent           = 0x00000006;
+static constexpr AttributeId WiredNominalVoltage            = 0x00000007;
+static constexpr AttributeId WiredMaximumCurrent            = 0x00000008;
+static constexpr AttributeId WiredPresent                   = 0x00000009;
+static constexpr AttributeId ActiveWiredFaults              = 0x0000000A;
+static constexpr AttributeId BatteryVoltage                 = 0x0000000B;
+static constexpr AttributeId BatteryPercentRemaining        = 0x0000000C;
+static constexpr AttributeId BatteryTimeRemaining           = 0x0000000D;
+static constexpr AttributeId BatteryChargeLevel             = 0x0000000E;
+static constexpr AttributeId BatteryReplacementNeeded       = 0x0000000F;
+static constexpr AttributeId BatteryReplaceability          = 0x00000010;
+static constexpr AttributeId BatteryPresent                 = 0x00000011;
+static constexpr AttributeId ActiveBatteryFaults            = 0x00000012;
+static constexpr AttributeId BatteryReplacementDescription  = 0x00000013;
+static constexpr AttributeId BatteryCommonDesignation       = 0x00000014;
+static constexpr AttributeId BatteryANSIDesignation         = 0x00000015;
+static constexpr AttributeId BatteryIECDesignation          = 0x00000016;
+static constexpr AttributeId BatteryApprovedChemistry       = 0x00000017;
+static constexpr AttributeId BatteryCapacity                = 0x00000018;
+static constexpr AttributeId BatteryQuantity                = 0x00000019;
+static constexpr AttributeId BatteryChargeState             = 0x0000001A;
+static constexpr AttributeId BatteryTimeToFullCharge        = 0x0000001B;
+static constexpr AttributeId BatteryFunctionalWhileCharging = 0x0000001C;
+static constexpr AttributeId BatteryChargingCurrent         = 0x0000001D;
+static constexpr AttributeId ActiveBatteryChargeFaults      = 0x0000001E;
+} // namespace Ids
+} // namespace Attributes
+} // namespace PowerSource
 
 namespace GeneralCommissioning {
 namespace Attributes {
