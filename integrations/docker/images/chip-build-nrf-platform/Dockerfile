@@ -2,7 +2,7 @@ ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION}
 
 # Compatible Nordic Connect SDK revision.
-ARG NCS_REVISION=55ae470380f17a949fe45b7686cf5c8743d5fb30
+ARG NCS_REVISION=v1.7.0
 
 # ==================================================
 # nRF Connect SDK dependencies
