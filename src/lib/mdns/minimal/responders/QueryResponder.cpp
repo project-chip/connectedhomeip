@@ -26,28 +26,23 @@ namespace Minimal {
 
 const QNamePart kDnsSdQueryPath[] = { "_services", "_dns-sd", "_udp", "local" };
 
-QueryResponderBase::QueryResponderBase(Internal::QueryResponderInfo * infos, size_t infoSizes) :
-    Responder(QType::PTR, FullQName(kDnsSdQueryPath)), mResponderInfos(infos), mResponderInfoSize(infoSizes)
+QueryResponderBase::QueryResponderBase(chip::GenericAllocatorBase<Internal::QueryResponderInfo> * infos) :
+    Responder(QType::PTR, FullQName(kDnsSdQueryPath)), mResponderInfos(infos)
 {}
 
 void QueryResponderBase::Init()
 {
-    for (size_t i = 0; i < mResponderInfoSize; i++)
+    for (auto it = mResponderInfos->begin(); it != mResponderInfos->end();)
     {
-        mResponderInfos[i].Clear();
+        it = mResponderInfos->Free(it);
     }
-
-    if (mResponderInfoSize > 0)
+    Internal::QueryResponderInfo * serviceResponderInfo = mResponderInfos->Allocate();
+    if (serviceResponderInfo == nullptr)
     {
-        // reply to queries about services available
-        mResponderInfos[0].responder = this;
+        ChipLogError(Discovery, "Insufficient memory in query responder pool");
+        return;
     }
-
-    if (mResponderInfoSize < 2)
-    {
-        // Nothing usefull really
-        ChipLogError(Discovery, "Query responder storage size too small");
-    }
+    serviceResponderInfo->responder = this;
 }
 
 QueryResponderSettings QueryResponderBase::AddResponder(RecordResponder * responder)
@@ -56,47 +51,41 @@ QueryResponderSettings QueryResponderBase::AddResponder(RecordResponder * respon
     {
         return QueryResponderSettings();
     }
-
-    for (size_t i = 0; i < mResponderInfoSize; i++)
+    Internal::QueryResponderInfo * info = mResponderInfos->Allocate();
+    if (info != nullptr)
     {
-        if (mResponderInfos[i].responder == nullptr)
-        {
-            mResponderInfos[i].Clear();
-            mResponderInfos[i].responder = responder;
-
-            return QueryResponderSettings(&mResponderInfos[i]);
-        }
+        info->responder = responder;
+        return QueryResponderSettings(info);
     }
     return QueryResponderSettings();
 }
 
 void QueryResponderBase::ResetAdditionals()
 {
-
-    for (size_t i = 0; i < mResponderInfoSize; i++)
+    for (auto & i : *mResponderInfos)
     {
-        mResponderInfos[i].reportNowAsAdditional = false;
+        i.reportNowAsAdditional = false;
     }
 }
 
 size_t QueryResponderBase::MarkAdditional(const FullQName & qname)
 {
     size_t count = 0;
-    for (size_t i = 0; i < mResponderInfoSize; i++)
+    for (auto & i : *mResponderInfos)
     {
-        if (mResponderInfos[i].responder == nullptr)
+        if (i.responder == nullptr)
         {
             continue; // not a valid entry
         }
 
-        if (mResponderInfos[i].reportNowAsAdditional)
+        if (i.reportNowAsAdditional)
         {
             continue; // already marked
         }
 
-        if (mResponderInfos[i].responder->GetQName() == qname)
+        if (i.responder->GetQName() == qname)
         {
-            mResponderInfos[i].reportNowAsAdditional = true;
+            i.reportNowAsAdditional = true;
             count++;
         }
     }
@@ -142,27 +131,27 @@ void QueryResponderBase::AddAllResponses(const chip::Inet::IPPacketInfo * source
     ChipLogProgress(Discovery, "Replying to DNS-SD service listing request");
 
     // reply to dns-sd service list request
-    for (size_t i = 0; i < mResponderInfoSize; i++)
+    for (auto & i : *mResponderInfos)
     {
-        if (!mResponderInfos[i].reportService)
+        if (!i.reportService)
         {
             continue;
         }
 
-        if (mResponderInfos[i].responder == nullptr)
+        if (i.responder == nullptr)
         {
             continue;
         }
 
-        delegate->AddResponse(PtrResourceRecord(GetQName(), mResponderInfos[i].responder->GetQName()));
+        delegate->AddResponse(PtrResourceRecord(GetQName(), i.responder->GetQName()));
     }
 }
 
 void QueryResponderBase::ClearBroadcastThrottle()
 {
-    for (size_t i = 0; i < mResponderInfoSize; i++)
+    for (auto & i : *mResponderInfos)
     {
-        mResponderInfos[i].lastMulticastTime = 0;
+        i.lastMulticastTime = 0;
     }
 }
 

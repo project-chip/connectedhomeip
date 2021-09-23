@@ -22,6 +22,7 @@
 #include "Responder.h"
 
 #include <inet/InetLayer.h>
+#include <lib/support/GenericAllocator.h>
 
 namespace mdns {
 namespace Minimal {
@@ -43,14 +44,6 @@ struct QueryResponderInfo : public QueryResponderRecord
 
     bool alsoReportAdditionalQName = false; // report more data when this record is listed
     FullQName additionalQName;              // if alsoReportAdditionalQName is set, send this extra data
-
-    void Clear()
-    {
-        responder                 = nullptr;
-        reportService             = false;
-        reportNowAsAdditional     = false;
-        alsoReportAdditionalQName = false;
-    }
 };
 
 } // namespace Internal
@@ -161,29 +154,32 @@ private:
 
 /// Iterates over an array of QueryResponderRecord items, providing only 'valid' ones, where
 /// valid is based on the provided filter.
-class QueryResponderIterator
+class QueryResponderIterator : chip::GenericAllocatorIterator<Internal::QueryResponderInfo>
 {
 public:
     using value_type = QueryResponderRecord;
     using pointer    = QueryResponderRecord *;
     using reference  = QueryResponderRecord &;
 
-    QueryResponderIterator() : mCurrent(nullptr), mRemaining(0) {}
-    QueryResponderIterator(QueryResponderRecordFilter * recordFilter, Internal::QueryResponderInfo * pos, size_t size) :
-        mFilter(recordFilter), mCurrent(pos), mRemaining(size)
+    QueryResponderIterator(QueryResponderRecordFilter * recordFilter,
+                           chip::GenericAllocatorIterator<Internal::QueryResponderInfo> itBase) :
+        chip::GenericAllocatorIterator<Internal::QueryResponderInfo>(itBase),
+        mFilter(recordFilter)
     {
         SkipInvalid();
     }
     QueryResponderIterator(const QueryResponderIterator & other) = default;
     QueryResponderIterator & operator=(const QueryResponderIterator & other) = default;
 
+    bool operator==(const QueryResponderIterator & rhs) const
+    {
+        return chip::GenericAllocatorIterator<Internal::QueryResponderInfo>::operator==(rhs);
+    }
+    bool operator!=(const QueryResponderIterator & rhs) const { return !(*this == rhs); }
+
     QueryResponderIterator & operator++()
     {
-        if (mRemaining != 0)
-        {
-            mCurrent++;
-            mRemaining--;
-        }
+        chip::GenericAllocatorIterator<Internal::QueryResponderInfo>::operator++();
         SkipInvalid();
         return *this;
     }
@@ -195,34 +191,28 @@ public:
         return tmp;
     }
 
-    bool operator==(const QueryResponderIterator & rhs) const { return mCurrent == rhs.mCurrent; }
-    bool operator!=(const QueryResponderIterator & rhs) const { return mCurrent != rhs.mCurrent; }
+    // bool operator==(const QueryResponderIterator & rhs) const { return mCurrent == rhs.mCurrent; }
+    // bool operator!=(const QueryResponderIterator & rhs) const { return mCurrent != rhs.mCurrent; }
 
-    QueryResponderRecord & operator*() { return *mCurrent; }
-    QueryResponderRecord * operator->() { return mCurrent; }
+    QueryResponderRecord & operator*() { return chip::GenericAllocatorIterator<Internal::QueryResponderInfo>::operator*(); }
+    QueryResponderRecord * operator->() { return chip::GenericAllocatorIterator<Internal::QueryResponderInfo>::operator->(); }
 
-    Internal::QueryResponderInfo * GetInternal() { return mCurrent; }
-    const Internal::QueryResponderInfo * GetInternal() const { return mCurrent; }
+    Internal::QueryResponderInfo * GetInternal()
+    {
+        return chip::GenericAllocatorIterator<Internal::QueryResponderInfo>::operator->();
+    }
 
 private:
     /// Skips invalid/not useful values.
     /// ensures that if mRemaining is 0, mCurrent is nullptr;
     void SkipInvalid()
     {
-        while ((mRemaining > 0) && !mFilter->Accept(mCurrent))
+        while (!chip::GenericAllocatorIterator<Internal::QueryResponderInfo>::IsEnd() && !mFilter->Accept(GetInternal()))
         {
-            mRemaining--;
-            mCurrent++;
-        }
-        if (mRemaining == 0)
-        {
-            mCurrent = nullptr;
+            chip::GenericAllocatorIterator<Internal::QueryResponderInfo>::operator++();
         }
     }
-
     QueryResponderRecordFilter * mFilter;
-    Internal::QueryResponderInfo * mCurrent;
-    size_t mRemaining;
 };
 
 /// Responds to mDNS queries.
@@ -237,7 +227,7 @@ class QueryResponderBase : public Responder // "_services._dns-sd._udp.local"
 {
 public:
     /// Builds a new responder with the given storage for the response infos
-    QueryResponderBase(Internal::QueryResponderInfo * infos, size_t infoSizes);
+    QueryResponderBase(chip::GenericAllocatorBase<Internal::QueryResponderInfo> * infos);
     virtual ~QueryResponderBase() {}
 
     /// Setup initial settings (clears all infos and sets up dns-sd query replies)
@@ -255,9 +245,9 @@ public:
 
     QueryResponderIterator begin(QueryResponderRecordFilter * filter)
     {
-        return QueryResponderIterator(filter, mResponderInfos, mResponderInfoSize);
+        return QueryResponderIterator(filter, mResponderInfos->begin());
     }
-    QueryResponderIterator end() { return QueryResponderIterator(); }
+    QueryResponderIterator end() { return QueryResponderIterator(nullptr, mResponderInfos->end()); }
 
     /// Clear any items marked as 'additional'.
     void ResetAdditionals();
@@ -274,18 +264,17 @@ public:
     void ClearBroadcastThrottle();
 
 private:
-    Internal::QueryResponderInfo * mResponderInfos;
-    size_t mResponderInfoSize;
+    chip::GenericAllocatorBase<Internal::QueryResponderInfo> * mResponderInfos;
 };
 
-template <size_t kSize>
+template <size_t kPoolSize>
 class QueryResponder : public QueryResponderBase
 {
 public:
-    QueryResponder() : QueryResponderBase(mData, kSize) { Init(); }
+    QueryResponder() : QueryResponderBase(&mData) { Init(); }
 
 private:
-    Internal::QueryResponderInfo mData[kSize];
+    chip::GenericAllocator<Internal::QueryResponderInfo, kPoolSize> mData;
 };
 
 } // namespace Minimal
