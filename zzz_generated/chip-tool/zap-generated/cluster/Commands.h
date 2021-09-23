@@ -14654,36 +14654,6 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Discover Attributes
- */
-class DiscoverPowerSourceAttributes : public ModelCommand
-{
-public:
-    DiscoverPowerSourceAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
-
-    ~DiscoverPowerSourceAttributes()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::PowerSourceCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
  * Attribute Status
  */
 class ReadPowerSourceStatus : public ModelCommand
@@ -24848,7 +24818,6 @@ void registerClusterPowerSource(Commands & commands)
     const char * clusterName = "PowerSource";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverPowerSourceAttributes>(),          //
         make_unique<ReadPowerSourceStatus>(),                  //
         make_unique<ReadPowerSourceOrder>(),                   //
         make_unique<ReadPowerSourceDescription>(),             //
