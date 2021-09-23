@@ -4076,6 +4076,96 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
+  public static class PowerSourceCluster extends BaseChipCluster {
+    public PowerSourceCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface ActiveBatteryFaultsAttributeCallback {
+      void onSuccess(List<Integer> valueList);
+
+      void onError(Exception ex);
+    }
+
+    public void readStatusAttribute(IntegerAttributeCallback callback) {
+      readStatusAttribute(chipClusterPtr, callback);
+    }
+
+    public void readOrderAttribute(IntegerAttributeCallback callback) {
+      readOrderAttribute(chipClusterPtr, callback);
+    }
+
+    public void readDescriptionAttribute(CharStringAttributeCallback callback) {
+      readDescriptionAttribute(chipClusterPtr, callback);
+    }
+
+    public void readBatteryVoltageAttribute(LongAttributeCallback callback) {
+      readBatteryVoltageAttribute(chipClusterPtr, callback);
+    }
+
+    public void readBatteryPercentRemainingAttribute(IntegerAttributeCallback callback) {
+      readBatteryPercentRemainingAttribute(chipClusterPtr, callback);
+    }
+
+    public void readBatteryTimeRemainingAttribute(LongAttributeCallback callback) {
+      readBatteryTimeRemainingAttribute(chipClusterPtr, callback);
+    }
+
+    public void readBatteryChargeLevelAttribute(IntegerAttributeCallback callback) {
+      readBatteryChargeLevelAttribute(chipClusterPtr, callback);
+    }
+
+    public void readActiveBatteryFaultsAttribute(ActiveBatteryFaultsAttributeCallback callback) {
+      readActiveBatteryFaultsAttribute(chipClusterPtr, callback);
+    }
+
+    public void readBatteryChargeStateAttribute(IntegerAttributeCallback callback) {
+      readBatteryChargeStateAttribute(chipClusterPtr, callback);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readStatusAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readOrderAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readDescriptionAttribute(
+        long chipClusterPtr, CharStringAttributeCallback callback);
+
+    private native void readBatteryVoltageAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readBatteryPercentRemainingAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readBatteryTimeRemainingAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readBatteryChargeLevelAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readActiveBatteryFaultsAttribute(
+        long chipClusterPtr, ActiveBatteryFaultsAttributeCallback callback);
+
+    private native void readBatteryChargeStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class PressureMeasurementCluster extends BaseChipCluster {
     public PressureMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

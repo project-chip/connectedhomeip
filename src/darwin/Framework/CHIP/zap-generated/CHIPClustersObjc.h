@@ -1153,6 +1153,36 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Power Source
+ *
+ */
+@interface CHIPPowerSource : CHIPCluster
+
+- (void)readAttributeStatusWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeOrderWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryPercentRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryTimeRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryChargeLevelWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeActiveBatteryFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryChargeStateWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Pressure Measurement
  *
  */

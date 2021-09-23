@@ -1018,6 +1018,29 @@ public:
 private:
 };
 
+class DLL_EXPORT PowerSourceCluster : public ClusterBase
+{
+public:
+    PowerSourceCluster() : ClusterBase(app::Clusters::PowerSource::Id) {}
+    ~PowerSourceCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOrder(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeDescription(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBatteryVoltage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBatteryPercentRemaining(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBatteryTimeRemaining(Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBatteryChargeLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeActiveBatteryFaults(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBatteryChargeState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
 class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
 {
 public:
