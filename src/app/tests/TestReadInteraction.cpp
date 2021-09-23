@@ -41,7 +41,7 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/UDP.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 #include <type_traits>
@@ -1132,7 +1132,7 @@ int Initialize(void * aContext)
     VerifyOrReturnError(ctx->Init(&sSuite, &gTransportManager, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     InitializeEventLogging(ctx->GetExchangeManager());
-    gTransportManager.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
+    gTransportManager.SetSessionManager(&ctx->GetSecureSessionManager());
     return SUCCESS;
 }
 

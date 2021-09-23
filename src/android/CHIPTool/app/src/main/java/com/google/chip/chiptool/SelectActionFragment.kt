@@ -50,7 +50,6 @@ class SelectActionFragment : Fragment() {
         isEnabled = hasLocationPermission()
         setOnClickListener { getCallback()?.onProvisionThreadCredentialsClicked() }
       }
-      echoClientBtn.setOnClickListener { getCallback()?.handleEchoClientClicked() }
       onOffClusterBtn.setOnClickListener { getCallback()?.handleOnOffClicked() }
       sensorClustersBtn.setOnClickListener{ getCallback()?.handleSensorClicked() }
       attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
@@ -106,8 +105,6 @@ class SelectActionFragment : Fragment() {
     fun onProvisionWifiCredentialsClicked()
     /** Notifies listener of provision-Thread-credentials button click. */
     fun onProvisionThreadCredentialsClicked()
-    /** Notifies listener of Echo client button click. */
-    fun handleEchoClientClicked()
     /** Notifies listener of Light On/Off & Level Cluster button click. */
     fun handleOnOffClicked()
     /** Notifies listener of Sensor Clusters button click. */

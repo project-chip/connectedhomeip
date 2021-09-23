@@ -17,16 +17,19 @@ limitations under the License.
 <configurator>
     <domain name="CHIP" spec="chip-0.7" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
     <enum name="OTAQueryStatus" type="ENUM8">
+        <cluster code="0x0029"/>
         <item name="UpdateAvailable" value="0x0"/>
         <item name="Busy" value="0x1"/>
         <item name="NotAvailable" value="0x2"/>
     </enum>
     <enum name="OTAApplyUpdateAction" type="ENUM8">
+        <cluster code="0x0029"/>
         <item name="Proceed" value="0x0"/>
         <item name="AwaitNextAction" value="0x1"/>
         <item name="Discontinue" value="0x2"/>
     </enum>
     <enum name="OTADownloadProtocol" type="ENUM8">
+        <cluster code="0x0029"/>
         <item name="BDXSynchronous" value="0x0"/>
         <item name="BDXAsynchronous" value="0x1"/>
         <item name="HTTPS" value="0x2"/>
@@ -79,6 +82,7 @@ limitations under the License.
         </command>
     </cluster>
     <enum name="OTAAnnouncementReason" type="ENUM8">
+        <cluster code="0x002a"/>
         <item name="SimpleAnnouncement" value="0x0"/>
         <item name="UpdateAvailable" value="0x1"/>
         <item name="CriticalUpdateAvailable" value="0x2"/>

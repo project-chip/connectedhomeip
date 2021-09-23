@@ -33,8 +33,8 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     {{#if isCommand}}
     [cluster {{asLowerCamelCase command}}:{{#chip_tests_item_parameters}}{{#not_first}}{{asLowerCamelCase name}}:{{/not_first}}{{asLowerCamelCase name}}Argument {{#last}}responseHandler:{{/last}}{{/chip_tests_item_parameters}}^(NSError * err, NSDictionary * values) {
     {{else if isSubscribeAttribute}}
-    [cluster configureAttribute{{asUpperCamelCase attribute}}WithMinInterval:{{minInterval}}
-                                                                 maxInterval:{{maxInterval}}
+    [cluster configureAttribute{{asUpperCamelCase attribute}}WithMinInterval:minIntervalArgument
+                                                                 maxInterval:maxIntervalArgument
                                                              responseHandler:^(NSError * err, NSDictionary * values) {
     {{else if isWaitForReport}}
     [cluster reportAttribute{{asUpperCamelCase attribute}}WithResponseHandler:^(NSError * err, NSDictionary * values) {

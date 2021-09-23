@@ -113,7 +113,7 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
 
     // setup for tests
     DeviceTransportMgr * mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
-    mUdcTransportMgr->SetSecureSessionMgr(&udcServer);
+    mUdcTransportMgr->SetSessionManager(&udcServer);
     udcServer.SetInstanceNameResolver(&testCallback);
 
     // set state for instance1

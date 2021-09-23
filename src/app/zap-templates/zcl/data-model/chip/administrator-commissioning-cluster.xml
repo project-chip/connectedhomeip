@@ -18,6 +18,7 @@ limitations under the License.
   <domain name="General"/>
 
   <enum name="StatusCode" type="ENUM8">
+    <cluster code="0x003c"/>
      <item name="Success" value="0x00"/>
      <item name="Busy" value="0x01"/>
      <item name="GeneralError" value="0x02"/>

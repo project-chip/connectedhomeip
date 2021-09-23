@@ -52,15 +52,13 @@ enum class AttestationVerificationResult : uint16_t
     kFirmwareInformationMismatch = 400,
     kFirmwareInformationMissing  = 401,
 
-    kCertificationDeclarationMissing = 500,
+    kCertificationDeclarationMissing   = 500,
+    kAttestationSignatureInvalid       = 501,
+    kAttestationElementsMalformed      = 502,
+    kAttestationNonceMismatch          = 503,
+    kAttestationSignatureInvalidFormat = 504,
 
-    kNonceMismatch = 600,
-
-    kInvalidSignatureFormat = 700,
-
-    kAttestationSignatureInvalid = 800,
-
-    kNoMemory = 900,
+    kNoMemory = 600,
 
     kNotImplemented = 0xFFFFU,
 

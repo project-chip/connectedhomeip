@@ -137,6 +137,12 @@ gn gen --check --fail-on-unused-args {out}/android-x64-chip_tool '--args=target_
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
+# Generating android-x86-chip_tool
+gn gen --check --fail-on-unused-args {out}/android-x86-chip_tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
 # Generating infineon-p6board-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6board-lock
 
@@ -244,7 +250,7 @@ cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libCHIPController.so {root}/s
 cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
 # Building APP android-arm-chip_tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm-chip_tool/lib -PbuildDir={out}/android-arm-chip_tool build
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm-chip_tool/lib -PbuildDir={out}/android-arm-chip_tool assembleDebug
 
 # Building JNI android-arm64-chip_tool
 ninja -C {out}/android-arm64-chip_tool
@@ -259,7 +265,7 @@ cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libCHIPController.so {root}/s
 cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
 # Building APP android-arm64-chip_tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm64-chip_tool/lib -PbuildDir={out}/android-arm64-chip_tool build
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm64-chip_tool/lib -PbuildDir={out}/android-arm64-chip_tool assembleDebug
 
 # Building JNI android-x64-chip_tool
 ninja -C {out}/android-x64-chip_tool
@@ -274,7 +280,22 @@ cp {out}/android-x64-chip_tool/lib/jni/x86_64/libCHIPController.so {root}/src/an
 cp {out}/android-x64-chip_tool/lib/jni/x86_64/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libc++_shared.so
 
 # Building APP android-x64-chip_tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-x64-chip_tool/lib -PbuildDir={out}/android-x64-chip_tool build
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-x64-chip_tool/lib -PbuildDir={out}/android-x64-chip_tool assembleDebug
+
+# Building JNI android-x86-chip_tool
+ninja -C {out}/android-x86-chip_tool
+
+# Prepare Native libs android-x86-chip_tool
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/x86
+
+cp {out}/android-x86-chip_tool/lib/jni/x86/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libSetupPayloadParser.so
+
+cp {out}/android-x86-chip_tool/lib/jni/x86/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libCHIPController.so
+
+cp {out}/android-x86-chip_tool/lib/jni/x86/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libc++_shared.so
+
+# Building APP android-x86-chip_tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-x86-chip_tool/lib -PbuildDir={out}/android-x86-chip_tool assembleDebug
 
 # Building infineon-p6board-lock
 ninja -C {out}/infineon-p6board-lock

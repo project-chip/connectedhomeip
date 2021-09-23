@@ -15,19 +15,19 @@
  *    limitations under the License.
  */
 
-#include <transport/PeerConnectionState.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SecureSession.h>
 #include <transport/SessionHandle.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 
 using namespace Transport;
 
-const PeerAddress * SessionHandle::GetPeerAddress(SecureSessionMgr * ssm) const
+const PeerAddress * SessionHandle::GetPeerAddress(SessionManager * sessionManager) const
 {
     if (IsSecure())
     {
-        PeerConnectionState * state = ssm->GetPeerConnectionState(*this);
+        SecureSession * state = sessionManager->GetSecureSession(*this);
         if (state == nullptr)
         {
             return nullptr;
