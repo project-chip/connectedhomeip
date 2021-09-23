@@ -11,7 +11,7 @@ CXXFLAGS += -DLWIP_IPV6_SCOPES=0 -std=gnu++14
 CPPFLAGS += -DLWIP_IPV6_SCOPES=0 -DCHIP_HAVE_CONFIG_H
 CFLAGS += -DLWIP_IPV6_SCOPES=0 -std=gnu11
 
-EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32/components
+EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/zzz_generated/app-common $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32/components
 
 include $(IDF_PATH)/make/project.mk
 

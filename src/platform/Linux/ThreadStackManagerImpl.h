@@ -19,7 +19,7 @@
 
 #include <memory>
 
-#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/Linux/GlibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/introspect.h>
@@ -86,8 +86,7 @@ public:
 
     CHIP_ERROR _JoinerStart();
 
-    CHIP_ERROR _GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength,
-                                                        chip::TLV::TLVType & type);
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(chip::AttributeId attributeId, chip::TLV::TLVWriter * aWriter);
 
     ~ThreadStackManagerImpl() = default;
 

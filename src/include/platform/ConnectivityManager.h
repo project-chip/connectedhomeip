@@ -24,7 +24,7 @@
 #pragma once
 #include <memory>
 
-#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
@@ -166,8 +166,7 @@ public:
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
     bool HaveServiceConnectivityViaThread();
-    CHIP_ERROR GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength,
-                                                       chip::TLV::TLVType & type);
+    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(chip::AttributeId attributeId, chip::TLV::TLVWriter * aWriter);
 
     // Internet connectivity methods
     bool HaveIPv4InternetConnectivity();
@@ -479,10 +478,10 @@ inline bool ConnectivityManager::HaveServiceConnectivityViaThread()
     return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaThread();
 }
 
-inline CHIP_ERROR ConnectivityManager::GetThreadNetworkDiagnosticAttributeInfo(chip::AttributeId attributeId, uint8_t ** buffer,
-                                                                               uint16_t & ReadLength, chip::TLV::TLVType & type)
+inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTlv(chip::AttributeId attributeId,
+                                                                                  chip::TLV::TLVWriter * aWriter)
 {
-    return static_cast<ImplClass *>(this)->_GetThreadNetworkDiagnosticAttributeInfo(attributeId, buffer, ReadLength, type);
+    return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, aWriter);
 }
 
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()

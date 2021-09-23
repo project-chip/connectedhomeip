@@ -46,6 +46,7 @@
 #endif
 
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/CodeUtils.h>
@@ -58,7 +59,9 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/MessageDef/AttributeDataElement.h>
 
 #include <limits>
 
@@ -67,6 +70,10 @@ extern "C" void otSysProcessDrivers(otInstance * aInstance);
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 extern "C" void otAppCliInit(otInstance * aInstance);
 #endif
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 
 namespace chip {
 namespace DeviceLayer {
@@ -805,108 +812,73 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadNetworkDiagnosticAttributeInfo(
-    chip::AttributeId attributeId, uint8_t ** buffer, uint16_t & ReadLength, chip::TLV::TLVType & type)
+CHIP_ERROR
+GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(chip::AttributeId attributeId,
+                                                                                                 chip::TLV::TLVWriter * aWriter)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     switch (attributeId)
     {
-    case ZCL_CHANNEL_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint16_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-        uint16_t channel = static_cast<uint16_t>(otLinkGetChannel(mOTInst));
-        Encoding::LittleEndian::Put16(*buffer, channel);
+    case ThreadNetworkDiagnostics::Attributes::Ids::Channel: {
+        uint16_t channel = otLinkGetChannel(mOTInst);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), channel);
     }
     break;
 
-    case ZCL_ROUTING_ROLE_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(otDeviceRole);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RoutingRole: {
         otDeviceRole role = otThreadGetDeviceRole(mOTInst);
-        Encoding::LittleEndian::Put16(*buffer, role);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), role);
     }
     break;
 
-    case ZCL_NETWORK_NAME_ATTRIBUTE_ID: {
-        type       = kTLVType_UTF8String;
-        ReadLength = OT_NETWORK_NAME_MAX_SIZE + 1;
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-        ChipLogProgress(DeviceLayer, "Read NetworkName= %s", otThreadGetNetworkName(mOTInst));
-        strncpy(reinterpret_cast<char *>(*buffer), otThreadGetNetworkName(mOTInst), ReadLength);
-        ChipLogProgress(DeviceLayer, "Copied NetworkName= %s", *buffer);
+    case ThreadNetworkDiagnostics::Attributes::Ids::NetworkName: {
+        const char * networkName = otThreadGetNetworkName(mOTInst);
+        aWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), networkName, strlen(networkName));
     }
     break;
 
-    case ZCL_DIAG_PAN_ID_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(otPanId);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-        otPanId panId = otLinkGetPanId(mOTInst);
-        Encoding::LittleEndian::Put16(*buffer, panId);
+    case ThreadNetworkDiagnostics::Attributes::Ids::PanId: {
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otLinkGetPanId(mOTInst));
     }
     break;
 
-    case ZCL_DIAG_EXTENDED_PAN_ID_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint64_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::ExtendedPanId: {
         const otExtendedPanId * pExtendedPanid = otThreadGetExtendedPanId(mOTInst);
-        Encoding::LittleEndian::Put64(*buffer, Encoding::BigEndian::Get64(pExtendedPanid->m8));
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), Encoding::BigEndian::Get64(pExtendedPanid->m8));
     }
     break;
 
-    case ZCL_MESH_LOCAL_PREFIX_ATTRIBUTE_ID: {
-        const uint8_t kOctStrPrefixLen =
-            (OT_MESH_LOCAL_PREFIX_SIZE + 1) * 2 + 1; // For each hex character of Len + Prefix + NULL char
-        type       = kTLVType_ByteString;
-        ReadLength = kOctStrPrefixLen;
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+    case ThreadNetworkDiagnostics::Attributes::Ids::MeshLocalPrefix: {
+        uint8_t meshLocaPrefix[OT_MESH_LOCAL_PREFIX_SIZE + 1] = { 0 }; // + 1  to encode prefix Len in the octstr
 
-        const otMeshLocalPrefix * pMeshLocalPrefix                 = otThreadGetMeshLocalPrefix(mOTInst);
-        uint8_t formattedIpv6Prefix[OT_MESH_LOCAL_PREFIX_SIZE + 1] = { 0 };
-        formattedIpv6Prefix[0]                                     = OT_IP6_PREFIX_BITSIZE;
-        memcpy(&formattedIpv6Prefix[1], pMeshLocalPrefix->m8, OT_MESH_LOCAL_PREFIX_SIZE);
+        const otMeshLocalPrefix * pMeshLocalPrefix = otThreadGetMeshLocalPrefix(mOTInst);
+        meshLocaPrefix[0]                          = OT_IP6_PREFIX_BITSIZE;
 
-        chip::Encoding::BytesToUppercaseHexString(formattedIpv6Prefix, OT_MESH_LOCAL_PREFIX_SIZE + 1,
-                                                  reinterpret_cast<char *>(*buffer), ReadLength);
+        memcpy(&meshLocaPrefix[1], pMeshLocalPrefix->m8, OT_MESH_LOCAL_PREFIX_SIZE);
+        aWriter->PutBytes(TLV::ContextTag(AttributeDataElement::kCsTag_Data), meshLocaPrefix, OT_MESH_LOCAL_PREFIX_SIZE + 1);
     }
     break;
 
-    case ZCL_DIAG_OVERRUN_COUNT_ATTRIBUTE_ID: {
+    case ThreadNetworkDiagnostics::Attributes::Ids::OverrunCount: {
         // TO DO
-        type = kTLVType_UnsignedInteger;
-        err  = CHIP_ERROR_NOT_IMPLEMENTED;
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
     }
     break;
 
-    case ZCL_NEIGHBOR_TABLE_ATTRIBUTE_ID: {
-        type = kTLVType_List;
-        // List not yet functionnal
+    case ThreadNetworkDiagnostics::Attributes::Ids::NeighborTableList: {
+        // List and structure not yet functionnal
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         // TO DO When list is functionnal.
         // Determined limit of otNeighborInfo list
-        // ReadLength = sizeof(otNeighborInfo) * 20;
-        // *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
+        // pReadLength = sizeof(otNeighborInfo) * 20;
+        // buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(*pReadLength));
         // VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
         // otNeighborInfoIterator iterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
         // otNeighborInfo neighInfo;
 
-        // uint16_t remainingSize = ReadLength;
+        // uint16_t remainingSize = *pReadLength;
         // uint16_t offset        = 0;
         // while (otThreadGetNextNeighborInfo(mOTInst, &iterator, &neighInfo) == OT_ERROR_NONE)
         // {
@@ -922,628 +894,376 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadNetwor
     }
     break;
 
-    case ZCL_ROUTE_TABLE_ATTRIBUTE_ID: {
-        type = kTLVType_List;
+    case ThreadNetworkDiagnostics::Attributes::Ids::RouteTableList: {
         // List not yet functionnal
         err = CHIP_ERROR_NOT_IMPLEMENTED;
     }
     break;
 
-    case ZCL_PARTITION_ID_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-        Encoding::LittleEndian::Put32(*buffer, otThreadGetPartitionId(mOTInst));
+    case ThreadNetworkDiagnostics::Attributes::Ids::PartitionId: {
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otThreadGetPartitionId(mOTInst));
     }
     break;
 
-    case ZCL_WEIGHTING_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint8_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-        Encoding::Put8(*buffer, otThreadGetLeaderWeight(mOTInst));
+    case ThreadNetworkDiagnostics::Attributes::Ids::Weighting: {
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otThreadGetLeaderWeight(mOTInst));
     }
     break;
 
-    case ZCL_DATA_VERSION_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint8_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-        Encoding::Put8(*buffer, otNetDataGetVersion(mOTInst));
+    case ThreadNetworkDiagnostics::Attributes::Ids::DataVersion: {
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otNetDataGetVersion(mOTInst));
     }
     break;
 
-    case ZCL_STABLE_DATA_VERSION_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint8_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-        Encoding::Put8(*buffer, otNetDataGetStableVersion(mOTInst));
+    case ThreadNetworkDiagnostics::Attributes::Ids::StableDataVersion: {
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otNetDataGetStableVersion(mOTInst));
     }
     break;
 
-    case ZCL_LEADER_ROUTER_ID_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint8_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-        Encoding::Put8(*buffer, otThreadGetLeaderRouterId(mOTInst));
+    case ThreadNetworkDiagnostics::Attributes::Ids::LeaderRouterId: {
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otThreadGetLeaderRouterId(mOTInst));
     }
     break;
 
-    case ZCL_DETACHED_ROLE_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint16_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::DetachedRoleCount: {
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        Encoding::LittleEndian::Put16(*buffer, mleCounters->mDetachedRole);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mDetachedRole);
     }
     break;
 
-    case ZCL_CHILD_ROLE_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint16_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::ChildRoleCount: {
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        Encoding::LittleEndian::Put16(*buffer, mleCounters->mChildRole);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mChildRole);
     }
     break;
 
-    case ZCL_ROUTER_ROLE_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint16_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RouterRoleCount: {
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        Encoding::LittleEndian::Put16(*buffer, mleCounters->mRouterRole);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mRouterRole);
     }
     break;
 
-    case ZCL_LEADER_ROLE_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint16_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::LeaderRoleCount: {
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        Encoding::LittleEndian::Put16(*buffer, mleCounters->mLeaderRole);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mLeaderRole);
         break;
     }
 
-    case ZCL_ATTACH_ATTEMPT_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint16_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::AttachAttemptCount: {
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        Encoding::LittleEndian::Put16(*buffer, mleCounters->mAttachAttempts);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mAttachAttempts);
     }
     break;
 
-    case ZCL_PARTITION_ID_CHANGE_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint16_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::PartitionIdChangeCount: {
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        Encoding::LittleEndian::Put16(*buffer, mleCounters->mPartitionIdChanges);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mPartitionIdChanges);
     }
     break;
 
-    case ZCL_BETTER_PARTITION_ATTACH_ATTEMPT_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint16_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::BetterPartitionAttachAttemptCount: {
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        Encoding::LittleEndian::Put16(*buffer, mleCounters->mBetterPartitionAttachAttempts);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mBetterPartitionAttachAttempts);
     }
     break;
 
-    case ZCL_PARENT_CHANGE_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint16_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::ParentChangeCount: {
         const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        Encoding::LittleEndian::Put16(*buffer, mleCounters->mParentChanges);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mParentChanges);
     }
     break;
 
-    case ZCL_TX_TOTAL_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxTotalCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxTotal);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxTotal);
     }
     break;
 
-    case ZCL_TX_UNICAST_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxUnicastCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxUnicast);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxUnicast);
     }
     break;
 
-    case ZCL_TX_BROADCAST_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxBroadcastCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxBroadcast);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxBroadcast);
     }
     break;
 
-    case ZCL_TX_ACK_REQUESTED_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxAckRequestedCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxAckRequested);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxAckRequested);
     }
     break;
 
-    case ZCL_TX_ACKED_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxAckedCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxAcked);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxAcked);
     }
     break;
 
-    case ZCL_TX_NO_ACK_REQUESTED_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxNoAckRequestedCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxNoAckRequested);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxNoAckRequested);
     }
     break;
 
-    case ZCL_TX_DATA_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxDataCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxData);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxData);
     }
     break;
 
-    case ZCL_TX_DATA_POLL_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxDataPollCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxDataPoll);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxDataPoll);
     }
     break;
 
-    case ZCL_TX_BEACON_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxBeaconCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxBeacon);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxBeacon);
     }
     break;
 
-    case ZCL_TX_BEACON_REQUEST_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxBeaconRequestCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxBeaconRequest);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxBeaconRequest);
     }
     break;
 
-    case ZCL_TX_OTHER_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxOtherCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxOther);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxOther);
     }
     break;
 
-    case ZCL_TX_RETRY_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxRetryCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxRetry);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxRetry);
     }
     break;
 
-    case ZCL_TX_DIRECT_MAX_RETRY_EXPIRY_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxDirectMaxRetryExpiryCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxDirectMaxRetryExpiry);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxDirectMaxRetryExpiry);
     }
     break;
 
-    case ZCL_TX_INDIRECT_MAX_RETRY_EXPIRY_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxIndirectMaxRetryExpiryCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxIndirectMaxRetryExpiry);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxIndirectMaxRetryExpiry);
     }
     break;
 
-    case ZCL_TX_ERR_CCA_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxErrCcaCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxErrCca);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxErrCca);
     }
     break;
 
-    case ZCL_TX_ERR_ABORT_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxErrAbortCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxErrAbort);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxErrAbort);
     }
     break;
 
-    case ZCL_TX_ERR_BUSY_CHANNEL_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::TxErrBusyChannelCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mTxErrBusyChannel);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxErrBusyChannel);
     }
     break;
 
-    case ZCL_RX_TOTAL_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxTotalCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxTotal);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxTotal);
     }
     break;
 
-    case ZCL_RX_UNICAST_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxUnicastCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxUnicast);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxUnicast);
     }
     break;
 
-    case ZCL_RX_BROADCAST_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxBroadcastCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxBroadcast);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxBroadcast);
     }
     break;
 
-    case ZCL_RX_DATA_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxDataCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxData);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxData);
     }
     break;
 
-    case ZCL_RX_DATA_POLL_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxDataPollCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxDataPoll);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxDataPoll);
     }
     break;
 
-    case ZCL_RX_BEACON_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxBeaconCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxBeacon);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxBeacon);
     }
     break;
 
-    case ZCL_RX_BEACON_REQUEST_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxBeaconRequestCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxBeaconRequest);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxBeaconRequest);
     }
     break;
 
-    case ZCL_RX_OTHER_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxOtherCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxOther);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxOther);
     }
     break;
 
-    case ZCL_RX_ADDRESS_FILTERED_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxAddressFilteredCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxAddressFiltered);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxAddressFiltered);
     }
     break;
 
-    case ZCL_RX_DESTADDR_FILTERED_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxDestAddrFilteredCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxDestAddrFiltered);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxDestAddrFiltered);
     }
     break;
 
-    case ZCL_RX_DUPLICATED_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxDuplicatedCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxDuplicated);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxDuplicated);
     }
     break;
 
-    case ZCL_RX_ERR_NO_FRAME_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrNoFrameCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrNoFrame);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrNoFrame);
     }
     break;
 
-    case ZCL_RX_ERR_UNKNOWN_NEIGHBOR_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrUnknownNeighborCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        memcpy(*buffer, &macCounters->mRxErrUnknownNeighbor, ReadLength);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrUnknownNeighbor);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrUnknownNeighbor);
     }
     break;
 
-    case ZCL_RX_ERR_INVALID_SRC_ADDR_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrInvalidSrcAddrCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrInvalidSrcAddr);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrInvalidSrcAddr);
     }
     break;
 
-    case ZCL_RX_ERR_SEC_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrSecCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrSec);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrSec);
     }
     break;
 
-    case ZCL_RX_ERR_FCS_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrFcsCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrFcs);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrFcs);
     }
     break;
 
-    case ZCL_RX_ERR_OTHER_COUNT_ATTRIBUTE_ID: {
-        type       = kTLVType_UnsignedInteger;
-        ReadLength = sizeof(uint32_t);
-        *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-        VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
+    case ThreadNetworkDiagnostics::Attributes::Ids::RxErrOtherCount: {
         const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        Encoding::LittleEndian::Put32(*buffer, macCounters->mRxErrOther);
+        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrOther);
     }
     break;
 
-    case ZCL_ACTIVE_TIMESTAMP_ATTRIBUTE_ID: {
-        type = kTLVType_UnsignedInteger;
+    case ThreadNetworkDiagnostics::Attributes::Ids::ActiveTimestamp: {
         if (otDatasetIsCommissioned(mOTInst))
         {
-            ReadLength = sizeof(uint64_t);
-            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            Encoding::LittleEndian::Put64(*buffer, activeDataset.mActiveTimestamp);
+            aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), activeDataset.mActiveTimestamp);
         }
     }
     break;
 
-    case ZCL_PENDING_TIMESTAMP_ATTRIBUTE_ID: {
-        type = kTLVType_UnsignedInteger;
+    case ThreadNetworkDiagnostics::Attributes::Ids::PendingTimestamp: {
         if (otDatasetIsCommissioned(mOTInst))
         {
-            ReadLength = sizeof(uint64_t);
-            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            Encoding::LittleEndian::Put64(*buffer, activeDataset.mPendingTimestamp);
+            aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), activeDataset.mPendingTimestamp);
         }
     }
     break;
 
-    case ZCL_DELAY_ATTRIBUTE_ID: {
-        type = kTLVType_UnsignedInteger;
+    case ThreadNetworkDiagnostics::Attributes::Ids::Delay: {
         if (otDatasetIsCommissioned(mOTInst))
         {
-            ReadLength = sizeof(uint32_t);
-            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            Encoding::LittleEndian::Put32(*buffer, activeDataset.mDelay);
+            aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), activeDataset.mDelay);
         }
     }
     break;
 
-    case ZCL_SECURITY_POLICY_ATTRIBUTE_ID: {
-        type = kTLVType_Structure;
-        if (otDatasetIsCommissioned(mOTInst))
-        {
-            ReadLength = sizeof(otSecurityPolicy);
-            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-            otOperationalDataset activeDataset;
-            otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
-            VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            memcpy(*buffer, &activeDataset.mSecurityPolicy, sizeof(otSecurityPolicy));
-        }
+    case ThreadNetworkDiagnostics::Attributes::Ids::SecurityPolicy: {
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        // Stuct type nopt yet supported
+        // if (otDatasetIsCommissioned(mOTInst))
+        // {
+        //     otOperationalDataset activeDataset;
+        //     otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
+        //     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+        //     activeDataset.mSecurityPolicy
+        // }
     }
     break;
 
-    case ZCL_DIAG_CHANNEL_MASK_ATTRIBUTE_ID: {
-        type = kTLVType_ByteString;
+    case ThreadNetworkDiagnostics::Attributes::Ids::ChannelMask: {
         if (otDatasetIsCommissioned(mOTInst))
         {
-            ReadLength = (sizeof(uint32_t) * 2) + 1; // For all Hex characters + NULL
-            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
-
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
             // In the resultant Octet string, the most significant bit of the left-most byte indicates channel 0
-            uint32_t swapedChannelMask = Encoding::Swap32(activeDataset.mChannelMask);
-            chip::Encoding::BytesToUppercaseHexString(reinterpret_cast<uint8_t *>(&swapedChannelMask), sizeof(uint32_t),
-                                                      reinterpret_cast<char *>(*buffer), ReadLength);
+            // We have to bitswap the entire uin32t before converting to octet string
+            uint32_t bitSwappedChannelMask = 0;
+            for (int i = 0, j = 31; i < 32; i++, j--)
+            {
+                bitSwappedChannelMask |= ((activeDataset.mChannelMask >> j) & 1) << i;
+            }
+
+            uint8_t buffer[sizeof(uint32_t)] = { 0 };
+            Encoding::BigEndian::Put32(buffer, bitSwappedChannelMask);
+            aWriter->PutBytes(TLV::ContextTag(AttributeDataElement::kCsTag_Data), buffer, sizeof(uint32_t));
         }
     }
     break;
 
-    case ZCL_OPERATIONAL_DATASET_COMPONENTS_ATTRIBUTE_ID: {
-        type = kTLVType_Structure;
-        if (otDatasetIsCommissioned(mOTInst))
-        {
-            ReadLength = sizeof(otOperationalDatasetComponents);
-            *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(ReadLength));
-            VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
+    case ThreadNetworkDiagnostics::Attributes::Ids::OperationalDatasetComponents: {
+        // Structure not yet supported
+        // if (otDatasetIsCommissioned(mOTInst))
+        // {
+        //     *pReadLength = sizeof(otOperationalDatasetComponents);
+        //     *buffer    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(*pReadLength));
+        //     VerifyOrExit(*buffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-            otOperationalDataset activeDataset;
-            otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
-            VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            memcpy(*buffer, &activeDataset.mComponents, sizeof(otOperationalDatasetComponents));
-        }
+        //     otOperationalDataset activeDataset;
+        //     otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
+        //     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
+        //     // TODO encode TLV STRUCT with content of activeDataset.mComponents
+
+        // }
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
     }
     break;
 
-    case ZCL_ACTIVE_THREAD_NETWORK_FAULTS_ATTRIBUTE_ID: {
-        type = kTLVType_List;
+    case ThreadNetworkDiagnostics::Attributes::Ids::ActiveNetworkFaultsList: {
         // List not yet supported
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         break;
@@ -1558,7 +1278,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadNetwor
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "_GetThreadNetworkDiagnosticAttributeInfo failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "_WriteThreadNetworkDiagnosticAttributeToTlv failed: %s", ErrorStr(err));
     }
     return err;
 }

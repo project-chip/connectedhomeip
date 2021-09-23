@@ -41,13 +41,10 @@ namespace {
 class ThreadDiagosticsAttrAccess : public AttributeAccessInterface
 {
 public:
-    // Register for the EthernetNetworkDiagnostics cluster on all endpoints.
+    // Register for the ThreadNetworkDiagnostics cluster on all endpoints.
     ThreadDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
 
     CHIP_ERROR Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead) override;
-
-private:
-    CHIP_ERROR ReadIfSupported(chip::AttributeId attributeId, TLV::TLVWriter * aWriter);
 };
 
 ThreadDiagosticsAttrAccess gAttrAccess;
@@ -60,69 +57,13 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLV
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    *aDataRead = true;
-
-    return ReadIfSupported(aClusterInfo.mFieldId, aWriter);
-}
-
-CHIP_ERROR ThreadDiagosticsAttrAccess::ReadIfSupported(chip::AttributeId attributeId, TLV::TLVWriter * aWriter)
-{
-    uint8_t * pData   = nullptr;
-    uint16_t dataLen  = 0;
-    TLVType valueType = kTLVType_NotSpecified;
-
-    // GetThreadNetworkDiagnosticAttributeInfo will alloc memory for the data returned.
-    CHIP_ERROR err = ConnectivityMgr().GetThreadNetworkDiagnosticAttributeInfo(attributeId, &pData, dataLen, valueType);
+    CHIP_ERROR err = ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aClusterInfo.mFieldId, aWriter);
 
     if (err == CHIP_NO_ERROR)
     {
-        switch (valueType)
-        {
-        case kTLVType_UnsignedInteger: {
-            if (dataLen == sizeof(uint8_t))
-            {
-                aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), Encoding::Get8(pData));
-            }
-            else if (dataLen == sizeof(uint16_t))
-            {
-                aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::Encoding::LittleEndian::Get16(pData));
-            }
-            else if (dataLen == sizeof(uint32_t))
-            {
-                aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::Encoding::LittleEndian::Get32(pData));
-            }
-            else if (dataLen == sizeof(uint64_t))
-            {
-                aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::Encoding::LittleEndian::Get64(pData));
-            }
-            else
-            {
-                err = CHIP_ERROR_INVALID_INTEGER_VALUE;
-            }
-        }
-        break;
-
-        case kTLVType_UTF8String: {
-            aWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), reinterpret_cast<char *>(pData), dataLen);
-        }
-        break;
-
-        case kTLVType_ByteString: {
-            aWriter->PutBytes(TLV::ContextTag(AttributeDataElement::kCsTag_Data), pData, dataLen);
-        }
-        break;
-
-        default: {
-            err = CHIP_ERROR_NOT_IMPLEMENTED;
-        }
-        break;
-        }
+        *aDataRead = true;
     }
 
-    if (pData != nullptr)
-    {
-        CHIPPlatformMemoryFree(pData);
-    }
     return err;
 }
 } // anonymous namespace
