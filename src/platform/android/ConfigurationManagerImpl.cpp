@@ -29,13 +29,13 @@
 #include <netpacket/packet.h>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/support/CHIPJNIError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/JniTypeWrappers.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/android/AndroidConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/JniTypeWrappers.h>
-#include <lib/support/CHIPJNIError.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -45,7 +45,6 @@ using namespace ::chip::DeviceLayer::Internal;
 /** Singleton instance of the ConfigurationManager implementation object.
  */
 ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
-
 
 void ConfigurationManagerImpl::InitializeWithObject(jobject managerObject)
 {

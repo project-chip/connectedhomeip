@@ -117,12 +117,12 @@ static_library("support") {
 
   # added JNI helper on android
   if (current_os == "android") {
-    sources += [ 
+    sources += [
+      "CHIPJNIError.h",
       "JniReferences.cpp",
       "JniReferences.h",
-      "StackLock.h",
-      "CHIPJNIError.h",
       "JniTypeWrappers.h",
+      "StackLock.h",
     ]
   }
 

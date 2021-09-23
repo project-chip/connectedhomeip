@@ -20,112 +20,117 @@ package chip.platform;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-
 import java.util.Base64;
 import java.util.Map;
 
-/**
- * Java interface for ConfigurationManager
- */
+/** Java interface for ConfigurationManager */
 public class DefaultConfigurationManager implements ConfigurationManager {
 
-    private final String TAG = KeyValueStoreManager.class.getSimpleName();
-    private final String PREFERENCE_FILE_KEY = "chip.platform.ConfigurationManager";
-    private SharedPreferences preferences;
+  private final String TAG = KeyValueStoreManager.class.getSimpleName();
+  private final String PREFERENCE_FILE_KEY = "chip.platform.ConfigurationManager";
+  private SharedPreferences preferences;
 
-    public DefaultConfigurationManager(Context context) {
-        preferences = context.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+  public DefaultConfigurationManager(Context context) {
+    preferences = context.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+  }
+
+  @Override
+  public long readConfigValueLong(String namespace, String name)
+      throws AndroidChipPlatformException {
+    String key = getKey(namespace, name);
+    long value = preferences.getLong(key, Long.MAX_VALUE);
+    if (value == Long.MAX_VALUE) {
+      Log.d(TAG, "Key '" + key + "' not found in shared preferences");
+      throw new AndroidChipPlatformException();
     }
+    return value;
+  }
 
-    @Override
-    public long readConfigValueLong(String namespace, String name) throws AndroidChipPlatformException {
-        String key = getKey(namespace,name);
-        long value = preferences.getLong(key, Long.MAX_VALUE);
-        if (value == Long.MAX_VALUE) {
-            Log.d(TAG, "Key '" + key + "' not found in shared preferences");
-            throw new AndroidChipPlatformException();
+  @Override
+  public String readConfigValueStr(String namespace, String name)
+      throws AndroidChipPlatformException {
+    String key = getKey(namespace, name);
+    String value = preferences.getString(key, null);
+    if (value == null) {
+      Log.d(TAG, "Key '" + key + "' not found in shared preferences");
+      throw new AndroidChipPlatformException();
+    }
+    return value;
+  }
+
+  @Override
+  public byte[] readConfigValueBin(String namespace, String name)
+      throws AndroidChipPlatformException {
+    String key = getKey(namespace, name);
+    String value = preferences.getString(key, null);
+    if (value == null) {
+      Log.d(TAG, "Key '" + key + "' not found in shared preferences");
+      throw new AndroidChipPlatformException();
+    }
+    byte[] byteValue = Base64.getDecoder().decode(value);
+    return byteValue;
+  }
+
+  @Override
+  public void writeConfigValueLong(String namespace, String name, long val)
+      throws AndroidChipPlatformException {
+    String key = getKey(namespace, name);
+    preferences.edit().putLong(key, val).apply();
+  }
+
+  @Override
+  public void writeConfigValueStr(String namespace, String name, String val)
+      throws AndroidChipPlatformException {
+    String key = getKey(namespace, name);
+    preferences.edit().putString(key, val).apply();
+  }
+
+  @Override
+  public void writeConfigValueBin(String namespace, String name, byte[] val)
+      throws AndroidChipPlatformException {
+    String key = getKey(namespace, name);
+    if (val != null) {
+      String valStr = Base64.getEncoder().encodeToString(val);
+      preferences.edit().putString(key, valStr).apply();
+    } else {
+      preferences.edit().remove(key).apply();
+    }
+  }
+
+  @Override
+  public void clearConfigValue(String namespace, String name) throws AndroidChipPlatformException {
+    if (namespace != null && name != null) {
+      preferences.edit().remove(getKey(namespace, name)).apply();
+      ;
+    } else if (namespace != null && name == null) {
+      String pre = getKey(namespace, null);
+      SharedPreferences.Editor editor = preferences.edit();
+      Map<String, ?> allEntries = preferences.getAll();
+      for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+        String key = entry.getKey();
+        if (key.startsWith(pre)) {
+          editor.remove(key);
         }
-        return value;
+      }
+      editor.apply();
+    } else if (namespace == null && name == null) {
+      preferences.edit().clear().apply();
+    }
+  }
+
+  @Override
+  public boolean configValueExists(String namespace, String name)
+      throws AndroidChipPlatformException {
+    return preferences.contains(getKey(namespace, name));
+  }
+
+  private String getKey(String namespace, String name) throws AndroidChipPlatformException {
+    if (namespace != null && name != null) {
+      return namespace + ":" + name;
+    } else if (namespace != null && name == null) {
+      return namespace + ":";
     }
 
-    @Override
-    public String readConfigValueStr(String namespace, String name) throws AndroidChipPlatformException {
-        String key = getKey(namespace,name);
-        String value = preferences.getString(key, null);
-        if (value == null) {
-            Log.d(TAG, "Key '" + key + "' not found in shared preferences");
-            throw new AndroidChipPlatformException();
-        }
-        return value;
-    }
-
-    @Override
-    public byte[] readConfigValueBin(String namespace, String name) throws AndroidChipPlatformException {
-        String key = getKey(namespace,name);
-        String value = preferences.getString(key, null);
-        if (value == null) {
-            Log.d(TAG, "Key '" + key + "' not found in shared preferences");
-            throw new AndroidChipPlatformException();
-        }
-        byte[] byteValue = Base64.getDecoder().decode(value);
-        return byteValue;
-    }
-
-    @Override
-    public void writeConfigValueLong(String namespace, String name, long val) throws AndroidChipPlatformException {
-        String key = getKey(namespace,name);
-        preferences.edit().putLong(key, val).apply();
-    }
-
-    @Override
-    public void writeConfigValueStr(String namespace, String name, String val) throws AndroidChipPlatformException  {
-        String key = getKey(namespace,name);
-        preferences.edit().putString(key, val).apply();
-    }
-
-    @Override
-    public void writeConfigValueBin(String namespace, String name, byte[] val) throws AndroidChipPlatformException  {
-        String key = getKey(namespace,name);
-        if(val != null) {
-            String valStr = Base64.getEncoder().encodeToString(val);
-            preferences.edit().putString(key, valStr).apply();
-        } else {
-            preferences.edit().remove(key).apply();
-        }
-    }
-
-    @Override
-    public void clearConfigValue(String namespace, String name) throws AndroidChipPlatformException  {
-        if(namespace != null && name != null) {
-            preferences.edit().remove(getKey(namespace,name)).apply();;
-        } else if(namespace != null && name == null) {
-            String pre = getKey(namespace, null);
-            SharedPreferences.Editor editor = preferences.edit();
-            Map<String, ?> allEntries = preferences.getAll();
-            for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-                String key = entry.getKey();
-                if(key.startsWith(pre)) {
-                    editor.remove(key);
-                }
-            }
-            editor.apply();
-        } else if(namespace == null && name == null) {
-            preferences.edit().clear().apply();
-        }
-    }
-
-    @Override
-    public boolean configValueExists(String namespace, String name) throws AndroidChipPlatformException  {
-        return preferences.contains(getKey(namespace,name));
-    }
-
-    private String getKey(String namespace, String name) throws AndroidChipPlatformException {
-        if(namespace != null && name != null) {
-            return namespace + ":" + name;
-        } else if(namespace != null && name == null) {
-            return namespace + ":";
-        }
-
-        throw new AndroidChipPlatformException();
-    }
+    throw new AndroidChipPlatformException();
+  }
 }

@@ -42,4 +42,4 @@ public:
 private:
     pthread_mutex_t * mMutex;
 };
-} // namespace jni
+} // namespace chip

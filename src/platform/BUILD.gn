@@ -60,11 +60,12 @@ if (chip_device_platform != "none") {
     chip_stack_lock_tracking = "auto"
 
     # some operates need root, but without it, we may still work
-    chip_device_config_run_as_root =  (current_os != "android")
+    chip_device_config_run_as_root = current_os != "android"
   }
 
   if (chip_stack_lock_tracking == "auto") {
-    if (chip_device_platform == "linux" || chip_device_platform == "tizen" || chip_device_platform == "android") {
+    if (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
+        chip_device_platform == "android") {
       # TODO: should be fatal for development. Change once bugs are fixed
       chip_stack_lock_tracking = "log"
     } else {
@@ -103,7 +104,7 @@ if (chip_device_platform != "none") {
       "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
       "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
       "CHIP_ENABLE_ROTATING_DEVICE_ID=${chip_enable_rotating_device_id}",
-      "CHIP_DEVICE_CONFIG_RUN_AS_ROOT=${chip_device_config_run_as_root}"
+      "CHIP_DEVICE_CONFIG_RUN_AS_ROOT=${chip_device_config_run_as_root}",
     ]
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
