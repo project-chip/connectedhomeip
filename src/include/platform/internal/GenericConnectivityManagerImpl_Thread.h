@@ -69,7 +69,7 @@ protected:
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
     bool _HaveServiceConnectivityViaThread();
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(chip::AttributeId attributeId, chip::TLV::TLVWriter * aWriter);
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
 
     // ===== Members for use by the implementation subclass.
 
@@ -160,8 +160,8 @@ inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_HaveServiceConnec
 
 template <class ImplClass>
 inline CHIP_ERROR
-GenericConnectivityManagerImpl_Thread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(chip::AttributeId attributeId,
-                                                                                              chip::TLV::TLVWriter * aWriter)
+GenericConnectivityManagerImpl_Thread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
+                                                                                              TLV::TLVWriter * aWriter)
 {
     return ThreadStackMgrImpl().WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, aWriter);
 }

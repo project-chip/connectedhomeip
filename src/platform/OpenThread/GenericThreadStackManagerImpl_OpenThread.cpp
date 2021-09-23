@@ -47,8 +47,6 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPTLV.h>
-#include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -58,10 +56,10 @@
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/MessageDef/AttributeDataElement.h>
+#include <app/data-model/Encode.h>
 
 #include <limits>
 
@@ -71,9 +69,9 @@ extern "C" void otSysProcessDrivers(otInstance * aInstance);
 extern "C" void otAppCliInit(otInstance * aInstance);
 #endif
 
-using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::DataModel;
 
 namespace chip {
 namespace DeviceLayer {
@@ -813,22 +811,22 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
 
 template <class ImplClass>
 CHIP_ERROR
-GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(chip::AttributeId attributeId,
-                                                                                                 chip::TLV::TLVWriter * aWriter)
+GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
+                                                                                                 TLV::TLVWriter * aWriter)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err;
 
     switch (attributeId)
     {
     case ThreadNetworkDiagnostics::Attributes::Ids::Channel: {
         uint16_t channel = otLinkGetChannel(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), channel);
+        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), channel);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RoutingRole: {
         otDeviceRole role = otThreadGetDeviceRole(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), role);
+        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), role);
     }
     break;
 
@@ -839,13 +837,14 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::PanId: {
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otLinkGetPanId(mOTInst));
+        uint16_t panId = otLinkGetPanId(mOTInst);
+        err            = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), panId);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::ExtendedPanId: {
         const otExtendedPanId * pExtendedPanid = otThreadGetExtendedPanId(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), Encoding::BigEndian::Get64(pExtendedPanid->m8));
+        err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), Encoding::BigEndian::Get64(pExtendedPanid->m8));
     }
     break;
 
@@ -856,7 +855,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
         meshLocaPrefix[0]                          = OT_IP6_PREFIX_BITSIZE;
 
         memcpy(&meshLocaPrefix[1], pMeshLocalPrefix->m8, OT_MESH_LOCAL_PREFIX_SIZE);
-        aWriter->PutBytes(TLV::ContextTag(AttributeDataElement::kCsTag_Data), meshLocaPrefix, OT_MESH_LOCAL_PREFIX_SIZE + 1);
+        err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), ByteSpan(meshLocaPrefix));
     }
     break;
 
@@ -901,311 +900,322 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::PartitionId: {
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otThreadGetPartitionId(mOTInst));
+        uint32_t partitionId = otThreadGetPartitionId(mOTInst);
+        err                  = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), partitionId);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::Weighting: {
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otThreadGetLeaderWeight(mOTInst));
+        uint8_t weight = otThreadGetLeaderWeight(mOTInst);
+        err            = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), weight);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::DataVersion: {
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otNetDataGetVersion(mOTInst));
+        uint8_t dataVersion = otNetDataGetVersion(mOTInst);
+        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), dataVersion);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::StableDataVersion: {
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otNetDataGetStableVersion(mOTInst));
+        uint8_t stableVersion = otNetDataGetStableVersion(mOTInst);
+        err                   = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), stableVersion);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::LeaderRouterId: {
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), otThreadGetLeaderRouterId(mOTInst));
+        uint8_t leaderRouterId = otThreadGetLeaderRouterId(mOTInst);
+        err                    = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), leaderRouterId);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::DetachedRoleCount: {
-        const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mDetachedRole);
+        uint16_t detachedRole = otThreadGetMleCounters(mOTInst)->mDetachedRole;
+        err                   = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), detachedRole);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::ChildRoleCount: {
-        const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mChildRole);
+        uint16_t childRole = otThreadGetMleCounters(mOTInst)->mChildRole;
+        err                = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), childRole);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RouterRoleCount: {
-        const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mRouterRole);
+        uint16_t routerRole = otThreadGetMleCounters(mOTInst)->mRouterRole;
+        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), routerRole);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::LeaderRoleCount: {
-        const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mLeaderRole);
-        break;
+        uint16_t leaderRole = otThreadGetMleCounters(mOTInst)->mLeaderRole;
+        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), leaderRole);
     }
+    break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::AttachAttemptCount: {
-        const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mAttachAttempts);
+        uint16_t attachAttempts = otThreadGetMleCounters(mOTInst)->mAttachAttempts;
+        err                     = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), attachAttempts);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::PartitionIdChangeCount: {
-        const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mPartitionIdChanges);
+        uint16_t partitionIdChanges = otThreadGetMleCounters(mOTInst)->mPartitionIdChanges;
+        err                         = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), partitionIdChanges);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::BetterPartitionAttachAttemptCount: {
-        const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mBetterPartitionAttachAttempts);
+        uint16_t betterPartitionAttachAttempts = otThreadGetMleCounters(mOTInst)->mBetterPartitionAttachAttempts;
+        err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), betterPartitionAttachAttempts);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::ParentChangeCount: {
-        const otMleCounters * mleCounters = otThreadGetMleCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), mleCounters->mParentChanges);
+        uint16_t parentChanges = otThreadGetMleCounters(mOTInst)->mParentChanges;
+        err                    = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), parentChanges);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxTotalCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxTotal);
+        uint32_t txTotal = otLinkGetCounters(mOTInst)->mTxTotal;
+        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txTotal);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxUnicastCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxUnicast);
+        uint32_t txUnicast = otLinkGetCounters(mOTInst)->mTxUnicast;
+        err                = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txUnicast);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxBroadcastCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxBroadcast);
+        uint32_t txBroadcast = otLinkGetCounters(mOTInst)->mTxBroadcast;
+        err                  = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txBroadcast);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxAckRequestedCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxAckRequested);
+        uint32_t txAckRequested = otLinkGetCounters(mOTInst)->mTxAckRequested;
+        err                     = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txAckRequested);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxAckedCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxAcked);
+        uint32_t txAcked = otLinkGetCounters(mOTInst)->mTxAcked;
+        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txAcked);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxNoAckRequestedCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxNoAckRequested);
+        uint32_t txNoAckRequested = otLinkGetCounters(mOTInst)->mTxNoAckRequested;
+        err                       = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txNoAckRequested);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxDataCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxData);
+        uint32_t txData = otLinkGetCounters(mOTInst)->mTxData;
+        err             = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txData);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxDataPollCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxDataPoll);
+        uint32_t txDataPoll = otLinkGetCounters(mOTInst)->mTxDataPoll;
+        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txDataPoll);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxBeaconCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxBeacon);
+        uint32_t txBeacon = otLinkGetCounters(mOTInst)->mTxBeacon;
+        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txBeacon);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxBeaconRequestCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxBeaconRequest);
+        uint32_t txBeaconRequest = otLinkGetCounters(mOTInst)->mTxBeaconRequest;
+        err                      = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txBeaconRequest);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxOtherCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxOther);
+        uint32_t txOther = otLinkGetCounters(mOTInst)->mTxOther;
+        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txOther);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxRetryCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxRetry);
+        uint32_t txRetry = otLinkGetCounters(mOTInst)->mTxRetry;
+        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txRetry);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxDirectMaxRetryExpiryCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxDirectMaxRetryExpiry);
+        uint32_t txDirectMaxRetryExpiry = otLinkGetCounters(mOTInst)->mTxDirectMaxRetryExpiry;
+        err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txDirectMaxRetryExpiry);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxIndirectMaxRetryExpiryCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxIndirectMaxRetryExpiry);
+        uint32_t txIndirectMaxRetryExpiry = otLinkGetCounters(mOTInst)->mTxIndirectMaxRetryExpiry;
+        err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txIndirectMaxRetryExpiry);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxErrCcaCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxErrCca);
+        uint32_t txErrCca = otLinkGetCounters(mOTInst)->mTxErrCca;
+        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), txErrCca);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxErrAbortCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxErrAbort);
+        uint32_t TxErrAbort = otLinkGetCounters(mOTInst)->mTxErrAbort;
+        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), TxErrAbort);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::TxErrBusyChannelCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mTxErrBusyChannel);
+        uint32_t TxErrBusyChannel = otLinkGetCounters(mOTInst)->mTxErrBusyChannel;
+        err                       = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), TxErrBusyChannel);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxTotalCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxTotal);
+        uint32_t rxTotal = otLinkGetCounters(mOTInst)->mRxTotal;
+        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxTotal);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxUnicastCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxUnicast);
+        uint32_t rxUnicast = otLinkGetCounters(mOTInst)->mRxUnicast;
+        err                = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxUnicast);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxBroadcastCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxBroadcast);
+        uint32_t rxBroadcast = otLinkGetCounters(mOTInst)->mRxBroadcast;
+        err                  = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxBroadcast);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxDataCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxData);
+        uint32_t rxData = otLinkGetCounters(mOTInst)->mRxData;
+        err             = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxData);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxDataPollCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxDataPoll);
+        uint32_t rxDataPoll = otLinkGetCounters(mOTInst)->mRxDataPoll;
+        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxDataPoll);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxBeaconCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxBeacon);
+        uint32_t rxBeacon = otLinkGetCounters(mOTInst)->mRxBeacon;
+        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxBeacon);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxBeaconRequestCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxBeaconRequest);
+        uint32_t rxBeaconRequest = otLinkGetCounters(mOTInst)->mRxBeaconRequest;
+        err                      = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxBeaconRequest);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxOtherCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxOther);
+        uint32_t rxOther = otLinkGetCounters(mOTInst)->mRxOther;
+        err              = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxOther);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxAddressFilteredCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxAddressFiltered);
+        uint32_t rxAddressFiltered = otLinkGetCounters(mOTInst)->mRxAddressFiltered;
+        err                        = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxAddressFiltered);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxDestAddrFilteredCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxDestAddrFiltered);
+        uint32_t rxDestAddrFiltered = otLinkGetCounters(mOTInst)->mRxDestAddrFiltered;
+        err                         = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxDestAddrFiltered);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxDuplicatedCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxDuplicated);
+        uint32_t rxDuplicated = otLinkGetCounters(mOTInst)->mRxDuplicated;
+        err                   = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxDuplicated);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxErrNoFrameCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrNoFrame);
+        uint32_t rxErrNoFrame = otLinkGetCounters(mOTInst)->mRxErrNoFrame;
+        err                   = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrNoFrame);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxErrUnknownNeighborCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrUnknownNeighbor);
+        uint32_t rxErrUnknownNeighbor = otLinkGetCounters(mOTInst)->mRxErrUnknownNeighbor;
+        err                           = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrUnknownNeighbor);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxErrInvalidSrcAddrCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrInvalidSrcAddr);
+        uint32_t rxErrInvalidSrcAddr = otLinkGetCounters(mOTInst)->mRxErrInvalidSrcAddr;
+        err                          = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrInvalidSrcAddr);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxErrSecCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrSec);
+        uint32_t rxErrSec = otLinkGetCounters(mOTInst)->mRxErrSec;
+        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrSec);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxErrFcsCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrFcs);
+        uint32_t rxErrFcs = otLinkGetCounters(mOTInst)->mRxErrFcs;
+        err               = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrFcs);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::RxErrOtherCount: {
-        const otMacCounters * macCounters = otLinkGetCounters(mOTInst);
-        aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), macCounters->mRxErrOther);
+        uint32_t rxErrOther = otLinkGetCounters(mOTInst)->mRxErrOther;
+        err                 = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), rxErrOther);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::ActiveTimestamp: {
+        err = CHIP_ERROR_INCORRECT_STATE;
         if (otDatasetIsCommissioned(mOTInst))
         {
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), activeDataset.mActiveTimestamp);
+            uint64_t activeTimestamp = activeDataset.mPendingTimestamp;
+            err                      = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), activeTimestamp);
         }
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::PendingTimestamp: {
+        err = CHIP_ERROR_INCORRECT_STATE;
         if (otDatasetIsCommissioned(mOTInst))
         {
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), activeDataset.mPendingTimestamp);
+            uint64_t pendingTimestamp = activeDataset.mPendingTimestamp;
+            err                       = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), pendingTimestamp);
         }
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::Delay: {
+        err = CHIP_ERROR_INCORRECT_STATE;
         if (otDatasetIsCommissioned(mOTInst))
         {
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-            aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), activeDataset.mDelay);
+            uint32_t delay = activeDataset.mDelay;
+            err            = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), delay);
         }
     }
     break;
@@ -1224,6 +1234,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Ids::ChannelMask: {
+        err = CHIP_ERROR_INCORRECT_STATE;
         if (otDatasetIsCommissioned(mOTInst))
         {
             otOperationalDataset activeDataset;
@@ -1231,7 +1242,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
             // In the resultant Octet string, the most significant bit of the left-most byte indicates channel 0
-            // We have to bitswap the entire uin32t before converting to octet string
+            // We have to bitswap the entire uint32t before converting to octet string
             uint32_t bitSwappedChannelMask = 0;
             for (int i = 0, j = 31; i < 32; i++, j--)
             {
@@ -1240,7 +1251,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
 
             uint8_t buffer[sizeof(uint32_t)] = { 0 };
             Encoding::BigEndian::Put32(buffer, bitSwappedChannelMask);
-            aWriter->PutBytes(TLV::ContextTag(AttributeDataElement::kCsTag_Data), buffer, sizeof(uint32_t));
+            err = Encode(*aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), ByteSpan(buffer));
         }
     }
     break;
@@ -1270,7 +1281,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
     }
 
     default: {
-        err = CHIP_ERROR_UNKNOWN_RESOURCE_ID;
+        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
     break;
     }

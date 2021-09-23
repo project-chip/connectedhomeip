@@ -86,7 +86,7 @@ public:
 
     CHIP_ERROR _JoinerStart();
 
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(chip::AttributeId attributeId, chip::TLV::TLVWriter * aWriter);
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
 
     ~ThreadStackManagerImpl() = default;
 

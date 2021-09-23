@@ -463,8 +463,7 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(chip::AttributeId attributeId,
-                                                                               chip::TLV::TLVWriter * aWriter)
+CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

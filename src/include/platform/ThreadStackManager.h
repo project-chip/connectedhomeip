@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <app-common/zap-generated/attribute-id.h>
+#include <app/util/basic-types.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/Span.h>
 

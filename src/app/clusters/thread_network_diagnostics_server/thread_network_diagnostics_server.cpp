@@ -59,9 +59,15 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLV
 
     CHIP_ERROR err = ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aClusterInfo.mFieldId, aWriter);
 
-    if (err == CHIP_NO_ERROR)
+    *aDataRead = true;
+
+    // If it isn't a run time assigned attribute, e.j ClusterRevision, or if
+    // not implented  Use standard read.
+    // Clear error and no data read
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE || err == CHIP_ERROR_NOT_IMPLEMENTED)
     {
-        *aDataRead = true;
+        err        = CHIP_NO_ERROR;
+        *aDataRead = false;
     }
 
     return err;

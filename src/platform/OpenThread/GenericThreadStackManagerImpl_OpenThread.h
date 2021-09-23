@@ -40,8 +40,6 @@
 #include <lib/mdns/Advertiser.h>
 #include <lib/mdns/platform/Mdns.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-
 namespace chip {
 namespace DeviceLayer {
 

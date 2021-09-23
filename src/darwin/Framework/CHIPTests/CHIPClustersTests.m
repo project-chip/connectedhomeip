@@ -6654,6 +6654,77 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_DIAGTH_1_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 1);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DIAGTH_1_1_000001_WriteAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t clusterRevisionArgument = 1U;
+    [cluster
+        writeAttributeClusterRevisionWithValue:clusterRevisionArgument
+                               responseHandler:^(NSError * err, NSDictionary * values) {
+                                   NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
+
+                                   XCTAssertEqual(err.code, 1);
+                                   [expectation fulfill];
+                               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DIAGTH_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 1);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterAccountLoginReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =
