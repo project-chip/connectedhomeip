@@ -118,22 +118,22 @@ private:
     };
 
     // ===== helpers
-    CHIP_ERROR HasFlag(Flags flag, bool& has);
+    CHIP_ERROR HasFlag(Flags flag, bool & has);
     CHIP_ERROR SetFlag(Flags flag, bool isSet);
 
     jobject mBLEManagerObject = nullptr;
 
-    jmethodID mInitMethod = nullptr;
+    jmethodID mInitMethod    = nullptr;
     jmethodID mSetFlagMethod = nullptr;
     jmethodID mHasFlagMethod = nullptr;
 
-    jmethodID mOnSubscribeCharacteristicMethod = nullptr;
-    jmethodID mOnUnsubscribeCharacteristicMethod = nullptr;
-    jmethodID mOnCloseConnectionMethod = nullptr;
-    jmethodID mOnGetMTUMethod = nullptr;
-    jmethodID mOnSendWriteRequestMethod = nullptr;
+    jmethodID mOnSubscribeCharacteristicMethod    = nullptr;
+    jmethodID mOnUnsubscribeCharacteristicMethod  = nullptr;
+    jmethodID mOnCloseConnectionMethod            = nullptr;
+    jmethodID mOnGetMTUMethod                     = nullptr;
+    jmethodID mOnSendWriteRequestMethod           = nullptr;
     jmethodID mOnNotifyChipConnectionClosedMethod = nullptr;
-    jmethodID mOnNewConnectionMethod = nullptr;
+    jmethodID mOnNewConnectionMethod              = nullptr;
 };
 
 /**

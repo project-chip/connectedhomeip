@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include <lib/support/JniReferences.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
 
 namespace chip {
 
@@ -36,7 +36,7 @@ void JniReferences::SetJavaVm(JavaVM * jvm, const char * clsType)
     // https://developer.android.com/training/articles/perf-jni#faq_FindClass
     JNIEnv * env = GetEnvForCurrentThread();
     // Any chip.devicecontroller.* class will work here - just need something to call getClassLoader() on.
-    jclass chipClass               = env->FindClass(clsType);
+    jclass chipClass = env->FindClass(clsType);
     VerifyOrReturn(chipClass != nullptr, ChipLogError(Support, "clsType can not found"));
 
     jclass classClass              = env->FindClass("java/lang/Class");

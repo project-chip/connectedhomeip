@@ -23,9 +23,9 @@
 
 #pragma once
 
+#include <platform/android/AndroidConfig.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-#include <platform/android/AndroidConfig.h>
 
 #include <jni.h>
 
