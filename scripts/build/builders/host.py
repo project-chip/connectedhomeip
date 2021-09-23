@@ -80,9 +80,9 @@ class HostBuilder(GnBuilder):
             runner=runner,
             output_prefix=output_prefix)
 
-        self.app_name= app.BinaryName()
-        self.map_name= self.app_name + '.map'
-        self.board= board
+        self.app_name = app.BinaryName()
+        self.map_name = self.app_name + '.map'
+        self.board = board
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
