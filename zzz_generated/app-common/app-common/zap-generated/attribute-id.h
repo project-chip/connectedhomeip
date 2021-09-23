@@ -110,7 +110,7 @@
 
 // Server attributes
 #define ZCL_IDENTIFY_TIME_ATTRIBUTE_ID (0x0000)
-#define ZCL_COMMISSION_STATE_ATTRIBUTE_ID (0x0001)
+#define ZCL_IDENTIFY_TYPE_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Groups
 

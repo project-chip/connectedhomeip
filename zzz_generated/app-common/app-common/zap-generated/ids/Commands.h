@@ -61,8 +61,6 @@ namespace Ids {
 static constexpr CommandId Identify              = 0x00000000;
 static constexpr CommandId IdentifyQueryResponse = 0x00000000;
 static constexpr CommandId IdentifyQuery         = 0x00000001;
-static constexpr CommandId EZModeInvoke          = 0x00000002;
-static constexpr CommandId UpdateCommissionState = 0x00000003;
 static constexpr CommandId TriggerEffect         = 0x00000040;
 } // namespace Ids
 } // namespace Commands
