@@ -22,10 +22,25 @@
 
 struct Identify
 {
+    /**
+     * Callbacks are not thread safe. To access the identify struct please
+     * consider using the LockChipStack / UnlockChipStack functions of the PlatformMgr.
+     */
     using onIdentifyStartCb    = void (*)(Identify *);
     using onIdentifyStopCb     = onIdentifyStartCb;
     using onEffectIdentifierCb = onIdentifyStartCb;
 
+    /**
+     * @brief Construct a new Identify object
+     *
+     * @param endpoint endpoint of the cluster
+     * @param onIdentifyStart callback to indicate to the app to start identifiying
+     * @param onIdentifyStop callback to indicate to the app to stop identifiying
+     * @param identifyType initial identifying type
+     * @param onEffectIdentifier if supported by the app, callback to the app to indicate change of effect identifier
+     * @param effectIdentifier if supported by the app, initial identify effect
+     * @param effectVariant if supported by the app, initial effect variant
+     */
     Identify(chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
              EmberAfIdentifyIdentifyType identifyType, onEffectIdentifierCb onEffectIdentifier = nullptr,
              EmberAfIdentifyEffectIdentifier effectIdentifier = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK,
