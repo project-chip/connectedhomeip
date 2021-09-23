@@ -22,8 +22,8 @@
 #include <algorithm>
 #include <memory>
 
-#include <lib/support/JniReferences.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
 
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/PersistentStorageMacros.h>
@@ -209,8 +209,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.operationalCredentialsDelegate = wrapper.get();
     initParams.systemLayer                    = systemLayer;
     initParams.inetLayer                      = inetLayer;
-    //move bleLayer into platform/android to share with app server
-    initParams.bleLayer                       = DeviceLayer::ConnectivityMgr().GetBleLayer();
+    // move bleLayer into platform/android to share with app server
+    initParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 
     wrapper->InitializeOperationalCredentialsIssuer();
 
@@ -249,7 +249,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.controllerRCAC   = rcacSpan;
     initParams.controllerICAC   = icacSpan;
     initParams.controllerNOC    = nocSpan;
-
 
     *errInfoOnFailure = wrapper->Controller()->Init(initParams);
 

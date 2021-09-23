@@ -30,24 +30,24 @@
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <lib/core/CHIPEncoding.h>
-#include <platform/android/AndroidConfig.h>
+#include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <lib/support/CHIPJNIError.h>
+#include <platform/android/AndroidConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-static jobject gAndroidConfigObject = nullptr;
-static jmethodID gReadConfigValueLongMethod = nullptr;
-static jmethodID gReadConfigValueStrMethod = nullptr;
-static jmethodID gReadConfigValueBinMethod = nullptr;
+static jobject gAndroidConfigObject          = nullptr;
+static jmethodID gReadConfigValueLongMethod  = nullptr;
+static jmethodID gReadConfigValueStrMethod   = nullptr;
+static jmethodID gReadConfigValueBinMethod   = nullptr;
 static jmethodID gWriteConfigValueLongMethod = nullptr;
-static jmethodID gWriteConfigValueStrMethod = nullptr;
-static jmethodID gWriteConfigValueBinMethod = nullptr;
-static jmethodID gClearConfigValueMethod = nullptr;
-static jmethodID gConfigValueExistsMethod = nullptr;
+static jmethodID gWriteConfigValueStrMethod  = nullptr;
+static jmethodID gWriteConfigValueBinMethod  = nullptr;
+static jmethodID gClearConfigValueMethod     = nullptr;
+static jmethodID gConfigValueExistsMethod    = nullptr;
 
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
@@ -79,58 +79,65 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_FailSafeArmed               =
 const AndroidConfig::Key AndroidConfig::kConfigKey_WiFiStationSecType          = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_OperationalDeviceId         = { kConfigNamespace_ChipConfig, "op-device-id" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_OperationalDeviceCert       = { kConfigNamespace_ChipConfig, "op-device-cert" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_OperationalDeviceICACerts   = { kConfigNamespace_ChipConfig, "op-device-ca-certs" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_OperationalDeviceICACerts   = { kConfigNamespace_ChipConfig,
+                                                                                 "op-device-ca-certs" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_ChipConfig, "op-device-key" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_RegulatoryLocation          = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char AndroidConfig::kGroupKeyNamePrefix[] = "gk-";
 
-void AndroidConfig::InitializeWithObject(jobject managerObject) 
+void AndroidConfig::InitializeWithObject(jobject managerObject)
 {
-    JNIEnv * env                     = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env              = JniReferences::GetInstance().GetEnvForCurrentThread();
     gAndroidConfigObject      = env->NewGlobalRef(managerObject);
     jclass androidConfigClass = env->GetObjectClass(gAndroidConfigObject);
     VerifyOrReturn(androidConfigClass != nullptr, ChipLogError(DeviceLayer, "Failed to get KVS Java class"));
 
-    gReadConfigValueLongMethod = env->GetMethodID(androidConfigClass, "readConfigValueLong", "(Ljava/lang/String;Ljava/lang/String;)J");
+    gReadConfigValueLongMethod =
+        env->GetMethodID(androidConfigClass, "readConfigValueLong", "(Ljava/lang/String;Ljava/lang/String;)J");
     if (gReadConfigValueLongMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access AndroidConfig 'readConfigValueLong' method");
         env->ExceptionClear();
     }
 
-    gReadConfigValueStrMethod = env->GetMethodID(androidConfigClass, "readConfigValueStr", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+    gReadConfigValueStrMethod =
+        env->GetMethodID(androidConfigClass, "readConfigValueStr", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
     if (gReadConfigValueStrMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access AndroidConfig 'readConfigValueStr' method");
         env->ExceptionClear();
     }
 
-    gReadConfigValueBinMethod = env->GetMethodID(androidConfigClass, "readConfigValueBin", "(Ljava/lang/String;Ljava/lang/String;)[B");
+    gReadConfigValueBinMethod =
+        env->GetMethodID(androidConfigClass, "readConfigValueBin", "(Ljava/lang/String;Ljava/lang/String;)[B");
     if (gReadConfigValueBinMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access AndroidConfig 'readConfigValueBin' method");
         env->ExceptionClear();
     }
 
-    gWriteConfigValueLongMethod = env->GetMethodID(androidConfigClass, "writeConfigValueLong", "(Ljava/lang/String;Ljava/lang/String;J)V");
+    gWriteConfigValueLongMethod =
+        env->GetMethodID(androidConfigClass, "writeConfigValueLong", "(Ljava/lang/String;Ljava/lang/String;J)V");
     if (gWriteConfigValueLongMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access AndroidConfig 'writeConfigValueLong' method");
         env->ExceptionClear();
     }
 
-    gWriteConfigValueStrMethod = env->GetMethodID(androidConfigClass, "writeConfigValueStr", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+    gWriteConfigValueStrMethod =
+        env->GetMethodID(androidConfigClass, "writeConfigValueStr", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
     if (gWriteConfigValueStrMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access AndroidConfig 'writeConfigValueStr' method");
         env->ExceptionClear();
     }
 
-    gWriteConfigValueBinMethod = env->GetMethodID(androidConfigClass, "writeConfigValueBin", "(Ljava/lang/String;Ljava/lang/String;[B)V");
+    gWriteConfigValueBinMethod =
+        env->GetMethodID(androidConfigClass, "writeConfigValueBin", "(Ljava/lang/String;Ljava/lang/String;[B)V");
     if (gWriteConfigValueBinMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access AndroidConfig 'writeConfigValueBin' method");
@@ -161,8 +168,9 @@ CHIP_ERROR AndroidConfig::Init()
 CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, bool & val)
 {
     uint64_t valuint64;
-    CHIP_ERROR err = AndroidConfig::ReadConfigValue(key,valuint64);
-    if(err == CHIP_NO_ERROR) {
+    CHIP_ERROR err = AndroidConfig::ReadConfigValue(key, valuint64);
+    if (err == CHIP_NO_ERROR)
+    {
         val = static_cast<bool>(valuint64);
     }
 
@@ -172,8 +180,9 @@ CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, bool & val)
 CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, uint32_t & val)
 {
     uint64_t valuint64;
-    CHIP_ERROR err = AndroidConfig::ReadConfigValue(key,valuint64);
-    if(err == CHIP_NO_ERROR) {
+    CHIP_ERROR err = AndroidConfig::ReadConfigValue(key, valuint64);
+    if (err == CHIP_NO_ERROR)
+    {
         val = static_cast<uint32_t>(valuint64);
     }
 
@@ -244,7 +253,8 @@ CHIP_ERROR AndroidConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufS
     UtfString space(env, key.Namespace);
     UtfString name(env, key.Name);
 
-    jbyteArray javaValue = static_cast<jbyteArray>(env->CallObjectMethod(gAndroidConfigObject, gReadConfigValueBinMethod, space.jniValue(), name.jniValue()));
+    jbyteArray javaValue = static_cast<jbyteArray>(
+        env->CallObjectMethod(gAndroidConfigObject, gReadConfigValueBinMethod, space.jniValue(), name.jniValue()));
     if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in AndroidConfig::ReadConfigValueBin");
@@ -253,15 +263,15 @@ CHIP_ERROR AndroidConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufS
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
 
-    jbyte* elements = env->GetByteArrayElements(javaValue, NULL);
-    if(elements == NULL)
+    jbyte * elements = env->GetByteArrayElements(javaValue, NULL);
+    if (elements == NULL)
     {
         ChipLogError(DeviceLayer, "AndroidConfig::ReadConfigValueBin got null");
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
 
     outLen = static_cast<size_t>(env->GetArrayLength(javaValue));
-    memcpy(buf, elements, min(outLen,bufSize));
+    memcpy(buf, elements, min(outLen, bufSize));
 
     env->ReleaseByteArrayElements(javaValue, elements, 0);
 
@@ -361,7 +371,7 @@ CHIP_ERROR AndroidConfig::WriteConfigValueBin(Key key, const uint8_t * data, siz
 
     UtfString space(env, key.Namespace);
     UtfString name(env, key.Name);
-    ByteArray jval(env, reinterpret_cast<const jbyte*>(data), dataLen);
+    ByteArray jval(env, reinterpret_cast<const jbyte *>(data), dataLen);
 
     env->CallVoidMethod(gAndroidConfigObject, gWriteConfigValueBinMethod, space.jniValue(), name.jniValue(), jval.jniValue());
     if (env->ExceptionCheck())

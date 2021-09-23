@@ -22,20 +22,19 @@ public final class AndroidChipPlatform {
   private static AndroidChipPlatform sInstance = new AndroidChipPlatform();
   private BLEManager mBLEManager = null;
 
-  private AndroidChipPlatform() {
-  }
+  private AndroidChipPlatform() {}
 
   public static AndroidChipPlatform getInstance() {
     return sInstance;
   }
 
-  //for BLEManager
+  // for BLEManager
   public BLEManager getBLEManager() {
     return mBLEManager;
   }
 
   public void setBLEManager(BLEManager manager) {
-    if(mBLEManager == null) {
+    if (mBLEManager == null) {
       mBLEManager = manager;
       nativeSetBLEManager(manager);
     }
@@ -43,41 +42,39 @@ public final class AndroidChipPlatform {
 
   public native void nativeSetBLEManager(BLEManager manager);
 
-  //apis in BleLayer.h called by Platform
-  //write success
+  // apis in BleLayer.h called by Platform
+  // write success
   public native void handleWriteConfirmation(
-          int connId, byte[] svcId, byte[] charId, boolean success);
+      int connId, byte[] svcId, byte[] charId, boolean success);
 
-  //onSubscribeCharacteristic get data
-  public native void handleIndicationReceived(
-          int connId, byte[] svcId, byte[] charId, byte[] data);
+  // onSubscribeCharacteristic get data
+  public native void handleIndicationReceived(int connId, byte[] svcId, byte[] charId, byte[] data);
 
-  //Subscribe success
+  // Subscribe success
   public native void handleSubscribeComplete(
-          int connId, byte[] svcId, byte[] charId, boolean success);
+      int connId, byte[] svcId, byte[] charId, boolean success);
 
-  //Unsubscribe success
+  // Unsubscribe success
   public native void handleUnsubscribeComplete(
-          int connId, byte[] svcId, byte[] charId, boolean success);
+      int connId, byte[] svcId, byte[] charId, boolean success);
 
-  //connection status changed
+  // connection status changed
   public native void handleConnectionError(int connId);
 
-
-  //for KeyValueStoreManager
+  // for KeyValueStoreManager
   public native void setKeyValueStoreManager(KeyValueStoreManager manager);
 
-  //for ConfigurationManager
+  // for ConfigurationManager
   public native void setConfigurationManager(ConfigurationManager manager);
 
-  //for ServiceResolver
+  // for ServiceResolver
   public native void setServiceResolver(ServiceResolver resolver);
 
   public native void handleServiceResolve(
-          String instanceName,
-          String serviceType,
-          String address,
-          int port,
-          long callbackHandle,
-          long contextHandle);
+      String instanceName,
+      String serviceType,
+      String address,
+      int port,
+      long callbackHandle,
+      long contextHandle);
 }

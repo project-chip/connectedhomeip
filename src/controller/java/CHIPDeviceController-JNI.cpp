@@ -161,7 +161,8 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     SuccessOrExit(err);
 
     // Create and start the IO thread. Must be called after Controller()->Init
-    if (sIOThread == PTHREAD_NULL) {
+    if (sIOThread == PTHREAD_NULL)
+    {
         int pthreadErr = pthread_create(&sIOThread, NULL, IOThreadMain, NULL);
         VerifyOrExit(pthreadErr == 0, err = CHIP_ERROR_POSIX(pthreadErr));
     }
