@@ -72,7 +72,11 @@ class HostBoard(Enum):
             raise Exception('Unknown host board type: %r' % self)
 
     def PlatformName(self):
-        return uname().system.lower()
+        if self == HostBoard.NATIVE:
+            return uname().system.lower()
+        else:
+            # Cross compilation assumes linux currently
+            return 'linux'
 
 
 class HostBuilder(GnBuilder):
