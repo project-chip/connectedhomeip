@@ -29,14 +29,15 @@ from .targets import Application, Board, Platform
 
 class MatchApplication:
 
-    def __init__(self, app, board=None):
+    def __init__(self, app, rpcs_supported, board=None):
         self.app = app
         self.board = board
+        self.rpcs_supported = rpcs_supported
 
-    def Match(self, board: Board, app: Application):
+    def Match(self, board: Board, app: Application, enable_rpcs: bool):
         if app != self.app:
             return False
-        return self.board is None or board == self.board
+        return (self.board is None or board == self.board) and (self.rpcs_supported or not enable_rpcs)
 
 
 class Matcher():
@@ -47,34 +48,36 @@ class Matcher():
         self.app_arguments = {}
         self.board_arguments = {}
 
-    def AcceptApplication(self, __app_key: Application, **kargs):
-        self.app_arguments[MatchApplication(__app_key)] = kargs
+    def AcceptApplication(self, __app_key: Application, rpcs_supported=False, **kargs):
+        self.app_arguments[MatchApplication(__app_key, rpcs_supported)] = kargs
 
-    def AcceptApplicationForBoard(self, __app_key: Application, __board: Board,
+    def AcceptApplicationForBoard(self, __app_key: Application, __board: Board, rpcs_supported=False,
                                   **kargs):
-        self.app_arguments[MatchApplication(__app_key, __board)] = kargs
+        self.app_arguments[MatchApplication(
+            __app_key, rpcs_supported, __board)] = kargs
 
     def AcceptBoard(self, __board_key: Board, **kargs):
         self.board_arguments[__board_key] = kargs
 
     def Create(self, runner, __board_key: Board, __app_key: Application,
-               repo_path: str, **kargs):
+               repo_path: str, enable_rpcs: bool, **kargs):
         """Creates a new builder for the given board/app. """
         if not __board_key in self.board_arguments:
             return None
 
         extra_app_args = None
         for key, value in self.app_arguments.items():
-            if key.Match(__board_key, __app_key):
+            if key.Match(__board_key, __app_key, enable_rpcs):
                 extra_app_args = value
                 break
 
         if extra_app_args is None:
             return None
+        if enable_rpcs:
+            kargs['enable_rpcs'] = True
 
         kargs.update(self.board_arguments[__board_key])
         kargs.update(extra_app_args)
-
         return self.builder_class(repo_path, runner=runner, **kargs)
 
 
@@ -108,8 +111,12 @@ _MATCHERS[Platform.ESP32].AcceptBoard(Board.DEVKITC, board=Esp32Board.DevKitC)
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.M5STACK, board=Esp32Board.M5Stack)
 _MATCHERS[Platform.ESP32].AcceptBoard(
     Board.C3DEVKIT, board=Esp32Board.C3DevKit)
-_MATCHERS[Platform.ESP32].AcceptApplication(
-    Application.ALL_CLUSTERS, app=Esp32App.ALL_CLUSTERS)
+_MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
+    Application.ALL_CLUSTERS, Board.M5STACK, app=Esp32App.ALL_CLUSTERS, rpcs_supported=True)
+_MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
+    Application.ALL_CLUSTERS, Board.DEVKITC, app=Esp32App.ALL_CLUSTERS)
+_MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
+    Application.ALL_CLUSTERS, Board.C3DEVKIT, app=Esp32App.ALL_CLUSTERS)
 _MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
     Application.SHELL, Board.DEVKITC, app=Esp32App.SHELL)
 _MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
@@ -125,7 +132,7 @@ _MATCHERS[Platform.QPG].AcceptBoard(Board.QPG6100)
 _MATCHERS[Platform.EFR32].AcceptBoard(
     Board.BRD4161A, board=Efr32Board.BRD4161A)
 _MATCHERS[Platform.EFR32].AcceptApplication(
-    Application.LIGHT, app=Efr32App.LIGHT)
+    Application.LIGHT, app=Efr32App.LIGHT, rpcs_supported=True)
 _MATCHERS[Platform.EFR32].AcceptApplication(
     Application.LOCK, app=Efr32App.LOCK)
 _MATCHERS[Platform.EFR32].AcceptApplication(
@@ -134,7 +141,8 @@ _MATCHERS[Platform.EFR32].AcceptApplication(
 _MATCHERS[Platform.NRF].AcceptBoard(Board.NRF5340, board=NrfBoard.NRF5340)
 _MATCHERS[Platform.NRF].AcceptBoard(Board.NRF52840, board=NrfBoard.NRF52840)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LOCK, app=NrfApp.LOCK)
-_MATCHERS[Platform.NRF].AcceptApplication(Application.LIGHT, app=NrfApp.LIGHT)
+_MATCHERS[Platform.NRF].AcceptApplication(
+    Application.LIGHT, app=NrfApp.LIGHT, rpcs_supported=True)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.SHELL, app=NrfApp.SHELL)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.PUMP, app=NrfApp.PUMP)
 _MATCHERS[Platform.NRF].AcceptApplication(
@@ -169,7 +177,7 @@ class BuilderFactory:
         self.repository_path = repository_path
         self.output_prefix = output_prefix
 
-    def Create(self, platform: Platform, board: Board, app: Application, enable_flashbundle: bool = False):
+    def Create(self, platform: Platform, board: Board, app: Application, enable_rpcs: bool, enable_flashbundle: bool = False):
         """Creates a builder object for the specified arguments. """
 
         builder = _MATCHERS[platform].Create(
@@ -177,11 +185,13 @@ class BuilderFactory:
             board,
             app,
             self.repository_path,
+            enable_rpcs,
             output_prefix=self.output_prefix)
 
         if builder:
             builder.SetIdentifier(platform.name.lower(),
-                                  board.name.lower(), app.name.lower())
+                                  board.name.lower(), app.name.lower(),
+                                  enable_rpcs=enable_rpcs)
             builder.enable_flashbundle(enable_flashbundle)
 
         return builder
@@ -206,11 +216,14 @@ class TargetRelations:
         return platforms
 
     @staticmethod
-    def ApplicationsForPlatform(platform: Platform) -> Set[Application]:
+    def ApplicationsForPlatform(platform: Platform, enable_rpcs: bool) -> Set[Application]:
         """What applications are buildable for a specific platform."""
         global _MATCHERS
-        return set(
-            [matcher.app for matcher in _MATCHERS[platform].app_arguments.keys()])
+        apps = set()
+        for matcher in _MATCHERS[platform].app_arguments.keys():
+            if matcher.rpcs_supported or not enable_rpcs:
+                apps.add(matcher.app)
+        return apps
 
     @staticmethod
     def PlatformsForApplication(application: Application) -> Set[Platform]:
