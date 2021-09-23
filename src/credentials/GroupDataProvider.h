@@ -60,7 +60,7 @@ public:
         }
     };
 
-    // A group state maps the group key set to use for encryption/decryption for a given group.
+    // A group state maps the group key set to use for encryption/decryption for a given group ID.
     struct GroupState
     {
         chip::GroupId group;
@@ -90,58 +90,91 @@ public:
             kLowLatency = 1
         };
 
+        // The actual keys for the group key set
+        EpochKey epoch_keys[3];
         // Logical index provided by the Administrator that configured the entry
         uint16_t key_set_index;
         // Security policy to use for groups that use this keyset
         SecurityPolicy policy;
-        // The actual keys for the group key set
-        EpochKey epoch_keys[3];
-        // TODO: Move fields around to reduce padding loss
         // Number of keys present
         uint8_t num_keys_used;
     };
 
+    // Iterator for group mappings under a given endpoint. Associated with
+    // Groups cluster logic.
     class GroupMappingIterator
     {
     public:
         virtual ~GroupMappingIterator() = default;
-        virtual uint16_t Count()        = 0;
-        virtual GroupId Next()          = 0;
-        virtual void Release()          = 0;
+        // Returns the number of entries in total that will be iterated.
+        virtual uint16_t Count() = 0;
+        // Returns true if a groupID is found in the iteration.
+        virtual bool Next(GroupId & outGroup) = 0;
+        // Release the memory allocated by this iterator, if any. Must be called before
+        // losing scope of a `GroupMappingIterator *`
+        virtual void Release() = 0;
 
     protected:
         GroupMappingIterator() = default;
     };
 
+    // Iterator for group state information mapping a Group ID to a Group Key Set index,
+    // such as reflected by the Groups attribute of the Group Key Management cluster.
     class GroupStateIterator
     {
     public:
-        virtual ~GroupStateIterator()                    = default;
-        virtual uint16_t Count()                         = 0;
-        virtual const GroupStateListEntry * Next()       = 0;
-        virtual void Release()                           = 0;
+        virtual ~GroupStateIterator() = default;
+        // Returns the number of entries in total that will be iterated.
+        virtual uint16_t Count() = 0;
+        // Returns true if a GroupStateListEntry is found in the iteration.
+        virtual bool Next(GroupStateListEntry & outEntry) = 0;
+        // Release the memory allocated by this iterator, if any. Must be called before
+        // losing scope of a `GroupStateIterator *`
+        virtual void Release() = 0;
 
     protected:
         GroupStateIterator() = default;
     };
 
+    // Iterator for the Group Key Sets related under a given Fabric.
+    // TODO: Refactor to allow trial decryption and encryption directly, rather than accessing raw keys.
     class KeySetIterator
     {
     public:
-        virtual ~KeySetIterator()           = default;
-        virtual uint16_t Count()            = 0;
-        virtual const KeySet * Next()       = 0;
-        virtual void Release()              = 0;
+        virtual ~KeySetIterator() = default;
+        // Returns the number of entries in total that will be iterated.
+        virtual uint16_t Count() = 0;
+        // Returns true if a KeySet is found in the iteration.
+        virtual bool Next(KeySet & outSet) = 0;
+        // Release the memory allocated by this iterator, if any. Must be called before
+        // losing scope of a `KeySetIterator *`
+        virtual void Release() = 0;
 
     protected:
         KeySetIterator() = default;
     };
 
+    // Interface for a listener for changes in any Group configuration. Necessary
+    // to implement attribute subscription for Group Key Management cluster, and
+    // to react to configuration changes that may impact in-progress functional
+    // work.
     class GroupListener
     {
+    public:
         virtual ~GroupListener() = default;
-        virtual void OnGroupStateChanged(const GroupState & old_state, const GroupState & new_state) = 0;
-        virtual void OnGroupStateRemoved(const GroupState & removed_state) = 0;
+        /**
+         *  Listener callback invoked when a GroupState entry is mutated or added.
+         *
+         *  @param[in] old_state  GroupStateListEntry reflecting the previous entry. Set to nullptr on appends.
+         *  @param[in] new_state  GroupStateListEntry reflecting the updated/new entry.
+         */
+        virtual void OnGroupStateChanged(const GroupStateListEntry * old_state, const GroupStateListEntry * new_state) = 0;
+        /**
+         *  Listener callback invoked when a GroupState entry is removed from the Groups list.
+         *
+         *  @param[in] removed_state  Copy of GroupStateListEntry that was just removed. Index included is no longer accessible.
+         */
+        virtual void OnGroupStateRemoved(const GroupStateListEntry * removed_state) = 0;
     };
 
     GroupDataProvider()          = default;
@@ -151,6 +184,13 @@ public:
     GroupDataProvider(const GroupDataProvider &) = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
 
+    /**
+     *  Initialize the GroupDataProvider, including any persistent data store
+     *  initialization. Must be called once before any other API succeeds.
+     *
+     *  @retval #CHIP_ERROR_INCORRECT_STATE if called when already initialized.
+     *  @retval #CHIP_NO_ERROR on success.
+     */
     virtual CHIP_ERROR Init() = 0;
     virtual void Finish()     = 0;
 
@@ -166,6 +206,7 @@ public:
     virtual CHIP_ERROR GetGroupState(chip::FabricIndex fabric_index, uint16_t state_index, GroupStateListEntry & state) = 0;
     virtual CHIP_ERROR RemoveGroupState(chip::FabricIndex fabric_index, uint16_t state_index)                           = 0;
     virtual GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric_index)                                     = 0;
+    virtual GroupStateIterator * IterateGroupStates()                                                                   = 0;
 
     // Keys
     virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, KeySet & keys)             = 0;
@@ -177,7 +218,7 @@ public:
     void RemoveListener() { mListener = nullptr; };
 
     // TODO: handle fabric deletion (reindex fabric entries!)
-private:
+protected:
     GroupListener * mListener = nullptr;
 };
 
