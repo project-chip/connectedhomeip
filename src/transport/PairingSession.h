@@ -115,8 +115,11 @@ protected:
         System::PacketBufferHandle msg = bbuf.Finalize();
         VerifyOrReturn(!msg.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
 
-        VerifyOrReturn(exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg)) == CHIP_NO_ERROR,
-                       ChipLogError(SecureChannel, "Failed to send status report message"));
+        CHIP_ERROR err = exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Failed to send status report message. %s", ErrorStr(err));
+        }
     }
 
     CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg)

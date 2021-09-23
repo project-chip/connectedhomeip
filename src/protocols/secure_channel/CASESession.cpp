@@ -974,7 +974,8 @@ CHIP_ERROR CASESession::SendSigma3()
     mState = kSentSigma3;
 
     // Call delegate to send the Msg3 to peer
-    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma3, std::move(msg_R3));
+    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma3, std::move(msg_R3),
+                                     SendFlags(SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
     ChipLogDetail(SecureChannel, "Sent Sigma3 msg");
