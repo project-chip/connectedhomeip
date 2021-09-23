@@ -103,7 +103,7 @@ CHIP_ERROR PythonInteractionModelDelegate::WriteResponseStatus(const app::WriteC
 }
 
 void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
-                                                  TLV::TLVReader * apData, Protocols::InteractionModel::ProtocolCode status)
+                                                  TLV::TLVReader * apData, Protocols::InteractionModel::Status status)
 {
     if (onReportDataFunct != nullptr)
     {
