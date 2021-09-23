@@ -80,12 +80,13 @@ dependencies {
     if (matterBuildSrcDir.isEmpty()) {
         // local in-source-tree copy of the dependencies. Useful for IDE compilation
         implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
-    } else if (project.hasProperty("chipSdkJarDir")) {
-        //scripts/build/build_examples.py
-        println "Compiling using custom sdk jar file directory: ${chipSdkJarDir}"
-        implementation fileTree(dir: "${chipSdkJarDir}", include: ["*.jar", "*.so"])
-    }
-    else {
+
+        // build time dependencies
+        if (project.hasProperty("chipSdkJarDir")) {
+            println "Compiling using custom sdk jar file directory: ${chipSdkJarDir}"
+            implementation fileTree(dir: "${chipSdkJarDir}", include: ["*.jar", "*.so"])
+        }
+    } else {
         implementation project(':chip-library')
     }
 
