@@ -33,7 +33,7 @@ SCRIPT_ROOT = os.path.dirname(__file__)
 def build_expected_output(root: str, out: str) -> List[str]:
     with open(os.path.join(SCRIPT_ROOT, 'expected_all_platform_commands.txt'), 'rt') as f:
         for l in f.readlines():
-            yield l.replace("{root}", root).replace("{out}", out).replace('{real_platform}', HostBoard.NATIVE.PlatformName())
+            yield l.replace("{root}", root).replace("{out}", out).replace('{host_platform}', HostBoard.NATIVE.PlatformName()).replace('{host_board}', HostBoard.NATIVE.BoardName())
 
 
 def build_actual_output(root: str, out: str) -> List[str]:
