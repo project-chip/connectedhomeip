@@ -32,8 +32,8 @@ struct Identify
 
     /**
      * @brief Construct a new Identify object
-     * 
-     * Please note: The app should create a instance of this object to handle 
+     *
+     * Please note: The app should create a instance of this object to handle
      * the identify.
      *
      * @param endpoint endpoint of the cluster
