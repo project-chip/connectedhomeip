@@ -105,7 +105,8 @@ protected:
             : Protocols::SecureChannel::GeneralStatusCode::kFailure;
         uint32_t protocolId = Protocols::SecureChannel::Id.ToFullyQualifiedSpecForm();
 
-        ChipLogDetail(SecureChannel, "Sending status report");
+        ChipLogDetail(SecureChannel, "Sending status report. Protocol code %d, exchange %d", protocolCode,
+                      exchangeCtxt->GetExchangeId());
 
         Protocols::SecureChannel::StatusReport statusReport(generalCode, protocolId, protocolCode);
 

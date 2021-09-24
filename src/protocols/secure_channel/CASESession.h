@@ -66,13 +66,11 @@ struct CASESessionSerialized;
 struct CASESessionSerializable
 {
     uint8_t mVersion;
-    uint8_t mPairingComplete;
+    uint8_t mCASESessionWasEstablished;
     uint16_t mSharedSecretLen;
     uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length];
     uint16_t mMessageDigestLen;
     uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
-    uint16_t mIPKLen;
-    uint8_t mIPK[kIPKSize];
     NodeId mPeerNodeId;
     uint16_t mLocalSessionId;
     uint16_t mPeerSessionId;
@@ -280,7 +278,7 @@ private:
     State mState;
 
 protected:
-    bool mPairingComplete = false;
+    bool mCASESessionEstablished = false;
 
     virtual ByteSpan * GetIPKList() const
     {

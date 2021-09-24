@@ -108,7 +108,7 @@ void CASESession::Clear()
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
     mCommissioningHash.Clear();
-    mPairingComplete = false;
+    mCASESessionEstablished = false;
     PairingSession::Clear();
 
     mState = kInitialized;
@@ -167,27 +167,24 @@ CHIP_ERROR CASESession::Deserialize(CASESessionSerialized & input)
 
 CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
 {
-    // TODO: IPK should not be serialized/deserialized. Remove it from the stored session state.
     const NodeId peerNodeId = GetPeerNodeId();
     VerifyOrReturnError(CanCastTo<uint16_t>(mSharedSecret.Length()), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mMessageDigest)), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mIPK)), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint64_t>(peerNodeId), CHIP_ERROR_INTERNAL);
 
     memset(&serializable, 0, sizeof(serializable));
     serializable.mSharedSecretLen  = LittleEndian::HostSwap16(static_cast<uint16_t>(mSharedSecret.Length()));
     serializable.mMessageDigestLen = LittleEndian::HostSwap16(static_cast<uint16_t>(sizeof(mMessageDigest)));
-    serializable.mIPKLen           = LittleEndian::HostSwap16(static_cast<uint16_t>(sizeof(mIPK)));
-    serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
     serializable.mVersion          = kCASESessionVersion;
     serializable.mPeerNodeId       = LittleEndian::HostSwap64(peerNodeId);
     serializable.mLocalSessionId   = LittleEndian::HostSwap16(GetLocalSessionId());
     serializable.mPeerSessionId    = LittleEndian::HostSwap16(GetPeerSessionId());
 
+    serializable.mCASESessionWasEstablished = (mCASESessionEstablished) ? 1 : 0;
+
     memcpy(serializable.mResumptionId, mResumptionId, sizeof(mResumptionId));
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
     memcpy(serializable.mMessageDigest, mMessageDigest, sizeof(mMessageDigest));
-    memcpy(serializable.mIPK, mIPK, sizeof(mIPK));
 
     return CHIP_NO_ERROR;
 }
@@ -195,8 +192,9 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
 CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & serializable)
 {
     VerifyOrReturnError(serializable.mVersion == kCASESessionVersion, CHIP_ERROR_VERSION_MISMATCH);
-    mPairingComplete = (serializable.mPairingComplete == 1);
-    uint16_t length  = LittleEndian::HostSwap16(serializable.mSharedSecretLen);
+    mCASESessionEstablished = (serializable.mCASESessionWasEstablished == 1);
+
+    uint16_t length = LittleEndian::HostSwap16(serializable.mSharedSecretLen);
     ReturnErrorOnFailure(mSharedSecret.SetLength(static_cast<size_t>(length)));
     memset(mSharedSecret, 0, sizeof(mSharedSecret.Capacity()));
     memcpy(mSharedSecret, serializable.mSharedSecret, length);
@@ -205,15 +203,13 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     VerifyOrReturnError(length <= sizeof(mMessageDigest), CHIP_ERROR_INVALID_ARGUMENT);
     memcpy(mMessageDigest, serializable.mMessageDigest, length);
 
-    length = LittleEndian::HostSwap16(serializable.mIPKLen);
-    VerifyOrReturnError(length <= sizeof(mIPK), CHIP_ERROR_INVALID_ARGUMENT);
-    memcpy(mIPK, serializable.mIPK, length);
-
     SetPeerNodeId(LittleEndian::HostSwap64(serializable.mPeerNodeId));
     SetLocalSessionId(LittleEndian::HostSwap16(serializable.mLocalSessionId));
     SetPeerSessionId(LittleEndian::HostSwap16(serializable.mPeerSessionId));
 
     memcpy(mResumptionId, serializable.mResumptionId, sizeof(mResumptionId));
+
+    memcpy(mIPK, GetIPKList()->data(), sizeof(mIPK));
 
     return CHIP_NO_ERROR;
 }
@@ -243,8 +239,9 @@ CASESession::ListenForSessionEstablishment(uint16_t localSessionId, Transport::F
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(Init(localSessionId, delegate));
 
-    mFabricsTable    = fabrics;
-    mPairingComplete = false;
+    mFabricsTable = fabrics;
+
+    mCASESessionEstablished = false;
 
     ChipLogDetail(SecureChannel, "Waiting for Sigma1 msg");
 
@@ -308,7 +305,7 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoConte
     (void) kKDFSEInfo;
     (void) kKDFSEInfoLength;
 
-    VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mCASESessionEstablished, CHIP_ERROR_INCORRECT_STATE);
 
     // Generate Salt for Encryption keys
     saltlen = sizeof(mIPK) + kSHA256_Hash_Length;
@@ -375,7 +372,7 @@ CHIP_ERROR CASESession::SendSigma1()
     // If CASE session was previously established using the current state information, let's fill in the session resumption
     // information in the the Sigma1 request. It'll speed up the session establishment process if the peer can resume the old
     // session, since no certificate chains will have to be verified.
-    if (mPairingComplete)
+    if (mCASESessionEstablished)
     {
         ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(6), mResumptionId, kCASEResumptionIDSize));
 
@@ -721,7 +718,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     // TODO: Set timestamp on the new session, to allow selecting a least-recently-used session for eviction
     // on running out of session contexts.
 
-    mPairingComplete = true;
+    mCASESessionEstablished = true;
 
     // Forget our exchange, as no additional messages are expected from the peer
     mExchangeCtxt = nullptr;
@@ -1136,7 +1133,7 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     // TODO: Set timestamp on the new session, to allow selecting a least-recently-used session for eviction
     // on running out of session contexts.
 
-    mPairingComplete = true;
+    mCASESessionEstablished = true;
 
     // Forget our exchange, as no additional messages are expected from the peer
     mExchangeCtxt = nullptr;
@@ -1320,7 +1317,7 @@ CHIP_ERROR CASESession::SetEffectiveTime(void)
 void CASESession::OnSuccessStatusReport()
 {
     ChipLogProgress(SecureChannel, "Success status report received. Session was established");
-    mPairingComplete = true;
+    mCASESessionEstablished = true;
 
     // Forget our exchange, as no additional messages are expected from the peer
     mExchangeCtxt = nullptr;
