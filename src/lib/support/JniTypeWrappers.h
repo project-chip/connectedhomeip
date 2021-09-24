@@ -83,7 +83,7 @@ private:
     jstring mData;
 };
 
-/// warp a byte array as a jin byte array
+/// wrap a byte array as a JNI byte array
 class ByteArray
 {
 public:

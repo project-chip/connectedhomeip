@@ -21,9 +21,6 @@
  *      Implementation of JNI bridge for CHIP Device Controller for Android apps
  *
  */
-// #include "AndroidBleApplicationDelegate.h"
-// #include "AndroidBleConnectionDelegate.h"
-// #include "AndroidBlePlatformDelegate.h"
 #include "AndroidCallbacks.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include <lib/support/CHIPJNIError.h>
@@ -65,7 +62,6 @@ using namespace chip::Controller;
 
 static void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device ** device);
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
-// static void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * cbName);
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
 
@@ -152,7 +148,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
 
     ChipLogProgress(Controller, "newDeviceController() called");
 
-    // //move sSystemLayer and sInetLayer into platform/android to share with app server
+    // sSystemLayer and sInetLayer are in platform/android to share with app server
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
@@ -484,35 +480,6 @@ void * IOThreadMain(void * arg)
 
     return NULL;
 }
-
-// void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName)
-// {
-//     if (cbErr == CHIP_JNI_ERROR_EXCEPTION_THROWN)
-//     {
-//         ChipLogError(Controller, "Java exception thrown in %s", functName);
-//         env->ExceptionDescribe();
-//     }
-//     else
-//     {
-//         const char * errStr;
-//         switch (cbErr.AsInteger())
-//         {
-//         case CHIP_JNI_ERROR_TYPE_NOT_FOUND.AsInteger():
-//             errStr = "JNI type not found";
-//             break;
-//         case CHIP_JNI_ERROR_METHOD_NOT_FOUND.AsInteger():
-//             errStr = "JNI method not found";
-//             break;
-//         case CHIP_JNI_ERROR_FIELD_NOT_FOUND.AsInteger():
-//             errStr = "JNI field not found";
-//             break;
-//         default:
-//             errStr = ErrorStr(cbErr);
-//             break;
-//         }
-//         ChipLogError(Controller, "Error in %s : %s", functName, errStr);
-//     }
-// }
 
 void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow)
 {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Utilities for accessing persisted device configuration on
- *          Linux platforms.
+ *          Android platforms.
  */
 
 #pragma once
@@ -34,7 +34,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Provides functions and definitions for accessing device configuration information on the Posix.
+ * Provides functions and definitions for accessing device configuration information on the Android.
  *
  * This class is designed to be mixed-in to concrete implementation classes as a means to
  * provide access to configuration information to generic base classes.

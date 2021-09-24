@@ -19,13 +19,13 @@ package chip.platform;
 
 import android.bluetooth.BluetoothGattCallback;
 
-public interface BLEManager {
+public interface BleManager {
   // For app
-  public int addConnection(BLEConnection connObj);
+  public int addConnection(BleConnection connObj);
 
-  BLEConnection removeConnection(int connId);
+  BleConnection removeConnection(int connId);
 
-  BLEConnection getConnection(int connId);
+  BleConnection getConnection(int connId);
 
   public BluetoothGattCallback getCallback();
 
