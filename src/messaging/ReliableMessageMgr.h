@@ -235,7 +235,7 @@ private:
     template <typename Function>
     void ExecuteForAllContext(Function function)
     {
-        mContextPool.ForEachActiveObject([&](auto * ec) {
+        mContextPool.ForEachActiveObjectMutableUnsafe([&](auto * ec) {
             function(ec->GetReliableMessageContext());
             return true;
         });

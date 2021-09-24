@@ -71,17 +71,27 @@ public:
 
     /**
      * @brief
-     *   Run a functor for each active object in the pool
+     *   Run a functor for each active object in the pool.
      *
      *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
      *  @return    bool     Returns false if broke during iteration
-     *
-     * caution
-     *   this function is not thread-safe, make sure all usage of the
-     *   pool is protected by a lock, or else avoid using this function
      */
     template <typename Function>
-    bool ForEachActiveObject(Function && function)
+    bool ForEachActiveObjectImmutable(Function && function)
+    {
+        LambdaProxy<Function> proxy(std::forward<Function>(function));
+        return ForEachActiveObjectInner(&proxy, &LambdaProxy<Function>::Call);
+    }
+
+    /**
+     * @brief
+     *   Run a functor for each active object in the pool.
+     *
+     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
+     *  @return    bool     Returns false if broke during iteration
+     */
+    template <typename Function>
+    bool ForEachActiveObjectMutableUnsafe(Function && function)
     {
         LambdaProxy<Function> proxy(std::forward<Function>(function));
         return ForEachActiveObjectInner(&proxy, &LambdaProxy<Function>::Call);

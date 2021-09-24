@@ -114,7 +114,7 @@ public:
     UnauthenticatedSession * FindEntry(const PeerAddress & address)
     {
         UnauthenticatedSession * result = nullptr;
-        mEntries.ForEachActiveObject([&](UnauthenticatedSession * entry) {
+        mEntries.ForEachActiveObjectImmutable([&](UnauthenticatedSession * entry) {
             if (MatchPeerAddress(entry->GetPeerAddress(), address))
             {
                 result = entry;
@@ -160,7 +160,7 @@ private:
         UnauthenticatedSession * result = nullptr;
         uint64_t oldestTimeMs           = std::numeric_limits<uint64_t>::max();
 
-        mEntries.ForEachActiveObject([&](UnauthenticatedSession * entry) {
+        mEntries.ForEachActiveObjectImmutable([&](UnauthenticatedSession * entry) {
             if (entry->GetReferenceCount() == 0 && entry->GetLastActivityTimeMs() < oldestTimeMs)
             {
                 result       = entry;

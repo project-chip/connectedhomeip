@@ -313,7 +313,7 @@ CHIP_ERROR InetLayer::Shutdown()
     {
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
         // Cancel all DNS resolution requests owned by this instance.
-        DNSResolver::sPool.ForEachActiveObject([&](DNSResolver * lResolver) {
+        DNSResolver::sPool.ForEachActiveObjectMutableUnsafe([&](DNSResolver * lResolver) {
             if ((lResolver != nullptr) && lResolver->IsCreatedByInetLayer(*this))
             {
                 lResolver->Cancel();
@@ -330,7 +330,7 @@ CHIP_ERROR InetLayer::Shutdown()
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         // Abort all TCP endpoints owned by this instance.
-        TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
+        TCPEndPoint::sPool.ForEachActiveObjectMutableUnsafe([&](TCPEndPoint * lEndPoint) {
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->Abort();
@@ -341,7 +341,7 @@ CHIP_ERROR InetLayer::Shutdown()
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         // Close all UDP endpoints owned by this instance.
-        UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
+        UDPEndPoint::sPool.ForEachActiveObjectMutableUnsafe([&](UDPEndPoint * lEndPoint) {
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->Close();
@@ -390,7 +390,7 @@ bool InetLayer::IsIdleTimerRunning()
     bool timerRunning = false;
 
     // See if there are any TCP connections with the idle timer check in use.
-    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
+    TCPEndPoint::sPool.ForEachActiveObjectImmutable([&](TCPEndPoint * lEndPoint) {
         if ((lEndPoint != nullptr) && (lEndPoint->mIdleTimeout != 0))
         {
             timerRunning = true;
@@ -812,7 +812,7 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
     if (State != kState_Initialized)
         return;
 
-    DNSResolver::sPool.ForEachActiveObject([&](DNSResolver * lResolver) {
+    DNSResolver::sPool.ForEachActiveObjectMutableUnsafe([&](DNSResolver * lResolver) {
         if (!lResolver->IsCreatedByInetLayer(*this))
         {
             return true;
@@ -916,7 +916,7 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
     InetLayer & lInetLayer = *reinterpret_cast<InetLayer *>(aAppState);
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();
 
-    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
+    TCPEndPoint::sPool.ForEachActiveObjectMutableUnsafe([&](TCPEndPoint * lEndPoint) {
         if (!lEndPoint->IsCreatedByInetLayer(lInetLayer))
             return true;
         if (!lEndPoint->IsConnected())
