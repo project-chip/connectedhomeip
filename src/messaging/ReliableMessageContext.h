@@ -41,7 +41,6 @@ namespace Messaging {
 class ChipMessageInfo;
 class ExchangeContext;
 enum class MessageFlagValues : uint32_t;
-class ReliableMessageContext;
 class ReliableMessageMgr;
 
 class ReliableMessageContext
@@ -158,20 +157,11 @@ public:
      */
     void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
 
-    /**
-     *  Determine whether there is already an acknowledgment pending to be sent to the peer on this exchange.
-     *
-     *  @return Returns 'true' if there is already an acknowledgment pending  on this exchange, else 'false'.
-     */
-    bool IsOccupied() const;
+    /// Determine whether there is message hasn't been acknowledged.
+    bool IsMessageNotAcked() const;
 
-    /**
-     *  Set whether there is an acknowledgment panding to be send to the peer on
-     *  this exchange.
-     *
-     *  @param[in]  inOccupied Whether there is a pending acknowledgment.
-     */
-    void SetOccupied(bool inOccupied);
+    /// Set whether there is a message hasn't been acknowledged.
+    void SetMessageNotAcked(bool messageNotAcked);
 
     /**
      * Get the reliable message manager that corresponds to this reliable
@@ -194,8 +184,8 @@ protected:
         /// Internal and debug only: when set, the exchange layer does not send an acknowledgment.
         kFlagDropAckDebug = 0x0008,
 
-        /// When set, signifies current reliable message context is in usage.
-        kFlagOccupied = 0x0010,
+        /// When set, signifies there is a message which hasn't been acknowledged.
+        kFlagMesageNotAcked = 0x0010,
 
         /// When set, signifies that there is an acknowledgment pending to be sent back.
         kFlagAckPending = 0x0020,
@@ -215,8 +205,6 @@ protected:
     BitFlags<Flags> mFlags; // Internal state flags
 
 private:
-    void RetainContext();
-    void ReleaseContext();
     void HandleRcvdAck(uint32_t ackMessageCounter);
     CHIP_ERROR HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags);
     CHIP_ERROR HandleNeedsAckInner(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags);
