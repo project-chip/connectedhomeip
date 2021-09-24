@@ -237,17 +237,18 @@ private:
      *    5. In Closed and Error state, no one is holding the reference to the exchange, and it should be release soon
      *       after goes out of current execution context. It is actually holding by Handler case in a very short time.
      */
-    enum class State {
-        Initiator = 0,
-        Active = 1,
-        Background = 2,
-        Responder = 3,
-        SentExpectResponse = 4,
+    enum class State
+    {
+        Initiator            = 0,
+        Active               = 1,
+        Background           = 2,
+        Responder            = 3,
+        SentExpectResponse   = 4,
         SentNoExpectResponse = 5,
-        Sleep = 6,
-        Closed = 7,
-        Error = 8,
-        Released = 9,
+        Sleep                = 6,
+        Closed               = 7,
+        Error                = 8,
+        Released             = 9,
     } mState;
 
     // Hide Retain/Release API, redeclare them as private

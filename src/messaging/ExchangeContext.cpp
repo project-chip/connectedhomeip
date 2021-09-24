@@ -75,7 +75,8 @@ CHIP_ERROR ExchangeContext::WillHandleMoreMessage(Timeout idleTimeout)
 
 bool ExchangeContext::CanHandleMessage()
 {
-    return mState == State::Responder || mState == State::SentExpectResponse || mState == State::SentNoExpectResponse || mState == State::Sleep;
+    return mState == State::Responder || mState == State::SentExpectResponse || mState == State::SentNoExpectResponse ||
+        mState == State::Sleep;
 }
 
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
@@ -84,9 +85,10 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     ExchangeHandle ref(*this); // Life-cycle Handler case
 
     bool isStandaloneAck =
-    (protocolId == Protocols::SecureChannel::Id) && msgType == to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck);
+        (protocolId == Protocols::SecureChannel::Id) && msgType == to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck);
 
-    VerifyOrReturnError(isStandaloneAck || mState == State::Initiator || mState == State::Active || mState == State::Background, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(isStandaloneAck || mState == State::Initiator || mState == State::Active || mState == State::Background,
+                        CHIP_ERROR_INCORRECT_STATE);
 
     bool isResponseExpected = sendFlags.Has(SendMessageFlags::kExpectResponse);
     if (isResponseExpected)
@@ -111,7 +113,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     bool reliableTransmissionRequested = isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
     CHIP_ERROR err = mDispatch->SendMessage(mSecureSession.Value(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
-        reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+                                            reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
     if (err == CHIP_NO_ERROR)
     {
         mState = isResponseExpected ? State::SentExpectResponse : State::SentNoExpectResponse;
@@ -195,7 +197,7 @@ void ExchangeContext::Close()
     }
 
     State originalState = mState;
-    mState = State::Closed;
+    mState              = State::Closed;
     DoClose(originalState, false);
 }
 
@@ -214,7 +216,7 @@ void ExchangeContext::Abort()
     }
 
     State originalState = mState;
-    mState = State::Error;
+    mState              = State::Error;
     DoClose(originalState, true);
 }
 
@@ -232,7 +234,8 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Sess
     mExchangeId  = ExchangeId;
     mSecureSession.SetValue(session);
     mFlags.Set(Flags::kFlagInitiator, Initiator);
-    if (Initiator) {
+    if (Initiator)
+    {
         mState = State::Initiator;
     }
     else
@@ -273,7 +276,7 @@ ExchangeContext::~ExchangeContext()
     // the boolean parameter passed to DoClose() should not matter.
 
     State originalState = mState;
-    mState = State::Released;
+    mState              = State::Released;
     DoClose(originalState, false);
     mExchangeMgr = nullptr;
 
@@ -330,7 +333,7 @@ void ExchangeContext::OnConnectionExpired()
     mSecureSession.ClearValue();
 
     State originalState = mState;
-    mState = State::Error;
+    mState              = State::Error;
     CleanUp(originalState);
 }
 
@@ -339,7 +342,7 @@ CHIP_ERROR ExchangeContext::StartTimer(Timeout timeout)
     VerifyOrReturnError(!mFlags.Has(Flags::kTimerScheduled), CHIP_ERROR_INCORRECT_STATE);
 
     System::Layer * lSystemLayer = mExchangeMgr->GetSessionManager()->SystemLayer();
-    CHIP_ERROR err = lSystemLayer->StartTimer(timeout, HandleTimeout, this);
+    CHIP_ERROR err               = lSystemLayer->StartTimer(timeout, HandleTimeout, this);
     if (err == CHIP_NO_ERROR)
     {
         mFlags.Set(Flags::kTimerScheduled, true);
@@ -380,7 +383,7 @@ void ExchangeContext::NotifyTimeout()
     if (mState == State::SentExpectResponse || mState == State::Sleep)
     {
         State originalState = mState;
-        mState = State::Error;
+        mState              = State::Error;
         DoClose(originalState, true);
     }
 }
