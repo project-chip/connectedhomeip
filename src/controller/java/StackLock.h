@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include <pthread.h>
 
 /** A scoped lock/unlock around a mutex. */
