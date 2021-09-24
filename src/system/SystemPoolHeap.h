@@ -76,16 +76,38 @@ public:
 
     /**
      * @brief
-     *   Run a functor for each active object in the pool
+     *   Run a functor for each active object in the pool. The object delivered to callback function can't be removed
+     *   during the iterator, or else it will trigger a dead lock.
      *
      *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
      *  @return    bool     Returns false if broke during iteration
      */
     template <typename Function>
-    bool ForEachActiveObject(Function && function)
+    bool ForEachActiveObjectImmutable(Function && function)
     {
         // Create a new copy of original set, allowing add/remove elements while iterating in the same thread.
-        for (auto object : CopyObjectSet())
+        std::lock_guard<std::mutex> lock(mutex);
+        for (auto object : mObjects)
+        {
+            if (!function(object))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * @brief
+     *   Run a functor for each active object in the pool. This function is not thread-safe, the caller must ensure that
+     *   extra synchronization model is used to prevent racing problems.
+     *
+     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
+     *  @return    bool     Returns false if broke during iteration
+     */
+    template <typename Function>
+    bool ForEachActiveObjectMutableUnsafe(Function && function)
+    {
+        // Create a new copy of original set, allowing add/remove elements while iterating in the same thread.
+        for (auto object : mObjects)
         {
             if (!function(object))
                 return false;
@@ -96,12 +118,6 @@ public:
 private:
     std::mutex mutex;
     std::set<T *> mObjects;
-
-    std::set<T *> CopyObjectSet()
-    {
-        std::lock_guard<std::mutex> lock(mutex);
-        return mObjects;
-    }
 };
 
 } // namespace System

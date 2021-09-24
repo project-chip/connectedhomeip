@@ -38,7 +38,7 @@ template <class T>
 size_t GetNumObjectsInUse(T & pool)
 {
     size_t count = 0;
-    pool.ForEachActiveObject([&count](void *) {
+    pool.ForEachActiveObjectMutableUnsafe([&count](void *) {
         ++count;
         return true;
     });

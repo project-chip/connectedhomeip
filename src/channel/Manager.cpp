@@ -25,7 +25,7 @@ ChannelHandle ChannelManager::EstablishChannel(const ChannelBuilder & builder, C
     ChannelContext * channelContext = nullptr;
 
     // Find an existing Channel matching the builder
-    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+    mChannelContexts.ForEachActiveObjectMutableUnsafe([&](ChannelContext * context) {
         if (context->MatchesBuilder(builder))
         {
             channelContext = context;

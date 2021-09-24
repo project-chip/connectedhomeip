@@ -143,7 +143,7 @@ void TestObject::CheckIteration(nlTestSuite * inSuite, void * aContext)
     unsigned int i;
 
     // Pool should be empty before tests.
-    sPool.ForEachActiveObject([&](auto object) {
+    sPool.ForEachActiveObjectMutableUnsafe([&](auto object) {
         NL_TEST_ASSERT(lContext.mTestSuite, false);
         return true;
     });
@@ -157,7 +157,7 @@ void TestObject::CheckIteration(nlTestSuite * inSuite, void * aContext)
     }
 
     i = 0;
-    sPool.ForEachActiveObject([&](TestObject * lCreated) {
+    sPool.ForEachActiveObjectMutableUnsafe([&](TestObject * lCreated) {
         NL_TEST_ASSERT(lContext.mTestSuite, lCreated->GetReferenceCount() > 0);
         i++;
         return true;
@@ -165,7 +165,7 @@ void TestObject::CheckIteration(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(lContext.mTestSuite, i == kPoolSize);
 
     i = 0;
-    sPool.ForEachActiveObject([&](TestObject * lCreated) {
+    sPool.ForEachActiveObjectMutableUnsafe([&](TestObject * lCreated) {
         i++;
         if (i == kPoolSize / 2)
             return false;
@@ -175,7 +175,7 @@ void TestObject::CheckIteration(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(lContext.mTestSuite, i == kPoolSize / 2);
 
     // Clear the pool
-    sPool.ForEachActiveObject([&](auto object) {
+    sPool.ForEachActiveObjectMutableUnsafe([&](auto object) {
         object->Release();
         return true;
     });
@@ -189,7 +189,7 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     unsigned int i;
 
     // Pool should be empty before tests.
-    sPool.ForEachActiveObject([&](auto object) {
+    sPool.ForEachActiveObjectMutableUnsafe([&](auto object) {
         NL_TEST_ASSERT(lContext.mTestSuite, false);
         return true;
     });
@@ -204,7 +204,7 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     }
 
     i = 0;
-    TestObject::sPool.ForEachActiveObject([&](TestObject * lGotten) {
+    TestObject::sPool.ForEachActiveObjectMutableUnsafe([&](TestObject * lGotten) {
         lGotten->Retain();
         i++;
         return true;
@@ -212,7 +212,7 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(lContext.mTestSuite, i == kPoolSize);
 
     i = 0;
-    TestObject::sPool.ForEachActiveObject([&](TestObject * lGotten) {
+    TestObject::sPool.ForEachActiveObjectMutableUnsafe([&](TestObject * lGotten) {
         lGotten->Release();
         i++;
         return true;
@@ -220,7 +220,7 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(lContext.mTestSuite, i == kPoolSize);
 
     // Clear the pool
-    sPool.ForEachActiveObject([&](auto object) {
+    sPool.ForEachActiveObjectMutableUnsafe([&](auto object) {
         object->Release();
         return true;
     });
@@ -296,7 +296,7 @@ void TestObject::MultithreadedTest(nlTestSuite * inSuite, void * aContext, void 
     pthread_t lThread[kNumThreads];
 
     // Pool should be empty before tests.
-    sPool.ForEachActiveObject([&](auto object) {
+    sPool.ForEachActiveObjectMutableUnsafe([&](auto object) {
         NL_TEST_ASSERT(lContext.mTestSuite, false);
         return true;
     });
@@ -324,7 +324,7 @@ void TestObject::CheckConcurrency(nlTestSuite * inSuite, void * aContext)
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     // Clear the pool
-    sPool.ForEachActiveObject([&](auto object) {
+    sPool.ForEachActiveObjectMutableUnsafe([&](auto object) {
         object->Release();
         return true;
     });
@@ -335,7 +335,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     TestContext & lContext = *static_cast<TestContext *>(aContext);
 
     // Pool should be empty before tests.
-    sPool.ForEachActiveObject([&](auto object) {
+    sPool.ForEachActiveObjectMutableUnsafe([&](auto object) {
         NL_TEST_ASSERT(lContext.mTestSuite, false);
         return true;
     });
@@ -375,7 +375,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     // change.
     lObject->Release();
     // Verify that lObject is not in the pool
-    sPool.ForEachActiveObject([&](auto object) {
+    sPool.ForEachActiveObjectMutableUnsafe([&](auto object) {
         NL_TEST_ASSERT(lContext.mTestSuite, lObject != object);
         return true;
     });
@@ -385,7 +385,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(lContext.mTestSuite, lHighWatermark == kNumObjects);
 
     // Clear the pool
-    sPool.ForEachActiveObject([&](auto object) {
+    sPool.ForEachActiveObjectMutableUnsafe([&](auto object) {
         object->Release();
         return true;
     });

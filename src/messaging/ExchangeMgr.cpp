@@ -97,7 +97,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
 {
     mReliableMessageMgr.Shutdown();
 
-    mContextPool.ForEachActiveObject([](auto * ec) {
+    mContextPool.ForEachActiveObjectImmutable([](auto * ec) {
         // There should be no active object in the pool
         VerifyOrDie(false);
         return true;
@@ -213,28 +213,28 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         msgFlags.Set(MessageFlagValues::kDuplicateMessage);
     }
 
-    // Search for an existing exchange that the message applies to. If a match is found...
-    bool found = false;
-    mContextPool.ForEachActiveObject([&](auto * ec) {
+
+    ExchangeContext * exchange = nullptr;
+    mContextPool.ForEachActiveObjectImmutable([&](auto * ec) {
         if (ec->MatchExchange(session, packetHeader, payloadHeader))
         {
-            // Found a matching exchange. Set flag for correct subsequent MRP
-            // retransmission timeout selection.
-            if (!ec->HasRcvdMsgFromPeer())
-            {
-                ec->SetMsgRcvdFromPeer(true);
-            }
-
-            // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
-            found = true;
+            exchange = ec;
             return false;
         }
         return true;
     });
 
-    if (found)
+    if (exchange != nullptr)
     {
+        // Found a matching exchange. Set flag for correct subsequent MRP
+        // retransmission timeout selection.
+        if (!exchange->HasRcvdMsgFromPeer())
+        {
+            exchange->SetMsgRcvdFromPeer(true);
+        }
+
+        // Matched ExchangeContext; send to message handler.
+        exchange->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
         return;
     }
 
@@ -324,7 +324,7 @@ void ExchangeManager::OnConnectionExpired(SessionHandle session)
         mDelegate->OnConnectionExpired(session, this);
     }
 
-    mContextPool.ForEachActiveObject([&](auto * ec) {
+    mContextPool.ForEachActiveObjectMutableUnsafe([&](auto * ec) {
         if (ec->mSecureSession.HasValue() && ec->mSecureSession.Value() == session)
         {
             ec->OnConnectionExpired();
@@ -337,7 +337,7 @@ void ExchangeManager::OnConnectionExpired(SessionHandle session)
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)
 {
-    mContextPool.ForEachActiveObject([&](auto * ec) {
+    mContextPool.ForEachActiveObjectMutableUnsafe([&](auto * ec) {
         if (ec->GetDelegate() == delegate)
         {
             // Make sure to null out the delegate before closing the context, so

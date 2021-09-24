@@ -51,7 +51,7 @@ public:
     template <typename Event>
     void NotifyChannelEvent(ChannelContext * channel, Event event)
     {
-        mChannelHandles.ForEachActiveObject([&](ChannelContextHandleAssociation * association) {
+        mChannelHandles.ForEachActiveObjectMutableUnsafe([&](ChannelContextHandleAssociation * association) {
             if (association->mChannelContext == channel)
                 event(association->mChannelDelegate);
             return true;
@@ -60,7 +60,7 @@ public:
 
     void OnNewConnection(SessionHandle session, ExchangeManager * mgr) override
     {
-        mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        mChannelContexts.ForEachActiveObjectMutableUnsafe([&](ChannelContext * context) {
             if (context->MatchesSession(session, mgr->GetSessionManager()))
             {
                 context->OnNewConnection(session);
@@ -72,7 +72,7 @@ public:
 
     void OnConnectionExpired(SessionHandle session, ExchangeManager * mgr) override
     {
-        mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        mChannelContexts.ForEachActiveObjectMutableUnsafe([&](ChannelContext * context) {
             if (context->MatchesSession(session, mgr->GetSessionManager()))
             {
                 context->OnConnectionExpired(session);
