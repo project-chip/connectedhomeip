@@ -1411,10 +1411,8 @@ void DeviceCommissioner::HandleAttestationResult(CHIP_ERROR err)
     }
     else
     {
-        // Handle error, and notify session failure to the commissioner application.
+        // Log an error message (no further handling currently)
         ChipLogError(Controller, "Failed to validate the Attestation Information");
-        // TODO: Map error status to correct error code
-        OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
     }
 }
 
