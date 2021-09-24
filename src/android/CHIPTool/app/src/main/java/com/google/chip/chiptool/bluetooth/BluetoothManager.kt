@@ -14,7 +14,6 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
-import chip.platform.AndroidChipPlatform
 import chip.platform.BleConnection
 import com.google.chip.chiptool.ChipClient
 import java.util.UUID
@@ -43,13 +42,13 @@ class BluetoothManager : BleConnection {
         .toByteArray()
   }
 
-  suspend fun getBluetoothDevice(discriminator: Int): BluetoothDevice? {
+  suspend fun getBluetoothDevice(context: Context, discriminator: Int): BluetoothDevice? {
 
     if (! bluetoothAdapter.isEnabled) {
       bluetoothAdapter.enable();
     }
 
-    connectionId = ChipClient.getAndroidChipPlatform().bleManager.addConnection(this)
+    connectionId = ChipClient.getAndroidChipPlatform(context).bleManager.addConnection(this)
 
     val scanner = bluetoothAdapter.bluetoothLeScanner ?: run {
       Log.e(TAG, "No bluetooth scanner found")
@@ -106,7 +105,7 @@ class BluetoothManager : BleConnection {
     continuation: CancellableContinuation<BluetoothGatt?>
   ): BluetoothGattCallback {
     return object : BluetoothGattCallback() {
-      private val wrappedCallback = ChipClient.getAndroidChipPlatform().bleManager.callback;
+      private val wrappedCallback = ChipClient.getAndroidChipPlatform(context).bleManager.callback;
       private val coroutineContinuation = continuation
 
       override fun onConnectionStateChange(
@@ -208,7 +207,7 @@ class BluetoothManager : BleConnection {
 
   override fun onCloseBleComplete(connId: Int) {
     bleGatt?.close();
-    ChipClient.getAndroidChipPlatform().bleManager.removeConnection(connectionId)
+    ChipClient.getAndroidChipPlatform(null).bleManager.removeConnection(connectionId)
     connectionId = 0
     //todo: notify DeviceProvisiongFragment
     Log.d(TAG, "onCloseBleComplete")
