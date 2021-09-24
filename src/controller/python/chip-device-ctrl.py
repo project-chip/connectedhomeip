@@ -513,10 +513,13 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("commission")
                 return
             parser = argparse.ArgumentParser()
-            parser.add_argument('-qr', help="discover and commission device with given qr code", type=str)
-            parser.add_argument('-nodeid', help="node ID to use for commissioning. Default is random", type=int)
-            parser.add_argument('-wifi', help="wifi credentials to use. Required for devices that are not on-network", type=str, nargs=2)
-            args=parser.parse_args(arglist)
+            parser.add_argument(
+                '-qr', help="discover and commission device with given qr code", type=str)
+            parser.add_argument(
+                '-nodeid', help="node ID to use for commissioning. Default is random", type=int)
+            parser.add_argument(
+                '-wifi', help="wifi credentials to use. Required for devices that are not on-network", type=str, nargs=2)
+            args = parser.parse_args(arglist)
 
             setupPayload = SetupPayload()
             if args.qr is not None:
@@ -527,10 +530,10 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("commission")
                 return
 
-            nodeid = random.randint(1, 1000000)  # Just a random number            
+            nodeid = random.randint(1, 1000000)  # Just a random number
             if args.nodeid is not None:
                 nodeid = args.nodeid
-            
+
             ssid = ""
             password = ""
             if args.wifi is not None:
@@ -548,7 +551,7 @@ class DeviceMgrCmd(Cmd):
                     print("Failed to commission device properly")
             else:
                 print("Failed to connect to device")
-            
+
         except exceptions.ChipStackException as ex:
             print('exception')
             print(str(ex))

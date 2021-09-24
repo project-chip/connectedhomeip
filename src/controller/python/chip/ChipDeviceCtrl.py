@@ -194,10 +194,11 @@ class ChipDeviceController(object):
             lambda: self._dmLib.pychip_DeviceController_ConnectIP(
                 self.devCtrl, ipaddr, setupPinCode, nodeid)
         )
-    
+
     def Commission(self, ssid, password, nodeid):
         return self._ChipStack.CallAsync(
-            lambda: self._dmLib.pychip_DeviceController_Commission(self.devCtrl, ssid, password, nodeid)
+            lambda: self._dmLib.pychip_DeviceController_Commission(
+                self.devCtrl, ssid, password, nodeid)
         )
 
     def ResolveNode(self, fabricid, nodeid):
@@ -457,7 +458,8 @@ class ChipDeviceController(object):
             self._dmLib.pychip_DeviceController_CloseSession.argtypes = [
                 c_void_p, c_uint64]
             self._dmLib.pychip_DeviceController_CloseSession.restype = c_uint32
-            self._dmLib.pychip_DeviceController_Commission.argtypes = [c_void_p, c_char_p, c_char_p, c_uint64]
+            self._dmLib.pychip_DeviceController_Commission.argtypes = [
+                c_void_p, c_char_p, c_char_p, c_uint64]
             self._dmLib.pychip_DeviceController_Commission.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
