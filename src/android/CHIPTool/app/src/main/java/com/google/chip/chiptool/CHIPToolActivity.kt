@@ -58,11 +58,6 @@ class CHIPToolActivity :
     setContentView(R.layout.top_activity)
 
     if (savedInstanceState == null) {
-      ChipDeviceController.load()
-      ChipClient.getAndroidChipPlatform().setConfigurationManager(PreferencesConfigurationManager(this))
-      ChipClient.getAndroidChipPlatform().setKeyValueStoreManager(chip.platform.PreferencesKeyValueStoreManager(this))
-      ChipClient.getAndroidChipPlatform().setServiceResolver(NsdManagerServiceResolver(this))
-      ChipClient.getAndroidChipPlatform().bleManager = AndroidBleManager()
       val fragment = SelectActionFragment.newInstance()
       supportFragmentManager
           .beginTransaction()
