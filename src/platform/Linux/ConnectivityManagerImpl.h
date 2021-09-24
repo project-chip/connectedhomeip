@@ -114,9 +114,6 @@ public:
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 
-    bool _HaveIPv4InternetConnectivity();
-    bool _HaveIPv6InternetConnectivity();
-    bool _HaveServiceConnectivity();
     CHIP_ERROR _Init();
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
@@ -208,10 +205,6 @@ inline uint32_t ConnectivityManagerImpl::_GetWiFiAPIdleTimeoutMS()
     return mWiFiAPIdleTimeoutMS;
 }
 
-inline bool ConnectivityManagerImpl::_HaveServiceConnectivity()
-{
-    return _HaveServiceConnectivityViaThread();
-}
 #endif
 
 /**

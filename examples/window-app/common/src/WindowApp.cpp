@@ -107,10 +107,9 @@ CHIP_ERROR WindowApp::Run()
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            mState.isThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            mState.isThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            mState.haveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            mState.haveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            mState.isThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            mState.isThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            mState.haveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -118,12 +117,6 @@ CHIP_ERROR WindowApp::Run()
         {
             // Provisioned state changed
             DispatchEvent(EventId::ProvisionedStateChanged);
-        }
-
-        if (mState.haveServiceConnectivity != oldState.haveServiceConnectivity)
-        {
-            // Provisioned state changed
-            DispatchEvent(EventId::ConnectivityStateChanged);
         }
 
         if (mState.haveBLEConnections != oldState.haveBLEConnections)
