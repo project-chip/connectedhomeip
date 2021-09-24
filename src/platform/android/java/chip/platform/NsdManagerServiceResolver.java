@@ -32,6 +32,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
   private Handler mainThreadHandler;
+  private AndroidChipPlatform mPlatform;
 
   public NsdManagerServiceResolver(Context context) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
@@ -43,7 +44,12 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     this.multicastLock.setReferenceCounted(true);
   }
 
-  @Override
+    @Override
+    public void setAndroidChipPlatform(AndroidChipPlatform platform) {
+        mPlatform = platform;
+    }
+
+    @Override
   public void resolve(
       final String instanceName,
       final String serviceType,
@@ -77,8 +83,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             Log.w(
                 TAG,
                 "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
-            AndroidChipPlatform.getInstance()
-                .handleServiceResolve(
+            mPlatform.handleServiceResolve(
                     instanceName, serviceType, null, 0, callbackHandle, contextHandle);
 
             if (multicastLock.isHeld()) {
@@ -96,14 +101,13 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                     + "' to "
                     + serviceInfo.getHost());
             // TODO: Find out if DNS-SD results for Android should contain interface ID
-            AndroidChipPlatform.getInstance()
-                .handleServiceResolve(
-                    instanceName,
-                    serviceType,
-                    serviceInfo.getHost().getHostAddress(),
-                    serviceInfo.getPort(),
-                    callbackHandle,
-                    contextHandle);
+          mPlatform.handleServiceResolve(
+                instanceName,
+                serviceType,
+                serviceInfo.getHost().getHostAddress(),
+                serviceInfo.getPort(),
+                callbackHandle,
+                contextHandle);
 
             if (multicastLock.isHeld()) {
               multicastLock.release();

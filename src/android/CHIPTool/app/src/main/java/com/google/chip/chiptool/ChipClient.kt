@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.Log
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
+import chip.platform.AndroidChipPlatform
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -29,12 +30,20 @@ import kotlin.coroutines.suspendCoroutine
 object ChipClient {
   private const val TAG = "ChipClient"
   private lateinit var chipDeviceController: ChipDeviceController
+  private lateinit var androidPlatform: AndroidChipPlatform
 
   fun getDeviceController(context: Context): ChipDeviceController {
     if (!this::chipDeviceController.isInitialized) {
       chipDeviceController = ChipDeviceController()
     }
     return chipDeviceController
+  }
+
+  fun getAndroidChipPlatform(): AndroidChipPlatform {
+    if(!this::androidPlatform.isInitialized) {
+      androidPlatform = AndroidChipPlatform()
+    }
+    return androidPlatform
   }
 
   /**
