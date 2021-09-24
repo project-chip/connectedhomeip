@@ -18,15 +18,9 @@
 package chip.platform;
 
 public final class AndroidChipPlatform {
-  private static final String TAG = AndroidChipPlatform.class.getSimpleName();
-  private static AndroidChipPlatform sInstance = new AndroidChipPlatform();
   private BleManager mBleManager = null;
 
-  private AndroidChipPlatform() {}
-
-  public static AndroidChipPlatform getInstance() {
-    return sInstance;
-  }
+  public AndroidChipPlatform() {}
 
   // for BLEManager
   public BleManager getBLEManager() {
@@ -34,8 +28,9 @@ public final class AndroidChipPlatform {
   }
 
   public void setBLEManager(BleManager manager) {
-    if (mBleManager == null) {
+    if (manager != null) {
       mBleManager = manager;
+      manager.setAndroidChipPlatform(this);
       nativeSetBLEManager(manager);
     }
   }
@@ -68,7 +63,14 @@ public final class AndroidChipPlatform {
   public native void setConfigurationManager(ConfigurationManager manager);
 
   // for ServiceResolver
-  public native void setServiceResolver(ServiceResolver resolver);
+  public void setServiceResolver(ServiceResolver resolver) {
+    if(resolver != null) {
+      resolver.setAndroidChipPlatform(this);
+      nativeSetServiceResolver(resolver);
+    }
+  }
+
+  public native void nativeSetServiceResolver(ServiceResolver resolver);
 
   public native void handleServiceResolve(
       String instanceName,

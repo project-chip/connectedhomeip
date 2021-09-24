@@ -195,7 +195,7 @@ JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject man
 }
 
 // for ServiceResolver
-JNI_METHOD(void, setServiceResolver)(JNIEnv * env, jclass self, jobject resolver)
+JNI_METHOD(void, nativeSetServiceResolver)(JNIEnv * env, jclass self, jobject resolver)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     chip::Mdns::InitializeWithObject(resolver);
