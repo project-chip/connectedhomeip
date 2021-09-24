@@ -48,6 +48,24 @@ limitations under the License.
     <attribute side="server" code="0x0020" define="OPERATION_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="false">operation mode</attribute>
     <attribute side="server" code="0x0021" define="CONTROL_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="true">control mode</attribute>
     <attribute side="server" code="0x0022" define="PUMP_ALARM_MASK" type="BITMAP16" writable="false" optional="true">alarm mask</attribute>
+
+    <event code="0x1" priority="info" name="SupplyVoltageLow"></event>
+    <event code="0x2" priority="info" name="SupplyVoltageHigh"></event>
+    <event code="0x4" priority="info" name="PowerMissingPhase"></event>
+    <event code="0x8" priority="info" name="SystemPressureLow"></event>
+    <event code="0x10" priority="info" name="SystemPressureHigh"></event>
+    <event code="0x20" priority="info" name="DryRunning"></event>
+    <event code="0x40" priority="info" name="MotorTemperatureHigh"></event>
+    <event code="0x80" priority="info" name="PumpMotorFatalFailure"></event>
+    <event code="0x100" priority="info" name="ElectronicTemperatureHigh"></event>
+    <event code="0x200" priority="info" name="PumpBlocked"></event>
+    <event code="0x400" priority="info" name="SensorFailure"></event>
+    <event code="0x800" priority="info" name="ElectronicNonFatalFailure"></event>
+    <event code="0x1000" priority="info" name="ElectronicFatalFailure"></event>
+    <event code="0x2000" priority="info" name="GeneralFault"></event>
+    <event code="0x4000" priority="info" name="Leakage"></event>
+    <event code="0x8000" priority="info" name="AirDetection"></event>
+    <event code="0x10000" priority="info" name="TurbineOperation"></event>
   </cluster>
 
   <bitmap name="PumpStatus" type="BITMAP16">
@@ -79,25 +97,5 @@ limitations under the License.
     <item name="ConstantTemperature" value="0x5"/>
     <item name="Automatic" value="0x7"/>
   </enum>
-
-  <bitmap name="PumpAlarmMask" type="BITMAP16">
-    <field name="SupplyVoltageLow" mask="0x1"/>
-    <field name="SupplyVoltageHigh" mask="0x2"/>
-    <field name="PowerMissingPhase" mask="0x4"/>
-    <field name="SystemPressureLow" mask="0x8"/>
-    <field name="SystemPressureHigh" mask="0x10"/>
-    <field name="DryRunning" mask="0x20"/>
-    <field name="MotorTemperatureHigh" mask="0x40"/>
-    <field name="PumpMotorFatalFailure" mask="0x80"/>
-    <field name="ElectronicTemperatureHigh" mask="0x100"/>
-    <field name="PumpBlocked" mask="0x200"/>
-    <field name="SensorFailure" mask="0x400"/>
-    <field name="ElectronicNonFatalFailure" mask="0x800"/>
-    <field name="ElectronicFatalFailure" mask="0x1000"/>
-    <field name="GeneralFault" mask="0x2000"/>
-    <field name="Leakage" mask="0x4000"/>
-    <field name="AirDetection" mask="0x8000"/>
-    <field name="TurbineOperation" mask="0x10000"/>
-  </bitmap>
 
 </configurator>
