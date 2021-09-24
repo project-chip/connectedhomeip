@@ -107,7 +107,7 @@ public:
     bool ForEachActiveObjectMutableUnsafe(Function && function)
     {
         // Create a new copy of original set, allowing add/remove elements while iterating in the same thread.
-        for (auto object : std::set<T*>(mObjects))
+        for (auto object : std::set<T *>(mObjects))
         {
             if (!function(object))
                 return false;
