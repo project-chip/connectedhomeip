@@ -122,7 +122,7 @@ class DeviceProvisioningFragment : Fragment() {
       deviceController.setCompletionListener(ConnectionCallback())
 
       val deviceId = DeviceIdUtil.getNextAvailableId(requireContext())
-      var connId = bluetoothManager.connectionId
+      val connId = bluetoothManager.connectionId
       deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }
