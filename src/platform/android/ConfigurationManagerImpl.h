@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ inline ConfigurationManager & ConfigurationMgr()
  * Returns the platform-specific implementation of the ConfigurationManager singleton object.
  *
  * chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the ESP32 platform.
+ * that are specific to the Android platform.
  */
 inline ConfigurationManagerImpl & ConfigurationMgrImpl()
 {

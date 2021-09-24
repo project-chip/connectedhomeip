@@ -59,7 +59,8 @@ if (chip_device_platform != "none") {
     # lock tracking: none/log/fatal or auto for a platform-dependent choice
     chip_stack_lock_tracking = "auto"
 
-    # some operates need root, but without it, we may still work
+    # todo: below operates are not work without root permission
+    # pthread_attr_setschedpolicy in GenericPlatformManagerImpl_POSIX.cpp
     chip_device_config_run_as_root = current_os != "android"
   }
 

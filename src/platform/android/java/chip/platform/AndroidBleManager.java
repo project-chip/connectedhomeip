@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AndroidBLEManager implements BLEManager {
+public class AndroidBleManager implements BleManager {
 
-  private static final String TAG = AndroidBLEManager.class.getSimpleName();
+  private static final String TAG = AndroidBleManager.class.getSimpleName();
   public static final int INITIAL_CONNECTIONS = 4;
 
   private static class BleMtuDenylist {
@@ -41,10 +41,10 @@ public class AndroidBLEManager implements BLEManager {
     }
   }
 
-  private final List<BLEConnection> mConnections;
+  private final List<BleConnection> mConnections;
   private BluetoothGattCallback mGattCallback;
 
-  public AndroidBLEManager() {
+  public AndroidBleManager() {
     mConnections = new ArrayList<>(INITIAL_CONNECTIONS);
 
     mGattCallback =
@@ -157,7 +157,7 @@ public class AndroidBLEManager implements BLEManager {
   }
 
   @Override
-  public synchronized int addConnection(BLEConnection connObj) {
+  public synchronized int addConnection(BleConnection connObj) {
     int connIndex = 0;
     while (connIndex < mConnections.size()) {
       if (mConnections.get(connIndex) == null) {
@@ -171,7 +171,7 @@ public class AndroidBLEManager implements BLEManager {
   }
 
   @Override
-  public synchronized BLEConnection removeConnection(int connId) {
+  public synchronized BleConnection removeConnection(int connId) {
     int connIndex = connId - 1;
     if (connIndex >= 0 && connIndex < mConnections.size()) {
       // Set to null, rather than remove, so that other indexes are unchanged.
@@ -183,7 +183,7 @@ public class AndroidBLEManager implements BLEManager {
   }
 
   @Override
-  public synchronized BLEConnection getConnection(int connId) {
+  public synchronized BleConnection getConnection(int connId) {
     int connIndex = connId - 1;
     if (connIndex >= 0 && connIndex < mConnections.size()) {
       return mConnections.get(connIndex);
@@ -202,7 +202,7 @@ public class AndroidBLEManager implements BLEManager {
     // Find callback given gatt
     int connIndex = 0;
     while (connIndex < mConnections.size()) {
-      BLEConnection connObj = mConnections.get(connIndex);
+      BleConnection connObj = mConnections.get(connIndex);
       if (connObj != null) {
         if (gatt == connObj.getBluetoothGatt()) {
           return connIndex + 1;
@@ -230,7 +230,7 @@ public class AndroidBLEManager implements BLEManager {
 
   @Override
   public boolean onSubscribeCharacteristic(int connId, byte[] svcId, byte[] charId) {
-    BLEConnection connObj = getConnection(connId);
+    BleConnection connObj = getConnection(connId);
     if (connObj == null) {
       Log.i(TAG, "Tried to send characteristic, but BLE connection was not found.");
       return false;
@@ -271,7 +271,7 @@ public class AndroidBLEManager implements BLEManager {
 
   @Override
   public boolean onUnsubscribeCharacteristic(int connId, byte[] svcId, byte[] charId) {
-    BLEConnection connObj = getConnection(connId);
+    BleConnection connObj = getConnection(connId);
     if (connObj == null) {
       Log.i(TAG, "Tried to unsubscribe characteristic, but BLE connection was not found.");
       return false;
@@ -312,7 +312,7 @@ public class AndroidBLEManager implements BLEManager {
 
   @Override
   public boolean onCloseConnection(int connId) {
-    BLEConnection connObj = getConnection(connId);
+    BleConnection connObj = getConnection(connId);
     if (connObj != null) {
       connObj.onCloseBleComplete(connId);
     } else {
@@ -341,7 +341,7 @@ public class AndroidBLEManager implements BLEManager {
   public boolean onSendWriteRequest(
       int connId, byte[] svcId, byte[] charId, byte[] characteristicData) {
     // onSendCharacteristic
-    BLEConnection connObj = getConnection(connId);
+    BleConnection connObj = getConnection(connId);
     if (connObj == null) {
       Log.i(TAG, "Tried to send characteristic, but BLE connection was not found.");
       return false;
@@ -377,7 +377,7 @@ public class AndroidBLEManager implements BLEManager {
 
   @Override
   public void onNotifyChipConnectionClosed(int connId) {
-    BLEConnection connObj = getConnection(connId);
+    BleConnection connObj = getConnection(connId);
     if (connObj != null) {
       connObj.onNotifyChipConnectionClosed(connId);
     } else {

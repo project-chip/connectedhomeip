@@ -72,7 +72,7 @@ struct GDBusWpaSupplicant
 #endif
 
 /**
- * Concrete implementation of the ConnectivityManager singleton object for Linux platforms.
+ * Concrete implementation of the ConnectivityManager singleton object for Android platforms.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

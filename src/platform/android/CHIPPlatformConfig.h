@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -121,7 +121,3 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #ifndef CHIP_CONFIG_ENABLE_CASE_RESPONDER
 #define CHIP_CONFIG_ENABLE_CASE_RESPONDER 1
 #endif // CHIP_CONFIG_ENABLE_CASE_RESPONDER
-
-#ifndef CHIP_CONFIG_KVS_PATH
-#define CHIP_CONFIG_KVS_PATH "/tmp/chip_kvs"
-#endif // CHIP_CONFIG_KVS_PATH

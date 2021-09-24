@@ -20,7 +20,7 @@ package chip.platform;
 public final class AndroidChipPlatform {
   private static final String TAG = AndroidChipPlatform.class.getSimpleName();
   private static AndroidChipPlatform sInstance = new AndroidChipPlatform();
-  private BLEManager mBLEManager = null;
+  private BleManager mBleManager = null;
 
   private AndroidChipPlatform() {}
 
@@ -29,18 +29,18 @@ public final class AndroidChipPlatform {
   }
 
   // for BLEManager
-  public BLEManager getBLEManager() {
-    return mBLEManager;
+  public BleManager getBLEManager() {
+    return mBleManager;
   }
 
-  public void setBLEManager(BLEManager manager) {
-    if (mBLEManager == null) {
-      mBLEManager = manager;
+  public void setBLEManager(BleManager manager) {
+    if (mBleManager == null) {
+      mBleManager = manager;
       nativeSetBLEManager(manager);
     }
   }
 
-  public native void nativeSetBLEManager(BLEManager manager);
+  public native void nativeSetBLEManager(BleManager manager);
 
   // apis in BleLayer.h called by Platform
   // write success

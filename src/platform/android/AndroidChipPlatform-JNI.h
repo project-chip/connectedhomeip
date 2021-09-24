@@ -29,7 +29,7 @@
 
 /**
     Load platform android jni functions
-    To avoid load 2 dynamic librares in one android app and
+    To avoid load 2 dynamic libraries in one android app and
     each of them have their own matter librares,
     we build android platform as an static libray and
     link them in app (app/server or controller)

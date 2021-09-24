@@ -24,13 +24,13 @@ import java.util.Base64;
 import java.util.Map;
 
 /** Java interface for ConfigurationManager */
-public class DefaultConfigurationManager implements ConfigurationManager {
+public class PreferencesConfigurationManager implements ConfigurationManager {
 
   private final String TAG = KeyValueStoreManager.class.getSimpleName();
   private final String PREFERENCE_FILE_KEY = "chip.platform.ConfigurationManager";
   private SharedPreferences preferences;
 
-  public DefaultConfigurationManager(Context context) {
+  public PreferencesConfigurationManager(Context context) {
     preferences = context.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
   }
 
@@ -38,37 +38,40 @@ public class DefaultConfigurationManager implements ConfigurationManager {
   public long readConfigValueLong(String namespace, String name)
       throws AndroidChipPlatformException {
     String key = getKey(namespace, name);
-    long value = preferences.getLong(key, Long.MAX_VALUE);
-    if (value == Long.MAX_VALUE) {
+    if(preferences.contains(key)) {
+      long value = preferences.getLong(key, Long.MAX_VALUE);
+      return value;
+    } else {
       Log.d(TAG, "Key '" + key + "' not found in shared preferences");
       throw new AndroidChipPlatformException();
     }
-    return value;
   }
 
   @Override
   public String readConfigValueStr(String namespace, String name)
       throws AndroidChipPlatformException {
     String key = getKey(namespace, name);
-    String value = preferences.getString(key, null);
-    if (value == null) {
+    if(preferences.contains(key)) {
+      String value = preferences.getString(key, null);
+      return value;
+    } else {
       Log.d(TAG, "Key '" + key + "' not found in shared preferences");
       throw new AndroidChipPlatformException();
     }
-    return value;
   }
 
   @Override
   public byte[] readConfigValueBin(String namespace, String name)
       throws AndroidChipPlatformException {
     String key = getKey(namespace, name);
-    String value = preferences.getString(key, null);
-    if (value == null) {
+    if(preferences.contains(key)) {
+      String value = preferences.getString(key, null);
+      byte[] byteValue = Base64.getDecoder().decode(value);
+      return byteValue;
+    } else {
       Log.d(TAG, "Key '" + key + "' not found in shared preferences");
       throw new AndroidChipPlatformException();
     }
-    byte[] byteValue = Base64.getDecoder().decode(value);
-    return byteValue;
   }
 
   @Override
@@ -101,7 +104,6 @@ public class DefaultConfigurationManager implements ConfigurationManager {
   public void clearConfigValue(String namespace, String name) throws AndroidChipPlatformException {
     if (namespace != null && name != null) {
       preferences.edit().remove(getKey(namespace, name)).apply();
-      ;
     } else if (namespace != null && name == null) {
       String pre = getKey(namespace, null);
       SharedPreferences.Editor editor = preferences.edit();
