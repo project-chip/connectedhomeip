@@ -122,7 +122,7 @@ protected:
         }
     }
 
-    CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg)
+    CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg, bool successExpected)
     {
         Protocols::SecureChannel::StatusReport report;
         CHIP_ERROR err = report.Parse(std::move(msg));
@@ -131,7 +131,7 @@ protected:
                             CHIP_ERROR_INVALID_ARGUMENT);
 
         if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kSuccess &&
-            report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeSuccess)
+            report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeSuccess && successExpected)
         {
             OnSuccessStatusReport();
         }

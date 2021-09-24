@@ -71,6 +71,8 @@ static_assert(sizeof(kTBEData2_Nonce) == sizeof(kTBEData3_Nonce), "TBEData2_Nonc
 // TODO: move this constant over to src/crypto/CHIPCryptoPAL.h - name it CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES
 constexpr size_t kTAGSize = 16;
 
+constexpr uint8_t kCASESessionVersion = 1;
+
 enum
 {
     kTag_TBEData_SenderNOC    = 1,
@@ -165,6 +167,7 @@ CHIP_ERROR CASESession::Deserialize(CASESessionSerialized & input)
 
 CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
 {
+    // TODO: IPK should not be serialized/deserialized. Remove it from the stored session state.
     const NodeId peerNodeId = GetPeerNodeId();
     VerifyOrReturnError(CanCastTo<uint16_t>(mSharedSecret.Length()), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mMessageDigest)), CHIP_ERROR_INTERNAL);
@@ -176,6 +179,7 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mMessageDigestLen = LittleEndian::HostSwap16(static_cast<uint16_t>(sizeof(mMessageDigest)));
     serializable.mIPKLen           = LittleEndian::HostSwap16(static_cast<uint16_t>(sizeof(mIPK)));
     serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
+    serializable.mVersion          = kCASESessionVersion;
     serializable.mPeerNodeId       = LittleEndian::HostSwap64(peerNodeId);
     serializable.mLocalSessionId   = LittleEndian::HostSwap16(GetLocalSessionId());
     serializable.mPeerSessionId    = LittleEndian::HostSwap16(GetPeerSessionId());
@@ -190,6 +194,7 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
 
 CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & serializable)
 {
+    VerifyOrReturnError(serializable.mVersion == kCASESessionVersion, CHIP_ERROR_VERSION_MISMATCH);
     mPairingComplete = (serializable.mPairingComplete == 1);
     uint16_t length  = LittleEndian::HostSwap16(serializable.mSharedSecretLen);
     ReturnErrorOnFailure(mSharedSecret.SetLength(static_cast<size_t>(length)));
@@ -213,7 +218,7 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::Init(uint16_t mySessionId, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR CASESession::Init(uint16_t localSessionId, SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -222,7 +227,7 @@ CHIP_ERROR CASESession::Init(uint16_t mySessionId, SessionEstablishmentDelegate 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     mDelegate = delegate;
-    SetLocalSessionId(mySessionId);
+    SetLocalSessionId(localSessionId);
 
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
@@ -232,11 +237,11 @@ CHIP_ERROR CASESession::Init(uint16_t mySessionId, SessionEstablishmentDelegate 
 }
 
 CHIP_ERROR
-CASESession::ListenForSessionEstablishment(uint16_t mySessionId, Transport::FabricTable * fabrics,
+CASESession::ListenForSessionEstablishment(uint16_t localSessionId, Transport::FabricTable * fabrics,
                                            SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(Init(mySessionId, delegate));
+    ReturnErrorOnFailure(Init(localSessionId, delegate));
 
     mFabricsTable    = fabrics;
     mPairingComplete = false;
@@ -247,7 +252,7 @@ CASESession::ListenForSessionEstablishment(uint16_t mySessionId, Transport::Fabr
 }
 
 CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress, Transport::FabricInfo * fabric,
-                                         NodeId peerNodeId, uint16_t mySessionId, ExchangeContext * exchangeCtxt,
+                                         NodeId peerNodeId, uint16_t localSessionId, ExchangeContext * exchangeCtxt,
                                          SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -256,7 +261,7 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = Init(mySessionId, delegate);
+    err = Init(localSessionId, delegate);
 
     // We are setting the exchange context specifically before checking for error.
     // This is to make sure the exchange will get closed if Init() returned an error.
@@ -326,14 +331,14 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoConte
 
 CHIP_ERROR CASESession::SendSigma1()
 {
-    size_t data_len = EstimateTLVStructOverhead(kSigmaParamRandomNumberSize + sizeof(uint16_t) + kSHA256_Hash_Length +
-                                                    kP256_PublicKey_Length + kCASEResumptionIDSize + kTAGSize,
-                                                7);
+    size_t data_len =
+        EstimateTLVStructOverhead(kSigmaParamRandomNumberSize + sizeof(uint16_t) + kSHA256_Hash_Length +
+                                      kP256_PublicKey_Length /* + kMRPOptionalParamsLength */ + kCASEResumptionIDSize + kTAGSize,
+                                  7);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R1;
-    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
-    //    uint8_t initiatorRandom[kSigmaParamRandomNumberSize] = { 0 };
+    TLV::TLVType outerContainerType                    = TLV::kTLVType_NotSpecified;
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
 
     // Generate an ephemeral keypair
@@ -351,7 +356,7 @@ CHIP_ERROR CASESession::SendSigma1()
 
     tlvWriter.Init(std::move(msg_R1));
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
-    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), mInitiatorRandom, sizeof(mInitiatorRandom)));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), ByteSpan(mInitiatorRandom)));
     // Retrieve Session Identifier
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId(), true));
     // Generate a Destination Identifier
@@ -369,14 +374,13 @@ CHIP_ERROR CASESession::SendSigma1()
 
     // If CASE session was previously established using the current state information, let's fill in the session resumption
     // information in the the Sigma1 request. It'll speed up the session establishment process if the peer can resume the old
-    // session.
+    // session, since no certificate chains will have to be verified.
     if (mPairingComplete)
     {
         ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(6), mResumptionId, kCASEResumptionIDSize));
 
-        chip::Platform::ScopedMemoryBuffer<uint8_t> initiatorResume1MIC;
-        ReturnErrorCodeIf(!initiatorResume1MIC.Alloc(kTAGSize), CHIP_ERROR_NO_MEMORY);
-        MutableByteSpan resumeMICSpan(initiatorResume1MIC.Get(), kTAGSize);
+        uint8_t initiatorResume1MIC[kTAGSize];
+        MutableByteSpan resumeMICSpan(initiatorResume1MIC);
         ReturnErrorOnFailure(GenerateSigmaResumeMIC(ByteSpan(mInitiatorRandom), ByteSpan(mResumptionId), ByteSpan(kKDFS1RKeyInfo),
                                                     ByteSpan(kResume1MIC_Nonce), resumeMICSpan));
 
@@ -388,6 +392,10 @@ CHIP_ERROR CASESession::SendSigma1()
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg_R1->Start(), msg_R1->DataLength() }));
 
+    // The state is being updated here before the message is successfully sent.
+    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
+    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
+    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
     mState = kSentSigma1;
 
     // Call delegate to send the msg to peer
@@ -421,12 +429,13 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     ChipLogDetail(SecureChannel, "Received Sigma1 msg");
 
     bool sessionResumptionRequested = false;
-    uint8_t resumptionID[kCASEResumptionIDSize];
-    MutableByteSpan resumptionIDSpan(resumptionID);
-    uint8_t initiatorResume1MIC[kTAGSize];
-    MutableByteSpan resume1MICSpan(initiatorResume1MIC);
+    ByteSpan resumptionId;
+    ByteSpan resume1MIC;
 
-    SuccessOrExit(err = ParseSessionResumptionRequest(msg, sessionResumptionRequested, resumptionIDSpan, resume1MICSpan));
+    const ByteSpan * ipkListSpan = GetIPKList();
+    FabricIndex fabricIndex      = Transport::kUndefinedFabricIndex;
+
+    SuccessOrExit(err = IsResumptionRequestPresent(msg, sessionResumptionRequested, resumptionId, resume1MIC));
 
     SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ msg->Start(), msg->DataLength() }));
 
@@ -445,43 +454,43 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", initiatorSessionId);
     SetPeerSessionId(initiatorSessionId);
 
-    if (sessionResumptionRequested && memcmp(resumptionID, mResumptionId, kCASEResumptionIDSize) == 0)
+    if (sessionResumptionRequested && resumptionId.data_equal(ByteSpan(mResumptionId)))
     {
         // Cross check resume1MIC with the shared secret
-        SuccessOrExit(err = ValidateSigmaResumeMIC(resume1MICSpan, ByteSpan(initiatorRandom), ByteSpan(mResumptionId),
-                                                   ByteSpan(kKDFS1RKeyInfo), ByteSpan(kResume1MIC_Nonce)));
+        if (ValidateSigmaResumeMIC(resume1MIC, ByteSpan(initiatorRandom), resumptionId, ByteSpan(kKDFS1RKeyInfo),
+                                   ByteSpan(kResume1MIC_Nonce)) == CHIP_NO_ERROR)
+        {
+            // Send Sigma2Resume message to the initiator
+            SuccessOrExit(err = SendSigma2Resume(ByteSpan(initiatorRandom)));
 
-        // Send Sigma2Resume message to the initiator
-        SuccessOrExit(err = SendSigma2Resume(ByteSpan(initiatorRandom)));
+            // Early returning here, since we have sent Sigma2Resume, and no further processing is needed for the Sigma1 message
+            return CHIP_NO_ERROR;
+        }
     }
-    else
-    {
-        const ByteSpan * ipkListSpan = GetIPKList();
-        FabricIndex fabricIndex      = Transport::kUndefinedFabricIndex;
-        memcpy(mIPK, ipkListSpan->data(), sizeof(mIPK));
 
-        SuccessOrExit(err = tlvReader.Next());
-        VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-        SuccessOrExit(err = tlvReader.GetBytes(destinationIdentifier, sizeof(destinationIdentifier)));
+    memcpy(mIPK, ipkListSpan->data(), sizeof(mIPK));
 
-        VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        fabricIndex = mFabricsTable->FindDestinationIDCandidate(ByteSpan(destinationIdentifier), ByteSpan(initiatorRandom),
-                                                                ipkListSpan, GetIPKListEntries());
-        VerifyOrExit(fabricIndex != Transport::kUndefinedFabricIndex, err = CHIP_ERROR_CERT_NOT_TRUSTED);
+    SuccessOrExit(err = tlvReader.Next());
+    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.GetBytes(destinationIdentifier, sizeof(destinationIdentifier)));
 
-        mFabricInfo = mFabricsTable->FindFabricWithIndex(fabricIndex);
-        VerifyOrExit(mFabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    fabricIndex = mFabricsTable->FindDestinationIDCandidate(ByteSpan(destinationIdentifier), ByteSpan(initiatorRandom), ipkListSpan,
+                                                            GetIPKListEntries());
+    VerifyOrExit(fabricIndex != Transport::kUndefinedFabricIndex, err = CHIP_ERROR_KEY_NOT_FOUND);
 
-        SuccessOrExit(err = tlvReader.Next());
-        VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-        SuccessOrExit(err = tlvReader.GetBytes(mRemotePubKey, static_cast<uint32_t>(mRemotePubKey.Length())));
+    mFabricInfo = mFabricsTable->FindFabricWithIndex(fabricIndex);
+    VerifyOrExit(mFabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-        SuccessOrExit(err = SendSigma2());
-    }
+    SuccessOrExit(err = tlvReader.Next());
+    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    SuccessOrExit(err = tlvReader.GetBytes(mRemotePubKey, static_cast<uint32_t>(mRemotePubKey.Length())));
+
+    SuccessOrExit(err = SendSigma2());
 
 exit:
 
-    if (err == CHIP_ERROR_CERT_NOT_TRUSTED)
+    if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeNoSharedRoot);
         mState = kInitialized;
@@ -496,13 +505,14 @@ exit:
 
 CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
 {
-    size_t data_len = EstimateTLVStructOverhead(kCASEResumptionIDSize + kTAGSize + sizeof(uint16_t), 7);
+    size_t max_sigma2_resume_data_len =
+        EstimateTLVStructOverhead(kCASEResumptionIDSize + kTAGSize + sizeof(uint16_t) /* + kMRPOptionalParamsLength */, 4);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R2_resume;
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
-    msg_R2_resume = System::PacketBufferHandle::New(data_len);
+    msg_R2_resume = System::PacketBufferHandle::New(max_sigma2_resume_data_len);
     VerifyOrReturnError(!msg_R2_resume.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     tlvWriter.Init(std::move(msg_R2_resume));
@@ -511,11 +521,10 @@ CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
     ReturnErrorOnFailure(DRBG_get_bytes(mResumptionId, sizeof(mResumptionId)));
 
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
-    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), mResumptionId, kCASEResumptionIDSize));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), ByteSpan(mResumptionId)));
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> sigma2ResumeMIC;
-    ReturnErrorCodeIf(!sigma2ResumeMIC.Alloc(kTAGSize), CHIP_ERROR_NO_MEMORY);
-    MutableByteSpan resumeMICSpan(sigma2ResumeMIC.Get(), kTAGSize);
+    uint8_t sigma2ResumeMIC[kTAGSize];
+    MutableByteSpan resumeMICSpan(sigma2ResumeMIC);
     ReturnErrorOnFailure(GenerateSigmaResumeMIC(initiatorRandom, ByteSpan(mResumptionId), ByteSpan(kKDFS2RKeyInfo),
                                                 ByteSpan(kResume2MIC_Nonce), resumeMICSpan));
 
@@ -528,6 +537,10 @@ CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg_R2_resume));
 
+    // The state is being updated here before the message is successfully sent.
+    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
+    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
+    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
     mState = kSentSigma2Resume;
 
     // Call delegate to send the msg to peer
@@ -591,6 +604,8 @@ CHIP_ERROR CASESession::SendSigma2()
     ReturnErrorOnFailure(
         mFabricInfo->GetOperationalKey()->ECDSA_sign_msg(msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature));
 
+    msg_R2_Signed.Free();
+
     // Construct Sigma2 TBE Data
     size_t msg_r2_signed_enc_len =
         EstimateTLVStructOverhead(nocCert.size() + icaCert.size() + tbsData2Signature.Length() + kCASEResumptionIDSize, 4);
@@ -648,6 +663,10 @@ CHIP_ERROR CASESession::SendSigma2()
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg_R2->Start(), msg_R2->DataLength() }));
 
+    // The state is being updated here before the message is successfully sent.
+    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
+    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
+    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
     mState = kSentSigma2;
 
     // Call delegate to send the msg to peer
@@ -679,10 +698,12 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    VerifyOrExit(tlvReader.GetLength() == kCASEResumptionIDSize, CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(mResumptionId, kCASEResumptionIDSize));
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+    VerifyOrExit(tlvReader.GetLength() == kTAGSize, CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(sigma2ResumeMIC, kTAGSize));
 
     SuccessOrExit(err = ValidateSigmaResumeMIC(ByteSpan(sigma2ResumeMIC), ByteSpan(mInitiatorRandom), ByteSpan(mResumptionId),
@@ -692,17 +713,20 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
-    ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", responderSessionId);
+    ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
     SetPeerSessionId(responderSessionId);
 
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
+
+    // TODO: Set timestamp on the new session, to allow selecting a least-recently-used session for eviction
+    // on running out of session contexts.
 
     mPairingComplete = true;
 
     // Forget our exchange, as no additional messages are expected from the peer
     mExchangeCtxt = nullptr;
 
-    // Call delegate to indicate pairing completion
+    // Call delegate to indicate session establishment is successful
     mDelegate->OnSessionEstablished();
 
 exit:
@@ -767,12 +791,12 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.GetBytes(responderRandom, sizeof(responderRandom)));
 
-    // Assign Session Key ID
+    // Assign Session ID
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
-    ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", responderSessionId);
+    ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
     SetPeerSessionId(responderSessionId);
 
     // Retrieve Responder's Ephemeral Pubkey
@@ -971,6 +995,10 @@ CHIP_ERROR CASESession::SendSigma3()
     err = mCommissioningHash.AddData(ByteSpan{ msg_R3->Start(), msg_R3->DataLength() });
     SuccessOrExit(err);
 
+    // The state is being updated here before the message is successfully sent.
+    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
+    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
+    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
     mState = kSentSigma3;
 
     // Call delegate to send the Msg3 to peer
@@ -1105,12 +1133,15 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
 
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 
+    // TODO: Set timestamp on the new session, to allow selecting a least-recently-used session for eviction
+    // on running out of session contexts.
+
     mPairingComplete = true;
 
     // Forget our exchange, as no additional messages are expected from the peer
     mExchangeCtxt = nullptr;
 
-    // Call delegate to indicate pairing completion
+    // Call delegate to indicate session establishment is successful
     mDelegate->OnSessionEstablished();
 
 exit:
@@ -1163,14 +1194,13 @@ CHIP_ERROR CASESession::ConstructSaltSigma3(const ByteSpan & ipk, MutableByteSpa
 CHIP_ERROR CASESession::ConstructSigmaResumeKey(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID,
                                                 const ByteSpan & skInfo, const ByteSpan & nonce, MutableByteSpan & resumeKey)
 {
-    VerifyOrReturnError(resumeKey.size() >= kAEADKeySize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(resumeKey.size() >= kAEADKeySize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> salt;
     constexpr size_t saltSize = kSigmaParamRandomNumberSize + kCASEResumptionIDSize;
-    ReturnErrorCodeIf(!salt.Alloc(saltSize), CHIP_ERROR_NO_MEMORY);
+    uint8_t salt[saltSize];
 
-    memset(salt.Get(), 0, saltSize);
-    Encoding::LittleEndian::BufferWriter bbuf(salt.Get(), saltSize);
+    memset(salt, 0, saltSize);
+    Encoding::LittleEndian::BufferWriter bbuf(salt, saltSize);
 
     bbuf.Put(initiatorRandom.data(), initiatorRandom.size());
     bbuf.Put(resumptionID.data(), resumptionID.size());
@@ -1179,8 +1209,8 @@ CHIP_ERROR CASESession::ConstructSigmaResumeKey(const ByteSpan & initiatorRandom
     VerifyOrReturnError(bbuf.Fit(saltWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     HKDF_sha_crypto mHKDF;
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), salt.Get(), saltWritten, skInfo.data(),
-                                           skInfo.size(), resumeKey.data(), kAEADKeySize));
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), salt, saltWritten, skInfo.data(), skInfo.size(),
+                                           resumeKey.data(), kAEADKeySize));
     resumeKey.reduce_size(kAEADKeySize);
     return CHIP_NO_ERROR;
 }
@@ -1188,11 +1218,10 @@ CHIP_ERROR CASESession::ConstructSigmaResumeKey(const ByteSpan & initiatorRandom
 CHIP_ERROR CASESession::GenerateSigmaResumeMIC(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID,
                                                const ByteSpan & skInfo, const ByteSpan & nonce, MutableByteSpan & resumeMIC)
 {
-    VerifyOrReturnError(resumeMIC.size() >= kTAGSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(resumeMIC.size() >= kTAGSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> srk;
-    ReturnErrorCodeIf(!srk.Alloc(kAEADKeySize), CHIP_ERROR_NO_MEMORY);
-    MutableByteSpan resumeKey(srk.Get(), kAEADKeySize);
+    uint8_t srk[kAEADKeySize];
+    MutableByteSpan resumeKey(srk);
 
     ReturnErrorOnFailure(ConstructSigmaResumeKey(initiatorRandom, resumptionID, skInfo, nonce, resumeKey));
 
@@ -1206,11 +1235,10 @@ CHIP_ERROR CASESession::GenerateSigmaResumeMIC(const ByteSpan & initiatorRandom,
 CHIP_ERROR CASESession::ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const ByteSpan & initiatorRandom,
                                                const ByteSpan & resumptionID, const ByteSpan & skInfo, const ByteSpan & nonce)
 {
-    VerifyOrReturnError(resumeMIC.size() == kTAGSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(resumeMIC.size() == kTAGSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> srk;
-    ReturnErrorCodeIf(!srk.Alloc(kAEADKeySize), CHIP_ERROR_NO_MEMORY);
-    MutableByteSpan resumeKey(srk.Get(), kAEADKeySize);
+    uint8_t srk[kAEADKeySize];
+    MutableByteSpan resumeKey(srk);
 
     ReturnErrorOnFailure(ConstructSigmaResumeKey(initiatorRandom, resumptionID, skInfo, nonce, resumeKey));
 
@@ -1301,6 +1329,9 @@ void CASESession::OnSuccessStatusReport()
     mDelegate->OnSessionEstablished();
 
     mState = kInitialized;
+
+    // TODO: Set timestamp on the new session, to allow selecting a least-recently-used session for eviction
+    // on running out of session contexts.
 }
 
 CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
@@ -1313,7 +1344,7 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
         break;
 
     case kProtocolCodeNoSharedRoot:
-        err = CHIP_ERROR_CERT_NOT_TRUSTED;
+        err = CHIP_ERROR_NO_SHARED_TRUSTED_ROOT;
         break;
 
     default:
@@ -1325,19 +1356,20 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
     return err;
 }
 
-CHIP_ERROR CASESession::ParseSessionResumptionRequest(const System::PacketBufferHandle & msg, bool & resumptionRequested,
-                                                      MutableByteSpan & resumptionID, MutableByteSpan & resume1MIC)
+CHIP_ERROR CASESession::IsResumptionRequestPresent(const System::PacketBufferHandle & msg, bool & resumptionRequested,
+                                                   ByteSpan & resumptionID, ByteSpan & resume1MIC)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
-    constexpr uint8_t kResumptionIDTag = 6;
-    constexpr uint8_t kResume1MICTag   = 7;
+    constexpr uint32_t kResumptionIDTag = 6;
+    constexpr uint32_t kResume1MICTag   = 7;
 
-    bool resumptionIDTagFound = false;
-    bool resume1MICTagFound   = false;
+    uint32_t lastDecodedTLVTag = 0;
+    bool resumptionIDTagFound  = false;
+    bool resume1MICTagFound    = false;
 
     System::PacketBufferHandle msg_clone = msg.CloneData();
 
@@ -1348,23 +1380,24 @@ CHIP_ERROR CASESession::ParseSessionResumptionRequest(const System::PacketBuffer
     while (!resumptionIDTagFound || !resume1MICTagFound)
     {
         SuccessOrExit(err = tlvReader.Next());
-        if (TLV::TagNumFromTag(tlvReader.GetTag()) == kResumptionIDTag)
+
+        // Make sure that tlv tags are in order.
+        // There are optional TLV elements, so some of them may not be present.
+        // So the check cannot match the absolute value of the expected tag.
+        uint32_t tlvTag = TLV::TagNumFromTag(tlvReader.GetTag());
+        VerifyOrExit(tlvTag > lastDecodedTLVTag, CHIP_ERROR_INVALID_TLV_TAG);
+        lastDecodedTLVTag = tlvTag;
+
+        if (tlvTag == kResumptionIDTag)
         {
             resumptionIDTagFound = true;
-            if (resumptionID.size() >= kCASEResumptionIDSize)
-            {
-                SuccessOrExit(err = tlvReader.GetBytes(resumptionID.data(), kCASEResumptionIDSize));
-                resumptionID.reduce_size(kCASEResumptionIDSize);
-            }
+            SuccessOrExit(err = tlvReader.GetByteView(resumptionID));
         }
-        if (TLV::TagNumFromTag(tlvReader.GetTag()) == kResume1MICTag)
+        else if (tlvTag == kResume1MICTag)
         {
+            VerifyOrExit(resumptionIDTagFound, CHIP_ERROR_INVALID_TLV_TAG);
             resume1MICTagFound = true;
-            if (resume1MIC.size() >= kTAGSize)
-            {
-                SuccessOrExit(err = tlvReader.GetBytes(resume1MIC.data(), kTAGSize));
-                resume1MIC.reduce_size(kTAGSize);
-            }
+            SuccessOrExit(err = tlvReader.GetByteView(resume1MIC));
         }
     }
 
@@ -1385,7 +1418,7 @@ exit:
     }
     else
     {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
+        err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
     }
 
     return err;
@@ -1423,6 +1456,8 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     Protocols::SecureChannel::MsgType msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);
 
+    // By default, CHIP_ERROR_INVALID_MESSAGE_TYPE is returned if in the current state
+    // a message handler is not defined for the received message type.
     err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
 
     switch (mState)
@@ -1445,10 +1480,11 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
             break;
 
         case MsgType::StatusReport:
-            err = HandleStatusReport(std::move(msg));
+            err = HandleStatusReport(std::move(msg), /* successExpected*/ false);
             break;
 
         default:
+            // Return the default error that was set above
             break;
         };
         break;
@@ -1460,10 +1496,11 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
             break;
 
         case MsgType::StatusReport:
-            err = HandleStatusReport(std::move(msg));
+            err = HandleStatusReport(std::move(msg), /* successExpected*/ false);
             break;
 
         default:
+            // Return the default error that was set above
             break;
         };
         break;
@@ -1471,14 +1508,20 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     case kSentSigma2Resume:
         if (msgType == Protocols::SecureChannel::MsgType::StatusReport)
         {
-            err = HandleStatusReport(std::move(msg));
+            err = HandleStatusReport(std::move(msg), /* successExpected*/ true);
         }
         break;
     default:
+        // Return the default error that was set above
         break;
     };
 
 exit:
+
+    if (err == CHIP_ERROR_INVALID_MESSAGE_TYPE)
+    {
+        ChipLogError(SecureChannel, "Received message (type %d) cannot be handled in %d state.", to_underlying(msgType), mState);
+    }
 
     // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)

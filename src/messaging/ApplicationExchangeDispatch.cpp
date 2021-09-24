@@ -56,7 +56,7 @@ bool ApplicationExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t ty
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_Sigma1):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_Sigma2):
         case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_Sigma3):
-        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaErr):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume):
             return false;
 
         default:

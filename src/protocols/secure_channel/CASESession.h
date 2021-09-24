@@ -65,13 +65,14 @@ struct CASESessionSerialized;
 
 struct CASESessionSerializable
 {
+    uint8_t mVersion;
+    uint8_t mPairingComplete;
     uint16_t mSharedSecretLen;
     uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length];
     uint16_t mMessageDigestLen;
     uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
     uint16_t mIPKLen;
     uint8_t mIPK[kIPKSize];
-    uint8_t mPairingComplete;
     NodeId mPeerNodeId;
     uint16_t mLocalSessionId;
     uint16_t mPeerSessionId;
@@ -120,7 +121,7 @@ public:
                                 SessionEstablishmentDelegate * delegate);
 
     /**
-     *   Parse the message to check if it is a valid session resumption request.
+     *   Parse the message to check if it has a session resumption request.
      *   A valid session resumption request must have Resumption ID, and InitiationResumeMIC.
      *
      *   If the message is a valid session resumption request, the output parameter resumptionRequested is set to true,
@@ -132,8 +133,8 @@ public:
      *   If the message doesn't contain either Resumption ID or InitiationResumeMIC (i.e. contains only one of these fields), the
      *   function returns CHIP_ERROR_INVALID_ARGUMENT.
      */
-    static CHIP_ERROR ParseSessionResumptionRequest(const System::PacketBufferHandle & message, bool & resumptionRequested,
-                                                    MutableByteSpan & resumptionID, MutableByteSpan & resume1MIC);
+    static CHIP_ERROR IsResumptionRequestPresent(const System::PacketBufferHandle & message, bool & resumptionRequested,
+                                                 ByteSpan & resumptionID, ByteSpan & resume1MIC);
 
     /**
      * @brief
@@ -273,6 +274,7 @@ private:
     Transport::FabricInfo * mFabricInfo    = nullptr;
 
     uint8_t mResumptionId[kCASEResumptionIDSize];
+    // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
     State mState;

@@ -811,7 +811,7 @@ CHIP_ERROR PASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
         err = CHIP_ERROR_INTERNAL;
         break;
     };
-    ChipLogError(SecureChannel, "Received error (protocol code %d) during pairing process. %s", protocolCode, ErrorStr(err));
+    ChipLogError(SecureChannel, "Received error (protocol code %d) during PASE process. %s", protocolCode, ErrorStr(err));
     return err;
 }
 
@@ -872,7 +872,7 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
         break;
 
     case MsgType::StatusReport:
-        err = HandleStatusReport(std::move(msg));
+        err = HandleStatusReport(std::move(msg), mNextExpectedMsg == MsgType::StatusReport);
         break;
 
     default:

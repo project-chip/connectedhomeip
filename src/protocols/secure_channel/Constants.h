@@ -66,9 +66,7 @@ enum class MsgType : uint8_t
     CASE_Sigma1       = 0x30,
     CASE_Sigma2       = 0x31,
     CASE_Sigma3       = 0x32,
-    CASE_Sigma1Resume = 0x33,
-    CASE_Sigma2Resume = 0x34,
-    CASE_SigmaErr     = 0x3F,
+    CASE_Sigma2Resume = 0x33,
 
     StatusReport = 0x40,
 };
