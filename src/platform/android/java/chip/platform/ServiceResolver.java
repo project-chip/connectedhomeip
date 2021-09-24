@@ -19,5 +19,6 @@ package chip.platform;
 
 public interface ServiceResolver {
   void setAndroidChipPlatform(AndroidChipPlatform platform);
+
   void resolve(String instanceName, String serviceType, long callbackHandle, long contextHandle);
 }
