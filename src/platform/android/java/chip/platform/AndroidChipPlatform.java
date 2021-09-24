@@ -20,14 +20,19 @@ package chip.platform;
 public final class AndroidChipPlatform {
   private BleManager mBleManager = null;
 
-  public AndroidChipPlatform() {}
+  public AndroidChipPlatform(BleManager ble, KeyValueStoreManager kvm, ConfigurationManager cfg, ServiceResolver resolver) {
+    setBLEManager(ble);
+    setKeyValueStoreManager(kvm);
+    setConfigurationManager(cfg);
+    setServiceResolver(resolver);
+  }
 
   // for BLEManager
   public BleManager getBLEManager() {
     return mBleManager;
   }
 
-  public void setBLEManager(BleManager manager) {
+  private void setBLEManager(BleManager manager) {
     if (manager != null) {
       mBleManager = manager;
       manager.setAndroidChipPlatform(this);
@@ -35,7 +40,7 @@ public final class AndroidChipPlatform {
     }
   }
 
-  public native void nativeSetBLEManager(BleManager manager);
+  private native void nativeSetBLEManager(BleManager manager);
 
   // apis in BleLayer.h called by Platform
   // write success
@@ -57,20 +62,20 @@ public final class AndroidChipPlatform {
   public native void handleConnectionError(int connId);
 
   // for KeyValueStoreManager
-  public native void setKeyValueStoreManager(KeyValueStoreManager manager);
+  private native void setKeyValueStoreManager(KeyValueStoreManager manager);
 
   // for ConfigurationManager
-  public native void setConfigurationManager(ConfigurationManager manager);
+  private native void setConfigurationManager(ConfigurationManager manager);
 
   // for ServiceResolver
-  public void setServiceResolver(ServiceResolver resolver) {
+  private void setServiceResolver(ServiceResolver resolver) {
     if(resolver != null) {
       resolver.setAndroidChipPlatform(this);
       nativeSetServiceResolver(resolver);
     }
   }
 
-  public native void nativeSetServiceResolver(ServiceResolver resolver);
+  private native void nativeSetServiceResolver(ServiceResolver resolver);
 
   public native void handleServiceResolve(
       String instanceName,
