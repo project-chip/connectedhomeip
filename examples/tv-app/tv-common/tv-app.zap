@@ -1,5 +1,5 @@
 {
-  "featureLevel": 51,
+  "featureLevel": 54,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -7828,7 +7828,7 @@
               "reportableChange": 0
             },
             {
-              "name": "updated at",
+              "name": "position updated at",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -7843,7 +7843,7 @@
               "reportableChange": 0
             },
             {
-              "name": "posistion",
+              "name": "position",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -8783,6 +8783,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 36
     }
-  ],
-  "log": []
+  ]
 }
