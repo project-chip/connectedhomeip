@@ -346,28 +346,28 @@ function asChipZapType(type)
   }
 
   switch (type) {
-    case 'BOOLEAN':
-      return 'bool';
-    case 'INT8S':
-      return  'int8_t';
-    case 'INT16S':
-      return  'int16_t';
-    case 'INT24S':
-      return  'int24_t';
-    case 'INT32S':
-      return  'int32_t';
-    case 'INT64S':
-      return  'int64_t';
-    case 'INT8U':
-      return  'uint8_t';
-    case 'INT16U':
-      return  'uint16_t';
-    case 'INT24U':
-      return  'uint24_t';
-    case 'INT32U':
-      return  'uint32_t';
-    case 'INT64U':
-      return  'uint64_t';
+  case 'BOOLEAN':
+    return 'bool';
+  case 'INT8S':
+    return 'int8_t';
+  case 'INT16S':
+    return 'int16_t';
+  case 'INT24S':
+    return 'int24_t';
+  case 'INT32S':
+    return 'int32_t';
+  case 'INT64S':
+    return 'int64_t';
+  case 'INT8U':
+    return 'uint8_t';
+  case 'INT16U':
+    return 'uint16_t';
+  case 'INT24U':
+    return 'uint24_t';
+  case 'INT32U':
+    return 'uint32_t';
+  case 'INT64U':
+    return 'uint64_t';
   }
 
   function fn(pkgId)
@@ -376,20 +376,20 @@ function asChipZapType(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
-        case 'bool':
-        case 'int8_t':
-        case 'uint8_t':
-        case 'int16_t':
-        case 'uint16_t':
-        case 'int24_t':
-        case 'uint24_t':
-        case 'int32_t':
-        case 'uint32_t':
-        case 'int64_t':
-        case 'uint64_t':
-          return basicType;
-        default:
-          return type +'::Type'
+      case 'bool':
+      case 'int8_t':
+      case 'uint8_t':
+      case 'int16_t':
+      case 'uint16_t':
+      case 'int24_t':
+      case 'uint24_t':
+      case 'int32_t':
+      case 'uint32_t':
+      case 'int64_t':
+      case 'uint64_t':
+        return basicType;
+      default:
+        return type + '::Type'
       }
     })
   }
@@ -414,4 +414,4 @@ exports.asLowerCamelCase                  = asLowerCamelCase;
 exports.asUpperCamelCase                  = asUpperCamelCase;
 exports.hasSpecificAttributes             = hasSpecificAttributes;
 exports.asMEI                             = asMEI;
-exports.asChipZapType = asChipZapType;
+exports.asChipZapType                     = asChipZapType;
