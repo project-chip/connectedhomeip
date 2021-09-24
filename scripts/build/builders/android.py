@@ -87,6 +87,10 @@ class AndroidBuilder(Builder):
                 % licenses)
 
     def generate(self):
+        self._Execute([
+            'python3', 'build/chip/java/tests/generate_jars_for_test.py'
+        ], title='Generating JARs for Java build rules test')
+
         if not os.path.exists(self.output_dir):
             # NRF does a in-place update  of SDK tools
             if not self._runner.dry_run:
@@ -97,7 +101,6 @@ class AndroidBuilder(Builder):
             gn_args['target_cpu'] = self.board.TargetCpuName()
             gn_args['android_ndk_root'] = os.environ['ANDROID_NDK_HOME']
             gn_args['android_sdk_root'] = os.environ['ANDROID_HOME']
-            gn_args['chip_use_clusters_for_ip_commissioning'] = 'true'
 
             args = '--args=%s' % (' '.join([
                 '%s="%s"' % (key, shlex.quote(value))
@@ -120,11 +123,6 @@ class AndroidBuilder(Builder):
         self._Execute(['ninja', '-C', self.output_dir],
                       title='Building JNI ' + self.identifier)
 
-        # NOTE: the following IDE-specific build instructions are NOT used:
-        #  - "rsync -a out/"android_$TARGET_CPU"/lib/*.jar src/android/CHIPTool/app/libs"
-        #    => using the 'ninjaOutputDir' project property instead to take the jar files directly
-        #       from the output
-
         # JNILibs will be copied as long as they reside in src/main/jniLibs/ABI:
         #    https://developer.android.com/studio/projects/gradle-external-native-builds#jniLibs
         # to avoid redefined in IDE mode, copy to another place and add that path in build.gradle
@@ -133,6 +131,7 @@ class AndroidBuilder(Builder):
         # when using dry run.
         jnilibs_dir = os.path.join(
             self.root, 'src/android/CHIPTool/app/libs/jniLibs', self.board.AbiName())
+        libs_dir = os.path.join(self.root, 'src/android/CHIPTool/app/libs')
         self._Execute(['mkdir', '-p', jnilibs_dir],
                       title='Prepare Native libs ' + self.identifier)
 
@@ -149,11 +148,18 @@ class AndroidBuilder(Builder):
             self._Execute(['cp', os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(
             ), libName), os.path.join(jnilibs_dir, libName)])
 
+        jars = {
+            'CHIPController.jar': 'src/controller/java/CHIPController.jar',
+            'SetupPayloadParser.jar': 'src/setup_payload/java/SetupPayloadParser.jar'
+        }
+        for jarName in jars.keys():
+            self._Execute(['cp', os.path.join(
+                self.output_dir, 'lib', jars[jarName]), os.path.join(libs_dir, jarName)])
+
         # App compilation
         self._Execute([
             '%s/src/android/CHIPTool/gradlew' % self.root, '-p',
             '%s/src/android/CHIPTool' % self.root,
-            '-PchipSdkJarDir=%s' % os.path.join(self.output_dir, 'lib'),
             '-PbuildDir=%s' % self.output_dir, 'assembleDebug'
         ],
             title='Building APP ' + self.identifier)
@@ -161,9 +167,11 @@ class AndroidBuilder(Builder):
     def build_outputs(self):
         outputs = {
             'CHIPController.jar':
-                os.path.join(self.output_dir, 'lib', 'CHIPController.jar'),
+                os.path.join(self.output_dir, 'lib',
+                             'src/controller/java/CHIPController.jar'),
             'SetupPayloadParser.jar':
-                os.path.join(self.output_dir, 'lib', 'SetupPayloadParser.jar'),
+                os.path.join(self.output_dir, 'lib',
+                             'src/setup_payload/java/SetupPayloadParser.jar'),
             'ChipTool-debug.apk':
                 os.path.join(self.output_dir, 'outputs', 'apk', 'debug',
                              'app-debug.apk'),

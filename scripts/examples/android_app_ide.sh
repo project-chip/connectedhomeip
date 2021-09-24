@@ -38,4 +38,4 @@ fi
 source scripts/activate.sh
 # Build CMake for Android Studio
 echo "build ide"
-gn gen --check --fail-on-unused-args out/"android_$TARGET_CPU" --args="target_os=\"android\" target_cpu=\"$TARGET_CPU\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\" chip_use_clusters_for_ip_commissioning=\"true\"" --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
+gn gen --check --fail-on-unused-args out/"android_$TARGET_CPU" --args="target_os=\"android\" target_cpu=\"$TARGET_CPU\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\"" --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
