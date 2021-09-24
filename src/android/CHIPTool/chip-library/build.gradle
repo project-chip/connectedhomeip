@@ -2,6 +2,8 @@ plugins {
     id 'com.android.library'
 }
 
+apply from: "../../../../third_party/android_deps/android_deps.gradle"
+
 android {
     compileSdkVersion 30
 
@@ -35,5 +37,14 @@ android {
                 ]
             }
         }
+    }
+}
+
+dependencies {
+    // Dependencies for CHIP Java code are defined centrally in
+    // android_deps.gradle. Copy deps from that file into our implementation
+    // config, instead of maintaining two separate lists of dependencies.
+    configurations.chipDeps.dependencies.each {
+        project.dependencies.add("implementation", "${it.group}:${it.name}:${it.version}")
     }
 }

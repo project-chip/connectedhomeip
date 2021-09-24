@@ -60,7 +60,10 @@ shared_library("jni") {
 android_library("java") {
   output_name = "CHIPController.jar"
 
-  deps = [ ":android" ]
+  deps = [
+    ":android",
+    "${chip_root}/third_party/android_deps:annotation",
+  ]
 
   data_deps = [
     ":jni",

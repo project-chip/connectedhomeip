@@ -20,6 +20,7 @@ package chip.devicecontroller;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.util.Log;
+import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.mdns.ChipMdnsCallback;
 import chip.devicecontroller.mdns.ServiceResolver;
@@ -27,7 +28,6 @@ import chip.devicecontroller.mdns.ServiceResolver;
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
   private static final String TAG = ChipDeviceController.class.getSimpleName();
-
   private long deviceControllerPtr;
   private int connectionId;
   private BluetoothGatt bleGatt;
@@ -66,7 +66,7 @@ public class ChipDeviceController {
    *     generated CSR nonce.
    */
   public void pairDevice(
-      BluetoothGatt bleServer, long deviceId, long setupPincode, byte[] csrNonce) {
+      BluetoothGatt bleServer, long deviceId, long setupPincode, @Nullable byte[] csrNonce) {
     if (connectionId == 0) {
       bleGatt = bleServer;
 
@@ -87,7 +87,12 @@ public class ChipDeviceController {
   }
 
   public void pairDeviceWithAddress(
-      long deviceId, String address, int port, int discriminator, long pinCode, byte[] csrNonce) {
+      long deviceId,
+      String address,
+      int port,
+      int discriminator,
+      long pinCode,
+      @Nullable byte[] csrNonce) {
     pairDeviceWithAddress(
         deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce);
   }
@@ -219,7 +224,11 @@ public class ChipDeviceController {
       KeyValueStoreManager manager, ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
 
   private native void pairDevice(
-      long deviceControllerPtr, long deviceId, int connectionId, long pinCode, byte[] csrNonce);
+      long deviceControllerPtr,
+      long deviceId,
+      int connectionId,
+      long pinCode,
+      @Nullable byte[] csrNonce);
 
   private native void pairDeviceWithAddress(
       long deviceControllerPtr,
@@ -228,7 +237,7 @@ public class ChipDeviceController {
       int port,
       int discriminator,
       long pinCode,
-      byte[] csrNonce);
+      @Nullable byte[] csrNonce);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 
