@@ -17,8 +17,10 @@ import("//build_overrides/chip.gni")
 static_library("cluster-objects") {
   output_name = "libClusterObjects"
 
-  sources = ["${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h",
-             "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp", ]
+  sources = [
+    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp",
+    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/app",
