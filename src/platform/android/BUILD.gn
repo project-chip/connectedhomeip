@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,13 +66,13 @@ android_library("java") {
   data_deps = [ ":android" ]
 
   sources = [
-    "java/chip/platform/AndroidBLEManager.java",
+    "java/chip/platform/AndroidBleManager.java",
     "java/chip/platform/AndroidChipPlatform.java",
     "java/chip/platform/AndroidChipPlatformException.java",
-    "java/chip/platform/BLEConnection.java",
-    "java/chip/platform/BLEManager.java",
+    "java/chip/platform/BleConnection.java",
+    "java/chip/platform/BleManager.java",
     "java/chip/platform/ConfigurationManager.java",
-    "java/chip/platform/DefaultConfigurationManager.java",
+    "java/chip/platform/PreferencesConfigurationManager.java",
     "java/chip/platform/KeyValueStoreManager.java",
     "java/chip/platform/NsdManagerServiceResolver.java",
     "java/chip/platform/PreferencesKeyValueStoreManager.java",

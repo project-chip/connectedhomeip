@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +58,7 @@ private:
  * Chip applications should use this to access features of the KeyValueStoreManager object
  * that are common to all platforms.
  */
-inline KeyValueStoreManager & KeyValueStoreMgr(void)
+inline KeyValueStoreManager & KeyValueStoreMgr()
 {
     return KeyValueStoreManagerImpl::sInstance;
 }
@@ -69,7 +69,7 @@ inline KeyValueStoreManager & KeyValueStoreMgr(void)
  * Chip applications can use this to gain access to features of the KeyValueStoreManager
  * that are specific to the ESP32 platform.
  */
-inline KeyValueStoreManagerImpl & KeyValueStoreMgrImpl(void)
+inline KeyValueStoreManagerImpl & KeyValueStoreMgrImpl()
 {
     return KeyValueStoreManagerImpl::sInstance;
 }

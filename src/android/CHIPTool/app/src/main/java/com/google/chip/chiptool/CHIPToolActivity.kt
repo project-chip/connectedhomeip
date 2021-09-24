@@ -27,9 +27,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipDeviceController
-import chip.platform.AndroidBLEManager
+import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
-import chip.platform.DefaultConfigurationManager
+import chip.platform.PreferencesConfigurationManager
 import chip.platform.NsdManagerServiceResolver
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
@@ -59,10 +59,10 @@ class CHIPToolActivity :
 
     if (savedInstanceState == null) {
       ChipDeviceController.load()
-      AndroidChipPlatform.getInstance().setConfigurationManager(DefaultConfigurationManager(this))
+      AndroidChipPlatform.getInstance().setConfigurationManager(PreferencesConfigurationManager(this))
       AndroidChipPlatform.getInstance().setKeyValueStoreManager(chip.platform.PreferencesKeyValueStoreManager(this))
       AndroidChipPlatform.getInstance().setServiceResolver(NsdManagerServiceResolver(this))
-      AndroidChipPlatform.getInstance().bleManager = AndroidBLEManager()
+      AndroidChipPlatform.getInstance().bleManager = AndroidBleManager()
       val fragment = SelectActionFragment.newInstance()
       supportFragmentManager
           .beginTransaction()
