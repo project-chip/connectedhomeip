@@ -30,7 +30,7 @@ cmake_minimum_required(VERSION 3.13.1)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
 # Make sure all components can see project mbedTLS config
-include_directories(AFTER ${CMAKE_CURRENT_SOURCE_DIR}/main/include
+include_directories(AFTER ${CMAKE_CURRENT_SOURCE_DIR}/main/include)
 
 # ==================================================
 # Setup CHIP build
