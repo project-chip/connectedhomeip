@@ -59,10 +59,10 @@ class CHIPToolActivity :
 
     if (savedInstanceState == null) {
       ChipDeviceController.load()
-      AndroidChipPlatform.getInstance().setConfigurationManager(PreferencesConfigurationManager(this))
-      AndroidChipPlatform.getInstance().setKeyValueStoreManager(chip.platform.PreferencesKeyValueStoreManager(this))
-      AndroidChipPlatform.getInstance().setServiceResolver(NsdManagerServiceResolver(this))
-      AndroidChipPlatform.getInstance().bleManager = AndroidBleManager()
+      ChipClient.getAndroidChipPlatform().setConfigurationManager(PreferencesConfigurationManager(this))
+      ChipClient.getAndroidChipPlatform().setKeyValueStoreManager(chip.platform.PreferencesKeyValueStoreManager(this))
+      ChipClient.getAndroidChipPlatform().setServiceResolver(NsdManagerServiceResolver(this))
+      ChipClient.getAndroidChipPlatform().bleManager = AndroidBleManager()
       val fragment = SelectActionFragment.newInstance()
       supportFragmentManager
           .beginTransaction()

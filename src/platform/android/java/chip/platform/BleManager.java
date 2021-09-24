@@ -21,13 +21,15 @@ import android.bluetooth.BluetoothGattCallback;
 
 public interface BleManager {
   // For app
-  public int addConnection(BleConnection connObj);
+  int addConnection(BleConnection connObj);
 
   BleConnection removeConnection(int connId);
 
   BleConnection getConnection(int connId);
 
-  public BluetoothGattCallback getCallback();
+  BluetoothGattCallback getCallback();
+
+  void setAndroidChipPlatform(AndroidChipPlatform platform);
 
   // BLEManager
   int init();

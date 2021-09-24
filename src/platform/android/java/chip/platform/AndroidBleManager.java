@@ -43,6 +43,7 @@ public class AndroidBleManager implements BleManager {
 
   private final List<BleConnection> mConnections;
   private BluetoothGattCallback mGattCallback;
+  private AndroidChipPlatform mPlatform;
 
   public AndroidBleManager() {
     mConnections = new ArrayList<>(INITIAL_CONNECTIONS);
@@ -57,7 +58,7 @@ public class AndroidBleManager implements BleManager {
               connId = getConnId(gatt);
               if (connId > 0) {
                 Log.d(TAG, "onConnectionStateChange Disconnected");
-                AndroidChipPlatform.getInstance().handleConnectionError(connId);
+                mPlatform.handleConnectionError(connId);
               } else {
                 Log.e(TAG, "onConnectionStateChange disconnected: no active connection");
               }
@@ -89,8 +90,7 @@ public class AndroidBleManager implements BleManager {
 
             int connId = getConnId(gatt);
             if (connId > 0) {
-              AndroidChipPlatform.getInstance()
-                  .handleWriteConfirmation(
+              mPlatform.handleWriteConfirmation(
                       connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
             } else {
               Log.e(TAG, "onCharacteristicWrite no active connection");
@@ -105,8 +105,7 @@ public class AndroidBleManager implements BleManager {
             byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
             int connId = getConnId(gatt);
             if (connId > 0) {
-              AndroidChipPlatform.getInstance()
-                  .handleIndicationReceived(
+              mPlatform.handleIndicationReceived(
                       connId, svcIdBytes, charIdBytes, characteristic.getValue());
             } else {
               Log.e(TAG, "onCharacteristicChanged no active connection");
@@ -138,12 +137,10 @@ public class AndroidBleManager implements BleManager {
             }
 
             if (desc.getValue() == BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) {
-              AndroidChipPlatform.getInstance()
-                  .handleSubscribeComplete(
+              mPlatform.handleSubscribeComplete(
                       connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
             } else if (desc.getValue() == BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE) {
-              AndroidChipPlatform.getInstance()
-                  .handleUnsubscribeComplete(
+              mPlatform.handleUnsubscribeComplete(
                       connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
             } else {
               Log.d(TAG, "Unexpected onDescriptorWrite().");
@@ -196,6 +193,11 @@ public class AndroidBleManager implements BleManager {
   @Override
   public BluetoothGattCallback getCallback() {
     return mGattCallback;
+  }
+
+  @Override
+  public void setAndroidChipPlatform(AndroidChipPlatform platform) {
+    mPlatform = platform;
   }
 
   private synchronized int getConnId(BluetoothGatt gatt) {
