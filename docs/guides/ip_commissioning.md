@@ -40,7 +40,7 @@ device into commissioning mode.
 ### linux builds with an ethernet connection
 
 ```bash
-gn gen out/debug --args='chip_ip_commissioning=true'
+gn gen out/debug
 ninja -C out/debug
 ```
 
@@ -59,7 +59,7 @@ The controller builds with IP commissioning support by default, but you can turn
 it on or off using
 
 ```
-scripts/build_python.sh --clusters_for_ip_commissioning <true/false>
+scripts/build_python.sh
 ```
 
 There are two ways to connect via IP: **Discover then connect ip**
