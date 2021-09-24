@@ -30,18 +30,27 @@
 // Struct for SimpleStruct
 typedef struct _SimpleStruct
 {
-    /* TYPE WARNING: unknown defaults to */ uint8_t * a;
+    uint8_t a;
     bool b;
     uint8_t c;
     chip::ByteSpan d;
     uint8_t * e;
 } SimpleStruct;
 
+// Struct for NestedStruct
+typedef struct _NestedStruct
+{
+    uint8_t a;
+    bool b;
+    SimpleStruct c;
+} NestedStruct;
+
 // Struct for NestedStructList
 typedef struct _NestedStructList
 {
-    /* TYPE WARNING: unknown defaults to */ uint8_t * a;
+    uint8_t a;
     bool b;
+    SimpleStruct c;
     /* TYPE WARNING: array array defaults to */ uint8_t * d;
     /* TYPE WARNING: array array defaults to */ uint8_t * e;
     /* TYPE WARNING: array array defaults to */ uint8_t * f;
@@ -53,6 +62,21 @@ typedef struct _DoubleNestedStructList
 {
     /* TYPE WARNING: array array defaults to */ uint8_t * a;
 } DoubleNestedStructList;
+
+// Struct for ContentLaunchAdditionalInfo
+typedef struct _ContentLaunchAdditionalInfo
+{
+    uint8_t * name;
+    uint8_t * value;
+} ContentLaunchAdditionalInfo;
+
+// Struct for ContentLaunchParamater
+typedef struct _ContentLaunchParamater
+{
+    uint8_t Type;
+    uint8_t * Value;
+    /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
+} ContentLaunchParamater;
 
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp
@@ -109,13 +133,6 @@ typedef struct _ConfigureReportingStatusRecord
     chip::AttributeId attributeId;
 } ConfigureReportingStatusRecord;
 
-// Struct for ContentLaunchAdditionalInfo
-typedef struct _ContentLaunchAdditionalInfo
-{
-    uint8_t * name;
-    uint8_t * value;
-} ContentLaunchAdditionalInfo;
-
 // Struct for ContentLaunchBrandingInformation
 typedef struct _ContentLaunchBrandingInformation
 {
@@ -134,14 +151,6 @@ typedef struct _ContentLaunchDimension
     uint8_t * height;
     uint8_t metric;
 } ContentLaunchDimension;
-
-// Struct for ContentLaunchParamater
-typedef struct _ContentLaunchParamater
-{
-    uint8_t Type;
-    uint8_t * Value;
-    /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
-} ContentLaunchParamater;
 
 // Struct for ContentLaunchStyleInformation
 typedef struct _ContentLaunchStyleInformation
@@ -264,13 +273,6 @@ typedef struct _NeighborTable
     bool FullNetworkData;
     bool IsChild;
 } NeighborTable;
-
-// Struct for NestedStruct
-typedef struct _NestedStruct
-{
-    /* TYPE WARNING: unknown defaults to */ uint8_t * a;
-    bool b;
-} NestedStruct;
 
 // Struct for NetworkInterfaceType
 typedef struct _NetworkInterfaceType
