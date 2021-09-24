@@ -38,7 +38,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
   public long readConfigValueLong(String namespace, String name)
       throws AndroidChipPlatformException {
     String key = getKey(namespace, name);
-    if(preferences.contains(key)) {
+    if (preferences.contains(key)) {
       long value = preferences.getLong(key, Long.MAX_VALUE);
       return value;
     } else {
@@ -51,7 +51,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
   public String readConfigValueStr(String namespace, String name)
       throws AndroidChipPlatformException {
     String key = getKey(namespace, name);
-    if(preferences.contains(key)) {
+    if (preferences.contains(key)) {
       String value = preferences.getString(key, null);
       return value;
     } else {
@@ -64,7 +64,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
   public byte[] readConfigValueBin(String namespace, String name)
       throws AndroidChipPlatformException {
     String key = getKey(namespace, name);
-    if(preferences.contains(key)) {
+    if (preferences.contains(key)) {
       String value = preferences.getString(key, null);
       byte[] byteValue = Base64.getDecoder().decode(value);
       return byteValue;
