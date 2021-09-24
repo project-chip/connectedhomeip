@@ -108,7 +108,7 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(chip::AttributeId attributeId, chip::TLV::TLVWriter * aWriter);
+    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -373,8 +373,20 @@ inline CHIP_ERROR ThreadStackManager::JoinerStart()
     return static_cast<ImplClass *>(this)->_JoinerStart();
 }
 
-inline CHIP_ERROR ThreadStackManager::WriteThreadNetworkDiagnosticAttributeToTlv(chip::AttributeId attributeId,
-                                                                                 chip::TLV::TLVWriter * aWriter)
+/*
+ * @brief Get runtime value from the thread network based on the given attribute ID.
+ *        The info is written in the TLVWriter for the zcl read command reply.
+ *
+ * @param  attributeId: Id of the attribute for the requested info.
+ *         * aWriter: Pointer to a TLVWriter were to write the obtained info.
+ *
+ * @return CHIP_NO_ERROR = Succes.
+ *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value ifor this attribute to yet available to send as reply
+ *                                      Use standard read.
+ *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
+ *         All other errors should be threated and a read error and reported as such.
+ */
+inline CHIP_ERROR ThreadStackManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter)
 {
     return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, aWriter);
 }

@@ -809,6 +809,19 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
+/*
+ * @brief Get runtime value from the thread network based on the given attribute ID.
+ *        The info is written in the TLVWriter for the zcl read command reply.
+ *
+ * @param  attributeId: Id of the attribute for the requested info.
+ *         * aWriter: Pointer to a TLVWriter were to write the obtained info.
+ *
+ * @return CHIP_NO_ERROR = Succes.
+ *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value ifor this attribute to yet available to send as reply
+ *                                      Use standard read.
+ *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
+ *         All other errors should be threated and a read error and reported as such.
+ */
 template <class ImplClass>
 CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
@@ -1242,7 +1255,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnost
             VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
             // In the resultant Octet string, the most significant bit of the left-most byte indicates channel 0
-            // We have to bitswap the entire uint32t before converting to octet string
+            // We have to bitswap the entire uint32_t before converting to octet string
             uint32_t bitSwappedChannelMask = 0;
             for (int i = 0, j = 31; i < 32; i++, j--)
             {
