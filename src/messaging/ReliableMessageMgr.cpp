@@ -274,7 +274,6 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
     }
 
     return CHIP_NO_ERROR;
-
 }
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
