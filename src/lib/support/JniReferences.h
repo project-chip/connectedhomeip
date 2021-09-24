@@ -45,7 +45,7 @@ public:
     /**
      * Set the JavaVM.
      *
-     * we need clsType in context to get ClassLoader 
+     * we need clsType in context to get ClassLoader
      *
      * This must be called before GetEnvForCurrentThread() or GetClassRef().
      */

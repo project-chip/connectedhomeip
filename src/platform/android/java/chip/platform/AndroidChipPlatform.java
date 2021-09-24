@@ -20,7 +20,11 @@ package chip.platform;
 public final class AndroidChipPlatform {
   private BleManager mBleManager = null;
 
-  public AndroidChipPlatform(BleManager ble, KeyValueStoreManager kvm, ConfigurationManager cfg, ServiceResolver resolver) {
+  public AndroidChipPlatform(
+      BleManager ble,
+      KeyValueStoreManager kvm,
+      ConfigurationManager cfg,
+      ServiceResolver resolver) {
     setBLEManager(ble);
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
@@ -69,7 +73,7 @@ public final class AndroidChipPlatform {
 
   // for ServiceResolver
   private void setServiceResolver(ServiceResolver resolver) {
-    if(resolver != null) {
+    if (resolver != null) {
       resolver.setAndroidChipPlatform(this);
       nativeSetServiceResolver(resolver);
     }
