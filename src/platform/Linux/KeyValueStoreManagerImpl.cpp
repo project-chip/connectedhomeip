@@ -56,6 +56,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     {
         return err;
     }
+    else if (offset_bytes > read_size)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     Platform::ScopedMemoryBuffer<uint8_t> buf;
     VerifyOrReturnError(buf.Alloc(read_size), CHIP_ERROR_NO_MEMORY);
