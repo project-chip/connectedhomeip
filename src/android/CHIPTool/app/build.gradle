@@ -78,13 +78,13 @@ dependencies {
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
     if (matterBuildSrcDir.isEmpty()) {
-        // local in-source-tree copy of the dependencies. Useful for IDE compilation
-        implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
-
         // build time dependencies
         if (project.hasProperty("chipSdkJarDir")) {
             println "Compiling using custom sdk jar file directory: ${chipSdkJarDir}"
             implementation fileTree(dir: "${chipSdkJarDir}", include: ["*.jar", "*.so"])
+        } else {
+            // local in-source-tree copy of the dependencies. Useful for IDE compilation
+            implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
         }
     } else {
         implementation project(':chip-library')

@@ -114,7 +114,7 @@ private:
         kFastAdvertisingEnabled   = 0x0080, /**< The application has enabled fast advertising. */
         kUseCustomDeviceName      = 0x0100, /**< The application has configured a custom BLE device name. */
         kAdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in BLE layer needs to be updated. */
-        kServiceModeEnalbe        = 0x0400, /**< CHIPoBLEServiceMode is enabled or not*/
+        kServiceModeEnabled       = 0x0400, /**< CHIPoBLEServiceMode is enabled or not*/
     };
 
     // ===== helpers
