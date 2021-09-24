@@ -52,9 +52,7 @@ class MainActivity : AppCompatActivity() {
                 mainHandler.sendMessage(msg)
             }.start()
         }
-        AndroidChipPlatform.getInstance().setConfigurationManager(DefaultConfigurationManager(this))
-        AndroidChipPlatform.getInstance().setKeyValueStoreManager(PreferencesKeyValueStoreManager(this))
-        AndroidChipPlatform.getInstance().setServiceResolver(NsdManagerServiceResolver(this))
-        AndroidChipPlatform.getInstance().bleManager = AndroidBLEManager()
+
+        AndroidChipPlatform(AndroidBleManager(), PreferencesKeyValueStoreManager(this), PreferencesConfigurationManager(this), NsdManagerServiceResolver(this))
     }
 }
