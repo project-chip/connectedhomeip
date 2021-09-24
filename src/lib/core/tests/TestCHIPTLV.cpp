@@ -4215,7 +4215,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("CHIP TLV Skip non-contiguous",        CheckCHIPTLVSkipCircular),
     NL_TEST_DEF("CHIP TLV ByteSpan",                   CheckCHIPTLVByteSpan),
     NL_TEST_DEF("CHIP TLV Check reserve",              CheckCloseContainerReserve),
-    NL_TEST_DEF("CHIP TLV Reader Fuzz Test",             TLVReaderFuzzTest),
+    NL_TEST_DEF("CHIP TLV Reader Fuzz Test",           TLVReaderFuzzTest),
     NL_TEST_DEF("CHIP TLV GetStringView Test",         CheckGetStringView),
     NL_TEST_DEF("CHIP TLV GetByteView Test",           CheckGetByteView),
     NL_TEST_DEF("CHIP TLV Check Chained Test",         CheckChainedBuffers),
