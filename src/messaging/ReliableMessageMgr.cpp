@@ -91,7 +91,8 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
             ChipLogDetail(ExchangeManager,
                           "EC:" ChipLogFormatExchange " MessageCounter:" ChipLogFormatMessageCounter
                           " NextRetransTimeCtr:%04" PRIX16,
-                          ChipLogValueExchange(entry.rc->GetExchangeContext()), entry.retainedBuf.GetMessageCounter(), entry.nextRetransTimeTick);
+                          ChipLogValueExchange(entry.rc->GetExchangeContext()), entry.retainedBuf.GetMessageCounter(),
+                          entry.nextRetransTimeTick);
         }
     }
 }
