@@ -213,7 +213,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         msgFlags.Set(MessageFlagValues::kDuplicateMessage);
     }
 
-
     ExchangeContext * exchange = nullptr;
     mContextPool.ForEachActiveObjectImmutable([&](auto * ec) {
         if (ec->MatchExchange(session, packetHeader, payloadHeader))
