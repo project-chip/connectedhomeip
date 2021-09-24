@@ -43,29 +43,9 @@ ReliableMessageContext::ReliableMessageContext() :
     mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0), mPendingPeerAckMessageCounter(0)
 {}
 
-bool ReliableMessageContext::AutoRequestAck() const
-{
-    return mFlags.Has(Flags::kFlagAutoRequestAck);
-}
-
 bool ReliableMessageContext::IsAckPending() const
 {
     return mFlags.Has(Flags::kFlagAckPending);
-}
-
-bool ReliableMessageContext::HasRcvdMsgFromPeer() const
-{
-    return mFlags.Has(Flags::kFlagMsgRcvdFromPeer);
-}
-
-void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
-{
-    mFlags.Set(Flags::kFlagAutoRequestAck, autoReqAck);
-}
-
-void ReliableMessageContext::SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer)
-{
-    mFlags.Set(Flags::kFlagMsgRcvdFromPeer, inMsgRcvdFromPeer);
 }
 
 void ReliableMessageContext::SetAckPending(bool inAckPending)

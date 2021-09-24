@@ -214,27 +214,19 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
 
     // Search for an existing exchange that the message applies to. If a match is found...
-    bool found = false;
+    ExchangeContext * exchange = nullptr;
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->MatchExchange(session, packetHeader, payloadHeader))
         {
-            // Found a matching exchange. Set flag for correct subsequent MRP
-            // retransmission timeout selection.
-            if (!ec->HasRcvdMsgFromPeer())
-            {
-                ec->SetMsgRcvdFromPeer(true);
-            }
-
-            // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
-            found = true;
+            exchange = ec;
             return false;
         }
         return true;
     });
 
-    if (found)
+    if (exchange != nullptr)
     {
+        exchange->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
         return;
     }
 

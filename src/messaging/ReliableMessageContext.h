@@ -97,22 +97,6 @@ public:
     CHIP_ERROR SendStandaloneAckMessage();
 
     /**
-     *  Determine whether an acknowledgment will be requested whenever a message is sent for the exchange.
-     *
-     *  @return Returns 'true' an acknowledgment will be requested whenever a message is sent, else 'false'.
-     */
-    bool AutoRequestAck() const;
-
-    /**
-     * Set whether an acknowledgment should be requested whenever a message is sent.
-     *
-     * @param[in] autoReqAck            A Boolean indicating whether or not an
-     *                                  acknowledgment should be requested whenever a
-     *                                  message is sent.
-     */
-    void SetAutoRequestAck(bool autoReqAck);
-
-    /**
      *  Determine whether the ChipExchangeManager should not send an
      *  acknowledgement.
      *
@@ -139,24 +123,6 @@ public:
      */
     bool IsAckPending() const;
 
-    /**
-     *  Determine whether at least one message has been received
-     *  on this exchange from peer.
-     *
-     *  @return Returns 'true' if message received, else 'false'.
-     */
-    bool HasRcvdMsgFromPeer() const;
-
-    /**
-     *  Set if a message has been received from the peer
-     *  on this exchange.
-     *
-     *  @param[in]  inMsgRcvdFromPeer  A Boolean indicating whether (true) or not
-     *                                 (false) a message has been received
-     *                                 from the peer on this exchange context.
-     */
-    void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
-
     /// Determine whether there is message hasn't been acknowledged.
     bool IsMessageNotAcked() const;
 
@@ -175,11 +141,8 @@ protected:
         /// When set, signifies that this context is the initiator of the exchange.
         kFlagInitiator = 0x0001,
 
-        /// When set, signifies that a response is expected for a message that is being sent.
-        kFlagResponseExpected = 0x0002,
-
-        /// When set, automatically request an acknowledgment whenever a message is sent via UDP.
-        kFlagAutoRequestAck = 0x0004,
+        /// When set, indicates that a reference to this context is scheduled in the system timer
+        kTimerScheduled = 0x0002,
 
         /// Internal and debug only: when set, the exchange layer does not send an acknowledgment.
         kFlagDropAckDebug = 0x0008,
@@ -189,17 +152,6 @@ protected:
 
         /// When set, signifies that there is an acknowledgment pending to be sent back.
         kFlagAckPending = 0x0020,
-
-        /// When set, signifies that at least one message has been received from peer on this exchange context.
-        kFlagMsgRcvdFromPeer = 0x0040,
-
-        /// When set, signifies that this exchange is waiting for a call to SendMessage.
-        kFlagWillSendMessage = 0x0080,
-
-        /// When set, signifies that we are currently in the middle of HandleMessage.
-        kFlagHandlingMessage = 0x0100,
-        /// When set, we have had Close() or Abort() called on us already.
-        kFlagClosed = 0x0200,
     };
 
     BitFlags<Flags> mFlags; // Internal state flags
@@ -218,6 +170,9 @@ private:
      *                          in response to a received message.
      */
     void SetAckPending(bool inAckPending);
+
+    bool GetTimerScheduled();
+    void SetTimerScheduled(bool timerScheduled);
 
     // Set our pending peer ack message counter and any other state needed to ensure that we
     // will send that ack at some point.

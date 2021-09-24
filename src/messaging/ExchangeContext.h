@@ -65,14 +65,9 @@ public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
     ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator, ExchangeDelegate * delegate);
-
     ~ExchangeContext();
 
-    /**
-     *  Determine whether the context is the initiator of the exchange.
-     *
-     *  @return Returns 'true' if it is the initiator, else 'false'.
-     */
+    /// Determine whether the context is the initiator of the exchange.
     bool IsInitiator() const;
 
     bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
@@ -117,11 +112,14 @@ public:
                            sendFlags);
     }
 
-    /**
-     * A notification that we will have SendMessage called on us in the future
-     * (and should stay open until that happens).
-     */
-    void WillSendMessage() { mFlags.Set(Flags::kFlagWillSendMessage); }
+    /// A notification that we will have SendMessage called on us in the future (and should stay open until that happens).
+    void WillSendMessage();
+
+    /// A notification that we will receive more requests in the future (and should stay open until that happens).
+    CHIP_ERROR WillHandleMoreMessage(Timeout idleTimeout);
+
+    /// Return whether this exchange is in a state which can handle incoming messages
+    bool CanHandleMessage();
 
     /**
      *  Handle a received CHIP message on this exchange.
@@ -169,18 +167,96 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    /*
-     * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
-     * can hold onto it while it's out of their direct control to make sure it isn't closed before everyone's ready.
-     * A customized version of reference counting is used since there are some extra stuff to do within Release.
-     */
     void Close();
     void Abort();
 
     void SetResponseTimeout(Timeout timeout);
 
 private:
-    Timeout mResponseTimeout       = 0; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
+    /* State machine of an exchange
+     *
+     *  +-------+       +-------+
+     *  |       |       |       |
+     *  |  +-+  |   R   |  +-+  |
+     *  |  |A|<---------|  |E|  |
+     *  |  +-+  |       |  +-+  |
+     *  |   |   |       |       |
+     *  |   |W  |       |       |
+     *  |   v   |       |       |
+     *  |  +-+  |   S   |  +-+  |
+     *  |  |B|  |------>|  |N|  |
+     *  |  +-+  |       |  +-+  |
+     *  |       |       |   |   |
+     *  |       |       |   |H  |
+     *  |       |       |   v   |
+     *  |  +-+  |       |  +-+  |
+     *  |  |I|  |       |  |S|  |
+     *  |  +-+  |       |  +-+  |
+     *  |       |       |       |
+     *  |       |       |       |
+     *  |       |       |  +-+  |
+     *  |       |       |  |R|  |
+     *  |       |       |  +-+  |
+     *  |       |       |       |
+     *  +-------+       +-------+
+     *
+     *
+     * States:
+     *   I(Initiator): The exchange is created as an initiator, it is going to send a message soon.
+     *   R(Responder): The exchange is created as an responder, it is going to handle a message soon.
+     *   A(Active): The exchange is active working on a request, and is about to send a message within current executing
+     *              context
+     *   B(Background): It is our turn to send a message, but WillSendMessage is called
+     *   E(SentExpectResponse): A packet has been sent, The exchange is expecting a response.
+     *   N(SentNoExpectResponse): A packet has been sent, The exchange is not expecting a response.
+     *   S(Sleep): A packet has been sent, The exchange is not expecting a response, and WillHandleMoreMessage is called
+     *   C(Closed): The exchange is graceful closed. Achieved by finishing handling a packet w/o sending a message and
+     *              WillSendMessage is not set. Or the user explicit called Close().
+     *   E(Error): Error state.
+     *
+     * Events:
+     *   S(Sent): A packet has been sent
+     *   R(Received): A packet has been received
+     *   W(WillSendMessage): WillSendMessage called
+     *   H(WillHandleMoreMessage): WillHandleMoreMessage called
+     *   T(ResponseTimeout): Timeout waiting for an response. (mResponseTimeout)
+     *
+     * Note: The difference between Initiator and Background is that AckMessageCounter is valid in state Background, but
+     *       invalid in state Initiator
+     *       The difference between SentExpectResponse and Sleep is that SentExpectResponse has response timer armed, but
+     *       Sleep has IdleTimer armed.
+     *
+     * Life-cycle management: The lifespan of the exchange is managed by reference counter, the counter can be retained
+     *                       by following cases:
+     *    1. Upper-layer: The upper layer is considered as holding a reference in Initiator, Responder and Background states.
+     *    2. Handler: While an exchange is handling a packet, it will hold a reference in case that the application
+     *                delegate calls Close() in the middle of the handler process. This is the case for Active state
+     *    3. Timer: When the response or idle timer is registered into system timer, it will hold a reference to the
+     *              context. This is the case for SentExpectResponse and Sleep state.
+     *    4. RMP: RMP will hold a reference in SentExpectResponse and SentNoExpectResponse state.
+     *    5. In Closed and Error state, no one is holding the reference to the exchange, and it should be release soon
+     *       after goes out of current execution context. It is actually holding by Handler case in a very short time.
+     */
+    enum class State {
+        Initiator = 0,
+        Active = 1,
+        Background = 2,
+        Responder = 3,
+        SentExpectResponse = 4,
+        SentNoExpectResponse = 5,
+        Sleep = 6,
+        Closed = 7,
+        Error = 8,
+        Released = 9,
+    } mState;
+
+    // Hide Retain/Release API, redeclare them as private
+    using ReferenceCounted<ExchangeContext, ExchangeContextDeletor>::Retain;
+    using ReferenceCounted<ExchangeContext, ExchangeContextDeletor>::Release;
+    friend class ReferenceCountedHandle<ExchangeContext>;
+
+    static constexpr const Timeout kDefaultResponseTimeout = 5000;
+    Timeout mResponseTimeout       = kDefaultResponseTimeout; // Maximum time to wait for response (in milliseconds)
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
     ExchangeACL * mExchangeACL     = nullptr;
@@ -189,32 +265,6 @@ private:
 
     Optional<SessionHandle> mSecureSession; // The connection state
     uint16_t mExchangeId;                   // Assigned exchange ID.
-
-    /**
-     *  Determine whether a response is currently expected for a message that was sent over
-     *  this exchange.  While this is true, attempts to send other messages that expect a response
-     *  will fail.
-     *
-     *  @return Returns 'true' if response expected, else 'false'.
-     */
-    bool IsResponseExpected() const;
-
-    /**
-     * Determine whether we are expecting our consumer to send a message on
-     * this exchange (i.e. WillSendMessage was called and the message has not
-     * yet been sent).
-     */
-    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
-
-    /**
-     *  Track whether we are now expecting a response to a message sent via this exchange (because that
-     *  message had the kExpectResponse flag set in its sendFlags).
-     *
-     *  @param[in]  inResponseExpected  A Boolean indicating whether (true) or not
-     *                                  (false) a response is currently expected on this
-     *                                  exchange.
-     */
-    void SetResponseExpected(bool inResponseExpected);
 
     /**
      *  Search for an existing exchange that the message applies to.
@@ -230,29 +280,17 @@ private:
      */
     bool MatchExchange(SessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
-    /**
-     * Notify the exchange that its connection has expired.
-     */
+    /// Notify the exchange that its connection has expired.
     void OnConnectionExpired();
 
-    /**
-     * Notify our delegate, if any, that we have timed out waiting for a
-     * response.
-     */
-    void NotifyResponseTimeout();
+    // Timer
+    void NotifyTimeout();
+    CHIP_ERROR StartTimer(Timeout timeout);
+    void CancelTimer();
+    static void HandleTimeout(System::Layer * aSystemLayer, void * aAppState);
 
-    CHIP_ERROR StartResponseTimer();
-
-    void CancelResponseTimer();
-    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState);
-
-    void DoClose(bool clearRetransTable);
-
-    /**
-     * We have handled an application-level message in some way and should
-     * re-evaluate out state to see whether we should still be open.
-     */
-    void MessageHandled();
+    void DoClose(State originalState, bool clearRetransTable);
+    void CleanUp(State originalState);
 };
 
 } // namespace Messaging

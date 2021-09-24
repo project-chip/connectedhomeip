@@ -65,8 +65,7 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
 #endif
     }
 
-    if (IsReliableTransmissionAllowed() && reliableMessageContext->AutoRequestAck() &&
-        reliableMessageContext->GetReliableMessageMgr() != nullptr && isReliableTransmission)
+    if (IsReliableTransmissionAllowed() && reliableMessageContext->GetReliableMessageMgr() != nullptr && isReliableTransmission)
     {
         auto * reliableMessageMgr = reliableMessageContext->GetReliableMessageMgr();
 
