@@ -91,7 +91,7 @@ public class AndroidBleManager implements BleManager {
             int connId = getConnId(gatt);
             if (connId > 0) {
               mPlatform.handleWriteConfirmation(
-                      connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
+                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
             } else {
               Log.e(TAG, "onCharacteristicWrite no active connection");
               return;
@@ -106,7 +106,7 @@ public class AndroidBleManager implements BleManager {
             int connId = getConnId(gatt);
             if (connId > 0) {
               mPlatform.handleIndicationReceived(
-                      connId, svcIdBytes, charIdBytes, characteristic.getValue());
+                  connId, svcIdBytes, charIdBytes, characteristic.getValue());
             } else {
               Log.e(TAG, "onCharacteristicChanged no active connection");
               return;
@@ -138,10 +138,10 @@ public class AndroidBleManager implements BleManager {
 
             if (desc.getValue() == BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) {
               mPlatform.handleSubscribeComplete(
-                      connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
+                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
             } else if (desc.getValue() == BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE) {
               mPlatform.handleUnsubscribeComplete(
-                      connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
+                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
             } else {
               Log.d(TAG, "Unexpected onDescriptorWrite().");
             }
