@@ -62,7 +62,7 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLV
     *aDataRead = true;
 
     // If it isn't a run time assigned attribute, e.j ClusterRevision, or if
-    // not implented,  use standard read.
+    // not implemented, use standard read.
     // Clear error and no data read
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE || err == CHIP_ERROR_NOT_IMPLEMENTED)
     {
