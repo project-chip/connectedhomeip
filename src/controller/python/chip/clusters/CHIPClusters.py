@@ -3458,6 +3458,21 @@ class ChipClusters:
                     "attributeId": 0x00000037,
                     "type": "int",
                 },
+                0x00000038: {
+                    "attributeName": "ActiveTimestamp",
+                    "attributeId": 0x00000038,
+                    "type": "int",
+                },
+                0x00000039: {
+                    "attributeName": "PendingTimestamp",
+                    "attributeId": 0x00000039,
+                    "type": "int",
+                },
+                0x0000003A: {
+                    "attributeName": "Delay",
+                    "attributeId": 0x0000003A,
+                    "type": "int",
+                },
                 0x0000003B: {
                     "attributeName": "SecurityPolicy",
                     "attributeId": 0x0000003B,
@@ -3466,7 +3481,7 @@ class ChipClusters:
                 0x0000003C: {
                     "attributeName": "ChannelMask",
                     "attributeId": 0x0000003C,
-                    "type": "int",
+                    "type": "bytes",
                 },
                 0x0000003D: {
                     "attributeName": "OperationalDatasetComponents",
@@ -5383,6 +5398,12 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrFcsCount(device, ZCLendpoint, ZCLgroupid)
     def ClusterThreadNetworkDiagnostics_ReadAttributeRxErrOtherCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrOtherCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeActiveTimestamp(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ActiveTimestamp(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributePendingTimestamp(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PendingTimestamp(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThreadNetworkDiagnostics_ReadAttributeDelay(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Delay(device, ZCLendpoint, ZCLgroupid)
     def ClusterThreadNetworkDiagnostics_ReadAttributeSecurityPolicy(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_SecurityPolicy(device, ZCLendpoint, ZCLgroupid)
     def ClusterThreadNetworkDiagnostics_ReadAttributeChannelMask(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -7256,6 +7277,15 @@ class ChipClusters:
         # Cluster ThreadNetworkDiagnostics ReadAttribute RxErrOtherCount
         self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrOtherCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxErrOtherCount.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute ActiveTimestamp
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ActiveTimestamp.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ActiveTimestamp.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute PendingTimestamp
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PendingTimestamp.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PendingTimestamp.restype = ctypes.c_uint32
+        # Cluster ThreadNetworkDiagnostics ReadAttribute Delay
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Delay.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Delay.restype = ctypes.c_uint32
         # Cluster ThreadNetworkDiagnostics ReadAttribute SecurityPolicy
         self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_SecurityPolicy.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_SecurityPolicy.restype = ctypes.c_uint32

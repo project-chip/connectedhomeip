@@ -964,8 +964,14 @@ public:
                                            uint32_t value);
     CHIP_ERROR WriteAttributeRxErrOtherCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint32_t value);
+    CHIP_ERROR WriteAttributeActiveTimestamp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint64_t value);
+    CHIP_ERROR WriteAttributePendingTimestamp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint64_t value);
+    CHIP_ERROR WriteAttributeDelay(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint32_t value);
     CHIP_ERROR WriteAttributeChannelMask(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         uint8_t value);
+                                         chip::ByteSpan value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
