@@ -15,7 +15,7 @@
  *   limitations under the License.
  *
  */
- package chip.platform;
+package chip.platform;
 
 import android.bluetooth.BluetoothGatt;
 
