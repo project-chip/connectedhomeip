@@ -131,7 +131,7 @@ class DeviceProvisioningFragment : Fragment() {
   private fun showMessage(msgResId: Int, stringArgs: String? = null) {
     requireActivity().runOnUiThread {
       val context = requireContext()
-      var msg = context.getString(msgResId, stringArgs)
+      val msg = context.getString(msgResId, stringArgs)
       Log.i(TAG, "showMessage:$msg")
       Toast.makeText(context, msg, Toast.LENGTH_SHORT)
         .show()
