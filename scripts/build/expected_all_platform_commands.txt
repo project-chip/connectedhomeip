@@ -265,6 +265,8 @@ cp {out}/android-arm-chip_tool/lib/src/controller/java/CHIPController.jar {root}
 
 cp {out}/android-arm-chip_tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
 
+cp {out}/android-arm-chip_tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+
 # Building APP android-arm-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PbuildDir={out}/android-arm-chip_tool assembleDebug
 
@@ -283,6 +285,8 @@ cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libc++_shared.so {root}/src/a
 cp {out}/android-arm64-chip_tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
 
 cp {out}/android-arm64-chip_tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+
+cp {out}/android-arm64-chip_tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
 
 # Building APP android-arm64-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PbuildDir={out}/android-arm64-chip_tool assembleDebug
@@ -303,6 +307,8 @@ cp {out}/android-x64-chip_tool/lib/src/controller/java/CHIPController.jar {root}
 
 cp {out}/android-x64-chip_tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
 
+cp {out}/android-x64-chip_tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+
 # Building APP android-x64-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PbuildDir={out}/android-x64-chip_tool assembleDebug
 
@@ -322,6 +328,8 @@ cp {out}/android-x86-chip_tool/lib/src/controller/java/CHIPController.jar {root}
 
 cp {out}/android-x86-chip_tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
 
+cp {out}/android-x86-chip_tool/lib/src/platform/android/AndroidPlatform.jar {root}/src/android/CHIPTool/app/libs/AndroidPlatform.jar
+
 # Building APP android-x86-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PbuildDir={out}/android-x86-chip_tool assembleDebug
 
@@ -333,5 +341,3 @@ ninja -C {out}/telink-tlsr9518adk80d-light
 
 # Building tizen-arm-light
 ninja -C {out}/tizen-arm-light
-
-
