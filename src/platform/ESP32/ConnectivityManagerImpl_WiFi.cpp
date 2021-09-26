@@ -20,10 +20,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
-#endif
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -57,8 +53,6 @@ using chip::DeviceLayer::Internal::ESP32Utils;
 
 namespace chip {
 namespace DeviceLayer {
-
-ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {
@@ -389,7 +383,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
 
 // ==================== ConnectivityManager Platform Internal Methods ====================
 
-CHIP_ERROR ConnectivityManagerImpl::_Init()
+CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
 {
     mLastStationConnectFailTime     = 0;
     mLastAPDemandTime               = 0;
@@ -448,7 +442,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     return CHIP_NO_ERROR;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
+void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
 {
     // Handle ESP system events...
     if (event->Type == DeviceEventType::kESPSystemEvent)
@@ -974,8 +968,6 @@ void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(const ip_event_got_i
     }
 #endif // CHIP_PROGRESS_LOGGING
 
-    RefreshMessageLayer();
-
     UpdateInternetConnectivityState();
 
     ChipDeviceEvent event;
@@ -987,8 +979,6 @@ void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(const ip_event_got_i
 void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
 {
     ChipLogProgress(DeviceLayer, "IPv4 address lost on WiFi station interface");
-
-    RefreshMessageLayer();
 
     UpdateInternetConnectivityState();
 
@@ -1007,8 +997,6 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & 
     }
 #endif // CHIP_PROGRESS_LOGGING
 
-    RefreshMessageLayer();
-
     UpdateInternetConnectivityState();
 
     ChipDeviceEvent event;
@@ -1016,8 +1004,6 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & 
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
     PlatformMgr().PostEventOrDie(&event);
 }
-
-void ConnectivityManagerImpl::RefreshMessageLayer(void) {}
 
 } // namespace DeviceLayer
 } // namespace chip
