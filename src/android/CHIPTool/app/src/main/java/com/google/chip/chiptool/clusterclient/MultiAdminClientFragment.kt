@@ -64,10 +64,6 @@ class MultiAdminClientFragment : Fragment() {
       Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
     }
 
-    override fun onSendMessageComplete(message: String?) {
-      multiAdminClusterCommandStatus.text = requireContext().getString(R.string.message_response, message)
-    }
-
     override fun onNotifyChipConnectionClosed() {
       Log.d(TAG, "onNotifyChipConnectionClosed")
     }
