@@ -124,9 +124,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
     return false;
 }
 
-void ConnectivityManagerImpl::_ClearWiFiStationProvision()
-{
-}
+void ConnectivityManagerImpl::_ClearWiFiStationProvision() {}
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {
@@ -196,13 +194,9 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
     DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
-void ConnectivityManagerImpl::StartWiFiManagement()
-{
-}
+void ConnectivityManagerImpl::StartWiFiManagement() {}
 
-void ConnectivityManagerImpl::DriveAPState()
-{
-}
+void ConnectivityManagerImpl::DriveAPState() {}
 
 CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 {
