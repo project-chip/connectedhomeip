@@ -70,15 +70,15 @@ void SignalHandler(int signum)
         ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
-    case SIGQUIT:
+    case SIGUSR1:
         ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
-    case SIGABRT:
+    case SIGUSR2:
         ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
-    case SIGBUS:
+    case SIGTSTP:
         ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
@@ -182,10 +182,12 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     memset(&action, 0, sizeof(action));
     action.sa_handler = SignalHandler;
-    sigaction(SIGTERM, &action, NULL);
     sigaction(SIGINT, &action, NULL);
     sigaction(SIGHUP, &action, NULL);
-    sigaction(SIGKILL, &action, NULL);
+    sigaction(SIGTERM, &action, NULL);
+    sigaction(SIGUSR1, &action, NULL);
+    sigaction(SIGUSR2, &action, NULL);
+    sigaction(SIGTSTP, &action, NULL);
 
 #if CHIP_WITH_GIO
     GError * error = nullptr;
@@ -223,7 +225,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgrImpl().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgrImpl().StoreTotalOperationalHours(totalOperationalHours + upTime / 3600);
+            ConfigurationMgrImpl().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -283,7 +285,10 @@ CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
     CHIP_ERROR err = ConfigurationMgrImpl().GetRebootCount(count);
 
     if (err == CHIP_NO_ERROR)
-        rebootCount = count;
+    {
+        VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        rebootCount = static_cast<uint16_t>(count);
+    }
 
     return err;
 }
@@ -303,7 +308,19 @@ CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
 
 CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    return ConfigurationMgrImpl().GetTotalOperationalHours(totalOperationalHours);
+    uint64_t upTime = 0;
+
+    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalHours = 0;
+        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
+        }
+    }
+
+    return CHIP_ERROR_INVALID_TIME;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
@@ -313,7 +330,10 @@ CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
     CHIP_ERROR err = ConfigurationMgrImpl().GetBootReasons(reason);
 
     if (err == CHIP_NO_ERROR)
-        bootReasons = reason;
+    {
+        VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        bootReasons = static_cast<uint8_t>(reason);
+    }
 
     return err;
 }

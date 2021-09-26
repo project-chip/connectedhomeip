@@ -72,7 +72,7 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
     }
     else
     {
-        // The frist boot after factory reset of the Node.
+        // The first boot after factory reset of the Node.
         err = StoreRebootCount(1);
         SuccessOrExit(err);
     }
