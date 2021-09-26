@@ -35,8 +35,6 @@
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 
-#include <platform/ESP32/BLEManagerImpl.h>
-
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -69,7 +67,6 @@ protected:
     void _ProcessThreadActivity();
     void _OnCHIPoBLEAdvertisingStart();
     void _OnCHIPoBLEAdvertisingStop();
-    TaskHandle_t mThreadTask;
 
 private:
     friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);

@@ -20,11 +20,18 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
+#endif
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -43,13 +50,23 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    InitWiFi();
+#endif
     return CHIP_NO_ERROR;
 }
 
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    OnWiFiPlatformEvent(event);
+#endif
 }
 
 } // namespace DeviceLayer

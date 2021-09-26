@@ -24,7 +24,7 @@
 
 #include "esp_wifi.h"
 
-#include "ServiceProvisioning.h"
+#include "WiFiProvisioning.h"
 
 using namespace ::chip::DeviceLayer;
 
