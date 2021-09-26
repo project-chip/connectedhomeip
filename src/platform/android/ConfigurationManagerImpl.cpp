@@ -76,14 +76,6 @@ void ConfigurationManagerImpl::_InitiateFactoryReset() {}
 
 CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    // PosixConfig::Key configKey{ kConfigNamespace_ChipCounters, key };
-
-    // CHIP_ERROR err = ReadConfigValue(configKey, value);
-    // if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    // {
-    //     err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    // }
-    // return err;
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
