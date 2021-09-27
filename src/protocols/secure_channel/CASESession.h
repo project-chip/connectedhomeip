@@ -66,7 +66,6 @@ struct CASESessionSerialized;
 struct CASESessionSerializable
 {
     uint8_t mVersion;
-    uint8_t mCASESessionWasEstablished;
     uint16_t mSharedSecretLen;
     uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length];
     uint16_t mMessageDigestLen;

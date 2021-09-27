@@ -180,8 +180,6 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mLocalSessionId   = LittleEndian::HostSwap16(GetLocalSessionId());
     serializable.mPeerSessionId    = LittleEndian::HostSwap16(GetPeerSessionId());
 
-    serializable.mCASESessionWasEstablished = (mCASESessionEstablished) ? 1 : 0;
-
     memcpy(serializable.mResumptionId, mResumptionId, sizeof(mResumptionId));
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
     memcpy(serializable.mMessageDigest, mMessageDigest, sizeof(mMessageDigest));
@@ -192,7 +190,6 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
 CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & serializable)
 {
     VerifyOrReturnError(serializable.mVersion == kCASESessionVersion, CHIP_ERROR_VERSION_MISMATCH);
-    mCASESessionEstablished = (serializable.mCASESessionWasEstablished == 1);
 
     uint16_t length = LittleEndian::HostSwap16(serializable.mSharedSecretLen);
     ReturnErrorOnFailure(mSharedSecret.SetLength(static_cast<size_t>(length)));
@@ -209,7 +206,11 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
 
     memcpy(mResumptionId, serializable.mResumptionId, sizeof(mResumptionId));
 
-    memcpy(mIPK, GetIPKList()->data(), sizeof(mIPK));
+    const ByteSpan * ipkListSpan = GetIPKList();
+    VerifyOrReturnError(ipkListSpan->size() == sizeof(mIPK), CHIP_ERROR_INVALID_ARGUMENT);
+    memcpy(mIPK, ipkListSpan->data(), sizeof(mIPK));
+
+    mCASESessionEstablished = true;
 
     return CHIP_NO_ERROR;
 }
