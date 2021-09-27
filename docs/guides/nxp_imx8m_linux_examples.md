@@ -4,9 +4,9 @@ This document describes how to build below Linux examples with the NXP embedded
 Linux Yocto SDK and then run the output executable files on the **NXP i.MX 8M**
 **Mini EVK** development board.
 
-- [CHIP Linux All-clusters Example](../../examples/all-clusters-app/linux)
-- [CHIP Linux Lighting Example](../../examples/lighting-app/linux)
-- [CHIP Linux Thermostat Example](../../examples/thermostat/linux)
+-   [CHIP Linux All-clusters Example](../../examples/all-clusters-app/linux)
+-   [CHIP Linux Lighting Example](../../examples/lighting-app/linux)
+-   [CHIP Linux Thermostat Example](../../examples/thermostat/linux)
 
 This document has been tested on:
 
@@ -21,10 +21,10 @@ Linux OS development. For more information about this project, see the
 
 <hr>
 
-- [Building and Running CHIP Linux Examples for i.MX 8M Mini EVK](#building-and-running-chip-linux-examples-for-imx-8m-mini-evk)
-  - [Building](#building)
-  - [Commandline arguments](#commandline-arguments)
-  - [Running the Examples on i.MX 8M Mini EVK](#running-the-examples-on-imx-8m-mini-evk)
+-   [Building and Running CHIP Linux Examples for i.MX 8M Mini EVK](#building-and-running-chip-linux-examples-for-imx-8m-mini-evk)
+    -   [Building](#building)
+    -   [Commandline arguments](#commandline-arguments)
+    -   [Running the Examples on i.MX 8M Mini EVK](#running-the-examples-on-imx-8m-mini-evk)
 
 <hr>
 
@@ -39,8 +39,8 @@ to be generated.
 -   Download the Yocto source code and generate the Yocto SDK and the SD card
     image
 
-    The Yocto source code is maintained with a repo manifest, the tool
-    `repo` is used to download the source code.
+    The Yocto source code is maintained with a repo manifest, the tool `repo` is
+    used to download the source code.
 
     This document is tested with the i.MX Yocto 5.10.35_2.0.0 release. Run the
     commands below to download this release:
@@ -64,8 +64,8 @@ to be generated.
             pylint3 xterm
 
     More information about the downloaded Yocto release can be found in the
-    corresponding i.MX Yocto Project User’s Guide which can be found at [NXP
-    official website](www.nxp.com/imxlinux).
+    corresponding i.MX Yocto Project User’s Guide which can be found at
+    [NXP official website](www.nxp.com/imxlinux).
 
     Change the current directory to the top directory of the Yocto source code
     and execute the commands below to generate the Yocto SDK:
@@ -114,8 +114,8 @@ to be generated.
 
 -   Build the example application:
 
-    Assuming that the working directory has been changed the CHIP Linux
-    Examples code, all the other steps are the same.
+    Assuming that the working directory has been changed the CHIP Linux Examples
+    code, all the other steps are the same.
 
           # If the all-clusters example is to be built
           $ cd ~/connectedhomeip/examples/all-clusters-app/linux
@@ -142,22 +142,21 @@ to be generated.
           $ ninja -C out/aarch64
 
     The executable file is built under out/aarch64, it can be executed on the
-    **i.MX 8M Mini EVK** which running the Yocto image previously generated as described
-    in the sections above.
+    **i.MX 8M Mini EVK** which running the Yocto image previously generated as
+    described in the sections above.
 
 <a name="command-line-args"></a>
 
 ## Commandline arguments
 
-The generated executable files supports to work with below commandline
-argument:
+The generated executable files supports to work with below commandline argument:
 
 -   `--wifi`
 
     Enables Wi-Fi management feature. Required for Wi-Fi provisioning.
 
-    The Wi-Fi device on **i.MX 8M Mini EVK** is a module based on the NXP 88W8987 
-    Wi-Fi/Bluetooth SoC.
+    The Wi-Fi device on **i.MX 8M Mini EVK** is a module based on the NXP
+    88W8987 Wi-Fi/Bluetooth SoC.
 
 -   `--ble-device <interface id>`
 
@@ -167,7 +166,7 @@ argument:
     `hciconfig` command, for example, `--ble-device 1` means using `hci1`
     interface. Default: `0`.
 
-    The BLE device on **i.MX 8M Mini EVK** is a module based on the NXP 88W8987 
+    The BLE device on **i.MX 8M Mini EVK** is a module based on the NXP 88W8987
     Wi-Fi/Bluetooth SoC.
 
 <a name="running-complete-examples-on-imx8mmevk"></a>
@@ -185,28 +184,28 @@ Thermostat-app is used as an example below.
     Follow the steps below to setup the environment needed to run the example on
     the **i.MX 8M Mini EVK**:
 
-    -   Plug the microSD card with Yocto image into the SD-card slot of the **i.MX 8M**
-        **Mini EVK**.
+    -   Plug the microSD card with Yocto image into the SD-card slot of the
+        **i.MX 8M** **Mini EVK**.
     -   Change the boot switch on the **i.MX 8M Mini EVK** board to boot from
         MicroSD/SDHC2 based on the silkscreen print on the board.
-    -   Use a Type-A to Micro-B cable to connect the DEBUG port of the **i.MX 8M**
-        **Mini EVK** to a host machine, and use a serial communication program like
-        minicom or Putty to connect to the debug interface.
+    -   Use a Type-A to Micro-B cable to connect the DEBUG port of the **i.MX
+        8M** **Mini EVK** to a host machine, and use a serial communication
+        program like minicom or Putty to connect to the debug interface.
     -   Power on the board to boot up the Yocto image, logging in with user name
-        `root` via the serial communication program. There is password for the root 
-        user in the default Yocto image configuration.
+        `root` via the serial communication program. There is password for the
+        root user in the default Yocto image configuration.
     -   Copy the executable file chip-lighting-app to the **i.MX 8M Mini EVK**,
         using either of the two methods below:
-        -   Connect the **i.MX 8M Mini EVK** to ethernet via the onboard ethernet
-            port, then use the `scp` command on the host machine to copy the
-            executable file to the **i.MX 8M Mini EVK**.
+        -   Connect the **i.MX 8M Mini EVK** to ethernet via the onboard
+            ethernet port, then use the `scp` command on the host machine to
+            copy the executable file to the **i.MX 8M Mini EVK**.
         -   Use a U-disk to copy the executable file between the build machine
             and the **i.MX 8M Mini EVK**.
 
     In order to test the CHIP protocol functions, another device on the same
     network is needed to run the
-    [ChipDeviceController](../../src/controller/python) tool to communicate
-    with the **i.MX 8M Mini EVK**.
+    [ChipDeviceController](../../src/controller/python) tool to communicate with
+    the **i.MX 8M Mini EVK**.
 
     The ChipDeviceController can be a laptop / workstation. Bluetooth
     functionality is mandatory on this device.
@@ -223,8 +222,8 @@ Thermostat-app is used as an example below.
     -   Boot up Ubuntu on the Raspberry Pi
     -   Clone this connectedhomeip project
     -   Follow Python ChipDeviceController
-        [README.md](../../src/controller/python/README.md) document.
-        Refer to the "Building and installing" part to build the tool.
+        [README.md](../../src/controller/python/README.md) document. Refer to
+        the "Building and installing" part to build the tool.
 
 -   Running
 
@@ -267,8 +266,8 @@ Thermostat-app is used as an example below.
         **i.MX 8M Mini EVK** and the controller device to observe connection and
         control events.
 
-    -   Provision the **i.MX 8M Mini EVK** to a Wi-Fi AP with the following commands
-        by `NetworkCommissioning` Cluster.
+    -   Provision the **i.MX 8M Mini EVK** to a Wi-Fi AP with the following
+        commands by `NetworkCommissioning` Cluster.
 
         Command `AddWiFiNetwork` sends the target Wi-Fi AP's SSID and password.
         The `${SSID}` and `${PASSWORD}` should be in plaintext format. At this
@@ -280,9 +279,9 @@ Thermostat-app is used as an example below.
                 chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 8889 0 0 ssid=str:${SSID} credentials=str:${PASSWORD} breadcrumb=0 timeoutMs=5000
                 chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 8889 0 0 networkID=str:${SSID} breadcrumb=0 timeoutMs=15000
 
-    -   Make sure the controller device is connected to the same network of
-        this Wi-Fi AP because the Wi-Fi connection is established between
-        the Wi-Fi AP and the **i.MX8 Mini EVK** and mDNS only works on local network.
+    -   Make sure the controller device is connected to the same network of this
+        Wi-Fi AP because the Wi-Fi connection is established between the Wi-Fi
+        AP and the **i.MX8 Mini EVK** and mDNS only works on local network.
 
         Resolve the target device with DNS-SD and update the address of the
         node. The compressed fabric id is necessary for the resolve command.
