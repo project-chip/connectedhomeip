@@ -382,6 +382,8 @@ public:
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
     CHIP_ERROR SetFabricDelegate(FabricTableDelegate * delegate);
 
+    uint8_t FabricCount() const { return mFabricCount; }
+
     ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_DEVICE_ADMINS); }
     ConstFabricIterator cend() const
     {
@@ -398,6 +400,7 @@ private:
     FabricTableDelegate * mDelegate = nullptr;
 
     FabricIndex mNextAvailableFabricIndex = kMinValidFabricIndex;
+    uint8_t mFabricCount                  = 0;
 };
 
 } // namespace Transport

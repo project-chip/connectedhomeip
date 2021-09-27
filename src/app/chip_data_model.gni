@@ -83,7 +83,7 @@ template("chip_data_model") {
       "${_app_root}/clusters/ias-zone-client/ias-zone-client.h",
       "${_app_root}/clusters/ias-zone-server/ias-zone-server-tokens.h",
       "${_app_root}/clusters/ias-zone-server/ias-zone-server.h",
-      "${_app_root}/clusters/identify/identify.h",
+      "${_app_root}/clusters/identify-server/identify-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/messaging-client/messaging-client.h",
       "${_app_root}/clusters/messaging-server/messaging-server.h",

@@ -962,6 +962,10 @@ public:
                       chip::ByteSpan iCACValue, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId);
     CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          chip::ByteSpan rootCertificate);
+    CHIP_ERROR AttestationRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  chip::ByteSpan attestationNonce);
+    CHIP_ERROR CertificateChainRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint8_t certificateType);
     CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             chip::ByteSpan cSRNonce);
     CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -980,6 +984,28 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
+};
+
+class DLL_EXPORT PowerSourceCluster : public ClusterBase
+{
+public:
+    PowerSourceCluster() : ClusterBase(app::Clusters::PowerSource::Id) {}
+    ~PowerSourceCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR ReadAttributeStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOrder(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeDescription(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBatteryVoltage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBatteryPercentRemaining(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBatteryTimeRemaining(Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBatteryChargeLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeActiveBatteryFaults(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBatteryChargeState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
@@ -1421,6 +1447,9 @@ public:
     CHIP_ERROR ReadAttributeRxErrSecCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeRxErrFcsCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeRxErrOtherCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeActiveTimestamp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePendingTimestamp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeDelay(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeSecurityPolicy(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeChannelMask(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeOperationalDatasetComponents(Callback::Cancelable * onSuccessCallback,

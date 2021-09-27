@@ -112,7 +112,7 @@ public:
                                    uint8_t aCommandIndex) override;
 
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
-                      Protocols::InteractionModel::ProtocolCode status) override;
+                      Protocols::InteractionModel::Status status) override;
 
     static PythonInteractionModelDelegate & Instance();
 

@@ -132,6 +132,12 @@
 #define CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER
 #endif
 
+#if defined(ZCL_USING_POWER_SOURCE_CLUSTER_SERVER) || defined(ZCL_USING_POWER_SOURCE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_POWER_SOURCE_CLUSTER { ZCL_POWER_SOURCE_CLUSTER_ID, 47, "Power Source" },
+#else
+#define CHIP_PRINTCLUSTER_POWER_SOURCE_CLUSTER
+#endif
+
 #if defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER { ZCL_GENERAL_COMMISSIONING_CLUSTER_ID, 48, "General Commissioning" },
 #else
@@ -744,6 +750,7 @@
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER                                                                                        \
+    CHIP_PRINTCLUSTER_POWER_SOURCE_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_DIAGNOSTIC_LOGS_CLUSTER                                                                                      \

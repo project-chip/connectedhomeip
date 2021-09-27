@@ -1226,18 +1226,34 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     // We resent our first message, which did not make it to the app-level
     // listener on the receiver (because it's a duplicate) but did trigger a
     // standalone ack.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
-    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
-    NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
-    NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
-    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+    //
+    // Now the annoying part is that depending on how long we _actually_ slept
+    // we might have also triggered the retransmit from the other side, even
+    // though we did not want to.  Handle both cases here.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4 || gLoopback.mSentMessageCount == 6);
+    if (gLoopback.mSentMessageCount == 4)
+    {
+        // Just triggered the retransmit from the sender.
+        NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
+        NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
+        NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
+        NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+    }
+    else
+    {
+        // Also triggered the retransmit from the receiver.
+        NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
+        NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
+        NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
+        NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+    }
 
     // 1 tick is 64 ms, sleep 65*3 ms to trigger re-transmit from receiver
     test_os_sleep_ms(65 * 3);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
-    // We resent our response message, which should show up as an app-level
-    // message and trigger a standalone ack.
+    // And now we've definitely resent our response message, which should show
+    // up as an app-level message and trigger a standalone ack.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 6);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
     NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);

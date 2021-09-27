@@ -27,6 +27,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -78,6 +82,9 @@ int Commands::Run(int argc, char ** argv)
 
     err = mController.SetUdpListenPort(mStorage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
+
+    chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());
 
     VerifyOrExit(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);

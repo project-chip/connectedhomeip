@@ -21,6 +21,8 @@
  *      CHIP specification.
  */
 
+#pragma once
+
 #include "SetupPayload.h"
 
 #include <lib/core/CHIPError.h>

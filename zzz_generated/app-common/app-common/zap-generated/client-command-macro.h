@@ -285,37 +285,16 @@
                                                                                                                                    \
                               ZCL_IDENTIFY_QUERY_COMMAND_ID, "", );
 
-/** @brief Command description for EZModeInvoke
- *
- * Command: EZModeInvoke
- * @param action BITMAP8
- */
-#define emberAfFillCommandIdentifyClusterEZModeInvoke(action)                                                                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_EZ_MODE_INVOKE_COMMAND_ID, "u", action);
-
-/** @brief Command description for UpdateCommissionState
- *
- * Command: UpdateCommissionState
- * @param action ENUM8
- * @param commissionStateMask BITMAP8
- */
-#define emberAfFillCommandIdentifyClusterUpdateCommissionState(action, commissionStateMask)                                        \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_UPDATE_COMMISSION_STATE_COMMAND_ID, "uu", action, commissionStateMask);
-
 /** @brief Command description for TriggerEffect
  *
  * Command: TriggerEffect
- * @param effectId IdentifyEffectIdentifier
+ * @param effectIdentifier IdentifyEffectIdentifier
  * @param effectVariant IdentifyEffectVariant
  */
-#define emberAfFillCommandIdentifyClusterTriggerEffect(effectId, effectVariant)                                                    \
+#define emberAfFillCommandIdentifyClusterTriggerEffect(effectIdentifier, effectVariant)                                            \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_TRIGGER_EFFECT_COMMAND_ID, "uu", effectId, effectVariant);
+                              ZCL_TRIGGER_EFFECT_COMMAND_ID, "uu", effectIdentifier, effectVariant);
 
 /** @brief Command description for AddGroup
  *
@@ -2244,6 +2223,51 @@
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
                               ZCL_REVOKE_COMMISSIONING_COMMAND_ID, "", );
+
+/** @brief Command description for AttestationRequest
+ *
+ * Command: AttestationRequest
+ * @param AttestationNonce OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterAttestationRequest(AttestationNonce)                                                                         \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ATTESTATION_REQUEST_COMMAND_ID, "u", AttestationNonce);
+
+/** @brief Command description for AttestationResponse
+ *
+ * Command: AttestationResponse
+ * @param AttestationElements OCTET_STRING
+ * @param Signature OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterAttestationResponse(AttestationElements, Signature)                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ATTESTATION_RESPONSE_COMMAND_ID, "uu", AttestationElements, Signature);
+
+/** @brief Command description for CertificateChainRequest
+ *
+ * Command: CertificateChainRequest
+ * @param CertificateType INT8U
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterCertificateChainRequest(CertificateType)                                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_CERTIFICATE_CHAIN_REQUEST_COMMAND_ID, "u", CertificateType);
+
+/** @brief Command description for CertificateChainResponse
+ *
+ * Command: CertificateChainResponse
+ * @param Certificate OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterCertificateChainResponse(Certificate)                                                                        \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_CERTIFICATE_CHAIN_RESPONSE_COMMAND_ID, "u", Certificate);
 
 /** @brief Command description for OpCSRRequest
  *

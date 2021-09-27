@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import os
-from platform import uname, release
+
+from platform import uname
 from enum import Enum, auto
 
 from .gn import GnBuilder
@@ -45,14 +46,42 @@ class HostApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
 
-def ConcretePlatformName():
-    uname_result = uname()
-    return '-'.join([uname_result.system.lower(), release(), uname_result.machine])
+class HostBoard(Enum):
+    NATIVE = auto()
+
+    # cross-compile support
+    ARM64 = auto()
+
+    def BoardName(self):
+        if self == HostBoard.NATIVE:
+            uname_result = uname()
+            arch = uname_result.machine
+
+            # standardize some common platforms
+            if arch == 'x86_64':
+                arch = 'x64'
+            elif arch == 'i386' or arch == 'i686':
+                arch = 'x86'
+            elif arch == 'aarch64' or arch == 'aarch64_be' or arch == 'armv8b' or arch == 'armv8l':
+                arch = 'arm64'
+
+            return arch
+        elif self == HostBoard.ARM64:
+            return 'arm64'
+        else:
+            raise Exception('Unknown host board type: %r' % self)
+
+    def PlatformName(self):
+        if self == HostBoard.NATIVE:
+            return uname().system.lower()
+        else:
+            # Cross compilation assumes linux currently
+            return 'linux'
 
 
 class HostBuilder(GnBuilder):
 
-    def __init__(self, root, runner, output_prefix: str, app: HostApp):
+    def __init__(self, root, runner, output_prefix: str, app: HostApp, board=HostBoard.NATIVE):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner,
@@ -60,6 +89,35 @@ class HostBuilder(GnBuilder):
 
         self.app_name = app.BinaryName()
         self.map_name = self.app_name + '.map'
+        self.board = board
+
+    def GnBuildArgs(self):
+        if self.board == HostBoard.NATIVE:
+            return None
+        elif self.board == HostBoard.ARM64:
+            return [
+                'target_cpu="arm64"',
+                'is_clang=true',
+                'chip_crypto="mbedtls"',
+                'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64'),
+            ]
+        else:
+            raise Exception('Unknown host board type: %r' % self)
+
+    def GnBuildEnv(self):
+        if self.board == HostBoard.NATIVE:
+            return None
+        elif self.board == HostBoard.ARM64:
+            return {
+                'PKG_CONFIG_PATH': self.SysRootPath('SYSROOT_AARCH64') + '/lib/aarch64-linux-gnu/pkgconfig',
+            }
+        else:
+            raise Exception('Unknown host board type: %r' % self)
+
+    def SysRootPath(self, name):
+        if not name in os.environ:
+            raise Exception('Missing environment variable "%s"' % name)
+        return os.environ[name]
 
     def build_outputs(self):
         return {
@@ -69,4 +127,4 @@ class HostBuilder(GnBuilder):
 
     def SetIdentifier(self, platform: str, board: str, app: str):
         super(HostBuilder, self).SetIdentifier(
-            ConcretePlatformName(), board, app)
+            self.board.PlatformName(), self.board.BoardName(), app)

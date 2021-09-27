@@ -14,6 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#pragma once
+
 #include "lib/mdns/platform/Mdns.h"
 #include <lib/support/CHIPMemString.h>
 

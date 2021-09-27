@@ -342,7 +342,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             }
             entryOffset = static_cast<uint16_t>(entryOffset + 10);
             copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
-                           sizeof(entry->Type)); // ENUM8
+                           sizeof(entry->Type)); // InterfaceType
             break;
         }
         }
@@ -517,6 +517,26 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
             entryLength = static_cast<uint16_t>(trustedRootCertificatesSpan->size());
+            break;
+        }
+        }
+        break;
+    }
+    case 0x002F: // Power Source Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0012: // ActiveBatteryFaults
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENUM8
             break;
         }
         }
@@ -755,7 +775,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         case 0x003B: // SecurityPolicy
         {
-            entryLength = 3;
+            entryLength = 4;
             if (((index - 1) * entryLength) > (am->size - entryLength))
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -767,7 +787,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             copyListMember(write ? dest : (uint8_t *) &entry->RotationTime, write ? (uint8_t *) &entry->RotationTime : src, write,
                            &entryOffset, sizeof(entry->RotationTime)); // INT16U
             copyListMember(write ? dest : (uint8_t *) &entry->Flags, write ? (uint8_t *) &entry->Flags : src, write, &entryOffset,
-                           sizeof(entry->Flags)); // INT8U
+                           sizeof(entry->Flags)); // BITMAP16
             break;
         }
         case 0x003D: // OperationalDatasetComponents
@@ -962,6 +982,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             break;
         }
         break;
+    case 0x002F: // Power Source Cluster
+        switch (attributeId)
+        {
+        case 0x0012: // ActiveBatteryFaults
+            // uint8_t
+            entryLength = 1;
+            break;
+        }
+        break;
     case 0x0504: // TV Channel Cluster
         switch (attributeId)
         {
@@ -1010,7 +1039,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             break;
         case 0x003B: // SecurityPolicy
             // Struct _SecurityPolicy
-            entryLength = 3;
+            entryLength = 4;
             break;
         case 0x003D: // OperationalDatasetComponents
             // Struct _OperationalDatasetComponents

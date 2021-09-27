@@ -634,6 +634,34 @@ public:
                                              uint16_t value);
 };
 
+class DLL_EXPORT PowerSourceClusterTest : public PowerSourceCluster
+{
+public:
+    PowerSourceClusterTest() : PowerSourceCluster() {}
+    ~PowerSourceClusterTest() {}
+
+    CHIP_ERROR WriteAttributeStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint8_t value);
+    CHIP_ERROR WriteAttributeOrder(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t value);
+    CHIP_ERROR WriteAttributeDescription(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         chip::ByteSpan value);
+    CHIP_ERROR WriteAttributeBatteryVoltage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint32_t value);
+    CHIP_ERROR WriteAttributeBatteryPercentRemaining(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint8_t value);
+    CHIP_ERROR WriteAttributeBatteryTimeRemaining(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint32_t value);
+    CHIP_ERROR WriteAttributeBatteryChargeLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint8_t value);
+    CHIP_ERROR WriteAttributeBatteryChargeState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint8_t value);
+    CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint32_t value);
+    CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t value);
+};
+
 class DLL_EXPORT PressureMeasurementClusterTest : public PressureMeasurementCluster
 {
 public:
@@ -936,8 +964,14 @@ public:
                                            uint32_t value);
     CHIP_ERROR WriteAttributeRxErrOtherCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint32_t value);
+    CHIP_ERROR WriteAttributeActiveTimestamp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint64_t value);
+    CHIP_ERROR WriteAttributePendingTimestamp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint64_t value);
+    CHIP_ERROR WriteAttributeDelay(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint32_t value);
     CHIP_ERROR WriteAttributeChannelMask(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         uint8_t value);
+                                         chip::ByteSpan value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
