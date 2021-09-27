@@ -63,5 +63,12 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
                                         size_t vendorReservedArraySize, uint16_t vendorId, uint16_t profileNum,
                                         MutableByteSpan & attestationElements);
 
+/***
+ *  @brief Count the number of VendorReservedElements in a DeviceAttestation blob
+ *
+ *  @param[in]   attestationElements ByeSpan conitaining source of Attestation Elements data
+ */
+int CountVendorReservedElementsInDA(const ByteSpan &attestationElements);
+
 } // namespace Credentials
 } // namespace chip

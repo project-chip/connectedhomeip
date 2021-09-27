@@ -34,6 +34,34 @@ enum : uint32_t
     kFirmwareInfoTagId             = 4,
 };
 
+int CountVendorReservedElementsInDA(const ByteSpan & attestationElements)
+{
+    TLV::ContiguousBufferTLVReader tlvReader;
+    TLV::TLVType containerType = TLV::kTLVType_Structure;
+
+
+    tlvReader.Init(attestationElements);
+    if(CHIP_NO_ERROR != tlvReader.Next(containerType, TLV::AnonymousTag))
+	return 0;
+    if(CHIP_NO_ERROR != tlvReader.EnterContainer(containerType))
+	return 0;
+
+    CHIP_ERROR error;
+
+    int count = 0;
+    while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
+    {
+	uint64_t tag = tlvReader.GetTag();
+	ChipLogProgress(Controller, "read tag = %lx\n", tag);
+	if(TLV::IsContextTag(tag)) {
+	   ChipLogProgress(Controller, "context tag\n");
+	   count++;
+	}
+
+   } 
+   return count;
+}
+
 CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, ByteSpan & certificationDeclaration,
                                           ByteSpan & attestationNonce, uint32_t & timestamp, ByteSpan & firmwareInfo,
                                           ByteSpan * vendorReservedArray, size_t & vendorReservedArraySize, uint16_t & vendorId,

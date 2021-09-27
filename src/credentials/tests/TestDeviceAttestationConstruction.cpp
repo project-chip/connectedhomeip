@@ -207,6 +207,7 @@ static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void *
     ByteSpan vendorReservedArrayTestVector[] = { ByteSpan(vendorReserved1TestVector), ByteSpan(vendorReserved3TestVector) };
     uint16_t vendorIdTestVector              = 0xFFF1;
     uint16_t profileNumTestVector            = 0x003E;
+    int count;
 
     ByteSpan certificationDeclarationDeconstructed;
     ByteSpan attestationNonceDeconstructed;
@@ -217,6 +218,9 @@ static void TestAttestationElements_Deconstruction(nlTestSuite * inSuite, void *
     uint16_t vendorIdDeconstructed;
     uint16_t profileNumDeconstructed;
 
+    count = CountVendorReservedElementsInDA(ByteSpan(attestationElementsTestVector));
+    NL_TEST_ASSERT(inSuite, count == (int) vendorReservedDeconstructedSize);
+    
     err = DeconstructAttestationElements(ByteSpan(attestationElementsTestVector), certificationDeclarationDeconstructed,
                                          attestationNonceDeconstructed, timestampDeconstructed, firmwareInfoDeconstructed,
                                          vendorReservedDeconstructed, vendorReservedDeconstructedSize, vendorIdDeconstructed,
