@@ -423,6 +423,8 @@ static CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint
     }
 
     DNSServiceProtocol protocol;
+
+#if INET_CONFIG_ENABLE_IPV4
     if (addressType == chip::Inet::kIPAddressType_IPv4)
     {
         protocol = kDNSServiceProtocol_IPv4;
@@ -435,6 +437,10 @@ static CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint
     {
         protocol = kDNSServiceProtocol_IPv4 | kDNSServiceProtocol_IPv6;
     }
+#else
+    // without IPv4, IPv6 is the only option
+    protocol = kDNSServiceProtocol_IPv6;
+#endif
 
     err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, protocol, hostname, OnGetAddrInfo, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
