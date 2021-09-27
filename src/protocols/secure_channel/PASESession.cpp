@@ -316,6 +316,8 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
 
+    mDelegate->OnSessionEstablishmentStarted();
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -425,6 +427,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
 
     err = SendPBKDFParamResponse(ByteSpan(initiatorRandom), hasPBKDFParameters);
     SuccessOrExit(err);
+
+    mDelegate->OnSessionEstablishmentStarted();
 
 exit:
 
