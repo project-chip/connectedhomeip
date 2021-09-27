@@ -1390,29 +1390,26 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
 
 void DeviceCommissioner::HandleAttestationResult(CHIP_ERROR err)
 {
-    // Here we assume the Attestation Information validation always succeeds.
-    // Spec mandates that commissioning shall continue despite attestation fails (in some cases).
-    // TODO: Handle failure scenarios where commissioning may progress regardless.
-    if (err == CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        VerifyOrReturn(mState == State::Initialized);
-        VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices);
-
-        Device * device = &mActiveDevices[mDeviceBeingPaired];
-
-        ChipLogProgress(Controller, "Sending 'CSR request' command to the device.");
-        CHIP_ERROR error = SendOperationalCertificateSigningRequestCommand(device);
-        if (error != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Failed in sending 'CSR request' command to the device: err %s", ErrorStr(error));
-            OnSessionEstablishmentError(error);
-            return;
-        }
-    }
-    else
-    {
-        // Log an error message (no further handling currently)
+        // Here we assume the Attestation Information validation always succeeds.
+        // Spec mandates that commissioning shall continue despite attestation fails (in some cases).
+        // TODO: Handle failure scenarios where commissioning may progress regardless.
         ChipLogError(Controller, "Failed to validate the Attestation Information");
+    }
+
+    VerifyOrReturn(mState == State::Initialized);
+    VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices);
+
+    Device * device = &mActiveDevices[mDeviceBeingPaired];
+
+    ChipLogProgress(Controller, "Sending 'CSR request' command to the device.");
+    CHIP_ERROR error = SendOperationalCertificateSigningRequestCommand(device);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed in sending 'CSR request' command to the device: err %s", ErrorStr(error));
+        OnSessionEstablishmentError(error);
+        return;
     }
 }
 
