@@ -395,7 +395,7 @@ static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testConte
             false
         }
     );
-            
+
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
