@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/BitFlags.h>
 #include <platform/ThreadStackManager.h>
 
@@ -67,7 +68,7 @@ protected:
     bool _IsThreadAttached();
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
-    bool _HaveServiceConnectivityViaThread();
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
 
     // ===== Members for use by the implementation subclass.
 
@@ -151,9 +152,11 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadPo
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_HaveServiceConnectivityViaThread()
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_Thread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
+                                                                                              TLV::TLVWriter * aWriter)
 {
-    return mFlags.Has(Flags::kHaveServiceConnectivity);
+    return ThreadStackMgrImpl().WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, aWriter);
 }
 
 } // namespace Internal

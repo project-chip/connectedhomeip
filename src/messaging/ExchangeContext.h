@@ -33,7 +33,7 @@
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 #include <protocols/Protocols.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 

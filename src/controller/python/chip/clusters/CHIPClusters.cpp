@@ -221,6 +221,15 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(void * cont
 }
 chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>
     gOperationalCredentialsFabricsListListAttributeCallback{ OnOperationalCredentialsFabricsListListAttributeResponse, nullptr };
+static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
+{
+    ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback> gPowerSourceActiveBatteryFaultsListAttributeCallback{
+    OnPowerSourceActiveBatteryFaultsListAttributeResponse, nullptr
+};
 static void OnTvChannelTvChannelListListAttributeResponse(void * context, uint16_t count, _TvChannelInfo * entries)
 {
     ChipLogProgress(Zcl, "  attributeValue: List of length %" PRIu16, count);
@@ -2939,6 +2948,37 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_RebootCou
     return cluster.ReadAttributeRebootCount(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_UpTime(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId,
+                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeUpTime(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_TotalOperationalHours(chip::Controller::Device * device,
+                                                                                             chip::EndpointId ZCLendpointId,
+                                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTotalOperationalHours(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_BootReasons(chip::Controller::Device * device,
+                                                                                   chip::EndpointId ZCLendpointId,
+                                                                                   chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBootReasons(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision(chip::Controller::Device * device,
                                                                                        chip::EndpointId ZCLendpointId,
                                                                                        chip::GroupId /* ZCLgroupId */)
@@ -4040,6 +4080,25 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_AddTr
     cluster.Associate(device, ZCLendpointId);
     return cluster.AddTrustedRootCertificate(nullptr, nullptr, chip::ByteSpan(rootCertificate, rootCertificate_Len)).AsInteger();
 }
+chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_AttestationRequest(chip::Controller::Device * device,
+                                                                                              chip::EndpointId ZCLendpointId,
+                                                                                              chip::GroupId,
+                                                                                              const uint8_t * attestationNonce,
+                                                                                              uint32_t attestationNonce_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.AttestationRequest(nullptr, nullptr, chip::ByteSpan(attestationNonce, attestationNonce_Len)).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_CertificateChainRequest(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint8_t certificateType)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.CertificateChainRequest(nullptr, nullptr, certificateType).AsInteger();
+}
 chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(chip::Controller::Device * device,
                                                                                         chip::EndpointId ZCLendpointId,
                                                                                         chip::GroupId, const uint8_t * cSRNonce,
@@ -4135,6 +4194,124 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_Clust
 }
 
 // End of Cluster OperationalCredentials
+// Cluster PowerSource
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_Status(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId,
+                                                                       chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeStatus(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_Order(chip::Controller::Device * device,
+                                                                      chip::EndpointId ZCLendpointId,
+                                                                      chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOrder(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_Description(chip::Controller::Device * device,
+                                                                            chip::EndpointId ZCLendpointId,
+                                                                            chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeDescription(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_BatteryVoltage(chip::Controller::Device * device,
+                                                                               chip::EndpointId ZCLendpointId,
+                                                                               chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBatteryVoltage(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_BatteryPercentRemaining(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBatteryPercentRemaining(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_BatteryTimeRemaining(chip::Controller::Device * device,
+                                                                                     chip::EndpointId ZCLendpointId,
+                                                                                     chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBatteryTimeRemaining(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_BatteryChargeLevel(chip::Controller::Device * device,
+                                                                                   chip::EndpointId ZCLendpointId,
+                                                                                   chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBatteryChargeLevel(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_ActiveBatteryFaults(chip::Controller::Device * device,
+                                                                                    chip::EndpointId ZCLendpointId,
+                                                                                    chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .ReadAttributeActiveBatteryFaults(gPowerSourceActiveBatteryFaultsListAttributeCallback.Cancel(),
+                                          gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_BatteryChargeState(chip::Controller::Device * device,
+                                                                                   chip::EndpointId ZCLendpointId,
+                                                                                   chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBatteryChargeState(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_FeatureMap(chip::Controller::Device * device,
+                                                                           chip::EndpointId ZCLendpointId,
+                                                                           chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeFeatureMap(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_ClusterRevision(chip::Controller::Device * device,
+                                                                                chip::EndpointId ZCLendpointId,
+                                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::PowerSourceCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+// End of Cluster PowerSource
 // Cluster PressureMeasurement
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_PressureMeasurement_MeasuredValue(chip::Controller::Device * device,
@@ -4496,6 +4673,26 @@ chip::ChipError::StorageType chip_ime_AppendCommand_SoftwareDiagnostics_ResetWat
     chip::Controller::SoftwareDiagnosticsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ResetWatermarks(nullptr, nullptr).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapFree(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::SoftwareDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentHeapFree(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapUsed(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::SoftwareDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentHeapUsed(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark(chip::Controller::Device * device,
@@ -5183,6 +5380,44 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_LongCharString(
         .WriteAttributeLongCharString(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
                                       chip::ByteSpan(value, len))
         .AsInteger();
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_EpochUs(chip::Controller::Device * device,
+                                                                        chip::EndpointId ZCLendpointId,
+                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeEpochUs(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_EpochUs(chip::Controller::Device * device,
+                                                                         chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                         uint64_t value)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.WriteAttributeEpochUs(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_EpochS(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId,
+                                                                       chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeEpochS(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_EpochS(chip::Controller::Device * device,
+                                                                        chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                        uint32_t value)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.WriteAttributeEpochS(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_Unsupported(chip::Controller::Device * device,
                                                                             chip::EndpointId ZCLendpointId,
@@ -6204,6 +6439,36 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_ThreadNetworkDiagnostics_RxE
     return cluster.ReadAttributeRxErrOtherCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_ThreadNetworkDiagnostics_ActiveTimestamp(chip::Controller::Device * device,
+                                                                                             chip::EndpointId ZCLendpointId,
+                                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeActiveTimestamp(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_ThreadNetworkDiagnostics_PendingTimestamp(chip::Controller::Device * device,
+                                                                                              chip::EndpointId ZCLendpointId,
+                                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePendingTimestamp(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Delay(chip::Controller::Device * device,
+                                                                                   chip::EndpointId ZCLendpointId,
+                                                                                   chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeDelay(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_ThreadNetworkDiagnostics_SecurityPolicy(chip::Controller::Device * device,
                                                                                             chip::EndpointId ZCLendpointId,
                                                                                             chip::GroupId /* ZCLgroupId */)
@@ -6224,7 +6489,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Cha
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeChannelMask(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+    return cluster.ReadAttributeChannelMask(gOctetStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_ThreadNetworkDiagnostics_OperationalDatasetComponents(

@@ -32,6 +32,8 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 /**
  * @file
  * @brief Definitions for the ZLL On Off Server plugin.

@@ -24,7 +24,7 @@
  *
  */
 
-#include "SecureSessionMgr.h"
+#include "SessionManager.h"
 
 #include <inttypes.h>
 #include <string.h>
@@ -46,7 +46,7 @@ namespace chip {
 
 using System::PacketBufferHandle;
 using Transport::PeerAddress;
-using Transport::PeerConnectionState;
+using Transport::SecureSession;
 
 uint32_t EncryptedPacketBufferHandle::GetMessageCounter() const
 {
@@ -64,12 +64,12 @@ uint32_t EncryptedPacketBufferHandle::GetMessageCounter() const
     return 0;
 }
 
-SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
+SessionManager::SessionManager() : mState(State::kNotReady) {}
 
-SecureSessionMgr::~SecureSessionMgr() {}
+SessionManager::~SessionManager() {}
 
-CHIP_ERROR SecureSessionMgr::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
-                                  Transport::MessageCounterManagerInterface * messageCounterManager)
+CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
+                                Transport::MessageCounterManagerInterface * messageCounterManager)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -84,12 +84,12 @@ CHIP_ERROR SecureSessionMgr::Init(System::Layer * systemLayer, TransportMgrBase 
 
     ScheduleExpiryTimer();
 
-    mTransportMgr->SetSecureSessionMgr(this);
+    mTransportMgr->SetSessionManager(this);
 
     return CHIP_NO_ERROR;
 }
 
-void SecureSessionMgr::Shutdown()
+void SessionManager::Shutdown()
 {
     CancelExpiryTimer();
 
@@ -102,8 +102,8 @@ void SecureSessionMgr::Shutdown()
     mCB           = nullptr;
 }
 
-CHIP_ERROR SecureSessionMgr::PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader,
-                                            System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
+CHIP_ERROR SessionManager::PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader,
+                                          System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
 {
     PacketHeader packetHeader;
     if (IsControlMessage(payloadHeader))
@@ -111,9 +111,12 @@ CHIP_ERROR SecureSessionMgr::PrepareMessage(SessionHandle session, PayloadHeader
         packetHeader.SetSecureSessionControlMsg(true);
     }
 
+#if CHIP_PROGRESS_LOGGING
+    NodeId destination;
+#endif // CHIP_PROGRESS_LOGGING
     if (session.IsSecure())
     {
-        PeerConnectionState * state = GetPeerConnectionState(session);
+        SecureSession * state = GetSecureSession(session);
         if (state == nullptr)
         {
             return CHIP_ERROR_NOT_CONNECTED;
@@ -122,12 +125,9 @@ CHIP_ERROR SecureSessionMgr::PrepareMessage(SessionHandle session, PayloadHeader
         MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *state);
         ReturnErrorOnFailure(SecureMessageCodec::Encode(state, payloadHeader, packetHeader, message, counter));
 
-        ChipLogProgress(Inet,
-                        "Build %s message %p to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
-                        " on exchange %d with MessageCounter %" PRIu32 ".",
-                        "encrypted", &preparedMessage, ChipLogValueX64(state->GetPeerNodeId()), payloadHeader.GetMessageType(),
-                        payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), payloadHeader.GetExchangeID(),
-                        packetHeader.GetMessageCounter());
+#if CHIP_PROGRESS_LOGGING
+        destination = state->GetPeerNodeId();
+#endif // CHIP_PROGRESS_LOGGING
     }
     else
     {
@@ -139,13 +139,18 @@ CHIP_ERROR SecureSessionMgr::PrepareMessage(SessionHandle session, PayloadHeader
 
         packetHeader.SetMessageCounter(messageCounter);
 
-        ChipLogProgress(Inet,
-                        "Build %s message %p to 0x" ChipLogFormatX64 " of type %d and protocolId %" PRIu32
-                        " on exchange %d with MessageCounter %" PRIu32 ".",
-                        "plaintext", &preparedMessage, ChipLogValueX64(kUndefinedNodeId), payloadHeader.GetMessageType(),
-                        payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(), payloadHeader.GetExchangeID(),
-                        packetHeader.GetMessageCounter());
+#if CHIP_PROGRESS_LOGGING
+        destination = kUndefinedNodeId;
+#endif // CHIP_PROGRESS_LOGGING
     }
+
+    ChipLogProgress(Inet,
+                    "Prepared %s message %p to 0x" ChipLogFormatX64 " of type " ChipLogFormatMessageType
+                    " and protocolId " ChipLogFormatProtocolId " on exchange " ChipLogFormatExchangeId
+                    " with MessageCounter:" ChipLogFormatMessageCounter ".",
+                    session.IsSecure() ? "encrypted" : "plaintext", &preparedMessage, ChipLogValueX64(destination),
+                    payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()),
+                    ChipLogValueExchangeIdFromSentHeader(payloadHeader), packetHeader.GetMessageCounter());
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
@@ -153,7 +158,7 @@ CHIP_ERROR SecureSessionMgr::PrepareMessage(SessionHandle session, PayloadHeader
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage)
+CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage)
 {
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!preparedMessage.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -163,7 +168,7 @@ CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SessionHandle session, const En
     if (session.IsSecure())
     {
         // Find an active connection to the specified peer node
-        PeerConnectionState * state = GetPeerConnectionState(session);
+        SecureSession * state = GetSecureSession(session);
         if (state == nullptr)
         {
             ChipLogError(Inet, "Secure transport could not find a valid PeerConnection");
@@ -175,8 +180,11 @@ CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SessionHandle session, const En
 
         destination = &state->GetPeerAddress();
 
-        ChipLogProgress(Inet, "Sending %s msg %p to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec", "encrypted",
-                        &preparedMessage, ChipLogValueX64(state->GetPeerNodeId()), System::Clock::GetMonotonicMilliseconds());
+        ChipLogProgress(Inet,
+                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
+                        " at monotonic time: %" PRId64 " msec",
+                        "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(state->GetPeerNodeId()),
+                        System::Clock::GetMonotonicMilliseconds());
     }
     else
     {
@@ -184,8 +192,11 @@ CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SessionHandle session, const En
         mUnauthenticatedSessions.MarkSessionActive(unauthenticated.Get());
         destination = &unauthenticated->GetPeerAddress();
 
-        ChipLogProgress(Inet, "Sending %s msg %p to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec", "plaintext",
-                        &preparedMessage, ChipLogValueX64(kUndefinedNodeId), System::Clock::GetMonotonicMilliseconds());
+        ChipLogProgress(Inet,
+                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
+                        " at monotonic time: %" PRId64 " msec",
+                        "plaintext", &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(kUndefinedNodeId),
+                        System::Clock::GetMonotonicMilliseconds());
     }
 
     PacketBufferHandle msgBuf = preparedMessage.CastToWritable();
@@ -194,7 +205,6 @@ CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SessionHandle session, const En
 
     if (mTransportMgr != nullptr)
     {
-        ChipLogProgress(Inet, "Sending msg on generic transport");
         return mTransportMgr->SendMessage(*destination, std::move(msgBuf));
     }
     else
@@ -204,25 +214,25 @@ CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SessionHandle session, const En
     }
 }
 
-void SecureSessionMgr::ExpirePairing(SessionHandle session)
+void SessionManager::ExpirePairing(SessionHandle session)
 {
-    PeerConnectionState * state = GetPeerConnectionState(session);
+    SecureSession * state = GetSecureSession(session);
     if (state != nullptr)
     {
         mPeerConnections.MarkConnectionExpired(
-            state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+            state, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
     }
 }
 
-void SecureSessionMgr::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
+void SessionManager::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
 {
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
+    SecureSession * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
     while (state != nullptr)
     {
         if (fabric == state->GetFabricIndex())
         {
             mPeerConnections.MarkConnectionExpired(
-                state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+                state, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
             state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
         }
         else
@@ -232,31 +242,31 @@ void SecureSessionMgr::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
     }
 }
 
-void SecureSessionMgr::ExpireAllPairingsForFabric(FabricIndex fabric)
+void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
 {
     ChipLogDetail(Inet, "Expiring all connections for fabric %d!!", fabric);
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionStateByFabric(fabric);
+    SecureSession * state = mPeerConnections.FindPeerConnectionStateByFabric(fabric);
     while (state != nullptr)
     {
         mPeerConnections.MarkConnectionExpired(
-            state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+            state, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
         state = mPeerConnections.FindPeerConnectionStateByFabric(fabric);
     }
 }
 
-CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
-                                        PairingSession * pairing, SecureSession::SessionRole direction, FabricIndex fabric)
+CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
+                                      PairingSession * pairing, CryptoContext::SessionRole direction, FabricIndex fabric)
 {
     uint16_t peerSessionId  = pairing->GetPeerSessionId();
     uint16_t localSessionId = pairing->GetLocalSessionId();
-    PeerConnectionState * state =
+    SecureSession * state =
         mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(peerNodeId), localSessionId, nullptr);
 
     // Find any existing connection with the same local key ID
     if (state)
     {
         mPeerConnections.MarkConnectionExpired(
-            state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+            state, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
     }
 
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", key %d!!", ChipLogValueX64(peerNodeId),
@@ -283,7 +293,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ReturnErrorOnFailure(pairing->DeriveSecureSession(state->GetSecureSession(), direction));
+    ReturnErrorOnFailure(pairing->DeriveSecureSession(state->GetCryptoContext(), direction));
 
     if (mCB != nullptr)
     {
@@ -294,23 +304,23 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     return CHIP_NO_ERROR;
 }
 
-void SecureSessionMgr::ScheduleExpiryTimer()
+void SessionManager::ScheduleExpiryTimer()
 {
     CHIP_ERROR err =
-        mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SecureSessionMgr::ExpiryTimerCallback, this);
+        mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SessionManager::ExpiryTimerCallback, this);
 
     VerifyOrDie(err == CHIP_NO_ERROR);
 }
 
-void SecureSessionMgr::CancelExpiryTimer()
+void SessionManager::CancelExpiryTimer()
 {
     if (mSystemLayer != nullptr)
     {
-        mSystemLayer->CancelTimer(SecureSessionMgr::ExpiryTimerCallback, this);
+        mSystemLayer->CancelTimer(SessionManager::ExpiryTimerCallback, this);
     }
 }
 
-void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
+void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
     PacketHeader packetHeader;
 
@@ -326,8 +336,8 @@ void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System
     }
 }
 
-void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                       System::PacketBufferHandle && msg)
+void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                     System::PacketBufferHandle && msg)
 {
     Transport::UnauthenticatedSession * session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
     if (session == nullptr)
@@ -336,14 +346,14 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
         return;
     }
 
-    SecureSessionMgrDelegate::DuplicateMessage isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::No;
+    SessionManagerDelegate::DuplicateMessage isDuplicate = SessionManagerDelegate::DuplicateMessage::No;
 
     // Verify message counter
     CHIP_ERROR err = session->GetPeerMessageCounter().VerifyOrTrustFirst(packetHeader.GetMessageCounter());
     if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
         ChipLogDetail(Inet, "Received a duplicate message with MessageCounter: %" PRIu32, packetHeader.GetMessageCounter());
-        isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::Yes;
+        isDuplicate = SessionManagerDelegate::DuplicateMessage::Yes;
         err         = CHIP_NO_ERROR;
     }
     VerifyOrDie(err == CHIP_NO_ERROR);
@@ -352,6 +362,14 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
+
+    if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes)
+    {
+        ChipLogDetail(Inet,
+                      "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
+                      " on exchange " ChipLogFormatExchangeId,
+                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromSentHeader(payloadHeader));
+    }
 
     session->GetPeerMessageCounter().Commit(packetHeader.GetMessageCounter());
 
@@ -362,16 +380,16 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
     }
 }
 
-void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                             System::PacketBufferHandle && msg)
+void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                           System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetSessionId(), nullptr);
+    SecureSession * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetSessionId(), nullptr);
 
     PayloadHeader payloadHeader;
 
-    SecureSessionMgrDelegate::DuplicateMessage isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::No;
+    SessionManagerDelegate::DuplicateMessage isDuplicate = SessionManagerDelegate::DuplicateMessage::No;
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
@@ -416,7 +434,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
         {
             ChipLogDetail(Inet, "Received a duplicate message with MessageCounter: %" PRIu32, packetHeader.GetMessageCounter());
-            isDuplicate = SecureSessionMgrDelegate::DuplicateMessage::Yes;
+            isDuplicate = SessionManagerDelegate::DuplicateMessage::Yes;
             err         = CHIP_NO_ERROR;
         }
         if (err != CHIP_NO_ERROR)
@@ -432,11 +450,18 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
                  ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
 
-    if (isDuplicate == SecureSessionMgrDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
+    if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {
-        // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
-        // cycles on further message processing.
-        ExitNow(err = CHIP_NO_ERROR);
+        ChipLogDetail(Inet,
+                      "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
+                      " on exchange " ChipLogFormatExchangeId,
+                      packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromSentHeader(payloadHeader));
+        if (!payloadHeader.NeedsAck())
+        {
+            // If it's a duplicate message, but doesn't require an ack, let's drop it right here to save CPU
+            // cycles on further message processing.
+            ExitNow(err = CHIP_NO_ERROR);
+        }
     }
 
     if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
@@ -470,7 +495,7 @@ exit:
     }
 }
 
-void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionState & state)
+void SessionManager::HandleConnectionExpired(const Transport::SecureSession & state)
 {
     ChipLogDetail(Inet, "Marking old secure session for device 0x" ChipLogFormatX64 " as expired",
                   ChipLogValueX64(state.GetPeerNodeId()));
@@ -484,20 +509,19 @@ void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionSt
     mTransportMgr->Disconnect(state.GetPeerAddress());
 }
 
-void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param)
+void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
 {
-    SecureSessionMgr * mgr = reinterpret_cast<SecureSessionMgr *>(param);
+    SessionManager * mgr = reinterpret_cast<SessionManager *>(param);
 #if CHIP_CONFIG_SESSION_REKEYING
     // TODO(#2279): session expiration is currently disabled until rekeying is supported
     // the #ifdef should be removed after that.
     mgr->mPeerConnections.ExpireInactiveConnections(
-        CHIP_PEER_CONNECTION_TIMEOUT_MS,
-        [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+        CHIP_PEER_CONNECTION_TIMEOUT_MS, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
 
-PeerConnectionState * SecureSessionMgr::GetPeerConnectionState(SessionHandle session)
+SecureSession * SessionManager::GetSecureSession(SessionHandle session)
 {
     return mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(session.mPeerNodeId),
                                                               session.mLocalSessionId.ValueOr(0), nullptr);

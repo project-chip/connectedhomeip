@@ -16,7 +16,9 @@ CHIPTool offers the following features:
 -   [Source files](#source)
 -   [Requirements for building](#requirements)
     -   [ABIs and TARGET_CPU](#abi)
--   [Building Android CHIPTool](#building)
+-   [Preparing for build](#preparing)
+-   [Building Android CHIPTool from scripts](#building-scripts)
+-   [Building Android CHIPTool from Android Studio](#building-studio)
 
 <hr>
 
@@ -54,11 +56,11 @@ architecture:
 
 <hr>
 
-<a name="building"></a>
+<a name="preparing"></a>
 
-## Building Android CHIPTool
+## Preparing for build
 
-Complete the following steps to build CHIPTool:
+Complete the following steps to prepare the CHIP build:
 
 1. Check out the CHIP repository.
 
@@ -68,18 +70,57 @@ Complete the following steps to build CHIPTool:
     source scripts/bootstrap.sh
     ```
 
-3. In the command line, run the following command from the top CHIP directory:
+3. Choose how you want to build the Android CHIPTool. There are two ways: from
+   script, or from source within Android Studio.
+
+<a name="building-scripts"></a>
+
+## Building Android CHIPTool from scripts
+
+This is the simplest option. In the command line, run the following command from
+the top CHIP directory:
+
+```shell
+./scripts/build/build_examples.py --platform android --board arm64 build
+```
+
+See the table above for other values of `TARGET_CPU`.
+
+The debug Android package `app-debug.apk` will be generated at
+`out/android-$TARGET_CPU-chip_tool/outputs/apk/debug/`, and can be installed
+with
+
+```shell
+adb install out/android-$TARGET_CPU-chip_tool/outputs/apk/debug/app-debug.apk
+```
+
+You can use Android Studio to edit the Android CHIPTool app itself, but you will
+not be able to edit CHIP Android code from `src/controller/java`, or other CHIP
+C++ code within Android Studio.
+
+<a name="building-studio"></a>
+
+## Building Android CHIPTool from Android Studio
+
+This option allows Android Studio to build the core CHIP code from source, which
+allows us to directly edit core CHIP code in-IDE.
+
+1. In the command line, run the following command from the top CHIP directory:
 
     ```shell
-    TARGET_CPU=arm64 ./scripts/examples/android_app.sh
+    TARGET_CPU=arm64 ./scripts/examples/android_app_ide.sh
     ```
 
     See the table above for other values of `TARGET_CPU`.
 
-4. Open the project in Android Studio and run **Sync Project with Gradle
+2. Modify the `matterBuildSrcDir` variable in
+   [src/android/CHIPTool/build.gradle](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/build.gradle)
+   to point to the appropriate output directory (e.g. `out/android_arm64`).
+
+3. Open the project in Android Studio and run **Sync Project with Gradle
    Files**.
 
-5. Use one of the following options to build an Android package:
+4. Use one of the following options to build an Android package:
 
     - Click **Make Project** in Android Studio.
     - Run the following command in the command line:
@@ -90,4 +131,14 @@ Complete the following steps to build CHIPTool:
         ```
 
 The debug Android package `app-debug.apk` will be generated at
-`src/android/CHIPTool/app/build/outputs/apk/debug/`.
+`src/android/CHIPTool/app/build/outputs/apk/debug/`, and can be installed with
+
+```shell
+adb install src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
+```
+
+or
+
+```shell
+(cd src/android/CHIPTool && ./gradlew installDebug)
+```

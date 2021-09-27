@@ -32,42 +32,7 @@
 #include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
-#define COMMAND_HEADER(name, clusterId)                                                                                            \
-    const char * kName = name;                                                                                                     \
-    uint8_t seqNum     = mDevice->GetNextSequenceNumber();                                                                         \
-                                                                                                                                   \
-    PacketBufferWriter buf(System::PacketBufferHandle::New(kMaxBufferSize));                                                       \
-    if (buf.IsNull())                                                                                                              \
-    {                                                                                                                              \
-        ChipLogError(Zcl, "Could not allocate packet buffer while trying to encode %s command", kName);                            \
-        return CHIP_ERROR_INTERNAL;                                                                                                \
-    }                                                                                                                              \
-                                                                                                                                   \
-    if (doEncodeApsFrame(buf, clusterId, kSourceEndpoint, mEndpoint, 0, 0, 0, 0, false))                                           \
-    {
-
-#define COMMAND_FOOTER()                                                                                                           \
-    }                                                                                                                              \
-    if (!buf.Fit())                                                                                                                \
-    {                                                                                                                              \
-        ChipLogError(Zcl, "Command %s can't fit in the allocated buffer", kName);                                                  \
-    }                                                                                                                              \
-    return SendCommand(seqNum, buf.Finalize(), onSuccessCallback, onFailureCallback);
-
 namespace chip {
-namespace {
-// TODO: Find a way to calculate maximum message length for clusters
-//       https://github.com/project-chip/connectedhomeip/issues/965
-constexpr uint16_t kMaxBufferSize = 1024;
-
-// This is a global command, so the low bits are 0b00.  The command is
-// standard, so does not need a manufacturer code, and we're sending client
-// to server, so all the remaining bits are 0.
-constexpr uint8_t kFrameControlGlobalCommand = 0x00;
-
-// Pick source endpoint as 1 for now
-constexpr EndpointId kSourceEndpoint = 1;
-} // namespace
 
 using namespace app::Clusters;
 using namespace System;
@@ -216,14 +181,6 @@ exit:
 }
 
 // GeneralCommissioning Cluster Attributes
-CHIP_ERROR GeneralCommissioningCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverGeneralCommissioningAttributes", GeneralCommissioning::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback)
 {
@@ -509,14 +466,6 @@ exit:
 }
 
 // NetworkCommissioning Cluster Attributes
-CHIP_ERROR NetworkCommissioningCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverNetworkCommissioningAttributes", NetworkCommissioning::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback)
 {
@@ -606,6 +555,91 @@ CHIP_ERROR OperationalCredentialsCluster::AddTrustedRootCertificate(Callback::Ca
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // rootCertificate: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), rootCertificate));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::AttestationRequest(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback,
+                                                             chip::ByteSpan attestationNonce)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OperationalCredentials::Commands::Ids::AttestationRequest,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // attestationNonce: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), attestationNonce));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::CertificateChainRequest(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint8_t certificateType)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OperationalCredentials::Commands::Ids::CertificateChainRequest,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // certificateType: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), certificateType));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -750,14 +784,6 @@ exit:
 }
 
 // OperationalCredentials Cluster Attributes
-CHIP_ERROR OperationalCredentialsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverOperationalCredentialsAttributes", OperationalCredentials::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR OperationalCredentialsCluster::ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback)
 {

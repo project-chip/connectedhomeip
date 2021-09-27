@@ -38,8 +38,8 @@
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/CryptoContext.h>
 #include <transport/PairingSession.h>
-#include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -168,7 +168,7 @@ public:
      * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override;
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
 
     const char * GetI2RSessionInfo() const override { return kSpake2pI2RSessionInfo; }
 
@@ -232,7 +232,7 @@ public:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SecureSessionMgr * sessionMgr) override
+                                                            SessionManager * sessionManager) override
     {
         return &mMessageDispatch;
     }
@@ -349,11 +349,11 @@ public:
         SetPeerSessionId(peerSessionId);
     }
 
-    CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override
     {
         size_t secretLen = strlen(kTestSecret);
         return session.InitFromSecret(ByteSpan(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen), ByteSpan(nullptr, 0),
-                                      SecureSession::SessionInfoType::kSessionEstablishment, role);
+                                      CryptoContext::SessionInfoType::kSessionEstablishment, role);
     }
 
     CHIP_ERROR ToSerializable(PASESessionSerializable & serializable)

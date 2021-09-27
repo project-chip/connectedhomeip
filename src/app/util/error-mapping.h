@@ -23,8 +23,8 @@
 namespace chip {
 namespace app {
 
-EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::ProtocolCode code);
-Protocols::InteractionModel::ProtocolCode ToInteractionModelProtocolCode(EmberAfStatus code);
+EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::Status code);
+Protocols::InteractionModel::Status ToInteractionModelStatus(EmberAfStatus code);
 
 } // namespace app
 } // namespace chip

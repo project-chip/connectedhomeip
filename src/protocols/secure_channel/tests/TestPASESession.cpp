@@ -304,9 +304,9 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
 
     // Let's try encrypting using original session, and decrypting using deserialized
     {
-        SecureSession session1;
+        CryptoContext session1;
 
-        CHIP_ERROR err = testPairingSession1->DeriveSecureSession(session1, SecureSession::SessionRole::kInitiator);
+        CHIP_ERROR err = testPairingSession1->DeriveSecureSession(session1, CryptoContext::SessionRole::kInitiator);
 
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -315,9 +315,9 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     }
 
     {
-        SecureSession session2;
+        CryptoContext session2;
         NL_TEST_ASSERT(inSuite,
-                       testPairingSession2->DeriveSecureSession(session2, SecureSession::SessionRole::kResponder) == CHIP_NO_ERROR);
+                       testPairingSession2->DeriveSecureSession(session2, CryptoContext::SessionRole::kResponder) == CHIP_NO_ERROR);
 
         uint8_t decrypted[64];
         NL_TEST_ASSERT(inSuite, session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, mac) == CHIP_NO_ERROR);
@@ -382,7 +382,7 @@ int TestSecurePairing_Setup(void * inContext)
     ctx.SetAliceKeyId(0);
     ctx.SetFabricIndex(kUndefinedFabricIndex);
 
-    gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
+    gTransportMgr.SetSessionManager(&ctx.GetSecureSessionManager());
 
     return SUCCESS;
 }

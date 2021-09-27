@@ -408,18 +408,18 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
 
     // Let's try encrypting using original session, and decrypting using deserialized
     {
-        SecureSession session1;
+        CryptoContext session1;
 
         NL_TEST_ASSERT(inSuite,
-                       testPairingSession1->DeriveSecureSession(session1, SecureSession::SessionRole::kInitiator) == CHIP_NO_ERROR);
+                       testPairingSession1->DeriveSecureSession(session1, CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, mac) == CHIP_NO_ERROR);
     }
 
     {
-        SecureSession session2;
+        CryptoContext session2;
         NL_TEST_ASSERT(inSuite,
-                       testPairingSession2->DeriveSecureSession(session2, SecureSession::SessionRole::kResponder) == CHIP_NO_ERROR);
+                       testPairingSession2->DeriveSecureSession(session2, CryptoContext::SessionRole::kResponder) == CHIP_NO_ERROR);
 
         uint8_t decrypted[64];
         NL_TEST_ASSERT(inSuite, session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, mac) == CHIP_NO_ERROR);
@@ -484,7 +484,7 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ctx.SetAliceKeyId(0);
     ctx.SetFabricIndex(kUndefinedFabricIndex);
 
-    gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
+    gTransportMgr.SetSessionManager(&ctx.GetSecureSessionManager());
 
     gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
     gDeviceFabrics.Init(&gDeviceStorageDelegate);

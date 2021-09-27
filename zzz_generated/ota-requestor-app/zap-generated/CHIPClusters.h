@@ -46,7 +46,6 @@ public:
                           chip::ByteSpan location, bool requestorCanConsent, chip::ByteSpan metadataForProvider);
 
     // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:

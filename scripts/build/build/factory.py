@@ -17,7 +17,7 @@ from typing import Set
 from builders.android import AndroidBoard, AndroidBuilder
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
-from builders.host import HostBuilder, HostApp
+from builders.host import HostBuilder, HostApp, HostBoard
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
 from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
@@ -93,7 +93,10 @@ _MATCHERS = {
 
 # Matrix of what can be compiled and what build options are required
 # by such compilation
-_MATCHERS[Platform.HOST].AcceptBoard(Board.NATIVE)
+_MATCHERS[Platform.HOST].AcceptBoard(Board.NATIVE, board=HostBoard.NATIVE)
+if HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName():
+    _MATCHERS[Platform.HOST].AcceptBoard(Board.ARM64, board=HostBoard.ARM64)
+
 _MATCHERS[Platform.HOST].AcceptApplication(
     Application.ALL_CLUSTERS, app=HostApp.ALL_CLUSTERS)
 _MATCHERS[Platform.HOST].AcceptApplication(
@@ -145,6 +148,7 @@ _MATCHERS[Platform.TELINK].AcceptApplication(
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM, board=AndroidBoard.ARM)
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM64, board=AndroidBoard.ARM64)
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.X64, board=AndroidBoard.X64)
+_MATCHERS[Platform.ANDROID].AcceptBoard(Board.X86, board=AndroidBoard.X86)
 _MATCHERS[Platform.ANDROID].AcceptApplication(Application.CHIP_TOOL)
 
 _MATCHERS[Platform.INFINEON].AcceptApplication(

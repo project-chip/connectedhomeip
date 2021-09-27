@@ -190,6 +190,8 @@ exit:
 
 CHIP_ERROR ReadClient::SendStatusResponse(CHIP_ERROR aError)
 {
+    using Protocols::InteractionModel::Status;
+
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrReturnLogError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -198,10 +200,10 @@ CHIP_ERROR ReadClient::SendStatusResponse(CHIP_ERROR aError)
 
     StatusResponse::Builder response;
     ReturnLogErrorOnFailure(response.Init(&writer));
-    Protocols::InteractionModel::ProtocolCode statusCode = Protocols::InteractionModel::ProtocolCode::Success;
+    Status statusCode = Status::Success;
     if (aError != CHIP_NO_ERROR)
     {
-        statusCode = Protocols::InteractionModel::ProtocolCode::InvalidSubscription;
+        statusCode = Status::InvalidSubscription;
     }
     response.Status(statusCode);
     ReturnLogErrorOnFailure(response.GetError());
@@ -449,8 +451,8 @@ exit:
 
 void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: %d",
-                    apExchangeContext->GetExchangeId());
+    ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: " ChipLogFormatExchange,
+                    ChipLogValueExchange(apExchangeContext));
     ShutdownInternal(CHIP_ERROR_TIMEOUT);
 }
 
@@ -464,7 +466,7 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         AttributePath::Parser attributePathParser;
         ClusterInfo clusterInfo;
         uint16_t statusU16 = 0;
-        auto status        = Protocols::InteractionModel::ProtocolCode::Success;
+        auto status        = Protocols::InteractionModel::Status::Success;
 
         TLV::TLVReader reader = aAttributeDataListReader;
         err                   = element.Init(reader);
@@ -511,7 +513,7 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
             // The spec requires that one of data or status code must exist, thus failure to read data and status code means we
             // received malformed data from server.
             SuccessOrExit(err = element.GetStatus(&statusU16));
-            status = static_cast<Protocols::InteractionModel::ProtocolCode>(statusU16);
+            status = static_cast<Protocols::InteractionModel::Status>(statusU16);
         }
         else if (err != CHIP_NO_ERROR)
         {
@@ -533,7 +535,7 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
     CancelLivenessCheckTimer();
     ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %d seconds", mMaxIntervalCeilingSeconds);
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->StartTimer(
+    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         mMaxIntervalCeilingSeconds * kMillisecondsPerSecond, OnLivenessTimeoutCallback, this);
 
     if (err != CHIP_NO_ERROR)
@@ -545,7 +547,7 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 
 void ReadClient::CancelLivenessCheckTimer()
 {
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->CancelTimer(
+    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnLivenessTimeoutCallback, this);
 }
 

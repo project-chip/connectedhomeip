@@ -46,7 +46,7 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
 #include <setup_payload/SetupPayload.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
@@ -63,8 +63,9 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-constexpr size_t kMaxBlePendingPackets = 1;
-constexpr uint32_t kOpCSRNonceLength   = 32;
+constexpr size_t kMaxBlePendingPackets   = 1;
+constexpr size_t kOpCSRNonceLength       = 32;
+constexpr size_t kAttestationNonceLength = 32;
 
 using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
@@ -80,7 +81,7 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 struct ControllerDeviceInitParams
 {
     DeviceTransportMgr * transportMgr           = nullptr;
-    SecureSessionMgr * sessionMgr               = nullptr;
+    SessionManager * sessionManager             = nullptr;
     Messaging::ExchangeManager * exchangeMgr    = nullptr;
     Inet::InetLayer * inetLayer                 = nullptr;
     PersistentStorageDelegate * storageDelegate = nullptr;
@@ -125,30 +126,6 @@ public:
     void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
 
     // ----- Messaging -----
-    /**
-     * @brief
-     *   Send the provided message to the device
-     *
-     * @param[in] protocolId  The protocol identifier of the CHIP message to be sent.
-     * @param[in] msgType     The message type of the message to be sent.  Must be a valid message type for protocolId.
-     * @param [in] sendFlags  SendMessageFlags::kExpectResponse or SendMessageFlags::kNone
-     * @param[in] message     The message payload to be sent.
-     *
-     * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, Messaging::SendFlags sendFlags,
-                           System::PacketBufferHandle && message);
-
-    /**
-     * A strongly-message-typed version of SendMessage.
-     */
-    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR SendMessage(MessageType msgType, Messaging::SendFlags sendFlags, System::PacketBufferHandle && message)
-    {
-        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(msgType), sendFlags,
-                           std::move(message));
-    }
-
     CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
                                         Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
 
@@ -193,8 +170,7 @@ public:
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, FabricIndex fabric)
     {
-        mTransportMgr    = params.transportMgr;
-        mSessionManager  = params.sessionMgr;
+        mSessionManager  = params.sessionManager;
         mExchangeMgr     = params.exchangeMgr;
         mInetLayer       = params.inetLayer;
         mListenPort      = listenPort;
@@ -421,6 +397,23 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
+    CHIP_ERROR SetAttestationNonce(ByteSpan attestationNonce)
+    {
+        VerifyOrReturnError(attestationNonce.size() == sizeof(mAttestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mAttestationNonce, attestationNonce.data(), attestationNonce.size());
+        return CHIP_NO_ERROR;
+    }
+
+    ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)); }
+
+    bool AreCredentialsAvailable() const { return (mDAC != nullptr && mDACLen != 0); }
+
+    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
+    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
+
+    CHIP_ERROR SetDAC(const ByteSpan & dac);
+    CHIP_ERROR SetPAI(const ByteSpan & pai);
+
     MutableByteSpan GetMutableNOCCert() { return MutableByteSpan(mNOCCertBuffer, sizeof(mNOCCertBuffer)); }
 
     CHIP_ERROR SetNOCCertBufferSize(size_t new_size);
@@ -483,9 +476,7 @@ private:
 
     DeviceStatusDelegate * mStatusDelegate = nullptr;
 
-    SecureSessionMgr * mSessionManager = nullptr;
-
-    DeviceTransportMgr * mTransportMgr = nullptr;
+    SessionManager * mSessionManager = nullptr;
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
@@ -505,10 +496,8 @@ private:
      *   This function loads the secure session object from the serialized operational
      *   credentials corresponding to the device. This is typically done when the device
      *   does not have an active secure channel.
-     *
-     * @param[in] resetNeeded   Does the underlying network socket require a reset
      */
-    CHIP_ERROR LoadSecureSessionParameters(ResetTransport resetNeeded);
+    CHIP_ERROR LoadSecureSessionParameters();
 
     /**
      * @brief
@@ -527,6 +516,9 @@ private:
 
     CHIP_ERROR WarmupCASESession();
 
+    void ReleaseDAC();
+    void ReleasePAI();
+
     static void OnOpenPairingWindowSuccessResponse(void * context);
     static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
 
@@ -541,7 +533,14 @@ private:
     CASESession mCASESession;
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
+    // TODO: Offload Nonces and DAC/PAI into a new struct
     uint8_t mCSRNonce[kOpCSRNonceLength];
+    uint8_t mAttestationNonce[kAttestationNonceLength];
+
+    uint8_t * mDAC   = nullptr;
+    uint16_t mDACLen = 0;
+    uint8_t * mPAI   = nullptr;
+    uint16_t mPAILen = 0;
 
     uint8_t mNOCCertBuffer[Credentials::kMaxCHIPCertLength];
     size_t mNOCCertBufferSize = 0;

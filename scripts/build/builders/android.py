@@ -24,6 +24,7 @@ class AndroidBoard(Enum):
     ARM = auto()
     ARM64 = auto()
     X64 = auto()
+    X86 = auto()
 
     def TargetCpuName(self):
         if self == AndroidBoard.ARM:
@@ -32,6 +33,8 @@ class AndroidBoard(Enum):
             return 'arm64'
         elif self == AndroidBoard.X64:
             return 'x64'
+        elif self == AndroidBoard.X86:
+            return 'x86'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -42,6 +45,8 @@ class AndroidBoard(Enum):
             return 'arm64-v8a'
         elif self == AndroidBoard.X64:
             return 'x86_64'
+        elif self == AndroidBoard.X86:
+            return 'x86'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -82,6 +87,10 @@ class AndroidBuilder(Builder):
                 % licenses)
 
     def generate(self):
+        self._Execute([
+            'python3', 'build/chip/java/tests/generate_jars_for_test.py'
+        ], title='Generating JARs for Java build rules test')
+
         if not os.path.exists(self.output_dir):
             # NRF does a in-place update  of SDK tools
             if not self._runner.dry_run:
@@ -115,11 +124,6 @@ class AndroidBuilder(Builder):
         self._Execute(['ninja', '-C', self.output_dir],
                       title='Building JNI ' + self.identifier)
 
-        # NOTE: the following IDE-specific build instructions are NOT used:
-        #  - "rsync -a out/"android_$TARGET_CPU"/lib/*.jar src/android/CHIPTool/app/libs"
-        #    => using the 'ninjaOutputDir' project property instead to take the jar files directly
-        #       from the output
-
         # JNILibs will be copied as long as they reside in src/main/jniLibs/ABI:
         #    https://developer.android.com/studio/projects/gradle-external-native-builds#jniLibs
         # to avoid redefined in IDE mode, copy to another place and add that path in build.gradle
@@ -128,6 +132,7 @@ class AndroidBuilder(Builder):
         # when using dry run.
         jnilibs_dir = os.path.join(
             self.root, 'src/android/CHIPTool/app/libs/jniLibs', self.board.AbiName())
+        libs_dir = os.path.join(self.root, 'src/android/CHIPTool/app/libs')
         self._Execute(['mkdir', '-p', jnilibs_dir],
                       title='Prepare Native libs ' + self.identifier)
 
@@ -144,27 +149,33 @@ class AndroidBuilder(Builder):
             self._Execute(['cp', os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(
             ), libName), os.path.join(jnilibs_dir, libName)])
 
+        jars = {
+            'CHIPController.jar': 'src/controller/java/CHIPController.jar',
+            'SetupPayloadParser.jar': 'src/setup_payload/java/SetupPayloadParser.jar'
+        }
+        for jarName in jars.keys():
+            self._Execute(['cp', os.path.join(
+                self.output_dir, 'lib', jars[jarName]), os.path.join(libs_dir, jarName)])
+
         # App compilation
         self._Execute([
             '%s/src/android/CHIPTool/gradlew' % self.root, '-p',
             '%s/src/android/CHIPTool' % self.root,
-            '-PchipSdkJarDir=%s' % os.path.join(self.output_dir, 'lib'),
-            '-PbuildDir=%s' % self.output_dir, 'build'
+            '-PbuildDir=%s' % self.output_dir, 'assembleDebug'
         ],
             title='Building APP ' + self.identifier)
 
     def build_outputs(self):
         outputs = {
             'CHIPController.jar':
-                os.path.join(self.output_dir, 'lib', 'CHIPController.jar'),
+                os.path.join(self.output_dir, 'lib',
+                             'src/controller/java/CHIPController.jar'),
             'SetupPayloadParser.jar':
-                os.path.join(self.output_dir, 'lib', 'SetupPayloadParser.jar'),
+                os.path.join(self.output_dir, 'lib',
+                             'src/setup_payload/java/SetupPayloadParser.jar'),
             'ChipTool-debug.apk':
                 os.path.join(self.output_dir, 'outputs', 'apk', 'debug',
                              'app-debug.apk'),
-            'ChipTool-release-unsigned.apk':
-                os.path.join(self.output_dir, 'outputs', 'apk', 'release',
-                             'app-release-unsigned.apk'),
 
             'jni/%s/libSetupPayloadParser.so' % self.board.AbiName():
                 os.path.join(self.output_dir, 'lib', 'jni',

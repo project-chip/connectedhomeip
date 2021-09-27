@@ -111,7 +111,7 @@ void CommissioningWindowManager::OnSessionEstablished()
 {
     CHIP_ERROR err = mServer->GetSecureSessionManager().NewPairing(
         Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
-        &mPairingSession, SecureSession::SessionRole::kResponder, 0);
+        &mPairingSession, CryptoContext::SessionRole::kResponder, 0);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Commissioning failed while setting up secure channel: err %s", ErrorStr(err));
@@ -145,7 +145,7 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
             DeviceLayer::SystemLayer().StartTimer(mCommissioningTimeoutSeconds * 1000, HandleCommissioningWindowTimeout, this));
     }
 
-    ReturnErrorOnFailure(mServer->GetExchangManager().RegisterUnsolicitedMessageHandlerForType(
+    ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
 
     ReturnErrorOnFailure(StartAdvertisement());
@@ -264,7 +264,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement()
 {
     RestoreDiscriminator();
 
-    mServer->GetExchangManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
+    mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     mPairingSession.Clear();
 
     mCommissioningWindowOpen = false;

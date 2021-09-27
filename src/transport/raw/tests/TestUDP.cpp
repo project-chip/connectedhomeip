@@ -127,7 +127,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite);
     TransportMgrBase gTransportMgrBase;
-    gTransportMgrBase.SetSecureSessionMgr(&gMockTransportMgrDelegate);
+    gTransportMgrBase.SetSessionManager(&gMockTransportMgrDelegate);
     gTransportMgrBase.Init(&udp);
 
     ReceiveHandlerCallCount = 0;

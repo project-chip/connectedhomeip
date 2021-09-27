@@ -38,7 +38,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/UDP.h>
 
 namespace chip {
@@ -76,7 +76,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     {
         printf("responder constructing status code in command");
         apCommandObj->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::ProtocolCode::Success);
+                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Success);
     }
     else
     {
@@ -132,7 +132,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     err = apWriteHandler->AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                                 Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
+                                                 Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::Success);
     return err;
 }
 } // namespace app
@@ -225,7 +225,7 @@ int main(int argc, char * argv[])
 
     InitializeEventLogging(&gExchangeManager);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::CryptoContext::SessionRole::kResponder,
                                      gFabricIndex);
     SuccessOrExit(err);
 

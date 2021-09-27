@@ -45,7 +45,7 @@
 #include <protocols/secure_channel/StatusReport.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 
@@ -221,8 +221,8 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, uint32_t p
     {
         ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&setupPIN), sizeof(setupPIN)));
 
-        // Use only kSetupPINCodeFieldLengthInBits bits out of the code
-        setupPIN &= ((1 << kSetupPINCodeFieldLengthInBits) - 1);
+        // Passcodes shall be restricted to the values 00000001 to 99999998 in decimal, see 5.1.1.6
+        setupPIN = (setupPIN % 99999998) + 1;
     }
 
     return PASESession::ComputePASEVerifier(setupPIN, pbkdf2IterCount, salt, verifier);
@@ -339,11 +339,11 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     Clear();
 }
 
-CHIP_ERROR PASESession::DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role)
+CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role)
 {
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
     return session.InitFromSecret(ByteSpan(mKe, mKeLen), ByteSpan(nullptr, 0),
-                                  SecureSession::SessionInfoType::kSessionEstablishment, role);
+                                  CryptoContext::SessionInfoType::kSessionEstablishment, role);
 }
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()

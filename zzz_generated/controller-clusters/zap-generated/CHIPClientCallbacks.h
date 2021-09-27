@@ -112,6 +112,9 @@ typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbac
 typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(
     void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
     uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
+typedef void (*OperationalCredentialsClusterAttestationResponseCallback)(void * context, chip::ByteSpan AttestationElements,
+                                                                         chip::ByteSpan Signature);
+typedef void (*OperationalCredentialsClusterCertificateChainResponseCallback)(void * context, chip::ByteSpan Certificate);
 typedef void (*OperationalCredentialsClusterNOCResponseCallback)(void * context, uint8_t StatusCode, uint8_t FabricIndex,
                                                                  chip::ByteSpan DebugText);
 typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan NOCSRElements,
@@ -189,6 +192,10 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(chip::TLV::TLVR
                                                                  chip::Callback::Cancelable * onSuccessCallback,
                                                                  chip::Callback::Cancelable * onFailureCallback);
 typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(void * context, uint16_t count, _FabricDescriptor * entries);
+void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                              chip::Callback::Cancelable * onSuccessCallback,
+                                                              chip::Callback::Cancelable * onFailureCallback);
+typedef void (*PowerSourceActiveBatteryFaultsListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);
 void TvChannelClusterTvChannelListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                       chip::Callback::Cancelable * onFailureCallback);
 typedef void (*TvChannelTvChannelListListAttributeCallback)(void * context, uint16_t count, _TvChannelInfo * entries);

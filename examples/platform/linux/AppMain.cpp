@@ -28,7 +28,9 @@
 #include <lib/core/NodeId.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <credentials/examples/DeviceAttestationVerifierExample.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/RandUtils.h>
@@ -222,6 +224,9 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(gCommissioner.SetUdpListenPort(LinuxDeviceOptions::GetInstance().securedCommissionerPort));
     // No need to explicitly set the UDC port since we will use default
     ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort));
+
+    // Initialize device attestation verifier
+    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);

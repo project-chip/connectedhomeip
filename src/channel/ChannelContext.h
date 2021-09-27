@@ -29,8 +29,8 @@
 #include <lib/mdns/platform/Mdns.h>
 #include <lib/support/Variant.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <transport/PeerConnectionState.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SecureSession.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 namespace Messaging {
@@ -103,7 +103,7 @@ public:
     bool IsCasePairing();
 
     bool MatchesBuilder(const ChannelBuilder & builder);
-    bool MatchesSession(SessionHandle session, SecureSessionMgr * ssm);
+    bool MatchesSession(SessionHandle session, SessionManager * sessionManager);
 
     // events of ResolveDelegate, propagated from ExchangeManager
     void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const Mdns::MdnsService & address);

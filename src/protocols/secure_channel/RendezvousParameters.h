@@ -49,6 +49,7 @@ public:
     bool HasPeerAddress() const { return mPeerAddress.IsInitialized(); }
     Transport::PeerAddress GetPeerAddress() const { return mPeerAddress; }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
+    const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
     RendezvousParameters & SetPeerAddress(const Transport::PeerAddress & peerAddress)
     {
         mPeerAddress = peerAddress;
@@ -62,6 +63,13 @@ public:
         return *this;
     }
 
+    // The lifetime of the buffer attestationNonce is pointing to, should exceed the lifetime of RendezvousParameter object.
+    RendezvousParameters & SetAttestationNonce(ByteSpan attestationNonce)
+    {
+        mAttestationNonce.SetValue(attestationNonce);
+        return *this;
+    }
+
     bool HasDiscriminator() const { return mDiscriminator <= kMaxRendezvousDiscriminatorValue; }
     uint16_t GetDiscriminator() const { return mDiscriminator; }
     RendezvousParameters & SetDiscriminator(uint16_t discriminator)
@@ -72,6 +80,7 @@ public:
 
     bool HasPASEVerifier() const { return mHasPASEVerifier; }
     bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
+    bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
     const PASEVerifier & GetPASEVerifier() const { return mPASEVerifier; }
     RendezvousParameters & SetPASEVerifier(PASEVerifier & verifier)
     {
@@ -105,6 +114,7 @@ private:
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
+    Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
 
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;

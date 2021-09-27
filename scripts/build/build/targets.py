@@ -66,6 +66,7 @@ class Board(IntEnum):
     ARM = auto()
     ARM64 = auto()
     X64 = auto()
+    X86 = auto()
 
     # Infineon board
     P6BOARD = auto()

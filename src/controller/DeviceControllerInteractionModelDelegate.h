@@ -26,7 +26,7 @@ public:
     CHIP_ERROR CommandResponseProcessed(const app::CommandSender * apCommandSender) override;
 
     void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
-                      Protocols::InteractionModel::ProtocolCode status) override;
+                      Protocols::InteractionModel::Status status) override;
     CHIP_ERROR ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
 
     CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient,

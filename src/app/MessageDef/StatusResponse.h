@@ -64,14 +64,14 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetStatus(Protocols::InteractionModel::ProtocolCode & aStatus) const;
+    CHIP_ERROR GetStatus(Protocols::InteractionModel::Status & aStatus) const;
 };
 
 class Builder : public app::Builder
 {
 public:
     CHIP_ERROR Init(TLV::TLVWriter * const apWriter);
-    StatusResponse::Builder & Status(const Protocols::InteractionModel::ProtocolCode aStatus);
+    StatusResponse::Builder & Status(const Protocols::InteractionModel::Status aStatus);
 };
 } // namespace StatusResponse
 } // namespace app

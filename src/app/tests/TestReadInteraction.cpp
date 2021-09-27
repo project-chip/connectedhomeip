@@ -41,7 +41,7 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/UDP.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 #include <type_traits>
@@ -181,9 +181,9 @@ public:
     }
 
     void OnReportData(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath,
-                      chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::ProtocolCode status) override
+                      chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::Status status) override
     {
-        if (status == chip::Protocols::InteractionModel::ProtocolCode::Success)
+        if (status == chip::Protocols::InteractionModel::Status::Success)
         {
             mNumAttributeResponse++;
         }
@@ -238,7 +238,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     if (!(aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId))
     {
         return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                             chip::Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute);
+                             chip::Protocols::InteractionModel::Status::UnsupportedAttribute);
     }
 
     ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), kTestFieldValue1));
@@ -1132,7 +1132,7 @@ int Initialize(void * aContext)
     VerifyOrReturnError(ctx->Init(&sSuite, &gTransportManager, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     InitializeEventLogging(ctx->GetExchangeManager());
-    gTransportManager.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
+    gTransportManager.SetSessionManager(&ctx->GetSecureSessionManager());
     return SUCCESS;
 }
 
