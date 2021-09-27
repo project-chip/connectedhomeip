@@ -208,13 +208,20 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         bool dataRead;
         // TODO: We should probably clone the writer and convert failures here
         // into status responses, unless our caller already does that.
-        ReturnErrorOnFailure(attrOverride->Read(aClusterInfo, apWriter, &dataRead));
+        ReturnErrorOnFailure(attrOverride->Read(aClusterInfo, AttributeValueEncoder(apWriter), &dataRead));
 
         if (dataRead)
         {
-            // TODO: Add DataVersion support
-            ReturnErrorOnFailure(
-                apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), kTemporaryDataVersion));
+            if (apDataExists != nullptr)
+            {
+                *apDataExists = true;
+            }
+            if (apWriter != nullptr)
+            {
+                // TODO: Add DataVersion support
+                ReturnErrorOnFailure(
+                    apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), kTemporaryDataVersion));
+            }
             return CHIP_NO_ERROR;
         }
     }

@@ -18,7 +18,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
-#include <lib/core/CHIPTLV.h>
+#include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
@@ -463,7 +463,8 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter)
+CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
+                                                                               const app::AttributeValueEncoder & encoder)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
