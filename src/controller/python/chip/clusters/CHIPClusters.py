@@ -1552,6 +1552,21 @@ class ChipClusters:
                     "attributeId": 0x00000001,
                     "type": "int",
                 },
+                0x00000002: {
+                    "attributeName": "UpTime",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
+                0x00000003: {
+                    "attributeName": "TotalOperationalHours",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                },
+                0x00000004: {
+                    "attributeName": "BootReasons",
+                    "attributeId": 0x00000004,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2657,6 +2672,16 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x00000001: {
+                    "attributeName": "CurrentHeapFree",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                },
+                0x00000002: {
+                    "attributeName": "CurrentHeapUsed",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
                 0x00000003: {
                     "attributeName": "CurrentHeapHighWatermark",
                     "attributeId": 0x00000003,
@@ -4898,6 +4923,12 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_NetworkInterfaces(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralDiagnostics_ReadAttributeRebootCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_RebootCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterGeneralDiagnostics_ReadAttributeUpTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_UpTime(device, ZCLendpoint, ZCLgroupid)
+    def ClusterGeneralDiagnostics_ReadAttributeTotalOperationalHours(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_TotalOperationalHours(device, ZCLendpoint, ZCLgroupid)
+    def ClusterGeneralDiagnostics_ReadAttributeBootReasons(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_BootReasons(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterGroupKeyManagement_ReadAttributeGroups(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -5086,6 +5117,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Scenes_NameSupport(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Scenes_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterSoftwareDiagnostics_ReadAttributeCurrentHeapFree(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapFree(device, ZCLendpoint, ZCLgroupid)
+    def ClusterSoftwareDiagnostics_ReadAttributeCurrentHeapUsed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapUsed(device, ZCLendpoint, ZCLgroupid)
     def ClusterSoftwareDiagnostics_ReadAttributeCurrentHeapHighWatermark(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark(device, ZCLendpoint, ZCLgroupid)
     def ClusterSoftwareDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -6255,6 +6290,15 @@ class ChipClusters:
         # Cluster GeneralDiagnostics ReadAttribute RebootCount
         self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_RebootCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_RebootCount.restype = ctypes.c_uint32
+        # Cluster GeneralDiagnostics ReadAttribute UpTime
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_UpTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_UpTime.restype = ctypes.c_uint32
+        # Cluster GeneralDiagnostics ReadAttribute TotalOperationalHours
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_TotalOperationalHours.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_TotalOperationalHours.restype = ctypes.c_uint32
+        # Cluster GeneralDiagnostics ReadAttribute BootReasons
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_BootReasons.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_BootReasons.restype = ctypes.c_uint32
         # Cluster GeneralDiagnostics ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision.restype = ctypes.c_uint32
@@ -6759,6 +6803,12 @@ class ChipClusters:
         # Cluster SoftwareDiagnostics Command ResetWatermarks
         self._chipLib.chip_ime_AppendCommand_SoftwareDiagnostics_ResetWatermarks.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_SoftwareDiagnostics_ResetWatermarks.restype = ctypes.c_uint32
+        # Cluster SoftwareDiagnostics ReadAttribute CurrentHeapFree
+        self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapFree.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapFree.restype = ctypes.c_uint32
+        # Cluster SoftwareDiagnostics ReadAttribute CurrentHeapUsed
+        self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapUsed.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapUsed.restype = ctypes.c_uint32
         # Cluster SoftwareDiagnostics ReadAttribute CurrentHeapHighWatermark
         self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark.restype = ctypes.c_uint32

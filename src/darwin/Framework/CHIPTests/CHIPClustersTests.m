@@ -9612,6 +9612,62 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterGeneralDiagnosticsReadAttributeUpTimeWithResponseHandler
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"GeneralDiagnosticsReadAttributeUpTimeWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeUpTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"GeneralDiagnostics UpTime Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterGeneralDiagnosticsReadAttributeTotalOperationalHoursWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"GeneralDiagnosticsReadAttributeTotalOperationalHoursWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTotalOperationalHoursWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"GeneralDiagnostics TotalOperationalHours Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterGeneralDiagnosticsReadAttributeBootReasonsWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"GeneralDiagnosticsReadAttributeBootReasonsWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeBootReasonsWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"GeneralDiagnostics BootReasons Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterGeneralDiagnosticsReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =
@@ -11286,6 +11342,44 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
     [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"Scenes ClusterRevision Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterSoftwareDiagnosticsReadAttributeCurrentHeapFreeWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"SoftwareDiagnosticsReadAttributeCurrentHeapFreeWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPSoftwareDiagnostics * cluster = [[CHIPSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentHeapFreeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"SoftwareDiagnostics CurrentHeapFree Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterSoftwareDiagnosticsReadAttributeCurrentHeapUsedWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"SoftwareDiagnosticsReadAttributeCurrentHeapUsedWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPSoftwareDiagnostics * cluster = [[CHIPSoftwareDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentHeapUsedWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"SoftwareDiagnostics CurrentHeapUsed Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

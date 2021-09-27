@@ -777,6 +777,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRebootCountWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeUpTimeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeTotalOperationalHoursWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBootReasonsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1299,6 +1305,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPSoftwareDiagnostics : CHIPCluster
 
 - (void)resetWatermarks:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCurrentHeapFreeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCurrentHeapUsedWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeCurrentHeapHighWatermarkWithResponseHandler:(ResponseHandler)responseHandler;
 
