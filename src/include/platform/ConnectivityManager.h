@@ -164,15 +164,8 @@ public:
     bool IsThreadAttached();
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
-    bool HaveServiceConnectivityViaThread();
+
     CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
-
-    // Internet connectivity methods
-    bool HaveIPv4InternetConnectivity();
-    bool HaveIPv6InternetConnectivity();
-
-    // Service connectivity methods
-    bool HaveServiceConnectivity();
 
     // Ethernet network diagnostics methods
     CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount);
@@ -377,21 +370,6 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
 }
 
-inline bool ConnectivityManager::HaveIPv4InternetConnectivity()
-{
-    return static_cast<ImplClass *>(this)->_HaveIPv4InternetConnectivity();
-}
-
-inline bool ConnectivityManager::HaveIPv6InternetConnectivity()
-{
-    return static_cast<ImplClass *>(this)->_HaveIPv6InternetConnectivity();
-}
-
-inline bool ConnectivityManager::HaveServiceConnectivity()
-{
-    return static_cast<ImplClass *>(this)->_HaveServiceConnectivity();
-}
-
 inline CHIP_ERROR ConnectivityManager::GetEthPacketRxCount(uint64_t & packetRxCount)
 {
     return static_cast<ImplClass *>(this)->_GetEthPacketRxCount(packetRxCount);
@@ -470,11 +448,6 @@ inline bool ConnectivityManager::IsThreadProvisioned()
 inline void ConnectivityManager::ErasePersistentInfo()
 {
     static_cast<ImplClass *>(this)->_ErasePersistentInfo();
-}
-
-inline bool ConnectivityManager::HaveServiceConnectivityViaThread()
-{
-    return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaThread();
 }
 
 /*
