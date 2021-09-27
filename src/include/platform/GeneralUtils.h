@@ -21,6 +21,8 @@
  *          General utility functions available on all platforms.
  */
 
+#pragma once
+
 #include <inet/Inet.h>
 
 namespace chip {
