@@ -100,7 +100,7 @@ def main():
     FailIfNot(test.TestLevelControlCluster(nodeid=1,
                                            endpoint=LIGHTING_ENDPOINT_ID,
                                            group=GROUP_ID),
-                                           "Failed to test level control cluster")
+              "Failed to test level control cluster")
 
     logger.info("Testing sending commands to non exist endpoint")
     FailIfNot(not test.TestOnOffCluster(nodeid=1,

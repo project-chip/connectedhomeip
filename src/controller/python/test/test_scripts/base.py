@@ -73,6 +73,7 @@ class TestTimeout(threading.Thread):
         if time.time() > stop_time:
             TestFail("Timeout")
 
+
 class TestResult:
     def __init__(self, operationName, result):
         self.operationName = operationName
@@ -82,7 +83,8 @@ class TestResult:
         if self.result is None:
             raise Exception(f"{self.operationName}: no result got")
         if self.result.status != expected:
-            raise Exception(f"{self.operationName}: expected status {expected}, got {self.result.status}")
+            raise Exception(
+                f"{self.operationName}: expected status {expected}, got {self.result.status}")
         return self
 
     def assertValueEqual(self, expected):
@@ -90,8 +92,10 @@ class TestResult:
         if self.result is None:
             raise Exception(f"{self.operationName}: no result got")
         if self.result.value != expected:
-            raise Exception(f"{self.operationName}: expected value {expected}, got {self.result.value}")
+            raise Exception(
+                f"{self.operationName}: expected value {expected}, got {self.result.value}")
         return self
+
 
 class BaseTestHelper:
     def __init__(self, nodeid: int):
@@ -183,7 +187,8 @@ class BaseTestHelper:
         return True
 
     def TestLevelControlCluster(self, nodeid: int, endpoint: int, group: int):
-        self.logger.info(f"Sending MoveToLevel command to device {nodeid} endpoint {endpoint}")
+        self.logger.info(
+            f"Sending MoveToLevel command to device {nodeid} endpoint {endpoint}")
         try:
             commonArgs = dict(transitionTime=0, optionMask=0, optionOverride=0)
 
@@ -195,7 +200,8 @@ class BaseTestHelper:
                                                 nodeid=nodeid,
                                                 endpoint=endpoint,
                                                 groupid=group)
-            TestResult("Read attribute LevelControl.CurrentLevel", res).assertValueEqual(0)
+            TestResult("Read attribute LevelControl.CurrentLevel",
+                       res).assertValueEqual(0)
 
             # Move to 255
             self.devCtrl.ZCLSend("LevelControl", "MoveToLevel", nodeid,
@@ -205,7 +211,8 @@ class BaseTestHelper:
                                                 nodeid=nodeid,
                                                 endpoint=endpoint,
                                                 groupid=group)
-            TestResult("Read attribute LevelControl.CurrentLevel", res).assertValueEqual(255)
+            TestResult("Read attribute LevelControl.CurrentLevel",
+                       res).assertValueEqual(255)
 
             return True
         except Exception as ex:
@@ -248,7 +255,8 @@ class BaseTestHelper:
                                                     nodeid=nodeid,
                                                     endpoint=endpoint,
                                                     groupid=group)
-                TestResult(f"Read attribute {basic_attr}", res).assertValueEqual(expected_value)
+                TestResult(f"Read attribute {basic_attr}", res).assertValueEqual(
+                    expected_value)
             except Exception as ex:
                 failed_zcl[basic_attr] = str(ex)
         if failed_zcl:
@@ -278,13 +286,15 @@ class BaseTestHelper:
                                                      endpoint=endpoint,
                                                      groupid=group,
                                                      value=req.value)
-                TestResult(f"Write attribute {req.cluster}.{req.attribute}", res).assertStatusEqual(req.expected_status)
+                TestResult(f"Write attribute {req.cluster}.{req.attribute}", res).assertStatusEqual(
+                    req.expected_status)
                 if req.expected_status != IM.ProtocolCode.Success:
                     # If the write interaction is expected to success, proceed to verify it.
                     continue
                 res = self.devCtrl.ZCLReadAttribute(
                     cluster=req.cluster, attribute=req.attribute, nodeid=nodeid, endpoint=endpoint, groupid=group)
-                TestResult(f"Read attribute {req.cluster}.{req.attribute}", res).assertValueEqual(req.value)
+                TestResult(f"Read attribute {req.cluster}.{req.attribute}", res).assertValueEqual(
+                    req.value)
             except Exception as ex:
                 failed_zcl.append(str(ex))
         if failed_zcl:
