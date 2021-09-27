@@ -388,7 +388,8 @@ static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testConte
             false
         }
     );
-
+            
+#if INET_CONFIG_ENABLE_IPV4
     RunTestCase(testSuite,
         DNSResolutionTestCase
         {
@@ -400,6 +401,7 @@ static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testConte
             false
         }
     );
+#endif
     // clang-format on
 }
 
@@ -587,7 +589,9 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
 
         for (uint8_t i = 0; i < addrCount; i++)
         {
+#if INET_CONFIG_ENABLE_IPV4
             respContainsIPv4Addrs = respContainsIPv4Addrs || (addrArray[i].Type() == kIPAddressType_IPv4);
+#endif
             respContainsIPv6Addrs = respContainsIPv6Addrs || (addrArray[i].Type() == kIPAddressType_IPv6);
         }
 
@@ -618,6 +622,7 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
         {
         case kDNSOption_AddrFamily_Any:
             break;
+#if INET_CONFIG_ENABLE_IPV4
         case kDNSOption_AddrFamily_IPv4Only:
             NL_TEST_ASSERT(testSuite, !respContainsIPv6Addrs);
             break;
@@ -627,6 +632,7 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
                 NL_TEST_ASSERT(testSuite, addrArray[0].Type() == kIPAddressType_IPv4);
             }
             break;
+#endif
         case kDNSOption_AddrFamily_IPv6Only:
             NL_TEST_ASSERT(testSuite, !respContainsIPv4Addrs);
             break;
