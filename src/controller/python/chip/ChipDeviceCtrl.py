@@ -210,7 +210,7 @@ class ChipDeviceController(object):
         )
 
         return (address.value.decode(), port.value) if error == 0 else None
-        
+
     def DiscoverCommissionableNodesLongDiscriminator(self, long_discriminator):
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(
