@@ -76,6 +76,13 @@ const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation          = { k
 const PosixConfig::Key PosixConfig::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
 const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
+// Keys stored in the Chip-counters namespace
+const PosixConfig::Key PosixConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
+const PosixConfig::Key PosixConfig::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
+const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters,
+                                                                          "total-operational-hours" };
+const PosixConfig::Key PosixConfig::kCounterKey_BootReason            = { kConfigNamespace_ChipCounters, "boot-reason" };
+
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 
@@ -471,9 +478,41 @@ CHIP_ERROR PosixConfig::FactoryResetConfig()
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLinuxStorage * storage;
 
-    ChipLogProgress(DeviceLayer, "Performing factory reset");
+    ChipLogProgress(DeviceLayer, "Performing factory reset configuration");
 
     storage = &gChipLinuxConfigStorage;
+    if (storage == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Storage get failed");
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    SuccessOrExit(err);
+
+    err = storage->ClearAll();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Storage ClearAll failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+
+    err = storage->Commit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Storage Commit failed: %s", ErrorStr(err));
+    }
+
+exit:
+    return err;
+}
+
+CHIP_ERROR PosixConfig::FactoryResetCounters()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipLinuxStorage * storage;
+
+    ChipLogProgress(DeviceLayer, "Performing factory reset counters");
+
+    storage = &gChipLinuxCountersStorage;
     if (storage == nullptr)
     {
         ChipLogError(DeviceLayer, "Storage get failed");

@@ -123,7 +123,7 @@ west build --cmake-only -d {out}/nrf-nrf5340-pump_controller -b nrf5340dk_nrf534
 python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Generating android-arm-chip_tool
-gn gen --check --fail-on-unused-args {out}/android-arm-chip_tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME"'
+gn gen --check --fail-on-unused-args {out}/android-arm-chip_tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -132,7 +132,7 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Generating android-arm64-chip_tool
-gn gen --check --fail-on-unused-args {out}/android-arm64-chip_tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME"'
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip_tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -141,7 +141,7 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Generating android-x64-chip_tool
-gn gen --check --fail-on-unused-args {out}/android-x64-chip_tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME"'
+gn gen --check --fail-on-unused-args {out}/android-x64-chip_tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -150,7 +150,7 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Generating android-x86-chip_tool
-gn gen --check --fail-on-unused-args {out}/android-x86-chip_tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME"'
+gn gen --check --fail-on-unused-args {out}/android-x86-chip_tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'

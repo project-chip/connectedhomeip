@@ -5862,11 +5862,23 @@ public class ChipClusters {
       readRxErrOtherCountAttribute(chipClusterPtr, callback);
     }
 
+    public void readActiveTimestampAttribute(LongAttributeCallback callback) {
+      readActiveTimestampAttribute(chipClusterPtr, callback);
+    }
+
+    public void readPendingTimestampAttribute(LongAttributeCallback callback) {
+      readPendingTimestampAttribute(chipClusterPtr, callback);
+    }
+
+    public void readDelayAttribute(LongAttributeCallback callback) {
+      readDelayAttribute(chipClusterPtr, callback);
+    }
+
     public void readSecurityPolicyAttribute(SecurityPolicyAttributeCallback callback) {
       readSecurityPolicyAttribute(chipClusterPtr, callback);
     }
 
-    public void readChannelMaskAttribute(IntegerAttributeCallback callback) {
+    public void readChannelMaskAttribute(OctetStringAttributeCallback callback) {
       readChannelMaskAttribute(chipClusterPtr, callback);
     }
 
@@ -6051,11 +6063,19 @@ public class ChipClusters {
     private native void readRxErrOtherCountAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
 
+    private native void readActiveTimestampAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readPendingTimestampAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readDelayAttribute(long chipClusterPtr, LongAttributeCallback callback);
+
     private native void readSecurityPolicyAttribute(
         long chipClusterPtr, SecurityPolicyAttributeCallback callback);
 
     private native void readChannelMaskAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, OctetStringAttributeCallback callback);
 
     private native void readOperationalDatasetComponentsAttribute(
         long chipClusterPtr, OperationalDatasetComponentsAttributeCallback callback);
