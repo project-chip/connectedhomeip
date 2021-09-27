@@ -86,7 +86,7 @@ public:
 
     // Called after ParsePacket is complete to send final notifications to the delegate.
     // Used to ensure all the available IP addresses are attached before completion.
-    void OnComplete(ActiveResolveAttempts & ActiveResolveAttempts);
+    void OnComplete(ActiveResolveAttempts & activeAttempts);
 
 private:
     ResolverDelegate * mDelegate = nullptr;
@@ -552,7 +552,7 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
         builder.Header().SetMessageId(0);
 
         {
-            char nameBuffer[64] = "";
+            char nameBuffer[kMaxOperationalServiceNameSize] = "";
 
             // Node and fabricid are encoded in server names.
             ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId.Value()));

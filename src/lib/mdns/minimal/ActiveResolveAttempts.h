@@ -63,13 +63,17 @@ public:
     // Get the peer Id that needs scheduling for a query
     //
     // Assumes that the resolution is being sent and will apply internal
-    // query logic.
+    // query logic. This means:
+    //  - internal tracking of 'next due time' will updated as 'request sent
+    //    now'
+    //  - there is NO sorting implied by this call. Returned value will be
+    //    any peer that needs a new request sent
     chip::Optional<chip::PeerId> NextScheduledPeer();
 
 private:
     struct RetryEntry
     {
-        // What peer id is pending discovery.
+        // What peer id is pending resolution.
         //
         // Inactive entries are marked by having NodeId == kUndefinedNodeId
         chip::PeerId peerId;

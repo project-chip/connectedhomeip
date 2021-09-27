@@ -89,8 +89,11 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
             continue;
         }
 
-        // Rule 2: both choices are used (have a defined node id),
-        // pick the one with most queryDueTimeMs
+        // Rule 3: both choices are used (have a defined node id):
+        //    - try to find the one with the largest next delay (oldest request)
+        //    - on same delay, use queryDueTime to determine the oldest request
+        //      (the one with the smallest  due time was issued the longest time
+        //       ago)
         if (entry->nextRetryDelaySec > entryToUse->nextRetryDelaySec)
         {
             entryToUse = entry;
@@ -104,6 +107,13 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
 
     if ((entryToUse->peerId.GetNodeId() != kUndefinedNodeId) && (entryToUse->peerId != peerId))
     {
+        // TODO: node was evicted here, if/when resolution failures are
+        // supported this could be a place for error callbacks
+        //
+        // Note however that this is NOT an actual 'timeout' it is showing
+        // a burst of lookups for which we cannot maintain state. A reply may
+        // still be received for this peer id (query was already sent on the
+        // network)
         ChipLogError(Discovery, "Re-using pending resolve entry before reply was received.");
     }
 
