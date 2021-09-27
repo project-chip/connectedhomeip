@@ -48,9 +48,11 @@ AvahiProtocol ToAvahiProtocol(chip::Inet::IPAddressType addressType)
 
     switch (addressType)
     {
+#ifdef INET_CONFIG_ENABLE_IPV4
     case chip::Inet::IPAddressType::kIPAddressType_IPv4:
         protocol = AVAHI_PROTO_INET;
         break;
+#endif
     case chip::Inet::IPAddressType::kIPAddressType_IPv6:
         protocol = AVAHI_PROTO_INET6;
         break;
@@ -68,9 +70,11 @@ chip::Inet::IPAddressType ToAddressType(AvahiProtocol protocol)
 
     switch (protocol)
     {
+#ifdef INET_CONFIG_ENABLE_IPV4
     case AVAHI_PROTO_INET:
         type = chip::Inet::IPAddressType::kIPAddressType_IPv4;
         break;
+#endif
     case AVAHI_PROTO_INET6:
         type = chip::Inet::IPAddressType::kIPAddressType_IPv6;
         break;
@@ -713,10 +717,14 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
             switch (address->proto)
             {
             case AVAHI_PROTO_INET:
+#ifdef INET_CONFIG_ENABLE_IPV4
                 struct in_addr addr4;
 
                 memcpy(&addr4, &(address->data.ipv4), sizeof(addr4));
                 result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv4(addr4));
+#else
+                ChipLogError(Discovery, "Ignoring IPv4 mDNS address.");
+#endif
                 break;
             case AVAHI_PROTO_INET6:
                 struct in6_addr addr6;
