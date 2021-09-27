@@ -608,6 +608,23 @@ static void OnOtaSoftwareUpdateProviderClusterQueryImageResponse(void * context,
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
+static void OnOperationalCredentialsClusterAttestationResponse(void * context, chip::ByteSpan AttestationElements,
+                                                               chip::ByteSpan Signature)
+{
+    ChipLogProgress(chipTool, "OperationalCredentialsClusterAttestationResponse");
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnOperationalCredentialsClusterCertificateChainResponse(void * context, chip::ByteSpan Certificate)
+{
+    ChipLogProgress(chipTool, "OperationalCredentialsClusterCertificateChainResponse");
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
 static void OnOperationalCredentialsClusterNOCResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex,
                                                        chip::ByteSpan DebugText)
 {
@@ -14228,6 +14245,8 @@ private:
 | Commands:                                                           |        |
 | * AddNOC                                                            |   0x06 |
 | * AddTrustedRootCertificate                                         |   0x0B |
+| * AttestationRequest                                                |   0x00 |
+| * CertificateChainRequest                                           |   0x02 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveFabric                                                      |   0x0A |
 | * RemoveTrustedRootCertificate                                      |   0x0C |
@@ -14317,6 +14336,76 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::ByteSpan mRootCertificate;
+};
+
+/*
+ * Command AttestationRequest
+ */
+class OperationalCredentialsAttestationRequest : public ModelCommand
+{
+public:
+    OperationalCredentialsAttestationRequest() : ModelCommand("attestation-request")
+    {
+        AddArgument("AttestationNonce", &mAttestationNonce);
+        ModelCommand::AddArguments();
+    }
+    ~OperationalCredentialsAttestationRequest()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.AttestationRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mAttestationNonce);
+    }
+
+private:
+    chip::Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback>(
+            OnOperationalCredentialsClusterAttestationResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::ByteSpan mAttestationNonce;
+};
+
+/*
+ * Command CertificateChainRequest
+ */
+class OperationalCredentialsCertificateChainRequest : public ModelCommand
+{
+public:
+    OperationalCredentialsCertificateChainRequest() : ModelCommand("certificate-chain-request")
+    {
+        AddArgument("CertificateType", 0, UINT8_MAX, &mCertificateType);
+        ModelCommand::AddArguments();
+    }
+    ~OperationalCredentialsCertificateChainRequest()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x02) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.CertificateChainRequest(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mCertificateType);
+    }
+
+private:
+    chip::Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback>(
+            OnOperationalCredentialsClusterCertificateChainResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mCertificateType;
 };
 
 /*
@@ -24905,6 +24994,8 @@ void registerClusterOperationalCredentials(Commands & commands)
     commands_list clusterCommands = {
         make_unique<OperationalCredentialsAddNOC>(),                       //
         make_unique<OperationalCredentialsAddTrustedRootCertificate>(),    //
+        make_unique<OperationalCredentialsAttestationRequest>(),           //
+        make_unique<OperationalCredentialsCertificateChainRequest>(),      //
         make_unique<OperationalCredentialsOpCSRRequest>(),                 //
         make_unique<OperationalCredentialsRemoveFabric>(),                 //
         make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(), //

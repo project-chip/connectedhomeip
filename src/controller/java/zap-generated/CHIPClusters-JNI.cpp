@@ -4856,6 +4856,170 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPOperationalCredentialsClusterAttestationResponseCallback
+    : public Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback>
+{
+public:
+    CHIPOperationalCredentialsClusterAttestationResponseCallback(jobject javaCallback) :
+        Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+    ~CHIPOperationalCredentialsClusterAttestationResponseCallback()
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+        env->DeleteGlobalRef(javaCallbackRef);
+    };
+
+    static void CallbackFn(void * context, chip::ByteSpan AttestationElements, chip::ByteSpan Signature)
+    {
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+        jmethodID javaMethod;
+        CHIPOperationalCredentialsClusterAttestationResponseCallback * cppCallback = nullptr;
+        jbyteArray AttestationElementsArr;
+        jbyteArray SignatureArr;
+
+        VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+        cppCallback = reinterpret_cast<CHIPOperationalCredentialsClusterAttestationResponseCallback *>(context);
+        VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+
+        javaCallbackRef = cppCallback->javaCallbackRef;
+        VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
+
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B[B)V", &javaMethod);
+        SuccessOrExit(err);
+
+        AttestationElementsArr = env->NewByteArray(AttestationElements.size());
+        VerifyOrExit(AttestationElementsArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+        env->SetByteArrayRegion(AttestationElementsArr, 0, AttestationElements.size(),
+                                reinterpret_cast<const jbyte *>(AttestationElements.data()));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        SignatureArr = env->NewByteArray(Signature.size());
+        VerifyOrExit(SignatureArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+        env->SetByteArrayRegion(SignatureArr, 0, Signature.size(), reinterpret_cast<const jbyte *>(Signature.data()));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, AttestationElementsArr, SignatureArr);
+
+        env->DeleteLocalRef(AttestationElementsArr);
+        env->DeleteLocalRef(SignatureArr);
+
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        if (cppCallback != nullptr)
+        {
+            cppCallback->Cancel();
+            delete cppCallback;
+        }
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPOperationalCredentialsClusterCertificateChainResponseCallback
+    : public Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback>
+{
+public:
+    CHIPOperationalCredentialsClusterCertificateChainResponseCallback(jobject javaCallback) :
+        Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+    ~CHIPOperationalCredentialsClusterCertificateChainResponseCallback()
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+        env->DeleteGlobalRef(javaCallbackRef);
+    };
+
+    static void CallbackFn(void * context, chip::ByteSpan Certificate)
+    {
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+        jmethodID javaMethod;
+        CHIPOperationalCredentialsClusterCertificateChainResponseCallback * cppCallback = nullptr;
+        jbyteArray CertificateArr;
+
+        VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+        cppCallback = reinterpret_cast<CHIPOperationalCredentialsClusterCertificateChainResponseCallback *>(context);
+        VerifyOrExit(cppCallback != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+
+        javaCallbackRef = cppCallback->javaCallbackRef;
+        VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
+
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
+        SuccessOrExit(err);
+
+        CertificateArr = env->NewByteArray(Certificate.size());
+        VerifyOrExit(CertificateArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+        env->SetByteArrayRegion(CertificateArr, 0, Certificate.size(), reinterpret_cast<const jbyte *>(Certificate.data()));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, CertificateArr);
+
+        env->DeleteLocalRef(CertificateArr);
+
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        if (cppCallback != nullptr)
+        {
+            cppCallback->Cancel();
+            delete cppCallback;
+        }
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPOperationalCredentialsClusterNOCResponseCallback
     : public Callback::Callback<OperationalCredentialsClusterNOCResponseCallback>
 {
@@ -22065,6 +22229,100 @@ JNI_METHOD(void, OperationalCredentialsCluster, addTrustedRootCertificate)
     err = cppCluster->AddTrustedRootCertificate(
         onSuccess->Cancel(), onFailure->Cancel(),
         chip::ByteSpan((const uint8_t *) rootCertificateArr.data(), rootCertificateArr.size()));
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err.Format(), exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
+JNI_METHOD(void, OperationalCredentialsCluster, attestationRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray attestationNonce)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    OperationalCredentialsCluster * cppCluster;
+
+    JniByteArray attestationNonceArr(env, attestationNonce);
+    CHIPOperationalCredentialsClusterAttestationResponseCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<OperationalCredentialsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPOperationalCredentialsClusterAttestationResponseCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->AttestationRequest(onSuccess->Cancel(), onFailure->Cancel(),
+                                         chip::ByteSpan((const uint8_t *) attestationNonceArr.data(), attestationNonceArr.size()));
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err.Format(), exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
+JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint certificateType)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    OperationalCredentialsCluster * cppCluster;
+
+    CHIPOperationalCredentialsClusterCertificateChainResponseCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<OperationalCredentialsCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPOperationalCredentialsClusterCertificateChainResponseCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->CertificateChainRequest(onSuccess->Cancel(), onFailure->Cancel(), certificateType);
     SuccessOrExit(err);
 
 exit:
