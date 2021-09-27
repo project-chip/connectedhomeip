@@ -1748,9 +1748,15 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Device * device)
     if (commissioner->mDeviceBeingPaired < kNumMaxActiveDevices)
     {
         Device * deviceBeingPaired = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
-        if (device == deviceBeingPaired && commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
+        if (device == deviceBeingPaired && commissioner->mIsIPRendezvous)
         {
-            commissioner->AdvanceCommissioningStage(CHIP_NO_ERROR);
+            if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
+            {
+                commissioner->AdvanceCommissioningStage(CHIP_NO_ERROR);
+            }
+            // For IP rendezvous, we don't want to call commissioning complete below because IP commissioning
+            // has more steps currently.
+            return;
         }
     }
 
