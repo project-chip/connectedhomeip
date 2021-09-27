@@ -66,7 +66,7 @@ enum class MsgType : uint8_t
 };
 
 // This table comes from the IM's "Status Code Table" section from the Interaction Model spec.
-enum class ProtocolCode : uint16_t
+enum class Status : uint16_t
 {
     Success                = 0x0,
     Failure                = 0x01,

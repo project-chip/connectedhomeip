@@ -19,6 +19,7 @@
 
 #include <memory>
 
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/Linux/GlibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/introspect.h>
@@ -84,6 +85,8 @@ public:
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
 
     CHIP_ERROR _JoinerStart();
+
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
 
     ~ThreadStackManagerImpl() = default;
 

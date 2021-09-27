@@ -41,7 +41,6 @@
 
 // Code used to configure the cluster event mechanism
 #define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
-    EmberEventControl emberAfIdentifyClusterServerTickCallbackControl1;                                                            \
     EmberEventControl emberAfLevelControlClusterServerTickCallbackControl1;                                                        \
     EmberEventControl emberAfBarrierControlClusterServerTickCallbackControl1;                                                      \
     EmberEventControl emberAfIasZoneClusterServerTickCallbackControl1;                                                             \
@@ -66,10 +65,6 @@
         (*callback)(endpoint);                                                                                                     \
         /* emberAfPopNetworkIndex(); */                                                                                            \
     }                                                                                                                              \
-    void emberAfIdentifyClusterServerTickCallbackWrapperFunction1(void)                                                            \
-    {                                                                                                                              \
-        clusterTickWrapper(&emberAfIdentifyClusterServerTickCallbackControl1, emberAfIdentifyClusterServerTickCallback, 1);        \
-    }                                                                                                                              \
     void emberAfLevelControlClusterServerTickCallbackWrapperFunction1(void)                                                        \
     {                                                                                                                              \
         clusterTickWrapper(&emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallback,    \
@@ -87,8 +82,7 @@
 
 // EmberEventData structs used to populate the EmberEventData table
 #define EMBER_AF_GENERATED_EVENTS                                                                                                  \
-    { &emberAfIdentifyClusterServerTickCallbackControl1, emberAfIdentifyClusterServerTickCallbackWrapperFunction1 },               \
-        { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },   \
+    { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },       \
         { &emberAfBarrierControlClusterServerTickCallbackControl1,                                                                 \
           emberAfBarrierControlClusterServerTickCallbackWrapperFunction1 },                                                        \
         { &emberAfIasZoneClusterServerTickCallbackControl1, emberAfIasZoneClusterServerTickCallbackWrapperFunction1 },             \
@@ -102,19 +96,17 @@
         { &emberAfPluginReportingTickEventControl, emberAfPluginReportingTickEventHandler },
 
 #define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
-    "Identify Cluster Server EP 1", "Level Control Cluster Server EP 1", "Barrier Control Cluster Server EP 1",                    \
-        "IAS Zone Cluster Server EP 1", "Color Control Cluster Server Plugin HueSatTransition",                                    \
-        "Color Control Cluster Server Plugin TempTransition", "Color Control Cluster Server Plugin XyTransition",                  \
-        "Door Lock Server Cluster Plugin Lockout", "Door Lock Server Cluster Plugin Relock", "IAS Zone Server Plugin ManageQueue", \
-        "Reporting Plugin Tick",
+    "Level Control Cluster Server EP 1", "Barrier Control Cluster Server EP 1", "IAS Zone Cluster Server EP 1",                    \
+        "Color Control Cluster Server Plugin HueSatTransition", "Color Control Cluster Server Plugin TempTransition",              \
+        "Color Control Cluster Server Plugin XyTransition", "Door Lock Server Cluster Plugin Lockout",                             \
+        "Door Lock Server Cluster Plugin Relock", "IAS Zone Server Plugin ManageQueue", "Reporting Plugin Tick",
 
 // The length of the event context table used to track and retrieve cluster events
-#define EMBER_AF_EVENT_CONTEXT_LENGTH 4
+#define EMBER_AF_EVENT_CONTEXT_LENGTH 3
 
 // EmberAfEventContext structs used to populate the EmberAfEventContext table
 #define EMBER_AF_GENERATED_EVENT_CONTEXT                                                                                           \
-    { 0x1, 0x3, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfIdentifyClusterServerTickCallbackControl1 },              \
-        { 0x1, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },      \
+    { 0x1, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },          \
         { 0x1, 0x103, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfBarrierControlClusterServerTickCallbackControl1 },  \
     {                                                                                                                              \
         0x1, 0x500, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfIasZoneClusterServerTickCallbackControl1              \

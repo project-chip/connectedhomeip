@@ -109,7 +109,7 @@ void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apCo
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
     err = aWriteHandler.AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                               Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
+                                               Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::Success);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -262,7 +262,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
         AttributePathParams(aClusterInfo.mNodeId, aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId,
                             aClusterInfo.mListIndex, AttributePathParams::Flags::kFieldIdValid),
         Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
-        Protocols::InteractionModel::ProtocolCode::Success);
+        Protocols::InteractionModel::Status::Success);
 }
 
 class RoundtripDelegate : public chip::app::InteractionModelDelegate

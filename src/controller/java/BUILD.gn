@@ -60,6 +60,8 @@ shared_library("jni") {
 android_library("java") {
   output_name = "CHIPController.jar"
 
+  deps = [ ":android" ]
+
   data_deps = [
     ":jni",
     "${chip_root}/build/chip/java:shared_cpplib",
@@ -85,4 +87,8 @@ android_library("java") {
 
   # TODO: add classpath support (we likely need to add something like
   #  ..../platforms/android-21/android.jar to access BLE items)
+}
+
+java_prebuilt("android") {
+  jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
 }

@@ -26,7 +26,7 @@ void ReportCommandUnsupported(Command * aCommandObj, EndpointId aEndpointId, Clu
                                                        aCommandId,
                                                        (CommandPathFlags::kEndpointIdValid) };
     aCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
-        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
+        Protocols::InteractionModel::Status::UnsupportedCommand);
     ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandId), ChipLogValueMEI(aClusterId));
 }
 } // anonymous namespace
@@ -78,7 +78,7 @@ void Dispatch{{asUpperCamelCase side}}Command({{#if (isServer side)}}CommandHand
                                                        aCommandId,
                                                        (CommandPathFlags::kEndpointIdValid) };
       apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest, Protocols::SecureChannel::Id,
-        Protocols::InteractionModel::ProtocolCode::InvalidCommand);
+        Protocols::InteractionModel::Status::InvalidCommand);
       ChipLogProgress(Zcl, "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32, validArgumentCount, expectArgumentCount, TLVError.Format(), TLVUnpackError.Format(), currentDecodeTagId);
       // A command with no arguments would never write currentDecodeTagId.  If
       // progress logging is also disabled, it would look unused.  Silence that
@@ -123,7 +123,7 @@ void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, En
                                                        aCommandId,
                                                        (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
-                                    Protocols::InteractionModel::ProtocolCode::InvalidCommand);
+                                    Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogError(Zcl, "Unknown cluster %" PRIx32, aClusterId);
         break;
     }
@@ -157,7 +157,7 @@ void DispatchSingleClusterResponseCommand(ClusterId aClusterId, CommandId aComma
                                                        aCommandId,
                                                        (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
-                                    Protocols::InteractionModel::ProtocolCode::InvalidCommand);
+                                    Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aClusterId));
         break;
     }

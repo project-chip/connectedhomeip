@@ -73,11 +73,11 @@ CHIP_ERROR StatusResponse::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR StatusResponse::Parser::GetStatus(Protocols::InteractionModel::ProtocolCode & aStatus) const
+CHIP_ERROR StatusResponse::Parser::GetStatus(Protocols::InteractionModel::Status & aStatus) const
 {
     uint16_t status = 0;
     CHIP_ERROR err  = GetUnsignedInteger(kCsTag_Status, &status);
-    aStatus         = static_cast<Protocols::InteractionModel::ProtocolCode>(status);
+    aStatus         = static_cast<Protocols::InteractionModel::Status>(status);
     return err;
 }
 
@@ -86,12 +86,12 @@ CHIP_ERROR StatusResponse::Builder::Init(TLV::TLVWriter * const apWriter)
     return InitAnonymousStructure(apWriter);
 }
 
-StatusResponse::Builder & StatusResponse::Builder::Status(const Protocols::InteractionModel::ProtocolCode aStatus)
+StatusResponse::Builder & StatusResponse::Builder::Status(const Protocols::InteractionModel::Status aStatus)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(kCsTag_Status), to_underlying(aStatus));
+        mError = mpWriter->Put(TLV::ContextTag(kCsTag_Status), aStatus);
     }
     EndOfContainer();
     return *this;

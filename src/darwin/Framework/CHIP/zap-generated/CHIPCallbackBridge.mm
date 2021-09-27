@@ -275,6 +275,16 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, @ { @"value" : array });
 };
 
+void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, uint8_t * entries)
+{
+    id array = [NSMutableArray arrayWithCapacity:count];
+    for (uint16_t i = 0; i < count; i++) {
+        array[i] = [NSNumber numberWithUnsignedChar:entries[i]];
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
 void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, _TvChannelInfo * entries)
 {
     id array = [NSMutableArray arrayWithCapacity:count];
@@ -396,7 +406,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSu
     for (uint16_t i = 0; i < count; i++) {
         array[i] = @ {
             @"RotationTime" : [NSNumber numberWithUnsignedShort:entries[i].RotationTime],
-            @"Flags" : [NSNumber numberWithUnsignedChar:entries[i].Flags],
+            @"Flags" : [NSNumber numberWithUnsignedShort:entries[i].Flags],
         };
     }
 

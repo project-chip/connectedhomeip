@@ -136,7 +136,8 @@ function asReadType(type)
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
   'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/Off', 'Level Control', 'Color Control', 'IAS Zone',
-  'Pump Configuration and Control', 'Ethernet Network Diagnostics', 'Software Diagnostics'
+  'Pump Configuration and Control', 'Ethernet Network Diagnostics', 'Software Diagnostics', 'Thread Network Diagnostics',
+  'General Diagnostics'
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];

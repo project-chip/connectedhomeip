@@ -427,7 +427,7 @@ void MdnsServer::StartServer(chip::Mdns::CommissioningMode mode)
 
     if (HaveOperationalCredentials())
     {
-        ChipLogError(Discovery, "Have operational credentials");
+        ChipLogProgress(Discovery, "Have operational credentials");
         if (mode != chip::Mdns::CommissioningMode::kDisabled)
         {
             err = AdvertiseCommissionableNode(mode);

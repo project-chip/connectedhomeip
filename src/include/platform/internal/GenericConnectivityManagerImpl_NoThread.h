@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <lib/core/CHIPTLV.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -54,6 +56,7 @@ protected:
     bool _IsThreadProvisioned(void);
     void _ErasePersistentInfo(void);
     bool _HaveServiceConnectivityViaThread(void);
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
@@ -129,6 +132,14 @@ template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_HaveServiceConnectivityViaThread(void)
 {
     return false;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_NoThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
+                                                                                                TLV::TLVWriter * aWriter)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace Internal
