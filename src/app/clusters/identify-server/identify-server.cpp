@@ -183,7 +183,7 @@ static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appS
         if (EMBER_ZCL_STATUS_SUCCESS == Clusters::Identify::Attributes::GetIdentifyTime(endpoint, &identifyTime) &&
             0 != identifyTime)
         {
-            identifyTime = identifyTime == 0 ? 0 : identifyTime - 1;
+            identifyTime = static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1);
             // This tick writes the new attribute, which will trigger the Attribute
             // Changed callback below, which in turn will schedule or cancel the tick.
             // Because of this, the tick does not have to be scheduled here.
