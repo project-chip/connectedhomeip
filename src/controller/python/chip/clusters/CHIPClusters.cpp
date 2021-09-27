@@ -4049,6 +4049,25 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_AddTr
     cluster.Associate(device, ZCLendpointId);
     return cluster.AddTrustedRootCertificate(nullptr, nullptr, chip::ByteSpan(rootCertificate, rootCertificate_Len)).AsInteger();
 }
+chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_AttestationRequest(chip::Controller::Device * device,
+                                                                                              chip::EndpointId ZCLendpointId,
+                                                                                              chip::GroupId,
+                                                                                              const uint8_t * attestationNonce,
+                                                                                              uint32_t attestationNonce_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.AttestationRequest(nullptr, nullptr, chip::ByteSpan(attestationNonce, attestationNonce_Len)).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_CertificateChainRequest(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint8_t certificateType)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.CertificateChainRequest(nullptr, nullptr, certificateType).AsInteger();
+}
 chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(chip::Controller::Device * device,
                                                                                         chip::EndpointId ZCLendpointId,
                                                                                         chip::GroupId, const uint8_t * cSRNonce,

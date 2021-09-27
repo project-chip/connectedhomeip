@@ -55,7 +55,6 @@ protected:
     bool _IsThreadAttached(void);
     bool _IsThreadProvisioned(void);
     void _ErasePersistentInfo(void);
-    bool _HaveServiceConnectivityViaThread(void);
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
@@ -126,12 +125,6 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThread
     const ConnectivityManager::ThreadPollingConfig & pollingConfig)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_HaveServiceConnectivityViaThread(void)
-{
-    return false;
 }
 
 template <class ImplClass>

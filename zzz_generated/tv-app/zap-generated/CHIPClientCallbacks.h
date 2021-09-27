@@ -53,6 +53,9 @@ typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(v
                                                                                uint8_t * debugText);
 typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
                                                                              uint8_t * debugText);
+typedef void (*OperationalCredentialsClusterAttestationResponseCallback)(void * context, chip::ByteSpan AttestationElements,
+                                                                         chip::ByteSpan Signature);
+typedef void (*OperationalCredentialsClusterCertificateChainResponseCallback)(void * context, chip::ByteSpan Certificate);
 typedef void (*OperationalCredentialsClusterNOCResponseCallback)(void * context, uint8_t StatusCode, uint8_t FabricIndex,
                                                                  chip::ByteSpan DebugText);
 typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan NOCSRElements,

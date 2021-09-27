@@ -57,15 +57,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init(void)
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
-{
-    return false;
-}
-
-bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
-{
-    return false;
-}
 
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {

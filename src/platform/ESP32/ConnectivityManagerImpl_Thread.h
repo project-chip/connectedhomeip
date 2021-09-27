@@ -60,9 +60,6 @@ private:
 
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-    bool _HaveIPv4InternetConnectivity(void);
-    bool _HaveIPv6InternetConnectivity(void);
-    bool _HaveServiceConnectivity(void);
     // ===== Members for internal use by the following friends.
 
     friend ConnectivityManager & ConnectivityMgr(void);
@@ -70,21 +67,6 @@ private:
 
     static ConnectivityManagerImpl sInstance;
 };
-
-inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
-{
-    return HaveServiceConnectivityViaThread();
-}
-
-inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
-{
-    return false;
-}
-
-inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
-{
-    return false;
-}
 
 /**
  * Returns the public interface of the ConnectivityManager singleton object.

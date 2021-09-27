@@ -4468,6 +4468,22 @@
           "enabled": 1,
           "commands": [
             {
+              "name": "AttestationRequest",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "CertificateChainRequest",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
               "name": "OpCSRRequest",
               "code": 4,
               "mfgCode": null,
@@ -4550,6 +4566,22 @@
           "side": "server",
           "enabled": 0,
           "commands": [
+            {
+              "name": "AttestationResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "CertificateChainResponse",
+              "code": 3,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
             {
               "name": "OpCSRResponse",
               "code": 5,

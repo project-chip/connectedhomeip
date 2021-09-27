@@ -32,6 +32,8 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 
@@ -175,6 +177,9 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
                 return;
             }
         }
+
+        // Initialize device attestation verifier
+        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());
 
         chip::Controller::CommissionerInitParams params;
 

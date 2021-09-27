@@ -3957,6 +3957,15 @@ public class ChipClusters {
       addTrustedRootCertificate(chipClusterPtr, callback, rootCertificate);
     }
 
+    public void attestationRequest(AttestationResponseCallback callback, byte[] attestationNonce) {
+      attestationRequest(chipClusterPtr, callback, attestationNonce);
+    }
+
+    public void certificateChainRequest(
+        CertificateChainResponseCallback callback, int certificateType) {
+      certificateChainRequest(chipClusterPtr, callback, certificateType);
+    }
+
     public void opCSRRequest(OpCSRResponseCallback callback, byte[] cSRNonce) {
       opCSRRequest(chipClusterPtr, callback, cSRNonce);
     }
@@ -3990,6 +3999,12 @@ public class ChipClusters {
     private native void addTrustedRootCertificate(
         long chipClusterPtr, DefaultClusterCallback callback, byte[] rootCertificate);
 
+    private native void attestationRequest(
+        long chipClusterPtr, AttestationResponseCallback callback, byte[] attestationNonce);
+
+    private native void certificateChainRequest(
+        long chipClusterPtr, CertificateChainResponseCallback callback, int certificateType);
+
     private native void opCSRRequest(
         long chipClusterPtr, OpCSRResponseCallback callback, byte[] cSRNonce);
 
@@ -4004,6 +4019,18 @@ public class ChipClusters {
 
     private native void updateNOC(
         long chipClusterPtr, NOCResponseCallback callback, byte[] nOCValue, byte[] iCACValue);
+
+    public interface AttestationResponseCallback {
+      void onSuccess(byte[] AttestationElements, byte[] Signature);
+
+      void onError(Exception error);
+    }
+
+    public interface CertificateChainResponseCallback {
+      void onSuccess(byte[] Certificate);
+
+      void onError(Exception error);
+    }
 
     public interface NOCResponseCallback {
       void onSuccess(int StatusCode, int FabricIndex, byte[] DebugText);

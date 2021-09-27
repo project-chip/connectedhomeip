@@ -392,16 +392,6 @@ BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>:
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
 std::mutex ConnectivityManagerImpl::mWpaSupplicantMutex;
 
-bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity()
-{
-    return mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
-}
-
-bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity()
-{
-    return mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
-}
-
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode()
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
