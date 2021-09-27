@@ -45,7 +45,7 @@ public:
     {
         // The endpoint to which a GroupId is mapped.
         EndpointId endpoint;
-        // The GroupId, which, when received in a message will map the the `endpoint`.
+        // The GroupId, which, when received in a message will map to the `endpoint`.
         GroupId group;
 
         bool operator==(const GroupMapping & other) { return this->endpoint == other.endpoint && this->group == other.group; }
@@ -63,22 +63,12 @@ public:
     // A group state maps the group key set to use for encryption/decryption for a given group ID.
     struct GroupState
     {
-        chip::GroupId group;
-        uint16_t key_set_index;
-
-        bool operator==(const GroupState & other)
-        {
-            return this->group == other.group && this->key_set_index == other.key_set_index;
-        }
-    };
-
-    // A group state list entry has the data for a list read operation, including during iteration.
-    struct GroupStateListEntry : public GroupState
-    {
         // Fabric Index associated with the group state entry's fabric scoping
         chip::FabricIndex fabric_index;
-        // Positional index within the overall list.
-        uint16_t list_index;
+        // Identifies the group within the scope of the given fabric
+        chip::GroupId group;
+        // References the set of group keys that generate operationa group keys for use with the given group
+        uint16_t key_set_index;
     };
 
     // A operational group key set, usable by many GroupState mappings
@@ -126,8 +116,8 @@ public:
         virtual ~GroupStateIterator() = default;
         // Returns the number of entries in total that will be iterated.
         virtual uint16_t Count() = 0;
-        // Returns true if a GroupStateListEntry is found in the iteration.
-        virtual bool Next(GroupStateListEntry & outEntry) = 0;
+        // Returns true if a GroupState is found in the iteration.
+        virtual bool Next(GroupState & outEntry) = 0;
         // Release the memory allocated by this iterator, if any. Must be called before
         // losing scope of a `GroupStateIterator *`
         virtual void Release() = 0;
@@ -165,16 +155,16 @@ public:
         /**
          *  Listener callback invoked when a GroupState entry is mutated or added.
          *
-         *  @param[in] old_state  GroupStateListEntry reflecting the previous entry. Set to nullptr on appends.
-         *  @param[in] new_state  GroupStateListEntry reflecting the updated/new entry.
+         *  @param[in] old_state  GroupState reflecting the previous entry. Set to nullptr on appends.
+         *  @param[in] new_state  GroupState reflecting the updated/new entry.
          */
-        virtual void OnGroupStateChanged(const GroupStateListEntry * old_state, const GroupStateListEntry * new_state) = 0;
+        virtual void OnGroupStateChanged(const GroupState * old_state, const GroupState * new_state) = 0;
         /**
          *  Listener callback invoked when a GroupState entry is removed from the Groups list.
          *
-         *  @param[in] removed_state  Copy of GroupStateListEntry that was just removed. Index included is no longer accessible.
+         *  @param[in] removed_state  Copy of GroupState that was just removed. Index included is no longer accessible.
          */
-        virtual void OnGroupStateRemoved(const GroupStateListEntry * removed_state) = 0;
+        virtual void OnGroupStateRemoved(const GroupState * removed_state) = 0;
     };
 
     GroupDataProvider()          = default;
@@ -198,15 +188,15 @@ public:
     virtual bool GroupMappingExists(chip::FabricIndex fabric_index, GroupMapping & mapping)                       = 0;
     virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, GroupMapping & mapping, const char * name) = 0;
     virtual CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, GroupMapping & mapping)                 = 0;
-    virtual CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint)                = 0;
+    virtual CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index)                                     = 0;
     virtual GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint)      = 0;
 
     // States
-    virtual CHIP_ERROR SetGroupState(chip::FabricIndex fabric_index, uint16_t state_index, const GroupState & state)    = 0;
-    virtual CHIP_ERROR GetGroupState(chip::FabricIndex fabric_index, uint16_t state_index, GroupStateListEntry & state) = 0;
-    virtual CHIP_ERROR RemoveGroupState(chip::FabricIndex fabric_index, uint16_t state_index)                           = 0;
-    virtual GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric_index)                                     = 0;
-    virtual GroupStateIterator * IterateGroupStates()                                                                   = 0;
+    virtual CHIP_ERROR SetGroupState(uint16_t state_index, const GroupState & state) = 0;
+    virtual CHIP_ERROR GetGroupState(uint16_t state_index, GroupState & state)       = 0;
+    virtual CHIP_ERROR RemoveGroupState(uint16_t state_index)                        = 0;
+    virtual GroupStateIterator * IterateGroupStates()                                = 0;
+    virtual GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric_index)  = 0;
 
     // Keys
     virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, KeySet & keys)             = 0;

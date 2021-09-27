@@ -2506,7 +2506,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of GroupState entries to support per fabric
  */
 #ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 5
+#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 1
 #endif
 
 // TODO: Need to cap number of KeySets
@@ -2519,7 +2519,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of GroupMapping entries per fabric
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 8
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
 #endif
 
 /**
@@ -2530,7 +2530,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Number of iterator instances that can be allocated at any one time
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
-#define CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS 4
+#define CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS 2
 #endif
 
 /**

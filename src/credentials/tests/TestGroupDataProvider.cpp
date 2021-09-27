@@ -97,7 +97,7 @@ void TestEndpoints(nlTestSuite * apSuite, void * apContext)
     exists = groups->GroupMappingExists(kFabricIndex1, group1c);
     NL_TEST_ASSERT(apSuite, exists);
 
-    err = groups->RemoveAllGroupMappings(kFabricIndex1, 1);
+    err = groups->RemoveAllGroupMappings(kFabricIndex1);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     exists = groups->GroupMappingExists(kFabricIndex1, group1a);
@@ -167,7 +167,7 @@ void TestEndpoints(nlTestSuite * apSuite, void * apContext)
     exists = groups->GroupMappingExists(kFabricIndex2, group1c);
     NL_TEST_ASSERT(apSuite, exists);
 
-    err = groups->RemoveAllGroupMappings(kFabricIndex2, 1);
+    err = groups->RemoveAllGroupMappings(kFabricIndex2);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     exists = groups->GroupMappingExists(kFabricIndex2, group1a);
@@ -264,39 +264,33 @@ void TestStates(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, groups);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == groups->Init());
 
-    GroupDataProvider::GroupState state0a = { .group = 1, .key_set_index = 1 };
+    GroupDataProvider::GroupState state0a = { .fabric_index = 1, .group = 1, .key_set_index = 1 };
 
-    GroupDataProvider::GroupStateListEntry state0b{};
-    state0b.group         = 10;
-    state0b.key_set_index = 11;
+    GroupDataProvider::GroupState state0b = { .fabric_index = 0, .group = 10, .key_set_index = 11 };
 
-    GroupDataProvider::GroupState state1a = { .group = 1, .key_set_index = 2 };
-    GroupDataProvider::GroupStateListEntry state1b{};
-    state1b.group         = 10;
-    state1b.key_set_index = 12;
+    GroupDataProvider::GroupState state1a = { .fabric_index = 1, .group = 1, .key_set_index = 2 };
+    GroupDataProvider::GroupState state1b = { .fabric_index = 0, .group = 10, .key_set_index = 12 };
 
-    GroupDataProvider::GroupStateListEntry state3b{};
-    state3b.group         = 10;
-    state3b.key_set_index = 13;
+    GroupDataProvider::GroupState state3b = { .fabric_index = 0, .group = 10, .key_set_index = 13 };
+    state3b.group                         = 10;
+    state3b.key_set_index                 = 13;
 
-    GroupDataProvider::GroupState state4a = { .group = 5, .key_set_index = 3 };
-    GroupDataProvider::GroupStateListEntry state4b{};
-    state1b.group         = 10;
-    state1b.key_set_index = 14;
+    GroupDataProvider::GroupState state4a = { .fabric_index = 1, .group = 5, .key_set_index = 3 };
+    GroupDataProvider::GroupState state4b = { .fabric_index = 0, .group = 10, .key_set_index = 14 };
 
     chip::FabricIndex fabric_index = 1;
     CHIP_ERROR err                 = CHIP_NO_ERROR;
 
     // First append
-    err = groups->SetGroupState(fabric_index, 0, state0a);
+    err = groups->SetGroupState(0, state0a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     // Second append
-    err = groups->SetGroupState(fabric_index, 1, state1a);
+    err = groups->SetGroupState(1, state1a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     // Attempt to set past the append slot
-    err = groups->SetGroupState(fabric_index, 3, state0a);
+    err = groups->SetGroupState(3, state0a);
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_ARGUMENT == err);
 
     auto * it = groups->IterateGroupStates(fabric_index);
@@ -305,74 +299,67 @@ void TestStates(nlTestSuite * apSuite, void * apContext)
     it->Release();
     it = nullptr;
 
-    err = groups->GetGroupState(fabric_index, 0, state0b);
+    err = groups->GetGroupState(0, state0b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state0a.group == state0b.group);
     NL_TEST_ASSERT(apSuite, state0a.key_set_index == state0b.key_set_index);
     NL_TEST_ASSERT(apSuite, fabric_index == state0b.fabric_index);
-    NL_TEST_ASSERT(apSuite, 0 == state0b.list_index);
 
-    err = groups->GetGroupState(fabric_index, 1, state1b);
+    err = groups->GetGroupState(1, state1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state1a.group == state1b.group);
     NL_TEST_ASSERT(apSuite, state1a.key_set_index == state1b.key_set_index);
     NL_TEST_ASSERT(apSuite, fabric_index == state1b.fabric_index);
-    NL_TEST_ASSERT(apSuite, 1 == state1b.list_index);
 
-    err = groups->GetGroupState(fabric_index, 2, state3b);
+    err = groups->GetGroupState(2, state3b);
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == err);
 
-    err = groups->RemoveGroupState(fabric_index, 0);
+    err = groups->RemoveGroupState(0);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     // Entry 1 should remain, now at slot 0
     state1b.group         = 10;
     state1b.key_set_index = 12;
-    state1b.list_index    = 13;
     state1b.fabric_index  = 14;
-    err                   = groups->GetGroupState(fabric_index, 0, state1b);
+    err                   = groups->GetGroupState(0, state1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state1a.group == state1b.group);
     NL_TEST_ASSERT(apSuite, state1a.key_set_index == state1b.key_set_index);
-    NL_TEST_ASSERT(apSuite, 0 == state1b.list_index);
     NL_TEST_ASSERT(apSuite, fabric_index == state1b.fabric_index);
 
     state1b.group         = 10;
     state1b.key_set_index = 12;
-    state1b.list_index    = 13;
     state1b.fabric_index  = 14;
-    err                   = groups->GetGroupState(fabric_index, 1, state1b);
+    err                   = groups->GetGroupState(1, state1b);
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == err);
 
-    err = groups->RemoveGroupState(fabric_index, 0);
+    err = groups->RemoveGroupState(0);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->GetGroupState(fabric_index, 0, state1b);
+    err = groups->GetGroupState(0, state1b);
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == err);
 
     // Test Override
 
-    fabric_index = 3;
-
-    err = groups->SetGroupState(fabric_index, 0, state0a);
+    err = groups->SetGroupState(0, state0a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->SetGroupState(fabric_index, 0, state4a);
+    err = groups->SetGroupState(0, state4a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->GetGroupState(fabric_index, 0, state4b);
+    err = groups->GetGroupState(0, state4b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state4a.group == state4b.group);
     NL_TEST_ASSERT(apSuite, state4a.key_set_index == state4b.key_set_index);
-    NL_TEST_ASSERT(apSuite, fabric_index == state4b.fabric_index);
-    NL_TEST_ASSERT(apSuite, 0 == state4b.list_index);
+    NL_TEST_ASSERT(apSuite, state4a.fabric_index == state4b.fabric_index);
 
     // Incorrect fabric
 
-    err = groups->SetGroupState(1, 0, state4a);
+    state4a.fabric_index = 3;
+    err                  = groups->SetGroupState(0, state4a);
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_ACCESS_DENIED == err);
 
-    err = groups->RemoveGroupState(fabric_index, 0);
+    err = groups->RemoveGroupState(0);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     groups->Finish();
@@ -385,24 +372,24 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
 
     chip::FabricIndex kFabricIndex1      = 1;
     chip::FabricIndex kFabricIndex2      = 2;
-    GroupDataProvider::GroupState state0 = { .group = 1, .key_set_index = 1 }; // Fabric1
-    GroupDataProvider::GroupState state1 = { .group = 2, .key_set_index = 1 }; // Fabric1
-    GroupDataProvider::GroupState state2 = { .group = 2, .key_set_index = 2 }; // Fabric2
-    GroupDataProvider::GroupState state3 = { .group = 3, .key_set_index = 1 }; // Fabric1
+    GroupDataProvider::GroupState state0 = { .fabric_index = kFabricIndex1, .group = 1, .key_set_index = 1 }; // Fabric1
+    GroupDataProvider::GroupState state1 = { .fabric_index = kFabricIndex1, .group = 2, .key_set_index = 1 }; // Fabric1
+    GroupDataProvider::GroupState state2 = { .fabric_index = kFabricIndex2, .group = 2, .key_set_index = 2 }; // Fabric2
+    GroupDataProvider::GroupState state3 = { .fabric_index = kFabricIndex1, .group = 3, .key_set_index = 1 }; // Fabric1
     CHIP_ERROR err                       = CHIP_NO_ERROR;
 
     NL_TEST_ASSERT(apSuite, groups);
 
-    err = groups->SetGroupState(kFabricIndex1, 0, state0);
+    err = groups->SetGroupState(0, state0);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->SetGroupState(kFabricIndex1, 1, state1);
+    err = groups->SetGroupState(1, state1);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->SetGroupState(kFabricIndex2, 2, state2);
+    err = groups->SetGroupState(2, state2);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->SetGroupState(kFabricIndex1, 3, state3);
+    err = groups->SetGroupState(3, state3);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     {
@@ -413,12 +400,10 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
         uint16_t count1 = it->Count();
         uint16_t count2 = 0;
         NL_TEST_ASSERT(apSuite, 3 == count1);
-        GroupDataProvider::GroupStateListEntry state;
+        GroupDataProvider::GroupState state;
         while (it->Next(state))
         {
             NL_TEST_ASSERT(apSuite, (state.group > 0 && state.group < 4) && (state.key_set_index == 1));
-            // List index must be fabric-relative (no gaps)
-            NL_TEST_ASSERT(apSuite, (state.list_index == count2));
             NL_TEST_ASSERT(apSuite, (state.fabric_index == kFabricIndex1));
             count2++;
         }
@@ -434,11 +419,10 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
 
         uint16_t count1 = it->Count();
         NL_TEST_ASSERT(apSuite, 1 == count1);
-        GroupDataProvider::GroupStateListEntry state;
+        GroupDataProvider::GroupState state;
         NL_TEST_ASSERT(apSuite, it->Next(state));
 
         NL_TEST_ASSERT(apSuite, (state.group > 0 && state.group < 4) && (state.key_set_index == 2));
-        NL_TEST_ASSERT(apSuite, (state.list_index == 0));
         NL_TEST_ASSERT(apSuite, (state.fabric_index == kFabricIndex2));
 
         NL_TEST_ASSERT(apSuite, !it->Next(state));
@@ -455,13 +439,11 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
         uint16_t count1 = it->Count();
         uint16_t count2 = 0;
         NL_TEST_ASSERT(apSuite, 4 == count1);
-        GroupDataProvider::GroupStateListEntry state;
+        GroupDataProvider::GroupState state;
         while (it->Next(state))
         {
             NL_TEST_ASSERT(apSuite, (state.fabric_index == kFabricIndex1 || state.fabric_index == kFabricIndex2));
             NL_TEST_ASSERT(apSuite, (state.group > 0 && state.group < 4) && (state.key_set_index == 1 || state.key_set_index == 2));
-            // List index must be fabric-relative (no gaps)
-            NL_TEST_ASSERT(apSuite, (state.list_index == count2));
             count2++;
         }
         NL_TEST_ASSERT(apSuite, count2 == count1);
@@ -524,7 +506,6 @@ void TestKeys(nlTestSuite * apSuite, void * apContext)
     err = groups->GetKeySet(kFabricIndex, keys0b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, keys0a.policy == keys0b.policy);
-    // TODO: Make sure we have `num_keys_used` handled properly
     NL_TEST_ASSERT(apSuite, keys0a.num_keys_used == keys0b.num_keys_used);
     NL_TEST_ASSERT(apSuite, !memcmp(keys0a.epoch_keys, keys0b.epoch_keys, sizeof(keys0a.epoch_keys[0]) * keys0a.num_keys_used));
 
