@@ -136,7 +136,8 @@ function asReadType(type)
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
   'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/Off', 'Level Control', 'Color Control', 'IAS Zone',
-  'Pump Configuration and Control'
+  'Pump Configuration and Control', 'Ethernet Network Diagnostics', 'Software Diagnostics', 'Thread Network Diagnostics',
+  'General Diagnostics'
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
@@ -335,22 +336,16 @@ function asMEI(prefix, suffix)
   return cHelper.asHex((prefix << 16) + suffix, 8);
 }
 
-function asTestSuiteSimulatedClusterCommandPartial(label)
-{
-  return "TestSuiteHelper_" + asUpperCamelCase(label)
-}
-
 //
 // Module exports
 //
-exports.asPrintFormat                             = asPrintFormat;
-exports.asReadType                                = asReadType;
-exports.asReadTypeLength                          = asReadTypeLength;
-exports.chip_endpoint_generated_functions         = chip_endpoint_generated_functions
-exports.chip_endpoint_cluster_list                = chip_endpoint_cluster_list
-exports.asTypeLiteralSuffix                       = asTypeLiteralSuffix;
-exports.asLowerCamelCase                          = asLowerCamelCase;
-exports.asUpperCamelCase                          = asUpperCamelCase;
-exports.hasSpecificAttributes                     = hasSpecificAttributes;
-exports.asMEI                                     = asMEI;
-exports.asTestSuiteSimulatedClusterCommandPartial = asTestSuiteSimulatedClusterCommandPartial;
+exports.asPrintFormat                     = asPrintFormat;
+exports.asReadType                        = asReadType;
+exports.asReadTypeLength                  = asReadTypeLength;
+exports.chip_endpoint_generated_functions = chip_endpoint_generated_functions
+exports.chip_endpoint_cluster_list        = chip_endpoint_cluster_list
+exports.asTypeLiteralSuffix               = asTypeLiteralSuffix;
+exports.asLowerCamelCase                  = asLowerCamelCase;
+exports.asUpperCamelCase                  = asUpperCamelCase;
+exports.hasSpecificAttributes             = hasSpecificAttributes;
+exports.asMEI                             = asMEI;

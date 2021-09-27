@@ -18,8 +18,7 @@
 #pragma once
 
 #include <app/server/AppDelegate.h>
-#include <app/server/CommissionManager.h>
-#include <app/server/RendezvousServer.h>
+#include <app/server/CommissioningWindowManager.h>
 #include <inet/InetConfig.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
@@ -29,7 +28,7 @@
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <transport/FabricTable.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/TransportMgrBase.h>
 #include <transport/raw/BLE.h>
@@ -62,28 +61,24 @@ public:
 
     CHIP_ERROR AddTestCommissioning();
 
-    void SetFabricIndex(FabricIndex id) { mFabricIndex = id; }
-
     Transport::FabricTable & GetFabricTable() { return mFabrics; }
 
-    Messaging::ExchangeManager & GetExchangManager() { return mExchangeMgr; }
+    Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
     SessionIDAllocator & GetSessionIDAllocator() { return mSessionIDAllocator; }
 
-    SecureSessionMgr & GetSecureSessionManager() { return mSessions; }
-
-    RendezvousServer & GetRendezvousServer() { return mRendezvousServer; }
+    SessionManager & GetSecureSessionManager() { return mSessions; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
-    CommissionManager & GetCommissionManager() { return mCommissionManager; }
+    CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
     void Shutdown();
 
     static Server & GetInstance() { return sServer; }
 
 private:
-    Server() : mCommissionManager(this) {}
+    Server() : mCommissioningWindowManager(this) {}
 
     static Server sServer;
 
@@ -91,20 +86,23 @@ private:
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
         {
-            ChipLogProgress(AppServer, "Retrieved value from server storage.");
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size));
+            ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
+            return CHIP_NO_ERROR;
         }
 
         CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
         {
-            ChipLogProgress(AppServer, "Stored value in server storage");
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size));
+            ChipLogProgress(AppServer, "Saved into server storage: %s", key);
+            return CHIP_NO_ERROR;
         }
 
         CHIP_ERROR SyncDeleteKeyValue(const char * key) override
         {
-            ChipLogProgress(AppServer, "Delete value in server storage");
-            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key));
+            ChipLogProgress(AppServer, "Deleted from server storage: %s", key);
+            return CHIP_NO_ERROR;
         }
     };
 
@@ -116,8 +114,7 @@ private:
     AppDelegate * mAppDelegate = nullptr;
 
     ServerTransportMgr mTransports;
-    SecureSessionMgr mSessions;
-    RendezvousServer mRendezvousServer;
+    SessionManager mSessions;
     CASEServer mCASEServer;
     Messaging::ExchangeManager mExchangeMgr;
     Transport::FabricTable mFabrics;
@@ -129,12 +126,11 @@ private:
     SecurePairingUsingTestSecret mTestPairing;
 
     ServerStorageDelegate mServerStorage;
-    CommissionManager mCommissionManager;
+    CommissioningWindowManager mCommissioningWindowManager;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;
     uint16_t mUnsecuredServicePort;
-    FabricIndex mFabricIndex;
 };
 
 } // namespace chip

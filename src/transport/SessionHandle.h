@@ -17,11 +17,16 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
+#include <lib/core/NodeId.h>
+#include <lib/core/Optional.h>
+#include <transport/FabricTable.h>
 #include <transport/UnauthenticatedSessionTable.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 
-class SecureSessionMgr;
+class SessionManager;
 
 class SessionHandle
 {
@@ -32,11 +37,11 @@ public:
         mPeerNodeId(kPlaceholderNodeId), mFabric(Transport::kUndefinedFabricIndex), mUnauthenticatedSessionHandle(session)
     {}
 
-    SessionHandle(NodeId peerNodeId, uint16_t localKeyId, uint16_t peerKeyId, FabricIndex fabric) :
+    SessionHandle(NodeId peerNodeId, uint16_t localSessionId, uint16_t peerSessionId, FabricIndex fabric) :
         mPeerNodeId(peerNodeId), mFabric(fabric)
     {
-        mLocalKeyId.SetValue(localKeyId);
-        mPeerKeyId.SetValue(peerKeyId);
+        mLocalSessionId.SetValue(localSessionId);
+        mPeerSessionId.SetValue(peerSessionId);
     }
 
     bool IsSecure() const { return !mUnauthenticatedSessionHandle.HasValue(); }
@@ -48,14 +53,14 @@ public:
     bool operator==(const SessionHandle & that) const
     {
         // TODO: Temporarily keep the old logic, check why only those two fields are used in comparison.
-        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
+        return mPeerNodeId == that.mPeerNodeId && mPeerSessionId == that.mPeerSessionId;
     }
 
     bool MatchIncomingSession(const SessionHandle & that) const
     {
         if (IsSecure())
         {
-            return that.IsSecure() && mLocalKeyId.Value() == that.mLocalKeyId.Value();
+            return that.IsSecure() && mLocalSessionId.Value() == that.mLocalSessionId.Value();
         }
         else
         {
@@ -64,18 +69,23 @@ public:
     }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
-    const Optional<uint16_t> & GetPeerKeyId() const { return mPeerKeyId; }
-    const Optional<uint16_t> & GetLocalKeyId() const { return mLocalKeyId; }
+    const Optional<uint16_t> & GetPeerSessionId() const { return mPeerSessionId; }
+    const Optional<uint16_t> & GetLocalSessionId() const { return mLocalSessionId; }
 
-    Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession() { return mUnauthenticatedSessionHandle.Value(); }
+    // Return the peer address for this session.  May return null if the peer
+    // address is not known.  This can happen for secure sessions that have been
+    // torn down, at the very least.
+    const Transport::PeerAddress * GetPeerAddress(SessionManager * sessionManager) const;
+
+    Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession() const { return mUnauthenticatedSessionHandle.Value(); }
 
 private:
-    friend class SecureSessionMgr;
+    friend class SessionManager;
 
     // Fields for secure session
     NodeId mPeerNodeId;
-    Optional<uint16_t> mLocalKeyId;
-    Optional<uint16_t> mPeerKeyId;
+    Optional<uint16_t> mLocalSessionId;
+    Optional<uint16_t> mPeerSessionId;
     // TODO: Re-evaluate the storing of Fabric ID in SessionHandle
     //       The Fabric ID will not be available for PASE and group sessions. So need
     //       to identify an approach that'll allow looking up the corresponding information for

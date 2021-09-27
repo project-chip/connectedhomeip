@@ -29,6 +29,7 @@
 #include <type_traits>
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/GroupId.h>
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/BitFlags.h>
@@ -42,14 +43,16 @@ static constexpr size_t kMaxTagLen = 16;
 
 static constexpr size_t kMaxAppMessageLen = 1200;
 
+static constexpr size_t kMsgSessionIdUnsecured = 0x0000;
+
 typedef int PacketHeaderFlags;
 
 namespace Header {
 
-enum class EncryptionType
+enum class SessionType
 {
-    kEncryptionTypeNone = 0,
-    kAESCCMTagLen16     = 1,
+    kSessionTypeNone = 0,
+    kAESCCMTagLen16  = 1,
 };
 
 /**
@@ -134,7 +137,14 @@ public:
      */
     const Optional<NodeId> & GetDestinationNodeId() const { return mDestinationNodeId; }
 
-    uint16_t GetEncryptionKeyID() const { return mEncryptionKeyID; }
+    /**
+     * Gets the destination group id in the current message.
+     *
+     * NOTE: the destination group id is optional and may be missing.
+     */
+    const Optional<GroupId> & GetDestinationGroupId() const { return mDestinationGroupId; }
+
+    uint16_t GetSessionId() const { return mSessionId; }
 
     Header::Flags & GetFlags() { return mFlags; }
     const Header::Flags & GetFlags() const { return mFlags; }
@@ -142,7 +152,7 @@ public:
     /** Check if it's a secure session control message. */
     bool IsSecureSessionControlMsg() const { return mFlags.Has(Header::FlagValues::kSecureSessionControlMessage); }
 
-    Header::EncryptionType GetEncryptionType() const { return mEncryptionType; }
+    Header::SessionType GetSessionType() const { return mSessionType; }
 
     PacketHeader & SetSecureSessionControlMsg(bool value)
     {
@@ -192,9 +202,30 @@ public:
         return *this;
     }
 
-    PacketHeader & SetEncryptionKeyID(uint16_t id)
+    PacketHeader & SetDestinationGroupId(GroupId id)
     {
-        mEncryptionKeyID = id;
+        mDestinationGroupId.SetValue(id);
+        mFlags.Set(Header::FlagValues::kDestinationGroupIdPresent);
+        return *this;
+    }
+
+    PacketHeader & SetDestinationGroupId(Optional<GroupId> id)
+    {
+        mDestinationGroupId = id;
+        mFlags.Set(Header::FlagValues::kDestinationGroupIdPresent, id.HasValue());
+        return *this;
+    }
+
+    PacketHeader & ClearDestinationGroupId()
+    {
+        mDestinationGroupId.ClearValue();
+        mFlags.Clear(Header::FlagValues::kDestinationGroupIdPresent);
+        return *this;
+    }
+
+    PacketHeader & SetSessionId(uint16_t id)
+    {
+        mSessionId = id;
         return *this;
     }
 
@@ -204,9 +235,9 @@ public:
         return *this;
     }
 
-    PacketHeader & SetEncryptionType(Header::EncryptionType type)
+    PacketHeader & SetSessionType(Header::SessionType type)
     {
-        mEncryptionType = type;
+        mSessionType = type;
         return *this;
     }
 
@@ -292,7 +323,7 @@ public:
 
 private:
     /// Represents the current encode/decode header version
-    static constexpr int kHeaderVersion = 2;
+    static constexpr int kMsgHeaderVersion = 0;
 
     /// Value expected to be incremented for each message sent.
     uint32_t mMessageCounter = 0;
@@ -302,15 +333,16 @@ private:
 
     /// Intended recipient of the message.
     Optional<NodeId> mDestinationNodeId;
+    Optional<GroupId> mDestinationGroupId;
 
-    /// Encryption Key ID
-    uint16_t mEncryptionKeyID = 0;
+    /// Session ID
+    uint16_t mSessionId = kMsgSessionIdUnsecured;
 
     /// Message flags read from the message.
     Header::Flags mFlags;
 
-    /// Represents encryption type used for encrypting current packet
-    Header::EncryptionType mEncryptionType = Header::EncryptionType::kAESCCMTagLen16;
+    /// Represents session type used for encrypting current packet
+    Header::SessionType mSessionType = Header::SessionType::kAESCCMTagLen16;
 };
 
 /**
@@ -550,12 +582,12 @@ public:
     const uint8_t * GetTag() const { return &mTag[0]; }
 
     /** Set the message auth tag for this header. */
-    MessageAuthenticationCode & SetTag(PacketHeader * header, Header::EncryptionType encType, uint8_t * tag, size_t len)
+    MessageAuthenticationCode & SetTag(PacketHeader * header, Header::SessionType sessionType, uint8_t * tag, size_t len)
     {
-        const size_t tagLen = TagLenForEncryptionType(encType);
+        const size_t tagLen = TagLenForSessionType(sessionType);
         if (tagLen > 0 && tagLen <= kMaxTagLen && len == tagLen)
         {
-            header->SetEncryptionType(encType);
+            header->SetSessionType(sessionType);
             memcpy(&mTag, tag, tagLen);
         }
 
@@ -594,7 +626,7 @@ public:
      */
     CHIP_ERROR Encode(const PacketHeader & packetHeader, uint8_t * data, uint16_t size, uint16_t * encode_size) const;
 
-    static uint16_t TagLenForEncryptionType(Header::EncryptionType encType);
+    static uint16_t TagLenForSessionType(Header::SessionType sessionType);
 
 private:
     /// Message authentication tag generated at encryption of the message.

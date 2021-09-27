@@ -18,17 +18,20 @@ limitations under the License.
   <domain name="General"/>
 
   <enum name="OnOffEffectIdentifier" type="enum8">
+    <cluster code="0x0006"/>
     <item name="DelayedAllOff" value="0x00"/>
     <item name="DyingLight" value="0x01"/>
   </enum>
 
   <enum name="OnOffDelayedAllOffEffectVariant" type="enum8">
+    <cluster code="0x0006"/>
     <item name="FadeToOffIn_0p8Seconds" value="0x00"/>
     <item name="NoFade" value="0x01"/>
     <item name="50PercentDimDownIn_0p8SecondsThenFadeToOffIn_12Seconds" value="0x02"/>
   </enum>
 
   <enum name="OnOffDyingLightEffectVariant" type="enum8">
+    <cluster code="0x0006"/>
     <item name="20PercenterDimUpIn_0p5SecondsThenFadeToOffIn_1Second" value="0x00"/>
   </enum>
 

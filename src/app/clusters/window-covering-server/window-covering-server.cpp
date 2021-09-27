@@ -412,6 +412,18 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::EndpointId endpoint, 
 }
 
 /**
+ * @brief  Cluster StopMotion Command callback (from client)
+ */
+bool __attribute__((weak))
+emberAfWindowCoveringClusterStopMotionCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+{
+    emberAfWindowCoveringClusterPrint("StopMotion command received");
+
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+/**
  * @brief  Cluster GoToLiftValue Command callback (from client)
  */
 bool emberAfWindowCoveringClusterGoToLiftValueCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,

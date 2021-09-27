@@ -664,15 +664,14 @@ EmberAfStatus SetIdentifyTime(chip::EndpointId endpoint, uint16_t identifyTime)
     return emberAfWriteServerAttribute(endpoint, Identify::Id, Ids::IdentifyTime, (uint8_t *) &identifyTime,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetCommissionState(chip::EndpointId endpoint, uint8_t * commissionState)
+EmberAfStatus GetIdentifyType(chip::EndpointId endpoint, uint8_t * identifyType)
 {
-    return emberAfReadServerAttribute(endpoint, Identify::Id, Ids::CommissionState, (uint8_t *) commissionState,
-                                      sizeof(*commissionState));
+    return emberAfReadServerAttribute(endpoint, Identify::Id, Ids::IdentifyType, (uint8_t *) identifyType, sizeof(*identifyType));
 }
-EmberAfStatus SetCommissionState(chip::EndpointId endpoint, uint8_t commissionState)
+EmberAfStatus SetIdentifyType(chip::EndpointId endpoint, uint8_t identifyType)
 {
-    return emberAfWriteServerAttribute(endpoint, Identify::Id, Ids::CommissionState, (uint8_t *) &commissionState,
-                                       ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Identify::Id, Ids::IdentifyType, (uint8_t *) &identifyType,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 } // namespace Attributes
 } // namespace Identify
@@ -1363,6 +1362,247 @@ EmberAfStatus SetUpdatePossible(chip::EndpointId endpoint, bool updatePossible)
 } // namespace Attributes
 } // namespace OtaSoftwareUpdateRequestor
 
+namespace PowerSource {
+namespace Attributes {
+EmberAfStatus GetStatus(chip::EndpointId endpoint, uint8_t * status)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::Status, (uint8_t *) status, sizeof(*status));
+}
+EmberAfStatus SetStatus(chip::EndpointId endpoint, uint8_t status)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::Status, (uint8_t *) &status, ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetOrder(chip::EndpointId endpoint, uint8_t * order)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::Order, (uint8_t *) order, sizeof(*order));
+}
+EmberAfStatus SetOrder(chip::EndpointId endpoint, uint8_t order)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::Order, (uint8_t *) &order, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetWiredAssessedInputVoltage(chip::EndpointId endpoint, uint32_t * wiredAssessedInputVoltage)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::WiredAssessedInputVoltage,
+                                      (uint8_t *) wiredAssessedInputVoltage, sizeof(*wiredAssessedInputVoltage));
+}
+EmberAfStatus SetWiredAssessedInputVoltage(chip::EndpointId endpoint, uint32_t wiredAssessedInputVoltage)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::WiredAssessedInputVoltage,
+                                       (uint8_t *) &wiredAssessedInputVoltage, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetWiredAssessedInputFrequency(chip::EndpointId endpoint, uint16_t * wiredAssessedInputFrequency)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::WiredAssessedInputFrequency,
+                                      (uint8_t *) wiredAssessedInputFrequency, sizeof(*wiredAssessedInputFrequency));
+}
+EmberAfStatus SetWiredAssessedInputFrequency(chip::EndpointId endpoint, uint16_t wiredAssessedInputFrequency)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::WiredAssessedInputFrequency,
+                                       (uint8_t *) &wiredAssessedInputFrequency, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetWiredCurrentType(chip::EndpointId endpoint, uint8_t * wiredCurrentType)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::WiredCurrentType, (uint8_t *) wiredCurrentType,
+                                      sizeof(*wiredCurrentType));
+}
+EmberAfStatus SetWiredCurrentType(chip::EndpointId endpoint, uint8_t wiredCurrentType)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::WiredCurrentType, (uint8_t *) &wiredCurrentType,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetWiredAssessedCurrent(chip::EndpointId endpoint, uint32_t * wiredAssessedCurrent)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::WiredAssessedCurrent, (uint8_t *) wiredAssessedCurrent,
+                                      sizeof(*wiredAssessedCurrent));
+}
+EmberAfStatus SetWiredAssessedCurrent(chip::EndpointId endpoint, uint32_t wiredAssessedCurrent)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::WiredAssessedCurrent, (uint8_t *) &wiredAssessedCurrent,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetWiredNominalVoltage(chip::EndpointId endpoint, uint32_t * wiredNominalVoltage)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::WiredNominalVoltage, (uint8_t *) wiredNominalVoltage,
+                                      sizeof(*wiredNominalVoltage));
+}
+EmberAfStatus SetWiredNominalVoltage(chip::EndpointId endpoint, uint32_t wiredNominalVoltage)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::WiredNominalVoltage, (uint8_t *) &wiredNominalVoltage,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetWiredMaximumCurrent(chip::EndpointId endpoint, uint32_t * wiredMaximumCurrent)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::WiredMaximumCurrent, (uint8_t *) wiredMaximumCurrent,
+                                      sizeof(*wiredMaximumCurrent));
+}
+EmberAfStatus SetWiredMaximumCurrent(chip::EndpointId endpoint, uint32_t wiredMaximumCurrent)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::WiredMaximumCurrent, (uint8_t *) &wiredMaximumCurrent,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetWiredPresent(chip::EndpointId endpoint, bool * wiredPresent)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::WiredPresent, (uint8_t *) wiredPresent,
+                                      sizeof(*wiredPresent));
+}
+EmberAfStatus SetWiredPresent(chip::EndpointId endpoint, bool wiredPresent)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::WiredPresent, (uint8_t *) &wiredPresent,
+                                       ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryVoltage(chip::EndpointId endpoint, uint32_t * batteryVoltage)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryVoltage, (uint8_t *) batteryVoltage,
+                                      sizeof(*batteryVoltage));
+}
+EmberAfStatus SetBatteryVoltage(chip::EndpointId endpoint, uint32_t batteryVoltage)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryVoltage, (uint8_t *) &batteryVoltage,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryPercentRemaining(chip::EndpointId endpoint, uint8_t * batteryPercentRemaining)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryPercentRemaining, (uint8_t *) batteryPercentRemaining,
+                                      sizeof(*batteryPercentRemaining));
+}
+EmberAfStatus SetBatteryPercentRemaining(chip::EndpointId endpoint, uint8_t batteryPercentRemaining)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryPercentRemaining,
+                                       (uint8_t *) &batteryPercentRemaining, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryTimeRemaining(chip::EndpointId endpoint, uint32_t * batteryTimeRemaining)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryTimeRemaining, (uint8_t *) batteryTimeRemaining,
+                                      sizeof(*batteryTimeRemaining));
+}
+EmberAfStatus SetBatteryTimeRemaining(chip::EndpointId endpoint, uint32_t batteryTimeRemaining)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryTimeRemaining, (uint8_t *) &batteryTimeRemaining,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryChargeLevel(chip::EndpointId endpoint, uint8_t * batteryChargeLevel)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryChargeLevel, (uint8_t *) batteryChargeLevel,
+                                      sizeof(*batteryChargeLevel));
+}
+EmberAfStatus SetBatteryChargeLevel(chip::EndpointId endpoint, uint8_t batteryChargeLevel)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryChargeLevel, (uint8_t *) &batteryChargeLevel,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryReplacementNeeded(chip::EndpointId endpoint, bool * batteryReplacementNeeded)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryReplacementNeeded,
+                                      (uint8_t *) batteryReplacementNeeded, sizeof(*batteryReplacementNeeded));
+}
+EmberAfStatus SetBatteryReplacementNeeded(chip::EndpointId endpoint, bool batteryReplacementNeeded)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryReplacementNeeded,
+                                       (uint8_t *) &batteryReplacementNeeded, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryReplaceability(chip::EndpointId endpoint, uint8_t * batteryReplaceability)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryReplaceability, (uint8_t *) batteryReplaceability,
+                                      sizeof(*batteryReplaceability));
+}
+EmberAfStatus SetBatteryReplaceability(chip::EndpointId endpoint, uint8_t batteryReplaceability)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryReplaceability, (uint8_t *) &batteryReplaceability,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryPresent(chip::EndpointId endpoint, bool * batteryPresent)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryPresent, (uint8_t *) batteryPresent,
+                                      sizeof(*batteryPresent));
+}
+EmberAfStatus SetBatteryPresent(chip::EndpointId endpoint, bool batteryPresent)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryPresent, (uint8_t *) &batteryPresent,
+                                       ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryCommonDesignation(chip::EndpointId endpoint, uint32_t * batteryCommonDesignation)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryCommonDesignation,
+                                      (uint8_t *) batteryCommonDesignation, sizeof(*batteryCommonDesignation));
+}
+EmberAfStatus SetBatteryCommonDesignation(chip::EndpointId endpoint, uint32_t batteryCommonDesignation)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryCommonDesignation,
+                                       (uint8_t *) &batteryCommonDesignation, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryApprovedChemistry(chip::EndpointId endpoint, uint32_t * batteryApprovedChemistry)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryApprovedChemistry,
+                                      (uint8_t *) batteryApprovedChemistry, sizeof(*batteryApprovedChemistry));
+}
+EmberAfStatus SetBatteryApprovedChemistry(chip::EndpointId endpoint, uint32_t batteryApprovedChemistry)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryApprovedChemistry,
+                                       (uint8_t *) &batteryApprovedChemistry, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryCapacity(chip::EndpointId endpoint, uint32_t * batteryCapacity)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryCapacity, (uint8_t *) batteryCapacity,
+                                      sizeof(*batteryCapacity));
+}
+EmberAfStatus SetBatteryCapacity(chip::EndpointId endpoint, uint32_t batteryCapacity)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryCapacity, (uint8_t *) &batteryCapacity,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryQuantity(chip::EndpointId endpoint, uint8_t * batteryQuantity)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryQuantity, (uint8_t *) batteryQuantity,
+                                      sizeof(*batteryQuantity));
+}
+EmberAfStatus SetBatteryQuantity(chip::EndpointId endpoint, uint8_t batteryQuantity)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryQuantity, (uint8_t *) &batteryQuantity,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryChargeState(chip::EndpointId endpoint, uint8_t * batteryChargeState)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryChargeState, (uint8_t *) batteryChargeState,
+                                      sizeof(*batteryChargeState));
+}
+EmberAfStatus SetBatteryChargeState(chip::EndpointId endpoint, uint8_t batteryChargeState)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryChargeState, (uint8_t *) &batteryChargeState,
+                                       ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryTimeToFullCharge(chip::EndpointId endpoint, uint32_t * batteryTimeToFullCharge)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryTimeToFullCharge, (uint8_t *) batteryTimeToFullCharge,
+                                      sizeof(*batteryTimeToFullCharge));
+}
+EmberAfStatus SetBatteryTimeToFullCharge(chip::EndpointId endpoint, uint32_t batteryTimeToFullCharge)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryTimeToFullCharge,
+                                       (uint8_t *) &batteryTimeToFullCharge, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryFunctionalWhileCharging(chip::EndpointId endpoint, bool * batteryFunctionalWhileCharging)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryFunctionalWhileCharging,
+                                      (uint8_t *) batteryFunctionalWhileCharging, sizeof(*batteryFunctionalWhileCharging));
+}
+EmberAfStatus SetBatteryFunctionalWhileCharging(chip::EndpointId endpoint, bool batteryFunctionalWhileCharging)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryFunctionalWhileCharging,
+                                       (uint8_t *) &batteryFunctionalWhileCharging, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetBatteryChargingCurrent(chip::EndpointId endpoint, uint32_t * batteryChargingCurrent)
+{
+    return emberAfReadServerAttribute(endpoint, PowerSource::Id, Ids::BatteryChargingCurrent, (uint8_t *) batteryChargingCurrent,
+                                      sizeof(*batteryChargingCurrent));
+}
+EmberAfStatus SetBatteryChargingCurrent(chip::EndpointId endpoint, uint32_t batteryChargingCurrent)
+{
+    return emberAfWriteServerAttribute(endpoint, PowerSource::Id, Ids::BatteryChargingCurrent, (uint8_t *) &batteryChargingCurrent,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+} // namespace Attributes
+} // namespace PowerSource
+
 namespace GeneralCommissioning {
 namespace Attributes {
 EmberAfStatus GetBreadcrumb(chip::EndpointId endpoint, uint64_t * breadcrumb)
@@ -2005,16 +2245,6 @@ EmberAfStatus SetDelay(chip::EndpointId endpoint, uint32_t delay)
 {
     return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Ids::Delay, (uint8_t *) &delay,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
-}
-EmberAfStatus GetChannelMask(chip::EndpointId endpoint, uint8_t * channelMask)
-{
-    return emberAfReadServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Ids::ChannelMask, (uint8_t *) channelMask,
-                                      sizeof(*channelMask));
-}
-EmberAfStatus SetChannelMask(chip::EndpointId endpoint, uint8_t channelMask)
-{
-    return emberAfWriteServerAttribute(endpoint, ThreadNetworkDiagnostics::Id, Ids::ChannelMask, (uint8_t *) &channelMask,
-                                       ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 } // namespace Attributes
 } // namespace ThreadNetworkDiagnostics
@@ -6509,22 +6739,23 @@ EmberAfStatus SetDuration(chip::EndpointId endpoint, uint64_t duration)
     return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Ids::Duration, (uint8_t *) &duration,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetUpdatedAt(chip::EndpointId endpoint, uint64_t * updatedAt)
+EmberAfStatus GetPositionUpdatedAt(chip::EndpointId endpoint, uint64_t * positionUpdatedAt)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, Ids::UpdatedAt, (uint8_t *) updatedAt, sizeof(*updatedAt));
+    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, Ids::PositionUpdatedAt, (uint8_t *) positionUpdatedAt,
+                                      sizeof(*positionUpdatedAt));
 }
-EmberAfStatus SetUpdatedAt(chip::EndpointId endpoint, uint64_t updatedAt)
+EmberAfStatus SetPositionUpdatedAt(chip::EndpointId endpoint, uint64_t positionUpdatedAt)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Ids::UpdatedAt, (uint8_t *) &updatedAt,
+    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Ids::PositionUpdatedAt, (uint8_t *) &positionUpdatedAt,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetPosistion(chip::EndpointId endpoint, uint64_t * posistion)
+EmberAfStatus GetPosition(chip::EndpointId endpoint, uint64_t * position)
 {
-    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, Ids::Posistion, (uint8_t *) posistion, sizeof(*posistion));
+    return emberAfReadServerAttribute(endpoint, MediaPlayback::Id, Ids::Position, (uint8_t *) position, sizeof(*position));
 }
-EmberAfStatus SetPosistion(chip::EndpointId endpoint, uint64_t posistion)
+EmberAfStatus SetPosition(chip::EndpointId endpoint, uint64_t position)
 {
-    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Ids::Posistion, (uint8_t *) &posistion,
+    return emberAfWriteServerAttribute(endpoint, MediaPlayback::Id, Ids::Position, (uint8_t *) &position,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 EmberAfStatus GetPlaybackSpeed(chip::EndpointId endpoint, uint64_t * playbackSpeed)
@@ -6787,6 +7018,22 @@ EmberAfStatus GetEnum16(chip::EndpointId endpoint, uint16_t * enum16)
 EmberAfStatus SetEnum16(chip::EndpointId endpoint, uint16_t enum16)
 {
     return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Ids::Enum16, (uint8_t *) &enum16, ZCL_ENUM16_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetEpochUs(chip::EndpointId endpoint, uint64_t * epochUs)
+{
+    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Ids::EpochUs, (uint8_t *) epochUs, sizeof(*epochUs));
+}
+EmberAfStatus SetEpochUs(chip::EndpointId endpoint, uint64_t epochUs)
+{
+    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Ids::EpochUs, (uint8_t *) &epochUs, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetEpochS(chip::EndpointId endpoint, uint32_t * epochS)
+{
+    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Ids::EpochS, (uint8_t *) epochS, sizeof(*epochS));
+}
+EmberAfStatus SetEpochS(chip::EndpointId endpoint, uint32_t epochS)
+{
+    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Ids::EpochS, (uint8_t *) &epochS, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 EmberAfStatus GetUnsupported(chip::EndpointId endpoint, bool * unsupported)
 {

@@ -285,37 +285,16 @@
                                                                                                                                    \
                               ZCL_IDENTIFY_QUERY_COMMAND_ID, "", );
 
-/** @brief Command description for EZModeInvoke
- *
- * Command: EZModeInvoke
- * @param action BITMAP8
- */
-#define emberAfFillCommandIdentifyClusterEZModeInvoke(action)                                                                      \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_EZ_MODE_INVOKE_COMMAND_ID, "u", action);
-
-/** @brief Command description for UpdateCommissionState
- *
- * Command: UpdateCommissionState
- * @param action ENUM8
- * @param commissionStateMask BITMAP8
- */
-#define emberAfFillCommandIdentifyClusterUpdateCommissionState(action, commissionStateMask)                                        \
-    emberAfFillExternalBuffer(mask,                                                                                                \
-                                                                                                                                   \
-                              ZCL_UPDATE_COMMISSION_STATE_COMMAND_ID, "uu", action, commissionStateMask);
-
 /** @brief Command description for TriggerEffect
  *
  * Command: TriggerEffect
- * @param effectId IdentifyEffectIdentifier
+ * @param effectIdentifier IdentifyEffectIdentifier
  * @param effectVariant IdentifyEffectVariant
  */
-#define emberAfFillCommandIdentifyClusterTriggerEffect(effectId, effectVariant)                                                    \
+#define emberAfFillCommandIdentifyClusterTriggerEffect(effectIdentifier, effectVariant)                                            \
     emberAfFillExternalBuffer(mask,                                                                                                \
                                                                                                                                    \
-                              ZCL_TRIGGER_EFFECT_COMMAND_ID, "uu", effectId, effectVariant);
+                              ZCL_TRIGGER_EFFECT_COMMAND_ID, "uu", effectIdentifier, effectVariant);
 
 /** @brief Command description for AddGroup
  *
@@ -3389,7 +3368,7 @@
  * Command: StepHue
  * @param stepMode HueStepMode
  * @param stepSize INT8U
- * @param transitionTime INT8U
+ * @param transitionTime INT16U
  * @param optionsMask BITMAP8
  * @param optionsOverride BITMAP8
  */
@@ -3432,7 +3411,7 @@
  * Command: StepSaturation
  * @param stepMode SaturationStepMode
  * @param stepSize INT8U
- * @param transitionTime INT8U
+ * @param transitionTime INT16U
  * @param optionsMask BITMAP8
  * @param optionsOverride BITMAP8
  */

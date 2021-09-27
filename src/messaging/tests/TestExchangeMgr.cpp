@@ -31,7 +31,7 @@
 #include <messaging/Flags.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/Protocols.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
@@ -99,17 +99,17 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
-    auto sessionPeerToLocal = ctx.GetSecureSessionManager().GetPeerConnectionState(ec1->GetSecureSession());
+    auto sessionPeerToLocal = ctx.GetSecureSessionManager().GetSecureSession(ec1->GetSecureSession());
     NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerNodeId() == ctx.GetBobNodeId());
-    NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerKeyID() == ctx.GetBobKeyId());
+    NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerSessionId() == ctx.GetBobKeyId());
     NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
 
     ExchangeContext * ec2 = ctx.NewExchangeToAlice(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
-    auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetPeerConnectionState(ec2->GetSecureSession());
+    auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetSecureSession(ec2->GetSecureSession());
     NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerNodeId() == ctx.GetAliceNodeId());
-    NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerKeyID() == ctx.GetAliceKeyId());
+    NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerSessionId() == ctx.GetAliceKeyId());
 
     ec1->Close();
     ec2->Close();

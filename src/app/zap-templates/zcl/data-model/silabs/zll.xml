@@ -17,17 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="ZLL" spec="zll-1.0-11-0037-10" dependsOn="zcl-1.0-07-5123-03">
   </domain>
-  <enum name="IdentifyEffectIdentifier" type="ENUM8">
-    <item name="Blink" value="0x00"/>
-    <item name="Breathe" value="0x01"/>
-    <item name="Okay" value="0x02"/>
-    <item name="ChannelChange" value="0x0B"/>
-    <item name="FinishEffect" value="0xFE"/>
-    <item name="StopEffect" value="0xFF"/>
-  </enum>
-  <enum name="IdentifyEffectVariant" type="ENUM8">
-    <item name="Default" value="0x00"/>
-  </enum>
   <bitmap name="ScenesCopyMode" type="BITMAP8">
     <field name="CopyAllScenes" mask="0x01"/>
   </bitmap>
@@ -61,15 +50,6 @@ limitations under the License.
   </enum>
   <clusterExtension code="0x0000">
     <attribute side="server" code="0x4000" define="SW_BUILD_ID" type="CHAR_STRING" length="16" writable="false" default="" optional="true" introducedIn="zll-1.0-11-0037-10">sw build id</attribute>
-  </clusterExtension>
-  <clusterExtension code="0x0003">
-    <command source="client" code="0x40" name="TriggerEffect" optional="true" introducedIn="zll-1.0-11-0037-10" cli="zcl identify trigger">
-      <description>
-        Command description for TriggerEffect
-      </description>
-      <arg name="effectId" type="IdentifyEffectIdentifier"/>
-      <arg name="effectVariant" type="IdentifyEffectVariant"/>
-    </command>
   </clusterExtension>
   <clusterExtension code="0x0005">
     <command source="client" code="0x40" name="EnhancedAddScene" optional="true" introducedIn="zll-1.0-11-0037-10" cli="zcl scenes eadd">

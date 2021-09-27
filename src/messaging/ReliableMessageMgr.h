@@ -69,7 +69,7 @@ public:
     ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageMgr();
 
-    void Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr);
+    void Init(chip::System::Layer * systemLayer, SessionManager * sessionManager);
     void Shutdown();
 
     /**
@@ -149,13 +149,12 @@ public:
      *  Iterate through active exchange contexts and retrans table entries. Clear the entry matching
      *  the specified ExchangeContext and the message ID from the retransmision table.
      *
-     *  @param[in]    rc        A pointer to the ExchangeContext object.
-     *
-     *  @param[in]    messageCounter     message ID which has been acked.
+     *  @param[in]    rc                 A pointer to the ExchangeContext object.
+     *  @param[in]    ackMessageCounter  The acknowledged message counter of the received packet.
      *
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t messageCounter);
+    bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t ackMessageCounter);
 
     /**
      *  Send the specified entry from the retransmission table.
@@ -227,7 +226,7 @@ public:
 private:
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
-    SecureSessionMgr * mSessionMgr;
+    SessionManager * mSessionManager;
     uint64_t mTimeStampBase; // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
     System::Clock::MonotonicMilliseconds mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
     uint16_t mTimerIntervalShift;                             // ReliableMessageProtocol Timer tick period shift

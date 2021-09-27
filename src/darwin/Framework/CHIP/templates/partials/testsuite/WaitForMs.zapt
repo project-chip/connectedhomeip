@@ -1,2 +1,0 @@
-dispatch_queue_t queue = dispatch_get_main_queue();
-{{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{definedValue}}{{/chip_tests_item_parameters}});

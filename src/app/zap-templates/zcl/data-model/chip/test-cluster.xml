@@ -16,11 +16,51 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
+  <struct name="TestListStructOctet">
+    <cluster code="0x050F"/>
+    <item name="fabricIndex" type="INT64U"/>
+    <item name="operationalCert" type="OCTET_STRING" length="32"/>
+  </struct>
 
-   <struct name="TestListStructOctet">
-     <item name="fabricIndex" type="INT64U"/>
-     <item name="operationalCert" type="OCTET_STRING" length="32"/>
-   </struct>
+  <enum name="SimpleEnum" type="ENUM8">
+    <cluster code="0x050F"/>
+    <item name="Unspecified" value="0x00"/>
+    <item name="ValueA" value="0x01"/>
+    <item name="ValueB" value="0x02"/>
+    <item name="ValueC" value="0x03"/>
+  </enum>
+  
+  <struct name="SimpleStruct">
+    <cluster code="0x050F"/>
+    <item name="a" type="INT8U" optional="false"/>
+    <item name="b" type="BOOLEAN" optional="false"/>
+    <item name="c" type="SimpleEnum" optional="false"/>
+    <item name="d" type="OCTET_STRING" optional="false"/>
+    <item name="e" type="CHAR_STRING" optional="false"/>
+  </struct>
+
+  <struct name="NestedStruct">
+    <cluster code="0x050F"/>
+    <item name="a" type="INT8U" optional="false"/>
+    <item name="b" type="BOOLEAN" optional="false"/>
+    <item name="c" type="SimpleStruct" optional="false"/>
+  </struct>
+
+  <struct name="NestedStructList">
+    <cluster code="0x050F"/>
+    <item name="a" type="INT8U" optional="false"/>
+    <item name="b" type="BOOLEAN" optional="false"/>
+    <item name="c" type="SimpleStruct" optional="false"/>
+    <item name="d" type="SimpleStruct" array="true" optional="false"/>
+    <item name="e" type="INT32U" array="true" optional="false"/>
+    <item name="f" type="OCTET_STRING" array="true" optional="false"/>
+    <item name="g" type="INT8U" array="true" optional="false"/>
+  </struct>
+
+  <struct name="DoubleNestedStructList">
+    <cluster code="0x050F"/>
+    <item name="a" type="NestedStructList" array="true" optional="false"/>
+  </struct>
 
   <cluster>
     <domain>CHIP</domain>
@@ -62,6 +102,8 @@ limitations under the License.
     <attribute side="server" code="0x001D" define="LONG_OCTET_STRING" type="LONG_OCTET_STRING" length="1000" writable="true" optional="false">long_octet_string</attribute>
     <attribute side="server" code="0x001E" define="CHAR_STRING" type="CHAR_STRING" length="10" writable="true" optional="false">char_string</attribute>
     <attribute side="server" code="0x001F" define="LONG_CHAR_STRING" type="LONG_CHAR_STRING" length="1000" writable="true" optional="false">long_char_string</attribute>
+    <attribute side="server" code="0x0020" define="EPOCH_US" type="EPOCH_US" writable="true" optional="false">epoch_us</attribute>
+    <attribute side="server" code="0x0021" define="EPOCH_S" type="EPOCH_S" writable="true" optional="false">epoch_s</attribute>
 
     <!-- This attribute should not be enabled on the server side -->
     <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="BOOLEAN" writable="true" optional="false">unsupported</attribute>

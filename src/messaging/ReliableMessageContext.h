@@ -217,7 +217,7 @@ protected:
 private:
     void RetainContext();
     void ReleaseContext();
-    CHIP_ERROR HandleRcvdAck(uint32_t ackMessageCounter);
+    void HandleRcvdAck(uint32_t ackMessageCounter);
     CHIP_ERROR HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags);
     CHIP_ERROR HandleNeedsAckInner(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags);
     ExchangeContext * GetExchangeContext();

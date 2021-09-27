@@ -87,6 +87,7 @@ public:
     CHIP_ERROR InitChipStack();
     CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
+
     /**
      * ScheduleWork can be called after InitChipStack has been called.  Calls
      * that happen before either StartEventLoopTask or RunEventLoop will queue
@@ -99,6 +100,7 @@ public:
      * processing thread) before ScheduleWork returns.
      */
     void ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
+
     /**
      * Process work items until StopEventLoopTask is called.  RunEventLoop will
      * not return until work item processing is stopped.  Once it returns it
@@ -111,6 +113,7 @@ public:
      * before calling Shutdown.
      */
     void RunEventLoop();
+
     /**
      * Process work items until StopEventLoopTask is called.
      *
@@ -126,6 +129,7 @@ public:
      * StopEventLoopTask before calling Shutdown.
      */
     CHIP_ERROR StartEventLoopTask();
+
     /**
      * Stop processing of work items by the event loop.
      *
@@ -145,6 +149,21 @@ public:
     bool TryLockChipStack();
     void UnlockChipStack();
     CHIP_ERROR Shutdown();
+
+    /**
+     * Software Diagnostics methods.
+     */
+    CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree);
+    CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed);
+    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
+
+    /**
+     * General Diagnostics methods.
+     */
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount);
+    CHIP_ERROR GetUpTime(uint64_t & upTime);
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
+    CHIP_ERROR GetBootReasons(uint8_t & bootReasons);
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
@@ -375,6 +394,41 @@ inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
 inline CHIP_ERROR PlatformManager::StartChipTimer(uint32_t durationMS)
 {
     return static_cast<ImplClass *>(this)->_StartChipTimer(durationMS);
+}
+
+inline CHIP_ERROR PlatformManager::GetCurrentHeapFree(uint64_t & currentHeapFree)
+{
+    return static_cast<ImplClass *>(this)->_GetCurrentHeapFree(currentHeapFree);
+}
+
+inline CHIP_ERROR PlatformManager::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+{
+    return static_cast<ImplClass *>(this)->_GetCurrentHeapUsed(currentHeapUsed);
+}
+
+inline CHIP_ERROR PlatformManager::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+{
+    return static_cast<ImplClass *>(this)->_GetCurrentHeapHighWatermark(currentHeapHighWatermark);
+}
+
+inline CHIP_ERROR PlatformManager::GetRebootCount(uint16_t & rebootCount)
+{
+    return static_cast<ImplClass *>(this)->_GetRebootCount(rebootCount);
+}
+
+inline CHIP_ERROR PlatformManager::GetUpTime(uint64_t & upTime)
+{
+    return static_cast<ImplClass *>(this)->_GetUpTime(upTime);
+}
+
+inline CHIP_ERROR PlatformManager::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return static_cast<ImplClass *>(this)->_GetTotalOperationalHours(totalOperationalHours);
+}
+
+inline CHIP_ERROR PlatformManager::GetBootReasons(uint8_t & bootReasons)
+{
+    return static_cast<ImplClass *>(this)->_GetBootReasons(bootReasons);
 }
 
 } // namespace DeviceLayer

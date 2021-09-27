@@ -17,6 +17,7 @@ limitations under the License.
 <configurator>
     <domain name="CHIP" spec="chip-0.7" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
     <enum name="NetworkCommissioningError" type="ENUM8">
+        <cluster code="0x0031"/>
         <item name="Success" value="0x0"/>
         <item name="OutOfRange" value="0x1"/>
         <item name="BoundsExceeded" value="0x2"/>
@@ -46,6 +47,7 @@ limitations under the License.
         <field name="WPA3-PERSONAL" mask="0x10"/>
     </bitmap>
     <struct name="WiFiInterfaceScanResult">
+        <cluster code="0x0031"/>
         <item name="Security" type="BITMAP8"/>
         <item name="SSID" type="OCTET_STRING"/>
         <item name="BSSID" type="OCTET_STRING"/>
@@ -53,6 +55,7 @@ limitations under the License.
         <item name="FrequencyBand" type="INT32U"/>
     </struct>
     <struct name="ThreadInterfaceScanResult">
+        <cluster code="0x0031"/>
         <item name="DiscoveryResponse" type="OCTET_STRING"/>
     </struct>
     <cluster>

@@ -57,8 +57,10 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
 #if !defined(NDEBUG)
         if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
         {
-            ChipLogDetail(ExchangeManager, "Piggybacking Ack for MessageCounter:%08" PRIX32 " with msg",
-                          payloadHeader.GetAckMessageCounter().Value());
+            ChipLogDetail(ExchangeManager,
+                          "Piggybacking Ack for MessageCounter:" ChipLogFormatMessageCounter
+                          " on exchange: " ChipLogFormatExchangeId,
+                          payloadHeader.GetAckMessageCounter().Value(), ChipLogValueExchangeId(exchangeId, isInitiator));
         }
 #endif
     }
@@ -80,7 +82,21 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
         std::unique_ptr<ReliableMessageMgr::RetransTableEntry, decltype(deleter)> entryOwner(entry, deleter);
 
         ReturnErrorOnFailure(PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
-        ReturnErrorOnFailure(SendPreparedMessage(session, entryOwner->retainedBuf));
+        CHIP_ERROR err = SendPreparedMessage(session, entryOwner->retainedBuf);
+        if (err == CHIP_ERROR_POSIX(ENOBUFS))
+        {
+            // sendmsg on BSD-based systems never blocks, no matter how the
+            // socket is configured, and will return ENOBUFS in situation in
+            // which Linux, for example, blocks.
+            //
+            // This is typically a transient situation, so we pretend like this
+            // packet drop happened somewhere on the network instead of inside
+            // sendmsg and will just resend it in the normal MRP way later.
+            ChipLogError(ExchangeManager, "Ignoring ENOBUFS: %" CHIP_ERROR_FORMAT " on exchange " ChipLogFormatExchangeId,
+                         err.Format(), ChipLogValueExchangeId(exchangeId, isInitiator));
+            err = CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
         reliableMessageMgr->StartRetransmision(entryOwner.release());
     }
     else
@@ -107,7 +123,7 @@ CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint32_t messageCounter, c
         if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
             payloadHeader.GetAckMessageCounter().HasValue())
         {
-            ReturnErrorOnFailure(reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value()));
+            reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value());
         }
 
         if (payloadHeader.NeedsAck())

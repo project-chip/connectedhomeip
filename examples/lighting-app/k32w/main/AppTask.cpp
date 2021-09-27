@@ -489,8 +489,7 @@ void AppTask::BleHandler(AppEvent * aEvent)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
-        if (chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) ==
-            CHIP_NO_ERROR)
+        if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
         {
             K32W_LOG("Started BLE Advertising!");
         }

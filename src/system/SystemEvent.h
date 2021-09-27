@@ -56,16 +56,6 @@ typedef CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE Event;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-/**
- *   The Inet layer event type definitions.
- *
- */
-enum
-{
-    kEvent_ReleaseObj   = _CHIP_SYSTEM_CONFIG_LWIP_EVENT(0), /**< The event for the drop of a System::Layer object */
-    kEvent_ScheduleWork = _CHIP_SYSTEM_CONFIG_LWIP_EVENT(1), /**< The event for scheduling work on the System Layer's thread. */
-};
-
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace System

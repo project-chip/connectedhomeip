@@ -21,6 +21,7 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_CURRENT_LIST_DIR}"
                      "${CMAKE_SOURCE_DIR}/../../platform/esp32/pw_sys_io/public"
                      "${CMAKE_SOURCE_DIR}/../../platform/esp32"
+                     "${CMAKE_SOURCE_DIR}/../../common"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support"
@@ -47,6 +48,11 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ethernet_network_diagnostics_server"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/thread_network_diagnostics_server"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/wifi_network_diagnostics_server"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/software_diagnostics_server"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general_diagnostics_server"                      
                      PRIV_REQUIRES bt chip QRCode)
 
 idf_component_get_property(chip_lib chip COMPONENT_LIB)
@@ -87,11 +93,11 @@ pw_proto_library(button_service
 
 pw_proto_library(locking_service
   SOURCES
-    ${CHIP_ROOT}/examples/lock-app/lock-common/locking_service/locking_service.proto
+    ${CHIP_ROOT}/examples/common/pigweed/protos/locking_service.proto
   PREFIX
     locking_service
   STRIP_PREFIX
-    ${CHIP_ROOT}/examples/lock-app/lock-common/locking_service
+    ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
     pw_protobuf.common_protos
 )
@@ -131,6 +137,11 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/basic"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/bindings"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ethernet_network_diagnostics_server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/thread_network_diagnostics_server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/wifi_network_diagnostics_server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/software_diagnostics_server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general_diagnostics_server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/on-off-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"

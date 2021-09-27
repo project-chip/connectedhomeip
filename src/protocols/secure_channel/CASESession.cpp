@@ -37,7 +37,7 @@
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 
@@ -165,8 +165,8 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mIPKLen           = static_cast<uint16_t>(sizeof(mIPK));
     serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
     serializable.mPeerNodeId       = peerNodeId;
-    serializable.mLocalKeyId       = GetLocalKeyId();
-    serializable.mPeerKeyId        = GetPeerKeyId();
+    serializable.mLocalSessionId   = GetLocalSessionId();
+    serializable.mPeerSessionId    = GetPeerSessionId();
 
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
     memcpy(serializable.mMessageDigest, mMessageDigest, sizeof(mMessageDigest));
@@ -189,8 +189,8 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     memcpy(mIPK, serializable.mIPK, serializable.mIPKLen);
 
     SetPeerNodeId(serializable.mPeerNodeId);
-    SetLocalKeyId(serializable.mLocalKeyId);
-    SetPeerKeyId(serializable.mPeerKeyId);
+    SetLocalSessionId(serializable.mLocalSessionId);
+    SetPeerSessionId(serializable.mPeerSessionId);
 
     return CHIP_NO_ERROR;
 }
@@ -204,7 +204,7 @@ CHIP_ERROR CASESession::Init(uint16_t myKeyId, SessionEstablishmentDelegate * de
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     mDelegate = delegate;
-    SetLocalKeyId(myKeyId);
+    SetLocalSessionId(myKeyId);
 
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
@@ -280,7 +280,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     Clear();
 }
 
-CHIP_ERROR CASESession::DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role)
+CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role)
 {
     size_t saltlen;
 
@@ -303,7 +303,7 @@ CHIP_ERROR CASESession::DeriveSecureSession(SecureSession & session, SecureSessi
     }
 
     ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()), ByteSpan(msg_salt.Get(), saltlen),
-                                                SecureSession::SessionInfoType::kSessionEstablishment, role));
+                                                CryptoContext::SessionInfoType::kSessionEstablishment, role));
 
     return CHIP_NO_ERROR;
 }
@@ -336,7 +336,7 @@ CHIP_ERROR CASESession::SendSigmaR1()
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), initiatorRandom, sizeof(initiatorRandom)));
     // Retrieve Session Identifier
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyId(), true));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId(), true));
     // Generate a Destination Identifier
     {
         MutableByteSpan destinationIdSpan(destinationIdentifier);
@@ -379,7 +379,7 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle && msg)
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
-    uint16_t initiatorSessionId = 0;
+    uint16_t initiatorSessionId;
     uint8_t destinationIdentifier[kSHA256_Hash_Length];
     uint8_t initiatorRandom[kSigmaParamRandomNumberSize];
 
@@ -402,7 +402,7 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle && msg)
     SuccessOrExit(err = tlvReader.Get(initiatorSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", initiatorSessionId);
-    SetPeerKeyId(initiatorSessionId);
+    SetPeerSessionId(initiatorSessionId);
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
@@ -546,7 +546,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
         tlvWriter.Init(std::move(msg_R2));
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), &msg_rand[0], sizeof(msg_rand)));
-        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyId(), true));
+        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId(), true));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(3), mEphemeralKey.Pubkey(),
                                                static_cast<uint32_t>(mEphemeralKey.Pubkey().Length())));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(4), msg_R2_Encrypted.Get(),
@@ -613,7 +613,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle && msg)
     ByteSpan responderNOC;
     ByteSpan responderICAC;
 
-    uint16_t responderSessionId = 0;
+    uint16_t responderSessionId;
 
     uint32_t decodeTagIdSeq = 0;
 
@@ -636,7 +636,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle && msg)
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", responderSessionId);
-    SetPeerKeyId(responderSessionId);
+    SetPeerSessionId(responderSessionId);
 
     // Retrieve Responder's Ephemeral Pubkey
     SuccessOrExit(err = tlvReader.Next());

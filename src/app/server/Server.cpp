@@ -20,7 +20,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/Mdns.h>
-#include <app/server/RendezvousServer.h>
 #include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
@@ -43,7 +42,7 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/FabricTable.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 using chip::RendezvousInformationFlag;
 using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
@@ -82,7 +81,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     chip::Platform::MemoryInit();
 
-    mCommissionManager.SetAppDelegate(delegate);
+    mCommissioningWindowManager.SetAppDelegate(delegate);
+    mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
     InitDataModelHandler(&mExchangeMgr);
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -91,9 +91,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #elif CHIP_DEVICE_LAYER_TARGET_LINUX
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 #endif
-
-    err = mRendezvousServer.Init(mAppDelegate, &mSessionIDAllocator);
-    SuccessOrExit(err);
 
     err = mFabrics.Init(&mServerStorage);
     SuccessOrExit(err);
@@ -138,16 +135,18 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
         ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
         SuccessOrExit(err = AddTestCommissioning());
     }
-    else if (DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    else if ((DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned()) &&
+             (GetFabricTable().FabricCount() != 0))
     {
-        // If the network is already provisioned, proactively disable BLE advertisement.
-        ChipLogProgress(AppServer, "Network already provisioned. Disabling BLE advertisement");
+        // The device is already commissioned, proactively disable BLE advertisement.
+        ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
     }
     else
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
-        SuccessOrExit(err = mCommissionManager.OpenBasicCommissioningWindow(ResetFabrics::kYes));
+        GetFabricTable().DeleteAllFabrics();
+        SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow());
 #endif
     }
 
@@ -166,11 +165,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     // TODO @pan-apple Use IM protocol ID.
     // Register to receive unsolicited legacy ZCL messages from the exchange manager.
     err = mExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
-    SuccessOrExit(err);
-
-    // TODO @pan-apple Remove service provisioniong, maybe multi-admin?
-    // Register to receive unsolicited Service Provisioning messages from the exchange manager.
-    err = mExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, this);
     SuccessOrExit(err);
 
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
@@ -196,7 +190,7 @@ void Server::Shutdown()
     mExchangeMgr.Shutdown();
     mSessions.Shutdown();
     mTransports.Close();
-    mRendezvousServer.Cleanup();
+    mCommissioningWindowManager.Cleanup();
     chip::Platform::MemoryShutdown();
 }
 
@@ -249,7 +243,7 @@ CHIP_ERROR Server::AddTestCommissioning()
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
     SuccessOrExit(err = mSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, SecureSession::SessionRole::kResponder, kMinValidFabricIndex));
+                                             testSession, CryptoContext::SessionRole::kResponder, kMinValidFabricIndex));
 
 exit:
     if (testSession)

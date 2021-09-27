@@ -47,7 +47,7 @@
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <transport/FabricTable.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
@@ -295,7 +295,7 @@ protected:
     FabricId mFabricId = kUndefinedFabricId;
 
     DeviceTransportMgr * mTransportMgr                             = nullptr;
-    SecureSessionMgr * mSessionMgr                                 = nullptr;
+    SessionManager * mSessionManager                               = nullptr;
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
     PersistentStorageDelegate * mStorageDelegate                   = nullptr;
@@ -354,27 +354,6 @@ private:
     void ReleaseAllDevices();
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
-};
-
-/**
- * @brief
- *   The commissioner applications doesn't advertise itself as an available device for rendezvous
- *   process. This delegate class provides no-op functions for the advertisement delegate.
- */
-class DeviceCommissionerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
-{
-public:
-    /**
-     * @brief
-     *   Starts advertisement of the device for rendezvous availability.
-     */
-    CHIP_ERROR StartAdvertisement() override { return CHIP_NO_ERROR; }
-
-    /**
-     * @brief
-     *   Stops advertisement of the device for rendezvous availability.
-     */
-    CHIP_ERROR StopAdvertisement() override { return CHIP_NO_ERROR; }
 };
 
 /**
@@ -605,8 +584,6 @@ private:
     bool mPairedDevicesUpdated;
 
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
-
-    DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     UserDirectedCommissioningServer * mUdcServer = nullptr;

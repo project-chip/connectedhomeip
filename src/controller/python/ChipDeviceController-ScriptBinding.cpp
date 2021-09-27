@@ -48,6 +48,7 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <app/server/Mdns.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -214,6 +215,9 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     (*outDevCtrl)->SetUdpListenPort(0);
     err = (*outDevCtrl)->Init(initParams);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    chip::app::MdnsServer::Instance().StartServer(chip::Mdns::CommissioningMode::kDisabled);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     return CHIP_NO_ERROR.AsInteger();
 }
@@ -327,7 +331,7 @@ ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::De
 
 ChipError::StorageType pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl)
 {
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, static_cast<uint16_t>(0));
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, static_cast<uint64_t>(0));
     return devCtrl->DiscoverCommissionableNodes(filter).AsInteger();
 }
 
@@ -399,6 +403,23 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
         ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
         ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
         ChipLogProgress(Discovery, "\tPairing Hint\t\t0x%x", dnsSdInfo->pairingHint);
+        if (dnsSdInfo->GetMrpRetryIntervalIdle().HasValue())
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle().Value());
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval idle\tNot present");
+        }
+        if (dnsSdInfo->GetMrpRetryIntervalActive().HasValue())
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", dnsSdInfo->GetMrpRetryIntervalActive().Value());
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
+        }
+        ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
         for (int j = 0; j < dnsSdInfo->numIPs; ++j)
         {
             char buf[chip::Inet::kMaxIPAddressStringLength];

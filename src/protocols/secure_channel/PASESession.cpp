@@ -45,7 +45,7 @@
 #include <protocols/secure_channel/StatusReport.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 
@@ -87,8 +87,7 @@ void PASESession::Clear()
     memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg = MsgType::PASE_PakeError;
 
-    // Note: we don't need to explicitly clear the state of mSpake2p object.
-    //       Clearing the following state takes care of it.
+    mSpake2p.Clear();
     mCommissioningHash.Clear();
 
     mIterationCount = 0;
@@ -157,8 +156,8 @@ CHIP_ERROR PASESession::ToSerializable(PASESessionSerializable & serializable)
     memset(&serializable, 0, sizeof(serializable));
     serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
     serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
-    serializable.mLocalKeyId      = GetLocalKeyId();
-    serializable.mPeerKeyId       = GetPeerKeyId();
+    serializable.mLocalSessionId  = GetLocalSessionId();
+    serializable.mPeerSessionId   = GetPeerSessionId();
 
     memcpy(serializable.mKe, mKe, mKeLen);
 
@@ -174,8 +173,8 @@ CHIP_ERROR PASESession::FromSerializable(const PASESessionSerializable & seriali
     memset(mKe, 0, sizeof(mKe));
     memcpy(mKe, serializable.mKe, mKeLen);
 
-    SetLocalKeyId(serializable.mLocalKeyId);
-    SetPeerKeyId(serializable.mPeerKeyId);
+    SetLocalSessionId(serializable.mLocalSessionId);
+    SetPeerSessionId(serializable.mPeerSessionId);
 
     return CHIP_NO_ERROR;
 }
@@ -193,7 +192,7 @@ CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, SessionEstabl
     mDelegate = delegate;
 
     ChipLogDetail(SecureChannel, "Assigned local session key ID %d", myKeyId);
-    SetLocalKeyId(myKeyId);
+    SetLocalSessionId(myKeyId);
     mSetupPINCode    = setupCode;
     mComputeVerifier = true;
 
@@ -340,11 +339,11 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     Clear();
 }
 
-CHIP_ERROR PASESession::DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role)
+CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role)
 {
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
     return session.InitFromSecret(ByteSpan(mKe, mKeLen), ByteSpan(nullptr, 0),
-                                  SecureSession::SessionInfoType::kSessionEstablishment, role);
+                                  CryptoContext::SessionInfoType::kSessionEstablishment, role);
 }
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
@@ -362,7 +361,7 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(1), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyId(), true));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId(), true));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mPasscodeID, true));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
     // TODO - Add optional MRP parameter support to PASE
@@ -389,7 +388,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
-    uint16_t initiatorSessionId = 0;
+    uint16_t initiatorSessionId;
     uint8_t initiatorRandom[kPBKDFParamRandomNumberSize];
 
     uint32_t decodeTagIdSeq = 0;
@@ -413,7 +412,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
 
     ChipLogDetail(SecureChannel, "Peer assigned session ID %d", initiatorSessionId);
     // TODO - Update <Set/Get><Local/Peer>KeyId() functions to <Set/Get><Local/Peer>SessionId()
-    SetPeerKeyId(initiatorSessionId);
+    SetPeerSessionId(initiatorSessionId);
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
@@ -454,7 +453,7 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
     // The initiator random value is being sent back in the response as required by the specifications
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), initiatorRandom));
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(2), mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalKeyId(), true));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId(), true));
 
     if (!initiatorHasPBKDFParams)
     {
@@ -492,7 +491,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
-    uint16_t responderSessionId = 0;
+    uint16_t responderSessionId;
     uint8_t random[kPBKDFParamRandomNumberSize];
 
     uint32_t decodeTagIdSeq = 0;
@@ -524,7 +523,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session ID %d", responderSessionId);
-    SetPeerKeyId(responderSessionId);
+    SetPeerSessionId(responderSessionId);
 
     if (mHavePBKDFParameters)
     {

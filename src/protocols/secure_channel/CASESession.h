@@ -38,9 +38,9 @@
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/CryptoContext.h>
 #include <transport/FabricTable.h>
 #include <transport/PairingSession.h>
-#include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -71,8 +71,8 @@ struct CASESessionSerializable
     uint8_t mIPK[kIPKSize];
     uint8_t mPairingComplete;
     NodeId mPeerNodeId;
-    uint16_t mLocalKeyId;
-    uint16_t mPeerKeyId;
+    uint16_t mLocalSessionId;
+    uint16_t mPeerSessionId;
 };
 
 class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession
@@ -126,7 +126,7 @@ public:
      * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override;
+    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
 
     const char * GetI2RSessionInfo() const override { return "Sigma I2R Key"; }
 
@@ -159,7 +159,7 @@ public:
                                  System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SecureSessionMgr * sessionMgr) override
+                                                            SessionManager * sessionManager) override
     {
         return &mMessageDispatch;
     }

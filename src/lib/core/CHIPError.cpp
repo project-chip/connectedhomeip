@@ -644,8 +644,11 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED.AsInteger():
         desc = "Duplicate message received";
         break;
-    case CHIP_ERROR_MESSAGE_ID_OUT_OF_WINDOW.AsInteger():
+    case CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW.AsInteger():
         desc = "Message id out of window";
+        break;
+    case CHIP_ERROR_REBOOT_SIGNAL_RECEIVED.AsInteger():
+        desc = "Termination signal is received";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

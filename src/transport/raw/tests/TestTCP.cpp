@@ -110,7 +110,7 @@ public:
         CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&mContext.GetInetLayer()).SetAddressType(addr.Type()));
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
-        mTransportMgrBase.SetSecureSessionMgr(this);
+        mTransportMgrBase.SetSessionManager(this);
         mTransportMgrBase.Init(&tcp);
 
         mReceiveHandlerCallCount = 0;
@@ -132,7 +132,7 @@ public:
 
         // Should be able to send a message to itself by just calling send.
         err = tcp.SendMessage(Transport::PeerAddress::TCP(addr), std::move(buffer));
-        if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
+        if (err == CHIP_ERROR_POSIX(EADDRNOTAVAIL))
         {
             // TODO(#2698): the underlying system does not support IPV6. This early return
             // should be removed and error should be made fatal.

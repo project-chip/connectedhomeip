@@ -31,7 +31,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 chip::Messaging::ExchangeManager gExchangeManager;
-chip::SecureSessionMgr gSessionManager;
+chip::SessionManager gSessionManager;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;
 
 void InitializeChip(void)

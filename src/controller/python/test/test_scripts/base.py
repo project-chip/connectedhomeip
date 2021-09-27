@@ -19,12 +19,14 @@ from dataclasses import dataclass
 from typing import Any
 import typing
 from chip import ChipDeviceCtrl
+from chip import ChipCommissionableNodeCtrl
 import chip.interaction_model as IM
 import threading
 import os
 import sys
 import logging
 import time
+import ctypes
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -77,6 +79,31 @@ class BaseTestHelper:
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
             controllerNodeId=nodeid)
         self.logger = logger
+        self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController()
+
+    def _WaitForOneDiscoveredDevice(self, timeoutSeconds: int = 2):
+        print("Waiting for device responses...")
+        strlen = 100
+        addrStrStorage = ctypes.create_string_buffer(strlen)
+        timeout = time.time() + timeoutSeconds
+        while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and time.time() <= timeout):
+            time.sleep(0.2)
+        if time.time() > timeout:
+            return None
+        return ctypes.string_at(addrStrStorage)
+
+    def TestDiscovery(self, discriminator: int):
+        self.logger.info(
+            f"Discovering commissionable nodes with discriminator {discriminator}")
+        self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
+            ctypes.c_uint16(int(discriminator)))
+        res = self._WaitForOneDiscoveredDevice()
+        if not res:
+            self.logger.info(
+                f"Device not found")
+            return False
+        self.logger.info(f"Found device at {res}")
+        return res
 
     def TestKeyExchange(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Conducting key exchange with device {}".format(ip))

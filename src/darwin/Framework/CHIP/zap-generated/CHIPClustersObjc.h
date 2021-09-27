@@ -386,13 +386,13 @@ NS_ASSUME_NONNULL_BEGIN
              responseHandler:(ResponseHandler)responseHandler;
 - (void)stepHue:(uint8_t)stepMode
            stepSize:(uint8_t)stepSize
-     transitionTime:(uint8_t)transitionTime
+     transitionTime:(uint16_t)transitionTime
         optionsMask:(uint8_t)optionsMask
     optionsOverride:(uint8_t)optionsOverride
     responseHandler:(ResponseHandler)responseHandler;
 - (void)stepSaturation:(uint8_t)stepMode
               stepSize:(uint8_t)stepSize
-        transitionTime:(uint8_t)transitionTime
+        transitionTime:(uint16_t)transitionTime
            optionsMask:(uint8_t)optionsMask
        optionsOverride:(uint8_t)optionsOverride
        responseHandler:(ResponseHandler)responseHandler;
@@ -935,6 +935,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mediaStartOver:(ResponseHandler)responseHandler;
 - (void)mediaStop:(ResponseHandler)responseHandler;
 
+- (void)readAttributePlaybackStateWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeStartTimeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDurationWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePositionUpdatedAtWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePositionWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePlaybackSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeSeekRangeEndWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeSeekRangeStartWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1131,6 +1147,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeSupportedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster Power Source
+ *
+ */
+@interface CHIPPowerSource : CHIPCluster
+
+- (void)readAttributeStatusWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeOrderWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryPercentRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryTimeRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryChargeLevelWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeActiveBatteryFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryChargeStateWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -1411,6 +1457,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLongCharStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLongCharStringWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeEpochUsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeEpochUsWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeEpochSWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeEpochSWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
 
@@ -1623,6 +1675,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeRxErrFcsCountWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeRxErrOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeActiveTimestampWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePendingTimestampWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDelayWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeSecurityPolicyWithResponseHandler:(ResponseHandler)responseHandler;
 

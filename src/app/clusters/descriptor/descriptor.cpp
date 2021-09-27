@@ -131,13 +131,13 @@ void emberAfPluginDescriptorServerInitCallback(void)
 
     for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
     {
-        EndpointId endpoint = emberAfEndpointFromIndex(index);
-        if (!emberAfContainsCluster(endpoint, Descriptor::Id))
+        if (!emberAfEndpointIndexIsEnabled(index))
         {
             continue;
         }
 
-        if (!emberAfEndpointIndexIsEnabled(index))
+        EndpointId endpoint = emberAfEndpointFromIndex(index);
+        if (!emberAfContainsCluster(endpoint, Descriptor::Id))
         {
             continue;
         }

@@ -19,15 +19,15 @@
 
 #include <lib/core/CHIPError.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/Flags.h>
 #include <protocols/bdx/BdxTransferSession.h>
 
 #include <fstream>
 
-bool isTransferComplete = false;
-
 using namespace chip::bdx;
 
-uint32_t numBlocksRead = 0;
+uint32_t numBlocksRead   = 0;
+const char outFilePath[] = "test-ota-out.txt";
 
 void BdxDownloader::SetInitialExchange(chip::Messaging::ExchangeContext * ec)
 {
@@ -37,14 +37,20 @@ void BdxDownloader::SetInitialExchange(chip::Messaging::ExchangeContext * ec)
 void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogDetail(BDX, "OutputEvent type: %d", static_cast<uint16_t>(event.EventType));
+
+    if (event.EventType != TransferSession::OutputEventType::kNone)
+    {
+        ChipLogDetail(BDX, "OutputEvent type: %d", static_cast<uint16_t>(event.EventType));
+    }
+
     switch (event.EventType)
     {
     case TransferSession::OutputEventType::kNone:
-        if (isTransferComplete)
+        if (mIsTransferComplete)
         {
-            ChipLogDetail(BDX, "Transfer complete!");
+            ChipLogDetail(BDX, "Transfer complete! Contents written/appended to %s", outFilePath);
             mTransfer.Reset();
+            mIsTransferComplete = false;
         }
         break;
     case TransferSession::OutputEventType::kMsgToSend: {
@@ -53,6 +59,10 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
         if (event.msgTypeData.MessageType == static_cast<uint8_t>(MessageType::ReceiveInit))
         {
             sendFlags.Set(chip::Messaging::SendMessageFlags::kFromInitiator);
+        }
+        if (event.msgTypeData.MessageType != static_cast<uint8_t>(MessageType::BlockAckEOF))
+        {
+            sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
         }
         err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, std::move(event.MsgData),
                                         sendFlags);
@@ -66,18 +76,24 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
     case TransferSession::OutputEventType::kBlockReceived: {
         ChipLogDetail(BDX, "Got block length %zu", event.blockdata.Length);
 
-        std::ofstream otaFile("test-ota-out.txt", std::ifstream::out | std::ifstream::ate | std::ifstream::app);
+        // TODO: something more elegant than appending to a local file
+        // TODO: while convenient, we should not do a synchronous block write in our example application - this is bad practice
+        std::ofstream otaFile(outFilePath, std::ifstream::out | std::ifstream::ate | std::ifstream::app);
         otaFile.write(reinterpret_cast<const char *>(event.blockdata.Data), event.blockdata.Length);
 
         if (event.blockdata.IsEof)
         {
-            ReturnOnFailure(mTransfer.PrepareBlockAck());
+            err = mTransfer.PrepareBlockAck();
+            VerifyOrReturn(err == CHIP_NO_ERROR,
+                           ChipLogError(BDX, "%s: PrepareBlockAck failed: %s", __FUNCTION__, chip::ErrorStr(err)));
+            mIsTransferComplete = true;
         }
         else
         {
-            ReturnOnFailure(mTransfer.PrepareBlockQuery());
+            err = mTransfer.PrepareBlockQuery();
+            VerifyOrReturn(err == CHIP_NO_ERROR,
+                           ChipLogError(BDX, "%s: PrepareBlockQuery failed: %s", __FUNCTION__, chip::ErrorStr(err)));
         }
-        otaFile.close();
         break;
     }
     case TransferSession::OutputEventType::kStatusReceived:
@@ -97,6 +113,6 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
     case TransferSession::OutputEventType::kQueryReceived:
     case TransferSession::OutputEventType::kAckEOFReceived:
     default:
-        ChipLogError(BDX, "%s: unsupported event type", __FUNCTION__);
+        ChipLogError(BDX, "%s: unexpected event type", __FUNCTION__);
     }
 }

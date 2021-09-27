@@ -23,6 +23,8 @@
 #include <lib/support/ReferenceCountedHandle.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/TimeSource.h>
+#include <transport/MessageCounter.h>
+#include <transport/PeerMessageCounter.h>
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {

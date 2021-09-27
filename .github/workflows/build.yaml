@@ -58,7 +58,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -129,7 +129,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -174,7 +174,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.0
+            image: connectedhomeip/chip-build:latest
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -257,6 +257,9 @@ jobs:
                   submodules: true
             - name: Setup Environment
               run: brew install openssl pkg-config
+            - name: Try to ensure the directory for diagnostic log collection exists
+              run: |
+                  mkdir -p ~/Library/Logs/DiagnosticReports || true
             - name: Fix pkgconfig link
               working-directory: /usr/local/lib/pkgconfig
               run: |
@@ -270,7 +273,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -292,6 +295,12 @@ jobs:
                       scripts/build/gn_build.sh
                       scripts/tests/gn_tests.sh
                   done
+            - name: Uploading diagnostic logs
+              uses: actions/upload-artifact@v2
+              if: ${{ failure() }} && ${{ !env.ACT }}
+              with:
+                  name: crash-log-darwin
+                  path: ~/Library/Logs/DiagnosticReports/
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage

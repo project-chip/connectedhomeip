@@ -223,7 +223,7 @@ CHIP_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
             sa.sin6_scope_id = 0;
 
             if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
-                res = chip::System::MapErrorPOSIX(errno);
+                res = CHIP_ERROR_POSIX(errno);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (addrType == kIPAddressType_IPv4)
@@ -235,7 +235,7 @@ CHIP_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
             sa.sin_addr   = addr.ToIPv4();
 
             if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
-                res = chip::System::MapErrorPOSIX(errno);
+                res = CHIP_ERROR_POSIX(errno);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
         else
@@ -299,7 +299,7 @@ CHIP_ERROR TCPEndPoint::Listen(uint16_t backlog)
 
     if (listen(mSocket, backlog) != 0)
     {
-        res = chip::System::MapErrorPOSIX(errno);
+        res = CHIP_ERROR_POSIX(errno);
     }
     else
     {
@@ -450,7 +450,7 @@ CHIP_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
             int r = setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, &ifr, sizeof(ifr));
             if (r < 0 && errno != EACCES)
             {
-                return res = chip::System::MapErrorPOSIX(errno);
+                return res = CHIP_ERROR_POSIX(errno);
             }
 
             if (r < 0)
@@ -516,7 +516,7 @@ CHIP_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
 
     if (conRes == -1 && errno != EINPROGRESS)
     {
-        res = chip::System::MapErrorPOSIX(errno);
+        res = CHIP_ERROR_POSIX(errno);
         DoClose(res, true);
         return res;
     }
@@ -633,7 +633,7 @@ CHIP_ERROR TCPEndPoint::GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) con
     socklen_t saLen = sizeof(sa);
 
     if (getpeername(mSocket, &sa.any, &saLen) != 0)
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
 
     if (sa.any.sa_family == AF_INET6)
     {
@@ -704,7 +704,7 @@ CHIP_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
     socklen_t saLen = sizeof(sa);
 
     if (getsockname(mSocket, &sa.any, &saLen) != 0)
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
 
     if (sa.any.sa_family == AF_INET6)
     {
@@ -754,7 +754,7 @@ CHIP_ERROR TCPEndPoint::GetInterfaceId(InterfaceId * retInterface)
 
     if (getpeername(mSocket, &sa.any, &saLen) != 0)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
 
     if (sa.any.sa_family == AF_INET6)
@@ -879,7 +879,7 @@ CHIP_ERROR TCPEndPoint::EnableNoDelay()
         // Disable TCP Nagle buffering by setting TCP_NODELAY socket option to true
         val = 1;
         if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_NODELAY, &val, sizeof(val)) != 0)
-            return chip::System::MapErrorPOSIX(errno);
+            return CHIP_ERROR_POSIX(errno);
 #endif // defined(TCP_NODELAY)
     }
 
@@ -937,22 +937,22 @@ CHIP_ERROR TCPEndPoint::EnableKeepAlive(uint16_t interval, uint16_t timeoutCount
         // Set the idle interval
         val = interval;
         if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_IDLE_INTERVAL_OPT_NAME, &val, sizeof(val)) != 0)
-            return chip::System::MapErrorPOSIX(errno);
+            return CHIP_ERROR_POSIX(errno);
 
         // Set the probe retransmission interval.
         val = interval;
         if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_KEEPINTVL, &val, sizeof(val)) != 0)
-            return chip::System::MapErrorPOSIX(errno);
+            return CHIP_ERROR_POSIX(errno);
 
         // Set the probe timeout count
         val = timeoutCount;
         if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_KEEPCNT, &val, sizeof(val)) != 0)
-            return chip::System::MapErrorPOSIX(errno);
+            return CHIP_ERROR_POSIX(errno);
 
         // Enable keepalives for the connection.
         val = 1; // enable
         if (setsockopt(mSocket, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
-            return chip::System::MapErrorPOSIX(errno);
+            return CHIP_ERROR_POSIX(errno);
     }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -1013,7 +1013,7 @@ CHIP_ERROR TCPEndPoint::DisableKeepAlive()
         // Disable keepalives on the connection.
         val = 0; // disable
         if (setsockopt(mSocket, SOL_SOCKET, SO_KEEPALIVE, &val, sizeof(val)) != 0)
-            return chip::System::MapErrorPOSIX(errno);
+            return CHIP_ERROR_POSIX(errno);
     }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -1063,7 +1063,7 @@ CHIP_ERROR TCPEndPoint::SetUserTimeout(uint32_t userTimeoutMillis)
     // Set the user timeout
     uint32_t val = userTimeoutMillis;
     if (setsockopt(mSocket, TCP_SOCKOPT_LEVEL, TCP_USER_TIMEOUT, &val, sizeof(val)) != 0)
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
 #else  // TCP_USER_TIMEOUT
     res = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // defined(TCP_USER_TIMEOUT)
@@ -1379,7 +1379,7 @@ CHIP_ERROR TCPEndPoint::DriveSending()
 
     // Pretend send() fails in the while loop below
     INET_FAULT_INJECT(FaultInjection::kFault_Send, {
-        err = chip::System::MapErrorPOSIX(EIO);
+        err = CHIP_ERROR_POSIX(EIO);
         DoClose(err, false);
         return err;
     });
@@ -1393,7 +1393,7 @@ CHIP_ERROR TCPEndPoint::DriveSending()
         if (lenSentRaw == -1)
         {
             if (errno != EAGAIN && errno != EWOULDBLOCK)
-                err = (errno == EPIPE) ? INET_ERROR_PEER_DISCONNECTED : chip::System::MapErrorPOSIX(errno);
+                err = (errno == EPIPE) ? INET_ERROR_PEER_DISCONNECTED : CHIP_ERROR_POSIX(errno);
             break;
         }
 
@@ -1473,7 +1473,7 @@ CHIP_ERROR TCPEndPoint::DriveSending()
         if (State == kState_SendShutdown && mSendQueue.IsNull())
         {
             if (shutdown(mSocket, SHUT_WR) != 0)
-                err = chip::System::MapErrorPOSIX(errno);
+                err = CHIP_ERROR_POSIX(errno);
         }
     }
 
@@ -2425,7 +2425,7 @@ CHIP_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
             return INET_ERROR_WRONG_ADDRESS_TYPE;
         mSocket = ::socket(family, SOCK_STREAM | SOCK_FLAGS, 0);
         if (mSocket == -1)
-            return chip::System::MapErrorPOSIX(errno);
+            return CHIP_ERROR_POSIX(errno);
         ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->StartWatchingSocket(mSocket, &mWatch));
         mAddrType = addrType;
 
@@ -2498,7 +2498,7 @@ void TCPEndPoint::HandlePendingIO(System::SocketEvents events)
             // The socket option SO_ERROR is not available.
             int osConRes = 0;
 #endif
-            CHIP_ERROR conRes = chip::System::MapErrorPOSIX(osConRes);
+            CHIP_ERROR conRes = CHIP_ERROR_POSIX(osConRes);
 
             // Process the connection result.
             HandleConnectComplete(conRes);
@@ -2601,7 +2601,7 @@ void TCPEndPoint::ReceiveData()
             return;
         }
 
-        DoClose(chip::System::MapErrorPOSIX(systemErrno), false);
+        DoClose(CHIP_ERROR_POSIX(systemErrno), false);
     }
 
     else
@@ -2680,7 +2680,7 @@ void TCPEndPoint::HandleIncomingConnection()
         }
         else
         {
-            err = chip::System::MapErrorPOSIX(errno);
+            err = CHIP_ERROR_POSIX(errno);
         }
     }
 
@@ -2776,7 +2776,7 @@ CHIP_ERROR TCPEndPoint::CheckConnectionProgress(bool & isProgressing)
 
     if (ioctl(mSocket, TIOCOUTQ, &currPendingBytesRaw) < 0)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        return CHIP_ERROR_POSIX(errno);
     }
 
     if (!CanCastTo<uint32_t>(currPendingBytesRaw))
