@@ -5148,6 +5148,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": null
     }
-  ],
-  "log": []
+  ]
 }
