@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include <bitset>
 
 #include <setup_payload/Base38Decode.cpp>
