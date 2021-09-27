@@ -167,7 +167,10 @@ static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inCo
             numOfTestsRan++;
             chip::Platform::ScopedMemoryBuffer<uint8_t> out_ct;
             out_ct.Alloc(vector->ct_len);
-            NL_TEST_ASSERT(inSuite, out_ct);
+            if (vector->ct_len > 0)
+            {
+                NL_TEST_ASSERT(inSuite, out_ct);
+            }
             chip::Platform::ScopedMemoryBuffer<uint8_t> out_tag;
             out_tag.Alloc(vector->tag_len);
             NL_TEST_ASSERT(inSuite, out_tag);
@@ -206,7 +209,10 @@ static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inCo
             numOfTestsRan++;
             chip::Platform::ScopedMemoryBuffer<uint8_t> out_pt;
             out_pt.Alloc(vector->pt_len);
-            NL_TEST_ASSERT(inSuite, out_pt);
+            if (vector->pt_len > 0)
+            {
+                NL_TEST_ASSERT(inSuite, out_pt);
+            }
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
                                              vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt.Get());
 
