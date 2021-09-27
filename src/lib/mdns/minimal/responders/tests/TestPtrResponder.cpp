@@ -31,7 +31,9 @@ using namespace chip::Encoding;
 using namespace chip::Inet;
 using namespace mdns::Minimal;
 
+#if INET_CONFIG_ENABLE_IPV4
 constexpr uint16_t kMdnsPort = 5353;
+#endif
 
 const QNamePart kNames[]       = { "some", "test", "local" };
 const QNamePart kTargetNames[] = { "point", "to", "this" };

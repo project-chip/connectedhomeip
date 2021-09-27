@@ -349,10 +349,11 @@ void DNSResolver::LwIPHandleResolveComplete(const char * name, ip_addr_t * ipadd
 
 void DNSResolver::InitAddrInfoHints(struct addrinfo & hints)
 {
+    memset(&hints, 0, sizeof(hints));
+
+#if INET_CONFIG_ENABLE_IPV4
     uint8_t addrFamilyOption = (DNSOptions & kDNSOption_AddrFamily_Mask);
 
-    memset(&hints, 0, sizeof(hints));
-#if INET_CONFIG_ENABLE_IPV4
     if (addrFamilyOption == kDNSOption_AddrFamily_IPv4Only)
     {
         hints.ai_family = AF_INET;
