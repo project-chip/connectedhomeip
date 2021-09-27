@@ -49,23 +49,23 @@ limitations under the License.
     <attribute side="server" code="0x0021" define="CONTROL_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="true">control mode</attribute>
     <attribute side="server" code="0x0022" define="PUMP_ALARM_MASK" type="BITMAP16" writable="false" optional="true">alarm mask</attribute>
 
-    <event code="0x1" priority="info" name="SupplyVoltageLow"></event>
-    <event code="0x2" priority="info" name="SupplyVoltageHigh"></event>
-    <event code="0x4" priority="info" name="PowerMissingPhase"></event>
-    <event code="0x8" priority="info" name="SystemPressureLow"></event>
-    <event code="0x10" priority="info" name="SystemPressureHigh"></event>
-    <event code="0x20" priority="info" name="DryRunning"></event>
-    <event code="0x40" priority="info" name="MotorTemperatureHigh"></event>
-    <event code="0x80" priority="info" name="PumpMotorFatalFailure"></event>
-    <event code="0x100" priority="info" name="ElectronicTemperatureHigh"></event>
-    <event code="0x200" priority="info" name="PumpBlocked"></event>
-    <event code="0x400" priority="info" name="SensorFailure"></event>
-    <event code="0x800" priority="info" name="ElectronicNonFatalFailure"></event>
-    <event code="0x1000" priority="info" name="ElectronicFatalFailure"></event>
-    <event code="0x2000" priority="info" name="GeneralFault"></event>
-    <event code="0x4000" priority="info" name="Leakage"></event>
-    <event code="0x8000" priority="info" name="AirDetection"></event>
-    <event code="0x10000" priority="info" name="TurbineOperation"></event>
+    <event side="server" code="0x00" priority="info" name="SupplyVoltageLow"></event>
+    <event side="server" code="0x01" priority="info" name="SupplyVoltageHigh"></event>
+    <event side="server" code="0x02" priority="info" name="PowerMissingPhase"></event>
+    <event side="server" code="0x03" priority="info" name="SystemPressureLow"></event>
+    <event side="server" code="0x04" priority="info" name="SystemPressureHigh"></event>
+    <event side="server" code="0x05" priority="critical" name="DryRunning"></event>
+    <event side="server" code="0x06" priority="info" name="MotorTemperatureHigh"></event>
+    <event side="server" code="0x07" priority="critical" name="PumpMotorFatalFailure"></event>
+    <event side="server" code="0x08" priority="info" name="ElectronicTemperatureHigh"></event>
+    <event side="server" code="0x09" priority="critical" name="PumpBlocked"></event>
+    <event side="server" code="0x0A" priority="info" name="SensorFailure"></event>
+    <event side="server" code="0x0B" priority="info" name="ElectronicNonFatalFailure"></event>
+    <event side="server" code="0x0C" priority="critical" name="ElectronicFatalFailure"></event>
+    <event side="server" code="0x0D" priority="info" name="GeneralFault"></event>
+    <event side="server" code="0x0E" priority="info" name="Leakage"></event>
+    <event side="server" code="0x0F" priority="info" name="AirDetection"></event>
+    <event side="server" code="0x10" priority="info" name="TurbineOperation"></event>
   </cluster>
 
   <bitmap name="PumpStatus" type="BITMAP16">
