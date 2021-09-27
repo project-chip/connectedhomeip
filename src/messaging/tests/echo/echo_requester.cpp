@@ -230,7 +230,7 @@ int main(int argc, char * argv[])
     if (gUseTCP)
     {
         err = gTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer)
-                                   .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                                   .SetAddressType(chip::Inet::kIPAddressType_IPv6)
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
@@ -240,7 +240,7 @@ int main(int argc, char * argv[])
     else
     {
         err = gUDPManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
-                                   .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                                   .SetAddressType(chip::Inet::kIPAddressType_IPv6)
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
