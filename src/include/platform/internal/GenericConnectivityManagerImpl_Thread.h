@@ -68,7 +68,6 @@ protected:
     bool _IsThreadAttached();
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
-    bool _HaveServiceConnectivityViaThread();
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
 
     // ===== Members for use by the implementation subclass.
@@ -150,12 +149,6 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadPo
     const ConnectivityManager::ThreadPollingConfig & pollingConfig)
 {
     return ThreadStackMgrImpl().SetThreadPollingConfig(pollingConfig);
-}
-
-template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_HaveServiceConnectivityViaThread()
-{
-    return mFlags.Has(Flags::kHaveServiceConnectivity);
 }
 
 template <class ImplClass>

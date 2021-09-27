@@ -57,8 +57,6 @@ public:
     bool _IsWiFiStationEnabled(void);
     bool _IsWiFiStationApplicationControlled(void);
     bool _IsWiFiStationConnected(void);
-    bool _HaveIPv4InternetConnectivity(void);
-    bool _HaveIPv6InternetConnectivity(void);
     uint32_t _GetWiFiStationReconnectIntervalMS(void);
     CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
     bool _IsWiFiStationProvisioned(void);
@@ -105,18 +103,6 @@ inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_IsWiFiStationEnab
 
 template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_IsWiFiStationConnected(void)
-{
-    return false;
-}
-
-template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_HaveIPv4InternetConnectivity(void)
-{
-    return false;
-}
-
-template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_HaveIPv6InternetConnectivity(void)
 {
     return false;
 }

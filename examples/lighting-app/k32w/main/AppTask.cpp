@@ -52,10 +52,9 @@ static QueueHandle_t sAppEventQueue;
 static LEDWidget sStatusLED;
 static LEDWidget sLightLED;
 
-static bool sIsThreadProvisioned     = false;
-static bool sIsThreadEnabled         = false;
-static bool sHaveBLEConnections      = false;
-static bool sHaveServiceConnectivity = false;
+static bool sIsThreadProvisioned = false;
+static bool sIsThreadEnabled     = false;
+static bool sHaveBLEConnections  = false;
 
 static uint32_t eventMask = 0;
 
@@ -182,10 +181,9 @@ void AppTask::AppTaskMain(void * pvParameter)
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
             K32WUartProcess();
 #endif
-            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -203,11 +201,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            if (sHaveServiceConnectivity)
-            {
-                sStatusLED.Set(true);
-            }
-            else if (sIsThreadProvisioned && sIsThreadEnabled)
+            if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 sStatusLED.Blink(950, 50);
             }

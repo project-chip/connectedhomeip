@@ -298,13 +298,7 @@ void WindowAppImpl::UpdateLEDs()
     }
     else
     {
-        // Consider the system to be "fully connected" if it has service
-        // connectivity
-        if (mState.haveServiceConnectivity)
-        {
-            mStatusLED.Set(true);
-        }
-        else if (mState.isThreadProvisioned && mState.isThreadEnabled)
+        if (mState.isThreadProvisioned && mState.isThreadEnabled)
         {
             mStatusLED.Blink(950, 50);
         }
