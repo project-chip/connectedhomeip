@@ -26,7 +26,7 @@
 
 // ==================== Platform Adaptations ====================
 
-#define INET_CONFIG_ENABLE_IPV4 1
+#define INET_CONFIG_ENABLE_IPV4 0
 
 // ========== Platform-specific Configuration Overrides =========
 
