@@ -657,16 +657,9 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
-    {
-        mFlags.Set(Flags::kAdvertisingEnabled, val);
-    }
-
+    mFlags.Set(Flags::kAdvertisingEnabled, val);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
