@@ -37,6 +37,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/FabricTable.h>
+#include <transport/PairingSession.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
 
