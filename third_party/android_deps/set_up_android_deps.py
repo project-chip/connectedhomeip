@@ -29,7 +29,9 @@ def main():
     gradle_executable = os.path.join(android_deps_dir, gradlew)
     subprocess.check_call(
         [gradle_executable, '-p', android_deps_dir, 'setUpAndroidDeps'])
-    subprocess.check_call(['gn', 'format', os.path.join(android_deps_dir, 'BUILD.gn')])
+    subprocess.check_call(
+        ['gn', 'format', os.path.join(android_deps_dir, 'BUILD.gn')])
+
 
 if __name__ == '__main__':
     sys.exit(main())
