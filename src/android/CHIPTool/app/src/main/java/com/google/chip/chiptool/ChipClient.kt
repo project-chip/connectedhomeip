@@ -46,7 +46,7 @@ object ChipClient {
   }
 
   fun getAndroidChipPlatform(context: Context?): AndroidChipPlatform {
-    if(!this::androidPlatform.isInitialized && context != null) {
+    if (!this::androidPlatform.isInitialized && context != null) {
       //force ChipDeviceController load jni
       ChipDeviceController.loadJni()
       androidPlatform = AndroidChipPlatform(AndroidBleManager(), PreferencesKeyValueStoreManager(context), PreferencesConfigurationManager(context), NsdManagerServiceResolver(context))
