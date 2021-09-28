@@ -52,6 +52,7 @@ class SelectActionFragment : Fragment() {
       }
       onOffClusterBtn.setOnClickListener { getCallback()?.handleOnOffClicked() }
       sensorClustersBtn.setOnClickListener{ getCallback()?.handleSensorClicked() }
+      multiAdminClusterBtn.setOnClickListener{ getCallback()?.handleMultiAdminClicked() }
       attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
     }
   }
@@ -109,6 +110,8 @@ class SelectActionFragment : Fragment() {
     fun handleOnOffClicked()
     /** Notifies listener of Sensor Clusters button click. */
     fun handleSensorClicked()
+    /** Notifies listener of Multi-admin Clusters button click. */
+    fun handleMultiAdminClicked()
     /** Notifies listener of attestation command button clicked. */
     fun handleAttestationTestClicked()
     /** Notifies listener of a click to manually input the CHIP device address.. */

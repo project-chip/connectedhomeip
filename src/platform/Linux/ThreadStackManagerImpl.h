@@ -19,7 +19,7 @@
 
 #include <memory>
 
-#include <lib/core/CHIPTLV.h>
+#include <app/AttributeAccessInterface.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/Linux/GlibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/introspect.h>
@@ -86,7 +86,7 @@ public:
 
     CHIP_ERROR _JoinerStart();
 
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
 
     ~ThreadStackManagerImpl() = default;
 

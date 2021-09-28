@@ -493,6 +493,30 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
     return true;
 }
 
+JNI_METHOD(jboolean, openPairingWindowWithPIN)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint duration, jint iteration, jint discriminator, jlong setupPinCode)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    Device * chipDevice = nullptr;
+    chip::SetupPayload setupPayload;
+    setupPayload.discriminator = discriminator;
+    setupPayload.setUpPINCode  = setupPinCode;
+
+    GetCHIPDevice(env, handle, deviceId, &chipDevice);
+
+    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::CommissioningWindowOption::kTokenWithRandomPIN,
+                                        setupPayload);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "OpenPairingWindow failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+
+    return true;
+}
+
 static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUUID & uuid)
 {
     const auto valueBegin  = env->GetByteArrayElements(value, nullptr);

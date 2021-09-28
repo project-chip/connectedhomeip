@@ -932,6 +932,23 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuc
     });
 };
 
+void CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge::OnSuccessFn(
+    void * context, chip::ByteSpan AttestationElements, chip::ByteSpan Signature)
+{
+    DispatchSuccess(context, @ {
+        @"AttestationElements" : [NSData dataWithBytes:AttestationElements.data() length:AttestationElements.size()],
+        @"Signature" : [NSData dataWithBytes:Signature.data() length:Signature.size()],
+    });
+};
+
+void CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge::OnSuccessFn(
+    void * context, chip::ByteSpan Certificate)
+{
+    DispatchSuccess(context, @ {
+        @"Certificate" : [NSData dataWithBytes:Certificate.data() length:Certificate.size()],
+    });
+};
+
 void CHIPOperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
     void * context, uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText)
 {

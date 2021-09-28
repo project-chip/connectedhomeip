@@ -15883,6 +15883,30 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(chip::EndpointId endpoint,
                                                                          chip::app::CommandHandler * commandObj);
 /**
+ * @brief Operational Credentials Cluster AttestationRequest Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterAttestationRequestCallback(chip::EndpointId endpoint,
+                                                                    chip::app::CommandHandler * commandObj,
+                                                                    chip::ByteSpan AttestationNonce);
+/**
+ * @brief Operational Credentials Cluster AttestationResponse Command callback (from server)
+ */
+bool emberAfOperationalCredentialsClusterAttestationResponseCallback(chip::EndpointId endpoint,
+                                                                     chip::app::CommandSender * commandObj,
+                                                                     chip::ByteSpan AttestationElements, chip::ByteSpan Signature);
+/**
+ * @brief Operational Credentials Cluster CertificateChainRequest Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(chip::EndpointId endpoint,
+                                                                         chip::app::CommandHandler * commandObj,
+                                                                         uint8_t CertificateType);
+/**
+ * @brief Operational Credentials Cluster CertificateChainResponse Command callback (from server)
+ */
+bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(chip::EndpointId endpoint,
+                                                                          chip::app::CommandSender * commandObj,
+                                                                          chip::ByteSpan Certificate);
+/**
  * @brief Operational Credentials Cluster OpCSRRequest Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,

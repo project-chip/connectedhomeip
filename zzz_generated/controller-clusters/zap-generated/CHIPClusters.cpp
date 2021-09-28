@@ -5276,6 +5276,42 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeRebootCount(Callback::Cancela
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
+CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeUpTime(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000002;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int64uAttributeCallback>);
+}
+
+CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeTotalOperationalHours(Callback::Cancelable * onSuccessCallback,
+                                                                         Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000003;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
+CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeBootReasons(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000004;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
 CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback)
 {
@@ -8299,6 +8335,91 @@ exit:
     return err;
 }
 
+CHIP_ERROR OperationalCredentialsCluster::AttestationRequest(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback,
+                                                             chip::ByteSpan attestationNonce)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OperationalCredentials::Commands::Ids::AttestationRequest,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // attestationNonce: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), attestationNonce));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::CertificateChainRequest(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint8_t certificateType)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OperationalCredentials::Commands::Ids::CertificateChainRequest,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // certificateType: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), certificateType));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
 CHIP_ERROR OperationalCredentialsCluster::OpCSRRequest(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, chip::ByteSpan cSRNonce)
 {
@@ -9395,6 +9516,30 @@ exit:
 }
 
 // SoftwareDiagnostics Cluster Attributes
+CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeCurrentHeapFree(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000001;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int64uAttributeCallback>);
+}
+
+CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeCurrentHeapUsed(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000002;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int64uAttributeCallback>);
+}
+
 CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeCurrentHeapHighWatermark(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback)
 {

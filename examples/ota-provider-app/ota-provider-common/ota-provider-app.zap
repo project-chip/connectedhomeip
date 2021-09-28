@@ -1,5 +1,5 @@
 {
-  "featureLevel": 51,
+  "featureLevel": 54,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1090,36 +1090,6 @@
           "commands": [],
           "attributes": [
             {
-              "name": "default ota provider",
-              "code": 0,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "update possible",
-              "code": 1,
-              "mfgCode": null,
-              "side": "client",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "true",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -1170,6 +1140,22 @@
           "side": "client",
           "enabled": 0,
           "commands": [
+            {
+              "name": "AttestationRequest",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "CertificateChainRequest",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
             {
               "name": "OpCSRRequest",
               "code": 4,
@@ -1237,6 +1223,22 @@
           "side": "server",
           "enabled": 1,
           "commands": [
+            {
+              "name": "AttestationResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "CertificateChainResponse",
+              "code": 3,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
             {
               "name": "OpCSRResponse",
               "code": 5,

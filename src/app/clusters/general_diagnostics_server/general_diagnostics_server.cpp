@@ -36,15 +36,16 @@ public:
     // Register for the GeneralDiagnostics cluster on all endpoints.
     GeneralDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead) override;
+    CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) override;
 
 private:
     template <typename T>
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &), TLV::TLVWriter * aWriter);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &), const AttributeValueEncoder & aEncoder);
 };
 
 template <typename T>
-CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &), TLV::TLVWriter * aWriter)
+CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &),
+                                                        const AttributeValueEncoder & aEncoder)
 {
     T data;
     CHIP_ERROR err = (DeviceLayer::PlatformMgr().*getter)(data);
@@ -57,12 +58,12 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMana
         return err;
     }
 
-    return aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), data);
+    return aEncoder.Encode(data);
 }
 
 GeneralDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR GeneralDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead)
+CHIP_ERROR GeneralDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead)
 {
     if (aClusterInfo.mClusterId != GeneralDiagnostics::Id)
     {
@@ -74,16 +75,16 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TL
     switch (aClusterInfo.mFieldId)
     {
     case Ids::RebootCount: {
-        return ReadIfSupported(&PlatformManager::GetRebootCount, aWriter);
+        return ReadIfSupported(&PlatformManager::GetRebootCount, aEncoder);
     }
     case Ids::UpTime: {
-        return ReadIfSupported(&PlatformManager::GetUpTime, aWriter);
+        return ReadIfSupported(&PlatformManager::GetUpTime, aEncoder);
     }
     case Ids::TotalOperationalHours: {
-        return ReadIfSupported(&PlatformManager::GetTotalOperationalHours, aWriter);
+        return ReadIfSupported(&PlatformManager::GetTotalOperationalHours, aEncoder);
     }
     case Ids::BootReasons: {
-        return ReadIfSupported(&PlatformManager::GetBootReasons, aWriter);
+        return ReadIfSupported(&PlatformManager::GetBootReasons, aEncoder);
     }
     default: {
         *aDataRead = false;
