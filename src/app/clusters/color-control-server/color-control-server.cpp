@@ -1288,7 +1288,7 @@ bool ColorControlServer::moveToSaturationCommand(uint8_t saturation, uint16_t tr
     return true;
 }
 
-bool ColorControlServer::stepSaturationCommand(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
+bool ColorControlServer::stepSaturationCommand(uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
                                                uint8_t optionsOverride)
 {
     EndpointId endpoint                                      = emberAfCurrentEndpoint();
@@ -2320,15 +2320,15 @@ bool emberAfColorControlClusterMoveToHueAndSaturationCallback(EndpointId endpoin
 }
 
 bool emberAfColorControlClusterStepHueCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t stepMode,
-                                               uint8_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
+                                               uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
                                                uint8_t optionsOverride)
 {
-    return ColorControlServer::Instance().stepHueCommand(stepMode, static_cast<uint16_t>(stepSize), transitionTime, optionsMask,
-                                                         optionsOverride, false);
+    return ColorControlServer::Instance().stepHueCommand(
+        stepMode, static_cast<uint16_t>(stepSize), static_cast<uint16_t>(transitionTime), optionsMask, optionsOverride, false);
 }
 
 bool emberAfColorControlClusterStepSaturationCallback(EndpointId aEndpoint, app::CommandHandler * commandObj, uint8_t stepMode,
-                                                      uint8_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
+                                                      uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
                                                       uint8_t optionsOverride)
 {
     return ColorControlServer::Instance().stepSaturationCommand(stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
