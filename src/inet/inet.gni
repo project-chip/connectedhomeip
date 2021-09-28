@@ -18,7 +18,7 @@ import("${chip_root}/src/system/system.gni")
 
 declare_args() {
   # Enable IPv4 support.
-  chip_inet_config_enable_ipv4 = false
+  chip_inet_config_enable_ipv4 = true
 
   # Enable DNS resolver.
   chip_inet_config_enable_dns_resolver = true
