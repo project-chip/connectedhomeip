@@ -91,7 +91,8 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
             ChipLogDetail(ExchangeManager,
                           "EC:" ChipLogFormatExchange " MessageCounter:" ChipLogFormatMessageCounter
                           " NextRetransTimeCtr:%04" PRIX16,
-                          ChipLogValueExchange(entry.rc->GetExchangeContext()), entry.messageCounter, entry.nextRetransTimeTick);
+                          ChipLogValueExchange(entry.rc->GetExchangeContext()), entry.retainedBuf.GetMessageCounter(),
+                          entry.nextRetransTimeTick);
         }
     }
 }
@@ -205,7 +206,7 @@ void ReliableMessageMgr::ExpireTicks()
     uint64_t deltaTicks = GetTickCounterFromTimeDelta(now);
 
 #if defined(RMP_TICKLESS_DEBUG)
-    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExpireTicks at %" PRIu64 ", %" PRIu64 ", %u", now, mTimeStampBase,
+    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExpireTicks at %" PRIu64 ", %" PRIu64 ", %" PRIu64, now, mTimeStampBase,
                   deltaTicks);
 #endif
 
@@ -267,7 +268,16 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrDie(rc != nullptr && !rc->IsOccupied());
+    VerifyOrDie(rc != nullptr);
+
+    if (rc->IsOccupied())
+    {
+        // This can happen if we have a misbehaving peer that is not sending
+        // acks with its application-level responses when it should, so we end
+        // up with two outstanding app-level messages both waiting for an ack.
+        // Just give up and error out in that case.
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     for (RetransTableEntry & entry : mRetransTable)
     {
@@ -462,7 +472,7 @@ void ReliableMessageMgr::StartTimer()
             nextWakeTimeTick = rc->mNextAckTimeTick;
             foundWake        = true;
 #if defined(RMP_TICKLESS_DEBUG)
-            ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer next ACK time %u", nextWakeTimeTick);
+            ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer next ACK time %" PRIu64, nextWakeTimeTick);
 #endif
         }
     });
@@ -478,7 +488,7 @@ void ReliableMessageMgr::StartTimer()
                 nextWakeTimeTick = entry.nextRetransTimeTick;
                 foundWake        = true;
 #if defined(RMP_TICKLESS_DEBUG)
-                ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer RetransTime %u", nextWakeTimeTick);
+                ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer RetransTime %" PRIu64, nextWakeTimeTick);
 #endif
             }
         }

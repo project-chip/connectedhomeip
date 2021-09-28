@@ -76,7 +76,10 @@ class Efr32Builder(GnBuilder):
             output_prefix=output_prefix)
 
         self.app = app
-        self.gn_build_args = ['efr32_board="%s"' % board.GnArgName()]
+        self.board = board
+
+    def GnBuildArgs(self):
+        return ['efr32_board="%s"' % self.board.GnArgName()]
 
     def build_outputs(self):
         items = {

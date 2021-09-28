@@ -2499,5 +2499,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
+ *
+ * @brief Number of devices a controller can be simultaneously connected to
+ */
+#ifndef CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
+#define CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES 64
+#endif
+
+/**
  * @}
  */

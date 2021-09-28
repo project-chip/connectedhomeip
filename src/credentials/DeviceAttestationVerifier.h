@@ -65,6 +65,13 @@ enum class AttestationVerificationResult : uint16_t
     // TODO: Add more attestation verification errors
 };
 
+enum CertificateType : uint8_t
+{
+    kUnknown = 0,
+    kDAC     = 1,
+    kPAI     = 2,
+};
+
 class DeviceAttestationVerifier
 {
 public:

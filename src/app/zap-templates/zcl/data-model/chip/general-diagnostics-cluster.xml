@@ -74,7 +74,7 @@ limitations under the License.
     <item name="OffPremiseServicesReachableIPv6" type="BOOLEAN"/>
     <!-- TODO: HWADR not supported yet -->
     <item name="HardwareAddress" type="OCTET_STRING" length="8"/>
-    <item name="Type" type="ENUM8"/>
+    <item name="Type" type="InterfaceType"/>
   </struct>
   <cluster>
     <domain>General</domain>

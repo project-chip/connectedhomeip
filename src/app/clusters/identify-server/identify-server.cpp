@@ -100,72 +100,6 @@ static inline void unreg(Identify * inst)
     }
 }
 
-static void scheduleIdentifyTick(EndpointId endpoint)
-{
-    Identify * identify = inst(endpoint);
-    uint16_t identifyTime;
-
-    if (identify == nullptr)
-    {
-        return;
-    }
-
-    if (EMBER_ZCL_STATUS_SUCCESS == Clusters::Identify::Attributes::GetIdentifyTime(endpoint, &identifyTime))
-    {
-        /* effect identifier changed during identify */
-        if (identify->mTargetEffectIdentifier != identify->mCurrentEffectIdentifier)
-        {
-            identify->mCurrentEffectIdentifier = identify->mTargetEffectIdentifier;
-
-            /* finish identify process */
-            if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT == identify->mCurrentEffectIdentifier && identifyTime > 0)
-            {
-                (void) chip::DeviceLayer::SystemLayer().StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick, identify);
-                return;
-            }
-            /* stop identify process */
-            else if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT == identify->mCurrentEffectIdentifier && identifyTime > 0)
-            {
-                Clusters::Identify::Attributes::SetIdentifyTime(endpoint, 0);
-
-                if (nullptr != identify->mOnIdentifyStop)
-                    identify->mOnIdentifyStop(identify);
-            }
-            /* change from e.g. Breathe to Blink during identify */
-            else
-            {
-                /* cancel identify */
-                Clusters::Identify::Attributes::SetIdentifyTime(endpoint, 0);
-                if (nullptr != identify->mOnIdentifyStop)
-                    identify->mOnIdentifyStop(identify);
-
-                /* trigger effect identifier callback */
-                if (nullptr != identify->mOnEffectIdentifier)
-                    identify->mOnEffectIdentifier(identify);
-            }
-        }
-        else if (identifyTime > 0)
-        {
-            /* we only start if both callbacks are set */
-            if (nullptr != identify->mOnIdentifyStart && nullptr != identify->mOnIdentifyStop && false == identify->mActive)
-            {
-                identify->mActive = true;
-                identify->mOnIdentifyStart(identify);
-            }
-
-            (void) chip::DeviceLayer::SystemLayer().StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick, identify);
-            return;
-        }
-        else
-        {
-            if (nullptr != identify->mOnIdentifyStop)
-                identify->mOnIdentifyStop(identify);
-        }
-    }
-
-    (void) chip::DeviceLayer::SystemLayer().CancelTimer(onIdentifyClusterTick, identify);
-}
-
 void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
 {
     (void) endpoint;
@@ -183,16 +117,29 @@ static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appS
         if (EMBER_ZCL_STATUS_SUCCESS == Clusters::Identify::Attributes::GetIdentifyTime(endpoint, &identifyTime) &&
             0 != identifyTime)
         {
+            identifyTime = static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1);
             // This tick writes the new attribute, which will trigger the Attribute
-            // Changed callback below, which in turn will schedule or cancel the tick.
-            // Because of this, the tick does not have to be scheduled here.
-            (void) Clusters::Identify::Attributes::SetIdentifyTime(endpoint,
-                                                                   static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1));
+            // Changed callback.
+            (void) Clusters::Identify::Attributes::SetIdentifyTime(endpoint, identifyTime);
         }
-        else
-        {
-            identify->mActive = false;
-        }
+    }
+}
+
+static inline void identify_activate(Identify * identify)
+{
+    if (nullptr != identify->mOnIdentifyStart && nullptr != identify->mOnIdentifyStop && false == identify->mActive)
+    {
+        identify->mActive = true;
+        identify->mOnIdentifyStart(identify);
+    }
+}
+
+static inline void identify_deactivate(Identify * identify)
+{
+    if (nullptr != identify->mOnIdentifyStop)
+    {
+        identify->mActive = false;
+        identify->mOnIdentifyStop(identify);
     }
 }
 
@@ -200,7 +147,61 @@ void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, A
 {
     if (attributeId == Clusters::Identify::Attributes::Ids::IdentifyTime)
     {
-        scheduleIdentifyTick(endpoint);
+        Identify * identify = inst(endpoint);
+        uint16_t identifyTime;
+
+        if (identify == nullptr)
+        {
+            return;
+        }
+
+        if (EMBER_ZCL_STATUS_SUCCESS == Clusters::Identify::Attributes::GetIdentifyTime(endpoint, &identifyTime))
+        {
+            /* effect identifier changed during identify */
+            if (identify->mTargetEffectIdentifier != identify->mCurrentEffectIdentifier)
+            {
+                identify->mCurrentEffectIdentifier = identify->mTargetEffectIdentifier;
+
+                /* finish identify process */
+                if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT == identify->mCurrentEffectIdentifier && identifyTime > 0)
+                {
+                    (void) chip::DeviceLayer::SystemLayer().StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick,
+                                                                       identify);
+                    return;
+                }
+                /* stop identify process */
+                else if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT == identify->mCurrentEffectIdentifier && identifyTime > 0)
+                {
+                    Clusters::Identify::Attributes::SetIdentifyTime(endpoint, 0);
+                    identify_deactivate(identify);
+                }
+                /* change from e.g. Breathe to Blink during identify */
+                else
+                {
+                    /* cancel identify */
+                    Clusters::Identify::Attributes::SetIdentifyTime(endpoint, 0);
+                    identify_deactivate(identify);
+
+                    /* trigger effect identifier callback */
+                    if (nullptr != identify->mOnEffectIdentifier)
+                        identify->mOnEffectIdentifier(identify);
+                }
+            }
+            else if (identifyTime > 0)
+            {
+                /* we only start if both callbacks are set */
+                identify_activate(identify);
+
+                (void) chip::DeviceLayer::SystemLayer().StartTimer(MILLISECOND_TICKS_PER_SECOND, onIdentifyClusterTick, identify);
+                return;
+            }
+            else
+            {
+                identify_deactivate(identify);
+            }
+        }
+
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(onIdentifyClusterTick, identify);
     }
 }
 

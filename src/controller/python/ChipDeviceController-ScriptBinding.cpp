@@ -52,6 +52,8 @@
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <inet/IPAddress.h>
 #include <lib/mdns/Resolver.h>
 #include <lib/support/BytesToHex.h>
@@ -66,6 +68,7 @@
 using namespace chip;
 using namespace chip::Ble;
 using namespace chip::Controller;
+using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 
 static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
@@ -99,8 +102,6 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
                                                                  uint16_t * outPort);
 ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl,
                                                                      uint64_t * outFabricId);
-ChipError::StorageType pychip_DeviceController_CommissioningComplete(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                     chip::NodeId nodeId);
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 
 // Rendezvous
@@ -178,6 +179,9 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
         localDeviceId = kDefaultLocalDeviceId;
     }
 
+    // Initialize device attestation verifier
+    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
+
     CHIP_ERROR err = sOperationalCredentialsIssuer.Initialize(sStorageDelegate);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
@@ -253,12 +257,6 @@ ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Contr
 {
     *outFabricId = devCtrl->GetCompressedFabricId();
     return CHIP_NO_ERROR.AsInteger();
-}
-
-ChipError::StorageType pychip_DeviceController_CommissioningComplete(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                     chip::NodeId nodeId)
-{
-    return devCtrl->CommissioningComplete(nodeId).AsInteger();
 }
 
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId)

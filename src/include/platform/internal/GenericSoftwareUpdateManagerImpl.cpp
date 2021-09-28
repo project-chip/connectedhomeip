@@ -112,22 +112,9 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::_SetRetryPolicyCallback(
 template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareBinding(intptr_t arg)
 {
-    CHIP_ERROR err;
     GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
 
     self->Cleanup();
-
-    if (!ConnectivityMgr().HaveServiceConnectivity())
-    {
-        ChipLogProgress(DeviceLayer, "Software Update Check: No service connectivity");
-        ExitNow(err = CHIP_ERROR_NOT_CONNECTED);
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        self->Impl()->SoftwareUpdateFailed(err, NULL);
-    }
 }
 
 template <class ImplClass>

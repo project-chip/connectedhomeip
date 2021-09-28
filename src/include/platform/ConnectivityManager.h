@@ -24,9 +24,12 @@
 #pragma once
 #include <memory>
 
+#include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+
+#include <app/util/basic-types.h>
 
 namespace chip {
 
@@ -161,14 +164,8 @@ public:
     bool IsThreadAttached();
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
-    bool HaveServiceConnectivityViaThread();
 
-    // Internet connectivity methods
-    bool HaveIPv4InternetConnectivity();
-    bool HaveIPv6InternetConnectivity();
-
-    // Service connectivity methods
-    bool HaveServiceConnectivity();
+    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
 
     // Ethernet network diagnostics methods
     CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount);
@@ -373,21 +370,6 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
 }
 
-inline bool ConnectivityManager::HaveIPv4InternetConnectivity()
-{
-    return static_cast<ImplClass *>(this)->_HaveIPv4InternetConnectivity();
-}
-
-inline bool ConnectivityManager::HaveIPv6InternetConnectivity()
-{
-    return static_cast<ImplClass *>(this)->_HaveIPv6InternetConnectivity();
-}
-
-inline bool ConnectivityManager::HaveServiceConnectivity()
-{
-    return static_cast<ImplClass *>(this)->_HaveServiceConnectivity();
-}
-
 inline CHIP_ERROR ConnectivityManager::GetEthPacketRxCount(uint64_t & packetRxCount)
 {
     return static_cast<ImplClass *>(this)->_GetEthPacketRxCount(packetRxCount);
@@ -468,9 +450,23 @@ inline void ConnectivityManager::ErasePersistentInfo()
     static_cast<ImplClass *>(this)->_ErasePersistentInfo();
 }
 
-inline bool ConnectivityManager::HaveServiceConnectivityViaThread()
+/*
+ * @brief Get runtime value from the thread network based on the given attribute ID.
+ *        The info is encoded via the AttributeValueEncoder.
+ *
+ * @param attributeId Id of the attribute for the requested info.
+ * @param aEncoder Encoder to encode the attribute value.
+ *
+ * @return CHIP_NO_ERROR = Succes.
+ *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
+ *                                      Use standard read.
+ *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
+ *         All other errors should be treated as a read error and reported as such.
+ */
+inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
+                                                                                  const app::AttributeValueEncoder & encoder)
 {
-    return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaThread();
+    return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()

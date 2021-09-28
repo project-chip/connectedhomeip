@@ -495,6 +495,7 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
             ReturnErrorOnFailure(Store(i));
             mNextAvailableFabricIndex = static_cast<FabricIndex>((i + 1) % UINT8_MAX);
             *outputIndex              = i;
+            mFabricCount++;
             return CHIP_NO_ERROR;
         }
     }
@@ -508,6 +509,7 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
             ReturnErrorOnFailure(Store(i));
             mNextAvailableFabricIndex = static_cast<FabricIndex>((i + 1) % UINT8_MAX);
             *outputIndex              = i;
+            mFabricCount++;
             return CHIP_NO_ERROR;
         }
     }
@@ -532,6 +534,14 @@ exit:
         ReleaseFabricIndex(id);
         if (mDelegate != nullptr && fabricIsInitialized)
         {
+            if (mFabricCount == 0)
+            {
+                ChipLogError(Discovery, "!!Trying to delete a fabric, but the current fabric count is already 0");
+            }
+            else
+            {
+                mFabricCount--;
+            }
             ChipLogProgress(Discovery, "Fabric (%d) deleted. Calling OnFabricDeletedFromStorage", id);
             mDelegate->OnFabricDeletedFromStorage(id);
         }
@@ -561,7 +571,10 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
     for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
     {
         FabricInfo * fabric = &mStates[i - kMinValidFabricIndex];
-        LoadFromStorage(fabric);
+        if (LoadFromStorage(fabric) == CHIP_NO_ERROR)
+        {
+            mFabricCount++;
+        }
     }
 
     return CHIP_NO_ERROR;

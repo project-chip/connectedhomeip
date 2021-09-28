@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <app/AttributeAccessInterface.h>
+#include <app/util/basic-types.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -105,6 +107,8 @@ public:
     CHIP_ERROR DnsResolve(const char * aServiceName, const char * aInstanceName, DnsResolveCallback aCallback, void * aContext);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -367,6 +371,25 @@ inline CHIP_ERROR ThreadStackManager::GetPollPeriod(uint32_t & buf)
 inline CHIP_ERROR ThreadStackManager::JoinerStart()
 {
     return static_cast<ImplClass *>(this)->_JoinerStart();
+}
+
+/*
+ * @brief Get runtime value from the thread network based on the given attribute ID.
+ *        The info is encoded via the AttributeValueEncoder.
+ *
+ * @param attributeId Id of the attribute for the requested info.
+ * @param aEncoder Encoder to encode the attribute value.
+ *
+ * @return CHIP_NO_ERROR = Succes.
+ *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
+ *                                      Use standard read.
+ *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
+ *         All other errors should be treated as a read error and reported as such.
+ */
+inline CHIP_ERROR ThreadStackManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
+                                                                                 const app::AttributeValueEncoder & encoder)
+{
+    return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
 } // namespace DeviceLayer

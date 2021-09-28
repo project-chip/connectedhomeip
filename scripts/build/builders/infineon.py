@@ -57,7 +57,10 @@ class InfineonBuilder(GnBuilder):
             output_prefix=output_prefix)
 
         self.app = app
-        self.gn_build_args = ['p6_board="%s"' % board.GnArgName()]
+        self.board = board
+
+    def GnBuildArgs(self):
+        return ['p6_board="%s"' % self.board.GnArgName()]
 
     def build_outputs(self):
         items = {

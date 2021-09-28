@@ -585,7 +585,6 @@ class DeviceMgrCmd(Cmd):
                     address = "{}:{}".format(
                         *address) if address else "unknown"
                     print("Current address: " + address)
-                    self.devCtrl.CommissioningComplete(int(args[1]))
             else:
                 self.do_help("resolve")
         except exceptions.ChipStackException as ex:
@@ -858,7 +857,7 @@ class DeviceMgrCmd(Cmd):
 
         Options:
           -t  Timeout (in seconds)     
-          -o  Option  [OriginalSetupCode = 0, TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
+          -o  Option  [TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
           -d  Discriminator Value
           -i  Iteration
 
@@ -875,12 +874,16 @@ class DeviceMgrCmd(Cmd):
             parser.add_argument(
                 "-t", type=int, default=0, dest='timeout')
             parser.add_argument(
-                "-o", type=int, default=0, dest='option')
+                "-o", type=int, default=1, dest='option')
             parser.add_argument(
                 "-i", type=int, default=0, dest='iteration')
             parser.add_argument(
                 "-d", type=int, default=0, dest='discriminator')
             args = parser.parse_args(arglist[1:])
+
+            if args.option < 1 or args.option > 2:
+                print("Invalid option specified!")
+                raise ValueError("Invalid option specified")
 
             self.devCtrl.OpenCommissioningWindow(
                 int(arglist[0]), args.timeout, args.iteration, args.discriminator, args.option)
