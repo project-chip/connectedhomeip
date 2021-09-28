@@ -185,7 +185,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const Encr
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
                         " at monotonic time: %" PRId64 " msec",
                         "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(state->GetPeerNodeId()),
-                        System::Clock::GetMonotonicMilliseconds());
+                        System::SystemClock().GetMonotonicMilliseconds());
     }
     else
     {
@@ -197,7 +197,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle session, const Encr
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
                         " at monotonic time: %" PRId64 " msec",
                         "plaintext", &preparedMessage, preparedMessage.GetMessageCounter(), ChipLogValueX64(kUndefinedNodeId),
-                        System::Clock::GetMonotonicMilliseconds());
+                        System::SystemClock().GetMonotonicMilliseconds());
     }
 
     PacketBufferHandle msgBuf = preparedMessage.CastToWritable();

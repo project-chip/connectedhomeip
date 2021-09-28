@@ -51,7 +51,7 @@ void ReliableMessageMgr::Init(chip::System::Layer * systemLayer, SessionManager 
     mSystemLayer    = systemLayer;
     mSessionManager = sessionManager;
 
-    mTimeStampBase      = System::Clock::GetMonotonicMilliseconds();
+    mTimeStampBase      = System::SystemClock().GetMonotonicMilliseconds();
     mCurrentTimerExpiry = 0;
 }
 
@@ -197,7 +197,7 @@ static void TickProceed(uint16_t & time, uint64_t ticks)
 
 void ReliableMessageMgr::ExpireTicks()
 {
-    uint64_t now = System::Clock::GetMonotonicMilliseconds();
+    uint64_t now = System::SystemClock().GetMonotonicMilliseconds();
 
     // Number of full ticks elapsed since last timer processing.  We always round down
     // to the previous tick.  If we are between tick boundaries, the extra time since the
@@ -316,8 +316,9 @@ void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
     VerifyOrReturn(entry != nullptr && entry->rc != nullptr,
                    ChipLogError(ExchangeManager, "StartRetransmission was called for invalid entry"));
 
-    entry->nextRetransTimeTick = static_cast<uint16_t>(entry->rc->GetInitialRetransmitTimeoutTick() +
-                                                       GetTickCounterFromTimeDelta(System::Clock::GetMonotonicMilliseconds()));
+    entry->nextRetransTimeTick =
+        static_cast<uint16_t>(entry->rc->GetInitialRetransmitTimeoutTick() +
+                              GetTickCounterFromTimeDelta(System::SystemClock().GetMonotonicMilliseconds()));
 
     // Check if the timer needs to be started and start it.
     StartTimer();
@@ -507,7 +508,7 @@ void ReliableMessageMgr::StartTimer()
         {
             // If the tick boundary has expired in the past (delayed processing of event due to other system activity),
             // expire the timer immediately
-            uint64_t now           = System::Clock::GetMonotonicMilliseconds();
+            uint64_t now           = System::SystemClock().GetMonotonicMilliseconds();
             uint64_t timerArmValue = (timerExpiry > now) ? timerExpiry - now : 0;
 
 #if defined(RMP_TICKLESS_DEBUG)
@@ -531,7 +532,7 @@ void ReliableMessageMgr::StartTimer()
     {
 #if defined(RMP_TICKLESS_DEBUG)
         ChipLogDetail(ExchangeManager, "Not setting ReliableMessageProtocol timeout at %" PRIu64,
-                      System::Clock::GetMonotonicMilliseconds());
+                      System::SystemClock().GetMonotonicMilliseconds());
 #endif
         StopTimer();
     }

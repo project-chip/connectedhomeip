@@ -496,7 +496,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
     CircularEventBuffer * buffer   = nullptr;
     EventLoadOutContext ctxt       = EventLoadOutContext(writer, aEventOptions.mpEventSchema->mPriority,
                                                    GetPriorityBuffer(aEventOptions.mpEventSchema->mPriority)->GetLastEventNumber());
-    Timestamp timestamp(Timestamp::Type::kSystem, System::Clock::GetMonotonicMilliseconds());
+    Timestamp timestamp(Timestamp::Type::kSystem, System::SystemClock().GetMonotonicMilliseconds());
     EventOptions opts = EventOptions(timestamp);
     // Start the event container (anonymous structure) in the circular buffer
     writer.Init(*mpEventBuffer);

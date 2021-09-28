@@ -218,7 +218,7 @@ template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent * event)
 {
 #if CHIP_PROGRESS_LOGGING
-    uint64_t startUS = System::Clock::GetMonotonicMicroseconds();
+    uint64_t startUS = System::SystemClock().GetMonotonicMicroseconds();
 #endif // CHIP_PROGRESS_LOGGING
 
     switch (event->Type)
@@ -257,7 +257,7 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 
     // TODO: make this configurable
 #if CHIP_PROGRESS_LOGGING
-    uint32_t delta = (static_cast<uint32_t>(System::Clock::GetMonotonicMicroseconds() - startUS)) / 1000;
+    uint32_t delta = (static_cast<uint32_t>(System::SystemClock().GetMonotonicMicroseconds() - startUS)) / 1000;
     if (delta > 100)
     {
         ChipLogError(DeviceLayer, "Long dispatch time: %" PRId32 " ms, for event type %d", delta, event->Type);

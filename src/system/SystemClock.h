@@ -36,6 +36,8 @@
 #include <sys/time.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#include <stdint.h>
+
 namespace chip {
 namespace System {
 
@@ -90,25 +92,24 @@ public:
 };
 
 namespace Internal {
-// These should only be used via the public Clock:: functions below.
-extern ClockImpl gClockImpl;
+// This should only be used via SystemClock() below.
 extern ClockBase * gClockBase;
 } // namespace Internal
+
+inline ClockBase & SystemClock()
+{
+    return *Internal::gClockBase;
+}
+
+inline void SetSystemClockForTesting(System::ClockBase * clock)
+{
+    Internal::gClockBase = clock;
+}
 
 namespace Clock {
 using MonotonicMicroseconds = ClockBase::MonotonicMicroseconds;
 using MonotonicMilliseconds = ClockBase::MonotonicMicroseconds;
 using UnixTimeMicroseconds  = ClockBase::MonotonicMicroseconds;
-
-inline MonotonicMicroseconds GetMonotonicMicroseconds()
-{
-    return Internal::gClockBase->GetMonotonicMicroseconds();
-}
-
-inline MonotonicMilliseconds GetMonotonicMilliseconds()
-{
-    return Internal::gClockBase->GetMonotonicMilliseconds();
-}
 
 /**
  *  Compares two Clock::MonotonicMilliseconds values and returns true if the first value is earlier than the second value.

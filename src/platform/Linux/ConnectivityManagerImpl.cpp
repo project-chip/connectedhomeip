@@ -544,7 +544,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP()
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand start WiFi AP");
-        mLastAPDemandTime = System::Clock::GetMonotonicMilliseconds();
+        mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
     else
@@ -573,7 +573,7 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
     {
         if (mWiFiAPState == kWiFiAPState_Active)
         {
-            mLastAPDemandTime = System::Clock::GetMonotonicMilliseconds();
+            mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
         }
     }
 }
@@ -851,7 +851,7 @@ void ConnectivityManagerImpl::DriveAPState()
         // has been demand for the AP within the idle timeout period.
         else if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
         {
-            now = System::Clock::GetMonotonicMilliseconds();
+            now = System::SystemClock().GetMonotonicMilliseconds();
 
             if (mLastAPDemandTime != 0 && now < (mLastAPDemandTime + mWiFiAPIdleTimeoutMS))
             {

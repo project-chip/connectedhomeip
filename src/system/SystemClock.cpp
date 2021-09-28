@@ -52,11 +52,13 @@ namespace System {
 
 namespace Internal {
 
-ClockBase * gClockBase = &gClockImpl;
-
-#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+#if CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+extern ClockImpl gClockImpl;
+#else  // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 ClockImpl gClockImpl;
-#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+#endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+
+ClockBase * gClockBase = &gClockImpl;
 
 } // namespace Internal
 
