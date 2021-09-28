@@ -50,8 +50,6 @@ protected:
         bool in_use = false;
         // Node-wide fabric index associated with the entry
         chip::FabricIndex fabric_index;
-        // Index within the outer list, used to do index remapping
-        uint8_t internal_index;
         // Group to Endpoint mapping for fabric
         EndpointEntry endpoints[kEndpointEntriesMax];
         // Number of Group states for this fabric
@@ -81,10 +79,10 @@ protected:
             mProvider(provider), mFabric(fabric), mEndpoint(endpoint)
         {}
 
-        uint16_t Count() override
+        size_t Count() override
         {
-            uint16_t count = 0;
-            for (uint16_t i = 0; this->mFabric && i < kEndpointEntriesMax; ++i)
+            size_t count = 0;
+            for (size_t i = 0; this->mFabric && i < kEndpointEntriesMax; ++i)
             {
                 const EndpointEntry & entry = this->mFabric->endpoints[i];
                 if (entry.in_use && entry.endpoint == this->mEndpoint)
@@ -124,10 +122,10 @@ protected:
     public:
         FabricGroupStateIterator(StaticGroupsProvider & provider, Fabric * fabric) : mProvider(provider), mFabric(fabric) {}
 
-        uint16_t Count() override
+        size_t Count() override
         {
-            uint16_t count = 0;
-            for (uint16_t i = 0; i < kMaxNumGroupStates && this->mProvider.mGroupStatesCount; ++i)
+            size_t count = 0;
+            for (size_t i = 0; i < kMaxNumGroupStates && this->mProvider.mGroupStatesCount; ++i)
             {
                 const StateEntry & entry = this->mProvider.mGroupStates[i];
                 if (entry.in_use && entry.fabric == mFabric)
@@ -166,10 +164,10 @@ protected:
     public:
         AllGroupStateIterator(StaticGroupsProvider & provider) : mProvider(provider) {}
 
-        uint16_t Count() override
+        size_t Count() override
         {
-            uint16_t count = 0;
-            for (uint16_t i = 0; i < kMaxNumGroupStates && this->mProvider.mGroupStatesCount; ++i)
+            size_t count = 0;
+            for (size_t i = 0; i < kMaxNumGroupStates && this->mProvider.mGroupStatesCount; ++i)
             {
                 const StateEntry & entry = this->mProvider.mGroupStates[i];
                 if (entry.in_use)
@@ -207,10 +205,10 @@ protected:
     public:
         KeysIterator(StaticGroupsProvider & provider, Fabric * fabric) : mProvider(provider), mFabric(fabric) {}
 
-        uint16_t Count() override
+        size_t Count() override
         {
-            uint16_t count = 0;
-            for (uint16_t i = 0; this->mFabric && i < kKeyEntriesMax; ++i)
+            size_t count = 0;
+            for (size_t i = 0; this->mFabric && i < kKeyEntriesMax; ++i)
             {
                 const KeysEntry & entry = this->mFabric->keys[i];
                 if (entry.in_use)
@@ -252,11 +250,11 @@ protected:
     // If no slot is found matching the `fabric_index`, nullptr is returned.
     Fabric * GetFabric(chip::FabricIndex fabric_index, bool allow_allocate)
     {
-        Fabric * fabric      = nullptr;
-        Fabric * unused      = nullptr;
-        uint8_t unused_index = 0;
+        Fabric * fabric                = nullptr;
+        Fabric * unused                = nullptr;
+        chip::FabricIndex unused_index = 0;
 
-        for (uint8_t fabric_slot_idx = 0; fabric_slot_idx < kNumFabrics; fabric_slot_idx++)
+        for (chip::FabricIndex fabric_slot_idx = 0; fabric_slot_idx < kNumFabrics; fabric_slot_idx++)
         {
             fabric = &mFabrics[fabric_slot_idx];
             if (fabric->in_use)
@@ -277,7 +275,6 @@ protected:
         if (unused && allow_allocate)
         {
             // Use the first available entry
-            unused->internal_index = unused_index;
             unused->fabric_index   = fabric_index;
             unused->in_use         = true;
             return unused;

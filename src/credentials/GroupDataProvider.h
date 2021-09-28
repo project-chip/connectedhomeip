@@ -49,15 +49,6 @@ public:
         GroupId group;
 
         bool operator==(const GroupMapping & other) { return this->endpoint == other.endpoint && this->group == other.group; }
-
-        GroupMapping & operator=(const GroupMapping & other)
-        {
-            if (this == &other)
-                return *this; // Guard self assignment
-            this->endpoint = other.endpoint;
-            this->group    = other.group;
-            return *this;
-        }
     };
 
     // A group state maps the group key set to use for encryption/decryption for a given group ID.
@@ -97,7 +88,7 @@ public:
     public:
         virtual ~GroupMappingIterator() = default;
         // Returns the number of entries in total that will be iterated.
-        virtual uint16_t Count() = 0;
+        virtual size_t Count() = 0;
         // Returns true if a groupID is found in the iteration.
         virtual bool Next(GroupId & outGroup) = 0;
         // Release the memory allocated by this iterator, if any. Must be called before
@@ -115,7 +106,7 @@ public:
     public:
         virtual ~GroupStateIterator() = default;
         // Returns the number of entries in total that will be iterated.
-        virtual uint16_t Count() = 0;
+        virtual size_t Count() = 0;
         // Returns true if a GroupState is found in the iteration.
         virtual bool Next(GroupState & outEntry) = 0;
         // Release the memory allocated by this iterator, if any. Must be called before
@@ -133,7 +124,7 @@ public:
     public:
         virtual ~KeySetIterator() = default;
         // Returns the number of entries in total that will be iterated.
-        virtual uint16_t Count() = 0;
+        virtual size_t Count() = 0;
         // Returns true if a KeySet is found in the iteration.
         virtual bool Next(KeySet & outSet) = 0;
         // Release the memory allocated by this iterator, if any. Must be called before
