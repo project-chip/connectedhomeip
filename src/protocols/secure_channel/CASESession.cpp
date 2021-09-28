@@ -402,6 +402,8 @@ CHIP_ERROR CASESession::SendSigma1()
 
     ChipLogDetail(SecureChannel, "Sent Sigma1 msg");
 
+    mDelegate->OnSessionEstablishmentStarted();
+
     return CHIP_NO_ERROR;
 }
 
@@ -461,6 +463,8 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
             // Send Sigma2Resume message to the initiator
             SuccessOrExit(err = SendSigma2Resume(ByteSpan(initiatorRandom)));
 
+            mDelegate->OnSessionEstablishmentStarted();
+
             // Early returning here, since we have sent Sigma2Resume, and no further processing is needed for the Sigma1 message
             return CHIP_NO_ERROR;
         }
@@ -485,6 +489,8 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     SuccessOrExit(err = tlvReader.GetBytes(mRemotePubKey, static_cast<uint32_t>(mRemotePubKey.Length())));
 
     SuccessOrExit(err = SendSigma2());
+
+    mDelegate->OnSessionEstablishmentStarted();
 
 exit:
 
