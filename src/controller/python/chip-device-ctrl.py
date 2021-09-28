@@ -585,7 +585,6 @@ class DeviceMgrCmd(Cmd):
                     address = "{}:{}".format(
                         *address) if address else "unknown"
                     print("Current address: " + address)
-                    self.devCtrl.CommissioningComplete(int(args[1]))
             else:
                 self.do_help("resolve")
         except exceptions.ChipStackException as ex:
