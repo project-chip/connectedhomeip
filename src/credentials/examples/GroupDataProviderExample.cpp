@@ -275,8 +275,8 @@ protected:
         if (unused && allow_allocate)
         {
             // Use the first available entry
-            unused->fabric_index   = fabric_index;
-            unused->in_use         = true;
+            unused->fabric_index = fabric_index;
+            unused->in_use       = true;
             return unused;
         }
         // Fabric not found, and not allowed to allocate or out of entry
