@@ -698,11 +698,7 @@ int main(int argc, char * argv[])
     InitializeChip();
 
     err = gTransportManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
-#if INET_CONFIG_ENABLE_IPV4
-                                     .SetAddressType(chip::Inet::kIPAddressType_IPv4)
-#else
-                                     .SetAddressType(chip::Inet::kIPAddressType_IPv6)
-#endif
+                                     .SetAddressType(gDestAddr.GetAddressType())
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 
