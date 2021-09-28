@@ -107,11 +107,17 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
     case TransferSession::OutputEventType::kTransferTimeout:
         ChipLogError(BDX, "Transfer timed out");
         mTransfer.Reset();
+        mExchangeCtx->Close();
         break;
+    case TransferSession::OutputEventType::kAckEOFReceived:
+        ChipLogProgress(BDX, "Transfer complete");
+        mTransfer.Reset();
+        mExchangeCtx->Close();
+        break;
+
     case TransferSession::OutputEventType::kInitReceived:
     case TransferSession::OutputEventType::kAckReceived:
     case TransferSession::OutputEventType::kQueryReceived:
-    case TransferSession::OutputEventType::kAckEOFReceived:
     default:
         ChipLogError(BDX, "%s: unexpected event type", __FUNCTION__);
     }
