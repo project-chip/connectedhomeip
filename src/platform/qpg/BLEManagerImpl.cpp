@@ -441,7 +441,6 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     memset(advDataBuf, 0, kMaxAdvertisementDataSetSize);
     memset(scanRespDataBuf, 0, kMaxAdvertisementDataSetSize);
 
-
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     SuccessOrExit(err);
 
@@ -450,7 +449,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         snprintf(deviceName, sizeof(deviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
 
         deviceName[kMaxDeviceNameLength] = 0;
-        err                               = MapBLEError(qvCHIP_BleSetDeviceName(deviceName));
+        err                              = MapBLEError(qvCHIP_BleSetDeviceName(deviceName));
         SuccessOrExit(err);
     }
 
@@ -463,7 +462,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
                   "Advertisement data buffer is not big enough");
 
     // Fill in advertising data
-    index                = 0;
+    index               = 0;
     advDataBuf[index++] = 0x02;                     // length
     advDataBuf[index++] = CHIP_ADV_DATA_TYPE_FLAGS; // AD type : flags
     advDataBuf[index++] = CHIP_ADV_DATA_FLAGS;      // AD value
@@ -477,13 +476,13 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     advDataBuf[index++] = static_cast<uint8_t>(mDeviceNameLength + 1); // length
     advDataBuf[index++] = CHIP_ADV_DATA_TYPE_NAME;                     // AD type : name
-    memcpy(&advDataBuf[index], deviceName, mDeviceNameLength);        // AD value
+    memcpy(&advDataBuf[index], deviceName, mDeviceNameLength);         // AD value
     index = static_cast<uint8_t>(index + mDeviceNameLength);
 
     qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_ADV, index, advDataBuf);
 
     // Fill in scan response data
-    index                     = 0;
+    index                    = 0;
     scanRespDataBuf[index++] = CHIP_ADV_SHORT_UUID_LEN + 1;  // AD length
     scanRespDataBuf[index++] = CHIP_ADV_DATA_TYPE_UUID;      // AD type : uuid
     scanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[1]; // AD value
