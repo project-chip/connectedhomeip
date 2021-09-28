@@ -136,7 +136,8 @@ function asReadType(type)
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
   'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/Off', 'Level Control', 'Color Control', 'IAS Zone',
-  'Pump Configuration and Control'
+  'Pump Configuration and Control', 'Ethernet Network Diagnostics', 'Software Diagnostics', 'Thread Network Diagnostics',
+  'General Diagnostics'
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
@@ -335,6 +336,72 @@ function asMEI(prefix, suffix)
   return cHelper.asHex((prefix << 16) + suffix, 8);
 }
 
+function asChipZapType(type)
+{
+  if (StringHelper.isOctetString(type)) {
+    return 'chip::ByteSpan';
+  }
+
+  if (StringHelper.isCharString(type)) {
+    return 'Span<const char>';
+  }
+
+  switch (type) {
+  case 'BOOLEAN':
+    return 'bool';
+  case 'INT8S':
+    return 'int8_t';
+  case 'INT16S':
+    return 'int16_t';
+  case 'INT24S':
+    return 'int24_t';
+  case 'INT32S':
+    return 'int32_t';
+  case 'INT64S':
+    return 'int64_t';
+  case 'INT8U':
+    return 'uint8_t';
+  case 'INT16U':
+    return 'uint16_t';
+  case 'INT24U':
+    return 'uint24_t';
+  case 'INT32U':
+    return 'uint32_t';
+  case 'INT64U':
+    return 'uint64_t';
+  }
+
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+      const basicType = ChipTypesHelper.asBasicType(zclType);
+      switch (basicType) {
+      case 'bool':
+      case 'int8_t':
+      case 'uint8_t':
+      case 'int16_t':
+      case 'uint16_t':
+      case 'int24_t':
+      case 'uint24_t':
+      case 'int32_t':
+      case 'uint32_t':
+      case 'int64_t':
+      case 'uint64_t':
+        return basicType;
+      default:
+        return type + '::Type'
+      }
+    })
+  }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
+  return templateUtil.templatePromise(this.global, promise)
+}
+
 //
 // Module exports
 //
@@ -348,3 +415,4 @@ exports.asLowerCamelCase                  = asLowerCamelCase;
 exports.asUpperCamelCase                  = asUpperCamelCase;
 exports.hasSpecificAttributes             = hasSpecificAttributes;
 exports.asMEI                             = asMEI;
+exports.asChipZapType                     = asChipZapType;

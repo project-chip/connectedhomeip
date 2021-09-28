@@ -36,10 +36,10 @@ public:
 
     virtual ~SessionEstablishmentExchangeDispatch() {}
 
-    CHIP_ERROR Init(TransportMgrBase * transportMgr)
+    CHIP_ERROR Init(SessionManager * sessionManager)
     {
-        ReturnErrorCodeIf(transportMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mTransportMgr = transportMgr;
+        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        mSessionManager = sessionManager;
         return ExchangeMessageDispatch::Init();
     }
 
@@ -51,24 +51,13 @@ public:
                                  const Transport::PeerAddress & peerAddress, Messaging::MessageFlags msgFlags,
                                  Messaging::ReliableMessageContext * reliableMessageContext) override;
 
-    const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-
-    void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
-
 protected:
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;
-
-    bool IsReliableTransmissionAllowed() const override
-    {
-        // If the underlying transport is UDP.
-        return (mPeerAddress.GetTransportType() == Transport::Type::kUdp);
-    }
 
     bool IsEncryptionRequired() const override { return false; }
 
 private:
-    TransportMgrBase * mTransportMgr = nullptr;
-    Transport::PeerAddress mPeerAddress;
+    SessionManager * mSessionManager = nullptr;
 };
 
 } // namespace chip

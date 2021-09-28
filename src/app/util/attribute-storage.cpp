@@ -42,6 +42,7 @@
 #include "app/util/common.h"
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
@@ -109,6 +110,10 @@ const uint16_t attributeManufacturerCodeCount                   = GENERATED_ATTR
 #define endpointNetworkIndex(x) fixedNetworks[x]
 #endif
 
+namespace {
+app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
+} // anonymous namespace
+
 //------------------------------------------------------------------------------
 // Forward declarations
 
@@ -148,6 +153,8 @@ void emberAfEndpointConfigure(void)
 #ifdef DYNAMIC_ENDPOINT_COUNT
     if (MAX_ENDPOINT_COUNT > FIXED_ENDPOINT_COUNT)
     {
+        // This is assuming that EMBER_AF_ENDPOINT_DISABLED is 0
+        static_assert(EMBER_AF_ENDPOINT_DISABLED == 0, "We are creating enabled dynamic endpoints!");
         memset(&emAfEndpoints[FIXED_ENDPOINT_COUNT], 0,
                sizeof(EmberAfDefinedEndpoint) * (MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT));
     }
@@ -196,15 +203,14 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     emAfEndpoints[index].deviceVersion = deviceVersion;
     emAfEndpoints[index].endpointType  = ep;
     emAfEndpoints[index].networkIndex  = 0;
-    emAfEndpoints[index].bitmask       = EMBER_AF_ENDPOINT_ENABLED;
+    // Start the endpoint off as disabled.
+    emAfEndpoints[index].bitmask = EMBER_AF_ENDPOINT_DISABLED;
 
     emberAfSetDynamicEndpointCount(MAX_ENDPOINT_COUNT - FIXED_ENDPOINT_COUNT);
-    emberAfSetDeviceEnabled(id, true);
 
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-    // Rebuild descriptor attributes on all endpoints
-    emberAfPluginDescriptorServerInitCallback();
-#endif
+    // Now enable the endpoint.
+    emberAfEndpointEnableDisable(id, true);
+    emberAfSetDeviceEnabled(id, true);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -221,14 +227,9 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
         if (ep)
         {
             emberAfSetDeviceEnabled(ep, false);
+            emberAfEndpointEnableDisable(ep, false);
             emAfEndpoints[index].endpoint = 0;
-            emAfEndpoints[index].bitmask  = 0;
         }
-
-#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
-        // Rebuild descriptor attributes on all endpoints
-        emberAfPluginDescriptorServerInitCallback();
-#endif
     }
 
     return ep;
@@ -980,7 +981,40 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                     endpoint, cluster->clusterId,
                     (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
             }
+
+            // Clear out any attribute access overrides registered for this
+            // endpoint.
+            app::AttributeAccessInterface * prev = nullptr;
+            app::AttributeAccessInterface * cur  = gAttributeAccessOverrides;
+            while (cur)
+            {
+                app::AttributeAccessInterface * next = cur->GetNext();
+                if (cur->MatchesExactly(endpoint))
+                {
+                    // Remove it from the list
+                    if (prev)
+                    {
+                        prev->SetNext(next);
+                    }
+                    else
+                    {
+                        gAttributeAccessOverrides = next;
+                    }
+
+                    // Do not change prev in this case.
+                }
+                else
+                {
+                    prev = cur;
+                }
+                cur = next;
+            }
         }
+
+#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
+        // Rebuild descriptor attributes on all endpoints
+        emberAfPluginDescriptorServerInitCallback();
+#endif
     }
 
     return true;
@@ -1411,3 +1445,31 @@ bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, Cluste
     return true;
 }
 #endif
+
+bool registerAttributeAccessOverride(app::AttributeAccessInterface * attrOverride)
+{
+    for (auto * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(*attrOverride))
+        {
+            ChipLogError(Zcl, "Duplicate attribute override registration failed");
+            return false;
+        }
+    }
+    attrOverride->SetNext(gAttributeAccessOverrides);
+    gAttributeAccessOverrides = attrOverride;
+    return true;
+}
+
+app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
+{
+    for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
+    {
+        if (cur->Matches(endpointId, clusterId))
+        {
+            return cur;
+        }
+    }
+
+    return nullptr;
+}

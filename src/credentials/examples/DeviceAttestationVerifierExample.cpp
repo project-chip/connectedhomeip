@@ -17,6 +17,7 @@
 #include "DeviceAttestationVerifierExample.h"
 
 #include <credentials/CHIPCert.h>
+#include <credentials/DeviceAttestationConstructor.h>
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <lib/core/CHIPError.h>
@@ -177,7 +178,7 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
     P256ECDSASignature deviceSignature;
     // SetLength will fail if signature doesn't fit
     VerifyOrReturnError(deviceSignature.SetLength(attestationSignatureBuffer.size()) == CHIP_NO_ERROR,
-                        AttestationVerificationResult::kInvalidSignatureFormat);
+                        AttestationVerificationResult::kAttestationSignatureInvalidFormat);
     memcpy(deviceSignature.Bytes(), attestationSignatureBuffer.data(), attestationSignatureBuffer.size());
     VerifyOrReturnError(ValidateAttestationSignature(remoteManufacturerPubkey, attestationInfoBuffer, attestationChallengeBuffer,
                                                      deviceSignature) == CHIP_NO_ERROR,
@@ -198,14 +199,24 @@ AttestationVerificationResult ExampleDACVerifier::VerifyAttestationInformation(c
                                                  dacCertDerBuffer.data(), dacCertDerBuffer.size()) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kDacSignatureInvalid);
 
-    // TODO: Re-enable this when Construct/DeconstructAttestationElements methods are introduced
-#if 0
-    ReturnErrorOnFailure(
-        DeconstructAttestationElements(attestationElements, certDeclaration, attestationNonce, timestamp, firmwareInfo));
+    ByteSpan certificationDeclarationSpan;
+    ByteSpan attestationNonceSpan;
+    uint32_t timestampDeconstructed;
+    ByteSpan firmwareInfoSpan;
+    // TODO: refactor once final vendor-specific data tags is handled.
+    ByteSpan vendorReservedDeconstructed[2];
+    size_t vendorReservedDeconstructedSize = ArraySize(vendorReservedDeconstructed);
+    uint16_t vendorIdDeconstructed;
+    uint16_t profileNumDeconstructed;
+    VerifyOrReturnError(DeconstructAttestationElements(attestationInfoBuffer, certificationDeclarationSpan, attestationNonceSpan,
+                                                       timestampDeconstructed, firmwareInfoSpan, vendorReservedDeconstructed,
+                                                       vendorReservedDeconstructedSize, vendorIdDeconstructed,
+                                                       profileNumDeconstructed) == CHIP_NO_ERROR,
+                        AttestationVerificationResult::kAttestationElementsMalformed);
 
     // Verify that Nonce matches with what we sent
-    VerifyOrReturnError(attestation_nonce.data_equal(attestationNonce), AttestationVerificationResult::kNonceMismatch);
-#endif
+    VerifyOrReturnError(attestationNonceSpan.data_equal(attestationNonce),
+                        AttestationVerificationResult::kAttestationNonceMismatch);
 
     return AttestationVerificationResult::kSuccess;
 }

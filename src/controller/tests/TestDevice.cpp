@@ -27,7 +27,7 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemLayerImpl.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/PeerAddress.h>
 #include <transport/raw/UDP.h>
@@ -37,6 +37,7 @@ using namespace chip::Transport;
 using namespace chip::Controller;
 using namespace chip::Messaging;
 
+#if INET_CONFIG_ENABLE_IPV4
 namespace {
 
 using TestTransportMgr = TransportMgr<Transport::UDP>;
@@ -45,7 +46,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
 {
     Platform::MemoryInit();
     DeviceTransportMgr transportMgr;
-    SecureSessionMgr sessionMgr;
+    SessionManager sessionManager;
     ExchangeManager exchangeMgr;
     Inet::InetLayer inetLayer;
     System::LayerImpl systemLayer;
@@ -71,13 +72,13 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
         BleListenParameters(&blelayer)
 #endif
     );
-    sessionMgr.Init(&systemLayer, &transportMgr, fabrics, &messageCounterManager);
-    exchangeMgr.Init(&sessionMgr);
+    sessionManager.Init(&systemLayer, &transportMgr, fabrics, &messageCounterManager);
+    exchangeMgr.Init(&sessionManager);
     messageCounterManager.Init(&exchangeMgr);
 
     ControllerDeviceInitParams params = {
         .transportMgr    = &transportMgr,
-        .sessionMgr      = &sessionMgr,
+        .sessionManager  = &sessionManager,
         .exchangeMgr     = &exchangeMgr,
         .inetLayer       = &inetLayer,
         .storageDelegate = nullptr,
@@ -98,7 +99,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     device.Reset();
     messageCounterManager.Shutdown();
     exchangeMgr.Shutdown();
-    sessionMgr.Shutdown();
+    sessionManager.Shutdown();
     Platform::Delete(fabrics);
     transportMgr.Close();
     inetLayer.Shutdown();
@@ -124,3 +125,5 @@ int TestDevice()
 }
 
 CHIP_REGISTER_TEST_SUITE(TestDevice)
+
+#endif // INET_CONFIG_ENABLE_IPV4

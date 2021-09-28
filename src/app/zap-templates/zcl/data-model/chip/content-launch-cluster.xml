@@ -58,16 +58,19 @@ limitations under the License.
   </cluster>
 
   <struct name="ContentLaunchAdditionalInfo">
+    <cluster code="0x050a"/>
     <item name="name" type="CHAR_STRING"/>
     <item name="value" type="CHAR_STRING"/>
   </struct>
 
   <enum name="ContentLaunchMetricType" type="ENUM8">
+    <cluster code="0x050a"/>
     <item name="PIXELS" value="0x00"/>
     <item name="PERCENTAGE" value="0x01"/>
   </enum>
 
   <struct name="ContentLaunchDimension">
+    <cluster code="0x050a"/>
     <!-- TODO: Convert to double once it is supported -->
     <item name="width" type="CHAR_STRING"/>
     <!-- TODO: Convert to double once it is supported -->
@@ -76,6 +79,7 @@ limitations under the License.
   </struct>
 
   <struct name="ContentLaunchStyleInformation">
+    <cluster code="0x050a"/>
     <item name="imageUrl" type="CHAR_STRING"/>
     <item name="color" type="CHAR_STRING"/>
     <!-- TODO: Convert to struct ContentLaunchDimension once is supported -->
@@ -83,6 +87,7 @@ limitations under the License.
   </struct>
 
   <struct name="ContentLaunchBrandingInformation">
+    <cluster code="0x050a"/>
     <item name="providerName" type="CHAR_STRING"/>
     <!-- TODO: Convert to struct ContentLaunchStyleInformation once is supported -->
     <item name="background" type="INT8U"/>
@@ -98,6 +103,7 @@ limitations under the License.
 
 
   <enum name="ContentLaunchParameterEnum" type="ENUM8">
+    <cluster code="0x050a"/>
     <item name="Actor" value="0x00"/>
     <item name="Channel" value="0x01"/>
     <item name="Character" value="0x02"/>
@@ -112,19 +118,22 @@ limitations under the License.
   </enum>
 
   <enum name="ContentLaunchStreamingType" type="ENUM8">
+    <cluster code="0x050a"/>
     <item name="DASH" value="0x00"/>
     <item name="HLS" value="0x01"/>
   </enum>
 
   <enum name="ContentLaunchStatus" type="ENUM8">
+    <cluster code="0x050a"/>
     <item name="Success" value="0x00"/>
     <item name="UrlNotAvailable" value="0x01"/>
     <item name="AuthFailed" value="0x02"/>
   </enum>
 
   <struct name="ContentLaunchParamater">
+    <cluster code="0x050a"/>
     <item name="Type" type="ContentLaunchParameterEnum"/>
     <item name="Value" type="CHAR_STRING"/>
-    <item name="ExternalIDList" type="ARRAY" entryType="ContentLaunchAdditionalInfo" length="254"/>
+    <item name="ExternalIDList" type="ContentLaunchAdditionalInfo" array="true" length="254"/>
   </struct>
 </configurator>

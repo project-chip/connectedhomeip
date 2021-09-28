@@ -25,6 +25,8 @@
 #include "JniReferences.h"
 #include <lib/support/CodeUtils.h>
 
+#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
@@ -34,6 +36,7 @@
 
 using namespace chip;
 using namespace chip::Controller;
+using namespace chip::Credentials;
 using namespace TLV;
 
 extern chip::Ble::BleLayer * GetJNIBleLayer();
@@ -203,6 +206,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
     wrapper->Controller()->SetUdpListenPort(CHIP_PORT + 1);
+
+    // Initialize device attestation verifier
+    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
 
     chip::Controller::CommissionerInitParams initParams;
 

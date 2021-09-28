@@ -29,23 +29,6 @@
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 
-namespace {
-
-struct ReportCallbackInfo
-{
-    chip::NodeId nodeId;
-    chip::EndpointId endpointId;
-    chip::ClusterId clusterId;
-    chip::AttributeId attributeId;
-
-    bool operator==(ReportCallbackInfo const & other)
-    {
-        return nodeId == other.nodeId && endpointId == other.endpointId && clusterId == other.clusterId &&
-            attributeId == other.attributeId;
-    }
-};
-} // namespace
-
 namespace chip {
 namespace app {
 
@@ -145,10 +128,55 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::GetResponseCallback(NodeId nodeId, uint8_t se
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CHIPDeviceCallbacksMgr::SetSubscribeFilter(const ReportCallbackInfo & info, TLVDataFilter filter)
+{
+    constexpr ReportCallbackInfo kEmptyInfo{ kPlaceholderNodeId, 0, 0, 0 };
+
+    for (size_t i = 0; i < kTLVFilterPoolSize; i++)
+    {
+        if (mReportFilterPool[i].info == info)
+        {
+            mReportFilterPool[i].filter = filter;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    for (size_t i = 0; i < kTLVFilterPoolSize; i++)
+    {
+        if (mReportFilterPool[i].info == kEmptyInfo)
+        {
+            mReportFilterPool[i].info   = info;
+            mReportFilterPool[i].filter = filter;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_NO_MEMORY;
+}
+
+CHIP_ERROR CHIPDeviceCallbacksMgr::GetSubscribeFilter(const ReportCallbackInfo & info, TLVDataFilter * outFilter)
+{
+    for (size_t i = 0; i < kTLVFilterPoolSize; i++)
+    {
+        if (mReportFilterPool[i].info == info)
+        {
+            if (outFilter != nullptr)
+            {
+                *outFilter = mReportFilterPool[i].filter;
+            }
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_KEY_NOT_FOUND;
+}
+
 CHIP_ERROR CHIPDeviceCallbacksMgr::AddReportCallback(NodeId nodeId, EndpointId endpointId, ClusterId clusterId,
-                                                     AttributeId attributeId, Callback::Cancelable * onReportCallback)
+                                                     AttributeId attributeId, Callback::Cancelable * onReportCallback,
+                                                     TLVDataFilter filter)
 {
     VerifyOrReturnError(onReportCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(filter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReportCallbackInfo info = { nodeId, endpointId, clusterId, attributeId };
     static_assert(sizeof(onReportCallback->mInfo) >= sizeof(info), "Callback info too large");
@@ -157,16 +185,20 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::AddReportCallback(NodeId nodeId, EndpointId e
     // If a callback has already been registered for the same ReportCallbackInfo, let's cancel it.
     CancelCallback(info, mReports);
 
+    ReturnErrorOnFailure(SetSubscribeFilter(info, filter));
+
     mReports.Enqueue(onReportCallback);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CHIPDeviceCallbacksMgr::GetReportCallback(NodeId nodeId, EndpointId endpointId, ClusterId clusterId,
-                                                     AttributeId attributeId, Callback::Cancelable ** onReportCallback)
+                                                     AttributeId attributeId, Callback::Cancelable ** onReportCallback,
+                                                     TLVDataFilter * outFilter)
 {
     ReportCallbackInfo info = { nodeId, endpointId, clusterId, attributeId };
 
     ReturnErrorOnFailure(GetCallback(info, mReports, onReportCallback));
+    ReturnErrorOnFailure(GetSubscribeFilter(info, outFilter));
 
     return CHIP_NO_ERROR;
 }

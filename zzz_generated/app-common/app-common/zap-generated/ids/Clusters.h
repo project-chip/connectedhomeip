@@ -79,6 +79,9 @@ static constexpr ClusterId Id = 0x00000029;
 namespace OtaSoftwareUpdateRequestor {
 static constexpr ClusterId Id = 0x0000002A;
 } // namespace OtaSoftwareUpdateRequestor
+namespace PowerSource {
+static constexpr ClusterId Id = 0x0000002F;
+} // namespace PowerSource
 namespace GeneralCommissioning {
 static constexpr ClusterId Id = 0x00000030;
 } // namespace GeneralCommissioning

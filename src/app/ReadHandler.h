@@ -56,6 +56,12 @@ public:
         AbortCurrentExchange,
     };
 
+    enum class InteractionType : uint8_t
+    {
+        Read,
+        Subscribe,
+    };
+
     /**
      *  Initialize the ReadHandler. Within the lifetime
      *  of this instance, this method is invoked once after object
@@ -68,7 +74,7 @@ public:
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                    Messaging::ExchangeContext * apExchangeContext);
+                    Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
 
     /**
      *  Shut down the ReadHandler. This terminates this instance
@@ -77,7 +83,7 @@ public:
      */
     void Shutdown(ShutdownOptions aOptions = ShutdownOptions::KeepCurrentExchange);
     /**
-     *  Process a read request.  Parts of the processing may end up being asynchronous, but the ReadHandler
+     *  Process a read/subscribe request.  Parts of the processing may end up being asynchronous, but the ReadHandler
      *  guarantees that it will call Shutdown on itself when processing is done (including if OnReadInitialRequest
      *  returns an error).
      *
@@ -99,8 +105,9 @@ public:
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload);
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
-    bool IsReportable() const { return mState == HandlerState::Reportable; }
-    bool IsReporting() const { return mState == HandlerState::Reporting; }
+    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport; }
+    bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
+    bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
     virtual ~ReadHandler() = default;
 
     ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
@@ -117,21 +124,34 @@ public:
     // is larger than current self vended event number
     void MoveToNextScheduledDirtyPriority();
 
+    bool IsReadType() { return mInteractionType == InteractionType::Read; }
+    bool IsSubscriptionType() { return mInteractionType == InteractionType::Subscribe; }
     bool IsInitialReport() { return mInitialReport; }
+    CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    void GetSubscriptionId(uint64_t & aSubscriptionId) { aSubscriptionId = mSubscriptionId; }
+    void SetDirty() { mDirty = true; }
+    void ClearDirty() { mDirty = false; }
+    bool IsDirty() { return mDirty; }
 
 private:
+    friend class TestReadInteraction;
     enum class HandlerState
     {
-        Uninitialized = 0, ///< The handler has not been initialized
-        Initialized,       ///< The handler has been initialized and is ready
-        Reportable,        ///< The handler has received read request and is waiting for the data to send to be available
-        Reporting,         ///< The handler is reporting
+        Uninitialized = 0,      ///< The handler has not been initialized
+        Initialized,            ///< The handler has been initialized and is ready
+        GeneratingReports,      ///< The handler has received either a Read or Subscribe request and is the process of generating a
+                                ///< report.
+        AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
     };
 
+    static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
+    CHIP_ERROR RefreshSubscribeSyncTimer();
+    CHIP_ERROR SendSubscribeResponse();
+    CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser);
     CHIP_ERROR ProcessEventPathList(EventPathList::Parser & aEventPathListParser);
-    CHIP_ERROR OnStatusReport(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
@@ -140,9 +160,6 @@ private:
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
-
-    // Merges aAttributePath inside the existing internal mpAttributeClusterInfoList
-    bool MergeOverlappedAttributePath(ClusterInfo & aAttributePath);
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
 
@@ -164,6 +181,13 @@ private:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     bool mInitialReport                        = false;
+    InteractionType mInteractionType           = InteractionType::Read;
+    uint64_t mSubscriptionId                   = 0;
+    uint16_t mMinIntervalFloorSeconds          = 0;
+    uint16_t mMaxIntervalCeilingSeconds        = 0;
+    Optional<SessionHandle> mSessionHandle;
+    bool mHoldReport = false;
+    bool mDirty      = false;
 };
 } // namespace app
 } // namespace chip

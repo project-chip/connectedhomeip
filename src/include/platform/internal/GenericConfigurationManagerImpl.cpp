@@ -781,11 +781,14 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioningData()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceId);
     Impl()->ClearConfigValue(ImplClass::kConfigKey_ServiceConfig);
     Impl()->ClearConfigValue(ImplClass::kConfigKey_PairedAccountId);
 
     // TODO: Move these behaviors out of configuration manager.
+    // Also, should the flags be cleared even if the corresponding notification fails to post?
 
     // If necessary, post an event alerting other subsystems to the change in
     // the account pairing state.
@@ -794,7 +797,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioning
         ChipDeviceEvent event;
         event.Type                                   = DeviceEventType::kAccountPairingChange;
         event.AccountPairingChange.IsPairedToAccount = false;
-        PlatformMgr().PostEvent(&event);
+        err                                          = PlatformMgr().PostEvent(&event);
     }
 
     // If necessary, post an event alerting other subsystems to the change in
@@ -805,13 +808,17 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ClearServiceProvisioning
         event.Type                                           = DeviceEventType::kServiceProvisioningChange;
         event.ServiceProvisioningChange.IsServiceProvisioned = false;
         event.ServiceProvisioningChange.ServiceConfigUpdated = false;
-        PlatformMgr().PostEvent(&event);
+        CHIP_ERROR postError                                 = PlatformMgr().PostEvent(&event);
+        if (err == CHIP_NO_ERROR)
+        {
+            err = postError;
+        }
     }
 
     mFlags.Clear(Flags::kIsServiceProvisioned);
     mFlags.Clear(Flags::kIsPairedToAccount);
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 template <class ImplClass>

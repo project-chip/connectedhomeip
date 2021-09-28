@@ -58,6 +58,10 @@
 #include "X509_PKCS7Extraction_test_vectors.h"
 #endif
 
+#if CHIP_CRYPTO_MBEDTLS
+#include <mbedtls/memory_buffer_alloc.h>
+#endif
+
 #include <credentials/CHIPCert.h>
 #include <credentials/tests/CHIPCert_test_vectors.h>
 
@@ -65,6 +69,8 @@
 
 using namespace chip;
 using namespace chip::Crypto;
+
+namespace {
 
 #ifdef ENABLE_HSM_EC_KEY
 class Test_P256Keypair : public P256KeypairHSM
@@ -101,6 +107,45 @@ using TestHMAC_sha = HMAC_shaHSM;
 using TestHMAC_sha                      = HMAC_sha;
 #endif
 
+// Helper class to verify that all mbedTLS heap objects are released at the end of a test.
+#if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
+class HeapChecker
+{
+public:
+    explicit HeapChecker(nlTestSuite * testSuite) : mTestSuite(testSuite)
+    {
+
+        size_t numBlocks;
+        mbedtls_memory_buffer_alloc_cur_get(&mHeapBytesUsed, &numBlocks);
+    }
+
+    ~HeapChecker()
+    {
+        size_t bytesUsed;
+        size_t numBlocks;
+        mbedtls_memory_buffer_alloc_cur_get(&bytesUsed, &numBlocks);
+
+        if (bytesUsed != mHeapBytesUsed)
+        {
+            mbedtls_memory_buffer_alloc_status();
+            NL_TEST_ASSERT(mTestSuite, bytesUsed == mHeapBytesUsed);
+        }
+    }
+
+private:
+    nlTestSuite * mTestSuite;
+    size_t mHeapBytesUsed;
+};
+#else
+class HeapChecker
+{
+public:
+    explicit HeapChecker(nlTestSuite *) {}
+};
+#endif
+
+} // namespace
+
 static uint32_t gs_test_entropy_source_called = 0;
 static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
 {
@@ -111,17 +156,21 @@ static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t
 
 static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
         const ccm_test_vector * vector = ccm_test_vectors[vectorIndex];
-        if (vector->key_len == 32 && vector->pt_len > 0)
+        if (vector->key_len == 32)
         {
             numOfTestsRan++;
             chip::Platform::ScopedMemoryBuffer<uint8_t> out_ct;
             out_ct.Alloc(vector->ct_len);
-            NL_TEST_ASSERT(inSuite, out_ct);
+            if (vector->ct_len > 0)
+            {
+                NL_TEST_ASSERT(inSuite, out_ct);
+            }
             chip::Platform::ScopedMemoryBuffer<uint8_t> out_tag;
             out_tag.Alloc(vector->tag_len);
             NL_TEST_ASSERT(inSuite, out_tag);
@@ -149,17 +198,21 @@ static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inCo
 
 static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
         const ccm_test_vector * vector = ccm_test_vectors[vectorIndex];
-        if (vector->key_len == 32 && vector->pt_len > 0)
+        if (vector->key_len == 32)
         {
             numOfTestsRan++;
             chip::Platform::ScopedMemoryBuffer<uint8_t> out_pt;
             out_pt.Alloc(vector->pt_len);
-            NL_TEST_ASSERT(inSuite, out_pt);
+            if (vector->pt_len > 0)
+            {
+                NL_TEST_ASSERT(inSuite, out_pt);
+            }
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
                                              vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt.Get());
 
@@ -175,34 +228,9 @@ static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-static void TestAES_CCM_256EncryptInvalidPlainText(nlTestSuite * inSuite, void * inContext)
-{
-    int numOfTestVectors = ArraySize(ccm_test_vectors);
-    int numOfTestsRan    = 0;
-    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
-    {
-        const ccm_test_vector * vector = ccm_test_vectors[vectorIndex];
-        if (vector->key_len == 32 && vector->pt_len > 0)
-        {
-            numOfTestsRan++;
-            chip::Platform::ScopedMemoryBuffer<uint8_t> out_ct;
-            out_ct.Alloc(vector->ct_len);
-            NL_TEST_ASSERT(inSuite, out_ct);
-            chip::Platform::ScopedMemoryBuffer<uint8_t> out_tag;
-            out_tag.Alloc(vector->tag_len);
-            NL_TEST_ASSERT(inSuite, out_tag);
-
-            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, 0, vector->aad, vector->aad_len, vector->key, vector->key_len, vector->iv,
-                                             vector->iv_len, out_ct.Get(), out_tag.Get(), vector->tag_len);
-            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
-            break;
-        }
-    }
-    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
-}
-
 static void TestAES_CCM_256EncryptNilKey(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -229,6 +257,7 @@ static void TestAES_CCM_256EncryptNilKey(nlTestSuite * inSuite, void * inContext
 
 static void TestAES_CCM_256EncryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -255,6 +284,7 @@ static void TestAES_CCM_256EncryptInvalidIVLen(nlTestSuite * inSuite, void * inC
 
 static void TestAES_CCM_256EncryptInvalidTagLen(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -279,30 +309,9 @@ static void TestAES_CCM_256EncryptInvalidTagLen(nlTestSuite * inSuite, void * in
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-static void TestAES_CCM_256DecryptInvalidCipherText(nlTestSuite * inSuite, void * inContext)
-{
-    int numOfTestVectors = ArraySize(ccm_test_vectors);
-    int numOfTestsRan    = 0;
-    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
-    {
-        const ccm_test_vector * vector = ccm_test_vectors[vectorIndex];
-        if (vector->key_len == 32 && vector->pt_len > 0)
-        {
-            numOfTestsRan++;
-            chip::Platform::ScopedMemoryBuffer<uint8_t> out_pt;
-            out_pt.Alloc(vector->pt_len);
-            NL_TEST_ASSERT(inSuite, out_pt);
-            CHIP_ERROR err = AES_CCM_decrypt(vector->ct, 0, vector->aad, vector->aad_len, vector->tag, vector->tag_len, vector->key,
-                                             vector->key_len, vector->iv, vector->iv_len, out_pt.Get());
-            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
-            break;
-        }
-    }
-    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
-}
-
 static void TestAES_CCM_256DecryptInvalidKey(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -325,6 +334,7 @@ static void TestAES_CCM_256DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
 
 static void TestAES_CCM_256DecryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -347,6 +357,7 @@ static void TestAES_CCM_256DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
 
 static void TestAES_CCM_256DecryptInvalidTestVectors(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_invalid_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -371,6 +382,7 @@ static void TestAES_CCM_256DecryptInvalidTestVectors(nlTestSuite * inSuite, void
 
 static void TestAES_CCM_128EncryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -412,6 +424,7 @@ static void TestAES_CCM_128EncryptTestVectors(nlTestSuite * inSuite, void * inCo
 
 static void TestAES_CCM_128DecryptTestVectors(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -441,34 +454,9 @@ static void TestAES_CCM_128DecryptTestVectors(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-static void TestAES_CCM_128EncryptInvalidPlainText(nlTestSuite * inSuite, void * inContext)
-{
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
-    int numOfTestsRan    = 0;
-    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
-    {
-        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
-        if (vector->pt_len > 0)
-        {
-            numOfTestsRan++;
-            chip::Platform::ScopedMemoryBuffer<uint8_t> out_ct;
-            out_ct.Alloc(vector->ct_len);
-            NL_TEST_ASSERT(inSuite, out_ct);
-            chip::Platform::ScopedMemoryBuffer<uint8_t> out_tag;
-            out_tag.Alloc(vector->tag_len);
-            NL_TEST_ASSERT(inSuite, out_tag);
-
-            CHIP_ERROR err = AES_CCM_encrypt(vector->pt, 0, vector->aad, vector->aad_len, vector->key, vector->key_len, vector->iv,
-                                             vector->iv_len, out_ct.Get(), out_tag.Get(), vector->tag_len);
-            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
-            break;
-        }
-    }
-    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
-}
-
 static void TestAES_CCM_128EncryptNilKey(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -495,6 +483,7 @@ static void TestAES_CCM_128EncryptNilKey(nlTestSuite * inSuite, void * inContext
 
 static void TestAES_CCM_128EncryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -521,6 +510,7 @@ static void TestAES_CCM_128EncryptInvalidIVLen(nlTestSuite * inSuite, void * inC
 
 static void TestAES_CCM_128EncryptInvalidTagLen(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -545,30 +535,9 @@ static void TestAES_CCM_128EncryptInvalidTagLen(nlTestSuite * inSuite, void * in
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
 }
 
-static void TestAES_CCM_128DecryptInvalidCipherText(nlTestSuite * inSuite, void * inContext)
-{
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
-    int numOfTestsRan    = 0;
-    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
-    {
-        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
-        if (vector->pt_len > 0)
-        {
-            numOfTestsRan++;
-            Platform::ScopedMemoryBuffer<uint8_t> out_pt;
-            out_pt.Alloc(vector->pt_len);
-            NL_TEST_ASSERT(inSuite, out_pt);
-            CHIP_ERROR err = AES_CCM_decrypt(vector->ct, 0, vector->aad, vector->aad_len, vector->tag, vector->tag_len, vector->key,
-                                             vector->key_len, vector->iv, vector->iv_len, out_pt.Get());
-            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
-            break;
-        }
-    }
-    NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
-}
-
 static void TestAES_CCM_128DecryptInvalidKey(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -591,6 +560,7 @@ static void TestAES_CCM_128DecryptInvalidKey(nlTestSuite * inSuite, void * inCon
 
 static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -613,6 +583,7 @@ static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
 
 static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     static_assert(sizeof(kDerSigConvDerCase4) == (sizeof(kDerSigConvRawCase4) + chip::Crypto::kMax_ECDSA_X9Dot62_Asn1_Overhead),
                   "kDerSigConvDerCase4 must have worst case overhead");
 
@@ -653,6 +624,7 @@ static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
 
 static void TestRawIntegerToDerValidCases(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestCases = ArraySize(kRawIntegerToDerVectors);
 
     for (int testIdx = 0; testIdx < numOfTestCases; testIdx++)
@@ -695,6 +667,7 @@ static void TestRawIntegerToDerValidCases(nlTestSuite * inSuite, void * inContex
 
 static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     // Cover case of invalid buffers
     uint8_t placeholder[10] = { 0 };
     MutableByteSpan good_out_buffer(placeholder, sizeof(placeholder));
@@ -735,6 +708,7 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
 
 static void TestHash_SHA256(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestCases     = ArraySize(hash_sha256_test_vectors);
     int numOfTestsExecuted = 0;
 
@@ -751,6 +725,7 @@ static void TestHash_SHA256(nlTestSuite * inSuite, void * inContext)
 
 static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestCases     = ArraySize(hash_sha256_test_vectors);
     int numOfTestsExecuted = 0;
     CHIP_ERROR error       = CHIP_NO_ERROR;
@@ -878,6 +853,7 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
 
 static void TestHMAC_SHA256(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestCases     = ArraySize(hmac_sha256_test_vectors);
     int numOfTestsExecuted = 0;
     TestHMAC_sha mHMAC;
@@ -898,6 +874,7 @@ static void TestHMAC_SHA256(nlTestSuite * inSuite, void * inContext)
 
 static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestCases     = ArraySize(hkdf_sha256_test_vectors);
     int numOfTestsExecuted = 0;
     TestHKDF_sha mHKDF;
@@ -919,6 +896,7 @@ static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
 
 static void TestDRBG_InvalidInputs(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     CHIP_ERROR error = CHIP_NO_ERROR;
     error            = DRBG_get_bytes(nullptr, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
@@ -942,6 +920,7 @@ static void TestDRBG_Output(nlTestSuite * inSuite, void * inContext)
 
 static void TestECDSA_Signing_SHA256_Msg(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     const char * msg  = "Hello World!";
     size_t msg_length = strlen(msg);
 
@@ -960,6 +939,7 @@ static void TestECDSA_Signing_SHA256_Msg(nlTestSuite * inSuite, void * inContext
 
 static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     const uint8_t hash[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
                              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
     size_t hash_length   = sizeof(hash);
@@ -992,6 +972,7 @@ static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContex
 
 static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     const char * msg  = "Hello World!";
     size_t msg_length = strlen(msg);
 
@@ -1011,6 +992,7 @@ static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, voi
 
 static void TestECDSA_ValidationFailsDifferentHash(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     const uint8_t hash[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
                              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
     size_t hash_length   = sizeof(hash);
@@ -1032,6 +1014,7 @@ static void TestECDSA_ValidationFailsDifferentHash(nlTestSuite * inSuite, void *
 
 static void TestECDSA_ValidationFailIncorrectMsgSignature(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     const char * msg  = "Hello World!";
     size_t msg_length = strlen(msg);
 
@@ -1050,6 +1033,7 @@ static void TestECDSA_ValidationFailIncorrectMsgSignature(nlTestSuite * inSuite,
 
 static void TestECDSA_ValidationFailIncorrectHashSignature(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     const uint8_t hash[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
                              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
     size_t hash_length   = sizeof(hash);
@@ -1068,6 +1052,7 @@ static void TestECDSA_ValidationFailIncorrectHashSignature(nlTestSuite * inSuite
 
 static void TestECDSA_SigningMsgInvalidParams(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     const uint8_t * msg = reinterpret_cast<const uint8_t *>("Hello World!");
     size_t msg_length   = strlen(reinterpret_cast<const char *>(msg));
 
@@ -1086,6 +1071,7 @@ static void TestECDSA_SigningMsgInvalidParams(nlTestSuite * inSuite, void * inCo
 
 static void TestECDSA_SigningHashInvalidParams(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     const uint8_t hash[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
                              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
     size_t hash_length   = sizeof(hash);
@@ -1105,6 +1091,7 @@ static void TestECDSA_SigningHashInvalidParams(nlTestSuite * inSuite, void * inC
 
 static void TestECDSA_ValidationMsgInvalidParam(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     const char * msg  = "Hello World!";
     size_t msg_length = strlen(msg);
 
@@ -1126,6 +1113,7 @@ static void TestECDSA_ValidationMsgInvalidParam(nlTestSuite * inSuite, void * in
 
 static void TestECDSA_ValidationHashInvalidParam(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     const uint8_t hash[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
                              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
     size_t hash_length   = sizeof(hash);
@@ -1148,6 +1136,7 @@ static void TestECDSA_ValidationHashInvalidParam(nlTestSuite * inSuite, void * i
 
 static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     Test_P256Keypair keypair1;
     NL_TEST_ASSERT(inSuite, keypair1.Initialize() == CHIP_NO_ERROR);
 
@@ -1185,6 +1174,7 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 #if CHIP_CRYPTO_OPENSSL
 static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     CHIP_ERROR error = add_entropy_source(test_entropy_source, nullptr, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
     uint8_t buffer[5];
@@ -1195,6 +1185,7 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 #if CHIP_CRYPTO_MBEDTLS
 static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     CHIP_ERROR error = add_entropy_source(test_entropy_source, nullptr, 10);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
     uint8_t buffer[5];
@@ -1210,6 +1201,7 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 
 static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(pbkdf2_sha256_test_vectors);
     int numOfTestsRan    = 0;
     TestPBKDF2_sha256 pbkdf1;
@@ -1238,6 +1230,7 @@ static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContex
 
 static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
@@ -1252,6 +1245,7 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
 
 static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     uint8_t csr[kMAX_CSR_Length];
     size_t length = sizeof(csr);
 
@@ -1282,6 +1276,7 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
 
 static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     Test_P256Keypair keypair;
 
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
@@ -1306,6 +1301,7 @@ static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)
 
 static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     uint8_t fe_out[kMAX_FE_Length];
 
     int numOfTestVectors = ArraySize(fe_mul_tvs);
@@ -1340,6 +1336,7 @@ static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
 
 static void TestSPAKE2P_spake2p_FELoadWrite(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     uint8_t fe_out[kMAX_FE_Length];
 
     int numOfTestVectors = ArraySize(fe_rw_tvs);
@@ -1368,6 +1365,7 @@ static void TestSPAKE2P_spake2p_FELoadWrite(nlTestSuite * inSuite, void * inCont
 
 static void TestSPAKE2P_spake2p_Mac(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     uint8_t mac[kMAX_Hash_Length];
 
     int numOfTestVectors = ArraySize(hmac_tvs);
@@ -1397,6 +1395,7 @@ static void TestSPAKE2P_spake2p_Mac(nlTestSuite * inSuite, void * inContext)
 
 static void TestSPAKE2P_spake2p_PointMul(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
@@ -1434,6 +1433,7 @@ static void TestSPAKE2P_spake2p_PointMul(nlTestSuite * inSuite, void * inContext
 
 static void TestSPAKE2P_spake2p_PointMulAdd(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
@@ -1477,6 +1477,7 @@ static void TestSPAKE2P_spake2p_PointMulAdd(nlTestSuite * inSuite, void * inCont
 
 static void TestSPAKE2P_spake2p_PointLoadWrite(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
@@ -1508,6 +1509,7 @@ static void TestSPAKE2P_spake2p_PointLoadWrite(nlTestSuite * inSuite, void * inC
 
 static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     int numOfTestVectors = ArraySize(point_valid_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -1562,6 +1564,7 @@ private:
 
 static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint8_t L[kMAX_Point_Length];
     size_t L_len = sizeof(L);
@@ -1693,8 +1696,23 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsRan == numOfTestVectors);
 }
 
+static void TestSPAKE2P_Reuse(nlTestSuite * inSuite, void * inContext)
+{
+    HeapChecker heapChecker(inSuite);
+    Test_Spake2p_P256_SHA256_HKDF_HMAC spake2;
+
+    // Veriy Init -> Clear -> Init sequence works and does not leak memory
+    NL_TEST_ASSERT(inSuite, spake2.Init(nullptr, 0) == CHIP_NO_ERROR);
+    spake2.Clear();
+    NL_TEST_ASSERT(inSuite, spake2.Init(nullptr, 0) == CHIP_NO_ERROR);
+
+    // Even without an explicit Clear, Init does not leak memory
+    NL_TEST_ASSERT(inSuite, spake2.Init(nullptr, 0) == CHIP_NO_ERROR);
+}
+
 static void TestCompressedFabricIdentifier(nlTestSuite * inSuite, void * inContext)
 {
+    HeapChecker heapChecker(inSuite);
     // Data from spec test vector (see Operational Discovery section)
     const uint8_t kRootPublicKey[65] = {
         0x04, 0x4a, 0x9f, 0x42, 0xb1, 0xca, 0x48, 0x40, 0xd3, 0x72, 0x92, 0xbb, 0xc7, 0xf6, 0xa7, 0xe1, 0x1e,
@@ -1781,6 +1799,7 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
 {
     using namespace TestCerts;
 
+    HeapChecker heapChecker(inSuite);
     CHIP_ERROR err = CHIP_NO_ERROR;
     P256PublicKey publicKey;
 
@@ -1807,6 +1826,7 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
 {
     using namespace TestCerts;
 
+    HeapChecker heapChecker(inSuite);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ByteSpan root_cert;
@@ -1840,6 +1860,7 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 {
     using namespace TestCerts;
 
+    HeapChecker heapChecker(inSuite);
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t akidBuf[Credentials::kKeyIdentifierLength];
     MutableByteSpan akidOut(akidBuf);
@@ -1866,6 +1887,7 @@ static void TestVID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 {
     using namespace TestCerts;
 
+    HeapChecker heapChecker(inSuite);
     CHIP_ERROR err = CHIP_NO_ERROR;
     VendorId vid;
     /*
@@ -1933,20 +1955,16 @@ static const nlTest sTests[] = {
 
     NL_TEST_DEF("Test encrypting AES-CCM-128 test vectors", TestAES_CCM_128EncryptTestVectors),
     NL_TEST_DEF("Test decrypting AES-CCM-128 test vectors", TestAES_CCM_128DecryptTestVectors),
-    NL_TEST_DEF("Test encrypting AES-CCM-128 invalid plain text", TestAES_CCM_128EncryptInvalidPlainText),
     NL_TEST_DEF("Test encrypting AES-CCM-128 using nil key", TestAES_CCM_128EncryptNilKey),
     NL_TEST_DEF("Test encrypting AES-CCM-128 using invalid IV", TestAES_CCM_128EncryptInvalidIVLen),
     NL_TEST_DEF("Test encrypting AES-CCM-128 using invalid tag", TestAES_CCM_128EncryptInvalidTagLen),
-    NL_TEST_DEF("Test decrypting AES-CCM-128 invalid ct", TestAES_CCM_128DecryptInvalidCipherText),
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid key", TestAES_CCM_128DecryptInvalidKey),
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid IV", TestAES_CCM_128DecryptInvalidIVLen),
     NL_TEST_DEF("Test encrypting AES-CCM-256 test vectors", TestAES_CCM_256EncryptTestVectors),
     NL_TEST_DEF("Test decrypting AES-CCM-256 test vectors", TestAES_CCM_256DecryptTestVectors),
-    NL_TEST_DEF("Test encrypting AES-CCM-256 invalid plain text", TestAES_CCM_256EncryptInvalidPlainText),
     NL_TEST_DEF("Test encrypting AES-CCM-256 using nil key", TestAES_CCM_256EncryptNilKey),
     NL_TEST_DEF("Test encrypting AES-CCM-256 using invalid IV", TestAES_CCM_256EncryptInvalidIVLen),
     NL_TEST_DEF("Test encrypting AES-CCM-256 using invalid tag", TestAES_CCM_256EncryptInvalidTagLen),
-    NL_TEST_DEF("Test decrypting AES-CCM-256 invalid ct", TestAES_CCM_256DecryptInvalidCipherText),
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid key", TestAES_CCM_256DecryptInvalidKey),
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
@@ -1983,6 +2001,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2p_spake2p PointLoad/PointWrite", TestSPAKE2P_spake2p_PointLoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p PointIsValid", TestSPAKE2P_spake2p_PointIsValid),
     NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
+    NL_TEST_DEF("Test Spake2+ object reuse", TestSPAKE2P_Reuse),
     NL_TEST_DEF("Test compressed fabric identifier", TestCompressedFabricIdentifier),
     NL_TEST_DEF("Test Pubkey Extraction from x509 Certificate", TestPubkey_x509Extraction),
 #if CHIP_CRYPTO_OPENSSL

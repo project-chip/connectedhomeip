@@ -305,6 +305,17 @@ public:
     static void OnSuccessFn(void * context, uint16_t count, _FabricDescriptor * entries);
 };
 
+class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>
+{
+public:
+    CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, uint16_t count, uint8_t * entries);
+};
+
 class CHIPTvChannelTvChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>
 {
 public:
@@ -1052,6 +1063,30 @@ public:
     static void OnSuccessFn(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI,
                             uint32_t softwareVersion, chip::ByteSpan updateToken, bool userConsentNeeded,
                             chip::ByteSpan metadataForRequestor);
+};
+
+class CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsClusterAttestationResponseCallback>
+{
+public:
+    CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsClusterAttestationResponseCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::ByteSpan AttestationElements, chip::ByteSpan Signature);
+};
+
+class CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge
+    : public CHIPCallbackBridge<OperationalCredentialsClusterCertificateChainResponseCallback>
+{
+public:
+    CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OperationalCredentialsClusterCertificateChainResponseCallback>(queue, handler, action, OnSuccessFn,
+                                                                                          keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::ByteSpan Certificate);
 };
 
 class CHIPOperationalCredentialsClusterNOCResponseCallbackBridge

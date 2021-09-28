@@ -386,13 +386,13 @@ NS_ASSUME_NONNULL_BEGIN
              responseHandler:(ResponseHandler)responseHandler;
 - (void)stepHue:(uint8_t)stepMode
            stepSize:(uint8_t)stepSize
-     transitionTime:(uint8_t)transitionTime
+     transitionTime:(uint16_t)transitionTime
         optionsMask:(uint8_t)optionsMask
     optionsOverride:(uint8_t)optionsOverride
     responseHandler:(ResponseHandler)responseHandler;
 - (void)stepSaturation:(uint8_t)stepMode
               stepSize:(uint8_t)stepSize
-        transitionTime:(uint8_t)transitionTime
+        transitionTime:(uint16_t)transitionTime
            optionsMask:(uint8_t)optionsMask
        optionsOverride:(uint8_t)optionsOverride
        responseHandler:(ResponseHandler)responseHandler;
@@ -777,6 +777,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRebootCountWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeUpTimeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeTotalOperationalHoursWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBootReasonsWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -935,6 +941,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mediaStartOver:(ResponseHandler)responseHandler;
 - (void)mediaStop:(ResponseHandler)responseHandler;
 
+- (void)readAttributePlaybackStateWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeStartTimeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDurationWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePositionUpdatedAtWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePositionWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePlaybackSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeSeekRangeEndWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeSeekRangeStartWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1007,6 +1029,27 @@ NS_ASSUME_NONNULL_BEGIN
     requestorCanConsent:(bool)requestorCanConsent
     metadataForProvider:(NSData *)metadataForProvider
         responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster OTA Software Update Requestor
+ *
+ */
+@interface CHIPOtaSoftwareUpdateRequestor : CHIPCluster
+
+- (void)announceOtaProvider:(NSData *)serverLocation
+                   vendorId:(uint16_t)vendorId
+         announcementReason:(uint8_t)announcementReason
+            metadataForNode:(NSData *)metadataForNode
+            responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDefaultOtaProviderWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeDefaultOtaProviderWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeUpdatePossibleWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -1092,23 +1135,56 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOperationalCredentials : CHIPCluster
 
-- (void)addNOC:(NSData *)nOCArray
+- (void)addNOC:(NSData *)nOCValue
+          iCACValue:(NSData *)iCACValue
            iPKValue:(NSData *)iPKValue
       caseAdminNode:(uint64_t)caseAdminNode
       adminVendorId:(uint16_t)adminVendorId
     responseHandler:(ResponseHandler)responseHandler;
 - (void)addTrustedRootCertificate:(NSData *)rootCertificate responseHandler:(ResponseHandler)responseHandler;
+- (void)attestationRequest:(NSData *)attestationNonce responseHandler:(ResponseHandler)responseHandler;
+- (void)certificateChainRequest:(uint8_t)certificateType responseHandler:(ResponseHandler)responseHandler;
 - (void)opCSRRequest:(NSData *)cSRNonce responseHandler:(ResponseHandler)responseHandler;
 - (void)removeFabric:(uint8_t)fabricIndex responseHandler:(ResponseHandler)responseHandler;
 - (void)removeTrustedRootCertificate:(NSData *)trustedRootIdentifier responseHandler:(ResponseHandler)responseHandler;
 - (void)updateFabricLabel:(NSString *)label responseHandler:(ResponseHandler)responseHandler;
-- (void)updateNOC:(NSData *)nOCArray responseHandler:(ResponseHandler)responseHandler;
+- (void)updateNOC:(NSData *)nOCValue iCACValue:(NSData *)iCACValue responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeFabricsListWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeSupportedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster Power Source
+ *
+ */
+@interface CHIPPowerSource : CHIPCluster
+
+- (void)readAttributeStatusWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeOrderWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryVoltageWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryPercentRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryTimeRemainingWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryChargeLevelWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeActiveBatteryFaultsWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBatteryChargeStateWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -1231,6 +1307,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPSoftwareDiagnostics : CHIPCluster
 
 - (void)resetWatermarks:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCurrentHeapFreeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCurrentHeapUsedWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeCurrentHeapHighWatermarkWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -1388,6 +1468,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLongCharStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLongCharStringWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeEpochUsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeEpochUsWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeEpochSWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeEpochSWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
@@ -1601,6 +1687,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeRxErrFcsCountWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeRxErrOtherCountWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeActiveTimestampWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePendingTimestampWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeDelayWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeSecurityPolicyWithResponseHandler:(ResponseHandler)responseHandler;
 

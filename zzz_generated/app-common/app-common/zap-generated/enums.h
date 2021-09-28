@@ -140,6 +140,56 @@ enum EmberAfBarrierControlMovingState : uint8_t
     EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING = 2,
 };
 
+// Enum for BatChargeFaultType
+enum EmberAfBatChargeFaultType : uint8_t
+{
+    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_UNSPECFIED            = 0,
+    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_AMBIENT_TOO_HOT       = 1,
+    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_AMBIENT_TOO_COLD      = 2,
+    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_BATTERY_TOO_HOT       = 3,
+    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_BATTERY_TOO_COLD      = 4,
+    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_BATTERY_ABSENT        = 5,
+    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_BATTERY_OVER_VOLTAGE  = 6,
+    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_BATTERY_UNDER_VOLTAGE = 7,
+    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_CHARGER_OVER_VOLTAGE  = 8,
+    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_CHARGER_UNDER_VOLTAGE = 9,
+    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_SAFETY_TIMEOUT        = 10,
+};
+
+// Enum for BatChargeLevel
+enum EmberAfBatChargeLevel : uint8_t
+{
+    EMBER_ZCL_BAT_CHARGE_LEVEL_OK       = 0,
+    EMBER_ZCL_BAT_CHARGE_LEVEL_WARNING  = 1,
+    EMBER_ZCL_BAT_CHARGE_LEVEL_CRITICAL = 2,
+};
+
+// Enum for BatChargeState
+enum EmberAfBatChargeState : uint8_t
+{
+    EMBER_ZCL_BAT_CHARGE_STATE_UNKNOWN           = 0,
+    EMBER_ZCL_BAT_CHARGE_STATE_IS_CHARGING       = 1,
+    EMBER_ZCL_BAT_CHARGE_STATE_IS_AT_FULL_CHARGE = 2,
+    EMBER_ZCL_BAT_CHARGE_STATE_IS_NOT_CHARGING   = 3,
+};
+
+// Enum for BatFaultType
+enum EmberAfBatFaultType : uint8_t
+{
+    EMBER_ZCL_BAT_FAULT_TYPE_UNSPECFIED = 0,
+    EMBER_ZCL_BAT_FAULT_TYPE_OVER_TEMP  = 1,
+    EMBER_ZCL_BAT_FAULT_TYPE_UNDER_TEMP = 2,
+};
+
+// Enum for BatReplaceability
+enum EmberAfBatReplaceability : uint8_t
+{
+    EMBER_ZCL_BAT_REPLACEABILITY_UNSPECIFIED         = 0,
+    EMBER_ZCL_BAT_REPLACEABILITY_NOT_REPLACEABLE     = 1,
+    EMBER_ZCL_BAT_REPLACEABILITY_USER_REPLACEABLE    = 2,
+    EMBER_ZCL_BAT_REPLACEABILITY_FACTORY_REPLACEABLE = 3,
+};
+
 // Enum for BatterySize
 enum EmberAfBatterySize : uint8_t
 {
@@ -750,6 +800,17 @@ enum EmberAfIdentifyEffectVariant : uint8_t
     EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT = 0,
 };
 
+// Enum for IdentifyIdentifyType
+enum EmberAfIdentifyIdentifyType : uint8_t
+{
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE          = 0,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LIGHT = 1,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED   = 2,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_AUDIBLE_BEEP  = 3,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_DISPLAY       = 4,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_ACTUATOR      = 5,
+};
+
 // Enum for InterfaceType
 enum EmberAfInterfaceType : uint8_t
 {
@@ -1192,6 +1253,15 @@ enum EmberAfPowerSource : uint8_t
     EMBER_ZCL_POWER_SOURCE_BATTERY_BACKUP                  = 128,
 };
 
+// Enum for PowerSourceStatus
+enum EmberAfPowerSourceStatus : uint8_t
+{
+    EMBER_ZCL_POWER_SOURCE_STATUS_UNSPECFIED  = 0,
+    EMBER_ZCL_POWER_SOURCE_STATUS_ACTIVE      = 1,
+    EMBER_ZCL_POWER_SOURCE_STATUS_STANDBY     = 2,
+    EMBER_ZCL_POWER_SOURCE_STATUS_UNAVAILABLE = 3,
+};
+
 // Enum for ProductCode
 enum EmberAfProductCode : uint8_t
 {
@@ -1331,6 +1401,15 @@ enum EmberAfSetpointAdjustMode : uint8_t
     EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_SETPOINT           = 0,
     EMBER_ZCL_SETPOINT_ADJUST_MODE_COOL_SETPOINT           = 1,
     EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_AND_COOL_SETPOINTS = 2,
+};
+
+// Enum for SimpleEnum
+enum EmberAfSimpleEnum : uint8_t
+{
+    EMBER_ZCL_SIMPLE_ENUM_UNSPECIFIED = 0,
+    EMBER_ZCL_SIMPLE_ENUM_VALUE_A     = 1,
+    EMBER_ZCL_SIMPLE_ENUM_VALUE_B     = 2,
+    EMBER_ZCL_SIMPLE_ENUM_VALUE_C     = 3,
 };
 
 // Enum for SquawkLevel
@@ -1557,6 +1636,21 @@ enum EmberAfWiFiVersionType : uint8_t
     EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N  = 3,
     EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AC = 4,
     EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AX = 5,
+};
+
+// Enum for WiredCurrentType
+enum EmberAfWiredCurrentType : uint8_t
+{
+    EMBER_ZCL_WIRED_CURRENT_TYPE_AC = 0,
+    EMBER_ZCL_WIRED_CURRENT_TYPE_DC = 1,
+};
+
+// Enum for WiredFaultType
+enum EmberAfWiredFaultType : uint8_t
+{
+    EMBER_ZCL_WIRED_FAULT_TYPE_UNSPECFIED    = 0,
+    EMBER_ZCL_WIRED_FAULT_TYPE_OVER_VOLTAGE  = 1,
+    EMBER_ZCL_WIRED_FAULT_TYPE_UNDER_VOLTAGE = 2,
 };
 
 #define EMBER_AF_ALARM_MASK_GENERAL_HW_FAULT (1)

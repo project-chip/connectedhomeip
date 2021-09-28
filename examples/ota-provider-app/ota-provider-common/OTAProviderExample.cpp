@@ -97,7 +97,7 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
 
 EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId,
                                                    uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion,
-                                                   uint8_t protocolsSupported, const chip::ByteSpan & location,
+                                                   uint8_t protocolsSupported, const chip::Span<const char> & location,
                                                    bool clientCanConsent, const chip::ByteSpan & metadataForServer)
 {
     // TODO: add confiuration for returning BUSY status

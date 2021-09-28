@@ -32,6 +32,10 @@
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <credentials/CHIPCert.h>
+#include <credentials/DeviceAttestationConstructor.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/CodeUtils.h>
@@ -44,6 +48,13 @@
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
+
+namespace {
+
+constexpr uint8_t kDACCertificate = 1;
+constexpr uint8_t kPAICertificate = 2;
+
+} // namespace
 
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr uint16_t kMaxRspLen = 900;
@@ -86,7 +97,7 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
 }
 
 EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel,
-                          const Crypto::P256PublicKey & rootPubkey, uint8_t index)
+                          Credentials::P256PublicKeySpan rootPubkey, uint8_t index)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -94,7 +105,7 @@ EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nod
     VerifyOrReturnError(fabricDescriptor != nullptr, EMBER_ZCL_STATUS_FAILURE);
 
     fabricDescriptor->FabricIndex   = fabricIndex;
-    fabricDescriptor->RootPublicKey = ByteSpan(rootPubkey.ConstBytes(), rootPubkey.Length());
+    fabricDescriptor->RootPublicKey = ByteSpan(rootPubkey.data(), rootPubkey.size());
 
     fabricDescriptor->VendorId = vendorId;
     fabricDescriptor->FabricId = fabricId;
@@ -238,18 +249,58 @@ void emberAfPluginOperationalCredentialsServerInitCallback(void)
     writeFabricsIntoFabricsListAttribute();
 }
 
+namespace {
+class FabricCleanupExchangeDelegate : public Messaging::ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+    void OnExchangeClosing(Messaging::ExchangeContext * ec) override
+    {
+        FabricIndex currentFabricIndex = ec->GetSecureSession().GetFabricIndex();
+        ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
+    }
+};
+
+FabricCleanupExchangeDelegate gFabricCleanupExchangeDelegate;
+
+} // namespace
+
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                              FabricIndex fabricIndex)
+                                                              FabricIndex fabricBeingRemoved)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    CHIP_ERROR err       = Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+    CHIP_ERROR err       = Server::GetInstance().GetFabricTable().Delete(fabricBeingRemoved);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
     writeFabricsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
+    if (err == CHIP_NO_ERROR)
+    {
+        Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
+        FabricIndex currentFabricIndex  = ec->GetSecureSession().GetFabricIndex();
+        if (currentFabricIndex == fabricBeingRemoved)
+        {
+            // If the current fabric is being removed, expiring all the secure sessions causes crashes as
+            // the message sent by emberAfSendImmediateDefaultResponse() is still in the queue. Also, RMP
+            // retries to send the message and runs into issues.
+            // We are hijacking the exchange delegate here (as no more messages should be received on this exchange),
+            // and wait for it to close, before expiring the secure sessions for the fabric.
+            // TODO: https://github.com/project-chip/connectedhomeip/issues/9642
+            ec->SetDelegate(&gFabricCleanupExchangeDelegate);
+        }
+        else
+        {
+            ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(fabricBeingRemoved);
+        }
+    }
     return true;
 }
 
@@ -344,8 +395,9 @@ bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(EndpointId end
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCArray,
-                                                        ByteSpan IPKValue, NodeId adminNodeId, uint16_t adminVendorId)
+bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCValue,
+                                                        ByteSpan ICACValue, ByteSpan IPKValue, NodeId adminNodeId,
+                                                        uint16_t adminVendorId)
 {
     EmberAfNodeOperationalCertStatus nocResponse = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
 
@@ -354,7 +406,10 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added an Op Cert");
 
-    err = gFabricBeingCommissioned.SetOperationalCertsFromCertArray(NOCArray);
+    err = gFabricBeingCommissioned.SetNOCCert(NOCValue);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+    err = gFabricBeingCommissioned.SetICACert(ICACValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     gFabricBeingCommissioned.SetVendorId(adminVendorId);
@@ -366,7 +421,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.
-    chip::app::Mdns::AdvertiseOperational();
+    app::MdnsServer::Instance().AdvertiseOperational();
 
 exit:
 
@@ -381,7 +436,8 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterUpdateNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCArray)
+bool emberAfOperationalCredentialsClusterUpdateNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCValue,
+                                                           ByteSpan ICACValue)
 {
     EmberAfNodeOperationalCertStatus nocResponse = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
 
@@ -394,7 +450,10 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(EndpointId endpoint, 
     FabricInfo * fabric = retrieveCurrentFabric();
     VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_ID));
 
-    err = fabric->SetOperationalCertsFromCertArray(NOCArray);
+    err = fabric->SetNOCCert(NOCValue);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+    err = fabric->SetICACert(ICACValue);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     fabricIndex = fabric->GetFabricIndex();
@@ -403,7 +462,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(EndpointId endpoint, 
     // can't just wait until we get network configuration commands, because we
     // might be on the operational network already, in which case we are
     // expected to be live with our new identity at this point.
-    app::Mdns::AdvertiseOperational();
+    app::MdnsServer::Instance().AdvertiseOperational();
 
 exit:
 
@@ -412,6 +471,146 @@ exit:
     if (nocResponse != EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed UpdateNOC request. Status %d", nocResponse);
+    }
+
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(EndpointId endpoint, app::CommandHandler * commandObj,
+                                                                         uint8_t certificateType)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Device Attestation Credentials");
+
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
+                                         ZCL_CERTIFICATE_CHAIN_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t derBuf[Credentials::kMaxDERCertLength];
+    MutableByteSpan derBufSpan(derBuf);
+
+    Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
+
+    VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+    writer = commandObj->GetCommandDataElementTLVWriter();
+    if (certificateType == kDACCertificate)
+    {
+        SuccessOrExit(err = dacProvider->GetDeviceAttestationCert(derBufSpan));
+    }
+    else if (certificateType == kPAICertificate)
+    {
+        err = dacProvider->GetProductAttestationIntermediateCert(derBufSpan);
+        if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE) // If Node does not have a PAI Certificate
+        {
+            // Send an empty octet string
+            derBufSpan = MutableByteSpan();
+        }
+        else
+        {
+            SuccessOrExit(err);
+        }
+    }
+    else
+    {
+        SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    // TODO: Update ZAP Templates to parse TLVs starting with Tag ID 1 in order for this be spec compliant.
+    // TODO: Use ContextTag(1) instead
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), derBufSpan));
+    SuccessOrExit(err = commandObj->FinishCommand());
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed CertificateChainRequest: %s", ErrorStr(err));
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterAttestationRequestCallback(EndpointId endpoint, app::CommandHandler * commandObj,
+                                                                    ByteSpan attestationNonce)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    Platform::ScopedMemoryBuffer<uint8_t> attestationElements;
+    size_t attestationElementsLen;
+    Crypto::P256ECDSASignature signature;
+
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Attestation");
+
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
+                                         ZCL_ATTESTATION_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+
+    Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
+
+    VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(attestationNonce.size() == 32, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    {
+        uint8_t certDeclBuf[512];
+        MutableByteSpan certDeclSpan(certDeclBuf);
+
+        // TODO: retrieve vendor information to populate the fields below.
+        uint32_t timestamp = 0;
+        ByteSpan firmwareInfo;
+        ByteSpan * vendorReservedArray = nullptr;
+        size_t vendorReservedArraySize = 0;
+        uint16_t vendorId              = 0;
+        uint16_t profileNum            = 0;
+
+        SuccessOrExit(err = dacProvider->GetCertificationDeclaration(certDeclSpan));
+        // TODO: Retrieve firmware Information
+
+        attestationElementsLen = certDeclSpan.size() + attestationNonce.size() + sizeof(uint64_t) * 8;
+        VerifyOrExit(attestationElements.Alloc(attestationElementsLen), err = CHIP_ERROR_NO_MEMORY);
+
+        MutableByteSpan attestationElementsSpan(attestationElements.Get(), attestationElementsLen);
+        SuccessOrExit(err = Credentials::ConstructAttestationElements(certDeclSpan, attestationNonce, timestamp, firmwareInfo,
+                                                                      vendorReservedArray, vendorReservedArraySize, vendorId,
+                                                                      profileNum, attestationElementsSpan));
+        attestationElementsLen = attestationElementsSpan.size();
+    }
+
+    {
+        uint8_t md[Crypto::kSHA256_Hash_Length];
+        MutableByteSpan messageDigestSpan(md);
+
+        // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
+        // Retrieve attestation challenge
+        ByteSpan attestationChallenge = commandObj->GetExchangeContext()
+                                            ->GetExchangeMgr()
+                                            ->GetSessionManager()
+                                            ->GetSecureSession(commandObj->GetExchangeContext()->GetSecureSession())
+                                            ->GetCryptoContext()
+                                            .GetAttestationChallenge();
+
+        Hash_SHA256_stream hashStream;
+        SuccessOrExit(err = hashStream.Begin());
+        SuccessOrExit(err = hashStream.AddData(ByteSpan(attestationElements.Get(), attestationElementsLen)));
+        SuccessOrExit(err = hashStream.AddData(attestationChallenge));
+        SuccessOrExit(err = hashStream.Finish(messageDigestSpan));
+
+        MutableByteSpan signatureSpan(signature, signature.Capacity());
+        SuccessOrExit(err = dacProvider->SignWithDeviceAttestationKey(messageDigestSpan, signatureSpan));
+        SuccessOrExit(err = signature.SetLength(signatureSpan.size()));
+    }
+
+    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+    writer = commandObj->GetCommandDataElementTLVWriter();
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(attestationElements.Get(), attestationElementsLen)));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), ByteSpan(signature, signature.Length())));
+    SuccessOrExit(err = commandObj->FinishCommand());
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AttestationRequest: %s", ErrorStr(err));
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
     return true;

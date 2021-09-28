@@ -63,6 +63,7 @@ limitations under the License.
   </bitmap>
 
   <enum name="PumpOperationMode" type="ENUM8">
+    <cluster code="0x0200"/>
     <item name="Normal" value="0x0"/>
     <item name="Minimum" value="0x1"/>
     <item name="Maximum" value="0x2"/>
@@ -70,6 +71,7 @@ limitations under the License.
   </enum>
 
   <enum name="PumpControlMode" type="ENUM8">
+    <cluster code="0x0200"/>
     <item name="ConstantSpeed" value="0x0"/>
     <item name="ConstantPressure" value="0x1"/>
     <item name="ProportionalPressure" value="0x2"/>

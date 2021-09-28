@@ -19,6 +19,10 @@
 
 #include "AppTask.h"
 
+#ifdef CAPSENSE_ENABLED
+#include "capsense.h"
+#endif
+
 #include "mbedtls/platform.h"
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -36,6 +40,10 @@ int main()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mbed_logging_init();
+
+#ifdef CAPSENSE_ENABLED
+    Capsense::getInstance().init();
+#endif
 
     ret = mbedtls_platform_setup(NULL);
     if (ret)

@@ -265,7 +265,7 @@ fully provisioned, BLE advertising will stop.
 
 #### Bluetooth LE Rendezvous
 
-To commission and control this application wtihin a CHIP-eanbled Thread network,
+To commission and control this application within a CHIP-enabled Thread network,
 consult the [CHIPTool README](../../../src/android/CHIPTool/README.md) for
 information on the Android smartphone application. Reference the Device
 Configuration information printed in the Logging Output of this application.

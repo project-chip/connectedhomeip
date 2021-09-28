@@ -72,9 +72,8 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
                ${CHIP_ROOT}/src/app/server/Mdns.cpp
                ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
-               ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
                ${CHIP_ROOT}/src/app/server/Server.cpp
-               ${CHIP_ROOT}/src/app/server/CommissionManager.cpp
+               ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
                ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
@@ -82,7 +81,8 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/ethernet_network_diagnostics_server/ethernet_network_diagnostics_server.cpp
                ${CHIP_ROOT}/src/app/clusters/thread_network_diagnostics_server/thread_network_diagnostics_server.cpp
                ${CHIP_ROOT}/src/app/clusters/wifi_network_diagnostics_server/wifi_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/software_diagnostics_server/software_diagnostics_server.cpp	                                    
+               ${CHIP_ROOT}/src/app/clusters/software_diagnostics_server/software_diagnostics_server.cpp
+               ${CHIP_ROOT}/src/app/clusters/general_diagnostics_server/general_diagnostics_server.cpp               	                                    
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
@@ -119,6 +119,11 @@ if("WHD" IN_LIST MBED_TARGET_LABELS)
     target_link_libraries(${APP_TARGET}
         mbed-cy_psoc6_common_network mbed-emac mbed-cy_psoc6_whd
     )
+endif()
+
+if("capsense" IN_LIST MBED_TARGET_LABELS)
+    add_subdirectory(${CHIP_ROOT}/third_party/mbed-os-cypress-capsense-button/repo ./capsense_build)
+    target_link_libraries(${APP_TARGET} capsense)
 endif()
 
 mbed_set_post_build(${APP_TARGET})

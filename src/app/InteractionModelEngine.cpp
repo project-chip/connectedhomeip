@@ -106,10 +106,11 @@ void InteractionModelEngine::Shutdown()
         VerifyOrDie(writeHandler.IsFree());
     }
 
+    mReportingEngine.Shutdown();
+
     for (uint32_t index = 0; index < CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS; index++)
     {
         mClusterInfoPool[index].mpNext = nullptr;
-        mClusterInfoPool[index].ClearDirty();
     }
 
     mpNextAvailableClusterInfo = nullptr;
@@ -137,7 +138,8 @@ CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCom
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, uint64_t aAppIdentifier)
+CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
+                                                 uint64_t aAppIdentifier)
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
@@ -146,7 +148,7 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
         if (readClient.IsFree())
         {
             *apReadClient = &readClient;
-            err           = readClient.Init(mpExchangeMgr, mpDelegate, aAppIdentifier);
+            err           = readClient.Init(mpExchangeMgr, mpDelegate, aInteractionType, aAppIdentifier);
             if (CHIP_NO_ERROR != err)
             {
                 *apReadClient = nullptr;
@@ -227,17 +229,19 @@ exit:
 
 CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
                                                         const PayloadHeader & aPayloadHeader,
-                                                        System::PacketBufferHandle && aPayload)
+                                                        System::PacketBufferHandle && aPayload,
+                                                        ReadHandler::InteractionType aInteractionType)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogDetail(InteractionModel, "Receive Read request");
+    ChipLogDetail(InteractionModel, "Receive %s request",
+                  aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
 
     for (auto & readHandler : mReadHandlers)
     {
         if (readHandler.IsFree())
         {
-            err = readHandler.Init(mpExchangeMgr, mpDelegate, apExchangeContext);
+            err = readHandler.Init(mpExchangeMgr, mpDelegate, apExchangeContext, aInteractionType);
             SuccessOrExit(err);
             err               = readHandler.OnReadInitialRequest(std::move(aPayload));
             apExchangeContext = nullptr;
@@ -282,6 +286,36 @@ exit:
     return err;
 }
 
+CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext,
+                                                           const PayloadHeader & aPayloadHeader,
+                                                           System::PacketBufferHandle && aPayload)
+{
+    System::PacketBufferTLVReader reader;
+    reader.Init(aPayload.Retain());
+    ReturnLogErrorOnFailure(reader.Next());
+
+    ReportData::Parser report;
+    ReturnLogErrorOnFailure(report.Init(reader));
+
+    uint64_t subscriptionId = 0;
+    ReturnLogErrorOnFailure(report.GetSubscriptionId(&subscriptionId));
+
+    for (auto & readClient : mReadClients)
+    {
+        if (!readClient.IsSubscriptionTypeIdle())
+        {
+            continue;
+        }
+        if (!readClient.IsMatchingClient(subscriptionId))
+        {
+            continue;
+        }
+
+        return readClient.OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
                                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
@@ -291,11 +325,20 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReadRequest))
     {
-        return OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
+        return OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), ReadHandler::InteractionType::Read);
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
         return OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
+    }
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeRequest))
+    {
+        return OnReadInitialRequest(apExchangeContext, aPayloadHeader, std::move(aPayload),
+                                    ReadHandler::InteractionType::Subscribe);
+    }
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
+    {
+        return OnUnsolicitedReportData(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
     else
     {
@@ -305,20 +348,29 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(InteractionModel, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
+    ChipLogProgress(InteractionModel, "Time out! failed to receive echo response from Exchange: " ChipLogFormatExchange,
+                    ChipLogValueExchange(ec));
 }
 
 CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier)
 {
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    ReturnErrorOnFailure(NewReadClient(&client, aAppIdentifier));
+    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aAppIdentifier));
     err = client->SendReadRequest(aReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
         client->Shutdown();
     }
     return err;
+}
+
+CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier)
+{
+    ReadClient * client = nullptr;
+    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aAppIdentifier));
+    ReturnErrorOnFailure(client->SendSubscribeRequest(aReadPrepareParams));
+    return CHIP_NO_ERROR;
 }
 
 uint16_t InteractionModelEngine::GetReadClientArrayIndex(const ReadClient * const apReadClient) const
@@ -341,10 +393,8 @@ void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
 
     while (lastClusterInfo != nullptr && lastClusterInfo->mpNext != nullptr)
     {
-        lastClusterInfo->ClearDirty();
         lastClusterInfo = lastClusterInfo->mpNext;
     }
-    lastClusterInfo->ClearDirty();
     lastClusterInfo->mFlags.ClearAll();
     lastClusterInfo->mpNext    = mpNextAvailableClusterInfo;
     mpNextAvailableClusterInfo = aClusterInfo;
@@ -356,6 +406,7 @@ CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfoList, Cl
     ClusterInfo * last = aClusterInfoList;
     if (mpNextAvailableClusterInfo == nullptr)
     {
+        ChipLogProgress(InteractionModel, "There is no available cluster info in mClusterInfoPool");
         return CHIP_ERROR_NO_MEMORY;
     }
     aClusterInfoList           = mpNextAvailableClusterInfo;
@@ -363,6 +414,51 @@ CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfoList, Cl
     *aClusterInfoList          = aClusterInfo;
     aClusterInfoList->mpNext   = last;
     return CHIP_NO_ERROR;
+}
+
+bool InteractionModelEngine::MergeOverlappedAttributePath(ClusterInfo * apAttributePathList, ClusterInfo & aAttributePath)
+{
+    ClusterInfo * runner = apAttributePathList;
+    while (runner != nullptr)
+    {
+        // If overlapped, we would skip this target path,
+        // --If targetPath is part of previous path, return true
+        // --If previous path is part of target path, update filedid and listindex and mflags with target path, return true
+        if (runner->IsAttributePathSupersetOf(aAttributePath))
+        {
+            return true;
+        }
+        if (aAttributePath.IsAttributePathSupersetOf(*runner))
+        {
+            runner->mListIndex = aAttributePath.mListIndex;
+            runner->mFieldId   = aAttributePath.mFieldId;
+            runner->mFlags     = aAttributePath.mFlags;
+            return true;
+        }
+        runner = runner->mpNext;
+    }
+    return false;
+}
+
+bool InteractionModelEngine::IsOverlappedAttributePath(ClusterInfo & aAttributePath)
+{
+    for (auto & handler : mReadHandlers)
+    {
+        if (handler.IsSubscriptionType() && (handler.IsGeneratingReports() || handler.IsAwaitingReportResponse()))
+        {
+            for (auto clusterInfo = handler.GetAttributeClusterInfolist(); clusterInfo != nullptr;
+                 clusterInfo      = clusterInfo->mpNext)
+            {
+                if (clusterInfo->IsAttributePathSupersetOf(aAttributePath) ||
+                    aAttributePath.IsAttributePathSupersetOf(*clusterInfo))
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    ChipLogDetail(DataManagement, "AttributePath is not interested");
+    return false;
 }
 
 } // namespace app

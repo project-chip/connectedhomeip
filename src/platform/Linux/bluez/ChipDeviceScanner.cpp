@@ -273,6 +273,24 @@ int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
         self->RemoveDevice(bluez_object_get_device1(&object));
     }
 
+    // Search for LE only.
+    // Do NOT add filtering by UUID as it is done by the following kernel function:
+    // https://github.com/torvalds/linux/blob/bdb575f872175ed0ecf2638369da1cb7a6e86a14/net/bluetooth/mgmt.c#L9258.
+    // The function requires that devices advertise its services' UUIDs in UUID16/32/128 fields
+    // while the Matter specification requires only FLAGS (0x01) and SERVICE_DATA_16 (0x16) fields
+    // in the advertisement packets.
+    GVariantBuilder filterBuilder;
+    g_variant_builder_init(&filterBuilder, G_VARIANT_TYPE("a{sv}"));
+    g_variant_builder_add(&filterBuilder, "{sv}", "Transport", g_variant_new_string("le"));
+    GVariant * filter = g_variant_builder_end(&filterBuilder);
+
+    if (!bluez_adapter1_call_set_discovery_filter_sync(self->mAdapter, filter, self->mCancellable, &error))
+    {
+        // Not critical: ignore if fails
+        ChipLogError(Ble, "Failed to set discovery filters: %s", error->message);
+        g_error_free(error);
+    }
+
     ChipLogProgress(Ble, "BLE initiating scan.");
     if (!bluez_adapter1_call_start_discovery_sync(self->mAdapter, self->mCancellable, &error))
     {

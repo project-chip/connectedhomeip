@@ -82,7 +82,6 @@ public:
         streamer_printf(streamer_get(), "   Device type: %" PRIu16 "\n", nodeData.deviceType);
         streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.deviceName);
         streamer_printf(streamer_get(), "   Commissioning mode: %d\n", static_cast<int>(nodeData.commissioningMode));
-        streamer_printf(streamer_get(), "   Additional pairing: %d\n", static_cast<int>(nodeData.additionalPairing));
         streamer_printf(streamer_get(), "   Pairing hint: %" PRIu16 "\n", nodeData.pairingHint);
         streamer_printf(streamer_get(), "   Pairing instruction: %s\n", nodeData.pairingInstruction);
         streamer_printf(streamer_get(), "   Rotating ID %s\n", rotatingId);
@@ -158,9 +157,6 @@ bool ParseSubType(int argc, char ** argv, Mdns::DiscoveryFilter & filter)
         break;
     case 'C':
         filterType = Mdns::DiscoveryFilterType::kCommissioningMode;
-        break;
-    case 'A':
-        filterType = Mdns::DiscoveryFilterType::kCommissioningModeFromCommand;
         break;
     default:
         return false;

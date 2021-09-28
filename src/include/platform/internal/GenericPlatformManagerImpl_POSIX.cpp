@@ -64,10 +64,10 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
     mShouldRunEventLoop.store(true, std::memory_order_relaxed);
 
     int ret = pthread_cond_init(&mEventQueueStoppedCond, nullptr);
-    VerifyOrReturnError(ret == 0, System::MapErrorPOSIX(ret));
+    VerifyOrReturnError(ret == 0, CHIP_ERROR_POSIX(ret));
 
     ret = pthread_mutex_init(&mStateLock, nullptr);
-    VerifyOrReturnError(ret == 0, System::MapErrorPOSIX(ret));
+    VerifyOrReturnError(ret == 0, CHIP_ERROR_POSIX(ret));
 
     mHasValidChipTask = false;
 
@@ -127,11 +127,12 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t 
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
     mChipEventQueue.Push(*event);
 
     SystemLayerSocketsLoop().Signal(); // Trigger wake select on CHIP thread
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -210,11 +211,11 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
 {
     int err;
     err = pthread_attr_init(&mChipTaskAttr);
-    VerifyOrReturnError(err == 0, System::MapErrorPOSIX(err));
+    VerifyOrReturnError(err == 0, CHIP_ERROR_POSIX(err));
     err = pthread_attr_getschedparam(&mChipTaskAttr, &mChipTaskSchedParam);
-    VerifyOrReturnError(err == 0, System::MapErrorPOSIX(err));
+    VerifyOrReturnError(err == 0, CHIP_ERROR_POSIX(err));
     err = pthread_attr_setschedpolicy(&mChipTaskAttr, SCHED_RR);
-    VerifyOrReturnError(err == 0, System::MapErrorPOSIX(err));
+    VerifyOrReturnError(err == 0, CHIP_ERROR_POSIX(err));
 
     //
     // We need to grab the lock here since we have to protect setting
@@ -232,7 +233,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
 
     pthread_mutex_unlock(&mStateLock);
 
-    return System::MapErrorPOSIX(err);
+    return CHIP_ERROR_POSIX(err);
 }
 
 template <class ImplClass>
@@ -289,7 +290,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
 
 exit:
     mHasValidChipTask = false;
-    return System::MapErrorPOSIX(err);
+    return CHIP_ERROR_POSIX(err);
 }
 
 template <class ImplClass>

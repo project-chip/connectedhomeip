@@ -64,8 +64,21 @@ const QNamePart kInstanceNameParts2[]           = { "5555666677778888-1212343456
 const FullQName kInstanceName2                  = FullQName(kInstanceNameParts2);
 const QNamePart kTxtRecordEmptyParts[]          = { "=" };
 const FullQName kTxtRecordEmptyName             = FullQName(kTxtRecordEmptyParts);
+const QNamePart kCompressedIdSubParts1[]        = { "_IBEEFBEEFF00DF00D", "_sub", "_matter", "_tcp", "local" };
+FullQName kCompressedIdSubName1                 = FullQName(kCompressedIdSubParts1);
+const QNamePart kCompressedIdSubParts2[]        = { "_I5555666677778888", "_sub", "_matter", "_tcp", "local" };
+FullQName kCompressedIdSubName2                 = FullQName(kCompressedIdSubParts2);
+PtrResourceRecord ptrServiceSubCompressedId1    = PtrResourceRecord(kDnsSdQueryName, kCompressedIdSubName1);
+PtrResourceRecord ptrServiceSubCompressedId2    = PtrResourceRecord(kDnsSdQueryName, kCompressedIdSubName2);
+
 OperationalAdvertisingParameters operationalParams1 =
-    OperationalAdvertisingParameters().SetPeerId(kPeerId1).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+    OperationalAdvertisingParameters()
+        .SetPeerId(kPeerId1)
+        .SetMac(ByteSpan(kMac))
+        .SetPort(CHIP_PORT)
+        .EnableIpV4(true)
+        .SetTcpSupported(chip::Optional<bool>(false))
+        .SetMRPRetryIntervals(chip::Optional<uint32_t>(32), chip::Optional<uint32_t>(33));
 OperationalAdvertisingParameters operationalParams2 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams3 =
@@ -76,10 +89,11 @@ OperationalAdvertisingParameters operationalParams5 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId5).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams6 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId6).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+const QNamePart txtOperational1Parts[]  = { "CRI=32", "CRA=33", "T=0" };
 PtrResourceRecord ptrOperationalService = PtrResourceRecord(kDnsSdQueryName, kMatterOperationalQueryName);
 PtrResourceRecord ptrOperational1       = PtrResourceRecord(kMatterOperationalQueryName, kInstanceName1);
 SrvResourceRecord srvOperational1       = SrvResourceRecord(kInstanceName1, kHostnameName, CHIP_PORT);
-TxtResourceRecord txtOperational1       = TxtResourceRecord(kInstanceName1, kTxtRecordEmptyName);
+TxtResourceRecord txtOperational1       = TxtResourceRecord(kInstanceName1, txtOperational1Parts);
 PtrResourceRecord ptrOperational2       = PtrResourceRecord(kMatterOperationalQueryName, kInstanceName2);
 SrvResourceRecord srvOperational2       = SrvResourceRecord(kInstanceName2, kHostnameName, CHIP_PORT);
 TxtResourceRecord txtOperational2       = TxtResourceRecord(kInstanceName2, kTxtRecordEmptyName);
@@ -88,33 +102,27 @@ TxtResourceRecord txtOperational2       = TxtResourceRecord(kInstanceName2, kTxt
 const QNamePart kMatterCommissionableNodeQueryParts[3] = { "_matterc", "_udp", "local" };
 const QNamePart kLongSubPartsFullLen[]                 = { "_L4094", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kShortSubPartsFullLen[]                = { "_S15", "_sub", "_matterc", "_udp", "local" };
-const QNamePart kCmSubParts0[]                         = { "_C0", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kCmSubParts[]                          = { "_CM", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kLongSubParts[]                        = { "_L22", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kShortSubParts[]                       = { "_S2", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kVendorSubParts[]                      = { "_V555", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kDeviceTypeSubParts[]                  = { "_T25", "_sub", "_matterc", "_udp", "local" };
-const QNamePart kCmSubParts1[]                         = { "_C1", "_sub", "_matterc", "_udp", "local" };
-const QNamePart kOpenWindowSubParts[]                  = { "_A1", "_sub", "_matterc", "_udp", "local" };
 const FullQName kMatterCommissionableNodeQueryName     = FullQName(kMatterCommissionableNodeQueryParts);
 FullQName kLongSubFullLenName                          = FullQName(kLongSubPartsFullLen);
 FullQName kShortSubFullLenName                         = FullQName(kShortSubPartsFullLen);
-FullQName kCmSub0Name                                  = FullQName(kCmSubParts0);
+FullQName kCmSubName                                   = FullQName(kCmSubParts);
 FullQName kLongSubName                                 = FullQName(kLongSubParts);
 FullQName kShortSubName                                = FullQName(kShortSubParts);
-FullQName kCmSub1Name                                  = FullQName(kCmSubParts1);
 FullQName kVendorSubName                               = FullQName(kVendorSubParts);
 FullQName kDeviceTypeSubName                           = FullQName(kDeviceTypeSubParts);
-FullQName kOpenWindowSubName                           = FullQName(kOpenWindowSubParts);
 PtrResourceRecord ptrCommissionableNodeService         = PtrResourceRecord(kDnsSdQueryName, kMatterCommissionableNodeQueryName);
 PtrResourceRecord ptrServiceSubLFullLen                = PtrResourceRecord(kDnsSdQueryName, kLongSubFullLenName);
 PtrResourceRecord ptrServiceSubSFullLen                = PtrResourceRecord(kDnsSdQueryName, kShortSubFullLenName);
-PtrResourceRecord ptrServiceSubC0                      = PtrResourceRecord(kDnsSdQueryName, kCmSub0Name);
+PtrResourceRecord ptrServiceSubCM                      = PtrResourceRecord(kDnsSdQueryName, kCmSubName);
 PtrResourceRecord ptrServiceSubLong                    = PtrResourceRecord(kDnsSdQueryName, kLongSubName);
 PtrResourceRecord ptrServiceSubShort                   = PtrResourceRecord(kDnsSdQueryName, kShortSubName);
-PtrResourceRecord ptrServiceSubC1                      = PtrResourceRecord(kDnsSdQueryName, kCmSub1Name);
 PtrResourceRecord ptrServiceSubVendor                  = PtrResourceRecord(kDnsSdQueryName, kVendorSubName);
 PtrResourceRecord ptrServiceSubDeviceType              = PtrResourceRecord(kDnsSdQueryName, kDeviceTypeSubName);
-PtrResourceRecord ptrServiceSubOpenWindow              = PtrResourceRecord(kDnsSdQueryName, kOpenWindowSubName);
 
 // For commissioning, the instance name is chosen randomly by the advertiser, so we have to get this value from it. We can, however,
 // pre-populate the records with the ptr.
@@ -130,13 +138,12 @@ CommissionAdvertisingParameters commissionableNodeParamsSmall =
         .SetMac(ByteSpan(kMac))
         .SetLongDiscriminator(0xFFE)
         .SetShortDiscriminator(0xF)
-        .SetCommissioningMode(false)
-        .SetAdditionalCommissioning(false);
+        .SetCommissioningMode(CommissioningMode::kDisabled);
 const QNamePart txtCommissionableNodeParamsSmallParts[] = { "CM=0", "D=4094" };
 FullQName txtCommissionableNodeParamsSmallName          = FullQName(txtCommissionableNodeParamsSmallParts);
 TxtResourceRecord txtCommissionableNodeParamsSmall      = TxtResourceRecord(instanceName, txtCommissionableNodeParamsSmallName);
 
-CommissionAdvertisingParameters commissionableNodeParamsLarge =
+CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
     CommissionAdvertisingParameters()
         .SetCommissionAdvertiseMode(CommssionAdvertiseMode::kCommissionableNode)
         .SetMac(ByteSpan(kMac, sizeof(kMac)))
@@ -144,17 +151,41 @@ CommissionAdvertisingParameters commissionableNodeParamsLarge =
         .SetShortDiscriminator(2)
         .SetVendorId(chip::Optional<uint16_t>(555))
         .SetDeviceType(chip::Optional<uint16_t>(25))
-        .SetCommissioningMode(true)
-        .SetAdditionalCommissioning(true)
+        .SetCommissioningMode(CommissioningMode::kEnabledBasic)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
         .SetPairingInstr(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
         .SetRotatingId(chip::Optional<const char *>("id_that_spins"));
-QNamePart txtCommissionableNodeParamsLargeParts[]  = { "D=22",          "VP=555+897",       "AP=1",       "CM=1", "DT=25",
-                                                      "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3" };
-FullQName txtCommissionableNodeParamsLargeName     = FullQName(txtCommissionableNodeParamsLargeParts);
-TxtResourceRecord txtCommissionableNodeParamsLarge = TxtResourceRecord(instanceName, txtCommissionableNodeParamsLargeName);
+QNamePart txtCommissionableNodeParamsLargeBasicParts[] = { "D=22",          "VP=555+897",       "CM=1",       "DT=25",
+                                                           "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3" };
+FullQName txtCommissionableNodeParamsLargeBasicName    = FullQName(txtCommissionableNodeParamsLargeBasicParts);
+TxtResourceRecord txtCommissionableNodeParamsLargeBasic =
+    TxtResourceRecord(instanceName, txtCommissionableNodeParamsLargeBasicName);
+
+CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
+    CommissionAdvertisingParameters()
+        .SetCommissionAdvertiseMode(CommssionAdvertiseMode::kCommissionableNode)
+        .SetMac(ByteSpan(kMac, sizeof(kMac)))
+        .SetLongDiscriminator(22)
+        .SetShortDiscriminator(2)
+        .SetVendorId(chip::Optional<uint16_t>(555))
+        .SetDeviceType(chip::Optional<uint16_t>(25))
+        .SetCommissioningMode(CommissioningMode::kEnabledEnhanced)
+        .SetDeviceName(chip::Optional<const char *>("testy-test"))
+        .SetPairingHint(chip::Optional<uint16_t>(3))
+        .SetPairingInstr(chip::Optional<const char *>("Pair me"))
+        .SetProductId(chip::Optional<uint16_t>(897))
+        .SetRotatingId(chip::Optional<const char *>("id_that_spins"))
+        .SetTcpSupported(chip::Optional<bool>(true))
+        .SetMRPRetryIntervals(chip::Optional<uint32_t>(3600000),
+                              chip::Optional<uint32_t>(3600005)); // 3600005 is more than the max so should be adjusted down
+QNamePart txtCommissionableNodeParamsLargeEnhancedParts[] = { "D=22",          "VP=555+897",       "CM=2",       "DT=25",
+                                                              "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3",
+                                                              "CRA=3600000",   "CRI=3600000",      "T=1" };
+FullQName txtCommissionableNodeParamsLargeEnhancedName    = FullQName(txtCommissionableNodeParamsLargeEnhancedParts);
+TxtResourceRecord txtCommissionableNodeParamsLargeEnhanced =
+    TxtResourceRecord(instanceName, txtCommissionableNodeParamsLargeEnhancedName);
 
 // Our server doesn't do anything with this, blank is fine.
 Inet::IPPacketInfo packetInfo;
@@ -193,6 +224,7 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     // Test for PTR response to _services request.
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
     server.AddExpectedRecord(&ptrOperationalService);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId1);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
 
     // These check that the requested records added are sent out correctly.
@@ -229,6 +261,7 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
     server.Reset();
     server.AddExpectedRecord(&ptrOperationalService);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId1);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -253,6 +286,8 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
     server.AddExpectedRecord(&ptrOperationalService);
     server.AddExpectedRecord(&ptrOperationalService);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId1);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId2);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -316,7 +351,6 @@ void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
     server.AddExpectedRecord(&ptrCommissionableNodeService);
     server.AddExpectedRecord(&ptrServiceSubLFullLen);
     server.AddExpectedRecord(&ptrServiceSubSFullLen);
-    server.AddExpectedRecord(&ptrServiceSubC0);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
     // These check that the requested records added are sent out correctly.
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
@@ -348,34 +382,64 @@ void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
 
     // Add more parameters, check that the subtypes and TXT values get set correctly.
     // Also check that we get proper values when the discriminators are small (no leading 0's)
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsLarge) == CHIP_NO_ERROR);
-    ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local for large parameters");
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsLargeBasic) == CHIP_NO_ERROR);
+    ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local for large basic parameters");
     server.Reset();
     server.AddExpectedRecord(&ptrCommissionableNodeService);
     server.AddExpectedRecord(&ptrServiceSubLong);
     server.AddExpectedRecord(&ptrServiceSubShort);
-    server.AddExpectedRecord(&ptrServiceSubC1);
+    server.AddExpectedRecord(&ptrServiceSubCM);
     server.AddExpectedRecord(&ptrServiceSubVendor);
     server.AddExpectedRecord(&ptrServiceSubDeviceType);
-    server.AddExpectedRecord(&ptrServiceSubOpenWindow);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
 
-    ChipLogProgress(Discovery, "Testing response to _matterc._udp.local for large parameters");
+    ChipLogProgress(Discovery, "Testing response to _matterc._udp.local for large basic parameters");
     server.Reset();
     server.AddExpectedRecord(&ptrCommissionableNode);
     server.AddExpectedRecord(&srvCommissionableNode);
-    server.AddExpectedRecord(&txtCommissionableNodeParamsLarge);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeBasic);
     NL_TEST_ASSERT(inSuite, SendQuery(kMatterCommissionableNodeQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
 
-    ChipLogProgress(Discovery, "Testing response to instance name for large parameters");
+    ChipLogProgress(Discovery, "Testing response to instance name for large basic parameters");
     server.Reset();
     // Just the SRV and TXT should return
     server.AddExpectedRecord(&srvCommissionableNode);
-    server.AddExpectedRecord(&txtCommissionableNodeParamsLarge);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeBasic);
+    NL_TEST_ASSERT(inSuite, SendQuery(instanceName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsLargeEnhanced) == CHIP_NO_ERROR);
+    ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local for large enhanced parameters");
+    server.Reset();
+    server.AddExpectedRecord(&ptrCommissionableNodeService);
+    server.AddExpectedRecord(&ptrServiceSubLong);
+    server.AddExpectedRecord(&ptrServiceSubShort);
+    server.AddExpectedRecord(&ptrServiceSubCM);
+    server.AddExpectedRecord(&ptrServiceSubVendor);
+    server.AddExpectedRecord(&ptrServiceSubDeviceType);
+    NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    ChipLogProgress(Discovery, "Testing response to _matterc._udp.local for large enhanced parameters");
+    server.Reset();
+    server.AddExpectedRecord(&ptrCommissionableNode);
+    server.AddExpectedRecord(&srvCommissionableNode);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeEnhanced);
+    NL_TEST_ASSERT(inSuite, SendQuery(kMatterCommissionableNodeQueryName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    ChipLogProgress(Discovery, "Testing response to instance name for large enhanced parameters");
+    server.Reset();
+    // Just the SRV and TXT should return
+    server.AddExpectedRecord(&srvCommissionableNode);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeEnhanced);
     NL_TEST_ASSERT(inSuite, SendQuery(instanceName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -392,7 +456,7 @@ void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext
     // Add two operational and a commissionable and test that we get the correct values back.
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams1) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsLarge) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsLargeEnhanced) == CHIP_NO_ERROR);
 
     // Services listing should have two operational ptrs, the base commissionable node ptr and the various _sub ptrs
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
@@ -402,10 +466,11 @@ void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext
     server.AddExpectedRecord(&ptrCommissionableNodeService);
     server.AddExpectedRecord(&ptrServiceSubLong);
     server.AddExpectedRecord(&ptrServiceSubShort);
-    server.AddExpectedRecord(&ptrServiceSubC1);
+    server.AddExpectedRecord(&ptrServiceSubCM);
     server.AddExpectedRecord(&ptrServiceSubVendor);
     server.AddExpectedRecord(&ptrServiceSubDeviceType);
-    server.AddExpectedRecord(&ptrServiceSubOpenWindow);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId1);
+    server.AddExpectedRecord(&ptrServiceSubCompressedId2);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -428,7 +493,7 @@ void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext
     server.Reset();
     server.AddExpectedRecord(&ptrCommissionableNode);
     server.AddExpectedRecord(&srvCommissionableNode);
-    server.AddExpectedRecord(&txtCommissionableNodeParamsLarge);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeEnhanced);
     NL_TEST_ASSERT(inSuite, SendQuery(kMatterCommissionableNodeQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -456,7 +521,7 @@ void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext
     server.Reset();
     // Just the SRV and TXT should return
     server.AddExpectedRecord(&srvCommissionableNode);
-    server.AddExpectedRecord(&txtCommissionableNodeParamsLarge);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLargeEnhanced);
     NL_TEST_ASSERT(inSuite, SendQuery(instanceName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());

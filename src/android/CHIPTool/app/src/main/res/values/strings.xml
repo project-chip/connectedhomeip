@@ -20,20 +20,14 @@
     <string name="camera_unavailable_alert_exit">Exit</string>
     <string name="input_address_btn_text">Input device address</string>
 
-    <string name="send_echo_btn_text">Send echo</string>
-    <string name="echo_status_connecting">Connecting…</string>
-    <string name="echo_status_sending_message">Sending message…</string>
-    <string name="echo_status_response">Received echo response:\n\n%1$s</string>
     <string name="scan_qr_code_btn_text">Scan QR Code</string>
     <string name="provision_wifi_credentials_btn_text">Provision CHIP device with Wi-Fi</string>
     <string name="provision_thread_credentials_btn_text">Provision CHIP device with Thread</string>
-    <string name="echo_client_btn_text">Echo Client</string>
     <string name="on_off_level_btn_text">Light On/Off &amp; Level Cluster</string>
     <string name="enter_ip_address_hint_text">Enter IP Address (eg. 192.168.10.2)</string>
     <string name="enter_fabric_id_hint_text">Enter Fabric ID</string>
     <string name="enter_device_id_hint_text">Enter Device ID</string>
     <string name="enter_endpoint_id_hint_text">Enter Endpoint ID</string>
-    <string name="echo_input_hint_text">Enter message for device</string>
     <string name="update_device_address_btn_text">Update address</string>
 
     <string name="address_commissioning_title_text">Commission with IP address</string>
@@ -92,4 +86,10 @@
     <string name="sensor_client_last_value_text">Last value: %1$.2f %2$s</string>
     <string name="sensor_client_read_error_text">Failed to read the sensor: %1$s</string>
 
+    <string name="multi_admin_client_btn_text">Multi-admin cluster</string>
+    <string name="basic_commissioning_method_btn_text">Basic Commissioning Method</string>
+    <string name="enter_discriminator_hint_text">Enter Discriminator</string>
+    <string name="enter_setup_pin_code_hint_text">Enter Setup PIN Code</string>
+    <string name="enhanced_commissioning_method_btn_text">Enhanced Commissioning Method</string>
+    <string name="revoke_btn_text">Revoke</string>
 </resources>

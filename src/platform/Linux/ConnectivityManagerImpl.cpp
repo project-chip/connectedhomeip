@@ -26,7 +26,18 @@
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>
+#include <linux/ethtool.h>
 #include <linux/if_link.h>
+#include <linux/sockios.h>
+#include <linux/wireless.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -52,6 +63,13 @@ using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace {
+
+enum class ConnectionType
+{
+    kConnectionUnknown,
+    kConnectionEthernet,
+    kConnectionWiFi
+};
 
 enum class EthernetStatsCountType
 {
@@ -240,6 +258,36 @@ static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
 }
 #endif
 
+ConnectionType GetInterfaceConnectionType(const char * ifname)
+{
+    int sock = -1;
+
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to open socket");
+        return ConnectionType::kConnectionUnknown;
+    }
+
+    // Test wireless extensions for CONNECTION_WIFI
+    struct iwreq pwrq = {};
+    strncpy(pwrq.ifr_name, ifname, IFNAMSIZ - 1);
+
+    if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1)
+        return ConnectionType::kConnectionWiFi;
+
+    // Test ethtool for CONNECTION_ETHERNET
+    struct ethtool_cmd ecmd = {};
+    ecmd.cmd                = ETHTOOL_GSET;
+    struct ifreq ifr        = {};
+    ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
+    strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+
+    if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
+        return ConnectionType::kConnectionEthernet;
+
+    return ConnectionType::kConnectionUnknown;
+}
+
 CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
 {
     CHIP_ERROR ret          = CHIP_ERROR_READ_FAILED;
@@ -257,8 +305,11 @@ CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
           can free list later */
         for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (strcmp(ifa->ifa_name, CHIP_DEVICE_CONFIG_ETHERNET_IF_NAME) == 0)
+            if (GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            {
+                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
                 break;
+            }
         }
 
         if (ifa != nullptr)
@@ -339,16 +390,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>::ConnectivityFlags>
     ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
-
-bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity()
-{
-    return mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
-}
-
-bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity()
-{
-    return mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
-}
+std::mutex ConnectivityManagerImpl::mWpaSupplicantMutex;
 
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode()
 {
@@ -399,6 +441,8 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
     bool ret            = false;
     const gchar * state = nullptr;
 
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationConnected: interface not connected");
@@ -426,6 +470,8 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
     bool ret          = false;
     const gchar * bss = nullptr;
 
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationProvisioned: interface not connected");
@@ -443,6 +489,8 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 {
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: _ClearWiFiStationProvision: interface not connected");
@@ -465,8 +513,12 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {
-    return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
         mWpaSupplicant.scanState == GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
+
+    return ret;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
@@ -559,7 +611,10 @@ CHIP_ERROR ConnectivityManagerImpl::_GetEthOverrunCount(uint64_t & overrunCount)
 
 void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
-    GError * err                            = nullptr;
+    GError * err = nullptr;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     WpaFiW1Wpa_supplicant1Interface * iface = wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus_finish(res, &err);
 
     if (mWpaSupplicant.iface)
@@ -589,6 +644,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
 void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     GError * err = nullptr;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     gboolean result =
         wpa_fi_w1_wpa_supplicant1_call_get_interface_finish(mWpaSupplicant.proxy, &mWpaSupplicant.interfacePath, res, &err);
@@ -653,8 +710,12 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
 void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                                    gpointer user_data)
 {
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     if (mWpaSupplicant.interfacePath)
+    {
         return;
+    }
 
     mWpaSupplicant.interfacePath = const_cast<gchar *>(path);
     if (mWpaSupplicant.interfacePath)
@@ -671,8 +732,12 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * prox
 void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                                      gpointer user_data)
 {
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     if (mWpaSupplicant.interfacePath == nullptr)
+    {
         return;
+    }
 
     if (g_strcmp0(mWpaSupplicant.interfacePath, path) == 0)
     {
@@ -699,6 +764,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * pr
 void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     GError * err = nullptr;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     mWpaSupplicant.proxy = wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus_finish(res, &err);
     if (mWpaSupplicant.proxy != nullptr && err == nullptr)
@@ -740,7 +807,11 @@ void ConnectivityManagerImpl::StartWiFiManagement()
 
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 {
-    return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
+
+    return ret;
 }
 
 void ConnectivityManagerImpl::DriveAPState()
@@ -1042,7 +1113,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
                         ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName,
                                       event.InternetConnectivityChange.address);
 
-                        PlatformMgr().PostEvent(&event);
+                        PlatformMgr().PostEventOrDie(&event);
                     }
                 }
             }

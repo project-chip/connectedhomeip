@@ -112,6 +112,14 @@ public:
     CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
 
     /**
+     *  Creates a new read client and sends SubscribeRequest message to the node using the read client.
+     *  Shuts down on transmission failure.
+     *
+     *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
+     *  @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, uint64_t aAppIdentifier = 0);
+    /**
      *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
      *  see WriteClient documentation for lifetime handling.
      *
@@ -141,6 +149,10 @@ public:
 
     void ReleaseClusterInfoList(ClusterInfo *& aClusterInfo);
     CHIP_ERROR PushFront(ClusterInfo *& aClusterInfoLisst, ClusterInfo & aClusterInfo);
+    // Merges aAttributePath inside apAttributePathList if current path is overlapped with existing path in apAttributePathList
+    // Overlap means the path is superset or subset of another path
+    bool MergeOverlappedAttributePath(ClusterInfo * apAttributePathList, ClusterInfo & aAttributePath);
+    bool IsOverlappedAttributePath(ClusterInfo & aAttributePath);
 
 private:
     friend class reporting::Engine;
@@ -156,8 +168,9 @@ private:
      * Called when Interaction Model receives a Read Request message.  Errors processing
      * the Read Request are handled entirely within this function.
      */
+
     CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                    System::PacketBufferHandle && aPayload);
+                                    System::PacketBufferHandle && aPayload, ReadHandler::InteractionType aInteractionType);
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
@@ -166,6 +179,11 @@ private:
     CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                               System::PacketBufferHandle && aPayload);
 
+    /**This function handles processing of un-solicited ReportData messages on the client, which can
+     * only occur post subscription establishment
+     */
+    CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                       System::PacketBufferHandle && aPayload);
     /**
      *  Retrieve a ReadClient that the SDK consumer can use to send do a read.  If the call succeeds, the consumer
      *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
@@ -173,7 +191,8 @@ private:
      *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, uint64_t aAppIdentifier);
+    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
+                             uint64_t aAppIdentifier);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;

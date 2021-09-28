@@ -53,6 +53,8 @@ template("chip_data_model") {
   _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
                              invoker.use_default_im_dispatch
 
+  _use_tests_apis = defined(invoker.use_tests_apis) && invoker.use_tests_apis
+
   _use_default_client_callbacks =
       defined(invoker.use_default_client_callbacks) &&
       invoker.use_default_client_callbacks
@@ -81,7 +83,7 @@ template("chip_data_model") {
       "${_app_root}/clusters/ias-zone-client/ias-zone-client.h",
       "${_app_root}/clusters/ias-zone-server/ias-zone-server-tokens.h",
       "${_app_root}/clusters/ias-zone-server/ias-zone-server.h",
-      "${_app_root}/clusters/identify/identify.h",
+      "${_app_root}/clusters/identify-server/identify-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/messaging-client/messaging-client.h",
       "${_app_root}/clusters/messaging-server/messaging-server.h",
@@ -169,6 +171,13 @@ template("chip_data_model") {
         sources +=
             [ "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp" ]
       }
+
+      if (_use_tests_apis) {
+        sources += [
+          "${invoker.zap_pregenerated_dir}/tests/CHIPClusters.cpp",
+          "${invoker.zap_pregenerated_dir}/tests/CHIPClusters.h",
+        ]
+      }
     }
 
     if (!defined(public_deps)) {
@@ -177,6 +186,7 @@ template("chip_data_model") {
 
     public_deps += [
       "${chip_root}/src/app",
+      "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/controller",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",

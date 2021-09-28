@@ -64,17 +64,32 @@ function setDefaultType(test)
   const type = test[kCommandName];
   switch (type) {
   case 'readAttribute':
+    test.commandName     = 'Read';
     test.isAttribute     = true;
     test.isReadAttribute = true;
     break;
 
   case 'writeAttribute':
+    test.commandName      = 'Write';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
     break;
 
+  case 'subscribeAttribute':
+    test.commandName          = 'Configure';
+    test.isAttribute          = true;
+    test.isSubscribeAttribute = true;
+    break;
+
+  case 'waitForReport':
+    test.commandName     = 'Report';
+    test.isAttribute     = true;
+    test.isWaitForReport = true;
+    break;
+
   default:
-    test.isCommand = true;
+    test.commandName = test.command;
+    test.isCommand   = true;
     break;
   }
 }
@@ -131,16 +146,21 @@ function setDefaultResponse(test)
     throwError(test, errorStr);
   }
 
-  if (test.isWriteAttribute && hasResponseValueOrConstraints) {
-    const errorStr = 'Attribute write test has a "value" or a "constraints" defined.';
-    throwError(test, errorStr);
+  if (!test.isAttribute) {
+    return;
   }
 
-  if (!test.isReadAttribute) {
+  if (test.isWriteAttribute || test.isSubscribeAttribute) {
+    if (hasResponseValueOrConstraints) {
+      const errorStr = 'Attribute test has a "value" or a "constraints" defined.';
+      throwError(test, errorStr);
+    }
+
     return;
   }
 
   if (!hasResponseValueOrConstraints) {
+    console.log(test);
     console.log(test[kResponseName]);
     const errorStr = 'Test does not have a "value" or a "constraints" defined.';
     throwError(test, errorStr);
@@ -183,6 +203,34 @@ function parse(filename)
 
   const data = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
   const yaml = YAML.parse(data);
+
+  // "subscribeAttribute" command expects a report to be acked before
+  // it got a success response.
+  // In order to validate that the report has been received with the proper value
+  // a "subscribeAttribute" command can have a response configured into the test step
+  // definition. In this case, a new async "waitForReport" test step will be synthesized
+  // and added to the list of tests.
+  yaml.tests.forEach((test, index) => {
+    if (test.command == "subscribeAttribute" && test.response) {
+      // Create a new report test where the expected response is the response argument
+      // for the "subscribeAttributeTest"
+      const reportTest = {
+        label : "Report: " + test.label,
+        command : "waitForReport",
+        attribute : test.attribute,
+        response : test.response,
+        async : true
+      };
+      delete test.response;
+
+      // insert the new report test into the tests list
+      yaml.tests.splice(index, 0, reportTest);
+
+      // Associate the "subscribeAttribute" test with the synthesized report test
+      test.hasWaitForReport = true;
+      test.waitForReport    = reportTest;
+    }
+  });
 
   const defaultConfig = yaml.config || [];
   yaml.tests.forEach(test => {
@@ -294,11 +342,28 @@ function isTestOnlyCluster(name)
   return name == DelayCommands.name;
 }
 
+function chip_tests_with_command_attribute_info(options)
+{
+  const promise = assertCommandOrAttribute(this).then(item => {
+    return [ item ];
+  });
+  return asBlocks.call(this, promise, options);
+}
+
 function chip_tests_item_parameters(options)
 {
   const commandValues = this.arguments.values;
 
   const promise = assertCommandOrAttribute(this).then(item => {
+    if (this.isAttribute && !this.isWriteAttribute) {
+      if (this.isSubscribeAttribute) {
+        const minInterval = { name : 'minInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.minInterval };
+        const maxInterval = { name : 'maxInterval', type : 'in16u', chipType : 'uint16_t', definedValue : this.maxInterval };
+        return [ minInterval, maxInterval ];
+      }
+      return [];
+    }
+
     const commandArgs = item.arguments;
     const commands    = commandArgs.map(commandArg => {
       commandArg = JSON.parse(JSON.stringify(commandArg));
@@ -360,11 +425,20 @@ function chip_tests_item_response_parameters(options)
   return asBlocks.call(this, promise, options);
 }
 
+function chip_tests_WaitForAttributeReport_attribute_info(options)
+{
+  const waitfor = Object.assign(JSON.parse(JSON.stringify(this.waitfor)), { command : 'readAttribute', isAttribute : true });
+  setDefaults(waitfor, this.parent);
+  return templateUtil.collectBlocks([ waitfor ], options, this);
+}
+
 //
 // Module exports
 //
-exports.chip_tests                          = chip_tests;
-exports.chip_tests_items                    = chip_tests_items;
-exports.chip_tests_item_parameters          = chip_tests_item_parameters;
-exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
-exports.isTestOnlyCluster                   = isTestOnlyCluster;
+exports.chip_tests                                       = chip_tests;
+exports.chip_tests_items                                 = chip_tests_items;
+exports.chip_tests_item_parameters                       = chip_tests_item_parameters;
+exports.chip_tests_item_response_parameters              = chip_tests_item_response_parameters;
+exports.isTestOnlyCluster                                = isTestOnlyCluster;
+exports.chip_tests_with_command_attribute_info           = chip_tests_with_command_attribute_info;
+exports.chip_tests_WaitForAttributeReport_attribute_info = chip_tests_WaitForAttributeReport_attribute_info;

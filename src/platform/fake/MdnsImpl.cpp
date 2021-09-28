@@ -75,7 +75,7 @@ CHIP_ERROR CheckExpected(CallType type, const MdnsService * service)
         ChipLogProgress(Discovery, "\t%s", service->mSubTypes[i]);
     }
     ChipLogProgress(Discovery, "num text entries = %lu", static_cast<unsigned long>(service->mTextEntrySize));
-    for (size_t i = 0; i < service->mSubTypeSize; ++i)
+    for (size_t i = 0; i < service->mTextEntrySize; ++i)
     {
         ChipLogProgress(Discovery, "\t%s", service->mTextEntries[i].mKey);
     }
@@ -91,6 +91,11 @@ CHIP_ERROR CheckExpected(CallType type, const MdnsService * service)
 } // namespace test
 
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ChipMdnsShutdown()
 {
     return CHIP_NO_ERROR;
 }

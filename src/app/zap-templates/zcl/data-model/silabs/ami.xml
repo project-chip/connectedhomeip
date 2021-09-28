@@ -32,22 +32,26 @@ limitations under the License.
      <field name="messageConfirmation" mask="0x80"/>
    </bitmap>
    <enum name="MessagingControlTransmission" type="ENUM8">
+     <cluster code="0x0703"/>
      <item name="normal" value="0x00"/>
      <item name="normalAndAnonymous" value="0x01"/>
      <item name="anonymous" value="0x02"/>
      <item name="reserved" value="0x03"/>
    </enum>
    <enum name="MessagingControlImportance" type="ENUM8">
+     <cluster code="0x0703"/>
      <item name="low" value="0x00"/>
      <item name="medium" value="0x04"/>
      <item name="high" value="0x08"/>
      <item name="critical" value="0x0C"/>
    </enum>
    <enum name="MessagingControlEnhancedConfirmation" type="ENUM8">
+     <cluster code="0x0703"/>
      <item name="notRequired" value="0x00"/>
      <item name="required" value="0x20"/>
    </enum>
    <enum name="MessagingControlConfirmation" type="ENUM8">
+     <cluster code="0x0703"/>
      <item name="notRequired" value="0x00"/>
      <item name="required" value="0x80"/>
    </enum>
@@ -130,6 +134,7 @@ limitations under the License.
   </cluster>
   <!-- SE extension to the Alarms cluster. -->
   <enum name="EventId" type="ENUM8">
+    <cluster code="0x0703"/>
     <item value="0x00" name="MeterCoverRemoved"/>
     <item value="0x01" name="MeterCoverClosed"/>
     <item value="0x02" name="StrongMagneticField"/>

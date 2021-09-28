@@ -50,17 +50,16 @@ using namespace chip::DeviceLayer;
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (2048)
+#define APP_TASK_STACK_SIZE (3 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
 
-static bool sIsThreadProvisioned     = false;
-static bool sIsThreadEnabled         = false;
-static bool sHaveBLEConnections      = false;
-static bool sHaveServiceConnectivity = false;
+static bool sIsThreadProvisioned = false;
+static bool sIsThreadEnabled     = false;
+static bool sHaveBLEConnections  = false;
 
 AppTask AppTask::sAppTask;
 
@@ -111,7 +110,7 @@ CHIP_ERROR AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     // Enable BLE advertisements
-    chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(chip::ResetFabrics::kNo);
+    chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
 
     return err;
@@ -146,10 +145,9 @@ void AppTask::AppTaskMain(void * pvParameter)
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -167,13 +165,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            // Consider the system to be "fully connected" if it has service
-            // connectivity
-            if (sHaveServiceConnectivity)
-            {
-                qvCHIP_LedSet(SYSTEM_STATE_LED, true);
-            }
-            else if (sIsThreadProvisioned && sIsThreadEnabled)
+            if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 qvCHIP_LedBlink(SYSTEM_STATE_LED, 950, 50);
             }

@@ -40,16 +40,16 @@ namespace Messaging {
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry() : rc(nullptr), nextRetransTimeTick(0), sendCount(0) {}
 
 ReliableMessageMgr::ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
-    mContextPool(contextPool), mSystemLayer(nullptr), mSessionMgr(nullptr), mCurrentTimerExpiry(0),
+    mContextPool(contextPool), mSystemLayer(nullptr), mSessionManager(nullptr), mCurrentTimerExpiry(0),
     mTimerIntervalShift(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)
 {}
 
 ReliableMessageMgr::~ReliableMessageMgr() {}
 
-void ReliableMessageMgr::Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr)
+void ReliableMessageMgr::Init(chip::System::Layer * systemLayer, SessionManager * sessionManager)
 {
-    mSystemLayer = systemLayer;
-    mSessionMgr  = sessionMgr;
+    mSystemLayer    = systemLayer;
+    mSessionManager = sessionManager;
 
     mTimeStampBase      = System::Clock::GetMonotonicMilliseconds();
     mCurrentTimerExpiry = 0;
@@ -59,8 +59,8 @@ void ReliableMessageMgr::Shutdown()
 {
     StopTimer();
 
-    mSystemLayer = nullptr;
-    mSessionMgr  = nullptr;
+    mSystemLayer    = nullptr;
+    mSessionManager = nullptr;
 
     // Clear the retransmit table
     for (RetransTableEntry & rEntry : mRetransTable)
@@ -88,8 +88,11 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
     {
         if (entry.rc)
         {
-            ChipLogDetail(ExchangeManager, "EC:%04" PRIX16 " MsgId:%08" PRIX32 " NextRetransTimeCtr:%04" PRIX16, entry.rc,
-                          entry.msgId, entry.nextRetransTimeTick);
+            ChipLogDetail(ExchangeManager,
+                          "EC:" ChipLogFormatExchange " MessageCounter:" ChipLogFormatMessageCounter
+                          " NextRetransTimeCtr:%04" PRIX16,
+                          ChipLogValueExchange(entry.rc->GetExchangeContext()), entry.retainedBuf.GetMessageCounter(),
+                          entry.nextRetransTimeTick);
         }
     }
 }
@@ -143,15 +146,18 @@ void ReliableMessageMgr::ExecuteActions()
             continue;
         }
 
-        uint8_t sendCount = entry.sendCount;
-        uint32_t msgId    = entry.retainedBuf.GetMsgId();
+        uint8_t sendCount       = entry.sendCount;
+        uint32_t messageCounter = entry.retainedBuf.GetMessageCounter();
 
         if (sendCount == CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS)
         {
             err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
-            ChipLogError(ExchangeManager, "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %d", msgId,
-                         sendCount, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
+            ChipLogError(ExchangeManager,
+                         "Failed to Send CHIP MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
+                         " sendCount: %" PRIu8 " max retries: %d",
+                         messageCounter, ChipLogValueExchange(rc->GetExchangeContext()), sendCount,
+                         CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
 
             // Remove from Table
             ClearRetransTable(entry);
@@ -166,7 +172,10 @@ void ReliableMessageMgr::ExecuteActions()
             // If the retransmission was successful, update the passive timer
             entry.nextRetransTimeTick = static_cast<uint16_t>(rc->GetActiveRetransmitTimeoutTick());
 #if !defined(NDEBUG)
-            ChipLogDetail(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", msgId, entry.sendCount);
+            ChipLogDetail(ExchangeManager,
+                          "Retransmitted MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
+                          " Send Cnt %d",
+                          messageCounter, ChipLogValueExchange(rc->GetExchangeContext()), entry.sendCount);
 #endif
         }
     }
@@ -197,7 +206,7 @@ void ReliableMessageMgr::ExpireTicks()
     uint64_t deltaTicks = GetTickCounterFromTimeDelta(now);
 
 #if defined(RMP_TICKLESS_DEBUG)
-    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExpireTicks at %" PRIu64 ", %" PRIu64 ", %u", now, mTimeStampBase,
+    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExpireTicks at %" PRIu64 ", %" PRIu64 ", %" PRIu64, now, mTimeStampBase,
                   deltaTicks);
 #endif
 
@@ -329,17 +338,20 @@ void ReliableMessageMgr::ResumeRetransmision(ReliableMessageContext * rc)
     }
 }
 
-bool ReliableMessageMgr::CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t ackMsgId)
+bool ReliableMessageMgr::CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t ackMessageCounter)
 {
     for (RetransTableEntry & entry : mRetransTable)
     {
-        if ((entry.rc == rc) && entry.retainedBuf.GetMsgId() == ackMsgId)
+        if ((entry.rc == rc) && entry.retainedBuf.GetMessageCounter() == ackMessageCounter)
         {
             // Clear the entry from the retransmision table.
             ClearRetransTable(entry);
 
 #if !defined(NDEBUG)
-            ChipLogDetail(ExchangeManager, "Rxd Ack; Removing MsgId:%08" PRIX32 " from Retrans Table", ackMsgId);
+            ChipLogDetail(ExchangeManager,
+                          "Rxd Ack; Removing MessageCounter:" ChipLogFormatMessageCounter
+                          " from Retrans Table on exchange " ChipLogFormatExchange,
+                          ackMessageCounter, ChipLogValueExchange(rc->GetExchangeContext()));
 #endif
             return true;
         }
@@ -357,11 +369,14 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     }
 
     const ExchangeMessageDispatch * dispatcher = rc->GetExchangeContext()->GetMessageDispatch();
-    if (dispatcher == nullptr)
+    if (dispatcher == nullptr || !rc->GetExchangeContext()->HasSecureSession())
     {
         // Using same error message for all errors to reduce code size.
-        ChipLogError(ExchangeManager, "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
-                     CHIP_ERROR_INCORRECT_STATE.Format(), entry->retainedBuf.GetMsgId(), entry->sendCount);
+        ChipLogError(ExchangeManager,
+                     "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MessageCounter:" ChipLogFormatMessageCounter
+                     " on exchange " ChipLogFormatExchange ", send tries: %d",
+                     CHIP_ERROR_INCORRECT_STATE.Format(), entry->retainedBuf.GetMessageCounter(),
+                     ChipLogValueExchange(rc->GetExchangeContext()), entry->sendCount);
         ClearRetransTable(*entry);
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -377,8 +392,11 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     {
         // Remove from table
         // Using same error message for all errors to reduce code size.
-        ChipLogError(ExchangeManager, "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
-                     err.Format(), entry->retainedBuf.GetMsgId(), entry->sendCount);
+        ChipLogError(ExchangeManager,
+                     "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MessageCounter:" ChipLogFormatMessageCounter
+                     " on exchange " ChipLogFormatExchange ", send tries: %d",
+                     err.Format(), entry->retainedBuf.GetMessageCounter(), ChipLogValueExchange(rc->GetExchangeContext()),
+                     entry->sendCount);
 
         ClearRetransTable(*entry);
     }
@@ -406,8 +424,8 @@ void ReliableMessageMgr::ClearRetransTable(RetransTableEntry & rEntry)
         // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
         ExpireTicks();
 
-        rEntry.rc->ReleaseContext();
         rEntry.rc->SetOccupied(false);
+        rEntry.rc->ReleaseContext();
         rEntry.rc = nullptr;
 
         // Clear all other fields
@@ -445,7 +463,7 @@ void ReliableMessageMgr::StartTimer()
             nextWakeTimeTick = rc->mNextAckTimeTick;
             foundWake        = true;
 #if defined(RMP_TICKLESS_DEBUG)
-            ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer next ACK time %u", nextWakeTimeTick);
+            ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer next ACK time %" PRIu64, nextWakeTimeTick);
 #endif
         }
     });
@@ -461,7 +479,7 @@ void ReliableMessageMgr::StartTimer()
                 nextWakeTimeTick = entry.nextRetransTimeTick;
                 foundWake        = true;
 #if defined(RMP_TICKLESS_DEBUG)
-                ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer RetransTime %u", nextWakeTimeTick);
+                ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer RetransTime %" PRIu64, nextWakeTimeTick);
 #endif
             }
         }

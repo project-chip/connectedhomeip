@@ -14,6 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#pragma once
+
 #include "lib/mdns/platform/Mdns.h"
 #include <lib/support/CHIPMemString.h>
 
@@ -166,7 +169,7 @@ struct ExpectedCall
         }
     }
 
-    static constexpr size_t kMaxTxtRecords          = 10;
+    static constexpr size_t kMaxTxtRecords          = 11;
     static constexpr size_t kMaxSubtypes            = 10;
     CallType callType                               = CallType::kUnknown;
     MdnsServiceProtocol protocol                    = MdnsServiceProtocol::kMdnsProtocolUnknown;

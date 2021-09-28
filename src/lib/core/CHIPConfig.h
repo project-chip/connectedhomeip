@@ -2059,8 +2059,8 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE)                                                                         \
-    ((CODE) == chip::System::MapErrorPOSIX(EHOSTUNREACH) || (CODE) == chip::System::MapErrorPOSIX(ENETUNREACH) ||                  \
-     (CODE) == chip::System::MapErrorPOSIX(EADDRNOTAVAIL) || (CODE) == chip::System::MapErrorPOSIX(EPIPE))
+    ((CODE) == CHIP_ERROR_POSIX(EHOSTUNREACH) || (CODE) == CHIP_ERROR_POSIX(ENETUNREACH) ||                                        \
+     (CODE) == CHIP_ERROR_POSIX(EADDRNOTAVAIL) || (CODE) == CHIP_ERROR_POSIX(EPIPE))
 #else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #define _CHIP_CONFIG_IsPlatformPOSIXErrorNonCritical(CODE) 0
 #endif // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -2273,6 +2273,18 @@
 #endif // CHIP_CONFIG_ENABLE_IFJ_SERVICE_FABRIC_JOIN
 
 /**
+ * @def CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+ *
+ * @brief Define the size of the pool used for tracking CHIP unauthenticated
+ * states. The entries in the pool are automatically rotated by LRU. The size
+ * of the pool limits how many PASE and CASE pairing sessions can be processed
+ * simultaneously.
+ */
+#ifndef CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+#define CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE 4
+#endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+
+/**
  * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking CHIP
@@ -2449,7 +2461,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 4
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 8
 #endif
 
 /**
@@ -2468,6 +2480,52 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+ *
+ * @brief Defines the object pool for allocating attribute path for subscription in device controller.
+ */
+#ifndef CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+#define CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE CHIP_IM_MAX_NUM_READ_CLIENT
+#endif
+
+/**
+ * @def CHIP_CONFIG_LAMBDA_EVENT_SIZE
+ *
+ * @brief The maximum size of the lambda which can be post into system event queue.
+ */
+#ifndef CHIP_CONFIG_LAMBDA_EVENT_SIZE
+#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (16)
+#endif
+
+/**
+ * @def CHIP_CONFIG_LAMBDA_EVENT_ALIGN
+ *
+ * @brief The maximum alignment of the lambda which can be post into system event queue.
+ */
+#ifndef CHIP_CONFIG_LAMBDA_EVENT_ALIGN
+#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (sizeof(void *))
+#endif
+
+/**
+ * @def CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+ *
+ * @brief If true, VerifyOrDie() calls with no message will use an
+ *        automatically generated message that makes it clear what failed.
+ */
+#ifndef CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE 0
+#endif
+
+/**
+ * @def CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
+ *
+ * @brief Number of devices a controller can be simultaneously connected to
+ */
+#ifndef CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
+#define CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES 64
 #endif
 
 /**

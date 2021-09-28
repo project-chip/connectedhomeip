@@ -87,12 +87,7 @@ private:
     uint32_t _GetWiFiAPIdleTimeoutMS(void);
     void _SetWiFiAPIdleTimeoutMS(uint32_t val);
 
-    // Internet connectivity methods
-    bool _HaveIPv4InternetConnectivity();
-    bool _HaveIPv6InternetConnectivity();
-
     // Service connectivity methods
-    bool _HaveServiceConnectivity();
 
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
@@ -166,24 +161,9 @@ inline uint32_t ConnectivityManagerImpl::_GetWiFiAPIdleTimeoutMS(void)
     return mWiFiAPIdleTimeoutMS;
 }
 
-inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
-{
-    return mFlags.Has(Flags::kHaveIPv4InternetConnectivity);
-}
-
-inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
-{
-    return mFlags.Has(Flags::kHaveIPv6InternetConnectivity);
-}
-
 inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {
     return mWiFiStationState != kWiFiStationState_Connecting;
-}
-
-inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
-{
-    return HaveServiceConnectivityViaThread();
 }
 
 /**

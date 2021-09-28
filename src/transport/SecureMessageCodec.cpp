@@ -36,21 +36,21 @@ using System::PacketBufferHandle;
 
 namespace SecureMessageCodec {
 
-CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+CHIP_ERROR Encode(Transport::SecureSession * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                   System::PacketBufferHandle & msgBuf, MessageCounter & counter)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrReturnError(msgBuf->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
 
-    uint32_t msgId = counter.Value();
+    uint32_t messageCounter = counter.Value();
 
     static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
                   "Addition to generate payloadLength might overflow");
 
     packetHeader
-        .SetMessageId(msgId) //
-        .SetEncryptionKeyID(state->GetPeerKeyID());
+        .SetMessageCounter(messageCounter) //
+        .SetSessionId(state->GetPeerSessionId());
 
     packetHeader.GetFlags().Set(Header::FlagValues::kEncryptedMessage);
 
@@ -68,13 +68,11 @@ CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     VerifyOrReturnError(CanCastTo<uint16_t>(totalLen + taglen), CHIP_ERROR_INTERNAL);
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
-    ChipLogDetail(Inet, "Secure message was encrypted: Msg ID %" PRIu32, msgId);
-
     ReturnErrorOnFailure(counter.Advance());
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
+CHIP_ERROR Decode(Transport::SecureSession * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
                   System::PacketBufferHandle & msg)
 {
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -92,7 +90,7 @@ CHIP_ERROR Decode(Transport::PeerConnectionState * state, PayloadHeader & payloa
     msg->SetDataLength(len);
 #endif
 
-    uint16_t footerLen = MessageAuthenticationCode::TagLenForEncryptionType(packetHeader.GetEncryptionType());
+    uint16_t footerLen = MessageAuthenticationCode::TagLenForSessionType(packetHeader.GetSessionType());
     VerifyOrReturnError(footerLen <= len, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     uint16_t taglen = 0;

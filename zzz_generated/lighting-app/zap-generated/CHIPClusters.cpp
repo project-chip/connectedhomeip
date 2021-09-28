@@ -32,44 +32,7 @@
 #include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
-#define COMMAND_HEADER(name, clusterId)                                                                                            \
-    const char * kName = name;                                                                                                     \
-    uint8_t seqNum     = mDevice->GetNextSequenceNumber();                                                                         \
-                                                                                                                                   \
-    PacketBufferWriter buf(System::PacketBufferHandle::New(kMaxBufferSize));                                                       \
-    if (buf.IsNull())                                                                                                              \
-    {                                                                                                                              \
-        ChipLogError(Zcl, "Could not allocate packet buffer while trying to encode %s command", kName);                            \
-        return CHIP_ERROR_INTERNAL;                                                                                                \
-    }                                                                                                                              \
-                                                                                                                                   \
-    if (doEncodeApsFrame(buf, clusterId, kSourceEndpoint, mEndpoint, 0, 0, 0, 0, false))                                           \
-    {
-
-#define COMMAND_FOOTER()                                                                                                           \
-    }                                                                                                                              \
-    if (!buf.Fit())                                                                                                                \
-    {                                                                                                                              \
-        ChipLogError(Zcl, "Command %s can't fit in the allocated buffer", kName);                                                  \
-    }                                                                                                                              \
-    return SendCommand(seqNum, buf.Finalize(), onSuccessCallback, onFailureCallback);
-
 namespace chip {
-namespace {
-// TODO: Find a way to calculate maximum message length for clusters
-//       https://github.com/project-chip/connectedhomeip/issues/965
-constexpr uint16_t kMaxBufferSize = 1024;
-
-// This is a global command, so the low bits are 0b00.  The command is
-// standard, so does not need a manufacturer code, and we're sending client
-// to server, so all the remaining bits are 0.
-constexpr uint8_t kFrameControlGlobalCommand = 0x00;
-
-// Pick source endpoint as 1 for now
-constexpr EndpointId kSourceEndpoint = 1;
-
-[[maybe_unused]] const uint8_t kReportingDirectionReported = 0x00;
-} // namespace
 
 using namespace app::Clusters;
 using namespace System;
@@ -83,13 +46,6 @@ namespace Controller {
 
 // OnOff Cluster Commands
 // OnOff Cluster Attributes
-CHIP_ERROR OnOffCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    COMMAND_HEADER("DiscoverOnOffAttributes", OnOff::Id);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
 CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;

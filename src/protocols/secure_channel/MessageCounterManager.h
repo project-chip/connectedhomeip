@@ -46,9 +46,9 @@ public:
     void Shutdown();
 
     // Implement MessageCounterManagerInterface
-    CHIP_ERROR StartSync(SessionHandle session, Transport::PeerConnectionState * state) override;
+    CHIP_ERROR StartSync(SessionHandle session, Transport::SecureSession * state) override;
     CHIP_ERROR QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, SessionHandle session,
-                                                Transport::PeerConnectionState * state, const Transport::PeerAddress & peerAddress,
+                                                Transport::SecureSession * state, const Transport::PeerAddress & peerAddress,
                                                 System::PacketBufferHandle && msgBuf) override;
 
     /**
@@ -63,7 +63,7 @@ public:
      * @retval  #CHIP_NO_ERROR                On success.
      *
      */
-    CHIP_ERROR SendMsgCounterSyncReq(SessionHandle session, Transport::PeerConnectionState * state);
+    CHIP_ERROR SendMsgCounterSyncReq(SessionHandle session, Transport::SecureSession * state);
 
     /**
      *  Add a CHIP message into the cache table to queue the incoming messages that trigger message counter synchronization

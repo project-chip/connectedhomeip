@@ -40,6 +40,7 @@ static constexpr uint32_t kImMessageTimeoutMsec = 12000;
 class ReadClient;
 class WriteClient;
 class CommandSender;
+class ReadHandler;
 
 /**
  * @brief
@@ -78,7 +79,7 @@ public:
      *
      */
     virtual void OnReportData(const ReadClient * apReadClient, const ClusterInfo & aPath, TLV::TLVReader * apData,
-                              Protocols::InteractionModel::ProtocolCode status)
+                              Protocols::InteractionModel::Status status)
     {}
 
     /**
@@ -196,7 +197,17 @@ public:
     }
 
     /**
-     * Notification that a read client has completed the current interaction.
+     * Notification that a Subscribe Response has been processed and application can do further work .
+     */
+    virtual CHIP_ERROR SubscribeResponseProcessed(const ReadClient * apReadClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that Subscription has been established successfully and application can do further work in handler.
+     */
+    virtual CHIP_ERROR SubscriptionEstablished(const ReadHandler * apReadHandler) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that a read interaction was completed on the client successfully.
      * @param[in]  apReadClient  A current read client which can identify the read client to the consumer, particularly
      * during multiple read interactions
      * @param[in]  aError  notify final error regarding the current read interaction

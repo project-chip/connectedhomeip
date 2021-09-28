@@ -55,7 +55,7 @@ extern InitFunc __init_array_end;
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[0xF000];
 
-unsigned int sleep(unsigned int seconds)
+extern "C" unsigned int sleep(unsigned int seconds)
 {
     const TickType_t xDelay = 1000 * seconds / portTICK_PERIOD_MS;
     vTaskDelay(xDelay);

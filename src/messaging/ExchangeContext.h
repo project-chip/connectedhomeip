@@ -33,7 +33,7 @@
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 #include <protocols/Protocols.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 
@@ -165,6 +165,7 @@ public:
     }
 
     SessionHandle GetSecureSession() { return mSecureSession.Value(); }
+    bool HasSecureSession() const { return mSecureSession.HasValue(); }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 

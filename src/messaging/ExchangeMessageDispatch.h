@@ -25,7 +25,7 @@
 
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/Flags.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 namespace Messaging {
@@ -66,6 +66,8 @@ public:
 
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;
+
+    // TODO: remove IsReliableTransmissionAllowed, this function should be provided over session.
     virtual bool IsReliableTransmissionAllowed() const { return true; }
 };
 

@@ -80,6 +80,11 @@ public:
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_Breadcrumb;
 
+    static const Key kCounterKey_RebootCount;
+    static const Key kCounterKey_UpTime;
+    static const Key kCounterKey_TotalOperationalHours;
+    static const Key kCounterKey_BootReason;
+
     static const char kGroupKeyNamePrefix[];
 
     static CHIP_ERROR Init();
@@ -99,7 +104,7 @@ public:
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
     static CHIP_ERROR FactoryResetConfig();
-
+    static CHIP_ERROR FactoryResetCounters();
     static void RunConfigUnitTest();
 
 protected:

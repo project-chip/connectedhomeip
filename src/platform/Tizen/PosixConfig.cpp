@@ -29,6 +29,7 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/KeyValueStoreManager.h>
 #include <platform/Tizen/PosixConfig.h>
 
 namespace chip {
@@ -76,72 +77,79 @@ const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 
 CHIP_ERROR PosixConfig::Init()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return PersistedStorage::KeyValueStoreMgr().Get(key.Name, &val);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return PersistedStorage::KeyValueStoreMgr().Get(key.Name, &val);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint64_t & val)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return PersistedStorage::KeyValueStoreMgr().Get(key.Name, &val);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return PersistedStorage::KeyValueStoreMgr().Get(key.Name, buf, bufSize, &outLen);
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return PersistedStorage::KeyValueStoreMgr().Get(key.Name, buf, bufSize, &outLen);
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return PersistedStorage::KeyValueStoreMgr().Put(key.Name, val);
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return PersistedStorage::KeyValueStoreMgr().Put(key.Name, val);
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint64_t val)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return PersistedStorage::KeyValueStoreMgr().Put(key.Name, val);
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(str != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return PersistedStorage::KeyValueStoreMgr().Put(key.Name, str, strlen(str));
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(str != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return PersistedStorage::KeyValueStoreMgr().Put(key.Name, str, strLen);
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return PersistedStorage::KeyValueStoreMgr().Put(key.Name, data, dataLen);
 }
 
 CHIP_ERROR PosixConfig::ClearConfigValue(Key key)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return PersistedStorage::KeyValueStoreMgr().Delete(key.Name);
 }
 
 bool PosixConfig::ConfigValueExists(Key key)
 {
-    return false;
+    CHIP_ERROR err;
+    err = PersistedStorage::KeyValueStoreMgrImpl()._Check(key.Name);
+    return (err == CHIP_NO_ERROR) ? true : false;
 }
 
 CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)

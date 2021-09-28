@@ -1,11 +1,26 @@
-# Generating {real_platform}-native-all_clusters
-gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux {out}/{real_platform}-native-all_clusters
+# Generating {host_platform}-{host_board}-all_clusters
+gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux {out}/{host_platform}-{host_board}-all_clusters
 
-# Generating {real_platform}-native-chip_tool
-gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool {out}/{real_platform}-native-chip_tool
+# Generating {host_platform}-{host_board}-chip_tool
+gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool {out}/{host_platform}-{host_board}-chip_tool
 
-# Generating {real_platform}-native-thermostat
-gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux {out}/{real_platform}-native-thermostat
+# Generating {host_platform}-{host_board}-thermostat
+gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux {out}/{host_platform}-{host_board}-thermostat
+
+# Generating linux-arm64-all_clusters
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all_clusters'
+
+# Generating linux-arm64-chip_tool
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip_tool'
+
+# Generating linux-arm64-thermostat
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-thermostat'
 
 # Generating qpg-qpg6100-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
@@ -104,11 +119,17 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340-pump_controller -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-controller-app/nrfconnect'
 
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
 # Generating android-arm-chip_tool
 gn gen --check --fail-on-unused-args {out}/android-arm-chip_tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Generating android-arm64-chip_tool
 gn gen --check --fail-on-unused-args {out}/android-arm64-chip_tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
@@ -116,8 +137,20 @@ gn gen --check --fail-on-unused-args {out}/android-arm64-chip_tool '--args=targe
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
 # Generating android-x64-chip_tool
 gn gen --check --fail-on-unused-args {out}/android-x64-chip_tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
+
+# Accepting NDK licenses
+bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
+
+# Generating JARs for Java build rules test
+python3 build/chip/java/tests/generate_jars_for_test.py
+
+# Generating android-x86-chip_tool
+gn gen --check --fail-on-unused-args {out}/android-x86-chip_tool '--args=target_os="android" target_cpu="x86" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -135,14 +168,23 @@ west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {
 # Generating tizen-arm-light
 bash -c 'gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '"'"'--args= target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"'"'"' {out}/tizen-arm-light'
 
-# Building {real_platform}-native-all_clusters
-ninja -C {out}/{real_platform}-native-all_clusters
+# Building {host_platform}-{host_board}-all_clusters
+ninja -C {out}/{host_platform}-{host_board}-all_clusters
 
-# Building {real_platform}-native-chip_tool
-ninja -C {out}/{real_platform}-native-chip_tool
+# Building {host_platform}-{host_board}-chip_tool
+ninja -C {out}/{host_platform}-{host_board}-chip_tool
 
-# Building {real_platform}-native-thermostat
-ninja -C {out}/{real_platform}-native-thermostat
+# Building {host_platform}-{host_board}-thermostat
+ninja -C {out}/{host_platform}-{host_board}-thermostat
+
+# Building linux-arm64-all_clusters
+ninja -C {out}/linux-arm64-all_clusters
+
+# Building linux-arm64-chip_tool
+ninja -C {out}/linux-arm64-chip_tool
+
+# Building linux-arm64-thermostat
+ninja -C {out}/linux-arm64-thermostat
 
 # Building qpg-qpg6100-lock
 ninja -C {out}/qpg-qpg6100-lock
@@ -219,8 +261,12 @@ cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libCHIPController.so {root}/s
 
 cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
+cp {out}/android-arm-chip_tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+
+cp {out}/android-arm-chip_tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+
 # Building APP android-arm-chip_tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm-chip_tool/lib -PbuildDir={out}/android-arm-chip_tool build
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PbuildDir={out}/android-arm-chip_tool assembleDebug
 
 # Building JNI android-arm64-chip_tool
 ninja -C {out}/android-arm64-chip_tool
@@ -234,8 +280,12 @@ cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libCHIPController.so {root}/s
 
 cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
+cp {out}/android-arm64-chip_tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+
+cp {out}/android-arm64-chip_tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+
 # Building APP android-arm64-chip_tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm64-chip_tool/lib -PbuildDir={out}/android-arm64-chip_tool build
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PbuildDir={out}/android-arm64-chip_tool assembleDebug
 
 # Building JNI android-x64-chip_tool
 ninja -C {out}/android-x64-chip_tool
@@ -249,8 +299,31 @@ cp {out}/android-x64-chip_tool/lib/jni/x86_64/libCHIPController.so {root}/src/an
 
 cp {out}/android-x64-chip_tool/lib/jni/x86_64/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86_64/libc++_shared.so
 
+cp {out}/android-x64-chip_tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+
+cp {out}/android-x64-chip_tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+
 # Building APP android-x64-chip_tool
-{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-x64-chip_tool/lib -PbuildDir={out}/android-x64-chip_tool build
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PbuildDir={out}/android-x64-chip_tool assembleDebug
+
+# Building JNI android-x86-chip_tool
+ninja -C {out}/android-x86-chip_tool
+
+# Prepare Native libs android-x86-chip_tool
+mkdir -p {root}/src/android/CHIPTool/app/libs/jniLibs/x86
+
+cp {out}/android-x86-chip_tool/lib/jni/x86/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libSetupPayloadParser.so
+
+cp {out}/android-x86-chip_tool/lib/jni/x86/libCHIPController.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libCHIPController.so
+
+cp {out}/android-x86-chip_tool/lib/jni/x86/libc++_shared.so {root}/src/android/CHIPTool/app/libs/jniLibs/x86/libc++_shared.so
+
+cp {out}/android-x86-chip_tool/lib/src/controller/java/CHIPController.jar {root}/src/android/CHIPTool/app/libs/CHIPController.jar
+
+cp {out}/android-x86-chip_tool/lib/src/setup_payload/java/SetupPayloadParser.jar {root}/src/android/CHIPTool/app/libs/SetupPayloadParser.jar
+
+# Building APP android-x86-chip_tool
+{root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PbuildDir={out}/android-x86-chip_tool assembleDebug
 
 # Building infineon-p6board-lock
 ninja -C {out}/infineon-p6board-lock

@@ -78,7 +78,7 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg)
         1, // MessageType
         2, // ExchangeId
         4, // ProfileId
-        8  // AckMsgId
+        8  // AckMessageCounter
     };
     const uint8_t values[CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES] = { 0x1, 0x2, 0xFF };
     size_t offsetIndex                                         = 0;

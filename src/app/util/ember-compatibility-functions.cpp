@@ -21,8 +21,10 @@
  *          when calling ember callbacks.
  */
 
+#include <app/ClusterInfo.h>
 #include <app/Command.h>
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/Engine.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -90,6 +92,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_STATUS_ATTRIBUTE_TYPE:     // Status Code
     case ZCL_DATA_VER_ATTRIBUTE_TYPE:   // Data Version
     case ZCL_BITMAP32_ATTRIBUTE_TYPE:   // 32-bit bitmap
+    case ZCL_EPOCH_S_ATTRIBUTE_TYPE:    // Epoch Seconds
         static_assert(std::is_same<chip::ClusterId, uint32_t>::value,
                       "chip::Cluster is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::AttributeId, uint32_t>::value,
@@ -114,6 +117,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_FABRIC_ID_ATTRIBUTE_TYPE: // Fabric Id
     case ZCL_NODE_ID_ATTRIBUTE_TYPE:   // Node Id
     case ZCL_BITMAP64_ATTRIBUTE_TYPE:  // 64-bit bitmap
+    case ZCL_EPOCH_US_ATTRIBUTE_TYPE:  // Epoch Microseconds
         static_assert(std::is_same<chip::EventNumber, uint64_t>::value,
                       "chip::EventNumber is expected to be uint64_t, change this when necessary");
         static_assert(std::is_same<chip::FabricId, uint64_t>::value,
@@ -166,8 +170,7 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
         returnStatusParam,
         status == EMBER_ZCL_STATUS_SUCCESS ? chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess
                                            : chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,
-        chip::Protocols::InteractionModel::Id,
-        static_cast<Protocols::InteractionModel::ProtocolCode>(ToInteractionModelProtocolCode(status)));
+        chip::Protocols::InteractionModel::Id, static_cast<Protocols::InteractionModel::Status>(ToInteractionModelStatus(status)));
     return CHIP_NO_ERROR == err;
 }
 
@@ -199,6 +202,30 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
                   ChipLogValueMEI(aClusterInfo.mClusterId), ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId,
                   aClusterInfo.mFieldId, aClusterInfo.mListIndex);
 
+    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
+    if (attrOverride != nullptr)
+    {
+        bool dataRead;
+        // TODO: We should probably clone the writer and convert failures here
+        // into status responses, unless our caller already does that.
+        ReturnErrorOnFailure(attrOverride->Read(aClusterInfo, AttributeValueEncoder(apWriter), &dataRead));
+
+        if (dataRead)
+        {
+            if (apDataExists != nullptr)
+            {
+                *apDataExists = true;
+            }
+            if (apWriter != nullptr)
+            {
+                // TODO: Add DataVersion support
+                ReturnErrorOnFailure(
+                    apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), kTemporaryDataVersion));
+            }
+            return CHIP_NO_ERROR;
+        }
+    }
+
     EmberAfAttributeType attributeType;
     EmberAfStatus status;
     status = emberAfReadAttribute(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId, CLUSTER_MASK_SERVER,
@@ -212,8 +239,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                             chip::to_underlying(ToInteractionModelProtocolCode(status)));
+        return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status), ToInteractionModelStatus(status));
     }
 
     // TODO: ZCL_STRUCT_ATTRIBUTE_TYPE is not included in this switch case currently, should add support for structures.
@@ -337,7 +363,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     default:
         ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
         return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                             chip::to_underlying(Protocols::InteractionModel::ProtocolCode::UnsupportedRead));
+                             Protocols::InteractionModel::Status::UnsupportedRead);
     }
 
     // TODO: Add DataVersion support
@@ -410,8 +436,8 @@ CHIP_ERROR prepareWriteData(EmberAfAttributeType expectedType, TLV::TLVReader & 
 }
 } // namespace
 
-static Protocols::InteractionModel::ProtocolCode
-WriteSingleClusterDataInternal(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader,
+                                                                          WriteHandler * apWriteHandler)
 {
     // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here, and ember will not do data read &
     // copy in this case.
@@ -420,7 +446,7 @@ WriteSingleClusterDataInternal(ClusterInfo & aClusterInfo, TLV::TLVReader & aRea
 
     if (attributeMetadata == nullptr)
     {
-        return Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 
     CHIP_ERROR preparationError = CHIP_NO_ERROR;
@@ -428,20 +454,20 @@ WriteSingleClusterDataInternal(ClusterInfo & aClusterInfo, TLV::TLVReader & aRea
     if ((preparationError = prepareWriteData(attributeMetadata->attributeType, aReader, dataLen)) != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "Failed to preapre data to write: %s", ErrorStr(preparationError));
-        return Protocols::InteractionModel::ProtocolCode::InvalidValue;
+        return Protocols::InteractionModel::Status::InvalidValue;
     }
 
     if (dataLen > attributeMetadata->size)
     {
         ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
-        return Protocols::InteractionModel::ProtocolCode::InvalidValue;
+        return Protocols::InteractionModel::Status::InvalidValue;
     }
 
     // TODO (#8442): emberAfWriteAttributeExternal is doing additional ACL check, however true ACL support is missing in ember /
     // IM. Should invesgate this function and integrate ACL support with related interactions.
-    return ToInteractionModelProtocolCode(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
-                                                                        aClusterInfo.mFieldId, CLUSTER_MASK_SERVER, 0,
-                                                                        attributeData, attributeMetadata->attributeType));
+    return ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
+                                                                  aClusterInfo.mFieldId, CLUSTER_MASK_SERVER, 0, attributeData,
+                                                                  attributeMetadata->attributeType));
 }
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
@@ -455,11 +481,28 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 
     auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
     return apWriteHandler->AddAttributeStatusCode(attributePathParams,
-                                                  imCode == Protocols::InteractionModel::ProtocolCode::Success
+                                                  imCode == Protocols::InteractionModel::Status::Success
                                                       ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
                                                       : Protocols::SecureChannel::GeneralStatusCode::kFailure,
                                                   Protocols::SecureChannel::Id, imCode);
 }
-
 } // namespace app
 } // namespace chip
+
+void InteractionModelReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                                                      uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type,
+                                                      uint8_t * data)
+{
+    IgnoreUnusedVariable(manufacturerCode);
+    IgnoreUnusedVariable(type);
+    IgnoreUnusedVariable(data);
+    IgnoreUnusedVariable(mask);
+
+    ClusterInfo info;
+    info.mClusterId  = clusterId;
+    info.mFieldId    = attributeId;
+    info.mEndpointId = endpoint;
+    info.mFlags.Set(ClusterInfo::Flags::kFieldIdValid);
+
+    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
+}

@@ -275,6 +275,16 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, @ { @"value" : array });
 };
 
+void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, uint8_t * entries)
+{
+    id array = [NSMutableArray arrayWithCapacity:count];
+    for (uint16_t i = 0; i < count; i++) {
+        array[i] = [NSNumber numberWithUnsignedChar:entries[i]];
+    }
+
+    DispatchSuccess(context, @ { @"value" : array });
+};
+
 void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t count, _TvChannelInfo * entries)
 {
     id array = [NSMutableArray arrayWithCapacity:count];
@@ -396,7 +406,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSu
     for (uint16_t i = 0; i < count; i++) {
         array[i] = @ {
             @"RotationTime" : [NSNumber numberWithUnsignedShort:entries[i].RotationTime],
-            @"Flags" : [NSNumber numberWithUnsignedChar:entries[i].Flags],
+            @"Flags" : [NSNumber numberWithUnsignedShort:entries[i].Flags],
         };
     }
 
@@ -919,6 +929,23 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuc
         @"updateToken" : [NSData dataWithBytes:updateToken.data() length:updateToken.size()],
         @"userConsentNeeded" : [NSNumber numberWithBool:userConsentNeeded],
         @"metadataForRequestor" : [NSData dataWithBytes:metadataForRequestor.data() length:metadataForRequestor.size()],
+    });
+};
+
+void CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge::OnSuccessFn(
+    void * context, chip::ByteSpan AttestationElements, chip::ByteSpan Signature)
+{
+    DispatchSuccess(context, @ {
+        @"AttestationElements" : [NSData dataWithBytes:AttestationElements.data() length:AttestationElements.size()],
+        @"Signature" : [NSData dataWithBytes:Signature.data() length:Signature.size()],
+    });
+};
+
+void CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge::OnSuccessFn(
+    void * context, chip::ByteSpan Certificate)
+{
+    DispatchSuccess(context, @ {
+        @"Certificate" : [NSData dataWithBytes:Certificate.data() length:Certificate.size()],
     });
 };
 

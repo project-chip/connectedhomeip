@@ -50,6 +50,8 @@ private:
     void LightingButtonPressEventHandler(void);
     void FunctionButtonPressEventHandler(void);
     void FunctionButtonReleaseEventHandler(void);
+    void ButtonEventHandler(uint32_t id, bool pushed);
+    void SliderEventHandler(int slider_pos);
     void TimerEventHandler(void);
 
     void StartTimer(uint32_t aTimeoutInMs);

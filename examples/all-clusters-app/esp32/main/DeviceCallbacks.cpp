@@ -81,7 +81,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             // will not trigger a 'internet connectivity change' as there is no internet
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
-            chip::app::Mdns::StartServer();
+            chip::app::MdnsServer::Instance().StartServer();
         }
         break;
     }
@@ -127,7 +127,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
-        chip::app::Mdns::StartServer();
+        chip::app::MdnsServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -137,7 +137,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
-        chip::app::Mdns::StartServer();
+        chip::app::MdnsServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

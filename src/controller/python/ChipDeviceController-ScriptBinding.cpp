@@ -48,9 +48,12 @@
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <app/server/Mdns.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <inet/IPAddress.h>
 #include <lib/mdns/Resolver.h>
 #include <lib/support/BytesToHex.h>
@@ -65,6 +68,7 @@
 using namespace chip;
 using namespace chip::Ble;
 using namespace chip::Controller;
+using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 
 static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
@@ -98,8 +102,6 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
                                                                  uint16_t * outPort);
 ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl,
                                                                      uint64_t * outFabricId);
-ChipError::StorageType pychip_DeviceController_CommissioningComplete(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                     chip::NodeId nodeId);
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 
 // Rendezvous
@@ -122,12 +124,8 @@ ChipError::StorageType pychip_DeviceController_DiscoverCommissionableNodesVendor
 ChipError::StorageType pychip_DeviceController_DiscoverCommissionableNodesDeviceType(chip::Controller::DeviceCommissioner * devCtrl,
                                                                                      uint16_t device_type);
 ChipError::StorageType
-pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                        uint16_t enabled);
+pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl);
 ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext);
-
-ChipError::StorageType
-pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand(chip::Controller::DeviceCommissioner * devCtrl);
 
 ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl,
                                                                        chip::NodeId nodeid, uint16_t timeout, uint16_t iteration,
@@ -181,6 +179,9 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
         localDeviceId = kDefaultLocalDeviceId;
     }
 
+    // Initialize device attestation verifier
+    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
+
     CHIP_ERROR err = sOperationalCredentialsIssuer.Initialize(sStorageDelegate);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
@@ -218,6 +219,9 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     (*outDevCtrl)->SetUdpListenPort(0);
     err = (*outDevCtrl)->Init(initParams);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    chip::app::MdnsServer::Instance().StartServer(chip::Mdns::CommissioningMode::kDisabled);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     return CHIP_NO_ERROR.AsInteger();
 }
@@ -253,12 +257,6 @@ ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Contr
 {
     *outFabricId = devCtrl->GetCompressedFabricId();
     return CHIP_NO_ERROR.AsInteger();
-}
-
-ChipError::StorageType pychip_DeviceController_CommissioningComplete(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                     chip::NodeId nodeId)
-{
-    return devCtrl->CommissioningComplete(nodeId).AsInteger();
 }
 
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId)
@@ -331,7 +329,7 @@ ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::De
 
 ChipError::StorageType pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl)
 {
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, static_cast<uint16_t>(0));
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, static_cast<uint64_t>(0));
     return devCtrl->DiscoverCommissionableNodes(filter).AsInteger();
 }
 
@@ -366,17 +364,9 @@ ChipError::StorageType pychip_DeviceController_DiscoverCommissionableNodesDevice
 }
 
 ChipError::StorageType
-pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                        uint16_t enabled)
+pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl)
 {
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kCommissioningMode, enabled);
-    return devCtrl->DiscoverCommissionableNodes(filter).AsInteger();
-}
-
-ChipError::StorageType
-pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand(chip::Controller::DeviceCommissioner * devCtrl)
-{
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kCommissioningModeFromCommand, 1);
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kCommissioningMode);
     return devCtrl->DiscoverCommissionableNodes(filter).AsInteger();
 }
 
@@ -401,16 +391,33 @@ void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceComm
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
         ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
+        ChipLogProgress(Discovery, "\tPort:\t\t\t%u", dnsSdInfo->port);
         ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);
         ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->vendorId);
         ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->productId);
-        ChipLogProgress(Discovery, "\tAdditional Pairing\t%u", dnsSdInfo->additionalPairing);
         ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", dnsSdInfo->commissioningMode);
         ChipLogProgress(Discovery, "\tDevice Type\t\t%u", dnsSdInfo->deviceType);
         ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->deviceName);
         ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
         ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
         ChipLogProgress(Discovery, "\tPairing Hint\t\t0x%x", dnsSdInfo->pairingHint);
+        if (dnsSdInfo->GetMrpRetryIntervalIdle().HasValue())
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle().Value());
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval idle\tNot present");
+        }
+        if (dnsSdInfo->GetMrpRetryIntervalActive().HasValue())
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", dnsSdInfo->GetMrpRetryIntervalActive().Value());
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
+        }
+        ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
         for (int j = 0; j < dnsSdInfo->numIPs; ++j)
         {
             char buf[chip::Inet::kMaxIPAddressStringLength];

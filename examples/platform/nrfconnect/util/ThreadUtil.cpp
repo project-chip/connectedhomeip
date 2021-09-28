@@ -46,5 +46,5 @@ void StartDefaultThreadNetwork(void)
     chip::DeviceLayer::ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(true);
 
-    chip::app::Mdns::StartServer();
+    chip::app::MdnsServer::Instance().StartServer();
 }

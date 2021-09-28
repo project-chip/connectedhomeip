@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -32,8 +32,11 @@
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
+#include <controller/DeviceControllerInteractionModelDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
+#include <credentials/DeviceAttestationVerifier.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPTLV.h>
@@ -46,7 +49,7 @@
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <transport/FabricTable.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
@@ -68,7 +71,7 @@ namespace Controller {
 
 using namespace chip::Protocols::UserDirectedCommissioning;
 
-constexpr uint16_t kNumMaxActiveDevices = 64;
+constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
 constexpr uint16_t kNumMaxPairedDevices = 128;
 
 // Raw functions for cluster callbacks
@@ -86,7 +89,7 @@ struct ControllerInitParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
-    app::InteractionModelDelegate * imDelegate = nullptr;
+    DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
@@ -117,6 +120,7 @@ enum CommissioningStage : uint8_t
     // kConfigTimeZone,  // NOT YET IMPLEMENTED
     // kConfigDST,  // NOT YET IMPLEMENTED
     kConfigRegulatory,
+    kDeviceAttestation,
     kCheckCertificates,
     kConfigACL,
     kNetworkSetup,
@@ -171,39 +175,6 @@ public:
 struct CommissionerInitParams : public ControllerInitParams
 {
     DevicePairingDelegate * pairingDelegate = nullptr;
-};
-
-/**
- * @brief
- * Used for make current OnSuccessCallback & OnFailureCallback works when interaction model landed, it will be removed
- * after #6308 is landed.
- */
-class DeviceControllerInteractionModelDelegate : public chip::app::InteractionModelDelegate
-{
-public:
-    CHIP_ERROR CommandResponseStatus(const app::CommandSender * apCommandSender,
-                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                     const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
-                                     chip::CommandId aCommandId, uint8_t aCommandIndex) override;
-
-    CHIP_ERROR CommandResponseProtocolError(const app::CommandSender * apCommandSender, uint8_t aCommandIndex) override;
-
-    CHIP_ERROR CommandResponseError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
-
-    CHIP_ERROR CommandResponseProcessed(const app::CommandSender * apCommandSender) override;
-
-    void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
-                      Protocols::InteractionModel::ProtocolCode status) override;
-    CHIP_ERROR ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
-
-    CHIP_ERROR WriteResponseStatus(const app::WriteClient * apWriteClient,
-                                   const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                   const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
-                                   uint8_t aCommandIndex) override;
-
-    CHIP_ERROR WriteResponseProtocolError(const app::WriteClient * apWriteClient, uint8_t aAttributeIndex) override;
-
-    CHIP_ERROR WriteResponseError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override;
 };
 
 /**
@@ -303,6 +274,8 @@ public:
      */
     uint64_t GetFabricId() const { return mFabricId; }
 
+    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() { return mInteractionModelDelegate; }
+
 protected:
     enum class State
     {
@@ -325,7 +298,7 @@ protected:
     FabricId mFabricId = kUndefinedFabricId;
 
     DeviceTransportMgr * mTransportMgr                             = nullptr;
-    SecureSessionMgr * mSessionMgr                                 = nullptr;
+    SessionManager * mSessionManager                               = nullptr;
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
     PersistentStorageDelegate * mStorageDelegate                   = nullptr;
@@ -340,7 +313,8 @@ protected:
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
-    System::Layer * mSystemLayer = nullptr;
+    System::Layer * mSystemLayer                                         = nullptr;
+    DeviceControllerInteractionModelDelegate * mInteractionModelDelegate = nullptr;
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
@@ -383,27 +357,6 @@ private:
     void ReleaseAllDevices();
 
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
-};
-
-/**
- * @brief
- *   The commissioner applications doesn't advertise itself as an available device for rendezvous
- *   process. This delegate class provides no-op functions for the advertisement delegate.
- */
-class DeviceCommissionerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
-{
-public:
-    /**
-     * @brief
-     *   Starts advertisement of the device for rendezvous availability.
-     */
-    CHIP_ERROR StartAdvertisement() override { return CHIP_NO_ERROR; }
-
-    /**
-     * @brief
-     *   Stops advertisement of the device for rendezvous availability.
-     */
-    CHIP_ERROR StopAdvertisement() override { return CHIP_NO_ERROR; }
 };
 
 /**
@@ -513,17 +466,6 @@ public:
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
                                        uint8_t option);
 
-    /**
-     *  This function call causes the DeviceCommissioner to send a
-     *  CommissioningComplete command to the given node.  At least when
-     *  mIsIPRendezvous is false, which seems to be an incredibly broken
-     *  workaround for
-     *  <https://github.com/project-chip/connectedhomeip/issues/8010>.  Chances
-     *  are, this function and its callsites should just be removed when that
-     *  issue is fixed.
-     */
-    CHIP_ERROR CommissioningComplete(NodeId remoteDeviceId);
-
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
@@ -622,6 +564,8 @@ private:
        If no device is currently being paired, this value will be kNumMaxPairedDevices.  */
     uint16_t mDeviceBeingPaired;
 
+    Credentials::CertificateType mCertificateTypeBeingRequested = Credentials::CertificateType::kUnknown;
+
     /* TODO: BLE rendezvous and IP rendezvous should share the same procedure, so this is just a
        workaround-like flag and should be removed in the future.
        When using IP rendezvous, we need to disable network provisioning. In the future, network
@@ -634,8 +578,6 @@ private:
     bool mPairedDevicesUpdated;
 
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
-
-    DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     UserDirectedCommissioningServer * mUdcServer = nullptr;
@@ -654,6 +596,14 @@ private:
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
+    /* This function sends a Device Attestation Certificate chain request to the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SendCertificateChainRequestCommand(Device * device, Credentials::CertificateType certificateType);
+    /* This function sends an Attestation request to the device.
+       The function does not hold a reference to the device object.
+     */
+    CHIP_ERROR SendAttestationRequestCommand(Device * device, const ByteSpan & attestationNonce);
     /* This function sends an OpCSR request to the device.
        The function does not hold a refernce to the device object.
      */
@@ -661,7 +611,7 @@ private:
     /* This function sends the operational credentials to the device.
        The function does not hold a refernce to the device object.
      */
-    CHIP_ERROR SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf);
+    CHIP_ERROR SendOperationalCertificate(Device * device, const ByteSpan & nocCertBuf, const ByteSpan & icaCertBuf);
     /* This function sends the trusted root certificate to the device.
        The function does not hold a refernce to the device object.
      */
@@ -675,6 +625,12 @@ private:
 
     /* Callback when the previously sent CSR request results in failure */
     static void OnCSRFailureResponse(void * context, uint8_t status);
+
+    static void OnCertificateChainFailureResponse(void * context, uint8_t status);
+    static void OnCertificateChainResponse(void * context, ByteSpan certificate);
+
+    static void OnAttestationFailureResponse(void * context, uint8_t status);
+    static void OnAttestationResponse(void * context, chip::ByteSpan attestationElements, chip::ByteSpan signature);
 
     /**
      * @brief
@@ -713,6 +669,23 @@ private:
      */
     CHIP_ERROR ProcessOpCSR(const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature);
 
+    /**
+     * @brief
+     *   This function processes the DAC or PAI certificate sent by the device.
+     */
+    CHIP_ERROR ProcessCertificateChain(const ByteSpan & certificate);
+
+    /**
+     * @brief
+     *   This function validates the Attestation Information sent by the device.
+     *
+     * @param[in] attestationElements Attestation Elements TLV.
+     * @param[in] signature           Attestation signature generated for all the above fields + Attestation Challenge.
+     */
+    CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature);
+
+    void HandleAttestationResult(CHIP_ERROR err);
+
     // Cluster callbacks for advancing commissioning flows
     Callback::Callback<BasicSuccessCallback> mSuccess;
     Callback::Callback<BasicFailureCallback> mFailure;
@@ -720,9 +693,13 @@ private:
     CommissioningStage GetNextCommissioningStage();
     static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
+    Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback> mCertificateChainResponseCallback;
+    Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> mAttestationResponseCallback;
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
     Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
     Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
+    Callback::Callback<DefaultFailureCallback> mOnCertificateChainFailureCallback;
+    Callback::Callback<DefaultFailureCallback> mOnAttestationFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;

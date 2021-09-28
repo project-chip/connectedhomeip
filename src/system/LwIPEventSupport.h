@@ -18,6 +18,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <system/SystemEvent.h>
+#include <system/SystemLayer.h>
 
 namespace chip {
 namespace System {
@@ -28,6 +29,7 @@ class Object;
 class PlatformEventing
 {
 public:
+    static CHIP_ERROR ScheduleLambdaBridge(System::Layer & aLayer, const LambdaBridge & bridge);
     static CHIP_ERROR PostEvent(System::Layer & aLayer, Object & aTarget, EventType aType, uintptr_t aArgument);
     static CHIP_ERROR DispatchEvents(System::Layer & aLayer);
     static CHIP_ERROR DispatchEvent(System::Layer & aLayer, Event aEvent);

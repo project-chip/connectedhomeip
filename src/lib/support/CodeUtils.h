@@ -28,6 +28,7 @@
 
 #ifdef __cplusplus
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -493,7 +494,12 @@ inline void chipDie(void)
  *  @sa #chipDie
  *
  */
+#if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define VerifyOrDie(aCondition)                                                                                                    \
+    nlABORT_ACTION(aCondition, ChipLogDetail(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
+#else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition) nlABORT(aCondition)
+#endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 
 /**
  *  @def VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)

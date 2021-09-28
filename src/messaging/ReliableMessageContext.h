@@ -58,14 +58,14 @@ public:
     CHIP_ERROR FlushAcks();
 
     /**
-     * Take the pending peer ack id from the context.  This must only be called
+     * Take the pending peer ack message counter from the context.  This must only be called
      * when IsAckPending() is true.  After this call, IsAckPending() will be
      * false; it's the caller's responsibility to send the ack.
      */
-    uint32_t TakePendingPeerAckId()
+    uint32_t TakePendingPeerAckMessageCounter()
     {
         SetAckPending(false);
-        return mPendingPeerAckId;
+        return mPendingPeerAckMessageCounter;
     }
 
     /**
@@ -217,9 +217,9 @@ protected:
 private:
     void RetainContext();
     void ReleaseContext();
-    CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
-    CHIP_ERROR HandleNeedsAck(uint32_t messageId, BitFlags<MessageFlagValues> messageFlags);
-    CHIP_ERROR HandleNeedsAckInner(uint32_t messageId, BitFlags<MessageFlagValues> messageFlags);
+    void HandleRcvdAck(uint32_t ackMessageCounter);
+    CHIP_ERROR HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags);
+    CHIP_ERROR HandleNeedsAckInner(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags);
     ExchangeContext * GetExchangeContext();
 
     /**
@@ -231,9 +231,9 @@ private:
      */
     void SetAckPending(bool inAckPending);
 
-    // Set our pending peer ack id and any other state needed to ensure that we
+    // Set our pending peer ack message counter and any other state needed to ensure that we
     // will send that ack at some point.
-    void SetPendingPeerAckId(uint32_t aPeerAckId);
+    void SetPendingPeerAckMessageCounter(uint32_t aPeerAckMessageCounter);
 
 private:
     friend class ReliableMessageMgr;
@@ -242,7 +242,7 @@ private:
 
     ReliableMessageProtocolConfig mConfig;
     uint16_t mNextAckTimeTick; // Next time for triggering Solo Ack
-    uint32_t mPendingPeerAckId;
+    uint32_t mPendingPeerAckMessageCounter;
 };
 
 } // namespace Messaging

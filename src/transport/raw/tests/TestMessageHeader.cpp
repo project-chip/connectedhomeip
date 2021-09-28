@@ -39,9 +39,10 @@ void TestPacketHeaderInitialState(nlTestSuite * inSuite, void * inContext)
     PacketHeader header;
 
     NL_TEST_ASSERT(inSuite, !header.IsSecureSessionControlMsg());
-    NL_TEST_ASSERT(inSuite, header.GetMessageId() == 0);
-    NL_TEST_ASSERT(inSuite, header.GetEncryptionKeyID() == 0);
+    NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 0);
+    NL_TEST_ASSERT(inSuite, header.GetSessionId() == 0);
     NL_TEST_ASSERT(inSuite, !header.GetDestinationNodeId().HasValue());
+    NL_TEST_ASSERT(inSuite, !header.GetDestinationGroupId().HasValue());
     NL_TEST_ASSERT(inSuite, !header.GetSourceNodeId().HasValue());
 }
 
@@ -61,26 +62,26 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     uint16_t encodeLen;
     uint16_t decodeLen;
 
-    header.SetMessageId(123);
+    header.SetMessageCounter(123);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
-    header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
+    header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
 
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
-    NL_TEST_ASSERT(inSuite, header.GetMessageId() == 123);
+    NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 123);
     NL_TEST_ASSERT(inSuite, !header.GetDestinationNodeId().HasValue());
 
     header.SetSourceNodeId(55);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
-    header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
+    header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
 
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
-    NL_TEST_ASSERT(inSuite, header.GetMessageId() == 123);
+    NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 123);
     NL_TEST_ASSERT(inSuite, !header.GetDestinationNodeId().HasValue());
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(55ull));
 
@@ -88,54 +89,68 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
-    header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
+    header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
-    NL_TEST_ASSERT(inSuite, header.GetMessageId() == 123);
+    NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 123);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(11ull));
     NL_TEST_ASSERT(inSuite, !header.GetSourceNodeId().HasValue());
 
-    header.SetMessageId(234).SetSourceNodeId(77).SetDestinationNodeId(88);
+    header.SetMessageCounter(234).SetSourceNodeId(77).SetDestinationNodeId(88);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
-    header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
+    header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, encodeLen == decodeLen);
-    NL_TEST_ASSERT(inSuite, header.GetMessageId() == 234);
+    NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 234);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(88ull));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
 
-    header.SetMessageId(234).SetSourceNodeId(77).SetDestinationNodeId(88).SetSecureSessionControlMsg(true);
+    header.SetMessageCounter(234).SetSourceNodeId(77).SetDestinationNodeId(88).SetSecureSessionControlMsg(true);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
-    header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
+    header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, header.GetMessageId() == 234);
+    NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 234);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(88ull));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
     NL_TEST_ASSERT(inSuite, header.IsSecureSessionControlMsg());
 
-    header.SetMessageId(234).SetSourceNodeId(77).SetDestinationNodeId(88).SetEncryptionKeyID(2);
+    header.SetMessageCounter(234).SetSourceNodeId(77).SetDestinationNodeId(88).SetSessionId(2);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
-    header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
+    header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, header.GetMessageId() == 234);
+    NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 234);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(88ull));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
-    NL_TEST_ASSERT(inSuite, header.GetEncryptionKeyID() == 2);
+    NL_TEST_ASSERT(inSuite, header.GetSessionId() == 2);
 
-    header.SetMessageId(234).SetSourceNodeId(77).SetDestinationNodeId(88);
+    header.SetMessageCounter(234).SetSourceNodeId(77).SetDestinationNodeId(88);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
 
     // change it to verify decoding
-    header.SetMessageId(222).SetSourceNodeId(1).SetDestinationNodeId(2);
+    header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
     NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, header.GetMessageId() == 234);
+    NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 234);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(88ull));
+    NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
+
+    // Verify Group Id helpers
+    header.SetMessageCounter(234).SetSourceNodeId(77).SetDestinationGroupId(45);
+    NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_ERROR_INTERNAL);
+
+    header.ClearDestinationNodeId();
+    NL_TEST_ASSERT(inSuite, header.Encode(buffer, &encodeLen) == CHIP_NO_ERROR);
+
+    // change it to verify decoding
+    header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationGroupId(2);
+    NL_TEST_ASSERT(inSuite, header.Decode(buffer, &decodeLen) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 234);
+    NL_TEST_ASSERT(inSuite, header.GetDestinationGroupId() == Optional<uint16_t>::Value((uint16_t) 45));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
 }
 
@@ -229,6 +244,22 @@ void TestPacketHeaderEncodeDecodeBounds(nlTestSuite * inSuite, void * inContext)
     }
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, minLen + 16, &encoded_len) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, encoded_len == minLen + 16);
+    for (uint16_t shortLen = 0; shortLen < encoded_len; shortLen++)
+    {
+        NL_TEST_ASSERT(inSuite, header.Decode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
+    }
+    NL_TEST_ASSERT(inSuite, header.Decode(buffer, encoded_len, &decoded_len) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, decoded_len == encoded_len);
+
+    // Now test encoding/decoding with a source node id and destination group id present.
+    header.ClearDestinationNodeId();
+    header.SetDestinationGroupId(25);
+    for (uint16_t shortLen = minLen; shortLen < minLen + 10; shortLen++)
+    {
+        NL_TEST_ASSERT(inSuite, header.Encode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);
+    }
+    NL_TEST_ASSERT(inSuite, header.Encode(buffer, minLen + 10, &encoded_len) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, encoded_len == minLen + 10);
     for (uint16_t shortLen = 0; shortLen < encoded_len; shortLen++)
     {
         NL_TEST_ASSERT(inSuite, header.Decode(buffer, shortLen, &unusedLen) != CHIP_NO_ERROR);

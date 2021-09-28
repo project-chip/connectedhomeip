@@ -22,7 +22,7 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <transport/FabricTable.h>
-#include <transport/SecureSessionMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
@@ -37,8 +37,9 @@ class MessagingContext
 {
 public:
     MessagingContext() :
-        mInitialized(false), mAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)),
-        mPairingAliceToBob(GetBobKeyId(), GetAliceKeyId()), mPairingBobToAlice(GetAliceKeyId(), GetBobKeyId())
+        mInitialized(false), mAliceAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
+        mBobAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingAliceToBob(GetBobKeyId(), GetAliceKeyId()),
+        mPairingBobToAlice(GetAliceKeyId(), GetBobKeyId())
     {}
     ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 
@@ -73,12 +74,15 @@ public:
         mDestFabricIndex = id;
     }
 
-    SecureSessionMgr & GetSecureSessionManager() { return mSecureSessionMgr; }
+    SessionManager & GetSecureSessionManager() { return mSessionManager; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
     secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
 
     SessionHandle GetSessionBobToAlice();
     SessionHandle GetSessionAliceToBob();
+
+    Messaging::ExchangeContext * NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeContext * NewUnauthenticatedExchangeToBob(Messaging::ExchangeDelegate * delegate);
 
     Messaging::ExchangeContext * NewExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate);
@@ -89,7 +93,7 @@ public:
 
 private:
     bool mInitialized;
-    SecureSessionMgr mSecureSessionMgr;
+    SessionManager mSessionManager;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
     IOContext * mIOContext;
@@ -98,7 +102,8 @@ private:
     NodeId mAliceNodeId  = 111222333;
     uint16_t mBobKeyId   = 1;
     uint16_t mAliceKeyId = 2;
-    Optional<Transport::PeerAddress> mAddress;
+    Transport::PeerAddress mAliceAddress;
+    Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;
     SecurePairingUsingTestSecret mPairingBobToAlice;
     Transport::FabricTable mFabrics;

@@ -125,10 +125,6 @@ public class ChipDeviceController {
     completionListener.onConnectDeviceComplete();
   }
 
-  public void onSendMessageComplete(String message) {
-    completionListener.onSendMessageComplete(message);
-  }
-
   public void onStatusUpdate(int status) {
     if (completionListener != null) {
       completionListener.onStatusUpdate(status);
@@ -211,16 +207,14 @@ public class ChipDeviceController {
     updateDevice(deviceControllerPtr, fabricId, deviceId);
   }
 
-  public void sendMessage(long deviceId, String message) {
-    sendMessage(deviceControllerPtr, deviceId, message);
-  }
-
-  public void sendCommand(long deviceId, ChipCommandType command, int value) {
-    sendCommand(deviceControllerPtr, deviceId, command, value);
-  }
-
   public boolean openPairingWindow(long deviceId, int duration) {
     return openPairingWindow(deviceControllerPtr, deviceId, duration);
+  }
+
+  public boolean openPairingWindowWithPIN(
+      long deviceId, int duration, int iteration, int discriminator, long setupPinCode) {
+    return openPairingWindowWithPIN(
+        deviceControllerPtr, deviceId, duration, iteration, discriminator, setupPinCode);
   }
 
   public boolean isActive(long deviceId) {
@@ -259,12 +253,15 @@ public class ChipDeviceController {
 
   private native void updateDevice(long deviceControllerPtr, long fabricId, long deviceId);
 
-  private native void sendMessage(long deviceControllerPtr, long deviceId, String message);
-
-  private native void sendCommand(
-      long deviceControllerPtr, long deviceId, ChipCommandType command, int value);
-
   private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
+
+  private native boolean openPairingWindowWithPIN(
+      long deviceControllerPtr,
+      long deviceId,
+      int duration,
+      int iteration,
+      int discriminator,
+      long setupPinCode);
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
 
@@ -287,9 +284,6 @@ public class ChipDeviceController {
 
     /** Notifies the completion of "ConnectDevice" command. */
     void onConnectDeviceComplete();
-
-    /** Notifies the completion of "SendMessage" echo command. */
-    void onSendMessageComplete(String message);
 
     /** Notifies the pairing status. */
     void onStatusUpdate(int status);

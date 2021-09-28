@@ -58,10 +58,9 @@ using namespace chip::DeviceLayer;
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
 
-static bool sIsThreadProvisioned     = false;
-static bool sIsThreadEnabled         = false;
-static bool sHaveBLEConnections      = false;
-static bool sHaveServiceConnectivity = false;
+static bool sIsThreadProvisioned = false;
+static bool sIsThreadEnabled     = false;
+static bool sHaveBLEConnections  = false;
 
 AppTask AppTask::sAppTask;
 
@@ -145,10 +144,9 @@ void AppTask::AppTaskMain(void * pvParameter)
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -166,13 +164,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            // Consider the system to be "fully connected" if it has service
-            // connectivity
-            if (sHaveServiceConnectivity)
-            {
-                qvCHIP_LedSet(SYSTEM_STATE_LED, true);
-            }
-            else if (sIsThreadProvisioned && sIsThreadEnabled)
+            if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 qvCHIP_LedBlink(SYSTEM_STATE_LED, 950, 50);
             }
@@ -350,8 +342,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
                 if (!ConnectivityMgr().IsThreadProvisioned())
                 {
                     // Enable BLE advertisements and pairing window
-                    if (chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) ==
-                        CHIP_NO_ERROR)
+                    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
                     {
                         ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
                     }

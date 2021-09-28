@@ -52,7 +52,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
-              if: ${{ always() }}
+              if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name: bootstrap-logs
                   path: |
@@ -116,15 +116,25 @@ jobs:
                     linux debug ota-provider-app \
                     out/ota_provider_debug/chip-ota-provider-app \
                     /tmp/bloat_reports/
+            - name: Build example OTA Requestor
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug ota-requestor-app \
+                    out/ota_requestor_debug/chip-ota-requestor-app \
+                    /tmp/bloat_reports/
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
+              if: ${{ !env.ACT }}
               with:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Uploading Binaries
               uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
               with:
                   name:
                       ${{ env.BUILD_TYPE }}-example-build-${{
@@ -134,6 +144,7 @@ jobs:
                       out/all_clusters_debug/all-clusters-server.map
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
               with:
                   name: Size,Linux-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
                   path: |

@@ -53,6 +53,7 @@ constexpr uint16_t kVersion = 0;
  */
 enum class MsgType : uint8_t
 {
+    StatusResponse        = 0x01,
     ReadRequest           = 0x02,
     SubscribeRequest      = 0x03,
     SubscribeResponse     = 0x04,
@@ -65,7 +66,7 @@ enum class MsgType : uint8_t
 };
 
 // This table comes from the IM's "Status Code Table" section from the Interaction Model spec.
-enum class ProtocolCode : uint16_t
+enum class Status : uint16_t
 {
     Success                = 0x0,
     Failure                = 0x01,

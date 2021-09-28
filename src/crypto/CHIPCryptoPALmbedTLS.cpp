@@ -112,8 +112,6 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     mbedtls_ccm_context context;
     mbedtls_ccm_init(&context);
 
-    VerifyOrExit(plaintext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(plaintext_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE);
     VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -153,8 +151,6 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     mbedtls_ccm_context context;
     mbedtls_ccm_init(&context);
 
-    VerifyOrExit(ciphertext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(ciphertext_len > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -941,13 +937,14 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 
 exit:
     _log_mbedTLS_error(result);
-
-    FreeImpl();
+    Clear();
     return error;
 }
 
-void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
+void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
 {
+    VerifyOrReturn(state != CHIP_SPAKE2P_STATE::PREINIT);
+
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
     mbedtls_ecp_point_free(&context->M);
@@ -964,6 +961,8 @@ void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
     mbedtls_mpi_free(&context->tempbn);
 
     mbedtls_ecp_group_free(&context->curve);
+
+    state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out)
