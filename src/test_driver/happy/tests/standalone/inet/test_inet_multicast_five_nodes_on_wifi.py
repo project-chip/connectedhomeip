@@ -185,22 +185,16 @@ class test_chip_inet_multicast_five_nodes_on_wifi(unittest.TestCase):
         }
 
         # Topology-independent test parameters:
+        TEST_TRANSPORT = "udp"
+        TEST_IP_NETWORK = "6"
 
-        transports = ["udp"]
-        networks = ["6", "4"]
+        # Run the test.
+        value, data = self.__run_inet_multicast_test(
+            configuration, self.interface, TEST_IP_NETWORK, TEST_TRANSPORT)
 
-        for network in networks:
-            for transport in transports:
-
-                # Run the test.
-
-                value, data = self.__run_inet_multicast_test(
-                    configuration, self.interface, network, transport)
-
-                # Process and report the results.
-
-                self.__process_result(
-                    configuration, self.interface, network, transport, value, data)
+        # Process and report the results.
+        self.__process_result(
+            configuration, self.interface, TEST_IP_NETWORK, TEST_TRANSPORT, value, data)
 
     def __process_result(self, configuration, interface, network, transport, value, data):
         nodes = len(configuration['sender']) + len(configuration['receivers'])
