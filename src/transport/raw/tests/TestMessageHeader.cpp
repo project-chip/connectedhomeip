@@ -41,6 +41,7 @@ void TestPacketHeaderInitialState(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !header.IsSecureSessionControlMsg());
     NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 0);
     NL_TEST_ASSERT(inSuite, header.GetSessionId() == 0);
+    NL_TEST_ASSERT(inSuite, !header.HasSessionId());
     NL_TEST_ASSERT(inSuite, !header.GetDestinationNodeId().HasValue());
     NL_TEST_ASSERT(inSuite, !header.GetDestinationGroupId().HasValue());
     NL_TEST_ASSERT(inSuite, !header.GetSourceNodeId().HasValue());
@@ -127,6 +128,7 @@ void TestPacketHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetMessageCounter() == 234);
     NL_TEST_ASSERT(inSuite, header.GetDestinationNodeId() == Optional<uint64_t>::Value(88ull));
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<uint64_t>::Value(77ull));
+    NL_TEST_ASSERT(inSuite, header.HasSessionId());
     NL_TEST_ASSERT(inSuite, header.GetSessionId() == 2);
 
     header.SetMessageCounter(234).SetSourceNodeId(77).SetDestinationNodeId(88);

@@ -339,8 +339,8 @@ class SecurePairingUsingTestSecret : public PairingSession
 public:
     SecurePairingUsingTestSecret()
     {
-        SetLocalSessionId(0);
-        SetPeerSessionId(0);
+        SetLocalSessionId(1);
+        SetPeerSessionId(1);
     }
 
     SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId)

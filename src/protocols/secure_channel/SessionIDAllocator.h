@@ -36,7 +36,9 @@ public:
 private:
     // Session ID is a 15 bit value (16th bit indicates unicast/group key)
     static constexpr uint16_t kMaxSessionID = (1 << 15) - 1;
-    uint16_t mNextAvailable                 = 0;
+    static constexpr uint16_t kUnsecureSessionId = 0;
+
+    uint16_t mNextAvailable                 = 1;
 };
 
 } // namespace chip
