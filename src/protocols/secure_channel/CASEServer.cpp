@@ -85,14 +85,14 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && payload)
 {
-    ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
+    ChipLogProgress(Inet, "CASE Server received Sigma1 message. Starting handshake. EC %p", ec);
     CHIP_ERROR err = InitCASEHandshake(ec);
     SuccessOrExit(err);
 
     // TODO - Enable multiple concurrent CASE session establishment
     // https://github.com/project-chip/connectedhomeip/issues/8342
     ChipLogProgress(Inet, "CASE Server disabling CASE session setups");
-    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1);
+    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1);
 
     err = GetSession().OnMessageReceived(ec, payloadHeader, std::move(payload));
     SuccessOrExit(err);
@@ -107,10 +107,10 @@ exit:
 
 void CASEServer::Cleanup()
 {
-    // Let's re-register for CASE SigmaR1 message, so that the next CASE session setup request can be processed.
+    // Let's re-register for CASE Sigma1 message, so that the next CASE session setup request can be processed.
     // https://github.com/project-chip/connectedhomeip/issues/8342
     ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
-    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1, this);
+    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1, this);
 
     GetSession().Clear();
 }

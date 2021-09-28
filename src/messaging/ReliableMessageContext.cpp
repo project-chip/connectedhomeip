@@ -136,6 +136,11 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
     return err;
 }
 
+bool ReliableMessageContext::HasPiggybackAckPending() const
+{
+    return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
+}
+
 uint64_t ReliableMessageContext::GetInitialRetransmitTimeoutTick()
 {
     return mConfig.mInitialRetransTimeoutTick;
@@ -213,6 +218,8 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
         // Is there pending ack for a different message counter.
         bool wasAckPending = IsAckPending() && mPendingPeerAckMessageCounter != messageCounter;
 
+        bool messageCounterWasValid = HasPiggybackAckPending();
+
         // Temporary store currently pending ack message counter (even if there is none).
         uint32_t tempAckMessageCounter = mPendingPeerAckMessageCounter;
 
@@ -228,6 +235,16 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
             // Restore previously pending ack message counter.
             SetPendingPeerAckMessageCounter(tempAckMessageCounter);
         }
+        else if (messageCounterWasValid)
+        {
+            // Restore the previous value, so later piggybacks will pick it up,
+            // but don't set out "ack is pending" state, because we didn't use
+            // to have it set.
+            mPendingPeerAckMessageCounter = tempAckMessageCounter;
+        }
+        // Otherwise don't restore the invalid old mPendingPeerAckMessageCounter
+        // value, so we preserve the invariant that once we have had an ack
+        // pending we always have a valid mPendingPeerAckMessageCounter.
 
         return err;
     }
@@ -296,6 +313,7 @@ void ReliableMessageContext::SetPendingPeerAckMessageCounter(uint32_t aPeerAckMe
 {
     mPendingPeerAckMessageCounter = aPeerAckMessageCounter;
     SetAckPending(true);
+    mFlags.Set(Flags::kFlagAckMessageCounterIsValid);
 }
 
 } // namespace Messaging

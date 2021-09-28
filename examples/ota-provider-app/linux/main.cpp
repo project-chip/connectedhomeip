@@ -101,7 +101,6 @@ int main(int argc, char * argv[])
     CHIP_ERROR err = CHIP_NO_ERROR;
     OTAProviderExample otaProvider;
     BdxOtaSender bdxServer;
-    ExchangeManager * exchangeMgr;
 
     if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
     {
@@ -123,9 +122,13 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     chip::Server::GetInstance().Init();
 
-    exchangeMgr = chip::ExchangeManager();
-    err         = exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id, &bdxServer);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, 1);
+    err = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
+                                                                                                        &bdxServer);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(SoftwareUpdate, "RegisterUnsolicitedMessageHandler failed: %s", chip::ErrorStr(err));
+        return 1;
+    }
 
     ChipLogDetail(SoftwareUpdate, "using OTA file: %s", gOtaFilepath ? gOtaFilepath : "(none)");
 
@@ -144,6 +147,7 @@ int main(int argc, char * argv[])
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "failed to init BDX server: %s", chip::ErrorStr(err));
+        return 1;
     }
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();

@@ -220,8 +220,8 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
-                       Protocols::SecureChannel::MsgType::CASE_SigmaR1, &pairingAccessory) == CHIP_NO_ERROR);
+                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
+                                                                                     &pairingAccessory) == CHIP_NO_ERROR);
 
     ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
@@ -234,7 +234,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
                    pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
                                                         contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
@@ -360,7 +360,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                    pairingCommissioner->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
                                                          contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
     auto * pairingCommissioner1 = chip::Platform::New<TestCASESessionIPK>();
