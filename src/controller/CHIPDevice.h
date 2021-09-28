@@ -198,8 +198,7 @@ public:
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
      * @param[in] fabric        Local administrator that's initializing this device object
      */
-    void Init(ControllerDeviceInitParams params, NodeId deviceId, const Transport::PeerAddress & peerAddress,
-              FabricIndex fabric)
+    void Init(ControllerDeviceInitParams params, NodeId deviceId, const Transport::PeerAddress & peerAddress, FabricIndex fabric)
     {
         Init(params, fabric);
         mDeviceId = deviceId;
