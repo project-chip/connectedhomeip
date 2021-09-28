@@ -135,7 +135,7 @@ void mbedtls_sha256_clone(mbedtls_sha256_context * dst, const mbedtls_sha256_con
     dst->object.hashType       = src->object.hashType;
     dst->object.bytesInBuffer  = src->object.bytesInBuffer;
     dst->object.bytesProcessed = src->object.bytesProcessed;
-    memcpy(dst->object.digest, src->object.digest, sizeof(dst->object.digest));
+    memcpy(dst->object.buffer, src->object.buffer, sizeof(dst->object.buffer));
 }
 
 int mbedtls_sha256_finish_ret(mbedtls_sha256_context * ctx, unsigned char output[32])

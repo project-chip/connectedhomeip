@@ -203,19 +203,25 @@ CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * o
     return CHIP_NO_ERROR;
 }
 
-Hash_SHA256_stream::Hash_SHA256_stream(void) {}
-
-Hash_SHA256_stream::~Hash_SHA256_stream(void)
-{
-    Clear();
-}
-
 static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(mbedtls_sha256_context),
               "kMAX_Hash_SHA256_Context_Size is too small for the size of underlying mbedtls_sha256_context");
 
 static inline mbedtls_sha256_context * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
 {
     return SafePointerCast<mbedtls_sha256_context *>(context);
+}
+
+Hash_SHA256_stream::Hash_SHA256_stream(void)
+{
+    mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
+    mbedtls_sha256_init(context);
+}
+
+Hash_SHA256_stream::~Hash_SHA256_stream(void)
+{
+    mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
+    mbedtls_sha256_free(context);
+    Clear();
 }
 
 CHIP_ERROR Hash_SHA256_stream::Begin(void)
