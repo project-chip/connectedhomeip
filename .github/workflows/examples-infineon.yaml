@@ -66,6 +66,7 @@ jobs:
 
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
               with:
                   name: Size,P6-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
                   path: |
