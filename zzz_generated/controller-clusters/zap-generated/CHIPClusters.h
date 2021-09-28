@@ -308,9 +308,9 @@ public:
                                     uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint16_t colorTemperatureMinimum,
                                     uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride);
     CHIP_ERROR StepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
-                       uint8_t stepSize, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+                       uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
     CHIP_ERROR StepSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
-                              uint8_t stepSize, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+                              uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
     CHIP_ERROR StopMoveStep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t optionsMask,
                             uint8_t optionsOverride);
 

@@ -5067,7 +5067,7 @@ public:
     {
         AddArgument("StepMode", 0, UINT8_MAX, &mStepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mStepSize);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mTransitionTime);
+        AddArgument("TransitionTime", 0, UINT8_MAX, &mTransitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
         ModelCommand::AddArguments();
@@ -5095,7 +5095,7 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mStepMode;
     uint8_t mStepSize;
-    uint16_t mTransitionTime;
+    uint8_t mTransitionTime;
     uint8_t mOptionsMask;
     uint8_t mOptionsOverride;
 };
@@ -5110,7 +5110,7 @@ public:
     {
         AddArgument("StepMode", 0, UINT8_MAX, &mStepMode);
         AddArgument("StepSize", 0, UINT8_MAX, &mStepSize);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mTransitionTime);
+        AddArgument("TransitionTime", 0, UINT8_MAX, &mTransitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
         ModelCommand::AddArguments();
@@ -5138,7 +5138,7 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mStepMode;
     uint8_t mStepSize;
-    uint16_t mTransitionTime;
+    uint8_t mTransitionTime;
     uint8_t mOptionsMask;
     uint8_t mOptionsOverride;
 };
