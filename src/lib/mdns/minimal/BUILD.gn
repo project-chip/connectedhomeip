@@ -16,6 +16,8 @@ import("//build_overrides/chip.gni")
 
 static_library("minimal") {
   sources = [
+    "ActiveResolveAttempts.cpp",
+    "ActiveResolveAttempts.h",
     "Parser.cpp",
     "Parser.h",
     "Query.h",
