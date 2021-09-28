@@ -22,7 +22,7 @@
  *
  *  @note These utility functions do not generate cryptographically strong
  *        random number. To get cryptographically strong random data use
- *        chip::Platform::Security::GetSecureRandomData().
+ *        chip::Crypto::DRBG_get_bytes().
  *
  */
 
