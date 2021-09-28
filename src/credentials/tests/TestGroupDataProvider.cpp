@@ -226,8 +226,8 @@ void TestEndpointIterator(nlTestSuite * apSuite, void * apContext)
     GroupDataProvider::GroupMappingIterator * it = groups->IterateGroupMappings(kFabricIndex, endpoint);
     NL_TEST_ASSERT(apSuite, it);
 
-    uint16_t count1 = it->Count();
-    uint16_t count2 = 0;
+    size_t count1 = it->Count();
+    size_t count2 = 0;
     NL_TEST_ASSERT(apSuite, 2 == count1);
     while (it->Next(gid))
     {
@@ -397,8 +397,8 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
         GroupDataProvider::GroupStateIterator * it = groups->IterateGroupStates(kFabricIndex1);
         NL_TEST_ASSERT(apSuite, it != nullptr);
 
-        uint16_t count1 = it->Count();
-        uint16_t count2 = 0;
+        size_t count1 = it->Count();
+        size_t count2 = 0;
         NL_TEST_ASSERT(apSuite, 3 == count1);
         GroupDataProvider::GroupState state;
         while (it->Next(state))
@@ -417,7 +417,7 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
         GroupDataProvider::GroupStateIterator * it = groups->IterateGroupStates(kFabricIndex2);
         NL_TEST_ASSERT(apSuite, it != nullptr);
 
-        uint16_t count1 = it->Count();
+        size_t count1 = it->Count();
         NL_TEST_ASSERT(apSuite, 1 == count1);
         GroupDataProvider::GroupState state;
         NL_TEST_ASSERT(apSuite, it->Next(state));
@@ -436,8 +436,8 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
         GroupDataProvider::GroupStateIterator * it = groups->IterateGroupStates();
         NL_TEST_ASSERT(apSuite, it != nullptr);
 
-        uint16_t count1 = it->Count();
-        uint16_t count2 = 0;
+        size_t count1 = it->Count();
+        size_t count2 = 0;
         NL_TEST_ASSERT(apSuite, 4 == count1);
         GroupDataProvider::GroupState state;
         while (it->Next(state))
@@ -561,8 +561,8 @@ void TestKeysIterator(nlTestSuite * apSuite, void * apContext)
     GroupDataProvider::KeySetIterator * it = groups->IterateKeySets(kFabricIndex);
     NL_TEST_ASSERT(apSuite, it);
 
-    uint16_t count1 = it->Count();
-    uint16_t count2 = 0;
+    size_t count1 = it->Count();
+    size_t count2 = 0;
     NL_TEST_ASSERT(apSuite, 3 == count1);
     GroupDataProvider::KeySet keys;
 
