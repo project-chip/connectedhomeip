@@ -876,7 +876,7 @@
  *      SHA_LONG Nl, Nh;
  *      SHA_LONG data[SHA_LBLOCK]; // SHA_LBLOCK is 16 for SHA256
  *      unsigned int num, md_len;
- *   
+ *
  *    We also have to account for possibly some custom extensions on some targets,
  *    especially for mbedTLS, so an extra sizeof(uint64_t) is added to account.
  *
