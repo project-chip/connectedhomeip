@@ -29,8 +29,11 @@ public class ChipDeviceController {
   private int connectionId;
   private CompletionListener completionListener;
 
-  /** To load class and jni */
-  public static void load() {
+  /**
+   * To load class and jni,
+   * we need to new AndroidChipPlatform after jni load but before new ChipDeviceController
+   */
+  public static void loadJni() {
     return;
   }
 
