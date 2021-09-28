@@ -81,6 +81,8 @@ bool GenerateBdxUri(const Span<char> & fileDesignator, Span<char> outUri, size_t
 OTAProviderExample::OTAProviderExample()
 {
     memset(mOTAFilePath, 0, kFilepathBufLen);
+    queryImageBehavior = kRespondWithUpdateAvailable;
+    delayedActionTimeSec = 0;
 }
 
 void OTAProviderExample::SetOTAFilePath(const char * path)
@@ -102,9 +104,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 {
     // TODO: add confiuration for returning BUSY status
 
-    EmberAfOTAQueryStatus queryStatus =
-        (strlen(mOTAFilePath) ? EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE : EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE);
-    uint32_t delayedActionTimeSec = 0;
+    EmberAfOTAQueryStatus queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
     uint32_t softwareVersion      = currentVersion + 1; // This implementation will always indicate that an update is available
                                                         // (if the user provides a file).
     bool userConsentNeeded               = false;
@@ -121,6 +121,24 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         // Only doing BDX transport for now
         GenerateBdxUri(Span<char>(mOTAFilePath, strlen(mOTAFilePath)), Span<char>(uriBuf, 0), kUriMaxLen);
         ChipLogDetail(SoftwareUpdate, "generated URI: %s", uriBuf);
+    }
+
+    // Set Status for the Query Image Response
+    switch(queryImageBehavior) {
+        case kRespondWithUpdateAvailable: {
+            queryStatus = (strlen(mOTAFilePath) ? EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE : EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE);
+            break;
+        }
+        case kRespondWithBusy: {
+            queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_BUSY;
+            break;
+        }
+        case kRespondWithNotAvailable: {
+            queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
+            break;
+        }
+        default:
+            queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
     }
 
     CommandPathParams cmdParams = { emberAfCurrentEndpoint(), 0 /* mGroupId */, ZCL_OTA_PROVIDER_CLUSTER_ID,
@@ -147,10 +165,8 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
                                                            const chip::ByteSpan & updateToken, uint32_t newVersion)
 {
     // TODO: handle multiple transfers by tracking updateTokens
-    // TODO: add configuration for sending different updateAction and delayedActionTime values
 
     EmberAfOTAApplyUpdateAction updateAction = EMBER_ZCL_OTA_APPLY_UPDATE_ACTION_PROCEED; // For now, just allow any update request
-    uint32_t delayedActionTimeSec            = 0;
     char tokenBuf[kUpdateTokenStrLen]        = { 0 };
 
     GetUpdateTokenString(updateToken, tokenBuf, kUpdateTokenStrLen);
