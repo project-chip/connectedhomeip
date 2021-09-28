@@ -36,6 +36,7 @@
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <credentials/DeviceAttestationVerifier.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPTLV.h>
@@ -70,7 +71,7 @@ namespace Controller {
 
 using namespace chip::Protocols::UserDirectedCommissioning;
 
-constexpr uint16_t kNumMaxActiveDevices = 64;
+constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
 constexpr uint16_t kNumMaxPairedDevices = 128;
 
 // Raw functions for cluster callbacks
