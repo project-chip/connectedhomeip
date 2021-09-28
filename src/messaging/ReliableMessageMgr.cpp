@@ -268,7 +268,16 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrDie(rc != nullptr && !rc->IsOccupied());
+    VerifyOrDie(rc != nullptr);
+
+    if (rc->IsOccupied())
+    {
+        // This can happen if we have a misbehaving peer that is not sending
+        // acks with its application-level responses when it should, so we end
+        // up with two outstanding app-level messages both waiting for an ack.
+        // Just give up and error out in that case.
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     for (RetransTableEntry & entry : mRetransTable)
     {
