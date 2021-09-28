@@ -24,13 +24,13 @@ import sys
 
 def main():
     chip_root = os.getenv('PW_PROJECT_ROOT')
-    android_deps_dir = chip_root + '/third_party/android_deps'
-    gradleExecutable = android_deps_dir + '/gradlew'
-    if sys.platform == 'win32':
-        gradleExecutable = android_deps_dir + '/gradlew.bat'
+    android_deps_dir = os.path.join(chip_root, 'third_party/android_deps')
+    gradlew = 'gradlew' if sys.platform != 'win32' else 'gradlew.bat'
+    gradle_executable = os.path.join(android_deps_dir, gradlew)
     subprocess.check_call(
-        [gradleExecutable, '-p', android_deps_dir, 'setUpAndroidDeps'])
-    subprocess.check_call(['gn', 'format', android_deps_dir + '/BUILD.gn'])
+        [gradle_executable, '-p', android_deps_dir, 'setUpAndroidDeps'])
+    subprocess.check_call(
+        ['gn', 'format', os.path.join(android_deps_dir, 'BUILD.gn')])
 
 
 if __name__ == '__main__':
