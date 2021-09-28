@@ -40,15 +40,15 @@ public:
     // Register for the SoftwareDiagnostics cluster on all endpoints.
     SoftwareDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead) override;
+    CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) override;
 
 private:
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), TLV::TLVWriter * aWriter);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), const AttributeValueEncoder & aEncoder);
 };
 
 SoftwareDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead)
+CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead)
 {
     if (aClusterInfo.mClusterId != SoftwareDiagnostics::Id)
     {
@@ -60,13 +60,13 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::T
     switch (aClusterInfo.mFieldId)
     {
     case Ids::CurrentHeapFree: {
-        return ReadIfSupported(&PlatformManager::GetCurrentHeapFree, aWriter);
+        return ReadIfSupported(&PlatformManager::GetCurrentHeapFree, aEncoder);
     }
     case Ids::CurrentHeapUsed: {
-        return ReadIfSupported(&PlatformManager::GetCurrentHeapUsed, aWriter);
+        return ReadIfSupported(&PlatformManager::GetCurrentHeapUsed, aEncoder);
     }
     case Ids::CurrentHeapHighWatermark: {
-        return ReadIfSupported(&PlatformManager::GetCurrentHeapHighWatermark, aWriter);
+        return ReadIfSupported(&PlatformManager::GetCurrentHeapHighWatermark, aEncoder);
     }
     default: {
         *aDataRead = false;
@@ -77,7 +77,7 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::T
 }
 
 CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &),
-                                                         TLV::TLVWriter * aWriter)
+                                                         const AttributeValueEncoder & aEncoder)
 {
     uint64_t data;
     CHIP_ERROR err = (DeviceLayer::PlatformMgr().*getter)(data);
@@ -90,7 +90,7 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMan
         return err;
     }
 
-    return aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), data);
+    return aEncoder.Encode(data);
 }
 } // anonymous namespace
 

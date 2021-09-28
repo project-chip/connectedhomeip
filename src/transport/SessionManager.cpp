@@ -352,7 +352,6 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
     CHIP_ERROR err = session->GetPeerMessageCounter().VerifyOrTrustFirst(packetHeader.GetMessageCounter());
     if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
     {
-        ChipLogDetail(Inet, "Received a duplicate message with MessageCounter: %" PRIu32, packetHeader.GetMessageCounter());
         isDuplicate = SessionManagerDelegate::DuplicateMessage::Yes;
         err         = CHIP_NO_ERROR;
     }
@@ -433,7 +432,6 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
         err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageCounter());
         if (err == CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED)
         {
-            ChipLogDetail(Inet, "Received a duplicate message with MessageCounter: %" PRIu32, packetHeader.GetMessageCounter());
             isDuplicate = SessionManagerDelegate::DuplicateMessage::Yes;
             err         = CHIP_NO_ERROR;
         }

@@ -2229,6 +2229,27 @@ using chip::Callback::Cancelable;
     });
 }
 
+- (void)readAttributeUpTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeUpTime(success, failure);
+    });
+}
+
+- (void)readAttributeTotalOperationalHoursWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeTotalOperationalHours(success, failure);
+    });
+}
+
+- (void)readAttributeBootReasonsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeBootReasons(success, failure);
+    });
+}
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -3251,6 +3272,22 @@ using chip::Callback::Cancelable;
     });
 }
 
+- (void)attestationRequest:(NSData *)attestationNonce responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.AttestationRequest(success, failure, [self asSpan:attestationNonce]);
+        });
+}
+
+- (void)certificateChainRequest:(uint8_t)certificateType responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.CertificateChainRequest(success, failure, certificateType);
+        });
+}
+
 - (void)opCSRRequest:(NSData *)cSRNonce responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge(
@@ -3742,6 +3779,20 @@ using chip::Callback::Cancelable;
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ResetWatermarks(success, failure);
+    });
+}
+
+- (void)readAttributeCurrentHeapFreeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeCurrentHeapFree(success, failure);
+    });
+}
+
+- (void)readAttributeCurrentHeapUsedWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeCurrentHeapUsed(success, failure);
     });
 }
 

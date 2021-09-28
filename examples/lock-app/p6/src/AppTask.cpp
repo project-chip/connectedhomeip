@@ -57,7 +57,6 @@ bool sIsWiFiStationProvisioned = false;
 bool sIsWiFiStationEnabled     = false;
 bool sIsWiFiStationConnected   = false;
 bool sHaveBLEConnections       = false;
-bool sHaveServiceConnectivity  = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
@@ -179,7 +178,6 @@ void AppTask::AppTaskMain(void * pvParameter)
             sIsWiFiStationConnected   = ConnectivityMgr().IsWiFiStationConnected();
             sIsWiFiStationProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
             sHaveBLEConnections       = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity  = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
 
@@ -197,13 +195,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != Function::kFactoryReset)
         {
-            // Consider the system to be "fully connected" if it has service
-            // connectivity
-            if (sHaveServiceConnectivity)
-            {
-                sStatusLED.Set(true);
-            }
-            else if (sIsWiFiStationEnabled && sIsWiFiStationProvisioned && (!sIsWiFiStationConnected || !sHaveServiceConnectivity))
+            if (sIsWiFiStationEnabled && sIsWiFiStationProvisioned && !sIsWiFiStationConnected)
             {
                 sStatusLED.Blink(950, 50);
             }

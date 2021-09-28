@@ -53,8 +53,7 @@ Button lockButton;
 BaseType_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-bool sHaveBLEConnections      = false;
-bool sHaveServiceConnectivity = false;
+bool sHaveBLEConnections = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 } // namespace
@@ -140,8 +139,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -158,13 +156,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            // Consider the system to be "fully connected" if it has service
-            // connectivity
-            if (sHaveServiceConnectivity)
-            {
-                sStatusLED.Set(true);
-            }
-            else if (sHaveBLEConnections)
+            if (sHaveBLEConnections)
             {
                 sStatusLED.Blink(100, 100);
             }

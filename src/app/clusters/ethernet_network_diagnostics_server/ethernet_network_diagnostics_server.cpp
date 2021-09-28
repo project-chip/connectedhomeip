@@ -40,15 +40,15 @@ public:
     // Register for the EthernetNetworkDiagnostics cluster on all endpoints.
     EthernetDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), EthernetNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead) override;
+    CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) override;
 
 private:
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(uint64_t &), TLV::TLVWriter * aWriter);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(uint64_t &), const AttributeValueEncoder & aEncoder);
 };
 
 EthernetDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead)
+CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead)
 {
     if (aClusterInfo.mClusterId != EthernetNetworkDiagnostics::Id)
     {
@@ -60,19 +60,19 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::T
     switch (aClusterInfo.mFieldId)
     {
     case Ids::PacketRxCount: {
-        return ReadIfSupported(&ConnectivityManager::GetEthPacketRxCount, aWriter);
+        return ReadIfSupported(&ConnectivityManager::GetEthPacketRxCount, aEncoder);
     }
     case Ids::PacketTxCount: {
-        return ReadIfSupported(&ConnectivityManager::GetEthPacketTxCount, aWriter);
+        return ReadIfSupported(&ConnectivityManager::GetEthPacketTxCount, aEncoder);
     }
     case Ids::TxErrCount: {
-        return ReadIfSupported(&ConnectivityManager::GetEthTxErrCount, aWriter);
+        return ReadIfSupported(&ConnectivityManager::GetEthTxErrCount, aEncoder);
     }
     case Ids::CollisionCount: {
-        return ReadIfSupported(&ConnectivityManager::GetEthCollisionCount, aWriter);
+        return ReadIfSupported(&ConnectivityManager::GetEthCollisionCount, aEncoder);
     }
     case Ids::OverrunCount: {
-        return ReadIfSupported(&ConnectivityManager::GetEthOverrunCount, aWriter);
+        return ReadIfSupported(&ConnectivityManager::GetEthOverrunCount, aEncoder);
     }
     default: {
         *aDataRead = false;
@@ -83,7 +83,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::T
 }
 
 CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(uint64_t &),
-                                                         TLV::TLVWriter * aWriter)
+                                                         const AttributeValueEncoder & aEncoder)
 {
     uint64_t data;
     CHIP_ERROR err = (DeviceLayer::ConnectivityMgr().*getter)(data);
@@ -96,7 +96,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (Connectivit
         return err;
     }
 
-    return aWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), data);
+    return aEncoder.Encode(data);
 }
 } // anonymous namespace
 

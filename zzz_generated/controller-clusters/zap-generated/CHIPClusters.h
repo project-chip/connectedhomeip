@@ -630,6 +630,10 @@ public:
     // Cluster Attributes
     CHIP_ERROR ReadAttributeNetworkInterfaces(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeRebootCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeUpTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTotalOperationalHours(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeBootReasons(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
@@ -962,6 +966,10 @@ public:
                       chip::ByteSpan iCACValue, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId);
     CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          chip::ByteSpan rootCertificate);
+    CHIP_ERROR AttestationRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  chip::ByteSpan attestationNonce);
+    CHIP_ERROR CertificateChainRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint8_t certificateType);
     CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             chip::ByteSpan cSRNonce);
     CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1104,6 +1112,8 @@ public:
     CHIP_ERROR ResetWatermarks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
     // Cluster Attributes
+    CHIP_ERROR ReadAttributeCurrentHeapFree(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentHeapUsed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeCurrentHeapHighWatermark(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
