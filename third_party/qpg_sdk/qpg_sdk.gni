@@ -69,7 +69,8 @@ template("qpg_sdk") {
     lib_dirs = []
 
     libs += [
-      "${qpg_sdk_root}/${qpg_target_ic}/lib/libCHIP_${qpg_target_ic}.a",
+      "${qpg_sdk_root}/${qpg_target_ic}/lib/libMatterQorvoGlue_${qpg_target_ic}_libbuild.a",
+      "${qpg_sdk_root}/${qpg_target_ic}/lib/libQorvoStack_${qpg_target_ic}.a",
       "${qpg_sdk_root}/${qpg_target_ic}/lib/libmbedtls_alt_${qpg_target_ic}.a",
     ]
 
