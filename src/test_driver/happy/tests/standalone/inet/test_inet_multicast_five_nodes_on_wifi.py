@@ -68,15 +68,9 @@ class test_chip_inet_multicast_five_nodes_on_wifi(unittest.TestCase):
         options = happy.HappyNodeList.option()
         options["quiet"] = True
 
-        # This test runs four (4) separate invocations / runs:
-        #
-        #   1) UDP over IPv6
-        #   2) UDP over IPv4
-        #   3) ICMPv6 over IPv6
-        #   4) ICMPv4 over IPv4
-        #
-        # each with one sender and four receivers. Each receiver
-        # varies in the number of multicast groups it participates in.
+        # This test validates UDP over IPv6 with one sender and four receivers. 
+        # Each receiver varies in the number of multicast groups it participates 
+        # in.
         #
         # The ipv4-local-addr configuration key-value pairs are only
         # used for LwIP hosted OS topologies where a network tap
