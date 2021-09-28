@@ -68,8 +68,8 @@ class test_chip_inet_multicast_five_nodes_on_wifi(unittest.TestCase):
         options = happy.HappyNodeList.option()
         options["quiet"] = True
 
-        # This test validates UDP over IPv6 with one sender and four receivers. 
-        # Each receiver varies in the number of multicast groups it participates 
+        # This test validates UDP over IPv6 with one sender and four receivers.
+        # Each receiver varies in the number of multicast groups it participates
         # in.
         #
         # The ipv4-local-addr configuration key-value pairs are only
