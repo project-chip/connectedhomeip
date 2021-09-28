@@ -29,7 +29,7 @@
 // ==================== Platform Adaptations ====================
 
 #ifndef INET_CONFIG_ENABLE_IPV4
-#error Inet IPv4 configuration should be configured at build generatiton time
+#error Inet IPv4 configuration should be configured at build generation time
 #endif
 
 // ========== Platform-specific Configuration Overrides =========
