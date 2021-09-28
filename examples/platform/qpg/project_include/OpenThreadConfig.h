@@ -44,7 +44,6 @@
 // Use smaller maximum interval to speed up reattaching.
 #define OPENTHREAD_CONFIG_MLE_ATTACH_BACKOFF_MAXIMUM_INTERVAL (60 * 10 * 1000) // default 1200000 ms
 
-
 // Turn on a moderate level of logging in OpenThread
 // Enable use of external heap allocator (calloc/free) for OpenThread.
 #define OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE 1
