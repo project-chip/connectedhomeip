@@ -100,10 +100,6 @@ struct ControllerInitParams
 
     uint16_t controllerVendorId;
 
-    /* The port used for operational communication to listen for and send messages over UDP/TCP.
-     * The default value of `0` will pick any available port. */
-    uint16_t listenPort = 0;
-
     FabricId fabricId = kUndefinedFabricId;
 };
 
@@ -299,7 +295,6 @@ protected:
 #endif
     DeviceControllerSystemState * mSystemState = nullptr;
 
-    uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
     uint16_t FindDeviceIndex(SessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
