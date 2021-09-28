@@ -30,7 +30,6 @@
 #include <app/MessageDef/SubscribeResponse.h>
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
-#include <lib/support/RandUtils.h>
 
 namespace chip {
 namespace app {
@@ -545,11 +544,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnLogErrorOnFailure(subscribeRequestParser.GetMinIntervalSeconds(&mMinIntervalFloorSeconds));
     ReturnLogErrorOnFailure(subscribeRequestParser.GetMaxIntervalSeconds(&mMaxIntervalCeilingSeconds));
 
-    // TODO: Use GetSecureRandomData to generate subscription id
-    // it needs #include <support/crypto/CHIPRNG.h>, but somehow CHIPRNG.h is missing
-    // err = Platform::Security::GetSecureRandomData((uint8_t *) &mSubscriptionId, sizeof(mSubscriptionId));
-    // SuccessOrExit(err);
-    mSubscriptionId = GetRandU64();
+    ReturnLogErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
 
     MoveToState(HandlerState::GeneratingReports);
 
