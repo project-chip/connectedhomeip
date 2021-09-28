@@ -364,8 +364,16 @@ CHIP_ERROR Browse(void * context, MdnsBrowseCallback callback, uint32_t interfac
     DNSServiceRef sdRef;
     BrowseContext * sdCtx;
 
+    std::string regtype(type);
+    std::string subtypeDelimiter = "._sub.";
+    size_t position              = regtype.find(subtypeDelimiter);
+    if (position != std::string::npos)
+    {
+        regtype = regtype.substr(position + subtypeDelimiter.size()) + "," + regtype.substr(0, position);
+    }
+
     sdCtx = chip::Platform::New<BrowseContext>(context, callback, protocol);
-    err   = DNSServiceBrowse(&sdRef, 0 /* flags */, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
+    err   = DNSServiceBrowse(&sdRef, 0 /* flags */, interfaceId, regtype.c_str(), kLocalDot, OnBrowse, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
 
     err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
@@ -506,6 +514,8 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     char buffer[kMdnsTextMaxSize];
     ReturnErrorOnFailure(PopulateTextRecord(&record, buffer, sizeof(buffer), service->mTextEntries, service->mTextEntrySize));
 
+    ChipLogProgress(chipTool, "Publising service %s on port %u with type: %s on interface id: %" PRIu32, service->mName,
+                    service->mPort, regtype.c_str(), interfaceId);
     return Register(interfaceId, regtype.c_str(), service->mName, service->mPort, &record);
 }
 
