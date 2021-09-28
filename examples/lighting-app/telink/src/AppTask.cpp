@@ -64,11 +64,10 @@ Button sFactoryResetButton;
 Button sLightingButton;
 Button sThreadStartButton;
 
-bool sIsThreadProvisioned     = false;
-bool sIsThreadEnabled         = false;
-bool sIsThreadAttached        = false;
-bool sHaveBLEConnections      = false;
-bool sHaveServiceConnectivity = false;
+bool sIsThreadProvisioned = false;
+bool sIsThreadEnabled     = false;
+bool sIsThreadAttached    = false;
+bool sHaveBLEConnections  = false;
 
 } // namespace
 
@@ -146,19 +145,14 @@ CHIP_ERROR AppTask::StartApp()
 
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
-            sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
+            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
+            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
-        if (sHaveServiceConnectivity)
-        {
-            sStatusLED.Set(true);
-        }
-        else if (sIsThreadProvisioned && sIsThreadEnabled)
+        if (sIsThreadProvisioned && sIsThreadEnabled)
         {
             if (sIsThreadAttached)
             {

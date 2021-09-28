@@ -19,6 +19,8 @@
 #pragma once
 
 #include <app/ClusterInfo.h>
+#include <app/MessageDef/AttributeDataElement.h>
+#include <app/data-model/Encode.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
@@ -35,6 +37,29 @@
  */
 namespace chip {
 namespace app {
+
+class AttributeValueEncoder
+{
+public:
+    AttributeValueEncoder(TLV::TLVWriter * aWriter) : mWriter(aWriter) {}
+
+    template <typename... Ts>
+    CHIP_ERROR Encode(Ts... aArgs) const
+    {
+        if (mWriter == nullptr)
+        {
+            return CHIP_NO_ERROR;
+        }
+        return DataModel::Encode(*mWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), std::forward<Ts>(aArgs)...);
+    }
+
+    // For consumers that can't just do a single Encode call for some reason
+    // (e.g. they're encoding a list a bit at a time).
+    TLV::TLVWriter * GetWriter() const { return mWriter; }
+
+private:
+    TLV::TLVWriter * mWriter;
+};
 
 class AttributeAccessInterface
 {
@@ -63,7 +88,7 @@ public:
      *                        may involve reading from the attribute store or
      *                        external attribute callbacks.
      */
-    virtual CHIP_ERROR Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead) = 0;
+    virtual CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) = 0;
 
     /**
      * Mechanism for keeping track of a chain of AttributeAccessInterfaces.
