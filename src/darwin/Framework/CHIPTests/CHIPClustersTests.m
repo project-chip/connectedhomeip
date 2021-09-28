@@ -4337,7 +4337,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
     uint8_t stepModeArgument = 1;
     uint8_t stepSizeArgument = 5;
-    uint16_t transitionTimeArgument = 25U;
+    uint8_t transitionTimeArgument = 25;
     uint8_t optionsMaskArgument = 0;
     uint8_t optionsOverrideArgument = 0;
     [cluster stepHue:stepModeArgument
@@ -4366,7 +4366,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
     uint8_t stepModeArgument = 3;
     uint8_t stepSizeArgument = 5;
-    uint16_t transitionTimeArgument = 25U;
+    uint8_t transitionTimeArgument = 25;
     uint8_t optionsMaskArgument = 0;
     uint8_t optionsOverrideArgument = 0;
     [cluster stepHue:stepModeArgument
@@ -4476,7 +4476,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
     uint8_t stepModeArgument = 1;
     uint8_t stepSizeArgument = 15;
-    uint16_t transitionTimeArgument = 10U;
+    uint8_t transitionTimeArgument = 10;
     uint8_t optionsMaskArgument = 0;
     uint8_t optionsOverrideArgument = 0;
     [cluster stepSaturation:stepModeArgument
@@ -4505,7 +4505,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
     uint8_t stepModeArgument = 3;
     uint8_t stepSizeArgument = 20;
-    uint16_t transitionTimeArgument = 10U;
+    uint8_t transitionTimeArgument = 10;
     uint8_t optionsMaskArgument = 0;
     uint8_t optionsOverrideArgument = 0;
     [cluster stepSaturation:stepModeArgument

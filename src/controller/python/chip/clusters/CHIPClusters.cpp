@@ -1412,9 +1412,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepColorTemper
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepHue(chip::Controller::Device * device,
                                                                          chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                         uint8_t stepMode, uint8_t stepSize,
-                                                                         uint16_t transitionTime, uint8_t optionsMask,
-                                                                         uint8_t optionsOverride)
+                                                                         uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime,
+                                                                         uint8_t optionsMask, uint8_t optionsOverride)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ColorControlCluster cluster;
@@ -1424,7 +1423,7 @@ chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepHue(chip::C
 chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepSaturation(chip::Controller::Device * device,
                                                                                 chip::EndpointId ZCLendpointId, chip::GroupId,
                                                                                 uint8_t stepMode, uint8_t stepSize,
-                                                                                uint16_t transitionTime, uint8_t optionsMask,
+                                                                                uint8_t transitionTime, uint8_t optionsMask,
                                                                                 uint8_t optionsOverride)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());

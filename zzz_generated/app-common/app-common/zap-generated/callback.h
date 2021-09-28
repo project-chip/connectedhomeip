@@ -16317,7 +16317,7 @@ bool emberAfColorControlClusterMoveHueCallback(chip::EndpointId endpoint, chip::
  * @brief Color Control Cluster StepHue Command callback (from client)
  */
 bool emberAfColorControlClusterStepHueCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint8_t stepMode,
-                                               uint8_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
+                                               uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
                                                uint8_t optionsOverride);
 /**
  * @brief Color Control Cluster MoveToSaturation Command callback (from client)
@@ -16334,7 +16334,7 @@ bool emberAfColorControlClusterMoveSaturationCallback(chip::EndpointId endpoint,
  * @brief Color Control Cluster StepSaturation Command callback (from client)
  */
 bool emberAfColorControlClusterStepSaturationCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                      uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime,
+                                                      uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime,
                                                       uint8_t optionsMask, uint8_t optionsOverride);
 /**
  * @brief Color Control Cluster MoveToHueAndSaturation Command callback (from client)
