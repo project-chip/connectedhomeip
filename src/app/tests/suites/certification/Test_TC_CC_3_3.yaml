@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name:
-    27.2.4. [TC-CC-3.3] Hue Step functionality with server as DUT
+name: 27.2.4. [TC-CC-3.3] Hue Step functionality with server as DUT
 
 config:
     cluster: "Color Control"

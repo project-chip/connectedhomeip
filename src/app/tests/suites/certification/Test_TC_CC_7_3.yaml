@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name:
-    27.2.17. [TC-CC-7.3] Enhanced Step functionality with server as DUT
+name: 27.2.17. [TC-CC-7.3] Enhanced Step functionality with server as DUT
 
 config:
     cluster: "Color Control"

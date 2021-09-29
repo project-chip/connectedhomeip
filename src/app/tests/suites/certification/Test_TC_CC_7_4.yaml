@@ -13,7 +13,8 @@
 # limitations under the License.
 
 name:
-    27.2.18. [TC-CC-7.4] MoveToEnhancedHueAndSaturation functionality with server as DUT
+    27.2.18. [TC-CC-7.4] MoveToEnhancedHueAndSaturation functionality with
+    server as DUT
 
 config:
     cluster: "Color Control"

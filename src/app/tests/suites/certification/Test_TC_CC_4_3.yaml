@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name:
-    27.2.7. [TC-CC-4.3] Saturation Step functionality with server as DUT
+name: 27.2.7. [TC-CC-4.3] Saturation Step functionality with server as DUT
 
 config:
     cluster: "Color Control"

@@ -13,7 +13,8 @@
 # limitations under the License.
 
 name:
-    27.2.12. [TC-CC-6.1] Color Temperature MoveTo functionality with server as DUT
+    27.2.12. [TC-CC-6.1] Color Temperature MoveTo functionality with server as
+    DUT
 
 config:
     cluster: "Color Control"
