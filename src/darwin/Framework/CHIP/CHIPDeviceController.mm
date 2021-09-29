@@ -32,6 +32,7 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <lib/support/CHIPMem.h>
@@ -65,6 +66,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 @property (readonly) uint16_t listenPort;
 @end
 
+// TODO Replace Shared Controller with a Controller Factory Singleton
 @implementation CHIPDeviceController
 
 + (CHIPDeviceController *)sharedController
@@ -171,23 +173,21 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
             return;
         }
 
+        chip::Controller::FactoryInitParams params;
+        chip::Controller::SetupParams commissionerParams;
+
         if (_listenPort) {
-            errorCode = _cppCommissioner->SetUdpListenPort(_listenPort);
-            if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
-                return;
-            }
+            params.listenPort = _listenPort;
         }
 
         // Initialize device attestation verifier
         chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());
 
-        chip::Controller::CommissionerInitParams params;
-
         params.storageDelegate = _persistentStorageDelegateBridge;
-        params.mDeviceAddressUpdateDelegate = _pairingDelegateBridge;
-        params.pairingDelegate = _pairingDelegateBridge;
+        commissionerParams.deviceAddressUpdateDelegate = _pairingDelegateBridge;
+        commissionerParams.pairingDelegate = _pairingDelegateBridge;
 
-        params.operationalCredentialsDelegate = _operationalCredentialsDelegate;
+        commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
         chip::Crypto::P256Keypair ephemeralKey;
         errorCode = ephemeralKey.Initialize();
@@ -209,13 +209,20 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
             return;
         }
 
-        params.ephemeralKeypair = &ephemeralKey;
-        params.controllerRCAC = rcac;
-        params.controllerICAC = icac;
-        params.controllerNOC = noc;
-        params.controllerVendorId = vendorId;
+        commissionerParams.ephemeralKeypair = &ephemeralKey;
+        commissionerParams.controllerRCAC = rcac;
+        commissionerParams.controllerICAC = icac;
+        commissionerParams.controllerNOC = noc;
+        commissionerParams.controllerVendorId = vendorId;
 
-        errorCode = _cppCommissioner->Init(params);
+        // TODO Replace Shared Controller with a Controller Factory Singleton
+        auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
+        errorCode = factory.Init(params);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+            return;
+        }
+
+        errorCode = factory.SetupCommissioner(commissionerParams, *_cppCommissioner);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;
         }
