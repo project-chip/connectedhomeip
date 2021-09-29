@@ -46,7 +46,7 @@
         android:text="@string/update_device_address_btn_text" />
 
     <Button
-        android:id="@+id/readSupportedFabicBtn"
+        android:id="@+id/readSupportedFabricBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/opCredClusterUpdateAddressBtn"
@@ -61,7 +61,7 @@
         android:id="@+id/readCommissionedFabricBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/readSupportedFabicBtn"
+        android:layout_below="@id/readSupportedFabricBtn"
         android:layout_alignParentStart="true"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"

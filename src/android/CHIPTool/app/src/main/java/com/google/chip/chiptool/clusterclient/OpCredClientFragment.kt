@@ -35,7 +35,7 @@ class OpCredClientFragment : Fragment() {
       deviceController.setCompletionListener(ChipControllerCallback())
 
       opCredClusterUpdateAddressBtn.setOnClickListener { scope.launch { updateAddressClick() } }
-      readSupportedFabicBtn.setOnClickListener { scope.launch { sendReadOpCredSupportedFabricAttrClick() } }
+      readSupportedFabricBtn.setOnClickListener { scope.launch { sendReadOpCredSupportedFabricAttrClick() } }
       readCommissionedFabricBtn.setOnClickListener { scope.launch { sendReadOpCredCommissionedFabricAttrClick() } }
     }
   }
@@ -43,7 +43,7 @@ class OpCredClientFragment : Fragment() {
   override fun onStart() {
     super.onStart()
     // TODO: use the fabric ID that was used to commission the device
-    val testFabricId = "0"//5544332211"
+    val testFabricId = "5544332211"
     opCredClusterFabricIdEd.setText(testFabricId)
     opCredClusterDeviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
   }
@@ -127,3 +127,4 @@ class OpCredClientFragment : Fragment() {
     private const val TAG = "OpCredClientFragment"
     fun newInstance(): OpCredClientFragment = OpCredClientFragment()
   }
+}

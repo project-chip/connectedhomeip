@@ -52,6 +52,14 @@
         android:text="@string/multi_admin_client_btn_text" />
 
     <Button
+        android:id="@+id/opCredClustersBtn"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/op_cred_client_btn_text" />
+
+    <Button
         android:id="@+id/attestationTestBtn"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
