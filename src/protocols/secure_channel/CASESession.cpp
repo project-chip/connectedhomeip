@@ -1399,7 +1399,7 @@ CHIP_ERROR CASESession::IsResumptionRequestPresent(const System::PacketBufferHan
         }
         else if (tlvTag == kResume1MICTag)
         {
-            VerifyOrExit(resumptionIDTagFound, err= CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrExit(resumptionIDTagFound, err = CHIP_ERROR_INVALID_TLV_TAG);
             resume1MICTagFound = true;
             SuccessOrExit(err = tlvReader.GetByteView(resume1MIC));
         }
