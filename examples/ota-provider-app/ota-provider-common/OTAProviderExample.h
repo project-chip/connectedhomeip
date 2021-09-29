@@ -42,13 +42,15 @@ public:
                                            uint32_t newVersion) override;
     EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t currentVersion) override;
 
-    enum queryImageBehaviorType {
-                                 kRespondWithUpdateAvailable,
-                                 kRespondWithBusy,
-                                 kRespondWithNotAvailable
+    enum queryImageBehaviorType
+    {
+        kRespondWithUpdateAvailable,
+        kRespondWithBusy,
+        kRespondWithNotAvailable
     };
-    void SetQueryImageBehavior(queryImageBehaviorType behavior) {mQueryImageBehavior = behavior;}
-    void SetDelayedActionTimeSec(uint32_t time) {mDelayedActionTimeSec = time;}
+    void SetQueryImageBehavior(queryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
+    void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
+
 private:
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
