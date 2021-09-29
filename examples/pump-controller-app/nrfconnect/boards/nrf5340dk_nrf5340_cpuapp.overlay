@@ -15,22 +15,6 @@
  */
 
 / {
-	/*
-	* By default, PWM module is only configured for led0 (LED1 on the board).
-	* The lighting-app, however, uses LED2 to show the state of the lighting,
-	* including its brightness level.
-	*/
-	aliases {
-		pwm-led1 = &pwm_led1;
-	};
-
-	pwmleds {
-		compatible = "pwm-leds";
-		pwm_led1: pwm_led_1 {
-			pwms = < &pwm0 0x1d >;
-		};
-	};
-
 	soc {
 		/* Add a flash controller which has the compatible
 		 * 'zephyr,sim-flash'. This will ensure that the flash
@@ -75,11 +59,4 @@
 		};
 	};
 
-};
-
-&pwm0 {
-	/delete-property/ ch0-pin;
-	/delete-property/ ch0-inverted;
-	ch1-pin = < 0x1d >;
-	ch1-inverted;
 };
