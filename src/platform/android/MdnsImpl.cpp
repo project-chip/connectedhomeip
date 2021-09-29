@@ -118,8 +118,8 @@ void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
 
     VerifyOrReturn(resolverClass != nullptr, ChipLogError(Discovery, "Failed to get Resolver Java class"));
 
-    sResolveMethod = env->GetMethodID(resolverClass, "resolve",
-                                      "(Ljava/lang/String;Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
+    sResolveMethod =
+        env->GetMethodID(resolverClass, "resolve", "(Ljava/lang/String;Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
 
     if (sResolveMethod == nullptr)
     {

@@ -229,7 +229,7 @@ public class AndroidBleManager implements BleManager {
     while (connIndex < mConnections.size()) {
       BluetoothGatt inGatt = mConnections.get(connIndex);
       if (inGatt == gatt && gatt != null) {
-          return connIndex + 1;
+        return connIndex + 1;
       }
       connIndex++;
     }
@@ -334,7 +334,7 @@ public class AndroidBleManager implements BleManager {
     if (bluetoothGatt != null) {
       bluetoothGatt.close();
       removeConnection(connId);
-      if(mBleCallback != null) {
+      if (mBleCallback != null) {
         mBleCallback.onCloseBleComplete(connId);
       }
     } else {
