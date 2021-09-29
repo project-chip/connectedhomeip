@@ -809,6 +809,14 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts(void)
+{
+    // Reset MAC counters
+    otLinkResetCounters(mOTInst);
+    otThreadResetMleCounters(mOTInst);
+    otThreadResetIp6Counters(mOTInst);
+}
 /*
  * @brief Get runtime value from the thread network based on the given attribute ID.
  *        The info is encoded via the AttributeValueEncoder.
@@ -844,7 +852,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 
     case ThreadNetworkDiagnostics::Attributes::Ids::NetworkName: {
         const char * networkName = otThreadGetNetworkName(mOTInst);
-        encoder.Encode(Span<const char>(networkName, strlen(networkName)));
+        err                      = encoder.Encode(Span<const char>(networkName, strlen(networkName)));
     }
     break;
 

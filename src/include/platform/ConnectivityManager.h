@@ -164,7 +164,7 @@ public:
     bool IsThreadAttached();
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
-
+    void ResetThreadNetworkDiagnosticsCounts();
     CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
 
     // Ethernet network diagnostics methods
@@ -448,6 +448,11 @@ inline bool ConnectivityManager::IsThreadProvisioned()
 inline void ConnectivityManager::ErasePersistentInfo()
 {
     static_cast<ImplClass *>(this)->_ErasePersistentInfo();
+}
+
+inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
+{
+    static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
 }
 
 /*

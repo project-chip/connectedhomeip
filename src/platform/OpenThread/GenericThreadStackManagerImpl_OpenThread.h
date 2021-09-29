@@ -93,6 +93,7 @@ protected:
     CHIP_ERROR _GetAndLogThreadTopologyFull(void);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+    void _ResetThreadNetworkDiagnosticsCounts(void);
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart(void);
