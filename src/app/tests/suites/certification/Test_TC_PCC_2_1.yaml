@@ -833,5 +833,3 @@ tests:
       response:
           constraints:
               type: uint32
-
-
