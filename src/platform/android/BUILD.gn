@@ -69,7 +69,7 @@ android_library("java") {
     "java/chip/platform/AndroidBleManager.java",
     "java/chip/platform/AndroidChipPlatform.java",
     "java/chip/platform/AndroidChipPlatformException.java",
-    "java/chip/platform/BleConnection.java",
+    "java/chip/platform/BleCallback.java",
     "java/chip/platform/BleManager.java",
     "java/chip/platform/ConfigurationManager.java",
     "java/chip/platform/KeyValueStoreManager.java",

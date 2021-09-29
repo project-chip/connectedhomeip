@@ -58,7 +58,8 @@ public class AndroidBleManager implements BleManager {
     }
   }
 
-  private final List<BleConnection> mConnections;
+  private final List<BluetoothGatt> mConnections;
+  private BleCallback mBleCallback;
   private BluetoothGattCallback mGattCallback;
   private AndroidChipPlatform mPlatform;
 
@@ -171,21 +172,21 @@ public class AndroidBleManager implements BleManager {
   }
 
   @Override
-  public synchronized int addConnection(BleConnection connObj) {
+  public synchronized int addConnection(BluetoothGatt bleGatt) {
     int connIndex = 0;
     while (connIndex < mConnections.size()) {
       if (mConnections.get(connIndex) == null) {
-        mConnections.set(connIndex, connObj);
+        mConnections.set(connIndex, bleGatt);
         return connIndex + 1;
       }
       connIndex++;
     }
-    mConnections.add(connIndex, connObj);
+    mConnections.add(connIndex, bleGatt);
     return connIndex + 1;
   }
 
   @Override
-  public synchronized BleConnection removeConnection(int connId) {
+  public synchronized BluetoothGatt removeConnection(int connId) {
     int connIndex = connId - 1;
     if (connIndex >= 0 && connIndex < mConnections.size()) {
       // Set to null, rather than remove, so that other indexes are unchanged.
@@ -197,7 +198,7 @@ public class AndroidBleManager implements BleManager {
   }
 
   @Override
-  public synchronized BleConnection getConnection(int connId) {
+  public synchronized BluetoothGatt getConnection(int connId) {
     int connIndex = connId - 1;
     if (connIndex >= 0 && connIndex < mConnections.size()) {
       return mConnections.get(connIndex);
@@ -205,6 +206,11 @@ public class AndroidBleManager implements BleManager {
       Log.e(TAG, "Unknown connId " + connId);
       return null;
     }
+  }
+
+  @Override
+  public void setBleCallback(BleCallback bleCallback) {
+    mBleCallback = bleCallback;
   }
 
   @Override
@@ -221,11 +227,9 @@ public class AndroidBleManager implements BleManager {
     // Find callback given gatt
     int connIndex = 0;
     while (connIndex < mConnections.size()) {
-      BleConnection connObj = mConnections.get(connIndex);
-      if (connObj != null) {
-        if (gatt == connObj.getBluetoothGatt()) {
+      BluetoothGatt inGatt = mConnections.get(connIndex);
+      if (inGatt == gatt && gatt != null) {
           return connIndex + 1;
-        }
       }
       connIndex++;
     }
@@ -252,13 +256,9 @@ public class AndroidBleManager implements BleManager {
 
   @Override
   public boolean onSubscribeCharacteristic(int connId, byte[] svcId, byte[] charId) {
-    BleConnection connObj = getConnection(connId);
-    if (connObj == null) {
-      Log.i(TAG, "Tried to send characteristic, but BLE connection was not found.");
-      return false;
-    }
-    BluetoothGatt bluetoothGatt = connObj.getBluetoothGatt();
+    BluetoothGatt bluetoothGatt = getConnection(connId);
     if (bluetoothGatt == null) {
+      Log.i(TAG, "Tried to send characteristic, but BLE connection was not found.");
       return false;
     }
 
@@ -293,13 +293,9 @@ public class AndroidBleManager implements BleManager {
 
   @Override
   public boolean onUnsubscribeCharacteristic(int connId, byte[] svcId, byte[] charId) {
-    BleConnection connObj = getConnection(connId);
-    if (connObj == null) {
-      Log.i(TAG, "Tried to unsubscribe characteristic, but BLE connection was not found.");
-      return false;
-    }
-    BluetoothGatt bluetoothGatt = connObj.getBluetoothGatt();
+    BluetoothGatt bluetoothGatt = getConnection(connId);
     if (bluetoothGatt == null) {
+      Log.i(TAG, "Tried to unsubscribe characteristic, but BLE connection was not found.");
       return false;
     }
 
@@ -334,9 +330,13 @@ public class AndroidBleManager implements BleManager {
 
   @Override
   public boolean onCloseConnection(int connId) {
-    BleConnection connObj = getConnection(connId);
-    if (connObj != null) {
-      connObj.onCloseBleComplete(connId);
+    BluetoothGatt bluetoothGatt = getConnection(connId);
+    if (bluetoothGatt != null) {
+      bluetoothGatt.close();
+      removeConnection(connId);
+      if(mBleCallback != null) {
+        mBleCallback.onCloseBleComplete(connId);
+      }
     } else {
       Log.i(TAG, "Tried to close BLE connection, but connection was not found.");
     }
@@ -362,14 +362,9 @@ public class AndroidBleManager implements BleManager {
   @Override
   public boolean onSendWriteRequest(
       int connId, byte[] svcId, byte[] charId, byte[] characteristicData) {
-    // onSendCharacteristic
-    BleConnection connObj = getConnection(connId);
-    if (connObj == null) {
-      Log.i(TAG, "Tried to send characteristic, but BLE connection was not found.");
-      return false;
-    }
-    BluetoothGatt bluetoothGatt = connObj.getBluetoothGatt();
+    BluetoothGatt bluetoothGatt = getConnection(connId);
     if (bluetoothGatt == null) {
+      Log.i(TAG, "Tried to send characteristic, but BLE connection was not found.");
       return false;
     }
 
@@ -399,9 +394,12 @@ public class AndroidBleManager implements BleManager {
 
   @Override
   public void onNotifyChipConnectionClosed(int connId) {
-    BleConnection connObj = getConnection(connId);
-    if (connObj != null) {
-      connObj.onNotifyChipConnectionClosed(connId);
+    BluetoothGatt gatt = getConnection(connId);
+    if (gatt != null) {
+      removeConnection(connId);
+      if (mBleCallback != null) {
+        mBleCallback.onNotifyChipConnectionClosed(connId);
+      }
     } else {
       Log.i(TAG, "Tried to notify connection closed, but BLE connection was not found.");
     }
