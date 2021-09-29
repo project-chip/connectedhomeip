@@ -82,6 +82,8 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoi
         ChipLogError(Zcl, "Failed to reset OverrunCount attribute");
     }
 
+    ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
+
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
