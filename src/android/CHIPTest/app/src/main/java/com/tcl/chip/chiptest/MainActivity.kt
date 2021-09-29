@@ -17,8 +17,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val mainHandler: Handler = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
-            super.handleMessage(msg!!)
-            when (msg?.what) {
+            super.handleMessage(msg)
+            when (msg.what) {
                 msgShowLog -> {
                     binding.testLog.append(msg.obj.toString())
                 }
@@ -53,6 +53,6 @@ class MainActivity : AppCompatActivity() {
             }.start()
         }
 
-        AndroidChipPlatform(AndroidBleManager(), PreferencesKeyValueStoreManager(this), PreferencesConfigurationManager(this), NsdManagerServiceResolver(this))
+        AndroidChipPlatform(AndroidBleManager(), PreferencesKeyValueStoreManager(this), PreferencesConfigurationManager(this), NsdManagerServiceResolver(this), ChipMdnsCallbackImpl())
     }
 }

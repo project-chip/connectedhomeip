@@ -71,6 +71,8 @@ android_library("java") {
     "java/chip/platform/AndroidChipPlatformException.java",
     "java/chip/platform/BleCallback.java",
     "java/chip/platform/BleManager.java",
+    "java/chip/platform/ChipMdnsCallback.java",
+    "java/chip/platform/ChipMdnsCallbackImpl.java",
     "java/chip/platform/ConfigurationManager.java",
     "java/chip/platform/KeyValueStoreManager.java",
     "java/chip/platform/NsdManagerServiceResolver.java",

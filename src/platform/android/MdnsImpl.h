@@ -24,9 +24,10 @@ namespace Mdns {
 
 /**
  * Initialize DNS-SD implementation for Android with an object of a class
- * that implements chip.devicecontroller.ServiceResolver interface.
+ * that implements chip.devicecontroller.mdns.ServiceResolver interface, and an object of a class that implements
+ * chip.devicecontroller.mdns.ChipMdnsCallback interface.
  */
-void InitializeWithObject(jobject resolverObject);
+void InitializeWithObjects(jobject resolverObject, jobject chipMdnsCallbackObject);
 
 /**
  * Pass results of the service resolution to the CHIP stack.

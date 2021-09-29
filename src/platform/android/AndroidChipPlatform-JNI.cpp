@@ -41,6 +41,7 @@
 using namespace chip;
 
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_AndroidChipPlatform_##METHOD_NAME
+#define JNI_MDNSCALLBACK_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_ChipMdnsCallbackImpl_##METHOD_NAME
 
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
@@ -195,17 +196,18 @@ JNI_METHOD(void, setConfigurationManager)(JNIEnv * env, jclass self, jobject man
 }
 
 // for ServiceResolver
-JNI_METHOD(void, nativeSetServiceResolver)(JNIEnv * env, jclass self, jobject resolver)
+JNI_METHOD(void, nativeSetServiceResolver)(JNIEnv * env, jclass self, jobject resolver, jobject chipMdnsCallback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    chip::Mdns::InitializeWithObject(resolver);
+    chip::Mdns::InitializeWithObjects(resolver, chipMdnsCallback);
 }
 
-JNI_METHOD(void, handleServiceResolve)
+JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)
 (JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring address, jint port, jlong callbackHandle,
  jlong contextHandle)
 {
-    chip::Mdns::HandleResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
+    using ::chip::Mdns::HandleResolve;
+    HandleResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
 }
 
 void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow)

@@ -32,7 +32,6 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
   private Handler mainThreadHandler;
-  private AndroidChipPlatform mPlatform;
 
   public NsdManagerServiceResolver(Context context) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
@@ -45,16 +44,12 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   }
 
   @Override
-  public void setAndroidChipPlatform(AndroidChipPlatform platform) {
-    mPlatform = platform;
-  }
-
-  @Override
   public void resolve(
       final String instanceName,
       final String serviceType,
       final long callbackHandle,
-      final long contextHandle) {
+      final long contextHandle,
+      final ChipMdnsCallback chipMdnsCallback) {
     multicastLock.acquire();
 
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
@@ -83,7 +78,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             Log.w(
                 TAG,
                 "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
-            mPlatform.handleServiceResolve(
+            chipMdnsCallback.handleServiceResolve(
                 instanceName, serviceType, null, 0, callbackHandle, contextHandle);
 
             if (multicastLock.isHeld()) {
@@ -101,7 +96,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                     + "' to "
                     + serviceInfo.getHost());
             // TODO: Find out if DNS-SD results for Android should contain interface ID
-            mPlatform.handleServiceResolve(
+            chipMdnsCallback.handleServiceResolve(
                 instanceName,
                 serviceType,
                 serviceInfo.getHost().getHostAddress(),

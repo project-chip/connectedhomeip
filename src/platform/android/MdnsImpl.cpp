@@ -36,8 +36,9 @@ namespace Mdns {
 using namespace chip::Platform;
 
 namespace {
-jobject sResolverObject  = nullptr;
-jmethodID sResolveMethod = nullptr;
+jobject sResolverObject     = nullptr;
+jobject sMdnsCallbackObject = nullptr;
+jmethodID sResolveMethod    = nullptr;
 } // namespace
 
 // Implemention of functions declared in lib/mdns/platform/Mdns.h
@@ -82,6 +83,7 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, Inet::InterfaceId interface, M
 {
     VerifyOrReturnError(service != nullptr && callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sResolverObject != nullptr && sResolveMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sMdnsCallbackObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     std::string serviceType = service->mType;
     serviceType += '.';
@@ -92,7 +94,7 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, Inet::InterfaceId interface, M
     UtfString jniServiceType(env, serviceType.c_str());
 
     env->CallVoidMethod(sResolverObject, sResolveMethod, jniInstanceName.jniValue(), jniServiceType.jniValue(),
-                        reinterpret_cast<jlong>(callback), reinterpret_cast<jlong>(context));
+                        reinterpret_cast<jlong>(callback), reinterpret_cast<jlong>(context), sMdnsCallbackObject);
 
     if (env->ExceptionCheck())
     {
@@ -107,15 +109,17 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, Inet::InterfaceId interface, M
 
 // Implemention of Java-specific functions
 
-void InitializeWithObject(jobject resolverObject)
+void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     sResolverObject      = env->NewGlobalRef(resolverObject);
+    sMdnsCallbackObject  = env->NewGlobalRef(mdnsCallbackObject);
     jclass resolverClass = env->GetObjectClass(sResolverObject);
 
     VerifyOrReturn(resolverClass != nullptr, ChipLogError(Discovery, "Failed to get Resolver Java class"));
 
-    sResolveMethod = env->GetMethodID(resolverClass, "resolve", "(Ljava/lang/String;Ljava/lang/String;JJ)V");
+    sResolveMethod = env->GetMethodID(resolverClass, "resolve",
+                                      "(Ljava/lang/String;Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
 
     if (sResolveMethod == nullptr)
     {
