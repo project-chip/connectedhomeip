@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: . [TC-CC-8] Color Loop Controls
+name: 27.2.19. [TC-CC-8.1] StopMoveStep functionality with server as DUT
 
 config:
     cluster: "Color Control"

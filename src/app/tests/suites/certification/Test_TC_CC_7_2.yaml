@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 3.2.15. [TC-CC-7.1 to 7.4] Enhanced Color Controls
+name:
+    27.2.16. [TC-CC-7.2] Enhanced MoveHue functionality with server as DUT
 
 config:
     cluster: "Color Control"
@@ -27,29 +28,6 @@ tests:
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
-      response:
-          value: 1
-
-    - label: "Enhanced Move To Hue command"
-      command: "EnhancedMoveToHue"
-      arguments:
-          values:
-              - name: "enhancedHue"
-                value: 1025
-              - name: "direction"
-                value: 0
-              - name: "transitionTime"
-                value: 1
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label:
-          "Check Remaining time attribute value matched the value sent by the
-          last command"
-      command: "readAttribute"
-      attribute: "remaining time"
       response:
           value: 1
 
@@ -127,87 +105,6 @@ tests:
       attribute: "enhanced current hue"
       response:
           value: -1
-
-    - label: "Enhanced Step Hue Up command"
-      command: "EnhancedStepHue"
-      arguments:
-          values:
-              - name: "stepMode"
-                value: 0
-              - name: "stepSize"
-                value: 50
-              - name: "transitionTime"
-                value: 1
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label:
-          "Check EnhancedCurrentHue attribute value matched the value sent by
-          the last command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "enhanced current hue"
-      response:
-          value: 1075
-
-    - label: "Enhanced Step Hue Down command"
-      command: "EnhancedStepHue"
-      arguments:
-          values:
-              - name: "stepMode"
-                value: 1
-              - name: "stepSize"
-                value: 75
-              - name: "transitionTime"
-                value: 1
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label:
-          "Check EnhancedCurrentHue attribute value matched the value sent by
-          the last command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "enhanced current hue"
-      response:
-          value: 1000
-
-    - label: "Enhanced move to hue and saturation command"
-      command: "EnhancedMoveToHueAndSaturation"
-      arguments:
-          values:
-              - name: "enhancedHue"
-                value: 1200
-              - name: "saturation"
-                value: 90
-              - name: "transitionTime"
-                value: 10
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label:
-          "Check EnhancedCurrentHue attribute value matched the value sent by
-          the last command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "enhanced current hue"
-      response:
-          value: 1200
-
-    - label:
-          "Check Saturation attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current saturation"
-      response:
-          value: 90
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

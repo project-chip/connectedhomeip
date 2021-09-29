@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 3.2.15. [TC-CC-5.1 to 5.3] Color XY Controls
+name:
+    27.2.2. [TC-CC-3.1] Hue MoveTo functionality with server as DUT
 
 config:
     cluster: "Color Control"
@@ -30,129 +31,101 @@ tests:
       response:
           value: 1
 
-    - label: "Move to Color command"
-      command: "MoveToColor"
+    - label: "Move to hue shortest distance command"
+      command: "MoveToHue"
       arguments:
           values:
-              - name: "colorX"
+              - name: "hue"
+                value: 150
+              - name: "direction"
+                value: 0
+              - name: "transitionTime"
+                value: 100
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label:
+          "Check current hue attribute value matched the value sent by the last
+          command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          value: 150
+
+    - label: "Move to hue longest distance command"
+      command: "MoveToHue"
+      arguments:
+          values:
+              - name: "hue"
                 value: 200
-              - name: "colorY"
-                value: 300
+              - name: "direction"
+                value: 1
               - name: "transitionTime"
-                value: 20
+                value: 100
               - name: "optionsMask"
                 value: 0
               - name: "optionsOverride"
                 value: 0
 
     - label:
-          "Check current y attribute value matched the value sent by the last
+          "Check current hue attribute value matched the value sent by the last
           command"
       disabled: true
       command: "readAttribute"
-      attribute: "current x"
+      attribute: "current hue"
       response:
-          value: 200
+          value: 150
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          value: 300
-
-    - label: "Move Color command"
-      command: "MoveColor"
+    - label: "Move to hue up command"
+      command: "MoveToHue"
       arguments:
           values:
-              - name: "rateX"
-                value: 15
-              - name: "rateY"
-                value: 20
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current x"
-      response:
-          value: -1
-
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          value: -1
-
-    - label: "Stop Move Step command"
-      command: "StopMoveStep"
-      arguments:
-          values:
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current x"
-      response:
-          value: -1
-
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          value: -1
-
-    - label: "Step Color command"
-      command: "StepColor"
-      arguments:
-          values:
-              - name: "stepX"
-                value: 15
-              - name: "stepY"
-                value: 20
+              - name: "hue"
+                value: 250
+              - name: "direction"
+                value: 2
               - name: "transitionTime"
-                value: 50
+                value: 100
               - name: "optionsMask"
                 value: 0
               - name: "optionsOverride"
                 value: 0
 
     - label:
-          "Check current x attribute value matched the value sent by the last
+          "Check current hue attribute value matched the value sent by the last
           command"
       disabled: true
       command: "readAttribute"
-      attribute: "current x"
+      attribute: "current hue"
       response:
-          value: -1
+          value: 250
+
+    - label: "Move to hue down command"
+      command: "MoveToHue"
+      arguments:
+          values:
+              - name: "hue"
+                value: 225
+              - name: "direction"
+                value: 3
+              - name: "transitionTime"
+                value: 100
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
 
     - label:
-          "Check current y attribute value matched the value sent by the last
+          "Check current hue attribute value matched the value sent by the last
           command"
       disabled: true
       command: "readAttribute"
-      attribute: "current y"
+      attribute: "current hue"
       response:
-          value: -1
+          value: 225
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
