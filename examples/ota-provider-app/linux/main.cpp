@@ -53,7 +53,6 @@ constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 constexpr uint16_t kOptionFilepath = 'f';
 constexpr uint16_t kOptionQueryImageBehavior = 'q';
 constexpr uint16_t kOptionDelayedActionTimeSec = 'd';
-const char * gOtaFilepath          = nullptr;
 
 // Arbitrary BDX Transfer Params
 constexpr uint32_t kMaxBdxBlockSize = 1024;
@@ -63,6 +62,7 @@ constexpr uint32_t kBdxPollFreqMs   = 500;
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
 OTAProviderExample::queryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
 uint32_t gDelayedActionTimeSec = 0;
+const char * gOtaFilepath          = nullptr;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
