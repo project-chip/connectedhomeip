@@ -81,8 +81,8 @@ bool GenerateBdxUri(const Span<char> & fileDesignator, Span<char> outUri, size_t
 OTAProviderExample::OTAProviderExample()
 {
     memset(mOTAFilePath, 0, kFilepathBufLen);
-    queryImageBehavior = kRespondWithUpdateAvailable;
-    delayedActionTimeSec = 0;
+    mQueryImageBehavior = kRespondWithNotAvailable;
+    mDelayedActionTimeSec = 0;
 }
 
 void OTAProviderExample::SetOTAFilePath(const char * path)
@@ -124,9 +124,14 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     }
 
     // Set Status for the Query Image Response
-    switch(queryImageBehavior) {
+    switch(mQueryImageBehavior) {
         case kRespondWithUpdateAvailable: {
-            queryStatus = (strlen(mOTAFilePath) ? EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE : EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE);
+            if(strlen(mOTAFilePath) != 0) {
+                queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE;
+            } else {
+                queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
+                ChipLogError(SoftwareUpdate, "No OTA file configured on the Provider");
+            }
             break;
         }
         case kRespondWithBusy: {
@@ -148,7 +153,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     VerifyOrReturnError((commandObj->PrepareCommand(cmdParams) == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(tagNum++), queryStatus) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(tagNum++), delayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrReturnError(writer->Put(ContextTag(tagNum++), mDelayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->PutString(ContextTag(tagNum++), uriBuf) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(tagNum++), softwareVersion) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->PutBytes(ContextTag(tagNum++), updateToken, kUpdateTokenLen) == CHIP_NO_ERROR,
@@ -181,7 +186,7 @@ EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHan
     VerifyOrReturnError((commandObj->PrepareCommand(cmdParams) == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError(writer->Put(ContextTag(0), updateAction) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(1), delayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrReturnError(writer->Put(ContextTag(1), mDelayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     VerifyOrReturnError((commandObj->FinishCommand() == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
 
     return EMBER_ZCL_STATUS_SUCCESS;

@@ -128,9 +128,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -f/--filepath <file>\n"
                              "        Path to a file containing an OTA image.\n"
                              "  -q/--QueryImageBehavior <UpdateAvailable | Busy | UpdateNotAvailable>\n"
-                             "        Status value in the Query Image Resonse\n"
+                             "        Status value in the Query Image Response\n"
                              "  -d/--DelayedActionTimeSec <time>\n"
-                             "        Value in seconds for the DelayedActionTime in the Query Image Resonse\n"};
+                             "        Value in seconds for the DelayedActionTime in the Query Image Response\n"};
 
 HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]", "1.0");
 

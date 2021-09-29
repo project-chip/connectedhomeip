@@ -47,11 +47,11 @@ public:
                                  kRespondWithBusy,
                                  kRespondWithNotAvailable
     };
-    void SetQueryImageBehavior(queryImageBehaviorType behavior) {queryImageBehavior = behavior;}
-    void SetDelayedActionTimeSec(uint32_t time) {delayedActionTimeSec = time;}
+    void SetQueryImageBehavior(queryImageBehaviorType behavior) {mQueryImageBehavior = behavior;}
+    void SetDelayedActionTimeSec(uint32_t time) {mDelayedActionTimeSec = time;}
 private:
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
-    queryImageBehaviorType queryImageBehavior;
-    uint32_t delayedActionTimeSec;
+    queryImageBehaviorType mQueryImageBehavior;
+    uint32_t mDelayedActionTimeSec;
 };
