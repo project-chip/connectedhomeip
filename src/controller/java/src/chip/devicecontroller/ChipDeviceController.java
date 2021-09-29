@@ -30,8 +30,8 @@ public class ChipDeviceController {
   private CompletionListener completionListener;
 
   /**
-   * To load class and jni,
-   * we need to new AndroidChipPlatform after jni load but before new ChipDeviceController
+   * To load class and jni, we need to new AndroidChipPlatform after jni load but before new
+   * ChipDeviceController
    */
   public static void loadJni() {
     return;
@@ -62,7 +62,11 @@ public class ChipDeviceController {
    *     generated CSR nonce.
    */
   public void pairDevice(
-      BluetoothGatt bleServer, int connId, long deviceId, long setupPincode, @Nullable byte[] csrNonce) {
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      @Nullable byte[] csrNonce) {
     if (connectionId == 0) {
       connectionId = connId;
 

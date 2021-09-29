@@ -79,5 +79,6 @@ public final class AndroidChipPlatform {
     }
   }
 
-  private native void nativeSetServiceResolver(ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
+  private native void nativeSetServiceResolver(
+      ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
 }
