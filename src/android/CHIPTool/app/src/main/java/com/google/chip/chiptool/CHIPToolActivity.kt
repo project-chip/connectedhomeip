@@ -26,11 +26,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import chip.devicecontroller.ChipDeviceController
-import chip.platform.AndroidBleManager
-import chip.platform.AndroidChipPlatform
-import chip.platform.PreferencesConfigurationManager
-import chip.platform.NsdManagerServiceResolver
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException

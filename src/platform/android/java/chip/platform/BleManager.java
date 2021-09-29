@@ -17,15 +17,18 @@
  */
 package chip.platform;
 
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 
 public interface BleManager {
   // For app
-  int addConnection(BleConnection connObj);
+  int addConnection(BluetoothGatt bleGatt);
 
-  BleConnection removeConnection(int connId);
+  BluetoothGatt removeConnection(int connId);
 
-  BleConnection getConnection(int connId);
+  BluetoothGatt getConnection(int connId);
+
+  void setBleCallback(BleCallback bleCallback);
 
   BluetoothGattCallback getCallback();
 

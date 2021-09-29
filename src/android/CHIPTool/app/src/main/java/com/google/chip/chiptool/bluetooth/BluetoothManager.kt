@@ -14,7 +14,7 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
-import chip.platform.BleConnection
+import chip.platform.BleCallback
 import com.google.chip.chiptool.ChipClient
 import java.util.UUID
 import kotlin.coroutines.resume
@@ -27,7 +27,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 
 @ExperimentalCoroutinesApi
-class BluetoothManager : BleConnection {
+class BluetoothManager : BleCallback {
   private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
   private var bleGatt: BluetoothGatt? = null
   var connectionId = 0
@@ -47,8 +47,6 @@ class BluetoothManager : BleConnection {
     if (! bluetoothAdapter.isEnabled) {
       bluetoothAdapter.enable();
     }
-
-    connectionId = ChipClient.getAndroidChipPlatform(context).bleManager.addConnection(this)
 
     val scanner = bluetoothAdapter.bluetoothLeScanner ?: run {
       Log.e(TAG, "No bluetooth scanner found")
@@ -96,6 +94,10 @@ class BluetoothManager : BleConnection {
 
       Log.i(TAG, "Connecting")
       bleGatt = device.connectGatt(context, false, bluetoothGattCallback)
+
+      connectionId = ChipClient.getAndroidChipPlatform(context).bleManager.addConnection(bleGatt)
+      ChipClient.getAndroidChipPlatform(context).bleManager.setBleCallback(this)
+
       continuation.invokeOnCancellation { bleGatt?.disconnect() }
     }
   }
@@ -201,20 +203,14 @@ class BluetoothManager : BleConnection {
     private const val CHIP_UUID = "0000FFF6-0000-1000-8000-00805F9B34FB"
   }
 
-  override fun getBluetoothGatt(): BluetoothGatt? {
-    return bleGatt;
-  }
-
   override fun onCloseBleComplete(connId: Int) {
-    bleGatt?.close();
-    ChipClient.getAndroidChipPlatform(null).bleManager.removeConnection(connectionId)
     connectionId = 0
-    //todo: notify DeviceProvisiongFragment
     Log.d(TAG, "onCloseBleComplete")
   }
 
   override fun onNotifyChipConnectionClosed(connId: Int) {
+    bleGatt?.close();
+    connectionId = 0
     Log.d(TAG, "onNotifyChipConnectionClosed")
-    onCloseBleComplete(connId)
   }
 }
