@@ -257,10 +257,10 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 
     // TODO: make this configurable
 #if CHIP_PROGRESS_LOGGING
-    uint32_t delta = (static_cast<uint32_t>(System::SystemClock().GetMonotonicMicroseconds() - startUS)) / 1000;
+    uint32_t delta = (static_cast<uint32_t>(System::SystemClock().GetMonotonicMicroseconds() - startUS) / 1000);
     if (delta > 100)
     {
-        ChipLogError(DeviceLayer, "Long dispatch time: %" PRId32 " ms, for event type %d", delta, event->Type);
+        ChipLogError(DeviceLayer, "Long dispatch time: %" PRIu32 " ms, for event type %d", delta, event->Type);
     }
 #endif // CHIP_PROGRESS_LOGGING
 }
