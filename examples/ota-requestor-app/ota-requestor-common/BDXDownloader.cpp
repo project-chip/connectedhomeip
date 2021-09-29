@@ -99,10 +99,12 @@ void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & e
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
         mTransfer.Reset();
+        mExchangeCtx->Close();
         break;
     case TransferSession::OutputEventType::kInternalError:
         ChipLogError(BDX, "InternalError");
         mTransfer.Reset();
+        mExchangeCtx->Close();
         break;
     case TransferSession::OutputEventType::kTransferTimeout:
         ChipLogError(BDX, "Transfer timed out");
