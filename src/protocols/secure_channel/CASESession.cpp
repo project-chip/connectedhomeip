@@ -1377,6 +1377,13 @@ CHIP_ERROR CASESession::IsResumptionRequestPresent(const System::PacketBufferHan
 
     System::PacketBufferHandle msg_clone = msg.CloneData();
 
+    resumptionRequested = false;
+    // We are returning success here even though we failed to clone the data.
+    // This is being done so that the caller can continue processing the request as
+    // a new CASE session setup request.
+    // TODO: Handle the failure of cloning the received message for Sigma1Resume processing
+    VerifyOrExit(!msg_clone.IsNull(), err = CHIP_NO_ERROR);
+
     tlvReader.Init(std::move(msg_clone));
     SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag));
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
