@@ -50,8 +50,12 @@ static_library("Tizen") {
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
     "PosixConfig.h",
+    "SoftAPManager.cpp",
+    "SoftAPManager.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
+    "WiFiManager.cpp",
+    "WiFiManager.h",
   ]
 
   deps = [ "${chip_root}/src/setup_payload" ]
