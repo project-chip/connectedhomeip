@@ -1348,63 +1348,70 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
                                     uint16_t & initiatorSessionId, ByteSpan & destinationId, ByteSpan & initiatorEphPubKey,
                                     bool & resumptionRequested, ByteSpan & resumptionId, ByteSpan & initiatorResumeMIC)
 {
-    constexpr uint32_t kResumptionIDTag = 6;
-    constexpr uint32_t kResume1MICTag   = 7;
+    using namespace TLV;
 
-    TLV::TLVType containerType = TLV::kTLVType_Structure;
-    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
+    constexpr uint8_t kInitiatorRandomTag    = 1;
+    constexpr uint8_t kInitiatorSessionIdTag = 2;
+    constexpr uint8_t kDestinationIdTag      = 3;
+    constexpr uint8_t kInitiatorPubKeyTag    = 4;
+    constexpr uint8_t kInitiatorMRPParamsTag = 5;
+    constexpr uint8_t kResumptionIDTag       = 6;
+    constexpr uint8_t kResume1MICTag         = 7;
+
+    TLVType containerType = kTLVType_Structure;
+    ReturnErrorOnFailure(tlvReader.Next(containerType, AnonymousTag));
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
-    uint32_t decodeTagIdSeq = 0;
-
-    ReturnErrorOnFailure(tlvReader.Next());
-    VerifyOrReturnError(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, CHIP_ERROR_INVALID_TLV_TAG);
+    ReturnErrorOnFailure(tlvReader.Next(ContextTag(kInitiatorRandomTag)));
     ReturnErrorOnFailure(tlvReader.GetByteView(initiatorRandom));
+    VerifyOrReturnError(initiatorRandom.size() == kSigmaParamRandomNumberSize, CHIP_ERROR_INVALID_CASE_PARAMETER);
 
-    ReturnErrorOnFailure(tlvReader.Next());
-    VerifyOrReturnError(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, CHIP_ERROR_INVALID_TLV_TAG);
+    ReturnErrorOnFailure(tlvReader.Next(ContextTag(kInitiatorSessionIdTag)));
     ReturnErrorOnFailure(tlvReader.Get(initiatorSessionId));
 
-    ReturnErrorOnFailure(tlvReader.Next());
-    VerifyOrReturnError(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, CHIP_ERROR_INVALID_TLV_TAG);
+    ReturnErrorOnFailure(tlvReader.Next(ContextTag(kDestinationIdTag)));
     ReturnErrorOnFailure(tlvReader.GetByteView(destinationId));
+    VerifyOrReturnError(destinationId.size() == kSHA256_Hash_Length, CHIP_ERROR_INVALID_CASE_PARAMETER);
 
-    ReturnErrorOnFailure(tlvReader.Next());
-    VerifyOrReturnError(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, CHIP_ERROR_INVALID_TLV_TAG);
+    ReturnErrorOnFailure(tlvReader.Next(ContextTag(kInitiatorPubKeyTag)));
     ReturnErrorOnFailure(tlvReader.GetByteView(initiatorEphPubKey));
+    VerifyOrReturnError(initiatorEphPubKey.size() == kP256_PublicKey_Length, CHIP_ERROR_INVALID_CASE_PARAMETER);
 
-    uint32_t lastDecodedTLVTag = decodeTagIdSeq;
-    bool resumptionIDTagFound  = false;
-    bool resume1MICTagFound    = false;
-
-    while (!resumptionIDTagFound || !resume1MICTagFound)
+    // Optional members start here.
+    CHIP_ERROR err = tlvReader.Next();
+    if (err == CHIP_NO_ERROR && tlvReader.GetTag() == ContextTag(kInitiatorMRPParamsTag))
     {
-        CHIP_ERROR err = tlvReader.Next();
-        if (err == CHIP_END_OF_TLV)
-        {
-            break;
-        }
-        ReturnErrorOnFailure(err);
-
-        // Make sure that tlv tags are in order.
-        // There are optional TLV elements, so some of them may not be present.
-        // So the check cannot match the absolute value of the expected tag.
-        uint32_t tlvTag = TLV::TagNumFromTag(tlvReader.GetTag());
-        VerifyOrReturnError(tlvTag > lastDecodedTLVTag, CHIP_ERROR_INVALID_TLV_TAG);
-        lastDecodedTLVTag = tlvTag;
-
-        if (tlvTag == kResumptionIDTag)
-        {
-            resumptionIDTagFound = true;
-            ReturnErrorOnFailure(tlvReader.GetByteView(resumptionId));
-        }
-        else if (tlvTag == kResume1MICTag)
-        {
-            VerifyOrReturnError(resumptionIDTagFound, CHIP_ERROR_INVALID_TLV_TAG);
-            resume1MICTagFound = true;
-            ReturnErrorOnFailure(tlvReader.GetByteView(initiatorResumeMIC));
-        }
+        // We don't handle this yet; just move on.
+        err = tlvReader.Next();
     }
+
+    bool resumptionIDTagFound = false;
+    bool resume1MICTagFound   = false;
+
+    if (err == CHIP_NO_ERROR && tlvReader.GetTag() == ContextTag(kResumptionIDTag))
+    {
+        resumptionIDTagFound = true;
+        ReturnErrorOnFailure(tlvReader.GetByteView(resumptionId));
+        VerifyOrReturnError(resumptionId.size() == kCASEResumptionIDSize, CHIP_ERROR_INVALID_CASE_PARAMETER);
+        err = tlvReader.Next();
+    }
+
+    if (err == CHIP_NO_ERROR && tlvReader.GetTag() == ContextTag(kResume1MICTag))
+    {
+        resume1MICTagFound = true;
+        ReturnErrorOnFailure(tlvReader.GetByteView(initiatorResumeMIC));
+        VerifyOrReturnError(initiatorResumeMIC.size() == kTAGSize, CHIP_ERROR_INVALID_CASE_PARAMETER);
+        err = tlvReader.Next();
+    }
+
+    if (err == CHIP_END_OF_TLV)
+    {
+        // We ran out of struct members, but that's OK, because they were optional.
+        err = CHIP_NO_ERROR;
+    }
+
+    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(tlvReader.ExitContainer(containerType));
 
     if (resumptionIDTagFound && resume1MICTagFound)
     {
