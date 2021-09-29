@@ -23,6 +23,8 @@
 #include <app/clusters/ota-provider/ota-provider.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
@@ -101,7 +103,6 @@ int main(int argc, char * argv[])
     CHIP_ERROR err = CHIP_NO_ERROR;
     OTAProviderExample otaProvider;
     BdxOtaSender bdxServer;
-    ExchangeManager * exchangeMgr;
 
     if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
     {
@@ -123,9 +124,16 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     chip::Server::GetInstance().Init();
 
-    exchangeMgr = chip::ExchangeManager();
-    err         = exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id, &bdxServer);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, 1);
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
+    err = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
+                                                                                                        &bdxServer);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(SoftwareUpdate, "RegisterUnsolicitedMessageHandler failed: %s", chip::ErrorStr(err));
+        return 1;
+    }
 
     ChipLogDetail(SoftwareUpdate, "using OTA file: %s", gOtaFilepath ? gOtaFilepath : "(none)");
 
@@ -144,6 +152,7 @@ int main(int argc, char * argv[])
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "failed to init BDX server: %s", chip::ErrorStr(err));
+        return 1;
     }
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();

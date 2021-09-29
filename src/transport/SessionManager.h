@@ -36,7 +36,6 @@
 #include <transport/CryptoContext.h>
 #include <transport/FabricTable.h>
 #include <transport/MessageCounterManagerInterface.h>
-#include <transport/PairingSession.h>
 #include <transport/SecureSessionTable.h>
 #include <transport/SessionHandle.h>
 #include <transport/TransportMgr.h>
@@ -46,6 +45,8 @@
 #include <transport/raw/Tuple.h>
 
 namespace chip {
+
+class PairingSession;
 
 /**
  * @brief

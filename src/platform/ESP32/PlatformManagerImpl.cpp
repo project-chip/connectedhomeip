@@ -118,6 +118,24 @@ exit:
     return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
 }
 
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+{
+    currentHeapFree = esp_get_free_heap_size();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+{
+    currentHeapUsed = heap_caps_get_total_size(MALLOC_CAP_DEFAULT) - esp_get_free_heap_size();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+{
+    currentHeapHighWatermark = heap_caps_get_total_size(MALLOC_CAP_DEFAULT) - esp_get_minimum_free_heap_size();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
 {
     return Internal::InitLwIPCoreLock();

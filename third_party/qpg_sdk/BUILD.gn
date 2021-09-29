@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/freertos.gni")
 import("//build_overrides/qpg_sdk.gni")
+import("${freertos_root}/freertos.gni")
 import("${qpg_sdk_build_root}/qpg_sdk.gni")
 
 declare_args() {
@@ -23,5 +25,24 @@ declare_args() {
 assert(qpg_sdk_target != "", "qpg_sdk_target must be specified")
 
 group("qpg_sdk") {
-  public_deps = [ qpg_sdk_target ]
+  public_deps = [
+    ":freertos",
+    qpg_sdk_target,
+  ]
+}
+
+config("qpg_freertos_config") {
+  include_dirs = [
+    "${chip_root}/third_party/qpg_sdk/repo/qpg6100/comps/gpFreeRTOS/config",
+    "${freertos_root}/repo/portable/GCC/ARM_CM3",
+  ]
+}
+
+freertos_target("freertos") {
+  sources = [
+    "${freertos_root}/repo/portable/GCC/ARM_CM3/port.c",
+    "${freertos_root}/repo/portable/MemMang/heap_3.c",
+  ]
+
+  public_configs = [ ":qpg_freertos_config" ]
 }

@@ -33,7 +33,7 @@ public:
     {
         if (mExchangeManager != nullptr)
         {
-            mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1);
+            mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1);
         }
     }
 

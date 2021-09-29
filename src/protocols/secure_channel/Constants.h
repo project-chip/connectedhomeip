@@ -63,10 +63,10 @@ enum class MsgType : uint8_t
     PASE_PakeError     = 0x2F,
 
     // Certificate-based session establishment Message Types
-    CASE_SigmaR1  = 0x30,
-    CASE_SigmaR2  = 0x31,
-    CASE_SigmaR3  = 0x32,
-    CASE_SigmaErr = 0x3F,
+    CASE_Sigma1       = 0x30,
+    CASE_Sigma2       = 0x31,
+    CASE_Sigma3       = 0x32,
+    CASE_Sigma2Resume = 0x33,
 
     StatusReport = 0x40,
 };

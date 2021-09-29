@@ -44,12 +44,12 @@ public:
     // Register for the ThreadNetworkDiagnostics cluster on all endpoints.
     ThreadDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead) override;
+    CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) override;
 };
 
 ThreadDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLVWriter * aWriter, bool * aDataRead)
+CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead)
 {
     if (aClusterInfo.mClusterId != ThreadNetworkDiagnostics::Id)
     {
@@ -57,7 +57,7 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, TLV::TLV
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR err = ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aClusterInfo.mFieldId, aWriter);
+    CHIP_ERROR err = ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aClusterInfo.mFieldId, aEncoder);
 
     *aDataRead = true;
 
@@ -81,6 +81,8 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoi
     {
         ChipLogError(Zcl, "Failed to reset OverrunCount attribute");
     }
+
+    ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
 
     emberAfSendImmediateDefaultResponse(status);
     return true;

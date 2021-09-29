@@ -22,7 +22,7 @@
  *
  */
 
-#include <app/common/cluster-objects.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -162,7 +162,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
 
         t.a = 20;
         t.b = true;
-        t.c = clusters::TestCluster::SimpleEnum::VALUEA;
+        t.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
         t.d = buf;
 
         t.e = Span<char>{ strbuf, strlen(strbuf) };
@@ -189,7 +189,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
 
         NL_TEST_ASSERT(apSuite, t.a == 20);
         NL_TEST_ASSERT(apSuite, t.b == true);
-        NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::VALUEA);
+        NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
 
         NL_TEST_ASSERT(apSuite, t.d.size() == 4);
 
@@ -222,7 +222,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
         t.b   = true;
         t.c.a = 11;
         t.c.b = true;
-        t.c.c = clusters::TestCluster::SimpleEnum::VALUEB;
+        t.c.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B;
         t.c.d = buf;
 
         t.c.e = Span<char>{ strbuf, strlen(strbuf) };
@@ -251,7 +251,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
         NL_TEST_ASSERT(apSuite, t.b == true);
         NL_TEST_ASSERT(apSuite, t.c.a == 11);
         NL_TEST_ASSERT(apSuite, t.c.b == true);
-        NL_TEST_ASSERT(apSuite, t.c.c == clusters::TestCluster::SimpleEnum::VALUEB);
+        NL_TEST_ASSERT(apSuite, t.c.c == clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B);
 
         NL_TEST_ASSERT(apSuite, t.c.d.size() == 4);
 
@@ -289,7 +289,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
         t.b   = true;
         t.c.a = 11;
         t.c.b = true;
-        t.c.c = clusters::TestCluster::SimpleEnum::VALUEB;
+        t.c.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B;
         t.c.d = buf;
         t.e   = intBuf;
 
@@ -337,7 +337,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
         NL_TEST_ASSERT(apSuite, t.b == true);
         NL_TEST_ASSERT(apSuite, t.c.a == 11);
         NL_TEST_ASSERT(apSuite, t.c.b == true);
-        NL_TEST_ASSERT(apSuite, t.c.c == clusters::TestCluster::SimpleEnum::VALUEB);
+        NL_TEST_ASSERT(apSuite, t.c.c == clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B);
         NL_TEST_ASSERT(apSuite, StringMatches(t.c.e, "chip"));
 
         {
@@ -504,7 +504,7 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
 
         t.a = 20;
         t.b = true;
-        t.c = clusters::TestCluster::SimpleEnum::VALUEA;
+        t.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
         t.d = buf;
 
         t.e = Span<char>{ strbuf, strlen(strbuf) };
@@ -543,7 +543,7 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
         NL_TEST_ASSERT(apSuite, t.a == 150);
 
         NL_TEST_ASSERT(apSuite, t.b == true);
-        NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::VALUEA);
+        NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
 
         NL_TEST_ASSERT(apSuite, t.d.size() == 4);
 
@@ -574,7 +574,7 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
 
         t.a = 20;
         t.b = true;
-        t.c = clusters::TestCluster::SimpleEnum::VALUEA;
+        t.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
         t.d = buf;
 
         t.e = Span<char>{ strbuf, strlen(strbuf) };
@@ -611,7 +611,7 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
 
         NL_TEST_ASSERT(apSuite, t.a == 20);
         NL_TEST_ASSERT(apSuite, t.b == true);
-        NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::VALUEA);
+        NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
 
         NL_TEST_ASSERT(apSuite, t.d.size() == 4);
 
@@ -646,7 +646,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
 
             t.a = 20;
             t.b = true;
-            t.c = clusters::TestCluster::SimpleEnum::VALUEA;
+            t.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
             t.d = buf;
 
             t.e = Span<char>{ strbuf, strlen(strbuf) };
@@ -697,7 +697,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
 
             t.a = 20;
             t.b = true;
-            t.c = clusters::TestCluster::SimpleEnum::VALUEA;
+            t.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
             t.d = buf;
 
             t.e = Span<char>{ strbuf, strlen(strbuf) };

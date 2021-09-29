@@ -1412,9 +1412,8 @@ chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepColorTemper
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepHue(chip::Controller::Device * device,
                                                                          chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                         uint8_t stepMode, uint8_t stepSize,
-                                                                         uint16_t transitionTime, uint8_t optionsMask,
-                                                                         uint8_t optionsOverride)
+                                                                         uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime,
+                                                                         uint8_t optionsMask, uint8_t optionsOverride)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ColorControlCluster cluster;
@@ -1424,7 +1423,7 @@ chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepHue(chip::C
 chip::ChipError::StorageType chip_ime_AppendCommand_ColorControl_StepSaturation(chip::Controller::Device * device,
                                                                                 chip::EndpointId ZCLendpointId, chip::GroupId,
                                                                                 uint8_t stepMode, uint8_t stepSize,
-                                                                                uint16_t transitionTime, uint8_t optionsMask,
+                                                                                uint8_t transitionTime, uint8_t optionsMask,
                                                                                 uint8_t optionsOverride)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
@@ -2946,6 +2945,37 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_RebootCou
     chip::Controller::GeneralDiagnosticsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ReadAttributeRebootCount(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_UpTime(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId,
+                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeUpTime(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_TotalOperationalHours(chip::Controller::Device * device,
+                                                                                             chip::EndpointId ZCLendpointId,
+                                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTotalOperationalHours(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_BootReasons(chip::Controller::Device * device,
+                                                                                   chip::EndpointId ZCLendpointId,
+                                                                                   chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBootReasons(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision(chip::Controller::Device * device,
@@ -4642,6 +4672,26 @@ chip::ChipError::StorageType chip_ime_AppendCommand_SoftwareDiagnostics_ResetWat
     chip::Controller::SoftwareDiagnosticsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ResetWatermarks(nullptr, nullptr).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapFree(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::SoftwareDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentHeapFree(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapUsed(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::SoftwareDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentHeapUsed(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_SoftwareDiagnostics_CurrentHeapHighWatermark(chip::Controller::Device * device,

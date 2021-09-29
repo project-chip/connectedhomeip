@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <lib/core/CHIPTLV.h>
+#include <app/AttributeAccessInterface.h>
 #include <lib/support/BitFlags.h>
 #include <platform/ThreadStackManager.h>
 
@@ -68,7 +68,8 @@ protected:
     bool _IsThreadAttached();
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
+    void _ResetThreadNetworkDiagnosticsCounts();
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
 
     // ===== Members for use by the implementation subclass.
 
@@ -152,11 +153,16 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadPo
 }
 
 template <class ImplClass>
-inline CHIP_ERROR
-GenericConnectivityManagerImpl_Thread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                              TLV::TLVWriter * aWriter)
+inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()
 {
-    return ThreadStackMgrImpl().WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, aWriter);
+    ThreadStackMgrImpl().ResetThreadNetworkDiagnosticsCounts();
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(
+    AttributeId attributeId, const app::AttributeValueEncoder & encoder)
+{
+    return ThreadStackMgrImpl().WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
 } // namespace Internal

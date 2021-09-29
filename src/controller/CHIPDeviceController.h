@@ -36,6 +36,7 @@
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <credentials/DeviceAttestationVerifier.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPTLV.h>
@@ -70,7 +71,7 @@ namespace Controller {
 
 using namespace chip::Protocols::UserDirectedCommissioning;
 
-constexpr uint16_t kNumMaxActiveDevices = 64;
+constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
 constexpr uint16_t kNumMaxPairedDevices = 128;
 
 // Raw functions for cluster callbacks
@@ -464,17 +465,6 @@ public:
      */
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
                                        uint8_t option);
-
-    /**
-     *  This function call causes the DeviceCommissioner to send a
-     *  CommissioningComplete command to the given node.  At least when
-     *  mIsIPRendezvous is false, which seems to be an incredibly broken
-     *  workaround for
-     *  <https://github.com/project-chip/connectedhomeip/issues/8010>.  Chances
-     *  are, this function and its callsites should just be removed when that
-     *  issue is fixed.
-     */
-    CHIP_ERROR CommissioningComplete(NodeId remoteDeviceId);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;

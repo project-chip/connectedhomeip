@@ -1119,20 +1119,6 @@ CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::CommissioningComplete(NodeId remoteDeviceId)
-{
-    if (!mIsIPRendezvous)
-    {
-        Device * device = nullptr;
-        ReturnErrorOnFailure(GetDevice(remoteDeviceId, &device));
-        ChipLogProgress(Controller, "Calling commissioning complete for device ID %" PRIu64, remoteDeviceId);
-        GeneralCommissioningCluster genCom;
-        genCom.Associate(device, 0);
-        return genCom.CommissioningComplete(NULL, NULL);
-    }
-    return CHIP_NO_ERROR;
-}
-
 void DeviceCommissioner::FreeRendezvousSession()
 {
     PersistNextKeyId();
@@ -1958,9 +1944,15 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Device * device)
     if (commissioner->mDeviceBeingPaired < kNumMaxActiveDevices)
     {
         Device * deviceBeingPaired = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
-        if (device == deviceBeingPaired && commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
+        if (device == deviceBeingPaired && commissioner->mIsIPRendezvous)
         {
-            commissioner->AdvanceCommissioningStage(CHIP_NO_ERROR);
+            if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
+            {
+                commissioner->AdvanceCommissioningStage(CHIP_NO_ERROR);
+            }
+            // For IP rendezvous, we don't want to call commissioning complete below because IP commissioning
+            // has more steps currently.
+            return;
         }
     }
 

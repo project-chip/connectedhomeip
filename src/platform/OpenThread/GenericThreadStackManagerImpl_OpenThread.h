@@ -36,7 +36,7 @@
 #include <openthread/dns_client.h>
 #endif
 
-#include <lib/core/CHIPTLV.h>
+#include <app/AttributeAccessInterface.h>
 #include <lib/mdns/Advertiser.h>
 #include <lib/mdns/platform/Mdns.h>
 
@@ -93,7 +93,8 @@ protected:
     CHIP_ERROR _GetAndLogThreadTopologyFull(void);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
+    void _ResetThreadNetworkDiagnosticsCounts(void);
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);

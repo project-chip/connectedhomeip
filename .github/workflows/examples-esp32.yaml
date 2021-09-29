@@ -107,6 +107,7 @@ jobs:
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
+              if: ${{ !env.ACT }}
               with:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
@@ -124,6 +125,7 @@ jobs:
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
               with:
                   name: Size,ESP32-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
                   path: /tmp/bloat_reports/

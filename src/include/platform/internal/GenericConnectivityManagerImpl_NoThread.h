@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <lib/core/CHIPTLV.h>
+#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -55,7 +55,8 @@ protected:
     bool _IsThreadAttached(void);
     bool _IsThreadProvisioned(void);
     void _ErasePersistentInfo(void);
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, TLV::TLVWriter * aWriter);
+    void _ResetThreadNetworkDiagnosticsCounts(void);
+    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
 
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
@@ -128,9 +129,12 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThread
 }
 
 template <class ImplClass>
-inline CHIP_ERROR
-GenericConnectivityManagerImpl_NoThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                                TLV::TLVWriter * aWriter)
+inline void GenericConnectivityManagerImpl_NoThread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()
+{}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(
+    AttributeId attributeId, const app::AttributeValueEncoder & encoder)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

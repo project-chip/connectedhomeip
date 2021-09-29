@@ -26,6 +26,9 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <messaging/ExchangeContext.h>
+#include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/StatusReport.h>
 #include <transport/CryptoContext.h>
 
 namespace chip {
@@ -89,6 +92,57 @@ protected:
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
     void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }
     void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
+    virtual void OnSuccessStatusReport() {}
+    virtual CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    void SendStatusReport(Messaging::ExchangeContext * exchangeCtxt, uint16_t protocolCode)
+    {
+        Protocols::SecureChannel::GeneralStatusCode generalCode = (protocolCode == Protocols::SecureChannel::kProtocolCodeSuccess)
+            ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
+            : Protocols::SecureChannel::GeneralStatusCode::kFailure;
+        uint32_t protocolId = Protocols::SecureChannel::Id.ToFullyQualifiedSpecForm();
+
+        ChipLogDetail(SecureChannel, "Sending status report. Protocol code %d, exchange %d", protocolCode,
+                      exchangeCtxt->GetExchangeId());
+
+        Protocols::SecureChannel::StatusReport statusReport(generalCode, protocolId, protocolCode);
+
+        Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(statusReport.Size()));
+        statusReport.WriteToBuffer(bbuf);
+
+        System::PacketBufferHandle msg = bbuf.Finalize();
+        VerifyOrReturn(!msg.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
+
+        CHIP_ERROR err = exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Failed to send status report message. %s", ErrorStr(err));
+        }
+    }
+
+    CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg, bool successExpected)
+    {
+        Protocols::SecureChannel::StatusReport report;
+        CHIP_ERROR err = report.Parse(std::move(msg));
+        ReturnErrorOnFailure(err);
+        VerifyOrReturnError(report.GetProtocolId() == Protocols::SecureChannel::Id.ToFullyQualifiedSpecForm(),
+                            CHIP_ERROR_INVALID_ARGUMENT);
+
+        if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kSuccess &&
+            report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeSuccess && successExpected)
+        {
+            OnSuccessStatusReport();
+        }
+        else
+        {
+            err = OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode());
+        }
+
+        return err;
+    }
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear()
