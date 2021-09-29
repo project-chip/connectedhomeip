@@ -37,6 +37,11 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include "SoftAPManager.h"
+#include "WiFiManager.h"
+#endif
+
 namespace chip {
 namespace Inet {
 class IPAddress;
@@ -74,6 +79,11 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 public:
     CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    void StartWiFiManagement(void);
+    void StopWiFiManagement(void);
+#endif
+
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 
@@ -101,6 +111,11 @@ private:
     void _MaintainOnDemandWiFiAP(void);
     uint32_t _GetWiFiAPIdleTimeoutMS(void);
     void _SetWiFiAPIdleTimeoutMS(uint32_t val);
+
+    static void ActivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState);
+    static void DeactivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState);
+    static void EnableSoftAPManager(::chip::System::Layer * aLayer, void * aAppState);
+    static void DisableSoftAPManager(::chip::System::Layer * aLayer, void * aAppState);
 #endif
 
     // ===== Members for internal use by the following friends.
@@ -121,12 +136,7 @@ private:
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
-{
-    return ConnectivityManager::kWiFiAPMode_NotSupported;
-}
-
-inline bool ConnectivityManagerImpl::_IsWiFiAPActive()
+inline bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
 {
     return false;
 }

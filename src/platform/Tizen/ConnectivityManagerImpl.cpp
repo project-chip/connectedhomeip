@@ -51,6 +51,19 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 CHIP_ERROR ConnectivityManagerImpl::_Init(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    mWiFiStationMode                = kWiFiStationMode_Disabled;
+    mWiFiAPMode                     = kWiFiAPMode_Disabled;
+    mWiFiAPState                    = kWiFiAPState_NotActive;
+    mLastAPDemandTime               = 0;
+    mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
+    mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    Internal::WiFiManager::Init();
+    Internal::SoftAPManager::Init();
+#endif
+
     return err;
 }
 
@@ -60,68 +73,223 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {
-    return ConnectivityManager::kWiFiStationMode_NotSupported;
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    wifi_manager_device_state_e deviceState = WIFI_MANAGER_DEVICE_STATE_DEACTIVATED;
+
+    if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
+    {
+        err = Internal::WiFiManager::GetDeviceState(&deviceState);
+        SuccessOrExit(err);
+
+        if (deviceState == WIFI_MANAGER_DEVICE_STATE_ACTIVATED)
+        {
+            mWiFiStationMode = kWiFiStationMode_Enabled;
+        }
+        else
+        {
+            mWiFiStationMode = kWiFiStationMode_Disabled;
+        }
+    }
+
+exit:
+    return mWiFiStationMode;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    wifi_manager_device_state_e deviceState = WIFI_MANAGER_DEVICE_STATE_DEACTIVATED;
+
+    VerifyOrExit(val != kWiFiStationMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(val != kWiFiStationMode_ApplicationControlled, );
+
+    deviceState = (val == kWiFiStationMode_Disabled) ? WIFI_MANAGER_DEVICE_STATE_DEACTIVATED : WIFI_MANAGER_DEVICE_STATE_ACTIVATED;
+    err         = Internal::WiFiManager::SetDeviceState(deviceState);
+    SuccessOrExit(err);
+
+    if (mWiFiStationMode != val)
+    {
+        ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
+                        WiFiStationModeToStr(val));
+
+        mWiFiStationMode = val;
+    }
+
+exit:
+    return err;
 }
 
 uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS(void)
 {
-    return 0;
+    return mWiFiStationReconnectIntervalMS;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectIntervalMS(uint32_t val)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    mWiFiStationReconnectIntervalMS = val;
+
+    return CHIP_NO_ERROR;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 {
-    return false;
+    bool isWifiStationEnabled = false;
+
+    Internal::WiFiManager::IsActivated(&isWifiStationEnabled);
+
+    return isWifiStationEnabled;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
 {
-    return false;
-}
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    wifi_manager_connection_state_e connectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
+    bool isWifiStationConnected                     = false;
 
-bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
-{
-    return false;
+    err = Internal::WiFiManager::GetConnectionState(&connectionState);
+    SuccessOrExit(err);
+
+    if (connectionState == WIFI_MANAGER_CONNECTION_STATE_CONNECTED)
+        isWifiStationConnected = true;
+
+exit:
+    return isWifiStationConnected;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 {
-    return false;
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    wifi_manager_connection_state_e connectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
+    bool isWifiStationProvisioned                   = false;
+
+    err = Internal::WiFiManager::GetConnectionState(&connectionState);
+    SuccessOrExit(err);
+
+    if (connectionState >= WIFI_MANAGER_CONNECTION_STATE_ASSOCIATION)
+        isWifiStationProvisioned = true;
+
+exit:
+    return isWifiStationProvisioned;
 }
 
-void ConnectivityManagerImpl::_ClearWiFiStationProvision(void) {}
+void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
+{
+    Internal::WiFiManager::RemoveAllConfigs();
+}
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan(void)
 {
     return false;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
+ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    bool apState   = false;
+
+    if (mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
+    {
+        err = Internal::SoftAPManager::GetAPState(&apState);
+        VerifyOrExit(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, mWiFiAPMode = kWiFiAPMode_NotSupported);
+        VerifyOrExit(err == CHIP_NO_ERROR, mWiFiAPMode = kWiFiAPMode_Disabled);
+
+        if (apState == true)
+        {
+            mWiFiAPMode = kWiFiAPMode_Enabled;
+        }
+        else
+        {
+            mWiFiAPMode = kWiFiAPMode_Disabled;
+        }
+    }
+
+exit:
+    return mWiFiAPMode;
 }
 
-void ConnectivityManagerImpl::_DemandStartWiFiAP(void) {}
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    bool apState   = false;
 
-void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void) {}
+    VerifyOrExit(val != kWiFiAPMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(val != kWiFiAPMode_ApplicationControlled, );
+
+    if (val == kWiFiAPMode_Disabled || val == kWiFiAPMode_Enabled)
+    {
+        apState = (val == kWiFiAPMode_Disabled) ? false : true;
+        err     = Internal::SoftAPManager::SetAPState(apState);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+        if (mWiFiAPMode != val)
+        {
+            ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
+
+            mWiFiAPMode = val;
+        }
+    }
+
+exit:
+    return err;
+}
+
+bool ConnectivityManagerImpl::_IsWiFiAPActive()
+{
+    bool isWiFiAPEnabled = false;
+
+    Internal::SoftAPManager::IsEnabled(&isWiFiAPEnabled);
+
+    return isWiFiAPEnabled;
+}
+
+void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
+{
+    SystemLayer().ScheduleWork(EnableSoftAPManager, NULL);
+}
+
+void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
+{
+    SystemLayer().ScheduleWork(DisableSoftAPManager, NULL);
+}
 
 void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void) {}
 
 void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val) {}
+
+void ConnectivityManagerImpl::StartWiFiManagement(void)
+{
+    SystemLayer().ScheduleWork(ActivateWiFiManager, NULL);
+}
+
+void ConnectivityManagerImpl::StopWiFiManagement(void)
+{
+    SystemLayer().ScheduleWork(DeactivateWiFiManager, NULL);
+}
+
+void ConnectivityManagerImpl::ActivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState)
+{
+    Internal::WiFiManager::Activate();
+}
+
+void ConnectivityManagerImpl::DeactivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState)
+{
+    Internal::WiFiManager::Deactivate();
+}
+
+void ConnectivityManagerImpl::EnableSoftAPManager(::chip::System::Layer * aLayer, void * aAppState)
+{
+    Internal::SoftAPManager::Enable();
+}
+
+void ConnectivityManagerImpl::DisableSoftAPManager(::chip::System::Layer * aLayer, void * aAppState)
+{
+    Internal::SoftAPManager::Disable();
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return Internal::WiFiManager::Connect(ssid, key);
 }
 
 } // namespace DeviceLayer
