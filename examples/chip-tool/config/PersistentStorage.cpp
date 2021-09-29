@@ -71,7 +71,7 @@ std::string Base64ToString(const std::string & b64Value)
 
 } // namespace
 
-CHIP_ERROR PersistentStorage::Init()
+CHIP_ERROR PersistentStorage::Init(const char * sectionName)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -83,6 +83,10 @@ CHIP_ERROR PersistentStorage::Init()
         ifs.open(kFilename, std::ifstream::in);
     }
     VerifyOrExit(ifs.is_open(), err = CHIP_ERROR_OPEN_FAILED);
+    if (sectionName && strlen(sectionName))
+        mSectionName.assign(sectionName);
+    else
+        mSectionName.assign(kDefaultSectionName);
 
     mConfig.parse(ifs);
     ifs.close();
@@ -95,7 +99,7 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 {
     std::string iniValue;
 
-    auto section = mConfig.sections[kDefaultSectionName];
+    auto section = mConfig.sections[mSectionName];
     auto it      = section.find(key);
     ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_KEY_NOT_FOUND);
 
@@ -118,19 +122,19 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 
 CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    auto section = mConfig.sections[kDefaultSectionName];
+    auto section = mConfig.sections[mSectionName];
     section[key] = StringToBase64(std::string(static_cast<const char *>(value), size));
 
-    mConfig.sections[kDefaultSectionName] = section;
+    mConfig.sections[mSectionName] = section;
     return CommitConfig();
 }
 
 CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
 {
-    auto section = mConfig.sections[kDefaultSectionName];
+    auto section = mConfig.sections[mSectionName];
     section.erase(key);
 
-    mConfig.sections[kDefaultSectionName] = section;
+    mConfig.sections[mSectionName] = section;
     return CommitConfig();
 }
 

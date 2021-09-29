@@ -32,6 +32,7 @@ declare_args() {
 executable("chip-tool") {
   sources = [
     "commands/clusters/ModelCommand.cpp",
+    "commands/common/Options.cpp",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
     "commands/discover/DiscoverCommand.cpp",
@@ -54,6 +55,7 @@ executable("chip-tool") {
   deps = [
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
   ]
