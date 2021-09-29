@@ -33,12 +33,12 @@ using namespace ::chip::Controller;
 using namespace ::chip::Logging;
 
 constexpr const char kFilename[]           = "/tmp/chip_tool_config.ini";
-constexpr const char kDefaultSectionName[] = "Default";
 constexpr const char kPortKey[]            = "ListenPort";
 constexpr const char kLoggingKey[]         = "LoggingLevel";
 constexpr const char kLocalNodeIdKey[]     = "LocalNodeId";
 constexpr const char kRemoteNodeIdKey[]    = "RemoteNodeId";
 constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Detail;
+char kSectionName[32] = {0};
 
 namespace {
 
@@ -71,7 +71,7 @@ std::string Base64ToString(const std::string & b64Value)
 
 } // namespace
 
-CHIP_ERROR PersistentStorage::Init()
+CHIP_ERROR PersistentStorage::Init(const char * sectionName)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -83,9 +83,14 @@ CHIP_ERROR PersistentStorage::Init()
         ifs.open(kFilename, std::ifstream::in);
     }
     VerifyOrExit(ifs.is_open(), err = CHIP_ERROR_OPEN_FAILED);
+    if (sectionName)
+        strcpy(kSectionName, sectionName);
+    else 
+        strcpy(kSectionName, "Default");
 
     mConfig.parse(ifs);
     ifs.close();
+
 
 exit:
     return err;
@@ -95,7 +100,7 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 {
     std::string iniValue;
 
-    auto section = mConfig.sections[kDefaultSectionName];
+    auto section = mConfig.sections[kSectionName];
     auto it      = section.find(key);
     ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_KEY_NOT_FOUND);
 
@@ -118,19 +123,19 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 
 CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    auto section = mConfig.sections[kDefaultSectionName];
+    auto section = mConfig.sections[kSectionName];
     section[key] = StringToBase64(std::string(static_cast<const char *>(value), size));
 
-    mConfig.sections[kDefaultSectionName] = section;
+    mConfig.sections[kSectionName] = section;
     return CommitConfig();
 }
 
 CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
 {
-    auto section = mConfig.sections[kDefaultSectionName];
+    auto section = mConfig.sections[kSectionName];
     section.erase(key);
 
-    mConfig.sections[kDefaultSectionName] = section;
+    mConfig.sections[kSectionName] = section;
     return CommitConfig();
 }
 
