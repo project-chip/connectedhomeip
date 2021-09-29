@@ -24,11 +24,12 @@ public final class AndroidChipPlatform {
       BleManager ble,
       KeyValueStoreManager kvm,
       ConfigurationManager cfg,
-      ServiceResolver resolver) {
+      ServiceResolver resolver,
+      ChipMdnsCallback chipMdnsCallback) {
     setBLEManager(ble);
     setKeyValueStoreManager(kvm);
     setConfigurationManager(cfg);
-    setServiceResolver(resolver);
+    setServiceResolver(resolver, chipMdnsCallback);
   }
 
   // for BLEManager
@@ -72,20 +73,11 @@ public final class AndroidChipPlatform {
   private native void setConfigurationManager(ConfigurationManager manager);
 
   // for ServiceResolver
-  private void setServiceResolver(ServiceResolver resolver) {
+  private void setServiceResolver(ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback) {
     if (resolver != null) {
-      resolver.setAndroidChipPlatform(this);
-      nativeSetServiceResolver(resolver);
+      nativeSetServiceResolver(resolver, chipMdnsCallback);
     }
   }
 
-  private native void nativeSetServiceResolver(ServiceResolver resolver);
-
-  public native void handleServiceResolve(
-      String instanceName,
-      String serviceType,
-      String address,
-      int port,
-      long callbackHandle,
-      long contextHandle);
+  private native void nativeSetServiceResolver(ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
 }
