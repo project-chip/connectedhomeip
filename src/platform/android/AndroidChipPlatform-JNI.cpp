@@ -41,7 +41,8 @@
 using namespace chip;
 
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_AndroidChipPlatform_##METHOD_NAME
-#define JNI_MDNSCALLBACK_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_ChipMdnsCallbackImpl_##METHOD_NAME
+#define JNI_MDNSCALLBACK_METHOD(RETURN, METHOD_NAME)                                                                               \
+    extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_ChipMdnsCallbackImpl_##METHOD_NAME
 
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
