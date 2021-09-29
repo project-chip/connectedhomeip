@@ -60,16 +60,6 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>::ConnectivityFlags>
     ConnectivityManagerImpl::mConnectivityFlag;
 
-bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity()
-{
-    return false;
-}
-
-bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity()
-{
-    return false;
-}
-
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode()
 {
     return mWiFiStationMode;
