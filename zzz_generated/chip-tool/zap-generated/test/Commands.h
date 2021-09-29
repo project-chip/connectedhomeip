@@ -12357,10 +12357,16 @@ public:
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGTH_1_1\n");
+        }
+
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, "Test_TC_DIAGTH_1_1: Test complete");
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGTH_1_1\n");
             SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
         }
 
         // Ensure we increment mTestIndex before we start running the relevant
@@ -12370,19 +12376,23 @@ public:
         switch (mTestIndex++)
         {
         case 0:
-            err = TestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_0();
+            ChipLogProgress(chipTool, " ***** Test Step 0 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_0();
             break;
         case 1:
-            err = TestSendClusterThreadNetworkDiagnosticsCommandWriteAttribute_1();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 1 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            err = TestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_2();
             break;
         }
 
         if (CHIP_NO_ERROR != err)
         {
-            ChipLogProgress(chipTool, "Test_TC_DIAGTH_1_1: %s", chip::ErrorStr(err));
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
             SetCommandExitStatus(err);
         }
     }
@@ -12391,204 +12401,92 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_0{ OnFailureCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_0{ OnSuccessCallback_0, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_1{ OnFailureCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_1{ OnSuccessCallback_1, this };
+    chip::Callback::Callback<void (*)(void * context, uint8_t status)> mOnFailureCallback_2{ OnFailureCallback_2, this };
+    chip::Callback::Callback<void (*)(void * context, uint16_t clusterRevision)> mOnSuccessCallback_2{ OnSuccessCallback_2, this };
+
+    static void OnFailureCallback_0(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnFailureResponse_0(status);
+    }
+
+    static void OnSuccessCallback_0(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_0(clusterRevision);
+    }
+
+    static void OnFailureCallback_1(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, uint8_t status)
+    {
+        (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
+
     //
     // Tests methods
     //
 
-    // Test read the global attribute: ClusterRevision
-    using SuccessCallback_0 = void (*)(void * context, uint16_t clusterRevision);
-    chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{
-        OnTestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_0_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
-        OnTestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_0_FailureResponse, this
-    };
-
-    bool mIsFailureExpected_0 = 0;
-
-    CHIP_ERROR TestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_0()
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_0()
     {
-        ChipLogProgress(chipTool, "Thread Network Diagnostics - read the global attribute: ClusterRevision: Sending command...");
-
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
-
-        return err;
+        return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
     }
 
-    static void OnTestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    void OnFailureResponse_0(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_0(uint16_t clusterRevision)
     {
-        ChipLogProgress(chipTool, "Thread Network Diagnostics - read the global attribute: ClusterRevision: Failure Response");
-
-        Test_TC_DIAGTH_1_1 * runner = reinterpret_cast<Test_TC_DIAGTH_1_1 *>(context);
-
-        if (runner->mIsFailureExpected_0 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 1U));
+        NextTest();
     }
 
-    static void OnTestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_0_SuccessResponse(void * context,
-                                                                                                uint16_t clusterRevision)
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
-        ChipLogProgress(chipTool, "Thread Network Diagnostics - read the global attribute: ClusterRevision: Success Response");
-
-        Test_TC_DIAGTH_1_1 * runner = reinterpret_cast<Test_TC_DIAGTH_1_1 *>(context);
-
-        if (runner->mIsFailureExpected_0 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        if (clusterRevision != 1U)
-        {
-            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test write the default values to mandatory global attribute: ClusterRevision
-    using SuccessCallback_1 = void (*)(void * context, uint16_t clusterRevision);
-    chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{
-        OnTestSendClusterThreadNetworkDiagnosticsCommandWriteAttribute_1_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
-        OnTestSendClusterThreadNetworkDiagnosticsCommandWriteAttribute_1_FailureResponse, this
-    };
-
-    bool mIsFailureExpected_1 = 1;
-
-    CHIP_ERROR TestSendClusterThreadNetworkDiagnosticsCommandWriteAttribute_1()
-    {
-        ChipLogProgress(chipTool,
-                        "Thread Network Diagnostics - write the default values to mandatory global attribute: ClusterRevision: "
-                        "Sending command...");
-
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
         cluster.Associate(mDevice, 0);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
 
         uint16_t clusterRevisionArgument = 1U;
-        err = cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
-                                                    clusterRevisionArgument);
 
-        return err;
+        return cluster.WriteAttributeClusterRevision(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(),
+                                                     clusterRevisionArgument);
     }
 
-    static void OnTestSendClusterThreadNetworkDiagnosticsCommandWriteAttribute_1_FailureResponse(void * context, uint8_t status)
+    void OnFailureResponse_1(uint8_t status) { NextTest(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_2()
     {
-        ChipLogProgress(chipTool,
-                        "Thread Network Diagnostics - write the default values to mandatory global attribute: ClusterRevision: "
-                        "Failure Response");
-
-        Test_TC_DIAGTH_1_1 * runner = reinterpret_cast<Test_TC_DIAGTH_1_1 *>(context);
-
-        if (runner->mIsFailureExpected_1 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterThreadNetworkDiagnosticsCommandWriteAttribute_1_SuccessResponse(void * context,
-                                                                                                 uint16_t clusterRevision)
-    {
-        ChipLogProgress(chipTool,
-                        "Thread Network Diagnostics - write the default values to mandatory global attribute: ClusterRevision: "
-                        "Success Response");
-
-        Test_TC_DIAGTH_1_1 * runner = reinterpret_cast<Test_TC_DIAGTH_1_1 *>(context);
-
-        if (runner->mIsFailureExpected_1 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test reads back global attribute: ClusterRevision
-    using SuccessCallback_2 = void (*)(void * context, uint16_t clusterRevision);
-    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
-        OnTestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_2_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
-        OnTestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_2_FailureResponse, this
-    };
-
-    bool mIsFailureExpected_2 = 0;
-
-    CHIP_ERROR TestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_2()
-    {
-        ChipLogProgress(chipTool, "Thread Network Diagnostics - reads back global attribute: ClusterRevision: Sending command...");
-
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
         cluster.Associate(mDevice, 0);
 
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
-
-        return err;
+        return cluster.ReadAttributeClusterRevision(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
     }
 
-    static void OnTestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
     {
-        ChipLogProgress(chipTool, "Thread Network Diagnostics - reads back global attribute: ClusterRevision: Failure Response");
-
-        Test_TC_DIAGTH_1_1 * runner = reinterpret_cast<Test_TC_DIAGTH_1_1 *>(context);
-
-        if (runner->mIsFailureExpected_2 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterThreadNetworkDiagnosticsCommandReadAttribute_2_SuccessResponse(void * context,
-                                                                                                uint16_t clusterRevision)
-    {
-        ChipLogProgress(chipTool, "Thread Network Diagnostics - reads back global attribute: ClusterRevision: Success Response");
-
-        Test_TC_DIAGTH_1_1 * runner = reinterpret_cast<Test_TC_DIAGTH_1_1 *>(context);
-
-        if (runner->mIsFailureExpected_2 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        if (clusterRevision != 1U)
-        {
-            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
+        VerifyOrReturn(CheckValue<uint16_t>("clusterRevision", clusterRevision, 1U));
+        NextTest();
     }
 };
 
