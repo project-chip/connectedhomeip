@@ -26,7 +26,7 @@
 class PersistentStorage : public chip::PersistentStorageDelegate
 {
 public:
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(const char * sectionName);
 
     /////////// PersistentStorageDelegate Interface /////////
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
@@ -51,4 +51,5 @@ private:
 
     CHIP_ERROR CommitConfig();
     inipp::Ini<char> mConfig;
+    std::string mSectionName;
 };

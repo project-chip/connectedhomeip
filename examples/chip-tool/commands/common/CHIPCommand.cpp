@@ -17,6 +17,7 @@
  */
 
 #include "CHIPCommand.h"
+#include "Options.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -35,7 +36,7 @@ CHIP_ERROR CHIPCommand::Run()
     ReturnLogErrorOnFailure(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, true));
 #endif
 
-    ReturnLogErrorOnFailure(mStorage.Init());
+    ReturnLogErrorOnFailure(mStorage.Init(ChiptoolCommandOptions::GetInstance().DeviceName.c_str()));
     ReturnLogErrorOnFailure(mOpCredsIssuer.Initialize(mStorage));
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
