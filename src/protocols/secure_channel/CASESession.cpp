@@ -702,12 +702,12 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    VerifyOrExit(tlvReader.GetLength() == kCASEResumptionIDSize, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrExit(tlvReader.GetLength() == kCASEResumptionIDSize, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(mResumptionId, kCASEResumptionIDSize));
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    VerifyOrExit(tlvReader.GetLength() == kTAGSize, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrExit(tlvReader.GetLength() == kTAGSize, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(sigma2ResumeMIC, kTAGSize));
 
     SuccessOrExit(err = ValidateSigmaResumeMIC(ByteSpan(sigma2ResumeMIC), ByteSpan(mInitiatorRandom), ByteSpan(mResumptionId),
@@ -1389,7 +1389,7 @@ CHIP_ERROR CASESession::IsResumptionRequestPresent(const System::PacketBufferHan
         // There are optional TLV elements, so some of them may not be present.
         // So the check cannot match the absolute value of the expected tag.
         uint32_t tlvTag = TLV::TagNumFromTag(tlvReader.GetTag());
-        VerifyOrExit(tlvTag > lastDecodedTLVTag, CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrExit(tlvTag > lastDecodedTLVTag, err = CHIP_ERROR_INVALID_TLV_TAG);
         lastDecodedTLVTag = tlvTag;
 
         if (tlvTag == kResumptionIDTag)
@@ -1399,7 +1399,7 @@ CHIP_ERROR CASESession::IsResumptionRequestPresent(const System::PacketBufferHan
         }
         else if (tlvTag == kResume1MICTag)
         {
-            VerifyOrExit(resumptionIDTagFound, CHIP_ERROR_INVALID_TLV_TAG);
+            VerifyOrExit(resumptionIDTagFound, err= CHIP_ERROR_INVALID_TLV_TAG);
             resume1MICTagFound = true;
             SuccessOrExit(err = tlvReader.GetByteView(resume1MIC));
         }
