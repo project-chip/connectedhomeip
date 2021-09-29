@@ -174,7 +174,7 @@ Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMilliseconds(void)
 namespace Clock {
 
 static_assert(std::is_unsigned<ClockBase::Tick>::value, "ClockBase::Tick must be unsigned");
-constexpr ClockBase::Tick kMaxTick = static_cast<ClockBase::Tick>(0) - static_cast<ClockBase::Tick>(1);
+constexpr ClockBase::Tick kMaxTick     = static_cast<ClockBase::Tick>(0) - static_cast<ClockBase::Tick>(1);
 constexpr ClockBase::Tick kHalfMaxTick = static_cast<ClockBase::Tick>(kMaxTick / 2);
 
 bool IsEarlier(const ClockBase::Tick & inFirst, const ClockBase::Tick & inSecond)
