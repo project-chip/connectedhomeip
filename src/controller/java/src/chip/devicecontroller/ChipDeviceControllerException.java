@@ -18,7 +18,7 @@
 package chip.devicecontroller;
 
 /** Exception thrown from CHIPDeviceController. */
-public class ChipDeviceControllerException extends Exception {
+public class ChipDeviceControllerException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   public int errorCode;
