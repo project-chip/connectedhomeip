@@ -476,11 +476,11 @@ void TestKeys(nlTestSuite * apSuite, void * apContext)
 
     // Pairs keys0[a|b], keys1[a|b] have different values. [b] is used as Get target, so it
     // should get overwritten with the values from [a].
-    KeySet keys0a                  = { .key_set_index = 0, .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 3 };
-    KeySet keys0b                  = { .key_set_index = 0, .policy = KeySet::SecurityPolicy::kLowLatency, .num_keys_used = 2 };
-    KeySet keys1a                  = { .key_set_index = 1, .policy = KeySet::SecurityPolicy::kLowLatency, .num_keys_used = 3 };
-    KeySet keys1b                  = { .key_set_index = 1, .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 2 };
-    KeySet keys3                   = { .key_set_index = 3, .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 2 };
+    KeySet keys0a                  = { .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 3 };
+    KeySet keys0b                  = { .policy = KeySet::SecurityPolicy::kLowLatency, .num_keys_used = 2 };
+    KeySet keys1a                  = { .policy = KeySet::SecurityPolicy::kLowLatency, .num_keys_used = 3 };
+    KeySet keys1b                  = { .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 2 };
+    KeySet keys3                   = { .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 2 };
     chip::FabricIndex kFabricIndex = 1;
     CHIP_ERROR err                 = CHIP_NO_ERROR;
 
@@ -492,10 +492,10 @@ void TestKeys(nlTestSuite * apSuite, void * apContext)
     memcpy(keys1b.epoch_keys, epoch_keys0, sizeof(epoch_keys0));
     memcpy(keys3.epoch_keys, epoch_keys2, sizeof(epoch_keys2));
 
-    err = groups->SetKeySet(kFabricIndex, keys0a);
+    err = groups->SetKeySet(kFabricIndex, 0, keys0a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->SetKeySet(kFabricIndex, keys1a);
+    err = groups->SetKeySet(kFabricIndex, 1, keys1a);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     auto * it = groups->IterateKeySets(kFabricIndex);
@@ -503,28 +503,28 @@ void TestKeys(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, it != nullptr);
     NL_TEST_ASSERT(apSuite, it->Count() == 2);
 
-    err = groups->GetKeySet(kFabricIndex, keys0b);
+    err = groups->GetKeySet(kFabricIndex, 0, keys0b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, keys0a.policy == keys0b.policy);
     NL_TEST_ASSERT(apSuite, keys0a.num_keys_used == keys0b.num_keys_used);
     NL_TEST_ASSERT(apSuite, !memcmp(keys0a.epoch_keys, keys0b.epoch_keys, sizeof(keys0a.epoch_keys[0]) * keys0a.num_keys_used));
 
-    err = groups->GetKeySet(kFabricIndex, keys1b);
+    err = groups->GetKeySet(kFabricIndex, 1, keys1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, keys1a.policy == keys1b.policy);
     NL_TEST_ASSERT(apSuite, keys1a.num_keys_used == keys1b.num_keys_used);
     NL_TEST_ASSERT(apSuite, !memcmp(keys1a.epoch_keys, keys1b.epoch_keys, sizeof(keys1a.epoch_keys[0]) * keys1a.num_keys_used));
 
-    err = groups->GetKeySet(kFabricIndex, keys3);
+    err = groups->GetKeySet(kFabricIndex, 3, keys3);
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == err);
 
     err = groups->RemoveKeySet(kFabricIndex, 0);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->GetKeySet(kFabricIndex, keys0b);
+    err = groups->GetKeySet(kFabricIndex, 0, keys0b);
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == err);
 
-    err = groups->GetKeySet(kFabricIndex, keys1b);
+    err = groups->GetKeySet(kFabricIndex, 1, keys1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     groups->Finish();
@@ -535,9 +535,9 @@ void TestKeysIterator(nlTestSuite * apSuite, void * apContext)
     GroupDataProvider * groups = GetGroupDataProvider();
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == groups->Init());
 
-    KeySet keys0                   = { .key_set_index = 0, .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 3 };
-    KeySet keys1                   = { .key_set_index = 1, .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 2 };
-    KeySet keys2                   = { .key_set_index = 2, .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 3 };
+    KeySet keys0                   = { .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 3 };
+    KeySet keys1                   = { .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 2 };
+    KeySet keys2                   = { .policy = KeySet::SecurityPolicy::kStandard, .num_keys_used = 3 };
     chip::FabricIndex kFabricIndex = 1;
     CHIP_ERROR err                 = CHIP_NO_ERROR;
 
@@ -549,13 +549,13 @@ void TestKeysIterator(nlTestSuite * apSuite, void * apContext)
 
     NL_TEST_ASSERT(apSuite, groups);
 
-    err = groups->SetKeySet(kFabricIndex, keys2);
+    err = groups->SetKeySet(kFabricIndex, 2, keys2);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->SetKeySet(kFabricIndex, keys0);
+    err = groups->SetKeySet(kFabricIndex, 0, keys0);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
-    err = groups->SetKeySet(kFabricIndex, keys1);
+    err = groups->SetKeySet(kFabricIndex, 1, keys1);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
 
     GroupDataProvider::KeySetIterator * it = groups->IterateKeySets(kFabricIndex);

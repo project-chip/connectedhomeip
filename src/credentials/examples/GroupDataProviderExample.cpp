@@ -42,6 +42,7 @@ protected:
     struct KeysEntry : public KeySet
     {
         bool in_use = false;
+        uint16_t key_set_index;
     };
 
     struct Fabric
@@ -515,7 +516,7 @@ public:
     void Release(AllGroupStateIterator * iterator) { mAllStateIterators.ReleaseObject(iterator); }
 
     // Keys
-    CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, KeySet & keys) override
+    CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, KeySet & keys) override
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
@@ -527,7 +528,7 @@ public:
         {
             if (fabric->keys[i].in_use)
             {
-                if (fabric->keys[i].key_set_index == keys.key_set_index)
+                if (fabric->keys[i].key_set_index == key_set_index)
                 {
                     // Reuse existing entry
                     entry = &fabric->keys[i];
@@ -542,7 +543,7 @@ public:
         }
         if (entry)
         {
-            entry->key_set_index = keys.key_set_index;
+            entry->key_set_index = key_set_index;
             entry->policy        = keys.policy;
             entry->num_keys_used = keys.num_keys_used;
             memcpy(entry->epoch_keys, keys.epoch_keys, sizeof(keys.epoch_keys[0]) * keys.num_keys_used);
@@ -552,7 +553,7 @@ public:
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, KeySet & keys) override
+    CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, KeySet & keys) override
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
         Fabric * fabric = GetExistingFabric(fabric_index);
@@ -560,7 +561,7 @@ public:
         for (uint16_t i = 0; fabric && i < kKeyEntriesMax; ++i)
         {
             KeysEntry & entry = fabric->keys[i];
-            if (entry.in_use && entry.key_set_index == keys.key_set_index)
+            if (entry.in_use && entry.key_set_index == key_set_index)
             {
                 // Found
                 keys.policy        = entry.policy;

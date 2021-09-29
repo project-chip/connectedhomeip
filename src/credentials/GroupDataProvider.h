@@ -190,10 +190,10 @@ public:
     virtual GroupStateIterator * IterateGroupStates(chip::FabricIndex fabric_index)  = 0;
 
     // Keys
-    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, KeySet & keys)             = 0;
-    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, KeySet & keys)             = 0;
-    virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index) = 0;
-    virtual KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index)                 = 0;
+    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, KeySet & keys) = 0;
+    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index, KeySet & keys) = 0;
+    virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t key_set_index)             = 0;
+    virtual KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index)                             = 0;
 
     void SetListener(GroupListener * listener) { mListener = listener; };
     void RemoveListener() { mListener = nullptr; };
