@@ -150,11 +150,11 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    ExchangeACL * GetExchangeACL(Transport::FabricTable & table)
+    ExchangeACL * GetExchangeACL(FabricTable & table)
     {
         if (mExchangeACL == nullptr)
         {
-            Transport::FabricInfo * fabric = table.FindFabricWithIndex(mSecureSession.Value().GetFabricIndex());
+            FabricInfo * fabric = table.FindFabricWithIndex(mSecureSession.Value().GetFabricIndex());
             if (fabric != nullptr)
             {
                 mExchangeACL = chip::Platform::New<CASEExchangeACL>(fabric);

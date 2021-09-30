@@ -97,8 +97,7 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR ListenForSessionEstablishment(uint16_t mySessionId, Transport::FabricTable * fabrics,
-                                             SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR ListenForSessionEstablishment(uint16_t mySessionId, FabricTable * fabrics, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -113,7 +112,7 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, Transport::FabricInfo * fabric, NodeId peerNodeId,
+    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId,
                                 uint16_t mySessionId, Messaging::ExchangeContext * exchangeCtxt,
                                 SessionEstablishmentDelegate * delegate);
 
@@ -188,10 +187,7 @@ public:
         return &mMessageDispatch;
     }
 
-    FabricIndex GetFabricIndex() const
-    {
-        return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : Transport::kUndefinedFabricIndex;
-    }
+    FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
@@ -279,8 +275,8 @@ private:
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
     SessionEstablishmentExchangeDispatch mMessageDispatch;
 
-    Transport::FabricTable * mFabricsTable = nullptr;
-    Transport::FabricInfo * mFabricInfo    = nullptr;
+    FabricTable * mFabricsTable = nullptr;
+    FabricInfo * mFabricInfo    = nullptr;
 
     uint8_t mResumptionId[kCASEResumptionIDSize];
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key

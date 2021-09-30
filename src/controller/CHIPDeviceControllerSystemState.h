@@ -55,7 +55,7 @@ struct DeviceControllerSystemStateParams
     SessionManager * sessionMgr                                   = nullptr;
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * messageCounterManager = nullptr;
-    Transport::FabricTable * fabricTable                          = nullptr;
+    FabricTable * fabricTable                                     = nullptr;
     DeviceControllerInteractionModelDelegate * imDelegate         = nullptr;
 };
 
@@ -116,7 +116,7 @@ public:
     SessionManager * SessionMgr() { return mSessionMgr; };
     Messaging::ExchangeManager * ExchangeMgr() { return mExchangeMgr; }
     secure_channel::MessageCounterManager * MessageCounterManager() { return mMessageCounterManager; };
-    Transport::FabricTable * Fabrics() { return mFabrics; };
+    FabricTable * Fabrics() { return mFabrics; };
     DeviceControllerInteractionModelDelegate * IMDelegate() { return mIMDelegate; }
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * BleLayer() { return mBleLayer; };
@@ -134,7 +134,7 @@ private:
     SessionManager * mSessionMgr                                   = nullptr;
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
-    Transport::FabricTable * mFabrics                              = nullptr;
+    FabricTable * mFabrics                                         = nullptr;
     DeviceControllerInteractionModelDelegate * mIMDelegate         = nullptr;
 
     std::atomic<uint32_t> mRefCount{ 1 };

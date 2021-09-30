@@ -61,7 +61,7 @@ public:
 
     CHIP_ERROR AddTestCommissioning();
 
-    Transport::FabricTable & GetFabricTable() { return mFabrics; }
+    FabricTable & GetFabricTable() { return mFabrics; }
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
@@ -125,7 +125,7 @@ private:
     SessionManager mSessions;
     CASEServer mCASEServer;
     Messaging::ExchangeManager mExchangeMgr;
-    Transport::FabricTable mFabrics;
+    FabricTable mFabrics;
     SessionIDAllocator mSessionIDAllocator;
     secure_channel::MessageCounterManager mMessageCounterManager;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
