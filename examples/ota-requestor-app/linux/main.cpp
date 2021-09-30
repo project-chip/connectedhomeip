@@ -19,7 +19,7 @@
 #include <app-common/zap-generated/enums.h>
 #include <app/util/util.h>
 #include <controller/CHIPDevice.h>
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPArgParser.hpp>
@@ -229,17 +229,16 @@ int main(int argc, char * argv[])
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
-    err = mController.SetUdpListenPort(mStorage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", chip::ErrorStr(err)));
 
     // Until #9518 is fixed, the only way to open a CASE session to another node is to commission it first using the
     // DeviceController API. Thus, the ota-requestor-app must do self commissioning and then read CASE credentials from persistent
     // storage to connect to the Provider node. See README.md for instructions.
     // NOTE: Controller is initialized in this call
-    err = DoExampleSelfCommissioning(mController, &mOpCredsIssuer, &mStorage, mStorage.GetLocalNodeId());
+    err = DoExampleSelfCommissioning(mController, &mOpCredsIssuer, &mStorage, mStorage.GetLocalNodeId(), mStorage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(SoftwareUpdate, "example self-commissioning failed: %s", chip::ErrorStr(err)));
 
-    err = mController.ServiceEvents();
+    err = chip::Controller::DeviceControllerFactory::GetInstance().ServiceEvents();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "ServiceEvents() failed: %s", chip::ErrorStr(err)));
 
     ChipLogProgress(SoftwareUpdate, "Attempting to connect to device 0x%" PRIX64, providerNodeId);

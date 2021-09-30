@@ -75,7 +75,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
       tests = [ "TestCHIPoBLEStackMgr" ]
     }
 
-    if (current_os == "zephyr") {
+    if (current_os == "zephyr" || current_os == "android") {
       test_sources += [ "TestKeyValueStoreMgr.cpp" ]
     }
   }

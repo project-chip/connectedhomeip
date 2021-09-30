@@ -59,10 +59,10 @@ using chip::Callback::Cancelable;
 {{#if isReportableAttribute}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
 {{#*inline "callbackParams"}}, minInterval, maxInterval{{#if isAnalog}}, change{{/if}}{{/inline}}
-- (void) configure{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler
+- (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval responseHandler:(ResponseHandler)responseHandler
 {
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.Configure{{>attribute}}(success, failure{{>callbackParams}});
+        return self.cppCluster.Subscribe{{>attribute}}(success, failure{{>callbackParams}});
     });
 }
 

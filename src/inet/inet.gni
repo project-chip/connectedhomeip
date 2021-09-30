@@ -33,5 +33,6 @@ declare_args() {
 declare_args() {
   # Enable async DNS.
   chip_inet_config_enable_async_dns_sockets =
-      chip_inet_config_enable_dns_resolver && chip_system_config_use_sockets
+      chip_inet_config_enable_dns_resolver && chip_system_config_use_sockets &&
+      !chip_system_config_use_dispatch
 }

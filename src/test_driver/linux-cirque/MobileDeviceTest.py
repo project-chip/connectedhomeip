@@ -23,7 +23,7 @@ import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
-logger = logging.getLogger('CHIPInteractionModelTest')
+logger = logging.getLogger('MobileDeviceTest')
 logger.setLevel(logging.INFO)
 
 sh = logging.StreamHandler()
