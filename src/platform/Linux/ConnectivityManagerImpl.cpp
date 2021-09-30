@@ -1035,6 +1035,13 @@ CHIP_ERROR ConnectivityManagerImpl::_GetEthOverrunCount(uint64_t & overrunCount)
     return GetEthernetStatsCount(EthernetStatsCountType::kEthOverrunCount, overrunCount);
 }
 
+CHIP_ERROR ConnectivityManagerImpl::_ResetEthNetworkDiagnosticsCounts()
+{
+    // On Linux simulation, the packet statistic informations are shared by all running programs,
+    // the current running program does not have permission to reset those counts.
+    return CHIP_NO_ERROR;
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR ConnectivityManagerImpl::_GetWiFiChannelNumber(uint16_t & channelNumber)
 {

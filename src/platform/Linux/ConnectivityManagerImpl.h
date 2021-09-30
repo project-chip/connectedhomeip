@@ -155,6 +155,7 @@ private:
     CHIP_ERROR _GetEthTxErrCount(uint64_t & txErrCount);
     CHIP_ERROR _GetEthCollisionCount(uint64_t & collisionCount);
     CHIP_ERROR _GetEthOverrunCount(uint64_t & overrunCount);
+    CHIP_ERROR _ResetEthNetworkDiagnosticsCounts();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR _GetWiFiChannelNumber(uint16_t & channelNumber);

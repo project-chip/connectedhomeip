@@ -173,6 +173,7 @@ public:
     CHIP_ERROR GetEthTxErrCount(uint64_t & txErrCount);
     CHIP_ERROR GetEthCollisionCount(uint64_t & collisionCount);
     CHIP_ERROR GetEthOverrunCount(uint64_t & overrunCount);
+    CHIP_ERROR ResetEthNetworkDiagnosticsCounts();
 
     // WiFi network diagnostics methods
     CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
@@ -408,6 +409,11 @@ inline CHIP_ERROR ConnectivityManager::GetEthCollisionCount(uint64_t & collision
 inline CHIP_ERROR ConnectivityManager::GetEthOverrunCount(uint64_t & overrunCount)
 {
     return static_cast<ImplClass *>(this)->_GetEthOverrunCount(overrunCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::ResetEthNetworkDiagnosticsCounts()
+{
+    return static_cast<ImplClass *>(this)->_ResetEthNetworkDiagnosticsCounts();
 }
 
 inline CHIP_ERROR ConnectivityManager::GetWiFiSecurityType(uint8_t & securityType)

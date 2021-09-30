@@ -102,7 +102,12 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (Connectivit
 
 bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
-    EmberAfStatus status = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Set(endpoint, 0);
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    VerifyOrExit(DeviceLayer::ConnectivityMgr().ResetEthNetworkDiagnosticsCounts() == CHIP_NO_ERROR,
+                 status = EMBER_ZCL_STATUS_FAILURE);
+
+    status = EmberAfStatus status = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketRxCount attribute"));
 
     status = EthernetNetworkDiagnostics::Attributes::PacketTxCount::Set(endpoint, 0);
