@@ -50,6 +50,8 @@ static_library("Linux") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "ConnectivityUtils.cpp",
+    "ConnectivityUtils.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "InetPlatformConfig.h",

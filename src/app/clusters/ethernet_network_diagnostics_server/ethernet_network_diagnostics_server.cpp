@@ -59,19 +59,19 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const 
     *aDataRead = true;
     switch (aClusterInfo.mFieldId)
     {
-    case Ids::PacketRxCount: {
+    case PacketRxCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthPacketRxCount, aEncoder);
     }
-    case Ids::PacketTxCount: {
+    case PacketTxCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthPacketTxCount, aEncoder);
     }
-    case Ids::TxErrCount: {
+    case TxErrCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthTxErrCount, aEncoder);
     }
-    case Ids::CollisionCount: {
+    case CollisionCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthCollisionCount, aEncoder);
     }
-    case Ids::OverrunCount: {
+    case OverrunCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthOverrunCount, aEncoder);
     }
     default: {

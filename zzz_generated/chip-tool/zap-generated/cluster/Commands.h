@@ -1211,60 +1211,6 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
 
-constexpr chip::ClusterId kAccountLoginClusterId                         = 0x050E;
-constexpr chip::ClusterId kAdministratorCommissioningClusterId           = 0x003C;
-constexpr chip::ClusterId kApplicationBasicClusterId                     = 0x050D;
-constexpr chip::ClusterId kApplicationLauncherClusterId                  = 0x050C;
-constexpr chip::ClusterId kAudioOutputClusterId                          = 0x050B;
-constexpr chip::ClusterId kBarrierControlClusterId                       = 0x0103;
-constexpr chip::ClusterId kBasicClusterId                                = 0x0028;
-constexpr chip::ClusterId kBinaryInputBasicClusterId                     = 0x000F;
-constexpr chip::ClusterId kBindingClusterId                              = 0xF000;
-constexpr chip::ClusterId kBridgedDeviceBasicClusterId                   = 0x0039;
-constexpr chip::ClusterId kColorControlClusterId                         = 0x0300;
-constexpr chip::ClusterId kContentLauncherClusterId                      = 0x050A;
-constexpr chip::ClusterId kDescriptorClusterId                           = 0x001D;
-constexpr chip::ClusterId kDiagnosticLogsClusterId                       = 0x0032;
-constexpr chip::ClusterId kDoorLockClusterId                             = 0x0101;
-constexpr chip::ClusterId kElectricalMeasurementClusterId                = 0x0B04;
-constexpr chip::ClusterId kEthernetNetworkDiagnosticsClusterId           = 0x0037;
-constexpr chip::ClusterId kFixedLabelClusterId                           = 0x0040;
-constexpr chip::ClusterId kFlowMeasurementClusterId                      = 0x0404;
-constexpr chip::ClusterId kGeneralCommissioningClusterId                 = 0x0030;
-constexpr chip::ClusterId kGeneralDiagnosticsClusterId                   = 0x0033;
-constexpr chip::ClusterId kGroupKeyManagementClusterId                   = 0xF004;
-constexpr chip::ClusterId kGroupsClusterId                               = 0x0004;
-constexpr chip::ClusterId kIdentifyClusterId                             = 0x0003;
-constexpr chip::ClusterId kKeypadInputClusterId                          = 0x0509;
-constexpr chip::ClusterId kLevelControlClusterId                         = 0x0008;
-constexpr chip::ClusterId kLowPowerClusterId                             = 0x0508;
-constexpr chip::ClusterId kMediaInputClusterId                           = 0x0507;
-constexpr chip::ClusterId kMediaPlaybackClusterId                        = 0x0506;
-constexpr chip::ClusterId kNetworkCommissioningClusterId                 = 0x0031;
-constexpr chip::ClusterId kOtaSoftwareUpdateProviderClusterId            = 0x0029;
-constexpr chip::ClusterId kOtaSoftwareUpdateRequestorClusterId           = 0x002A;
-constexpr chip::ClusterId kOccupancySensingClusterId                     = 0x0406;
-constexpr chip::ClusterId kOnOffClusterId                                = 0x0006;
-constexpr chip::ClusterId kOnOffSwitchConfigurationClusterId             = 0x0007;
-constexpr chip::ClusterId kOperationalCredentialsClusterId               = 0x003E;
-constexpr chip::ClusterId kPowerSourceClusterId                          = 0x002F;
-constexpr chip::ClusterId kPressureMeasurementClusterId                  = 0x0403;
-constexpr chip::ClusterId kPumpConfigurationAndControlClusterId          = 0x0200;
-constexpr chip::ClusterId kRelativeHumidityMeasurementClusterId          = 0x0405;
-constexpr chip::ClusterId kScenesClusterId                               = 0x0005;
-constexpr chip::ClusterId kSoftwareDiagnosticsClusterId                  = 0x0034;
-constexpr chip::ClusterId kSwitchClusterId                               = 0x003B;
-constexpr chip::ClusterId kTvChannelClusterId                            = 0x0504;
-constexpr chip::ClusterId kTargetNavigatorClusterId                      = 0x0505;
-constexpr chip::ClusterId kTemperatureMeasurementClusterId               = 0x0402;
-constexpr chip::ClusterId kTestClusterClusterId                          = 0x050F;
-constexpr chip::ClusterId kThermostatClusterId                           = 0x0201;
-constexpr chip::ClusterId kThermostatUserInterfaceConfigurationClusterId = 0x0204;
-constexpr chip::ClusterId kThreadNetworkDiagnosticsClusterId             = 0x0035;
-constexpr chip::ClusterId kWakeOnLanClusterId                            = 0x0503;
-constexpr chip::ClusterId kWiFiNetworkDiagnosticsClusterId               = 0x0036;
-constexpr chip::ClusterId kWindowCoveringClusterId                       = 0x0102;
-
 /*----------------------------------------------------------------------------*\
 | Cluster AccountLogin                                                | 0x050E |
 |------------------------------------------------------------------------------|
@@ -22910,6 +22856,14 @@ private:
 | * WiFiVersion                                                       | 0x0002 |
 | * ChannelNumber                                                     | 0x0003 |
 | * Rssi                                                              | 0x0004 |
+| * BeaconLostCount                                                   | 0x0005 |
+| * BeaconRxCount                                                     | 0x0006 |
+| * PacketMulticastRxCount                                            | 0x0007 |
+| * PacketMulticastTxCount                                            | 0x0008 |
+| * PacketUnicastRxCount                                              | 0x0009 |
+| * PacketUnicastTxCount                                              | 0x000A |
+| * CurrentMaxRate                                                    | 0x000B |
+| * OverrunCount                                                      | 0x000C |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -23108,6 +23062,278 @@ public:
 private:
     chip::Callback::Callback<Int8sAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BeaconLostCount
+ */
+class ReadWiFiNetworkDiagnosticsBeaconLostCount : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsBeaconLostCount() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "beacon-lost-count");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsBeaconLostCount()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBeaconLostCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BeaconRxCount
+ */
+class ReadWiFiNetworkDiagnosticsBeaconRxCount : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsBeaconRxCount() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "beacon-rx-count");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsBeaconRxCount()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBeaconRxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute PacketMulticastRxCount
+ */
+class ReadWiFiNetworkDiagnosticsPacketMulticastRxCount : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsPacketMulticastRxCount() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "packet-multicast-rx-count");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsPacketMulticastRxCount()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributePacketMulticastRxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute PacketMulticastTxCount
+ */
+class ReadWiFiNetworkDiagnosticsPacketMulticastTxCount : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsPacketMulticastTxCount() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "packet-multicast-tx-count");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsPacketMulticastTxCount()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributePacketMulticastTxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute PacketUnicastRxCount
+ */
+class ReadWiFiNetworkDiagnosticsPacketUnicastRxCount : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsPacketUnicastRxCount() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "packet-unicast-rx-count");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsPacketUnicastRxCount()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributePacketUnicastRxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute PacketUnicastTxCount
+ */
+class ReadWiFiNetworkDiagnosticsPacketUnicastTxCount : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsPacketUnicastTxCount() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "packet-unicast-tx-count");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsPacketUnicastTxCount()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributePacketUnicastTxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute CurrentMaxRate
+ */
+class ReadWiFiNetworkDiagnosticsCurrentMaxRate : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsCurrentMaxRate() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-max-rate");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsCurrentMaxRate()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCurrentMaxRate(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute OverrunCount
+ */
+class ReadWiFiNetworkDiagnosticsOverrunCount : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsOverrunCount() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "overrun-count");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsOverrunCount()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeOverrunCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -25517,13 +25743,21 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands)
     const char * clusterName = "WiFiNetworkDiagnostics";
 
     commands_list clusterCommands = {
-        make_unique<WiFiNetworkDiagnosticsResetCounts>(),         //
-        make_unique<ReadWiFiNetworkDiagnosticsBssid>(),           //
-        make_unique<ReadWiFiNetworkDiagnosticsSecurityType>(),    //
-        make_unique<ReadWiFiNetworkDiagnosticsWiFiVersion>(),     //
-        make_unique<ReadWiFiNetworkDiagnosticsChannelNumber>(),   //
-        make_unique<ReadWiFiNetworkDiagnosticsRssi>(),            //
-        make_unique<ReadWiFiNetworkDiagnosticsClusterRevision>(), //
+        make_unique<WiFiNetworkDiagnosticsResetCounts>(),                //
+        make_unique<ReadWiFiNetworkDiagnosticsBssid>(),                  //
+        make_unique<ReadWiFiNetworkDiagnosticsSecurityType>(),           //
+        make_unique<ReadWiFiNetworkDiagnosticsWiFiVersion>(),            //
+        make_unique<ReadWiFiNetworkDiagnosticsChannelNumber>(),          //
+        make_unique<ReadWiFiNetworkDiagnosticsRssi>(),                   //
+        make_unique<ReadWiFiNetworkDiagnosticsBeaconLostCount>(),        //
+        make_unique<ReadWiFiNetworkDiagnosticsBeaconRxCount>(),          //
+        make_unique<ReadWiFiNetworkDiagnosticsPacketMulticastRxCount>(), //
+        make_unique<ReadWiFiNetworkDiagnosticsPacketMulticastTxCount>(), //
+        make_unique<ReadWiFiNetworkDiagnosticsPacketUnicastRxCount>(),   //
+        make_unique<ReadWiFiNetworkDiagnosticsPacketUnicastTxCount>(),   //
+        make_unique<ReadWiFiNetworkDiagnosticsCurrentMaxRate>(),         //
+        make_unique<ReadWiFiNetworkDiagnosticsOverrunCount>(),           //
+        make_unique<ReadWiFiNetworkDiagnosticsClusterRevision>(),        //
     };
 
     commands.Register(clusterName, clusterCommands);

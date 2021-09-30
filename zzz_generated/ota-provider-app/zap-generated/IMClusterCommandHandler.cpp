@@ -68,7 +68,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::OtaSoftwareUpdateProvider::Commands::Ids::ApplyUpdateRequest: {
+        case Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id: {
             expectArgumentCount = 2;
             chip::ByteSpan updateToken;
             uint32_t newVersion;
@@ -131,7 +131,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OtaSoftwareUpdateProvider::Commands::Ids::NotifyUpdateApplied: {
+        case Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id: {
             expectArgumentCount = 2;
             chip::ByteSpan updateToken;
             uint32_t softwareVersion;
@@ -194,7 +194,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OtaSoftwareUpdateProvider::Commands::Ids::QueryImage: {
+        case Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Id: {
             expectArgumentCount = 8;
             uint16_t vendorId;
             uint16_t productId;
@@ -329,7 +329,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::OperationalCredentials::Commands::Ids::AddNOC: {
+        case Clusters::OperationalCredentials::Commands::AddNOC::Id: {
             expectArgumentCount = 5;
             chip::ByteSpan NOCValue;
             chip::ByteSpan ICACValue;
@@ -404,7 +404,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::AddTrustedRootCertificate: {
+        case Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan RootCertificate;
             bool argExists[1];
@@ -463,7 +463,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::AttestationRequest: {
+        case Clusters::OperationalCredentials::Commands::AttestationRequest::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan AttestationNonce;
             bool argExists[1];
@@ -522,7 +522,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::CertificateChainRequest: {
+        case Clusters::OperationalCredentials::Commands::CertificateChainRequest::Id: {
             expectArgumentCount = 1;
             uint8_t CertificateType;
             bool argExists[1];
@@ -581,7 +581,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::OpCSRRequest: {
+        case Clusters::OperationalCredentials::Commands::OpCSRRequest::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan CSRNonce;
             bool argExists[1];
@@ -639,7 +639,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::RemoveFabric: {
+        case Clusters::OperationalCredentials::Commands::RemoveFabric::Id: {
             expectArgumentCount = 1;
             uint8_t FabricIndex;
             bool argExists[1];
@@ -697,7 +697,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::UpdateFabricLabel: {
+        case Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id: {
             expectArgumentCount = 1;
             const uint8_t * Label;
             bool argExists[1];

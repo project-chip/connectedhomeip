@@ -41,7 +41,7 @@ CHIP_ERROR AccountLoginClusterTest::WriteAttributeClusterRevision(Callback::Canc
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -59,7 +59,7 @@ CHIP_ERROR AdministratorCommissioningClusterTest::WriteAttributeClusterRevision(
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -77,7 +77,7 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeVendorName(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ApplicationBasic::Attributes::Ids::VendorName;
+    attributePath.mFieldId    = ApplicationBasic::Attributes::VendorName::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -94,7 +94,7 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeVendorId(Callback::Cancela
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ApplicationBasic::Attributes::Ids::VendorId;
+    attributePath.mFieldId    = ApplicationBasic::Attributes::VendorId::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -112,7 +112,7 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationName(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ApplicationBasic::Attributes::Ids::ApplicationName;
+    attributePath.mFieldId    = ApplicationBasic::Attributes::ApplicationName::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -129,7 +129,7 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeProductId(Callback::Cancel
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ApplicationBasic::Attributes::Ids::ProductId;
+    attributePath.mFieldId    = ApplicationBasic::Attributes::ProductId::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -147,7 +147,7 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationId(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ApplicationBasic::Attributes::Ids::ApplicationId;
+    attributePath.mFieldId    = ApplicationBasic::Attributes::ApplicationId::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -165,7 +165,7 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeCatalogVendorId(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ApplicationBasic::Attributes::Ids::CatalogVendorId;
+    attributePath.mFieldId    = ApplicationBasic::Attributes::CatalogVendorId::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -183,7 +183,7 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeApplicationStatus(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ApplicationBasic::Attributes::Ids::ApplicationStatus;
+    attributePath.mFieldId    = ApplicationBasic::Attributes::ApplicationStatus::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -201,7 +201,7 @@ CHIP_ERROR ApplicationBasicClusterTest::WriteAttributeClusterRevision(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -219,7 +219,7 @@ CHIP_ERROR ApplicationLauncherClusterTest::WriteAttributeCatalogVendorId(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ApplicationLauncher::Attributes::Ids::CatalogVendorId;
+    attributePath.mFieldId    = ApplicationLauncher::Attributes::CatalogVendorId::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -237,7 +237,7 @@ CHIP_ERROR ApplicationLauncherClusterTest::WriteAttributeApplicationId(Callback:
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ApplicationLauncher::Attributes::Ids::ApplicationId;
+    attributePath.mFieldId    = ApplicationLauncher::Attributes::ApplicationId::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -255,7 +255,7 @@ CHIP_ERROR ApplicationLauncherClusterTest::WriteAttributeClusterRevision(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -273,7 +273,7 @@ CHIP_ERROR AudioOutputClusterTest::WriteAttributeCurrentAudioOutput(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = AudioOutput::Attributes::Ids::CurrentAudioOutput;
+    attributePath.mFieldId    = AudioOutput::Attributes::CurrentAudioOutput::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -290,7 +290,7 @@ CHIP_ERROR AudioOutputClusterTest::WriteAttributeClusterRevision(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -308,7 +308,7 @@ CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierMovingState(Callback:
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BarrierControl::Attributes::Ids::BarrierMovingState;
+    attributePath.mFieldId    = BarrierControl::Attributes::BarrierMovingState::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -326,7 +326,7 @@ CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierSafetyStatus(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BarrierControl::Attributes::Ids::BarrierSafetyStatus;
+    attributePath.mFieldId    = BarrierControl::Attributes::BarrierSafetyStatus::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -344,7 +344,7 @@ CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierCapabilities(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BarrierControl::Attributes::Ids::BarrierCapabilities;
+    attributePath.mFieldId    = BarrierControl::Attributes::BarrierCapabilities::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -362,7 +362,7 @@ CHIP_ERROR BarrierControlClusterTest::WriteAttributeBarrierPosition(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BarrierControl::Attributes::Ids::BarrierPosition;
+    attributePath.mFieldId    = BarrierControl::Attributes::BarrierPosition::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -380,7 +380,7 @@ CHIP_ERROR BarrierControlClusterTest::WriteAttributeClusterRevision(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -398,7 +398,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeInteractionModelVersion(Callback::Can
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::InteractionModelVersion;
+    attributePath.mFieldId    = Basic::Attributes::InteractionModelVersion::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -415,7 +415,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeVendorName(Callback::Cancelable * onS
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::VendorName;
+    attributePath.mFieldId    = Basic::Attributes::VendorName::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -432,7 +432,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeVendorID(Callback::Cancelable * onSuc
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::VendorID;
+    attributePath.mFieldId    = Basic::Attributes::VendorID::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -449,7 +449,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeProductName(Callback::Cancelable * on
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::ProductName;
+    attributePath.mFieldId    = Basic::Attributes::ProductName::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -466,7 +466,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeProductID(Callback::Cancelable * onSu
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::ProductID;
+    attributePath.mFieldId    = Basic::Attributes::ProductID::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -483,7 +483,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeHardwareVersion(Callback::Cancelable 
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::HardwareVersion;
+    attributePath.mFieldId    = Basic::Attributes::HardwareVersion::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -501,7 +501,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeHardwareVersionString(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::HardwareVersionString;
+    attributePath.mFieldId    = Basic::Attributes::HardwareVersionString::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -518,7 +518,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeSoftwareVersion(Callback::Cancelable 
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::SoftwareVersion;
+    attributePath.mFieldId    = Basic::Attributes::SoftwareVersion::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -536,7 +536,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeSoftwareVersionString(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::SoftwareVersionString;
+    attributePath.mFieldId    = Basic::Attributes::SoftwareVersionString::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -554,7 +554,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeManufacturingDate(Callback::Cancelabl
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::ManufacturingDate;
+    attributePath.mFieldId    = Basic::Attributes::ManufacturingDate::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -571,7 +571,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributePartNumber(Callback::Cancelable * onS
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::PartNumber;
+    attributePath.mFieldId    = Basic::Attributes::PartNumber::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -588,7 +588,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeProductURL(Callback::Cancelable * onS
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::ProductURL;
+    attributePath.mFieldId    = Basic::Attributes::ProductURL::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -605,7 +605,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeProductLabel(Callback::Cancelable * o
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::ProductLabel;
+    attributePath.mFieldId    = Basic::Attributes::ProductLabel::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -622,7 +622,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeSerialNumber(Callback::Cancelable * o
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::SerialNumber;
+    attributePath.mFieldId    = Basic::Attributes::SerialNumber::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -639,7 +639,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeReachable(Callback::Cancelable * onSu
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Basic::Attributes::Ids::Reachable;
+    attributePath.mFieldId    = Basic::Attributes::Reachable::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -656,7 +656,7 @@ CHIP_ERROR BasicClusterTest::WriteAttributeClusterRevision(Callback::Cancelable 
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -673,7 +673,7 @@ CHIP_ERROR BinaryInputBasicClusterTest::WriteAttributeStatusFlags(Callback::Canc
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BinaryInputBasic::Attributes::Ids::StatusFlags;
+    attributePath.mFieldId    = BinaryInputBasic::Attributes::StatusFlags::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -691,7 +691,7 @@ CHIP_ERROR BinaryInputBasicClusterTest::WriteAttributeClusterRevision(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -708,7 +708,7 @@ CHIP_ERROR BindingClusterTest::WriteAttributeClusterRevision(Callback::Cancelabl
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -726,7 +726,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeVendorName(Callback::Can
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::VendorName;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::VendorName::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -743,7 +743,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeVendorID(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::VendorID;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::VendorID::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -761,7 +761,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductName(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::ProductName;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::ProductName::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -779,7 +779,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeHardwareVersion(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::HardwareVersion;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::HardwareVersion::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -797,7 +797,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeHardwareVersionString(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::HardwareVersionString;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::HardwareVersionString::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -815,7 +815,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSoftwareVersion(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::SoftwareVersion;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::SoftwareVersion::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -833,7 +833,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSoftwareVersionString(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::SoftwareVersionString;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::SoftwareVersionString::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -851,7 +851,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeManufacturingDate(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::ManufacturingDate;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::ManufacturingDate::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -869,7 +869,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributePartNumber(Callback::Can
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::PartNumber;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::PartNumber::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -887,7 +887,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductURL(Callback::Can
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::ProductURL;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::ProductURL::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -905,7 +905,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeProductLabel(Callback::C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::ProductLabel;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::ProductLabel::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -923,7 +923,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeSerialNumber(Callback::C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::SerialNumber;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::SerialNumber::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -940,7 +940,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeReachable(Callback::Canc
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Ids::Reachable;
+    attributePath.mFieldId    = BridgedDeviceBasic::Attributes::Reachable::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -958,7 +958,7 @@ CHIP_ERROR BridgedDeviceBasicClusterTest::WriteAttributeClusterRevision(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -975,7 +975,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentHue(Callback::Cancelabl
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::CurrentHue;
+    attributePath.mFieldId    = ColorControl::Attributes::CurrentHue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -993,7 +993,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentSaturation(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::CurrentSaturation;
+    attributePath.mFieldId    = ColorControl::Attributes::CurrentSaturation::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1010,7 +1010,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeRemainingTime(Callback::Cancel
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::RemainingTime;
+    attributePath.mFieldId    = ColorControl::Attributes::RemainingTime::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1027,7 +1027,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentX(Callback::Cancelable 
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::CurrentX;
+    attributePath.mFieldId    = ColorControl::Attributes::CurrentX::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1044,7 +1044,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCurrentY(Callback::Cancelable 
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::CurrentY;
+    attributePath.mFieldId    = ColorControl::Attributes::CurrentY::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1062,7 +1062,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeDriftCompensation(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::DriftCompensation;
+    attributePath.mFieldId    = ColorControl::Attributes::DriftCompensation::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1080,7 +1080,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCompensationText(Callback::Can
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::CompensationText;
+    attributePath.mFieldId    = ColorControl::Attributes::CompensationText::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1098,7 +1098,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorTemperature(Callback::Can
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::ColorTemperature;
+    attributePath.mFieldId    = ColorControl::Attributes::ColorTemperature::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1115,7 +1115,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorMode(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::ColorMode;
+    attributePath.mFieldId    = ColorControl::Attributes::ColorMode::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1133,7 +1133,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeNumberOfPrimaries(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::NumberOfPrimaries;
+    attributePath.mFieldId    = ColorControl::Attributes::NumberOfPrimaries::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1150,7 +1150,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary1X(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary1X;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary1X::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1167,7 +1167,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary1Y(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary1Y;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary1Y::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1185,7 +1185,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary1Intensity(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary1Intensity;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary1Intensity::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1202,7 +1202,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary2X(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary2X;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary2X::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1219,7 +1219,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary2Y(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary2Y;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary2Y::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1237,7 +1237,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary2Intensity(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary2Intensity;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary2Intensity::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1254,7 +1254,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary3X(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary3X;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary3X::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1271,7 +1271,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary3Y(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary3Y;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary3Y::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1289,7 +1289,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary3Intensity(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary3Intensity;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary3Intensity::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1306,7 +1306,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary4X(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary4X;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary4X::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1323,7 +1323,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary4Y(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary4Y;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary4Y::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1341,7 +1341,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary4Intensity(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary4Intensity;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary4Intensity::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1358,7 +1358,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary5X(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary5X;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary5X::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1375,7 +1375,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary5Y(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary5Y;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary5Y::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1393,7 +1393,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary5Intensity(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary5Intensity;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary5Intensity::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1410,7 +1410,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary6X(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary6X;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary6X::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1427,7 +1427,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary6Y(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary6Y;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary6Y::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1445,7 +1445,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributePrimary6Intensity(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::Primary6Intensity;
+    attributePath.mFieldId    = ColorControl::Attributes::Primary6Intensity::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1463,7 +1463,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeEnhancedCurrentHue(Callback::C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::EnhancedCurrentHue;
+    attributePath.mFieldId    = ColorControl::Attributes::EnhancedCurrentHue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1481,7 +1481,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeEnhancedColorMode(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::EnhancedColorMode;
+    attributePath.mFieldId    = ColorControl::Attributes::EnhancedColorMode::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1498,7 +1498,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopActive(Callback::Canc
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::ColorLoopActive;
+    attributePath.mFieldId    = ColorControl::Attributes::ColorLoopActive::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1516,7 +1516,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopDirection(Callback::C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::ColorLoopDirection;
+    attributePath.mFieldId    = ColorControl::Attributes::ColorLoopDirection::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1533,7 +1533,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopTime(Callback::Cancel
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::ColorLoopTime;
+    attributePath.mFieldId    = ColorControl::Attributes::ColorLoopTime::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1551,7 +1551,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopStartEnhancedHue(Call
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::ColorLoopStartEnhancedHue;
+    attributePath.mFieldId    = ColorControl::Attributes::ColorLoopStartEnhancedHue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1569,7 +1569,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorLoopStoredEnhancedHue(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::ColorLoopStoredEnhancedHue;
+    attributePath.mFieldId    = ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1587,7 +1587,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorCapabilities(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::ColorCapabilities;
+    attributePath.mFieldId    = ColorControl::Attributes::ColorCapabilities::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1605,7 +1605,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorTempPhysicalMin(Callback:
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::ColorTempPhysicalMin;
+    attributePath.mFieldId    = ColorControl::Attributes::ColorTempPhysicalMin::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1623,7 +1623,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeColorTempPhysicalMax(Callback:
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::ColorTempPhysicalMax;
+    attributePath.mFieldId    = ColorControl::Attributes::ColorTempPhysicalMax::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1641,7 +1641,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeCoupleColorTempToLevelMinMired
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::Ids::CoupleColorTempToLevelMinMireds;
+    attributePath.mFieldId    = ColorControl::Attributes::CoupleColorTempToLevelMinMireds::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1659,7 +1659,7 @@ CHIP_ERROR ColorControlClusterTest::WriteAttributeClusterRevision(Callback::Canc
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1677,7 +1677,7 @@ CHIP_ERROR ContentLauncherClusterTest::WriteAttributeClusterRevision(Callback::C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1694,7 +1694,7 @@ CHIP_ERROR DescriptorClusterTest::WriteAttributeClusterRevision(Callback::Cancel
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1711,7 +1711,7 @@ CHIP_ERROR DoorLockClusterTest::WriteAttributeLockState(Callback::Cancelable * o
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = DoorLock::Attributes::Ids::LockState;
+    attributePath.mFieldId    = DoorLock::Attributes::LockState::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1728,7 +1728,7 @@ CHIP_ERROR DoorLockClusterTest::WriteAttributeLockType(Callback::Cancelable * on
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = DoorLock::Attributes::Ids::LockType;
+    attributePath.mFieldId    = DoorLock::Attributes::LockType::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1745,7 +1745,7 @@ CHIP_ERROR DoorLockClusterTest::WriteAttributeActuatorEnabled(Callback::Cancelab
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = DoorLock::Attributes::Ids::ActuatorEnabled;
+    attributePath.mFieldId    = DoorLock::Attributes::ActuatorEnabled::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1762,7 +1762,7 @@ CHIP_ERROR DoorLockClusterTest::WriteAttributeClusterRevision(Callback::Cancelab
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1780,7 +1780,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeMeasurementType(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ElectricalMeasurement::Attributes::Ids::MeasurementType;
+    attributePath.mFieldId    = ElectricalMeasurement::Attributes::MeasurementType::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1798,7 +1798,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeTotalActivePower(Call
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ElectricalMeasurement::Attributes::Ids::TotalActivePower;
+    attributePath.mFieldId    = ElectricalMeasurement::Attributes::TotalActivePower::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1815,7 +1815,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsVoltage(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ElectricalMeasurement::Attributes::Ids::RmsVoltage;
+    attributePath.mFieldId    = ElectricalMeasurement::Attributes::RmsVoltage::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1833,7 +1833,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsVoltageMin(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ElectricalMeasurement::Attributes::Ids::RmsVoltageMin;
+    attributePath.mFieldId    = ElectricalMeasurement::Attributes::RmsVoltageMin::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1851,7 +1851,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsVoltageMax(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ElectricalMeasurement::Attributes::Ids::RmsVoltageMax;
+    attributePath.mFieldId    = ElectricalMeasurement::Attributes::RmsVoltageMax::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1868,7 +1868,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsCurrent(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ElectricalMeasurement::Attributes::Ids::RmsCurrent;
+    attributePath.mFieldId    = ElectricalMeasurement::Attributes::RmsCurrent::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1886,7 +1886,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsCurrentMin(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ElectricalMeasurement::Attributes::Ids::RmsCurrentMin;
+    attributePath.mFieldId    = ElectricalMeasurement::Attributes::RmsCurrentMin::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1904,7 +1904,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeRmsCurrentMax(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ElectricalMeasurement::Attributes::Ids::RmsCurrentMax;
+    attributePath.mFieldId    = ElectricalMeasurement::Attributes::RmsCurrentMax::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1922,7 +1922,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeActivePower(Callback:
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ElectricalMeasurement::Attributes::Ids::ActivePower;
+    attributePath.mFieldId    = ElectricalMeasurement::Attributes::ActivePower::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1940,7 +1940,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeActivePowerMin(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ElectricalMeasurement::Attributes::Ids::ActivePowerMin;
+    attributePath.mFieldId    = ElectricalMeasurement::Attributes::ActivePowerMin::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1958,7 +1958,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeActivePowerMax(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ElectricalMeasurement::Attributes::Ids::ActivePowerMax;
+    attributePath.mFieldId    = ElectricalMeasurement::Attributes::ActivePowerMax::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1976,7 +1976,7 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeClusterRevision(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -1994,7 +1994,7 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePacketRxCount(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::Ids::PacketRxCount;
+    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2012,7 +2012,7 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePacketTxCount(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::Ids::PacketTxCount;
+    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2030,7 +2030,7 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeTxErrCount(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::Ids::TxErrCount;
+    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::TxErrCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2048,7 +2048,7 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeCollisionCount(C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::Ids::CollisionCount;
+    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::CollisionCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2066,7 +2066,7 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeOverrunCount(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::Ids::OverrunCount;
+    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::OverrunCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2084,7 +2084,7 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2101,7 +2101,7 @@ CHIP_ERROR FixedLabelClusterTest::WriteAttributeClusterRevision(Callback::Cancel
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2118,7 +2118,7 @@ CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeMeasuredValue(Callback::Can
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = FlowMeasurement::Attributes::Ids::MeasuredValue;
+    attributePath.mFieldId    = FlowMeasurement::Attributes::MeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2136,7 +2136,7 @@ CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeMinMeasuredValue(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = FlowMeasurement::Attributes::Ids::MinMeasuredValue;
+    attributePath.mFieldId    = FlowMeasurement::Attributes::MinMeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2154,7 +2154,7 @@ CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = FlowMeasurement::Attributes::Ids::MaxMeasuredValue;
+    attributePath.mFieldId    = FlowMeasurement::Attributes::MaxMeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2172,7 +2172,7 @@ CHIP_ERROR FlowMeasurementClusterTest::WriteAttributeClusterRevision(Callback::C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2190,7 +2190,7 @@ CHIP_ERROR GeneralCommissioningClusterTest::WriteAttributeClusterRevision(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2207,7 +2207,7 @@ CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeRebootCount(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = GeneralDiagnostics::Attributes::Ids::RebootCount;
+    attributePath.mFieldId    = GeneralDiagnostics::Attributes::RebootCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2224,7 +2224,7 @@ CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeUpTime(Callback::Cancela
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = GeneralDiagnostics::Attributes::Ids::UpTime;
+    attributePath.mFieldId    = GeneralDiagnostics::Attributes::UpTime::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2242,7 +2242,7 @@ CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeTotalOperationalHours(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = GeneralDiagnostics::Attributes::Ids::TotalOperationalHours;
+    attributePath.mFieldId    = GeneralDiagnostics::Attributes::TotalOperationalHours::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2259,7 +2259,7 @@ CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeBootReasons(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = GeneralDiagnostics::Attributes::Ids::BootReasons;
+    attributePath.mFieldId    = GeneralDiagnostics::Attributes::BootReasons::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2277,7 +2277,7 @@ CHIP_ERROR GeneralDiagnosticsClusterTest::WriteAttributeClusterRevision(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2295,7 +2295,7 @@ CHIP_ERROR GroupKeyManagementClusterTest::WriteAttributeClusterRevision(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2312,7 +2312,7 @@ CHIP_ERROR GroupsClusterTest::WriteAttributeNameSupport(Callback::Cancelable * o
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Groups::Attributes::Ids::NameSupport;
+    attributePath.mFieldId    = Groups::Attributes::NameSupport::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2329,7 +2329,7 @@ CHIP_ERROR GroupsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2346,7 +2346,7 @@ CHIP_ERROR IdentifyClusterTest::WriteAttributeClusterRevision(Callback::Cancelab
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2363,7 +2363,7 @@ CHIP_ERROR KeypadInputClusterTest::WriteAttributeClusterRevision(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2380,7 +2380,7 @@ CHIP_ERROR LevelControlClusterTest::WriteAttributeCurrentLevel(Callback::Cancela
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = LevelControl::Attributes::Ids::CurrentLevel;
+    attributePath.mFieldId    = LevelControl::Attributes::CurrentLevel::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2398,7 +2398,7 @@ CHIP_ERROR LevelControlClusterTest::WriteAttributeClusterRevision(Callback::Canc
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2415,7 +2415,7 @@ CHIP_ERROR LowPowerClusterTest::WriteAttributeClusterRevision(Callback::Cancelab
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2433,7 +2433,7 @@ CHIP_ERROR MediaInputClusterTest::WriteAttributeCurrentMediaInput(Callback::Canc
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = MediaInput::Attributes::Ids::CurrentMediaInput;
+    attributePath.mFieldId    = MediaInput::Attributes::CurrentMediaInput::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2450,7 +2450,7 @@ CHIP_ERROR MediaInputClusterTest::WriteAttributeClusterRevision(Callback::Cancel
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2467,7 +2467,7 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePlaybackState(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = MediaPlayback::Attributes::Ids::PlaybackState;
+    attributePath.mFieldId    = MediaPlayback::Attributes::PlaybackState::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2484,7 +2484,7 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeStartTime(Callback::Cancelabl
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = MediaPlayback::Attributes::Ids::StartTime;
+    attributePath.mFieldId    = MediaPlayback::Attributes::StartTime::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2501,7 +2501,7 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeDuration(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = MediaPlayback::Attributes::Ids::Duration;
+    attributePath.mFieldId    = MediaPlayback::Attributes::Duration::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2519,7 +2519,7 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePositionUpdatedAt(Callback::C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = MediaPlayback::Attributes::Ids::PositionUpdatedAt;
+    attributePath.mFieldId    = MediaPlayback::Attributes::PositionUpdatedAt::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2536,7 +2536,7 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePosition(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = MediaPlayback::Attributes::Ids::Position;
+    attributePath.mFieldId    = MediaPlayback::Attributes::Position::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2553,7 +2553,7 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributePlaybackSpeed(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = MediaPlayback::Attributes::Ids::PlaybackSpeed;
+    attributePath.mFieldId    = MediaPlayback::Attributes::PlaybackSpeed::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2570,7 +2570,7 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeSeekRangeEnd(Callback::Cancel
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = MediaPlayback::Attributes::Ids::SeekRangeEnd;
+    attributePath.mFieldId    = MediaPlayback::Attributes::SeekRangeEnd::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2587,7 +2587,7 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeSeekRangeStart(Callback::Canc
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = MediaPlayback::Attributes::Ids::SeekRangeStart;
+    attributePath.mFieldId    = MediaPlayback::Attributes::SeekRangeStart::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2605,7 +2605,7 @@ CHIP_ERROR MediaPlaybackClusterTest::WriteAttributeClusterRevision(Callback::Can
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2622,7 +2622,7 @@ CHIP_ERROR NetworkCommissioningClusterTest::WriteAttributeFeatureMap(Callback::C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::FeatureMap;
+    attributePath.mFieldId    = Globals::Attributes::FeatureMap::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2640,7 +2640,7 @@ CHIP_ERROR NetworkCommissioningClusterTest::WriteAttributeClusterRevision(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2658,7 +2658,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderClusterTest::WriteAttributeClusterRevision(C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2676,7 +2676,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorClusterTest::WriteAttributeUpdatePossible(C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OtaSoftwareUpdateRequestor::Attributes::Ids::UpdatePossible;
+    attributePath.mFieldId    = OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2694,7 +2694,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorClusterTest::WriteAttributeClusterRevision(
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2711,7 +2711,7 @@ CHIP_ERROR OccupancySensingClusterTest::WriteAttributeOccupancy(Callback::Cancel
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OccupancySensing::Attributes::Ids::Occupancy;
+    attributePath.mFieldId    = OccupancySensing::Attributes::Occupancy::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2729,7 +2729,7 @@ CHIP_ERROR OccupancySensingClusterTest::WriteAttributeOccupancySensorType(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OccupancySensing::Attributes::Ids::OccupancySensorType;
+    attributePath.mFieldId    = OccupancySensing::Attributes::OccupancySensorType::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2747,7 +2747,7 @@ CHIP_ERROR OccupancySensingClusterTest::WriteAttributeOccupancySensorTypeBitmap(
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OccupancySensing::Attributes::Ids::OccupancySensorTypeBitmap;
+    attributePath.mFieldId    = OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2765,7 +2765,7 @@ CHIP_ERROR OccupancySensingClusterTest::WriteAttributeClusterRevision(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2782,7 +2782,7 @@ CHIP_ERROR OnOffClusterTest::WriteAttributeOnOff(Callback::Cancelable * onSucces
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OnOff::Attributes::Ids::OnOff;
+    attributePath.mFieldId    = OnOff::Attributes::OnOff::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2799,7 +2799,7 @@ CHIP_ERROR OnOffClusterTest::WriteAttributeGlobalSceneControl(Callback::Cancelab
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OnOff::Attributes::Ids::GlobalSceneControl;
+    attributePath.mFieldId    = OnOff::Attributes::GlobalSceneControl::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2816,7 +2816,7 @@ CHIP_ERROR OnOffClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onS
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::FeatureMap;
+    attributePath.mFieldId    = Globals::Attributes::FeatureMap::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2833,7 +2833,7 @@ CHIP_ERROR OnOffClusterTest::WriteAttributeClusterRevision(Callback::Cancelable 
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2851,7 +2851,7 @@ CHIP_ERROR OnOffSwitchConfigurationClusterTest::WriteAttributeSwitchType(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OnOffSwitchConfiguration::Attributes::Ids::SwitchType;
+    attributePath.mFieldId    = OnOffSwitchConfiguration::Attributes::SwitchType::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2869,7 +2869,7 @@ CHIP_ERROR OnOffSwitchConfigurationClusterTest::WriteAttributeClusterRevision(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2887,7 +2887,7 @@ CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeSupportedFabrics(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OperationalCredentials::Attributes::Ids::SupportedFabrics;
+    attributePath.mFieldId    = OperationalCredentials::Attributes::SupportedFabrics::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2905,7 +2905,7 @@ CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeCommissionedFabrics(
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OperationalCredentials::Attributes::Ids::CommissionedFabrics;
+    attributePath.mFieldId    = OperationalCredentials::Attributes::CommissionedFabrics::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2923,7 +2923,7 @@ CHIP_ERROR OperationalCredentialsClusterTest::WriteAttributeClusterRevision(Call
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2940,7 +2940,7 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeStatus(Callback::Cancelable * o
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PowerSource::Attributes::Ids::Status;
+    attributePath.mFieldId    = PowerSource::Attributes::Status::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2957,7 +2957,7 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeOrder(Callback::Cancelable * on
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PowerSource::Attributes::Ids::Order;
+    attributePath.mFieldId    = PowerSource::Attributes::Order::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2974,7 +2974,7 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeDescription(Callback::Cancelabl
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PowerSource::Attributes::Ids::Description;
+    attributePath.mFieldId    = PowerSource::Attributes::Description::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -2991,7 +2991,7 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryVoltage(Callback::Cancel
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PowerSource::Attributes::Ids::BatteryVoltage;
+    attributePath.mFieldId    = PowerSource::Attributes::BatteryVoltage::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3009,7 +3009,7 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryPercentRemaining(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PowerSource::Attributes::Ids::BatteryPercentRemaining;
+    attributePath.mFieldId    = PowerSource::Attributes::BatteryPercentRemaining::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3027,7 +3027,7 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryTimeRemaining(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PowerSource::Attributes::Ids::BatteryTimeRemaining;
+    attributePath.mFieldId    = PowerSource::Attributes::BatteryTimeRemaining::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3045,7 +3045,7 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryChargeLevel(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PowerSource::Attributes::Ids::BatteryChargeLevel;
+    attributePath.mFieldId    = PowerSource::Attributes::BatteryChargeLevel::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3063,7 +3063,7 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeBatteryChargeState(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PowerSource::Attributes::Ids::BatteryChargeState;
+    attributePath.mFieldId    = PowerSource::Attributes::BatteryChargeState::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3080,7 +3080,7 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeFeatureMap(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::FeatureMap;
+    attributePath.mFieldId    = Globals::Attributes::FeatureMap::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3097,7 +3097,7 @@ CHIP_ERROR PowerSourceClusterTest::WriteAttributeClusterRevision(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3115,7 +3115,7 @@ CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeMeasuredValue(Callback:
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PressureMeasurement::Attributes::Ids::MeasuredValue;
+    attributePath.mFieldId    = PressureMeasurement::Attributes::MeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3133,7 +3133,7 @@ CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeMinMeasuredValue(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PressureMeasurement::Attributes::Ids::MinMeasuredValue;
+    attributePath.mFieldId    = PressureMeasurement::Attributes::MinMeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3151,7 +3151,7 @@ CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PressureMeasurement::Attributes::Ids::MaxMeasuredValue;
+    attributePath.mFieldId    = PressureMeasurement::Attributes::MaxMeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3169,7 +3169,7 @@ CHIP_ERROR PressureMeasurementClusterTest::WriteAttributeClusterRevision(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3187,7 +3187,7 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxPressure(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::Ids::MaxPressure;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MaxPressure::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3205,7 +3205,7 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxSpeed(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::Ids::MaxSpeed;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MaxSpeed::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3222,7 +3222,7 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeMaxFlow(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::Ids::MaxFlow;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::MaxFlow::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3240,7 +3240,7 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeEffectiveOperat
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::Ids::EffectiveOperationMode;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::EffectiveOperationMode::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3258,7 +3258,7 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeEffectiveContro
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::Ids::EffectiveControlMode;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::EffectiveControlMode::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3276,7 +3276,7 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeCapacity(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::Ids::Capacity;
+    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::Capacity::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3294,7 +3294,7 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeClusterRevision
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3312,7 +3312,7 @@ CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeMeasuredValue(C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = RelativeHumidityMeasurement::Attributes::Ids::MeasuredValue;
+    attributePath.mFieldId    = RelativeHumidityMeasurement::Attributes::MeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3330,7 +3330,7 @@ CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeMinMeasuredValu
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = RelativeHumidityMeasurement::Attributes::Ids::MinMeasuredValue;
+    attributePath.mFieldId    = RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3348,7 +3348,7 @@ CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeMaxMeasuredValu
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = RelativeHumidityMeasurement::Attributes::Ids::MaxMeasuredValue;
+    attributePath.mFieldId    = RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3366,7 +3366,7 @@ CHIP_ERROR RelativeHumidityMeasurementClusterTest::WriteAttributeClusterRevision
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3383,7 +3383,7 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeSceneCount(Callback::Cancelable * on
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Scenes::Attributes::Ids::SceneCount;
+    attributePath.mFieldId    = Scenes::Attributes::SceneCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3400,7 +3400,7 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeCurrentScene(Callback::Cancelable * 
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Scenes::Attributes::Ids::CurrentScene;
+    attributePath.mFieldId    = Scenes::Attributes::CurrentScene::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3417,7 +3417,7 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeCurrentGroup(Callback::Cancelable * 
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Scenes::Attributes::Ids::CurrentGroup;
+    attributePath.mFieldId    = Scenes::Attributes::CurrentGroup::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3434,7 +3434,7 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeSceneValid(Callback::Cancelable * on
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Scenes::Attributes::Ids::SceneValid;
+    attributePath.mFieldId    = Scenes::Attributes::SceneValid::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3451,7 +3451,7 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeNameSupport(Callback::Cancelable * o
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Scenes::Attributes::Ids::NameSupport;
+    attributePath.mFieldId    = Scenes::Attributes::NameSupport::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3468,7 +3468,7 @@ CHIP_ERROR ScenesClusterTest::WriteAttributeClusterRevision(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3486,7 +3486,7 @@ CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeCurrentHeapFree(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = SoftwareDiagnostics::Attributes::Ids::CurrentHeapFree;
+    attributePath.mFieldId    = SoftwareDiagnostics::Attributes::CurrentHeapFree::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3504,7 +3504,7 @@ CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeCurrentHeapUsed(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = SoftwareDiagnostics::Attributes::Ids::CurrentHeapUsed;
+    attributePath.mFieldId    = SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3522,7 +3522,7 @@ CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeCurrentHeapHighWatermar
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = SoftwareDiagnostics::Attributes::Ids::CurrentHeapHighWatermark;
+    attributePath.mFieldId    = SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3540,7 +3540,7 @@ CHIP_ERROR SoftwareDiagnosticsClusterTest::WriteAttributeClusterRevision(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3557,7 +3557,7 @@ CHIP_ERROR SwitchClusterTest::WriteAttributeNumberOfPositions(Callback::Cancelab
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Switch::Attributes::Ids::NumberOfPositions;
+    attributePath.mFieldId    = Switch::Attributes::NumberOfPositions::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3574,7 +3574,7 @@ CHIP_ERROR SwitchClusterTest::WriteAttributeCurrentPosition(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Switch::Attributes::Ids::CurrentPosition;
+    attributePath.mFieldId    = Switch::Attributes::CurrentPosition::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3591,7 +3591,7 @@ CHIP_ERROR SwitchClusterTest::WriteAttributeClusterRevision(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3609,7 +3609,7 @@ CHIP_ERROR TvChannelClusterTest::WriteAttributeTvChannelLineup(Callback::Cancela
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = TvChannel::Attributes::Ids::TvChannelLineup;
+    attributePath.mFieldId    = TvChannel::Attributes::TvChannelLineup::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3627,7 +3627,7 @@ CHIP_ERROR TvChannelClusterTest::WriteAttributeCurrentTvChannel(Callback::Cancel
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = TvChannel::Attributes::Ids::CurrentTvChannel;
+    attributePath.mFieldId    = TvChannel::Attributes::CurrentTvChannel::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3644,7 +3644,7 @@ CHIP_ERROR TvChannelClusterTest::WriteAttributeClusterRevision(Callback::Cancela
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3662,7 +3662,7 @@ CHIP_ERROR TargetNavigatorClusterTest::WriteAttributeClusterRevision(Callback::C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3680,7 +3680,7 @@ CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeMeasuredValue(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = TemperatureMeasurement::Attributes::Ids::MeasuredValue;
+    attributePath.mFieldId    = TemperatureMeasurement::Attributes::MeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3698,7 +3698,7 @@ CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeMinMeasuredValue(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = TemperatureMeasurement::Attributes::Ids::MinMeasuredValue;
+    attributePath.mFieldId    = TemperatureMeasurement::Attributes::MinMeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3716,7 +3716,7 @@ CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeMaxMeasuredValue(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = TemperatureMeasurement::Attributes::Ids::MaxMeasuredValue;
+    attributePath.mFieldId    = TemperatureMeasurement::Attributes::MaxMeasuredValue::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3734,7 +3734,7 @@ CHIP_ERROR TemperatureMeasurementClusterTest::WriteAttributeClusterRevision(Call
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3751,7 +3751,7 @@ CHIP_ERROR TestClusterClusterTest::WriteAttributeClusterRevision(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3768,7 +3768,7 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeLocalTemperature(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Thermostat::Attributes::Ids::LocalTemperature;
+    attributePath.mFieldId    = Thermostat::Attributes::LocalTemperature::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3786,7 +3786,7 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMinHeatSetpointLimit(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Thermostat::Attributes::Ids::AbsMinHeatSetpointLimit;
+    attributePath.mFieldId    = Thermostat::Attributes::AbsMinHeatSetpointLimit::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3804,7 +3804,7 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMaxHeatSetpointLimit(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Thermostat::Attributes::Ids::AbsMaxHeatSetpointLimit;
+    attributePath.mFieldId    = Thermostat::Attributes::AbsMaxHeatSetpointLimit::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3822,7 +3822,7 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMinCoolSetpointLimit(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Thermostat::Attributes::Ids::AbsMinCoolSetpointLimit;
+    attributePath.mFieldId    = Thermostat::Attributes::AbsMinCoolSetpointLimit::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3840,7 +3840,7 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeAbsMaxCoolSetpointLimit(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Thermostat::Attributes::Ids::AbsMaxCoolSetpointLimit;
+    attributePath.mFieldId    = Thermostat::Attributes::AbsMaxCoolSetpointLimit::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3857,7 +3857,7 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeStartOfWeek(Callback::Cancelable
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Thermostat::Attributes::Ids::StartOfWeek;
+    attributePath.mFieldId    = Thermostat::Attributes::StartOfWeek::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3875,7 +3875,7 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeNumberOfWeeklyTransitions(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Thermostat::Attributes::Ids::NumberOfWeeklyTransitions;
+    attributePath.mFieldId    = Thermostat::Attributes::NumberOfWeeklyTransitions::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3893,7 +3893,7 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeNumberOfDailyTransitions(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Thermostat::Attributes::Ids::NumberOfDailyTransitions;
+    attributePath.mFieldId    = Thermostat::Attributes::NumberOfDailyTransitions::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3910,7 +3910,7 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeFeatureMap(Callback::Cancelable 
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::FeatureMap;
+    attributePath.mFieldId    = Globals::Attributes::FeatureMap::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3927,7 +3927,7 @@ CHIP_ERROR ThermostatClusterTest::WriteAttributeClusterRevision(Callback::Cancel
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3945,7 +3945,7 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationClusterTest::WriteAttributeCluste
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3962,7 +3962,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeChannel(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::Channel;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Channel::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3980,7 +3980,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRoutingRole(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RoutingRole;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RoutingRole::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -3998,7 +3998,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeNetworkName(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::NetworkName;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::NetworkName::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4015,7 +4015,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePanId(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::PanId;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::PanId::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4033,7 +4033,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeExtendedPanId(Call
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::ExtendedPanId;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4051,7 +4051,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeMeshLocalPrefix(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::MeshLocalPrefix;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4069,7 +4069,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeOverrunCount(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::OverrunCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::OverrunCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4087,7 +4087,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePartitionId(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::PartitionId;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::PartitionId::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4104,7 +4104,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeWeighting(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::Weighting;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Weighting::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4122,7 +4122,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeDataVersion(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::DataVersion;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::DataVersion::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4140,7 +4140,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeStableDataVersion(
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::StableDataVersion;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4158,7 +4158,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeLeaderRouterId(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::LeaderRouterId;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4176,7 +4176,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeDetachedRoleCount(
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::DetachedRoleCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4194,7 +4194,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeChildRoleCount(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::ChildRoleCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::ChildRoleCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4212,7 +4212,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRouterRoleCount(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RouterRoleCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RouterRoleCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4230,7 +4230,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeLeaderRoleCount(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::LeaderRoleCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4248,7 +4248,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeAttachAttemptCount
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::AttachAttemptCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4266,7 +4266,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePartitionIdChangeC
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::PartitionIdChangeCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4283,7 +4283,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeBetterPartitionAtt
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::BetterPartitionAttachAttemptCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4301,7 +4301,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeParentChangeCount(
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::ParentChangeCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::ParentChangeCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4319,7 +4319,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxTotalCount(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxTotalCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxTotalCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4337,7 +4337,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxUnicastCount(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxUnicastCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxUnicastCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4355,7 +4355,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxBroadcastCount(C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxBroadcastCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4373,7 +4373,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxAckRequestedCoun
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxAckRequestedCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4391,7 +4391,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxAckedCount(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxAckedCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxAckedCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4409,7 +4409,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxNoAckRequestedCo
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxNoAckRequestedCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4427,7 +4427,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxDataCount(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxDataCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxDataCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4445,7 +4445,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxDataPollCount(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxDataPollCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxDataPollCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4463,7 +4463,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxBeaconCount(Call
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxBeaconCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxBeaconCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4481,7 +4481,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxBeaconRequestCou
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxBeaconRequestCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4499,7 +4499,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxOtherCount(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxOtherCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxOtherCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4517,7 +4517,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxRetryCount(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxRetryCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxRetryCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4535,7 +4535,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxDirectMaxRetryEx
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxDirectMaxRetryExpiryCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4552,7 +4552,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxIndirectMaxRetry
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxIndirectMaxRetryExpiryCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4570,7 +4570,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxErrCcaCount(Call
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxErrCcaCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4588,7 +4588,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxErrAbortCount(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxErrAbortCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4606,7 +4606,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeTxErrBusyChannelCo
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::TxErrBusyChannelCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4624,7 +4624,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxTotalCount(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxTotalCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxTotalCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4642,7 +4642,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxUnicastCount(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxUnicastCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxUnicastCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4660,7 +4660,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxBroadcastCount(C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxBroadcastCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4678,7 +4678,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDataCount(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxDataCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxDataCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4696,7 +4696,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDataPollCount(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxDataPollCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxDataPollCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4714,7 +4714,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxBeaconCount(Call
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxBeaconCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxBeaconCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4732,7 +4732,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxBeaconRequestCou
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxBeaconRequestCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4750,7 +4750,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxOtherCount(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxOtherCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxOtherCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4768,7 +4768,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxAddressFilteredC
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxAddressFilteredCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4786,7 +4786,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDestAddrFiltered
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxDestAddrFilteredCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4804,7 +4804,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxDuplicatedCount(
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxDuplicatedCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4822,7 +4822,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrNoFrameCount(
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxErrNoFrameCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4840,7 +4840,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrUnknownNeighb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxErrUnknownNeighborCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4858,7 +4858,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrInvalidSrcAdd
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxErrInvalidSrcAddrCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4876,7 +4876,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrSecCount(Call
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxErrSecCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxErrSecCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4894,7 +4894,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrFcsCount(Call
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxErrFcsCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4912,7 +4912,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeRxErrOtherCount(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::RxErrOtherCount;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4930,7 +4930,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeActiveTimestamp(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::ActiveTimestamp;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4948,7 +4948,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributePendingTimestamp(C
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::PendingTimestamp;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4965,7 +4965,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeDelay(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::Delay;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Delay::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -4983,7 +4983,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeChannelMask(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::Ids::ChannelMask;
+    attributePath.mFieldId    = ThreadNetworkDiagnostics::Attributes::ChannelMask::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5001,7 +5001,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5019,7 +5019,7 @@ CHIP_ERROR WakeOnLanClusterTest::WriteAttributeWakeOnLanMacAddress(Callback::Can
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WakeOnLan::Attributes::Ids::WakeOnLanMacAddress;
+    attributePath.mFieldId    = WakeOnLan::Attributes::WakeOnLanMacAddress::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5036,7 +5036,7 @@ CHIP_ERROR WakeOnLanClusterTest::WriteAttributeClusterRevision(Callback::Cancela
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5053,7 +5053,7 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeBssid(Callback::Canc
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::Ids::Bssid;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::Bssid::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5071,7 +5071,7 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeSecurityType(Callbac
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::Ids::SecurityType;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::SecurityType::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5089,7 +5089,7 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeWiFiVersion(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::Ids::WiFiVersion;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5107,7 +5107,7 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeChannelNumber(Callba
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::Ids::ChannelNumber;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::ChannelNumber::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5124,11 +5124,155 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeRssi(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::Ids::Rssi;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::Rssi::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
     ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, rssi));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeBeaconLostCount(Callback::Cancelable * onSuccessCallback,
+                                                                            Callback::Cancelable * onFailureCallback,
+                                                                            uint32_t beaconLostCount)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, beaconLostCount));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeBeaconRxCount(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback,
+                                                                          uint32_t beaconRxCount)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, beaconRxCount));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketMulticastRxCount(Callback::Cancelable * onSuccessCallback,
+                                                                                   Callback::Cancelable * onFailureCallback,
+                                                                                   uint32_t packetMulticastRxCount)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, packetMulticastRxCount));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketMulticastTxCount(Callback::Cancelable * onSuccessCallback,
+                                                                                   Callback::Cancelable * onFailureCallback,
+                                                                                   uint32_t packetMulticastTxCount)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, packetMulticastTxCount));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketUnicastRxCount(Callback::Cancelable * onSuccessCallback,
+                                                                                 Callback::Cancelable * onFailureCallback,
+                                                                                 uint32_t packetUnicastRxCount)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, packetUnicastRxCount));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributePacketUnicastTxCount(Callback::Cancelable * onSuccessCallback,
+                                                                                 Callback::Cancelable * onFailureCallback,
+                                                                                 uint32_t packetUnicastTxCount)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, packetUnicastTxCount));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeCurrentMaxRate(Callback::Cancelable * onSuccessCallback,
+                                                                           Callback::Cancelable * onFailureCallback,
+                                                                           uint64_t currentMaxRate)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, currentMaxRate));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeOverrunCount(Callback::Cancelable * onSuccessCallback,
+                                                                         Callback::Cancelable * onFailureCallback,
+                                                                         uint64_t overrunCount)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = WiFiNetworkDiagnostics::Attributes::OverrunCount::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, overrunCount));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
@@ -5142,7 +5286,7 @@ CHIP_ERROR WiFiNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(Call
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5159,7 +5303,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeType(Callback::Cancelable * 
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::Type;
+    attributePath.mFieldId    = WindowCovering::Attributes::Type::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5177,7 +5321,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionLift(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::CurrentPositionLift;
+    attributePath.mFieldId    = WindowCovering::Attributes::CurrentPositionLift::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5195,7 +5339,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionTilt(Callback
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::CurrentPositionTilt;
+    attributePath.mFieldId    = WindowCovering::Attributes::CurrentPositionTilt::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5212,7 +5356,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeConfigStatus(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::ConfigStatus;
+    attributePath.mFieldId    = WindowCovering::Attributes::ConfigStatus::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5230,7 +5374,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionLiftPercentag
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::CurrentPositionLiftPercentage;
+    attributePath.mFieldId    = WindowCovering::Attributes::CurrentPositionLiftPercentage::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5248,7 +5392,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionTiltPercentag
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::CurrentPositionTiltPercentage;
+    attributePath.mFieldId    = WindowCovering::Attributes::CurrentPositionTiltPercentage::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5266,7 +5410,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeOperationalStatus(Callback::
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::OperationalStatus;
+    attributePath.mFieldId    = WindowCovering::Attributes::OperationalStatus::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5284,7 +5428,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeTargetPositionLiftPercent100
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::TargetPositionLiftPercent100ths;
+    attributePath.mFieldId    = WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5302,7 +5446,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeTargetPositionTiltPercent100
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::TargetPositionTiltPercent100ths;
+    attributePath.mFieldId    = WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5319,7 +5463,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeEndProductType(Callback::Can
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::EndProductType;
+    attributePath.mFieldId    = WindowCovering::Attributes::EndProductType::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5337,7 +5481,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionLiftPercent10
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::CurrentPositionLiftPercent100ths;
+    attributePath.mFieldId    = WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5355,7 +5499,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeCurrentPositionTiltPercent10
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::CurrentPositionTiltPercent100ths;
+    attributePath.mFieldId    = WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5373,7 +5517,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledOpenLimitLift(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::InstalledOpenLimitLift;
+    attributePath.mFieldId    = WindowCovering::Attributes::InstalledOpenLimitLift::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5391,7 +5535,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledClosedLimitLift(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::InstalledClosedLimitLift;
+    attributePath.mFieldId    = WindowCovering::Attributes::InstalledClosedLimitLift::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5409,7 +5553,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledOpenLimitTilt(Callb
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::InstalledOpenLimitTilt;
+    attributePath.mFieldId    = WindowCovering::Attributes::InstalledOpenLimitTilt::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5427,7 +5571,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeInstalledClosedLimitTilt(Cal
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::InstalledClosedLimitTilt;
+    attributePath.mFieldId    = WindowCovering::Attributes::InstalledClosedLimitTilt::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5444,7 +5588,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeSafetyStatus(Callback::Cance
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::Ids::SafetyStatus;
+    attributePath.mFieldId    = WindowCovering::Attributes::SafetyStatus::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -5462,7 +5606,7 @@ CHIP_ERROR WindowCoveringClusterTest::WriteAttributeClusterRevision(Callback::Ca
     attributePath.mNodeId     = mDevice->GetDeviceId();
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Globals::Attributes::Ids::ClusterRevision;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));

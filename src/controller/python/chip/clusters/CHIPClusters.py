@@ -3593,6 +3593,46 @@ class ChipClusters:
                     "attributeId": 0x00000004,
                     "type": "int",
                 },
+                0x00000005: {
+                    "attributeName": "BeaconLostCount",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                },
+                0x00000006: {
+                    "attributeName": "BeaconRxCount",
+                    "attributeId": 0x00000006,
+                    "type": "int",
+                },
+                0x00000007: {
+                    "attributeName": "PacketMulticastRxCount",
+                    "attributeId": 0x00000007,
+                    "type": "int",
+                },
+                0x00000008: {
+                    "attributeName": "PacketMulticastTxCount",
+                    "attributeId": 0x00000008,
+                    "type": "int",
+                },
+                0x00000009: {
+                    "attributeName": "PacketUnicastRxCount",
+                    "attributeId": 0x00000009,
+                    "type": "int",
+                },
+                0x0000000A: {
+                    "attributeName": "PacketUnicastTxCount",
+                    "attributeId": 0x0000000A,
+                    "type": "int",
+                },
+                0x0000000B: {
+                    "attributeName": "CurrentMaxRate",
+                    "attributeId": 0x0000000B,
+                    "type": "int",
+                },
+                0x0000000C: {
+                    "attributeName": "OverrunCount",
+                    "attributeId": 0x0000000C,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -5484,6 +5524,22 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ChannelNumber(device, ZCLendpoint, ZCLgroupid)
     def ClusterWiFiNetworkDiagnostics_ReadAttributeRssi(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Rssi(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributeBeaconLostCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconLostCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributeBeaconRxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconRxCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributePacketMulticastRxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastRxCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributePacketMulticastTxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastTxCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributePacketUnicastRxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastRxCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributePacketUnicastTxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastTxCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributeCurrentMaxRate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_CurrentMaxRate(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributeOverrunCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_OverrunCount(device, ZCLendpoint, ZCLgroupid)
     def ClusterWiFiNetworkDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterWindowCovering_ReadAttributeType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -7404,6 +7460,30 @@ class ChipClusters:
         # Cluster WiFiNetworkDiagnostics ReadAttribute Rssi
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Rssi.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Rssi.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute BeaconLostCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconLostCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconLostCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute BeaconRxCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconRxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconRxCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute PacketMulticastRxCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastRxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastRxCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute PacketMulticastTxCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastTxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastTxCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute PacketUnicastRxCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastRxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastRxCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute PacketUnicastTxCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastTxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastTxCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute CurrentMaxRate
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_CurrentMaxRate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_CurrentMaxRate.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute OverrunCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_OverrunCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_OverrunCount.restype = ctypes.c_uint32
         # Cluster WiFiNetworkDiagnostics ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ClusterRevision.restype = ctypes.c_uint32

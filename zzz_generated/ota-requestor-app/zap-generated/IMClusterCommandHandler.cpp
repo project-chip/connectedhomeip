@@ -68,7 +68,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::OtaSoftwareUpdateProvider::Commands::Ids::ApplyUpdateRequestResponse: {
+        case Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::Id: {
             expectArgumentCount = 2;
             uint8_t action;
             uint32_t delayedActionTime;
@@ -131,7 +131,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::OtaSoftwareUpdateProvider::Commands::Ids::QueryImageResponse: {
+        case Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id: {
             expectArgumentCount = 8;
             uint8_t status;
             uint32_t delayedActionTime;
