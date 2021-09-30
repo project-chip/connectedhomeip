@@ -38,7 +38,7 @@ constexpr const char kLoggingKey[]         = "LoggingLevel";
 constexpr const char kLocalNodeIdKey[]     = "LocalNodeId";
 constexpr const char kRemoteNodeIdKey[]    = "RemoteNodeId";
 constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Detail;
-char kSectionName[32] = {0};
+char kSectionName[32]                      = { 0 };
 
 namespace {
 
@@ -90,7 +90,6 @@ CHIP_ERROR PersistentStorage::Init(const char * sectionName)
 
     mConfig.parse(ifs);
     ifs.close();
-
 
 exit:
     return err;

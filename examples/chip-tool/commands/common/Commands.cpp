@@ -55,11 +55,11 @@ int Commands::Run(int argc, char ** argv)
     Command * command = nullptr;
     NodeId localId;
     NodeId remoteId;
-    char *argNodeId = nullptr;
+    char * argNodeId = nullptr;
 
-    const char *optstring = "n::";
+    const char * optstring = "n::";
     int opt;
-    while((opt = getopt(argc, argv, optstring)) != -1)
+    while ((opt = getopt(argc, argv, optstring)) != -1)
     {
         if (opt == 'n')
         {
