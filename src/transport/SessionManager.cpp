@@ -401,7 +401,7 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
 
     // Decrypt and verify the message before message counter verification or any further processing.
     VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decrypt(state, payloadHeader, packetHeader, msg),
-                 ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
+                 ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding"));
 
     // Verify message counter
     if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
