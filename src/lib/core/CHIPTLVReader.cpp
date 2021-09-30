@@ -505,15 +505,23 @@ CHIP_ERROR TLVReader::Next()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Next(TLVType expectedType, uint64_t expectedTag)
+CHIP_ERROR TLVReader::Next(uint64_t expectedTag)
 {
     CHIP_ERROR err = Next();
     if (err != CHIP_NO_ERROR)
         return err;
-    if (GetType() != expectedType)
-        return CHIP_ERROR_WRONG_TLV_TYPE;
     if (mElemTag != expectedTag)
         return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TLVReader::Next(TLVType expectedType, uint64_t expectedTag)
+{
+    CHIP_ERROR err = Next(expectedTag);
+    if (err != CHIP_NO_ERROR)
+        return err;
+    if (GetType() != expectedType)
+        return CHIP_ERROR_WRONG_TLV_TYPE;
     return CHIP_NO_ERROR;
 }
 
