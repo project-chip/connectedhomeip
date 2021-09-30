@@ -100,6 +100,13 @@ class TestBuilder(unittest.TestCase):
            '--skip-target-glob {linux,darwin}-* targets'.split(' ')
         )
 
+    @unittest.skipUnless(sys.platform == 'linux', 'Build on linux test')
+    @unittest.skipUnless(os.uname().machine == 'x86_64', 'Validation x64 and crosscompile, requires linux x64')
+    def test_targets(self):
+        self.assertCommandOutput(
+           os.path.join('testdata', 'build_linux_on_x64.txt'),
+           '--target-glob {linux}-* build'.split(' ')
+        )
 
 
 if __name__ == '__main__':
