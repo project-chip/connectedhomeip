@@ -3413,7 +3413,7 @@
  * Command: StepHue
  * @param stepMode HueStepMode
  * @param stepSize INT8U
- * @param transitionTime INT16U
+ * @param transitionTime INT8U
  * @param optionsMask BITMAP8
  * @param optionsOverride BITMAP8
  */
@@ -3456,7 +3456,7 @@
  * Command: StepSaturation
  * @param stepMode SaturationStepMode
  * @param stepSize INT8U
- * @param transitionTime INT16U
+ * @param transitionTime INT8U
  * @param optionsMask BITMAP8
  * @param optionsOverride BITMAP8
  */

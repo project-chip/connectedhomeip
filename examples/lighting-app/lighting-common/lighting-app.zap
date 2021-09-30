@@ -1,5 +1,5 @@
 {
-  "featureLevel": 54,
+  "featureLevel": 55,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -2930,7 +2930,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -2945,7 +2945,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -2960,7 +2960,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -2975,7 +2975,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -2990,7 +2990,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -5642,5 +5642,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 259
     }
-  ]
+  ],
+  "log": []
 }

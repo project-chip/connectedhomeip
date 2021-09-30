@@ -96,15 +96,21 @@ def main():
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
 
+    logger.info("Testing level control cluster")
+    FailIfNot(test.TestLevelControlCluster(nodeid=1,
+                                           endpoint=LIGHTING_ENDPOINT_ID,
+                                           group=GROUP_ID),
+              "Failed to test level control cluster")
+
     logger.info("Testing sending commands to non exist endpoint")
     FailIfNot(not test.TestOnOffCluster(nodeid=1,
                                         endpoint=233,
                                         group=GROUP_ID), "Failed to test on off cluster on non-exist endpoint")
 
     logger.info("Testing attribute reading")
-    FailIfNot(test.TestReadBasicAttribiutes(nodeid=1,
-                                            endpoint=ENDPOINT_ID,
-                                            group=GROUP_ID),
+    FailIfNot(test.TestReadBasicAttributes(nodeid=1,
+                                           endpoint=ENDPOINT_ID,
+                                           group=GROUP_ID),
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing attribute writing")

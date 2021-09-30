@@ -108,6 +108,7 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
+    void ResetThreadNetworkDiagnosticsCounts(void);
     CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
 
 private:
@@ -371,6 +372,11 @@ inline CHIP_ERROR ThreadStackManager::GetPollPeriod(uint32_t & buf)
 inline CHIP_ERROR ThreadStackManager::JoinerStart()
 {
     return static_cast<ImplClass *>(this)->_JoinerStart();
+}
+
+inline void ThreadStackManager::ResetThreadNetworkDiagnosticsCounts()
+{
+    static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
 }
 
 /*

@@ -86,6 +86,8 @@ public:
 
     CHIP_ERROR _JoinerStart();
 
+    void _ResetThreadNetworkDiagnosticsCounts();
+
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
 
     ~ThreadStackManagerImpl() = default;
