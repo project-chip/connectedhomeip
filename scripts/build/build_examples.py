@@ -37,6 +37,11 @@ __LOG_LEVELS__ = {
     'fatal': logging.FATAL,
 }
 
+
+def CommaSeparate(items) -> str:
+    return ', '.join([x for x in items])
+
+
 def ValidateRepoPath(context, parameter, value):
     """Validates that the given path looks like a valid chip repository checkout."""
     if value.startswith('/TEST/'):
@@ -145,7 +150,7 @@ before running this script.
       requested_targets = set([t.lower for t in target])
       targets = [target for target in build.ALL_TARGETS if target.name.lower in requested_targets]
     
-      actual_targes = set([t.name.lower for t in targets]):
+      actual_targes = set([t.name.lower for t in targets])
       if requested_targets != actual_targes:
         logging.error('Targets not found: %s', CommaSeparate(actual_targes))
 
@@ -175,6 +180,13 @@ before running this script.
 @click.pass_context
 def cmd_generate(context):
     context.obj.Generate()
+
+@main.command(
+    'targets', help='List the targets that would be generated/built given the input arguments')
+@click.pass_context
+def cmd_generate(context):
+    for builder in context.obj.builders:
+        print(builder.identifier)
 
 
 @main.command('build', help='generate and run ninja/make as needed to compile')

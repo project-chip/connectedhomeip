@@ -10,10 +10,6 @@ from .targets import Target, ALL
 ALL_TARGETS = ALL
 
 
-def CommaSeparate(items) -> str:
-    return ', '.join([x.ArgName for x in items])
-
-
 class BuildSteps(Enum):
     GENERATED = auto()
 

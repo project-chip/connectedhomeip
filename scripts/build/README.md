@@ -56,3 +56,15 @@ Usage examples:
     ```
     ./scripts/build/build_examples.py --target qpg-qpg6100-lock build --copy-artifacts-to /tmp/artifacts
     ```
+
+5. Find out all possible targets for compiling the 'light' app:
+
+    ```
+    ./scripts/build/build_examples.py --target-glob '*light' --log-level fatal targets
+    ```
+
+6. Compile everything except linux or darwin:
+
+    ```
+    ./scripts/build/build_examples.py --skip-target-glob '{darwin,linux}-*' --log-level fatal build
+    ```
