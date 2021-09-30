@@ -103,12 +103,6 @@ public:
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen);
     CHIP_ERROR StoreProductRevision(uint16_t productRev);
     CHIP_ERROR StoreFabricId(uint64_t fabricId);
-#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-    CHIP_ERROR StoreDeviceId(uint64_t deviceId);
-    CHIP_ERROR StoreDeviceCertificate(const uint8_t * cert, size_t certLen);
-    CHIP_ERROR StoreDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen);
-    CHIP_ERROR StoreDevicePrivateKey(const uint8_t * key, size_t keyLen);
-#endif
     CHIP_ERROR StoreManufacturerDeviceId(uint64_t deviceId);
     CHIP_ERROR StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen);
     CHIP_ERROR StoreManufacturerDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen);
@@ -138,10 +132,6 @@ public:
     bool IsPairedToAccount();
     bool IsMemberOfFabric();
     bool IsFullyProvisioned();
-#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-    bool OperationalDeviceCredentialsProvisioned();
-#endif
-
     void InitiateFactoryReset();
 
     CHIP_ERROR ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize);
@@ -178,10 +168,6 @@ private:
     CHIP_ERROR SetFailSafeArmed(bool val);
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
-#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-    CHIP_ERROR ClearOperationalDeviceCredentials(void);
-    void UseManufacturerCredentialsAsOperational(bool val);
-#endif
 
 protected:
     // Construction/destruction limited to subclasses.
@@ -432,30 +418,6 @@ inline CHIP_ERROR ConfigurationManager::StoreFabricId(uint64_t fabricId)
     return static_cast<ImplClass *>(this)->_StoreFabricId(fabricId);
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-
-inline CHIP_ERROR ConfigurationManager::StoreDeviceId(uint64_t deviceId)
-{
-    return static_cast<ImplClass *>(this)->_StoreDeviceId(deviceId);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreDeviceCertificate(const uint8_t * cert, size_t certLen)
-{
-    return static_cast<ImplClass *>(this)->_StoreDeviceCertificate(cert, certLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen)
-{
-    return static_cast<ImplClass *>(this)->_StoreDeviceIntermediateCACerts(certs, certsLen);
-}
-
-inline CHIP_ERROR ConfigurationManager::StoreDevicePrivateKey(const uint8_t * key, size_t keyLen)
-{
-    return static_cast<ImplClass *>(this)->_StoreDevicePrivateKey(key, keyLen);
-}
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-
 inline CHIP_ERROR ConfigurationManager::StoreManufacturerDeviceId(uint64_t deviceId)
 {
     return static_cast<ImplClass *>(this)->_StoreManufacturerDeviceId(deviceId);
@@ -613,25 +575,6 @@ inline CHIP_ERROR ConfigurationManager::SetFailSafeArmed(bool val)
 {
     return static_cast<ImplClass *>(this)->_SetFailSafeArmed(val);
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-
-inline bool ConfigurationManager::OperationalDeviceCredentialsProvisioned()
-{
-    return static_cast<ImplClass *>(this)->_OperationalDeviceCredentialsProvisioned();
-}
-
-inline CHIP_ERROR ConfigurationManager::ClearOperationalDeviceCredentials(void)
-{
-    return static_cast<ImplClass *>(this)->_ClearOperationalDeviceCredentials();
-}
-
-inline void ConfigurationManager::UseManufacturerCredentialsAsOperational(bool val)
-{
-    static_cast<ImplClass *>(this)->_UseManufacturerCredentialsAsOperational(val);
-}
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 
 inline void ConfigurationManager::LogDeviceConfig()
 {
