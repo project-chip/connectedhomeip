@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 3.2.15. [TC-CC-6.1 to 6.3] Color Temperature Controls
+name:
+    27.2.14. [TC-CC-6.3] Color Temperature Step functionality with server as DUT
 
 config:
     cluster: "Color Control"
@@ -30,97 +31,12 @@ tests:
       response:
           value: 1
 
-    - label: "Move To Color Temperature command"
-      command: "MoveToColorTemperature"
-      arguments:
-          values:
-              - name: "colorTemperature"
-                value: 100
-              - name: "transitionTime"
-                value: 10
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
     - label: "Read current color temprature"
       disabled: true
       command: "readAttribute"
       attribute: "color temperature"
       response:
           value: 100
-
-    - label: "Move up color temperature command"
-      command: "MoveColorTemperature"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 1
-              - name: "rate"
-                value: 10
-              - name: "colorTemperatureMinimum"
-                value: 1
-              - name: "colorTemperatureMaximum"
-                value: 255
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label: "Read current color temprature"
-      disabled: true
-      command: "readAttribute"
-      attribute: "color temperature"
-      response:
-          value: -1
-
-    - label: "Stop Color Temperature command"
-      command: "MoveColorTemperature"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 0
-              - name: "rate"
-                value: 10
-              - name: "colorTemperatureMinimum"
-                value: 1
-              - name: "colorTemperatureMaximum"
-                value: 255
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label: "Read current color temprature"
-      disabled: true
-      command: "readAttribute"
-      attribute: "color temperature"
-      response:
-          value: -1
-
-    - label: "Move down color temperature command"
-      command: "MoveColorTemperature"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 3
-              - name: "rate"
-                value: 20
-              - name: "colorTemperatureMinimum"
-                value: 1
-              - name: "colorTemperatureMaximum"
-                value: 255
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label: "Read current color temprature"
-      disabled: true
-      command: "readAttribute"
-      attribute: "color temperature"
-      response:
-          value: -1
 
     - label: "Step up color temperature command"
       command: "StepColorTemperature"

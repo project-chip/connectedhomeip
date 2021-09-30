@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 3.2.15. [TC-CC-5.1 to 5.3] Color XY Controls
+name: 27.2.9. [TC-CC-5.1] Color MoveTo functionality with server as DUT
 
 config:
     cluster: "Color Control"
@@ -30,6 +30,24 @@ tests:
       response:
           value: 1
 
+    - label:
+          "Check current x attribute value matched the value sent by the last
+          command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current x"
+      response:
+          value: 200
+
+    - label:
+          "Check current y attribute value matched the value sent by the last
+          command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current y"
+      response:
+          value: 300
+
     - label: "Move to Color command"
       command: "MoveToColor"
       arguments:
@@ -46,7 +64,7 @@ tests:
                 value: 0
 
     - label:
-          "Check current y attribute value matched the value sent by the last
+          "Check current x attribute value matched the value sent by the last
           command"
       disabled: true
       command: "readAttribute"
@@ -55,104 +73,13 @@ tests:
           value: 200
 
     - label:
-          "Check current x attribute value matched the value sent by the last
+          "Check current y attribute value matched the value sent by the last
           command"
       disabled: true
       command: "readAttribute"
       attribute: "current y"
       response:
           value: 300
-
-    - label: "Move Color command"
-      command: "MoveColor"
-      arguments:
-          values:
-              - name: "rateX"
-                value: 15
-              - name: "rateY"
-                value: 20
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current x"
-      response:
-          value: -1
-
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          value: -1
-
-    - label: "Stop Move Step command"
-      command: "StopMoveStep"
-      arguments:
-          values:
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current x"
-      response:
-          value: -1
-
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          value: -1
-
-    - label: "Step Color command"
-      command: "StepColor"
-      arguments:
-          values:
-              - name: "stepX"
-                value: 15
-              - name: "stepY"
-                value: 20
-              - name: "transitionTime"
-                value: 50
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current x"
-      response:
-          value: -1
-
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current y"
-      response:
-          value: -1
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
