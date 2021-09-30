@@ -106,6 +106,16 @@ void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
         if (control->callback != NULL)
         {
             (control->callback)(control->endpoint);
+            return;
+        }
+
+        for (const EmberEventData & event : emAfEvents)
+        {
+            if (event.control != control)
+                continue;
+            control->status = EMBER_EVENT_INACTIVE;
+            event.handler();
+            break;
         }
     }
 }
