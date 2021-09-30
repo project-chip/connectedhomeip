@@ -1736,6 +1736,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRssiWithResponseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeBeaconLostCountWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeBeaconRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePacketMulticastRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePacketMulticastTxCountWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePacketUnicastRxCountWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributePacketUnicastTxCountWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCurrentMaxRateWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
