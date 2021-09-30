@@ -1,10 +1,6 @@
 {
     "version": "ZCL Test Data",
-    "xmlRoot": [
-        ".",
-        "./data-model/chip/",
-        "./data-model/silabs/"
-    ],
+    "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
     "xmlFile": [
         "account-login-cluster.xml",
         "administrator-commissioning-cluster.xml",
@@ -71,15 +67,9 @@
     "manufacturersXml": "../../../../third_party/zap/repo/zcl-builtin/shared/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": [
-                "Always",
-                "Conditional",
-                "Never"
-            ]
+            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
         },
-        "bool": [
-            "commandDiscovery"
-        ]
+        "bool": ["commandDiscovery"]
     },
     "defaults": {
         "text": {
