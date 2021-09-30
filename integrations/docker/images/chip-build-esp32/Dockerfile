@@ -13,5 +13,23 @@ RUN set -x \
     && IDF_TOOLS_PATH=/opt/espressif/tools ./install.sh \
     && : # last line
 
+# BEGIN: PATCH BORKEN UPSTREAM
+#
+# After an upgrade in https://pypi.org/project/cryptography/#history
+# ESP sdk starts failing when attempting to run:
+#
+#   /opt/espressif/tools/python_env/idf4.3_py3.9_env/bin/python \
+#       /opt/espressif/esp-idf/components/mbedtls/esp_crt_bundle/gen_crt_bundle.py \
+#       --input /opt/espressif/esp-idf/components/mbedtls/esp_crt_bundle/cacrt_all.pem -q
+#
+# Unfortunately cryptography is brought up as ">=2.7" so we get an incompatible version
+# Code below reverts to a known working version.
+
+RUN set -x \
+    && /opt/espressif/tools/python_env/idf4.3_py3.9_env/bin/pip uninstall cryptography \
+    && /opt/espressif/tools/python_env/idf4.3_py3.9_env/bin/pip install cryptography==3.4.8 \
+    && : # last line
+# END: PATCH BORKEN UPSTREAM
+
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
