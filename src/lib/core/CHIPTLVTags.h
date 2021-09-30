@@ -86,7 +86,7 @@ enum
  * @param[in]   tagNum          The profile-specific tag number assigned to the tag.
  * @return                      A 64-bit integer representing the tag.
  */
-inline uint64_t ProfileTag(uint32_t profileId, uint32_t tagNum)
+inline constexpr uint64_t ProfileTag(uint32_t profileId, uint32_t tagNum)
 {
     return ((static_cast<uint64_t>(profileId)) << kProfileIdShift) | tagNum;
 }
@@ -111,7 +111,7 @@ inline uint64_t ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagN
  * @param[in]   tagNum          The context-specific tag number assigned to the tag.
  * @return                      A 64-bit integer representing the tag.
  */
-inline uint64_t ContextTag(uint8_t tagNum)
+inline constexpr uint64_t ContextTag(uint8_t tagNum)
 {
     return kSpecialTagMarker | tagNum;
 }

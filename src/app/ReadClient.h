@@ -93,7 +93,8 @@ public:
     CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
     CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     uint64_t GetAppIdentifier() const { return mAppIdentifier; }
-    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+
+    NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
     CHIP_ERROR SendStatusResponse(CHIP_ERROR aError);
@@ -177,6 +178,7 @@ private:
     uint16_t mMinIntervalFloorSeconds          = 0;
     uint16_t mMaxIntervalCeilingSeconds        = 0;
     uint64_t mSubscriptionId                   = 0;
+    NodeId mPeerNodeId                         = kUndefinedNodeId;
     InteractionType mInteractionType           = InteractionType::Read;
 };
 

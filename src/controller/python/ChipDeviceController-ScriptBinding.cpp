@@ -51,6 +51,7 @@
 #include <app/server/Mdns.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
@@ -205,19 +206,21 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
                                                                         nocSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
-    CommissionerInitParams initParams;
-    initParams.storageDelegate                = &sStorageDelegate;
-    initParams.mDeviceAddressUpdateDelegate   = &sDeviceAddressUpdateDelegate;
+    FactoryInitParams factoryParams;
+    factoryParams.storageDelegate = &sStorageDelegate;
+    factoryParams.imDelegate      = &PythonInteractionModelDelegate::Instance();
+
+    SetupParams initParams;
+    initParams.deviceAddressUpdateDelegate    = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;
-    initParams.imDelegate                     = &PythonInteractionModelDelegate::Instance();
     initParams.ephemeralKeypair               = &ephemeralKey;
     initParams.controllerRCAC                 = rcacSpan;
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
 
-    (*outDevCtrl)->SetUdpListenPort(0);
-    err = (*outDevCtrl)->Init(initParams);
+    ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
+    err = DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, **outDevCtrl);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     chip::app::MdnsServer::Instance().StartServer(chip::Mdns::CommissioningMode::kDisabled);

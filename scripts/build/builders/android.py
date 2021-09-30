@@ -91,6 +91,10 @@ class AndroidBuilder(Builder):
             'python3', 'build/chip/java/tests/generate_jars_for_test.py'
         ], title='Generating JARs for Java build rules test')
 
+        self._Execute([
+            'python3', 'third_party/android_deps/set_up_android_deps.py'
+        ], title='Setting up Android deps through Gradle')
+
         if not os.path.exists(self.output_dir):
             # NRF does a in-place update  of SDK tools
             if not self._runner.dry_run:
@@ -151,7 +155,9 @@ class AndroidBuilder(Builder):
 
         jars = {
             'CHIPController.jar': 'src/controller/java/CHIPController.jar',
-            'SetupPayloadParser.jar': 'src/setup_payload/java/SetupPayloadParser.jar'
+            'SetupPayloadParser.jar': 'src/setup_payload/java/SetupPayloadParser.jar',
+            'AndroidPlatform.jar': 'src/platform/android/AndroidPlatform.jar'
+
         }
         for jarName in jars.keys():
             self._Execute(['cp', os.path.join(
@@ -170,6 +176,9 @@ class AndroidBuilder(Builder):
             'CHIPController.jar':
                 os.path.join(self.output_dir, 'lib',
                              'src/controller/java/CHIPController.jar'),
+            'AndroidPlatform.jar':
+                os.path.join(self.output_dir, 'lib',
+                             'src/platform/android/AndroidPlatform.jar'),
             'SetupPayloadParser.jar':
                 os.path.join(self.output_dir, 'lib',
                              'src/setup_payload/java/SetupPayloadParser.jar'),

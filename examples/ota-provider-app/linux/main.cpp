@@ -23,6 +23,8 @@
 #include <app/clusters/ota-provider/ota-provider.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
@@ -48,13 +50,19 @@ using chip::Messaging::ExchangeManager;
 // TODO: this should probably be done dynamically
 constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 
-constexpr uint16_t kOptionFilepath = 'f';
-const char * gOtaFilepath          = nullptr;
+constexpr uint16_t kOptionFilepath             = 'f';
+constexpr uint16_t kOptionQueryImageBehavior   = 'q';
+constexpr uint16_t kOptionDelayedActionTimeSec = 'd';
 
 // Arbitrary BDX Transfer Params
 constexpr uint32_t kMaxBdxBlockSize = 1024;
 constexpr uint32_t kBdxTimeoutMs    = 5 * 60 * 1000; // OTA Spec mandates >= 5 minutes
 constexpr uint32_t kBdxPollFreqMs   = 500;
+
+// Global variables used for passing the CLI arguments to the OTAProviderExample object
+OTAProviderExample::queryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+uint32_t gDelayedActionTimeSec                                 = 0;
+const char * gOtaFilepath                                      = nullptr;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -73,6 +81,33 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             gOtaFilepath = aValue;
         }
         break;
+    case kOptionQueryImageBehavior:
+        if (aValue == NULL)
+        {
+            PrintArgError("%s: ERROR: NULL QueryImageBehavior parameter\n", aProgram);
+            retval = false;
+        }
+        else if (strcmp(aValue, "UpdateAvailable") == 0)
+        {
+            gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+        }
+        else if (strcmp(aValue, "Busy") == 0)
+        {
+            gQueryImageBehavior = OTAProviderExample::kRespondWithBusy;
+        }
+        else if (strcmp(aValue, "UpdateNotAvailable") == 0)
+        {
+            gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+        }
+        else
+        {
+            PrintArgError("%s: ERROR: Invalid QueryImageBehavior parameter:  %s\n", aProgram, aValue);
+            retval = false;
+        }
+        break;
+    case kOptionDelayedActionTimeSec:
+        gDelayedActionTimeSec = static_cast<uint32_t>(strtol(aValue, NULL, 0));
+        break;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -84,13 +119,18 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
 OptionDef cmdLineOptionsDef[] = {
     { "filepath", chip::ArgParser::kArgumentRequired, kOptionFilepath },
+    { "QueryImageBehavior", chip::ArgParser::kArgumentRequired, kOptionQueryImageBehavior },
+    { "DelayedActionTimeSec", chip::ArgParser::kArgumentRequired, kOptionDelayedActionTimeSec },
     {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -f <file>\n"
-                             "  --filepath <file>\n"
-                             "        Path to a file containing an OTA image.\n" };
+                             "  -f/--filepath <file>\n"
+                             "        Path to a file containing an OTA image.\n"
+                             "  -q/--QueryImageBehavior <UpdateAvailable | Busy | UpdateNotAvailable>\n"
+                             "        Status value in the Query Image Response\n"
+                             "  -d/--DelayedActionTimeSec <time>\n"
+                             "        Value in seconds for the DelayedActionTime in the Query Image Response\n" };
 
 HelpOptions helpOptions("ota-provider-app", "Usage: ota-provider-app [options]", "1.0");
 
@@ -122,6 +162,9 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     chip::Server::GetInstance().Init();
 
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
     err = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
                                                                                                         &bdxServer);
     if (err != CHIP_NO_ERROR)
@@ -137,6 +180,9 @@ int main(int argc, char * argv[])
         otaProvider.SetOTAFilePath(gOtaFilepath);
         bdxServer.SetFilepath(gOtaFilepath);
     }
+
+    otaProvider.SetQueryImageBehavior(gQueryImageBehavior);
+    otaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
 
     chip::app::clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
 
