@@ -26,7 +26,6 @@
 #pragma once
 
 #include <credentials/CHIPCert.h>
-#include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>

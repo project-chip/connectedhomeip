@@ -22,7 +22,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <credentials/CHIPOperationalCredentials.h>
+#include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #if CHIP_CRYPTO_HSM

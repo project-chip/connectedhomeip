@@ -32,7 +32,6 @@
 #include <app/util/basic-types.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/DeviceControllerInteractionModelDelegate.h>
-#include <credentials/CHIPOperationalCredentials.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
