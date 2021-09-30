@@ -1211,60 +1211,6 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
 
-constexpr chip::ClusterId kAccountLoginClusterId                         = 0x050E;
-constexpr chip::ClusterId kAdministratorCommissioningClusterId           = 0x003C;
-constexpr chip::ClusterId kApplicationBasicClusterId                     = 0x050D;
-constexpr chip::ClusterId kApplicationLauncherClusterId                  = 0x050C;
-constexpr chip::ClusterId kAudioOutputClusterId                          = 0x050B;
-constexpr chip::ClusterId kBarrierControlClusterId                       = 0x0103;
-constexpr chip::ClusterId kBasicClusterId                                = 0x0028;
-constexpr chip::ClusterId kBinaryInputBasicClusterId                     = 0x000F;
-constexpr chip::ClusterId kBindingClusterId                              = 0xF000;
-constexpr chip::ClusterId kBridgedDeviceBasicClusterId                   = 0x0039;
-constexpr chip::ClusterId kColorControlClusterId                         = 0x0300;
-constexpr chip::ClusterId kContentLauncherClusterId                      = 0x050A;
-constexpr chip::ClusterId kDescriptorClusterId                           = 0x001D;
-constexpr chip::ClusterId kDiagnosticLogsClusterId                       = 0x0032;
-constexpr chip::ClusterId kDoorLockClusterId                             = 0x0101;
-constexpr chip::ClusterId kElectricalMeasurementClusterId                = 0x0B04;
-constexpr chip::ClusterId kEthernetNetworkDiagnosticsClusterId           = 0x0037;
-constexpr chip::ClusterId kFixedLabelClusterId                           = 0x0040;
-constexpr chip::ClusterId kFlowMeasurementClusterId                      = 0x0404;
-constexpr chip::ClusterId kGeneralCommissioningClusterId                 = 0x0030;
-constexpr chip::ClusterId kGeneralDiagnosticsClusterId                   = 0x0033;
-constexpr chip::ClusterId kGroupKeyManagementClusterId                   = 0xF004;
-constexpr chip::ClusterId kGroupsClusterId                               = 0x0004;
-constexpr chip::ClusterId kIdentifyClusterId                             = 0x0003;
-constexpr chip::ClusterId kKeypadInputClusterId                          = 0x0509;
-constexpr chip::ClusterId kLevelControlClusterId                         = 0x0008;
-constexpr chip::ClusterId kLowPowerClusterId                             = 0x0508;
-constexpr chip::ClusterId kMediaInputClusterId                           = 0x0507;
-constexpr chip::ClusterId kMediaPlaybackClusterId                        = 0x0506;
-constexpr chip::ClusterId kNetworkCommissioningClusterId                 = 0x0031;
-constexpr chip::ClusterId kOtaSoftwareUpdateProviderClusterId            = 0x0029;
-constexpr chip::ClusterId kOtaSoftwareUpdateRequestorClusterId           = 0x002A;
-constexpr chip::ClusterId kOccupancySensingClusterId                     = 0x0406;
-constexpr chip::ClusterId kOnOffClusterId                                = 0x0006;
-constexpr chip::ClusterId kOnOffSwitchConfigurationClusterId             = 0x0007;
-constexpr chip::ClusterId kOperationalCredentialsClusterId               = 0x003E;
-constexpr chip::ClusterId kPowerSourceClusterId                          = 0x002F;
-constexpr chip::ClusterId kPressureMeasurementClusterId                  = 0x0403;
-constexpr chip::ClusterId kPumpConfigurationAndControlClusterId          = 0x0200;
-constexpr chip::ClusterId kRelativeHumidityMeasurementClusterId          = 0x0405;
-constexpr chip::ClusterId kScenesClusterId                               = 0x0005;
-constexpr chip::ClusterId kSoftwareDiagnosticsClusterId                  = 0x0034;
-constexpr chip::ClusterId kSwitchClusterId                               = 0x003B;
-constexpr chip::ClusterId kTvChannelClusterId                            = 0x0504;
-constexpr chip::ClusterId kTargetNavigatorClusterId                      = 0x0505;
-constexpr chip::ClusterId kTemperatureMeasurementClusterId               = 0x0402;
-constexpr chip::ClusterId kTestClusterClusterId                          = 0x050F;
-constexpr chip::ClusterId kThermostatClusterId                           = 0x0201;
-constexpr chip::ClusterId kThermostatUserInterfaceConfigurationClusterId = 0x0204;
-constexpr chip::ClusterId kThreadNetworkDiagnosticsClusterId             = 0x0035;
-constexpr chip::ClusterId kWakeOnLanClusterId                            = 0x0503;
-constexpr chip::ClusterId kWiFiNetworkDiagnosticsClusterId               = 0x0036;
-constexpr chip::ClusterId kWindowCoveringClusterId                       = 0x0102;
-
 /*----------------------------------------------------------------------------*\
 | Cluster AccountLogin                                                | 0x050E |
 |------------------------------------------------------------------------------|
