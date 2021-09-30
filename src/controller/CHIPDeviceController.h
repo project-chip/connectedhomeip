@@ -35,7 +35,6 @@
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/DeviceControllerInteractionModelDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
-#include <credentials/CHIPOperationalCredentials.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>

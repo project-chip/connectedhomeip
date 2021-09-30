@@ -25,7 +25,6 @@
  */
 
 #include <credentials/CHIPCert.h>
-#include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/PeerId.h>

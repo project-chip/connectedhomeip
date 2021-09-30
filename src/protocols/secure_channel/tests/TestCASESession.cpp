@@ -25,7 +25,6 @@
 #include <nlunit-test.h>
 
 #include <credentials/CHIPCert.h>
-#include <credentials/CHIPOperationalCredentials.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
