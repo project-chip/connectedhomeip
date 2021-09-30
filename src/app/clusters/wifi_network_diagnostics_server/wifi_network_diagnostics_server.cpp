@@ -130,25 +130,25 @@ bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint
     VerifyOrExit(DeviceLayer::ConnectivityMgr().ResetWiFiNetworkDiagnosticsCounts() == CHIP_NO_ERROR,
                  status = EMBER_ZCL_STATUS_FAILURE);
 
-    status = WiFiNetworkDiagnostics::Attributes::SetBeaconLostCount(endpoint, 0);
+    status = WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset BeaconLostCount attribute"));
 
-    status = WiFiNetworkDiagnostics::Attributes::SetBeaconRxCount(endpoint, 0);
+    status = WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset BeaconRxCount attribute"));
 
-    status = WiFiNetworkDiagnostics::Attributes::SetPacketMulticastRxCount(endpoint, 0);
+    status = WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketMulticastRxCount attribute"));
 
-    status = WiFiNetworkDiagnostics::Attributes::SetPacketMulticastTxCount(endpoint, 0);
+    status = WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketMulticastTxCount attribute"));
 
-    status = WiFiNetworkDiagnostics::Attributes::SetPacketUnicastRxCount(endpoint, 0);
+    status = WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketUnicastRxCount attribute"));
 
-    status = WiFiNetworkDiagnostics::Attributes::SetPacketUnicastTxCount(endpoint, 0);
+    status = WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketUnicastTxCount attribute"));
 
-    status = WiFiNetworkDiagnostics::Attributes::SetOverrunCount(endpoint, 0);
+    status = WiFiNetworkDiagnostics::Attributes::OverrunCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset OverrunCount attribute"));
 
 exit:

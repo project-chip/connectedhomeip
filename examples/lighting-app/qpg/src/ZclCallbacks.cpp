@@ -90,14 +90,14 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             {
                 xy.x = *reinterpret_cast<uint16_t *>(value);
                 // get Y from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::GetCurrentY(endpoint, &xy.y);
+                EmberAfStatus status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             if (attributeId == ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID)
             {
                 xy.y = *reinterpret_cast<uint16_t *>(value);
                 // get X from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::GetCurrentX(endpoint, &xy.x);
+                EmberAfStatus status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
@@ -110,14 +110,14 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             {
                 hsv.h = *value;
                 // get saturation from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::GetCurrentSaturation(endpoint, &hsv.s);
+                EmberAfStatus status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             if (attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID)
             {
                 hsv.s = *value;
                 // get hue from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::GetCurrentHue(endpoint, &hsv.h);
+                EmberAfStatus status = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
