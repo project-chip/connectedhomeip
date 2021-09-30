@@ -3469,7 +3469,7 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributePresentValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+        return cluster.SubscribeAttributePresentValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
                                                       mMaxInterval);
     }
 
@@ -3549,7 +3549,7 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeStatusFlags(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+        return cluster.SubscribeAttributeStatusFlags(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
                                                      mMaxInterval);
     }
 
@@ -5221,7 +5221,6 @@ public:
         AddArgument("attr-name", "current-hue");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT8_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -5245,8 +5244,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                    mMaxInterval, mChange);
+        return cluster.SubscribeAttributeCurrentHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                    mMaxInterval);
     }
 
 private:
@@ -5258,7 +5257,6 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint8_t mChange;
 };
 
 /*
@@ -5303,7 +5301,6 @@ public:
         AddArgument("attr-name", "current-saturation");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT8_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -5327,8 +5324,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentSaturation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                           mMaxInterval, mChange);
+        return cluster.SubscribeAttributeCurrentSaturation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                           mMaxInterval);
     }
 
 private:
@@ -5340,7 +5337,6 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint8_t mChange;
 };
 
 /*
@@ -5419,7 +5415,6 @@ public:
         AddArgument("attr-name", "current-x");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -5443,8 +5438,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentX(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                  mMaxInterval, mChange);
+        return cluster.SubscribeAttributeCurrentX(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                  mMaxInterval);
     }
 
 private:
@@ -5456,7 +5451,6 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint16_t mChange;
 };
 
 /*
@@ -5501,7 +5495,6 @@ public:
         AddArgument("attr-name", "current-y");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -5525,8 +5518,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentY(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                  mMaxInterval, mChange);
+        return cluster.SubscribeAttributeCurrentY(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                  mMaxInterval);
     }
 
 private:
@@ -5538,7 +5531,6 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint16_t mChange;
 };
 
 /*
@@ -5651,7 +5643,6 @@ public:
         AddArgument("attr-name", "color-temperature");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -5675,8 +5666,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeColorTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                          mMaxInterval, mChange);
+        return cluster.SubscribeAttributeColorTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                          mMaxInterval);
     }
 
 private:
@@ -5688,7 +5679,6 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint16_t mChange;
 };
 
 /*
@@ -9014,7 +9004,7 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeLockState(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+        return cluster.SubscribeAttributeLockState(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
                                                    mMaxInterval);
     }
 
@@ -11537,7 +11527,6 @@ public:
         AddArgument("attr-name", "current-level");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT8_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -11561,8 +11550,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                      mMaxInterval, mChange);
+        return cluster.SubscribeAttributeCurrentLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                      mMaxInterval);
     }
 
 private:
@@ -11574,7 +11563,6 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint8_t mChange;
 };
 
 /*
@@ -13486,7 +13474,7 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeOccupancy(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+        return cluster.SubscribeAttributeOccupancy(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
                                                    mMaxInterval);
     }
 
@@ -13880,7 +13868,7 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeOnOff(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+        return cluster.SubscribeAttributeOnOff(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
                                                mMaxInterval);
     }
 
@@ -15276,7 +15264,6 @@ public:
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", INT16_MIN, INT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -15300,8 +15287,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                       mMaxInterval, mChange);
+        return cluster.SubscribeAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                       mMaxInterval);
     }
 
 private:
@@ -15313,7 +15300,6 @@ private:
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    int16_t mChange;
 };
 
 /*
@@ -15646,7 +15632,6 @@ public:
         AddArgument("attr-name", "capacity");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", INT16_MIN, INT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -15670,8 +15655,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCapacity(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                  mMaxInterval, mChange);
+        return cluster.SubscribeAttributeCapacity(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                  mMaxInterval);
     }
 
 private:
@@ -15683,7 +15668,6 @@ private:
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    int16_t mChange;
 };
 
 /*
@@ -15841,7 +15825,6 @@ public:
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -15865,8 +15848,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                       mMaxInterval, mChange);
+        return cluster.SubscribeAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                       mMaxInterval);
     }
 
 private:
@@ -15878,7 +15861,6 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint16_t mChange;
 };
 
 /*
@@ -16736,7 +16718,6 @@ public:
         AddArgument("attr-name", "current-position");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT8_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -16760,8 +16741,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentPosition(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                         mMaxInterval, mChange);
+        return cluster.SubscribeAttributeCurrentPosition(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                         mMaxInterval);
     }
 
 private:
@@ -16773,7 +16754,6 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint8_t mChange;
 };
 
 /*
@@ -17239,7 +17219,6 @@ public:
         AddArgument("attr-name", "measured-value");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", INT16_MIN, INT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -17263,8 +17242,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                       mMaxInterval, mChange);
+        return cluster.SubscribeAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                       mMaxInterval);
     }
 
 private:
@@ -17276,7 +17255,6 @@ private:
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    int16_t mChange;
 };
 
 /*
@@ -19432,7 +19410,6 @@ public:
         AddArgument("attr-name", "local-temperature");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", INT16_MIN, INT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -19456,8 +19433,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeLocalTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
-                                                          mMaxInterval, mChange);
+        return cluster.SubscribeAttributeLocalTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                          mMaxInterval);
     }
 
 private:
@@ -19469,7 +19446,6 @@ private:
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    int16_t mChange;
 };
 
 /*
@@ -23612,7 +23588,6 @@ public:
         AddArgument("attr-name", "current-position-lift-percentage");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT8_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -23636,8 +23611,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentPositionLiftPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                       mMinInterval, mMaxInterval, mChange);
+        return cluster.SubscribeAttributeCurrentPositionLiftPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                       mMinInterval, mMaxInterval);
     }
 
 private:
@@ -23649,7 +23624,6 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint8_t mChange;
 };
 
 /*
@@ -23694,7 +23668,6 @@ public:
         AddArgument("attr-name", "current-position-tilt-percentage");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT8_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -23718,8 +23691,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentPositionTiltPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                       mMinInterval, mMaxInterval, mChange);
+        return cluster.SubscribeAttributeCurrentPositionTiltPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                       mMinInterval, mMaxInterval);
     }
 
 private:
@@ -23731,7 +23704,6 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint8_t mChange;
 };
 
 /*
@@ -23799,7 +23771,7 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeOperationalStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+        return cluster.SubscribeAttributeOperationalStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
                                                            mMaxInterval);
     }
 
@@ -23856,7 +23828,6 @@ public:
         AddArgument("attr-name", "target-position-lift-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -23880,8 +23851,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeTargetPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                         mMinInterval, mMaxInterval, mChange);
+        return cluster.SubscribeAttributeTargetPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                         mMinInterval, mMaxInterval);
     }
 
 private:
@@ -23893,7 +23864,6 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint16_t mChange;
 };
 
 /*
@@ -23938,7 +23908,6 @@ public:
         AddArgument("attr-name", "target-position-tilt-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -23962,8 +23931,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeTargetPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                         mMinInterval, mMaxInterval, mChange);
+        return cluster.SubscribeAttributeTargetPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                         mMinInterval, mMaxInterval);
     }
 
 private:
@@ -23975,7 +23944,6 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint16_t mChange;
 };
 
 /*
@@ -24054,7 +24022,6 @@ public:
         AddArgument("attr-name", "current-position-lift-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -24078,8 +24045,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                          mMinInterval, mMaxInterval, mChange);
+        return cluster.SubscribeAttributeCurrentPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                          mMinInterval, mMaxInterval);
     }
 
 private:
@@ -24091,7 +24058,6 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint16_t mChange;
 };
 
 /*
@@ -24136,7 +24102,6 @@ public:
         AddArgument("attr-name", "current-position-tilt-percent100ths");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("change", 0, UINT16_MAX, &mChange);
         ModelCommand::AddArguments();
     }
 
@@ -24160,8 +24125,8 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeCurrentPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                                                          mMinInterval, mMaxInterval, mChange);
+        return cluster.SubscribeAttributeCurrentPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                          mMinInterval, mMaxInterval);
     }
 
 private:
@@ -24173,7 +24138,6 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    uint16_t mChange;
 };
 
 /*
@@ -24444,7 +24408,7 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttributeSafetyStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+        return cluster.SubscribeAttributeSafetyStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
                                                       mMaxInterval);
     }
 
