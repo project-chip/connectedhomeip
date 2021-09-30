@@ -723,7 +723,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                 memcpy(&addr4, &(address->data.ipv4), sizeof(addr4));
                 result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv4(addr4));
 #else
-                ChipLogError(Discovery, "Ignoring IPv4 mDNS address.");
+                ChipLogDetail(Discovery, "Ignoring IPv4 mDNS address.");
 #endif
                 break;
             case AVAHI_PROTO_INET6:
