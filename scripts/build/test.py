@@ -22,6 +22,7 @@ import os
 import subprocess
 import sys
 import time
+import unittest
 
 from builders.host import HostBoard
 
@@ -30,13 +31,13 @@ from typing import List
 SCRIPT_ROOT = os.path.dirname(__file__)
 
 
-def build_expected_output(root: str, out: str) -> List[str]:
-    with open(os.path.join(SCRIPT_ROOT, 'expected_all_platform_commands.txt'), 'rt') as f:
+def build_expected_output(source: str, root: str, out: str) -> List[str]:
+    with open(os.path.join(SCRIPT_ROOT, source), 'rt') as f:
         for l in f.readlines():
-            yield l.replace("{root}", root).replace("{out}", out).replace('{host_platform}', HostBoard.NATIVE.PlatformName()).replace('{host_board}', HostBoard.NATIVE.BoardName())
+            yield l.replace("{root}", root).replace("{out}", out)
 
 
-def build_actual_output(root: str, out: str) -> List[str]:
+def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
     # Fake out that we have a project root
     binary = os.path.join(SCRIPT_ROOT, 'build_examples.py')
 
@@ -53,35 +54,53 @@ def build_actual_output(root: str, out: str) -> List[str]:
 
     retval = subprocess.run([
         binary,
-        '--platform', 'all',
         '--log-level', 'FATAL',
         '--dry-run',
         '--repo', root,
         '--out-prefix', out,
-        'build'
-    ], stdout=subprocess.PIPE, check=True, encoding='UTF-8', env=runenv)
+    ] + args, stdout=subprocess.PIPE, check=True, encoding='UTF-8', env=runenv)
 
-    return [l + '\n' for l in retval.stdout.split('\n')]
+    result = [l + '\n' for l in retval.stdout.split('\n')]
+
+    # ensure a single terminating newline: easier to edit since autoformat
+    # often strips ending double newlines on text files
+    while result[-1] == '\n':
+        result = result[:-1]
+    
+    return result
+
+class TestBuilder(unittest.TestCase):
+
+    def assertCommandOutput(self, expected_file: str, args: List[str]):
+        ROOT = '/TEST/BUILD/ROOT'
+        OUT = '/OUTPUT/DIR'
+     
+        expected = [l for l in build_expected_output(expected_file, ROOT, OUT)]
+        actual = [l for l in build_actual_output(ROOT, OUT, args)]
+     
+        diffs = [line for line in difflib.unified_diff(expected, actual)]
+     
+        if diffs:
+            msg = "DIFFERENCE between expected and generated output in %s" % expected_file
+            for l in diffs:
+                msg += ("\n   " + l.replace(ROOT, '{root}').replace(OUT, '{out}').strip())
+            self.fail(msg)
 
 
-def main():
-    coloredlogs.install(level=logging.INFO,
-                        fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
 
-    ROOT = '/TEST/BUILD/ROOT'
-    OUT = '/OUTPUT/DIR'
+    def test_output(self):
+        self.assertCommandOutput(
+           os.path.join('testdata', 'build_all_except_host.txt'),
+           '--skip-target-glob {linux,darwin}-* build'.split(' ')
+        )
 
-    expected = [l for l in build_expected_output(ROOT, OUT)]
-    actual = [l for l in build_actual_output(ROOT, OUT)]
+    def test_targets(self):
+        self.assertCommandOutput(
+           os.path.join('testdata', 'all_targets_except_host.txt'),
+           '--skip-target-glob {linux,darwin}-* targets'.split(' ')
+        )
 
-    diffs = [line for line in difflib.unified_diff(expected, actual)]
-
-    if diffs:
-        logging.error("DIFFERENCE between expected and generated output")
-        for l in diffs:
-            logging.warning("  " + l.strip())
-        sys.exit(1)
 
 
 if __name__ == '__main__':
-    main()
+    unittest.main()

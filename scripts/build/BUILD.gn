@@ -22,7 +22,8 @@ pw_python_package("build_examples") {
   setup = [ "setup.py" ]
   inputs = [
     # Dependency for the unit test
-    "expected_all_platform_commands.txt",
+    "testdata/build_all_except_host.txt",
+    "testdata/all_targets_except_host.txt",
   ]
 
   sources = [
