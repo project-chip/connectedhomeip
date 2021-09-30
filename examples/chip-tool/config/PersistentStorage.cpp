@@ -85,7 +85,7 @@ CHIP_ERROR PersistentStorage::Init(const char * sectionName)
     VerifyOrExit(ifs.is_open(), err = CHIP_ERROR_OPEN_FAILED);
     if (sectionName)
         strcpy(kSectionName, sectionName);
-    else 
+    else
         strcpy(kSectionName, "Default");
 
     mConfig.parse(ifs);
