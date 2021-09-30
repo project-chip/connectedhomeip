@@ -13,7 +13,7 @@ RUN set -x \
     && IDF_TOOLS_PATH=/opt/espressif/tools ./install.sh \
     && : # last line
 
-# BEGIN: PATCH BORKEN UPSTREAM
+# BEGIN: PATCH BROKEN UPSTREAM
 #
 # After an upgrade in https://pypi.org/project/cryptography/#history
 # ESP sdk starts failing when attempting to run:
@@ -29,7 +29,7 @@ RUN set -x \
     && /opt/espressif/tools/python_env/idf4.3_py3.9_env/bin/pip uninstall -y cryptography \
     && /opt/espressif/tools/python_env/idf4.3_py3.9_env/bin/pip install cryptography==3.4.8 \
     && : # last line
-# END: PATCH BORKEN UPSTREAM
+# END: PATCH BROKEN UPSTREAM
 
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
