@@ -770,7 +770,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     }
 #endif
     session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress());
-    VerifyOrExit(session.HasValue(), CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &mPairingSession);
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
