@@ -72,7 +72,7 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
 
     switch (attributeId)
     {
-    case Ids::OccupiedHeatingSetpoint: {
+    case OccupiedHeatingSetpoint::Id: {
         int16_t AbsMinHeatSetpointLimit;
         int16_t AbsMaxHeatSetpointLimit;
         int16_t MinHeatSetpointLimit;
@@ -112,7 +112,7 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
         break;
     }
 
-    case Ids::OccupiedCoolingSetpoint: {
+    case OccupiedCoolingSetpoint::Id: {
         int16_t AbsMinCoolSetpointLimit;
         int16_t AbsMaxCoolSetpointLimit;
         int16_t MinCoolSetpointLimit;
@@ -151,8 +151,8 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
         break;
     }
 
-    case Ids::MinHeatSetpointLimit:
-    case Ids::MaxHeatSetpointLimit: {
+    case MinHeatSetpointLimit::Id:
+    case MaxHeatSetpointLimit::Id: {
         int16_t AbsMinHeatSetpointLimit;
         int16_t AbsMaxHeatSetpointLimit;
 
@@ -176,8 +176,8 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
 
         break;
     }
-    case Ids::MinCoolSetpointLimit:
-    case Ids::MaxCoolSetpointLimit: {
+    case MinCoolSetpointLimit::Id:
+    case MaxCoolSetpointLimit::Id: {
         int16_t AbsMinCoolSetpointLimit;
         int16_t AbsMaxCoolSetpointLimit;
 
@@ -202,7 +202,7 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
         break;
     }
 
-    case Ids::ControlSequenceOfOperation: {
+    case ControlSequenceOfOperation::Id: {
         uint8_t requestedCSO;
         requestedCSO = *value;
         if (requestedCSO > EMBER_ZCL_THERMOSTAT_CONTROL_SEQUENCE_COOLING_AND_HEATING_WITH_REHEAT)
@@ -213,7 +213,7 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
         break;
     }
 
-    case Ids::SystemMode: {
+    case SystemMode::Id: {
         uint8_t ControlSequenceOfOperation = kInvalidControlSequenceOfOperation;
         uint8_t RequestedSystemMode        = kInvalidRequestedSystemMode;
         GetControlSequenceOfOperation(endpoint, &ControlSequenceOfOperation);
