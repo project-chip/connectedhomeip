@@ -35,12 +35,12 @@ public:
 
     // Inherited from OTAProviderDelegate
     EmberAfStatus HandleQueryImage(chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId,
-                                   uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion,
-                                   uint8_t protocolsSupported, const chip::Span<const char> & location, bool clientCanConsent,
+                                   uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported,
+                                   const chip::Span<const char> & location, bool requestorCanConsent,
                                    const chip::ByteSpan & metadataForServer) override;
     EmberAfStatus HandleApplyUpdateRequest(chip::app::CommandHandler * commandObj, const chip::ByteSpan & updateToken,
                                            uint32_t newVersion) override;
-    EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t currentVersion) override;
+    EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t softwareVersion) override;
 
     enum queryImageBehaviorType
     {

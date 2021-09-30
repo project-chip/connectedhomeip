@@ -15649,10 +15649,10 @@ bool emberAfBasicClusterLeaveCallback(chip::EndpointId endpoint, chip::app::Comm
  * @brief OTA Software Update Provider Cluster QueryImage Command callback (from client)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                               uint16_t vendorId, uint16_t productId, uint16_t imageType,
-                                                               uint16_t hardwareVersion, uint32_t currentVersion,
-                                                               uint8_t protocolsSupported, uint8_t * location,
-                                                               bool requestorCanConsent, chip::ByteSpan metadataForProvider);
+                                                               uint16_t vendorId, uint16_t productId, uint16_t hardwareVersion,
+                                                               uint32_t softwareVersion, uint8_t protocolsSupported,
+                                                               uint8_t * location, bool requestorCanConsent,
+                                                               chip::ByteSpan metadataForProvider);
 /**
  * @brief OTA Software Update Provider Cluster ApplyUpdateRequest Command callback (from client)
  */
@@ -15664,15 +15664,16 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(chip::End
  */
 bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::EndpointId endpoint,
                                                                         chip::app::CommandHandler * commandObj,
-                                                                        chip::ByteSpan updateToken, uint32_t currentVersion);
+                                                                        chip::ByteSpan updateToken, uint32_t softwareVersion);
 /**
  * @brief OTA Software Update Provider Cluster QueryImageResponse Command callback (from server)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::EndpointId endpoint,
                                                                        chip::app::CommandSender * commandObj, uint8_t status,
                                                                        uint32_t delayedActionTime, uint8_t * imageURI,
-                                                                       uint32_t softwareVersion, chip::ByteSpan updateToken,
-                                                                       bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
+                                                                       uint32_t softwareVersion, uint8_t * softwareVersionString,
+                                                                       chip::ByteSpan updateToken, bool userConsentNeeded,
+                                                                       chip::ByteSpan metadataForRequestor);
 /**
  * @brief OTA Software Update Provider Cluster ApplyUpdateRequestResponse Command callback (from server)
  */
@@ -15684,7 +15685,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(c
  */
 bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(chip::EndpointId endpoint,
                                                                          chip::app::CommandHandler * commandObj,
-                                                                         chip::ByteSpan serverLocation, uint16_t vendorId,
+                                                                         chip::ByteSpan providerLocation, uint16_t vendorId,
                                                                          uint8_t announcementReason,
                                                                          chip::ByteSpan metadataForNode);
 /**
