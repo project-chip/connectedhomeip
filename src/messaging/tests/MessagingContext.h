@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include <credentials/CHIPOperationalCredentials.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -87,8 +86,6 @@ public:
     Messaging::ExchangeContext * NewExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate);
 
-    Credentials::OperationalCredentialSet & GetOperationalCredentialSet() { return mOperationalCredentialSet; }
-
     System::Layer & GetSystemLayer() { return mIOContext->GetSystemLayer(); }
 
 private:
@@ -109,7 +106,6 @@ private:
     Transport::FabricTable mFabrics;
     FabricIndex mSrcFabricIndex  = 0;
     FabricIndex mDestFabricIndex = 0;
-    Credentials::OperationalCredentialSet mOperationalCredentialSet;
 };
 
 } // namespace Test

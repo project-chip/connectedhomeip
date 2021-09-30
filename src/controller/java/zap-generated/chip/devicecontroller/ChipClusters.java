@@ -3624,17 +3624,16 @@ public class ChipClusters {
     }
 
     public void notifyUpdateApplied(
-        DefaultClusterCallback callback, byte[] updateToken, long currentVersion) {
-      notifyUpdateApplied(chipClusterPtr, callback, updateToken, currentVersion);
+        DefaultClusterCallback callback, byte[] updateToken, long softwareVersion) {
+      notifyUpdateApplied(chipClusterPtr, callback, updateToken, softwareVersion);
     }
 
     public void queryImage(
         QueryImageResponseCallback callback,
         int vendorId,
         int productId,
-        int imageType,
         int hardwareVersion,
-        long currentVersion,
+        long softwareVersion,
         int protocolsSupported,
         String location,
         boolean requestorCanConsent,
@@ -3644,9 +3643,8 @@ public class ChipClusters {
           callback,
           vendorId,
           productId,
-          imageType,
           hardwareVersion,
-          currentVersion,
+          softwareVersion,
           protocolsSupported,
           location,
           requestorCanConsent,
@@ -3663,16 +3661,15 @@ public class ChipClusters {
         long chipClusterPtr,
         DefaultClusterCallback callback,
         byte[] updateToken,
-        long currentVersion);
+        long softwareVersion);
 
     private native void queryImage(
         long chipClusterPtr,
         QueryImageResponseCallback callback,
         int vendorId,
         int productId,
-        int imageType,
         int hardwareVersion,
-        long currentVersion,
+        long softwareVersion,
         int protocolsSupported,
         String location,
         boolean requestorCanConsent,
@@ -3690,6 +3687,7 @@ public class ChipClusters {
           long delayedActionTime,
           String imageURI,
           long softwareVersion,
+          String softwareVersionString,
           byte[] updateToken,
           boolean userConsentNeeded,
           byte[] metadataForRequestor);
@@ -3715,18 +3713,23 @@ public class ChipClusters {
 
     public void announceOtaProvider(
         DefaultClusterCallback callback,
-        byte[] serverLocation,
+        byte[] providerLocation,
         int vendorId,
         int announcementReason,
         byte[] metadataForNode) {
       announceOtaProvider(
-          chipClusterPtr, callback, serverLocation, vendorId, announcementReason, metadataForNode);
+          chipClusterPtr,
+          callback,
+          providerLocation,
+          vendorId,
+          announcementReason,
+          metadataForNode);
     }
 
     private native void announceOtaProvider(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        byte[] serverLocation,
+        byte[] providerLocation,
         int vendorId,
         int announcementReason,
         byte[] metadataForNode);

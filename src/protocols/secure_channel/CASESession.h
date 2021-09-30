@@ -26,11 +26,11 @@
 #pragma once
 
 #include <credentials/CHIPCert.h>
-#include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
@@ -118,20 +118,27 @@ public:
                                 SessionEstablishmentDelegate * delegate);
 
     /**
-     *   Parse the message to check if it has a session resumption request.
-     *   A valid session resumption request must have Resumption ID, and InitiationResumeMIC.
+     * Parse a sigma1 message.  This function will return success only if the
+     * message passes schema checks.  Specifically:
+     *   * The tags come in order.
+     *   * The required tags are present.
+     *   * The values for the tags that are present satisfy schema requirements
+     *     (e.g. constraints on octet string lengths)
+     *   * Either resumptionID and initiatorResume1MIC are both present or both
+     *     absent.
      *
-     *   If the message is a valid session resumption request, the output parameter resumptionRequested is set to true,
-     *   and corresponding resumption ID and MIC are returned in the output parameters. Return value is set to CHIP_NO_ERROR.
+     * On success, the initiatorRandom, initiatorSessionId, destinationId,
+     * initiatorEphPubKey outparams will be set to the corresponding values in
+     * the message.
      *
-     *   If the message is not a session resumption request (i.e. it doesn't contain both Resumption ID, and InitiationResumeMIC),
-     *   the output parameter resumptionRequested is set to false. Return value is set to CHIP_NO_ERROR.
-     *
-     *   If the message doesn't contain either Resumption ID or InitiationResumeMIC (i.e. contains only one of these fields), the
-     *   function returns CHIP_ERROR_INVALID_ARGUMENT.
+     * On success, either the resumptionRequested outparam will be set to true
+     * and the  resumptionID and initiatorResumeMIC outparams will be set to
+     * valid values, or the resumptionRequested outparam will be set to false.
      */
-    static CHIP_ERROR IsResumptionRequestPresent(const System::PacketBufferHandle & message, bool & resumptionRequested,
-                                                 ByteSpan & resumptionID, ByteSpan & resume1MIC);
+    static CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ByteSpan & initiatorRandom,
+                                  uint16_t & initiatorSessionId, ByteSpan & destinationId, ByteSpan & initiatorEphPubKey,
+                                  // TODO: MRP param parsing
+                                  bool & resumptionRequested, ByteSpan & resumptionId, ByteSpan & initiatorResumeMIC);
 
     /**
      * @brief
@@ -190,6 +197,11 @@ public:
     /** @brief This function zeroes out and resets the memory used by the object.
      **/
     void Clear();
+
+    /**
+     * Parse the TLV for Sigma1 message.
+     */
+    CHIP_ERROR ParseSigma1();
 
 private:
     enum State : uint8_t
