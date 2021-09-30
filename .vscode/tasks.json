@@ -18,7 +18,7 @@
             "type": "shell",
             "command": "scripts/run_in_build_env.sh",
             "args": [
-                "./scripts/build/build_examples.py --target-glob ${input:exampleGlob} build"
+                "./scripts/build/build_examples.py --target-glob \"${input:exampleGlob}\" build"
             ],
             "group": "build",
             "problemMatcher": {

@@ -31,8 +31,8 @@ def _GlobMatch(glob: str, value: str) -> bool:
       if glob[0] == '?':
           glob, value = glob[1:], value[1:]
       elif glob[0] == '*':
-            for idx in range(len(value)):
-                if _GlobMatch(glob[1:], value[idx+1:]):
+            for idx in range(len(value)+1):
+                if _GlobMatch(glob[1:], value[idx:]):
                     return True
             return False
       elif glob[0] == '{':
