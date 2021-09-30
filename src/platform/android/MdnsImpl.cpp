@@ -57,17 +57,17 @@ CHIP_ERROR ChipMdnsShutdown()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ChipMdnsRemoveServices()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ChipMdnsStopPublish()
-{
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
+CHIP_ERROR ChipMdnsCompleteServiceUpdate()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

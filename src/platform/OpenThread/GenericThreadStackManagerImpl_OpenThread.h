@@ -104,7 +104,9 @@ protected:
                               const Span<const char * const> & aSubTypes, const Span<const Mdns::TextEntry> & aTxtEntries,
                               uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR _RemoveSrpService(const char * aInstanceName, const char * aName);
-    CHIP_ERROR _RemoveAllSrpServices();
+    CHIP_ERROR _InvalidateAllSrpServices();
+    CHIP_ERROR _RemoveInvalidSrpServices();
+
     CHIP_ERROR _SetupSrpHost(const char * aHostName);
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
     CHIP_ERROR _DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext);
@@ -161,6 +163,7 @@ private:
         struct Service
         {
             otSrpClientService mService;
+            bool mIsInvalid;
             uint8_t mServiceBuffer[kServiceBufferSize];
 #if OPENTHREAD_API_VERSION >= 132
             const char * mSubTypes[kSubTypeMaxNumber + 1]; // extra entry for null terminator

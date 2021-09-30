@@ -135,10 +135,10 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     params.systemState->ExchangeMgr()->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    ReturnErrorOnFailure(Mdns::Resolver::Instance().SetResolverDelegate(this));
+    Mdns::Resolver::Instance().Init(params.systemState->InetLayer(), kMdnsPort);
+    Mdns::Resolver::Instance().SetResolverDelegate(this);
     RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
-    Mdns::Resolver::Instance().StartResolver(params.systemState->InetLayer(), kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     InitDataModelHandler(params.systemState->ExchangeMgr());
@@ -217,7 +217,7 @@ CHIP_ERROR DeviceController::Shutdown()
     mState = State::NotInitialized;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    Mdns::Resolver::Instance().ShutdownResolver();
+    Mdns::Resolver::Instance().Shutdown();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     mStorageDelegate = nullptr;

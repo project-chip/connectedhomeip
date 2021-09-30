@@ -31,17 +31,16 @@ namespace {
 class MockResolver : public Resolver
 {
 public:
-    CHIP_ERROR SetResolverDelegate(ResolverDelegate *) override { return SetResolverDelegateStatus; }
-    CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) override { return StartResolverStatus; }
-    void ShutdownResolver() override {}
+    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer, uint16_t port) override { return InitStatus; }
+    void Shutdown() override {}
+    void SetResolverDelegate(ResolverDelegate *) override {}
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override { return ResolveNodeIdStatus; }
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return FindCommissionersStatus; }
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    CHIP_ERROR SetResolverDelegateStatus = CHIP_NO_ERROR;
-    CHIP_ERROR StartResolverStatus       = CHIP_NO_ERROR;
-    CHIP_ERROR ResolveNodeIdStatus       = CHIP_NO_ERROR;
-    CHIP_ERROR FindCommissionersStatus   = CHIP_NO_ERROR;
+    CHIP_ERROR InitStatus              = CHIP_NO_ERROR;
+    CHIP_ERROR ResolveNodeIdStatus     = CHIP_NO_ERROR;
+    CHIP_ERROR FindCommissionersStatus = CHIP_NO_ERROR;
 };
 
 } // namespace
@@ -143,18 +142,10 @@ void TestDiscoverCommissioners_HappyCaseWithDiscoveryFilter(nlTestSuite * inSuit
                        CHIP_NO_ERROR);
 }
 
-void TestDiscoverCommissioners_SetResolverDelegateError_ReturnsError(nlTestSuite * inSuite, void * inContext)
+void TestDiscoverCommissioners_InitError_ReturnsError(nlTestSuite * inSuite, void * inContext)
 {
     MockResolver resolver;
-    resolver.SetResolverDelegateStatus = CHIP_ERROR_INTERNAL;
-    CommissionableNodeController controller(&resolver);
-    NL_TEST_ASSERT(inSuite, controller.DiscoverCommissioners() != CHIP_NO_ERROR);
-}
-
-void TestDiscoverCommissioners_StartResolverError_ReturnsError(nlTestSuite * inSuite, void * inContext)
-{
-    MockResolver resolver;
-    resolver.StartResolverStatus = CHIP_ERROR_INTERNAL;
+    resolver.InitStatus = CHIP_ERROR_INTERNAL;
     CommissionableNodeController controller(&resolver);
     NL_TEST_ASSERT(inSuite, controller.DiscoverCommissioners() != CHIP_NO_ERROR);
 }
@@ -178,8 +169,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestGetDiscoveredCommissioner_NoNodesDiscovered_ReturnsNullptr", TestGetDiscoveredCommissioner_NoNodesDiscovered_ReturnsNullptr),
     NL_TEST_DEF("TestDiscoverCommissioners_HappyCase", TestDiscoverCommissioners_HappyCase),
     NL_TEST_DEF("TestDiscoverCommissioners_HappyCaseWithDiscoveryFilter", TestDiscoverCommissioners_HappyCaseWithDiscoveryFilter),
-    NL_TEST_DEF("TestDiscoverCommissioners_SetResolverDelegateError_ReturnsError", TestDiscoverCommissioners_SetResolverDelegateError_ReturnsError),
-    NL_TEST_DEF("TestDiscoverCommissioners_StartResolverError_ReturnsError", TestDiscoverCommissioners_StartResolverError_ReturnsError),
+    NL_TEST_DEF("TestDiscoverCommissioners_InitError_ReturnsError", TestDiscoverCommissioners_InitError_ReturnsError),
     NL_TEST_DEF("TestDiscoverCommissioners_FindCommissionersError_ReturnsError", TestDiscoverCommissioners_FindCommissionersError_ReturnsError),
     NL_TEST_SENTINEL()
 };

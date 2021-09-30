@@ -285,30 +285,68 @@ private:
     bool mPairingInstrHasValue = false;
 };
 
-/// Handles advertising of CHIP nodes
+/**
+ * Interface for advertising CHIP DNS-SD services.
+ *
+ * A user of this interface must first initialize the advertiser using the `Init` method.
+ *
+ * Then, whenever advertised services need to be refreshed, the following sequence of events must
+ * occur:
+ * 1. Call the `RemoveServices` method.
+ * 2. Call one of the `Advertise` methods for each service to be added or updated.
+ * 3. Call the `CompleteServiceUpdate` method to complete the update and apply all pending changes.
+ */
 class ServiceAdvertiser
 {
 public:
     virtual ~ServiceAdvertiser() {}
 
-    /// Starts the advertiser. Items 'Advertised' will become visible.
-    /// Must be called before Advertise() calls.
-    virtual CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint16_t port) = 0;
+    /**
+     * Initializes the advertiser.
+     *
+     * The method must be called before other methods of this class.
+     * If the advertiser has already been initialized, the method exits immediately with no error.
+     */
+    virtual CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer, uint16_t port) = 0;
 
-    /// Advertises the CHIP node as an operational node
+    /**
+     * Shuts down the advertiser.
+     */
+    virtual void Shutdown() = 0;
+
+    /**
+     * Removes or marks all services being advertised for removal.
+     *
+     * Depending on the implementation, the method may either stop advertising existing services
+     * immediately, or mark them for removal upon the subsequent `CompleteServiceUpdate` method call.
+     */
+    virtual CHIP_ERROR RemoveServices() = 0;
+
+    /**
+     * Advertises the given operational node service.
+     */
     virtual CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) = 0;
 
-    /// Advertises the CHIP node as a commissioner/commissionable node
+    /**
+     * Advertises the given commissionable/commissioner node service.
+     */
     virtual CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) = 0;
 
-    /// Stops the advertiser.
-    virtual CHIP_ERROR StopPublishDevice() = 0;
+    /**
+     * Completes updating advertised services.
+     *
+     * This method can be used by some implementations to apply changes made with the `RemoveServices`
+     * and `Advertise` methods in case they could not be applied immediately.
+     */
+    virtual CHIP_ERROR CompleteServiceUpdate() = 0;
+
+    /**
+     * Returns the commissionable node service instance name formatted as hex string.
+     */
+    virtual CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) = 0;
 
     /// Provides the system-wide implementation of the service advertiser
     static ServiceAdvertiser & Instance();
-
-    /// Returns DNS-SD instance name formatted as hex string
-    virtual CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) = 0;
 };
 
 } // namespace Mdns

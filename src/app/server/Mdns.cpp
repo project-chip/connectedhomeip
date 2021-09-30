@@ -148,17 +148,17 @@ bool MdnsServer::OnExpiration(uint64_t expirationMs)
 
     ChipLogDetail(Discovery, "OnExpiration - valid time out");
 
-    // reset advertising
-    CHIP_ERROR err;
-    err = chip::Mdns::ServiceAdvertiser::Instance().StopPublishDevice();
+    CHIP_ERROR err = Mdns::ServiceAdvertiser::Instance().Init(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to stop ServiceAdvertiser: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to initialize advertiser: %s", chip::ErrorStr(err));
     }
-    err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+
+    // reset advertising
+    err = Mdns::ServiceAdvertiser::Instance().RemoveServices();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to start ServiceAdvertiser: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to remove advertised services: %s", chip::ErrorStr(err));
     }
 
     // restart operational (if needed)
@@ -175,6 +175,12 @@ bool MdnsServer::OnExpiration(uint64_t expirationMs)
         ChipLogError(Discovery, "Failed to advertise commissioner: %s", chip::ErrorStr(err));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+    err = Mdns::ServiceAdvertiser::Instance().CompleteServiceUpdate();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to complete service update: %s", chip::ErrorStr(err));
+    }
 
     return true;
 }
@@ -406,17 +412,16 @@ void MdnsServer::StartServer(chip::Mdns::CommissioningMode mode)
 
     ClearTimeouts();
 
-    CHIP_ERROR err;
-    err = chip::Mdns::ServiceAdvertiser::Instance().StopPublishDevice();
+    CHIP_ERROR err = Mdns::ServiceAdvertiser::Instance().Init(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to stop ServiceAdvertiser: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to initialize advertiser: %s", chip::ErrorStr(err));
     }
 
-    err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    err = Mdns::ServiceAdvertiser::Instance().RemoveServices();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to start ServiceAdvertiser: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to remove advertised services: %s", chip::ErrorStr(err));
     }
 
     err = AdvertiseOperational();
@@ -471,6 +476,12 @@ void MdnsServer::StartServer(chip::Mdns::CommissioningMode mode)
         ChipLogError(Discovery, "Failed to advertise commissioner: %s", chip::ErrorStr(err));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+    err = Mdns::ServiceAdvertiser::Instance().CompleteServiceUpdate();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to complete service update: %s", chip::ErrorStr(err));
+    }
 }
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID

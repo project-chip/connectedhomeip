@@ -46,7 +46,12 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ChipMdnsStopPublish()
+CHIP_ERROR ChipMdnsRemoveServices()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ChipMdnsCompleteServiceUpdate()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

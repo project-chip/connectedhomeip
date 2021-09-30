@@ -26,9 +26,17 @@ namespace {
 class NoneAdvertiser : public ServiceAdvertiser
 {
 public:
-    CHIP_ERROR Start(chip::Inet::InetLayer * inetLayet, uint16_t port) override
+    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayet, uint16_t port) override
     {
-        ChipLogError(Discovery, "mDNS advertising not available. mDNS start disabled.");
+        ChipLogError(Discovery, "mDNS advertising not available. mDNS init disabled.");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    void Shutdown() override {}
+
+    CHIP_ERROR RemoveServices() override
+    {
+        ChipLogError(Discovery, "mDNS advertising not available. Removing services failed.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
@@ -44,10 +52,9 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    /// Stops the advertiser.
-    CHIP_ERROR StopPublishDevice() override
+    CHIP_ERROR CompleteServiceUpdate() override
     {
-        ChipLogError(Discovery, "mDNS advertising not available. mDNS stop not available.");
+        ChipLogError(Discovery, "mDNS advertising not available. Completing service update failed.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 

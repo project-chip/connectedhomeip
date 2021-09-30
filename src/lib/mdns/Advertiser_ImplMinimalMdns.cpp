@@ -115,10 +115,12 @@ public:
     ~AdvertiserMinMdns() {}
 
     // Service advertiser
-    CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
+    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
+    void Shutdown() override;
+    CHIP_ERROR RemoveServices() override;
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
-    CHIP_ERROR StopPublishDevice() override;
+    CHIP_ERROR CompleteServiceUpdate() override { return CHIP_NO_ERROR; }
     CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
 
     // MdnsPacketDelegate
@@ -272,7 +274,7 @@ void AdvertiserMinMdns::OnQuery(const QueryData & data)
     }
 }
 
-CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t port)
+CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::InetLayer * inetLayer, uint16_t port)
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
 
@@ -291,8 +293,12 @@ CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t 
     return CHIP_NO_ERROR;
 }
 
-/// Stops the advertiser.
-CHIP_ERROR AdvertiserMinMdns::StopPublishDevice()
+void AdvertiserMinMdns::Shutdown()
+{
+    GlobalMinimalMdnsServer::Server().Shutdown();
+}
+
+CHIP_ERROR AdvertiserMinMdns::RemoveServices()
 {
     for (auto & allocator : mQueryResponderAllocatorOperational)
     {

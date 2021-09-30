@@ -62,25 +62,20 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 }
 
-CHIP_ERROR ChipMdnsStopPublish()
+CHIP_ERROR ChipMdnsRemoveServices()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    return ThreadStackMgr().RemoveAllSrpServices();
+    ThreadStackMgr().InvalidateAllSrpServices();
+    return CHIP_NO_ERROR;
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 }
 
-CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
+CHIP_ERROR ChipMdnsCompleteServiceUpdate()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    if (service == nullptr)
-        return CHIP_ERROR_INVALID_ARGUMENT;
-
-    char serviceType[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1];
-    snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
-
-    return ThreadStackMgr().RemoveSrpService(service->mName, serviceType);
+    return ThreadStackMgr().RemoveInvalidSrpServices();
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT

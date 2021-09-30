@@ -36,35 +36,21 @@ namespace Mdns {
 class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 {
 public:
-    CHIP_ERROR Init();
+    /// Members that implement both ServiceAdveriser and Resolver interfaces.
+    CHIP_ERROR Init(Inet::InetLayer *, uint16_t /* port */) override { return InitImpl(); }
+    void Shutdown() override;
 
-    /// Starts the service advertiser if not yet started. Otherwise, removes all existing services.
-    CHIP_ERROR Start(Inet::InetLayer * inetLayer, uint16_t port) override;
-
-    /// Starts the service resolver if not yet started
-    CHIP_ERROR StartResolver(Inet::InetLayer * inetLayer, uint16_t port) override { return Init(); }
-    void ShutdownResolver() override { ChipMdnsShutdown(); }
-
-    /// Advertises the CHIP node as an operational node
+    // Members that implement ServiceAdvertiser interface.
+    CHIP_ERROR RemoveServices() override;
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
-
-    /// Advertises the CHIP node as a commissioner/commissionable node
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
-
-    /// This function stops publishing the device on mDNS.
-    CHIP_ERROR StopPublishDevice() override;
-
-    /// Returns DNS-SD instance name formatted as hex string
+    CHIP_ERROR CompleteServiceUpdate() override;
     CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
 
-    /// Registers a resolver delegate if none has been registered before
-    CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
-
-    /// Requests resolution of a node ID to its address
+    // Members that implement Resolver interface.
+    void SetResolverDelegate(ResolverDelegate * delegate) override { mResolverDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
-
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
-
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
     static DiscoveryImplPlatform & GetInstance();
@@ -75,6 +61,7 @@ private:
     DiscoveryImplPlatform(const DiscoveryImplPlatform &) = delete;
     DiscoveryImplPlatform & operator=(const DiscoveryImplPlatform &) = delete;
 
+    CHIP_ERROR InitImpl();
     CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
     CHIP_ERROR PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
 

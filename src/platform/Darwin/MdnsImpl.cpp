@@ -525,7 +525,7 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     return Register(interfaceId, regtype.c_str(), service->mName, service->mPort, &record);
 }
 
-CHIP_ERROR ChipMdnsStopPublish()
+CHIP_ERROR ChipMdnsRemoveServices()
 {
     GenericContext * sdCtx = nullptr;
     if (CHIP_ERROR_KEY_NOT_FOUND == MdnsContexts::GetInstance().Get(ContextType::Register, &sdCtx))
@@ -536,9 +536,9 @@ CHIP_ERROR ChipMdnsStopPublish()
     return MdnsContexts::GetInstance().Removes(ContextType::Register);
 }
 
-CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
+CHIP_ERROR ChipMdnsCompleteServiceUpdate()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip::Inet::IPAddressType addressType,

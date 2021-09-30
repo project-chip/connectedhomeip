@@ -129,7 +129,18 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCal
 CHIP_ERROR ChipMdnsShutdown();
 
 /**
- * This function publishes an service via mDNS.
+ * Removes or marks all services being advertised for removal.
+ *
+ * Depending on the implementation, the function may either stop advertising existing services
+ * immediately, or mark them for removal upon the subsequent `ChipMdnsCompleteServiceUpdate` call.
+ *
+ * @retval CHIP_NO_ERROR  The removal succeeds.
+ * @retval Error code     The removal fails.
+ */
+CHIP_ERROR ChipMdnsRemoveServices();
+
+/**
+ * This function publishes a service via mDNS or SRP.
  *
  * Calling the function again with the same service name, type, protocol,
  * interface and port but different text will update the text published.
@@ -145,25 +156,16 @@ CHIP_ERROR ChipMdnsShutdown();
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service);
 
 /**
- * This function stops publishing all services via mDNS.
+ * Completes updating advertised services.
  *
- * @retval CHIP_NO_ERROR                The publish stops successfully.
- * @retval Error code                   Stopping the publish fails.
+ * This function can be used by some implementations to apply changes made with the
+ * `ChipMdnsRemoveServices` and `ChipMdnsPublishService` functions in case they could
+ * not be applied immediately (like in case of implementations using SRP).
  *
+ * @retval CHIP_NO_ERROR  The service update completion succeeds.
+ * @retval Error code     The service update completion fails.
  */
-CHIP_ERROR ChipMdnsStopPublish();
-
-/**
- * This function stops publishing a specific service via mDNS.
- *
- * @param[in] service   The service entry.
- *
- * @retval CHIP_NO_ERROR                The service stop succeeds.
- * @retval CHIP_ERROR_INVALID_ARGUMENT  The service is nullptr.
- * @retval Error code                   The service stop fails.
- *
- */
-CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service);
+CHIP_ERROR ChipMdnsCompleteServiceUpdate();
 
 /**
  * This function browses the services published by mdns

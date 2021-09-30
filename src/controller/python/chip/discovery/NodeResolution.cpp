@@ -95,11 +95,9 @@ extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, ui
     CHIP_ERROR result = CHIP_NO_ERROR;
 
     chip::python::ChipMainThreadScheduleAndWait([&] {
-        result = Resolver::Instance().StartResolver(&chip::DeviceLayer::InetLayer, kMdnsPort);
+        result = Resolver::Instance().Init(&chip::DeviceLayer::InetLayer, kMdnsPort);
         ReturnOnFailure(result);
-
-        result = Resolver::Instance().SetResolverDelegate(&gPythonResolverDelegate);
-        ReturnOnFailure(result);
+        Resolver::Instance().SetResolverDelegate(&gPythonResolverDelegate);
 
         result = Resolver::Instance().ResolveNodeId(chip::PeerId().SetCompressedFabricId(fabricId).SetNodeId(nodeId),
                                                     chip::Inet::IPAddressType::kIPAddressType_Any);
