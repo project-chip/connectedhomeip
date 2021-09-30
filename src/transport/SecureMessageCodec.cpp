@@ -72,8 +72,8 @@ CHIP_ERROR Encrypt(Transport::SecureSession * state, PayloadHeader & payloadHead
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Decrypt(Transport::SecureSession * state, PayloadHeader & payloadHeader,
-                   const PacketHeader & packetHeader, System::PacketBufferHandle & msg)
+CHIP_ERROR Decrypt(Transport::SecureSession * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
+                   System::PacketBufferHandle & msg)
 {
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
