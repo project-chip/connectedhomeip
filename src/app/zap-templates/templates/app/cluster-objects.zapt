@@ -14,7 +14,6 @@ namespace clusters {
 
 {{#all_user_clusters}}
 namespace {{asCamelCased name false}} {
-constexpr ClusterId kClusterId = {{asHex code 2}};
 {{#zcl_enums}}
 // Enum for {{label}}
 enum class {{asType label}} : {{asUnderlyingZclType type}} {
