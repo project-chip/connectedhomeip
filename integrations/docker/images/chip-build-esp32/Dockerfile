@@ -26,7 +26,7 @@ RUN set -x \
 # Code below reverts to a known working version.
 
 RUN set -x \
-    && /opt/espressif/tools/python_env/idf4.3_py3.9_env/bin/pip uninstall cryptography \
+    && /opt/espressif/tools/python_env/idf4.3_py3.9_env/bin/pip uninstall -y cryptography \
     && /opt/espressif/tools/python_env/idf4.3_py3.9_env/bin/pip install cryptography==3.4.8 \
     && : # last line
 # END: PATCH BORKEN UPSTREAM
