@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:latest
+            image: connectedhomeip/chip-build:0.5.10
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -98,7 +98,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:latest
+            image: connectedhomeip/chip-build:0.5.10
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
@@ -174,7 +174,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:latest
+            image: connectedhomeip/chip-build:0.5.10
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options:
