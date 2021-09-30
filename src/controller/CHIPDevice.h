@@ -88,7 +88,7 @@ struct ControllerDeviceInitParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
-    Transport::FabricTable * fabricsTable                 = nullptr;
+    FabricTable * fabricsTable                            = nullptr;
     DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 };
 
@@ -517,9 +517,9 @@ private:
     static void OnOpenPairingWindowSuccessResponse(void * context);
     static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
 
-    FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
+    FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
-    Transport::FabricTable * mFabricsTable = nullptr;
+    FabricTable * mFabricsTable = nullptr;
 
     bool mDeviceOperationalCertProvisioned = false;
 

@@ -32,16 +32,13 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
-#include <transport/raw/MessageHeader.h>
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
 #define CASE_OPS_KEY 0xCA5EECC0
 #endif
 
 namespace chip {
-namespace Transport {
 
-static constexpr FabricIndex kUndefinedFabricIndex    = 0;
 static constexpr FabricIndex kMinValidFabricIndex     = 1;
 static constexpr FabricIndex kMaxValidFabricIndex     = std::min(UINT8_MAX, CHIP_CONFIG_MAX_DEVICE_ADMINS);
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
@@ -403,5 +400,4 @@ private:
     uint8_t mFabricCount                  = 0;
 };
 
-} // namespace Transport
 } // namespace chip

@@ -200,8 +200,6 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Transport::FabricTable fabrics;
-
     if (argc <= 1)
     {
         printf("Missing Echo Server IP address\n");
@@ -234,7 +232,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
@@ -244,7 +242,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
         SuccessOrExit(err);
     }
 

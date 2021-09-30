@@ -28,7 +28,6 @@
 
 #include <protocols/secure_channel/PASESession.h>
 #include <transport/CryptoContext.h>
-#include <transport/FabricTable.h>
 #include <transport/SessionHandle.h>
 
 #include <lib/support/CodeUtils.h>

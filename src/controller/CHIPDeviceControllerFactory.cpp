@@ -129,14 +129,14 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         params.imDelegate = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
     }
 
-    stateParams.fabricTable           = chip::Platform::New<Transport::FabricTable>();
+    stateParams.fabricTable           = chip::Platform::New<FabricTable>();
     stateParams.sessionMgr            = chip::Platform::New<SessionManager>();
     stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
     ReturnErrorOnFailure(stateParams.fabricTable->Init(mStorageDelegate));
-    ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr, stateParams.fabricTable,
-                                                      stateParams.messageCounterManager));
+    ReturnErrorOnFailure(
+        stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr, stateParams.messageCounterManager));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 

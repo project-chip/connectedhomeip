@@ -129,7 +129,6 @@ private:
 } gPingArguments;
 
 Protocols::Echo::EchoClient gEchoClient;
-Transport::FabricTable gFabrics;
 
 CHIP_ERROR SendEchoRequest(streamer_t * stream);
 void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState);
@@ -306,7 +305,7 @@ void StartPinging(streamer_t * stream, char * destination)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gFabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
@@ -315,7 +314,7 @@ void StartPinging(streamer_t * stream, char * destination)
     else
 #endif
     {
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gFabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);

@@ -36,7 +36,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/Constants.h>
-#include <transport/FabricTable.h>
 #include <transport/PairingSession.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
@@ -69,7 +68,7 @@ SessionManager::SessionManager() : mState(State::kNotReady) {}
 
 SessionManager::~SessionManager() {}
 
-CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
+CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
                                 Transport::MessageCounterManagerInterface * messageCounterManager)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
@@ -78,7 +77,6 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
     mState                 = State::kInitialized;
     mSystemLayer           = systemLayer;
     mTransportMgr          = transportMgr;
-    mFabrics               = fabrics;
     mMessageCounterManager = messageCounterManager;
 
     mGlobalEncryptedMessageCounter.Init();
@@ -99,7 +97,6 @@ void SessionManager::Shutdown()
     mState        = State::kNotReady;
     mSystemLayer  = nullptr;
     mTransportMgr = nullptr;
-    mFabrics      = nullptr;
     mCB           = nullptr;
 }
 

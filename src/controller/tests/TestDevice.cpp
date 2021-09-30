@@ -72,7 +72,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
         BleListenParameters(&blelayer)
 #endif
     );
-    sessionManager.Init(&systemLayer, &transportMgr, fabrics, &messageCounterManager);
+    sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager);
     exchangeMgr.Init(&sessionManager);
     messageCounterManager.Init(&exchangeMgr);
 

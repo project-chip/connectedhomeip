@@ -102,7 +102,7 @@ private:
 class DLL_EXPORT CASEExchangeACL : public ExchangeACL
 {
 public:
-    CASEExchangeACL(Transport::FabricInfo * info) : mFabricInfo(info) {}
+    CASEExchangeACL(FabricInfo * info) : mFabricInfo(info) {}
     virtual ~CASEExchangeACL() {}
 
     PermissionLevel GetPermissionLevel(const ACLSubject & subject, const ACLTarget & target) override
@@ -116,7 +116,7 @@ public:
     }
 
 private:
-    Transport::FabricInfo * mFabricInfo;
+    FabricInfo * mFabricInfo;
 };
 
 } // namespace Messaging

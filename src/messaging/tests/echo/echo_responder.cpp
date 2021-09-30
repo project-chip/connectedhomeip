@@ -61,8 +61,6 @@ int main(int argc, char * argv[])
     bool useTCP      = false;
     bool disableEcho = false;
 
-    chip::Transport::FabricTable fabrics;
-
     const chip::FabricIndex gFabricIndex = 0;
 
     if (argc > 2)
@@ -89,7 +87,7 @@ int main(int argc, char * argv[])
             chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
@@ -98,7 +96,7 @@ int main(int argc, char * argv[])
             chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
         SuccessOrExit(err);
     }
 
