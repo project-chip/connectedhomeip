@@ -69,14 +69,17 @@ class Efr32Builder(GnBuilder):
                  runner,
                  output_prefix: str,
                  app: Efr32App = Efr32App.LIGHT,
-                 board: Efr32Board = Efr32Board.BRD4161A):
+                 board: Efr32Board = Efr32Board.BRD4161A,
+                 enable_rpcs: bool = False):
         super(Efr32Builder, self).__init__(
             root=os.path.join(root, 'examples', app.ExampleName(), 'efr32'),
             runner=runner,
             output_prefix=output_prefix)
-
         self.app = app
         self.board = board
+        self.gn_build_args = ['efr32_board="%s"' % board.GnArgName()]
+        if enable_rpcs:
+            self.gn_build_args.append('import("//with_pw_rpc.gni")')
 
     def GnBuildArgs(self):
         return ['efr32_board="%s"' % self.board.GnArgName()]

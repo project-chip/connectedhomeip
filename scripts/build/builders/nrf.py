@@ -95,10 +95,12 @@ class NrfConnectBuilder(Builder):
                  runner,
                  output_prefix: str,
                  app: NrfApp = NrfApp.LIGHT,
-                 board: NrfBoard = NrfBoard.NRF52840):
+                 board: NrfBoard = NrfBoard.NRF52840,
+                 enable_rpcs: bool = False):
         super(NrfConnectBuilder, self).__init__(root, runner, output_prefix)
         self.app = app
         self.board = board
+        self.enable_rpcs = enable_rpcs
 
     def generate(self):
         if not os.path.exists(self.output_dir):
@@ -130,12 +132,13 @@ class NrfConnectBuilder(Builder):
             cmd = '''
 source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {outdir} -b {board} {sourcedir}
+west build --cmake-only -d {outdir} -b {board} {sourcedir}{rpcs}
         '''.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
                 sourcedir=shlex.quote(os.path.join(
-                    self.root, 'examples', self.app.ExampleName(), 'nrfconnect'))
+                    self.root, 'examples', self.app.ExampleName(), 'nrfconnect')),
+                rpcs=" -- -DOVERLAY_CONFIG=rpc.overlay" if self.enable_rpcs else ""
             ).strip()
 
             self._Execute(['bash', '-c', cmd],
