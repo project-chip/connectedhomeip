@@ -6045,7 +6045,7 @@ private:
         uint16_t minIntervalArgument = 2U;
         uint16_t maxIntervalArgument = 10U;
 
-        return cluster.ConfigureAttributeOnOff(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(), minIntervalArgument,
+        return cluster.SubscribeAttributeOnOff(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(), minIntervalArgument,
                                                maxIntervalArgument);
     }
 

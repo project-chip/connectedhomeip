@@ -111,9 +111,8 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::WriteAttribute{{asUpperCamel
 
 {{/if}}
 {{#if isReportableAttribute}}
-CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ConfigureAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}})
+CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::SubscribeAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
 {
-    {{#if isAnalog}}IgnoreUnusedVariable(change);{{/if}}
     chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
