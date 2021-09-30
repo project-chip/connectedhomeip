@@ -22,7 +22,8 @@ RUN set -x \
 #       /opt/espressif/esp-idf/components/mbedtls/esp_crt_bundle/gen_crt_bundle.py \
 #       --input /opt/espressif/esp-idf/components/mbedtls/esp_crt_bundle/cacrt_all.pem -q
 #
-# Unfortunately cryptography is brought up as ">=2.7" so we get an incompatible version
+# Unfortunately cryptography is brought up as ">=2.1.4" from
+# /opt/espressif/esp-idf/requirements.txt, so we get an incompatible version
 # Code below reverts to a known working version.
 
 RUN set -x \
