@@ -25,6 +25,8 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
+from glob_matcher import GlobMatcher
+
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -34,7 +36,6 @@ __LOG_LEVELS__ = {
     'warn': logging.WARN,
     'fatal': logging.FATAL,
 }
-
 
 def ValidateRepoPath(context, parameter, value):
     """Validates that the given path looks like a valid chip repository checkout."""
@@ -62,7 +63,17 @@ def ValidateRepoPath(context, parameter, value):
     default=['all'],
     type=click.Choice(['all'] + [t.name for t in build.ALL_TARGETS], case_sensitive=False),
     multiple=True,
-    help='Build target'
+    help='Build target(s)'
+)
+@click.option(
+    '--target-glob',
+    default=None,
+    help='Glob matching for targets to include'
+)
+@click.option(
+    '--skip-target-glob',
+    default=None,
+    help='Glob matching for targets to explicitly exclude'
 )
 @click.option(
     '--enable-flashbundle',
@@ -107,7 +118,7 @@ def ValidateRepoPath(context, parameter, value):
     help='Build with debug RPCs enabled.'
 )
 @click.pass_context
-def main(context, log_level, target, repo, out_prefix, clean,
+def main(context, log_level, target, target_glob, skip_target_glob, repo, out_prefix, clean,
          dry_run, dry_run_output, enable_flashbundle, no_log_timestamps, rpc):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
@@ -133,6 +144,23 @@ before running this script.
     else:
       requested_targets = set([t.lower for t in target])
       targets = [target for target in build.ALL_TARGETS if target.name.lower in requested_targets]
+    
+      actual_targes = set([t.name.lower for t in targets]):
+      if requested_targets != actual_targes:
+        logging.error('Targets not found: %s', CommaSeparate(actual_targes))
+
+    if target_glob:
+        matcher = GlobMatcher(target_glob)
+        targets = [t for t in targets if matcher.matches(t.name)]
+
+    if skip_target_glob:
+        matcher = GlobMatcher(skip_target_glob)
+        targets = [t for t in targets if not matcher.matches(t.name)]
+    
+
+    # force consistent sorting
+    targets.sort(key=lambda t: t.name)
+    logging.info('Building targets: %s', CommaSeparate([t.name for t in targets]))
 
 
     context.obj = build.Context(repository_path=repo, output_prefix=out_prefix, runner=runner)

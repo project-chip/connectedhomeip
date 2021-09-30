@@ -40,5 +40,9 @@ pw_python_package("build_examples") {
     "runner/printonly.py",
     "runner/shell.py",
   ]
-  tests = [ "test.py" ]
+
+  tests = [ 
+    "test.py",
+    "test_glob_matcher.py",
+  ]
 }
