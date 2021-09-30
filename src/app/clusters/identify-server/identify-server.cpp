@@ -145,7 +145,7 @@ static inline void identify_deactivate(Identify * identify)
 
 void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
 {
-    if (attributeId == Clusters::Identify::Attributes::Ids::IdentifyTime)
+    if (attributeId == Clusters::Identify::Attributes::IdentifyTime::Id)
     {
         Identify * identify = inst(endpoint);
         uint16_t identifyTime;
