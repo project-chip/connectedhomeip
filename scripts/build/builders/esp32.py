@@ -89,11 +89,10 @@ class Esp32Builder(Builder):
     def __init__(self,
                  root,
                  runner,
-                 output_prefix: str,
                  board: Esp32Board = Esp32Board.M5Stack,
                  app: Esp32App = Esp32App.ALL_CLUSTERS,
                  enable_rpcs: bool = False):
-        super(Esp32Builder, self).__init__(root, runner, output_prefix)
+        super(Esp32Builder, self).__init__(root, runner)
         self.board = board
         self.app = app
         self.enable_rpcs = enable_rpcs

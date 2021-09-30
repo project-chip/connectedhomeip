@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from runner import PrintOnlyRunner, ShellRunner
+
 import build
 import coloredlogs
 import click
@@ -57,25 +58,11 @@ def ValidateRepoPath(context, parameter, value):
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
-    '--platform',
-    default=[],
-    type=click.Choice(build.PLATFORMS + ['all'], case_sensitive=False),
+    '--target',
+    default=['all'],
+    type=click.Choice(['all'] + [t.name for t in build.ALL_TARGETS], case_sensitive=False),
     multiple=True,
-    help='Platform to use for compilation. Empty will default to a linux host build'
-)
-@click.option(
-    '--board',
-    default=[],
-    type=click.Choice(build.BOARDS, case_sensitive=False),
-    multiple=True,
-    help='Specific board to compile for. Empty will use --platform to determine suitable boards.'
-)
-@click.option(
-    '--app',
-    default=[],
-    type=click.Choice(build.APPLICATIONS, case_sensitive=False),
-    multiple=True,
-    help='What example application to build. Empty will find suitable applications.'
+    help='Build target'
 )
 @click.option(
     '--enable-flashbundle',
@@ -120,7 +107,7 @@ def ValidateRepoPath(context, parameter, value):
     help='Build with debug RPCs enabled.'
 )
 @click.pass_context
-def main(context, log_level, platform, board, app, repo, out_prefix, clean,
+def main(context, log_level, target, repo, out_prefix, clean,
          dry_run, dry_run_output, enable_flashbundle, no_log_timestamps, rpc):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
@@ -136,23 +123,20 @@ Please make sure you `source scripts/bootstrap.sh` or `source scripts/activate.s
 before running this script.
 """.strip())
 
-    # Support an 'all platforms' choice
-    if 'all' in platform:
-        platform = build.PLATFORMS
-
     if dry_run:
         runner = PrintOnlyRunner(dry_run_output)
     else:
         runner = ShellRunner()
 
-    context.obj = build.Context(
-        repository_path=repo, output_prefix=out_prefix, runner=runner)
-    context.obj.SetupBuilders(
-        platforms=[build.Platform.FromArgName(name) for name in platform],
-        boards=[build.Board.FromArgName(name) for name in board],
-        applications=[build.Application.FromArgName(name) for name in app],
-        enable_rpcs=rpc,
-        enable_flashbundle=enable_flashbundle)
+    if 'all' in target:
+      targets = build.ALL_TARGETS
+    else:
+      requested_targets = set([t.lower for t in target])
+      targets = [target for target in build.ALL_TARGETS if target.name.lower in requested_targets]
+
+
+    context.obj = build.Context(repository_path=repo, output_prefix=out_prefix, runner=runner)
+    context.obj.SetupBuilders(targets=targets, enable_flashbundle=enable_flashbundle)
 
     if clean:
         context.obj.CleanOutputDirectories()

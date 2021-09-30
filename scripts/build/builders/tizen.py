@@ -51,13 +51,11 @@ class TizenBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
-                 output_prefix: str,
                  app: TizenApp = TizenApp.LIGHT,
                  board: TizenBoard = TizenBoard.ARM):
         super(TizenBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExampleName(), 'linux'),
-            runner=runner,
-            output_prefix=output_prefix)
+            runner=runner)
         self.app = app
         self.board = board
 

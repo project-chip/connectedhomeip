@@ -27,7 +27,6 @@ pw_python_package("build_examples") {
 
   sources = [
     "build/__init__.py",
-    "build/factory.py",
     "build/targets.py",
     "build_examples.py",
     "builders/__init__.py",
