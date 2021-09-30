@@ -85,21 +85,21 @@ void emberAfPluginBarrierControlServerInitCallback(void) {}
 uint8_t emAfPluginBarrierControlServerGetBarrierPosition(EndpointId endpoint)
 {
     uint8_t position;
-    EmberAfStatus status = BarrierControl::Attributes::GetBarrierPosition(endpoint, &position);
+    EmberAfStatus status = BarrierControl::Attributes::BarrierPosition::Get(endpoint, &position);
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
     return position;
 }
 
 void emAfPluginBarrierControlServerSetBarrierPosition(EndpointId endpoint, uint8_t position)
 {
-    EmberAfStatus status = BarrierControl::Attributes::SetBarrierPosition(endpoint, position);
+    EmberAfStatus status = BarrierControl::Attributes::BarrierPosition::Set(endpoint, position);
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
 bool emAfPluginBarrierControlServerIsPartialBarrierSupported(EndpointId endpoint)
 {
     uint8_t bitmap;
-    EmberAfStatus status = BarrierControl::Attributes::GetBarrierCapabilities(endpoint, &bitmap);
+    EmberAfStatus status = BarrierControl::Attributes::BarrierCapabilities::Get(endpoint, &bitmap);
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
     return READBITS(bitmap, EMBER_AF_BARRIER_CONTROL_CAPABILITIES_PARTIAL_BARRIER);
 }
@@ -111,13 +111,13 @@ static uint16_t getOpenOrClosePeriod(EndpointId endpoint, bool open)
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_OPEN_PERIOD_ATTRIBUTE)
     if (open)
     {
-        status = BarrierControl::Attributes::GetBarrierOpenPeriod(endpoint, &period);
+        status = BarrierControl::Attributes::BarrierOpenPeriod::Get(endpoint, &period);
     }
 #endif
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_CLOSE_PERIOD_ATTRIBUTE)
     if (!open)
     {
-        status = BarrierControl::Attributes::GetBarrierClosePeriod(endpoint, &period);
+        status = BarrierControl::Attributes::BarrierClosePeriod::Get(endpoint, &period);
     }
 #endif
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
@@ -126,14 +126,14 @@ static uint16_t getOpenOrClosePeriod(EndpointId endpoint, bool open)
 
 static void setMovingState(EndpointId endpoint, uint8_t newState)
 {
-    EmberAfStatus status = BarrierControl::Attributes::SetBarrierMovingState(endpoint, newState);
+    EmberAfStatus status = BarrierControl::Attributes::BarrierMovingState::Set(endpoint, newState);
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
 uint16_t emAfPluginBarrierControlServerGetSafetyStatus(EndpointId endpoint)
 {
     uint16_t safetyStatus;
-    EmberAfStatus status = BarrierControl::Attributes::GetBarrierSafetyStatus(endpoint, &safetyStatus);
+    EmberAfStatus status = BarrierControl::Attributes::BarrierSafetyStatus::Get(endpoint, &safetyStatus);
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
     return safetyStatus;
 }
@@ -152,25 +152,25 @@ void emAfPluginBarrierControlServerIncrementEvents(EndpointId endpoint, bool ope
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_OPEN_EVENTS_ATTRIBUTE)
     if (open && !command)
     {
-        status = BarrierControl::Attributes::GetBarrierOpenEvents(endpoint, &events);
+        status = BarrierControl::Attributes::BarrierOpenEvents::Get(endpoint, &events);
     }
 #endif
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_CLOSE_EVENTS_ATTRIBUTE)
     if (!open && !command)
     {
-        status = BarrierControl::Attributes::GetBarrierCloseEvents(endpoint, &events);
+        status = BarrierControl::Attributes::BarrierCloseEvents::Get(endpoint, &events);
     }
 #endif
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_COMMAND_OPEN_EVENTS_ATTRIBUTE)
     if (open && command)
     {
-        status = BarrierControl::Attributes::GetBarrierCommandOpenEvents(endpoint, &events);
+        status = BarrierControl::Attributes::BarrierCommandOpenEvents::Get(endpoint, &events);
     }
 #endif
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_COMMAND_CLOSE_EVENTS_ATTRIBUTE)
     if (!open && command)
     {
-        status = BarrierControl::Attributes::GetBarrierCommandCloseEvents(endpoint, &events);
+        status = BarrierControl::Attributes::BarrierCommandCloseEvents::Get(endpoint, &events);
     }
 #endif
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
@@ -187,25 +187,25 @@ void emAfPluginBarrierControlServerIncrementEvents(EndpointId endpoint, bool ope
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_OPEN_EVENTS_ATTRIBUTE)
     if (open && !command)
     {
-        status = BarrierControl::Attributes::SetBarrierOpenEvents(endpoint, events);
+        status = BarrierControl::Attributes::BarrierOpenEvents::Set(endpoint, events);
     }
 #endif
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_CLOSE_EVENTS_ATTRIBUTE)
     if (!open && !command)
     {
-        status = BarrierControl::Attributes::SetBarrierCloseEvents(endpoint, events);
+        status = BarrierControl::Attributes::BarrierCloseEvents::Set(endpoint, events);
     }
 #endif
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_COMMAND_OPEN_EVENTS_ATTRIBUTE)
     if (open && command)
     {
-        status = BarrierControl::Attributes::SetBarrierCommandOpenEvents(endpoint, events);
+        status = BarrierControl::Attributes::BarrierCommandOpenEvents::Set(endpoint, events);
     }
 #endif
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_COMMAND_CLOSE_EVENTS_ATTRIBUTE)
     if (!open && command)
     {
-        status = BarrierControl::Attributes::SetBarrierCommandCloseEvents(endpoint, events);
+        status = BarrierControl::Attributes::BarrierCommandCloseEvents::Set(endpoint, events);
     }
 #endif
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
