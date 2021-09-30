@@ -78,40 +78,40 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const Attr
     *aDataRead = true;
     switch (aClusterInfo.mFieldId)
     {
-    case Ids::SecurityType: {
+    case SecurityType::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiSecurityType, aEncoder);
     }
-    case Ids::WiFiVersion: {
+    case WiFiVersion::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiVersion, aEncoder);
     }
-    case Ids::ChannelNumber: {
+    case ChannelNumber::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiChannelNumber, aEncoder);
     }
-    case Ids::Rssi: {
+    case Rssi::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiRssi, aEncoder);
     }
-    case Ids::BeaconLostCount: {
+    case BeaconLostCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiBeaconLostCount, aEncoder);
     }
-    case Ids::BeaconRxCount: {
+    case BeaconRxCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiBeaconRxCount, aEncoder);
     }
-    case Ids::PacketMulticastRxCount: {
+    case PacketMulticastRxCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiPacketMulticastRxCount, aEncoder);
     }
-    case Ids::PacketMulticastTxCount: {
+    case PacketMulticastTxCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiPacketMulticastTxCount, aEncoder);
     }
-    case Ids::PacketUnicastRxCount: {
+    case PacketUnicastRxCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiPacketUnicastRxCount, aEncoder);
     }
-    case Ids::PacketUnicastTxCount: {
+    case PacketUnicastTxCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiPacketUnicastTxCount, aEncoder);
     }
-    case Ids::CurrentMaxRate: {
+    case CurrentMaxRate::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiCurrentMaxRate, aEncoder);
     }
-    case Ids::OverrunCount: {
+    case OverrunCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiOverrunCount, aEncoder);
     }
     default: {

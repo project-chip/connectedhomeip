@@ -59,13 +59,13 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const 
     *aDataRead = true;
     switch (aClusterInfo.mFieldId)
     {
-    case Ids::CurrentHeapFree: {
+    case CurrentHeapFree::Id: {
         return ReadIfSupported(&PlatformManager::GetCurrentHeapFree, aEncoder);
     }
-    case Ids::CurrentHeapUsed: {
+    case CurrentHeapUsed::Id: {
         return ReadIfSupported(&PlatformManager::GetCurrentHeapUsed, aEncoder);
     }
-    case Ids::CurrentHeapHighWatermark: {
+    case CurrentHeapHighWatermark::Id: {
         return ReadIfSupported(&PlatformManager::GetCurrentHeapHighWatermark, aEncoder);
     }
     default: {
