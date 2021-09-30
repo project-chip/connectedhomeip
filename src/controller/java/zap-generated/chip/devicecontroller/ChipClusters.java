@@ -6181,6 +6181,38 @@ public class ChipClusters {
       readRssiAttribute(chipClusterPtr, callback);
     }
 
+    public void readBeaconLostCountAttribute(LongAttributeCallback callback) {
+      readBeaconLostCountAttribute(chipClusterPtr, callback);
+    }
+
+    public void readBeaconRxCountAttribute(LongAttributeCallback callback) {
+      readBeaconRxCountAttribute(chipClusterPtr, callback);
+    }
+
+    public void readPacketMulticastRxCountAttribute(LongAttributeCallback callback) {
+      readPacketMulticastRxCountAttribute(chipClusterPtr, callback);
+    }
+
+    public void readPacketMulticastTxCountAttribute(LongAttributeCallback callback) {
+      readPacketMulticastTxCountAttribute(chipClusterPtr, callback);
+    }
+
+    public void readPacketUnicastRxCountAttribute(LongAttributeCallback callback) {
+      readPacketUnicastRxCountAttribute(chipClusterPtr, callback);
+    }
+
+    public void readPacketUnicastTxCountAttribute(LongAttributeCallback callback) {
+      readPacketUnicastTxCountAttribute(chipClusterPtr, callback);
+    }
+
+    public void readCurrentMaxRateAttribute(LongAttributeCallback callback) {
+      readCurrentMaxRateAttribute(chipClusterPtr, callback);
+    }
+
+    public void readOverrunCountAttribute(LongAttributeCallback callback) {
+      readOverrunCountAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -6198,6 +6230,30 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readRssiAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readBeaconLostCountAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readBeaconRxCountAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readPacketMulticastRxCountAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readPacketMulticastTxCountAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readPacketUnicastRxCountAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readPacketUnicastTxCountAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readCurrentMaxRateAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readOverrunCountAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
