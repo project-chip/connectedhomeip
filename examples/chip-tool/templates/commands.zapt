@@ -175,10 +175,6 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
 {{> clusters_header}}
 
 {{#chip_client_clusters}}
-constexpr chip::ClusterId k{{asUpperCamelCase name}}ClusterId = {{asHex code 4}};
-{{/chip_client_clusters}}
-
-{{#chip_client_clusters}}
 {{> cluster_header}}
 
 {{#chip_cluster_commands}}
