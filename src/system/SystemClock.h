@@ -112,6 +112,16 @@ namespace Clock {
 using MonotonicMicroseconds = ClockBase::MonotonicMicroseconds;
 using MonotonicMilliseconds = ClockBase::MonotonicMicroseconds;
 
+// DO NOT USE - Temporary backward compatibility functions. TODO: remove.
+inline MonotonicMicroseconds GetMonotonicMicroseconds()
+{
+    return SystemClock().GetMonotonicMicroseconds();
+}
+inline MonotonicMilliseconds GetMonotonicMilliseconds()
+{
+    return SystemClock().GetMonotonicMilliseconds();
+}
+
 /**
  *  Compares two time values and returns true if the first value is earlier than the second value.
  *
