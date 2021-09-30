@@ -690,6 +690,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         break;
     case AVAHI_RESOLVER_FOUND:
         MdnsService result = {};
+        bool valid_result  = true;
 
         result.mAddress.SetValue(chip::Inet::IPAddress());
         ChipLogError(DeviceLayer, "Avahi resolve found");
@@ -723,7 +724,8 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                 memcpy(&addr4, &(address->data.ipv4), sizeof(addr4));
                 result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv4(addr4));
 #else
-                ChipLogDetail(Discovery, "Ignoring IPv4 mDNS address.");
+                valid_result = false;
+                ChipLogError(Discovery, "Ignoring IPv4 mDNS address.");
 #endif
                 break;
             case AVAHI_PROTO_INET6:
@@ -757,7 +759,10 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         }
         result.mTextEntrySize = textEntries.size();
 
-        context->mCallback(context->mContext, &result, CHIP_NO_ERROR);
+        if (valid_result)
+        {
+            context->mCallback(context->mContext, &result, CHIP_NO_ERROR);
+        }
         break;
     }
 
