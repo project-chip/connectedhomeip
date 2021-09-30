@@ -67,8 +67,8 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 // Magic values expected in first 2 bytes of valid BLE transport capabilities request or response:
-#define CAPABILITIES_MSG_CHECK_BYTE_1 'n'
-#define CAPABILITIES_MSG_CHECK_BYTE_2 'l'
+#define CAPABILITIES_MSG_CHECK_BYTE_1 0b01100101
+#define CAPABILITIES_MSG_CHECK_BYTE_2 0b01101100
 
 namespace chip {
 namespace Ble {
