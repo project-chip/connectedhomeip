@@ -32,31 +32,25 @@ requirement.
 
 Usage examples:
 
-1. Compiles the Lock app on all supported platforms
+1. Compiles All targets
 
     ```
-    ./scripts/build/build_examples.py --app lock build
+    ./scripts/build/build_examples.py --target all build
     ```
 
 2. Compile the all clusters app for a ESP32 DevKitC
 
     ```
-    ./scripts/build/build_examples.py --app all_clusters_app --board devkitc build
+    ./scripts/build/build_examples.py --target esp32-devkitc-all-clusters build
     ```
 
-3. Generate all the build rules (but do not compile) all native apps
+3. Generate all the makefiles (but do not compile) using a specific output root
 
     ```
-    ./scripts/build/build_examples.py --platform native generate
+    ./scripts/build/build_examples.py --target host-arm64-chip-tool generate --out-prefix ./mydir
     ```
 
-4. Generate all the makefiles (but do not compile) using a specific output root
-
-    ```
-    ./scripts/build/build_examples.py --platform native generate --out-prefix ./mydir
-    ```
-
-5. Compile the qpg lock app and copy the output in a 'artifact' folder. Note the
+4. Compile the qpg lock app and copy the output in a 'artifact' folder. Note the
    argument order (artifact copying is an argument for the build command)
 
     ```
