@@ -400,7 +400,7 @@ function asChipZapType(type)
       case 'uint32_t':
       case 'int64_t':
       case 'uint64_t':
-        return basicType;
+        return zclType;
       default:
         return type + '::Type'
       }
@@ -412,6 +412,14 @@ function asChipZapType(type)
     throw err;
   });
   return templateUtil.templatePromise(this.global, promise)
+}
+
+function asChipEnumType(type)
+{
+  if (type == 'Status') {
+    return 'chip::Protocols::InteractionModel::Status';
+  }
+  return type;
 }
 
 //
@@ -428,3 +436,4 @@ exports.asUpperCamelCase                  = asUpperCamelCase;
 exports.hasSpecificAttributes             = hasSpecificAttributes;
 exports.asMEI                             = asMEI;
 exports.asChipZapType                     = asChipZapType;
+exports.asChipEnumType                    = asChipEnumType;

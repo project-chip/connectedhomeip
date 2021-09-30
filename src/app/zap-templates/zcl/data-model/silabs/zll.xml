@@ -40,11 +40,13 @@ limitations under the License.
     <field name="UpdateStartHue" mask="0x08"/>
   </bitmap>
   <enum name="ColorLoopAction" type="ENUM8">
+    <cluster code="0x0300"/>
     <item name="Deactivate" value="0x00"/>
     <item name="ActivateFromColorLoopStartEnhancedHue" value="0x01"/>
     <item name="ActivateFromEnhancedCurrentHue" value="0x02"/>
   </enum>
   <enum name="ColorLoopDirection" type="ENUM8">
+    <cluster code="0x0300"/>
     <item name="DecrementHue" value="0x00"/>
     <item name="IncrementHue" value="0x01"/>
   </enum>

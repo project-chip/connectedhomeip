@@ -7,6 +7,7 @@
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/util/basic-types.h>
+#include <protocols/interaction_model/Constants.h>
 
 namespace chip {
 namespace app {
@@ -14,6 +15,10 @@ namespace Clusters {
 
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
+constexpr ClusterId kClusterId = {{asHex code 2}};
+
+ClusterId GetClusterId();
+
 {{#zcl_enums}}
 // Enum for {{label}}
 enum class {{asType label}} : {{asUnderlyingZclType type}} {
@@ -35,9 +40,9 @@ namespace {{name}} {
     public:
         {{#zcl_struct_items}}
         {{#if isArray}}
-        DataModel::List<{{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
+        DataModel::List<{{#if_is_enum type}}{{asChipEnumType type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
         {{else}}
-        {{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}} {{asLowerCamelCase label}};
+        {{#if_is_enum type}}{{asChipEnumType type}}{{else}}{{asChipZapType type}}{{/if_is_enum}} {{asLowerCamelCase label}};
         {{/if}}
         {{/zcl_struct_items}}
 
@@ -50,11 +55,12 @@ namespace {{name}} {
     public:
         {{#zcl_struct_items checkForDoubleNestedArray="true"}}
         {{#if isArray}}
-        DataModel::DecodableList<{{#if struct_item_contains_nested_array}}{{type}}::DecodableType{{else}}{{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}{{/if}}> {{asLowerCamelCase label}};
+        DataModel::DecodableList<{{#if struct_item_contains_nested_array}}{{type}}::DecodableType{{else}}{{#if_is_enum type}}{{asChipEnumType type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}{{/if}}> {{asLowerCamelCase label}};
         {{else}}
-        {{#if struct_item_contains_nested_array}}{{type}}::DecodableType{{else}}{{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}{{/if}} {{asLowerCamelCase label}};
+        {{#if struct_item_contains_nested_array}}{{type}}::DecodableType{{else}}{{#if_is_enum type}}{{asChipEnumType type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}{{/if}} {{asLowerCamelCase label}};
         {{/if}}
         {{/zcl_struct_items}}
+
         CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) const;
         CHIP_ERROR Decode(TLV::TLVReader &reader);
     };
@@ -63,7 +69,55 @@ namespace {{name}} {
 } // namespace {{name}}
 {{/zcl_structs}}
 
-} // namespace {{asUpperCamelCase name}}
+namespace Commands {
+{{#zcl_commands}}
+namespace {{name}}CommandParams {
+constexpr CommandId kCommandId = {{asHex code 2}};
+
+enum FieldId {
+    {{#zcl_command_arguments}}
+    k{{asUpperCamelCase label}}FieldId = {{index}},
+    {{/zcl_command_arguments}}
+};
+
+struct Type {
+public:
+    {{#zcl_command_arguments}}
+    {{#if isArray}}
+    DataModel::List<{{#if_is_enum type}}{{asChipEnumType type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
+    {{else}}
+    {{#if_is_enum type}}{{asChipEnumType type}}{{else}}{{asChipZapType type}}{{/if_is_enum}} {{asLowerCamelCase label}};
+    {{/if}}
+    {{/zcl_command_arguments}}
+
+    CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader &reader);
+};
+
+{{#if command_contains_array}}
+struct DecodableType {
+public:
+    {{#zcl_command_arguments checkForDoubleNestedArray="true"}}
+    {{#if isArray}}
+    DataModel::DecodableList<{{#if command_arg_contains_nested_array}}{{type}}::DecodableType{{else}}{{#if_is_enum type}}{{asChipEnumType type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}{{/if}}> {{asLowerCamelCase label}};
+    {{else}}
+    {{#if command_arg_contains_nested_array}}{{type}}::DecodableType{{else}}{{#if_is_enum type}}{{asChipEnumType type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}{{/if}} {{asLowerCamelCase label}};
+    {{/if}}
+    {{/zcl_command_arguments}}
+
+    CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader &reader);
+};
+{{/if}}
+
+CommandId GetCommandId();
+
+}// namespace {{name}}CommandParams
+{{/zcl_commands}}
+
+}// namespace Commands
+
+}// namespace {{asUpperCamelCase name}}
 {{/zcl_clusters}}
 
 } // namespace Clusters

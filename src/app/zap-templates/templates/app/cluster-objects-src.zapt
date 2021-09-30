@@ -9,6 +9,11 @@ namespace app {
 namespace Clusters {
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
+ClusterId GetClusterId()
+{
+    return kClusterId;
+}
+
 {{#zcl_structs}}
 namespace {{asType label}} {
 CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) const{
@@ -31,17 +36,19 @@ CHIP_ERROR Type::Decode(TLV::TLVReader &reader) {
         {
             {{#zcl_struct_items}}
             case k{{asUpperCamelCase label}}FieldId:
-                {{#if_is_enum type}}
-                uint8_t v;
-                ReturnErrorOnFailure(DataModel::Decode(reader, v));
-                {{asLowerCamelCase label}} = static_cast<{{type}}>(v);
-                break;
-                {{else if isArray}}
+            {{#if isArray}}
                 return CHIP_ERROR_NOT_IMPLEMENTED;
-                {{else}}
+            {{else}}
+            {{#if_is_enum type}}
+                uint8_t val{{asUpperCamelCase label}};
+                ReturnErrorOnFailure(DataModel::Decode(reader, val{{asUpperCamelCase label}}));
+                {{asLowerCamelCase label}} = static_cast<{{asChipEnumType type}}>(val{{asUpperCamelCase label}});
+                break;
+            {{else}}
                 ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
                 break;
-                {{/if_is_enum}}
+            {{/if_is_enum}}
+            {{/if}}
             {{/zcl_struct_items}}
             default:
                 break;
@@ -67,13 +74,17 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         {
             {{#zcl_struct_items}}
             case k{{asUpperCamelCase label}}FieldId:
-                {{#if_is_enum type}}
-                uint8_t v;
-                ReturnErrorOnFailure(DataModel::Decode(reader, v));
-                {{asLowerCamelCase label}} = static_cast<{{type}}>(v);
-                {{else}}
+            {{#if isArray}}
                 ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
-                {{/if_is_enum}}
+            {{else}}
+            {{#if_is_enum type}}
+                uint8_t val{{asUpperCamelCase label}};
+                ReturnErrorOnFailure(DataModel::Decode(reader, val{{asUpperCamelCase label}}));
+                {{asLowerCamelCase label}} = static_cast<{{asChipEnumType type}}>(val{{asUpperCamelCase label}});
+            {{else}}
+                ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
+            {{/if_is_enum}}
+            {{/if}}
                 break;
             {{/zcl_struct_items}}
             default:
@@ -88,8 +99,106 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 {{/if}}
 }
 {{/zcl_structs}}
+
+namespace Commands {
+{{#zcl_commands}}
+namespace {{name}}CommandParams {
+
+CommandId GetCommandId()
+{
+    return kCommandId;
 }
 
+CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) const{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    {{#zcl_command_arguments}}
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(k{{asUpperCamelCase label}}FieldId), {{asLowerCamelCase label}}));
+    {{/zcl_command_arguments}}
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Type::Decode(TLV::TLVReader &reader) {
+    CHIP_ERROR err;
+    TLV::TLVType outer;
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR) {
+        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        {
+            {{#zcl_command_arguments}}
+            case k{{asUpperCamelCase label}}FieldId:
+            {{#if isArray}}
+                return CHIP_ERROR_NOT_IMPLEMENTED;
+            {{else}}
+            {{#if_is_enum type}}
+                uint8_t val{{asUpperCamelCase label}};
+                ReturnErrorOnFailure(DataModel::Decode(reader, val{{asUpperCamelCase label}}));
+                {{asLowerCamelCase label}} = static_cast<{{asChipEnumType type}}>(val{{asUpperCamelCase label}});
+                break;
+            {{else}}
+                ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
+                break;
+            {{/if_is_enum}}
+            {{/if}}
+            {{/zcl_command_arguments}}
+            default:
+                break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+{{#if command_contains_array}}
+CHIP_ERROR DecodableType::Encode(TLV::TLVWriter &writer, uint64_t tag) const{
+    return CHIP_ERROR_BAD_REQUEST;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
+    CHIP_ERROR err;
+    TLV::TLVType outer;
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+
+    while ((err = reader.Next()) == CHIP_NO_ERROR) {
+        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        {
+            {{#zcl_command_arguments}}
+            case k{{asUpperCamelCase label}}FieldId:
+            {{#if isArray}}
+                ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
+            {{else}}
+            {{#if_is_enum type}}
+                uint8_t val{{asUpperCamelCase label}};
+                ReturnErrorOnFailure(DataModel::Decode(reader, val{{asUpperCamelCase label}}));
+                {{asLowerCamelCase label}} = static_cast<{{asChipEnumType type}}>(val{{asUpperCamelCase label}});
+            {{else}}
+                ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
+            {{/if_is_enum}}
+            {{/if}}
+                break;
+            {{/zcl_command_arguments}}
+            default:
+                break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+{{/if}}
+
+}
+
+{{/zcl_commands}}
+
+}// namespace Commands
+
+}//  namespace {{asUpperCamelCase name}}
 {{/zcl_clusters}}
 
 } // namespace Clusters

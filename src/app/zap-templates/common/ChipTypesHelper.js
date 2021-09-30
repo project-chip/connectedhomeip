@@ -36,6 +36,7 @@ function asBasicType(type)
   case 'chip::DeviceTypeId':
   case 'chip::StatusCode':
   case 'chip::DataVersion':
+  case 'chip::UTC':
     return 'uint32_t';
   case 'chip::EventNumber':
   case 'chip::FabricId':

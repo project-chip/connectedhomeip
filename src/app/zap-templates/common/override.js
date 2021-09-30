@@ -48,6 +48,8 @@ function atomicType(arg)
     return 'chip::EventNumber';
   case 'fabric_idx':
     return 'chip::FabricIndex';
+  case 'utc':
+    return 'chip::UTC';
   case 'status':
     return 'chip::StatusCode';
   case 'octet_string':

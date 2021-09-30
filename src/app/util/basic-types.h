@@ -49,6 +49,7 @@ typedef uint32_t TransactionId;
 typedef uint32_t StatusCode;
 typedef uint8_t Percent;
 typedef uint16_t Percent100ths;
+typedef uint32_t UTC;
 
 static constexpr FabricIndex kUndefinedFabricIndex = 0;
 } // namespace chip

@@ -155,5 +155,22 @@ limitations under the License.
       <arg name="returnValue" type="INT8U"/>
     </command>
 
+    <command source="server" code="0x02" name="TestAddArrayofStructArguments" optional="false">
+      <description>
+        Command that takes a array of struct arg
+      </description>
+      <arg name="arg1" type="SimpleStruct" array="true"/>
+    </command>
+
+    <command source="server" code="0x03" name="TestAddNestedArrayArguments" optional="false">
+      <description>
+        Command that takes a array of struct arg
+      </description>
+      <arg name="arg1" type="NestedStructList" array="true"/>
+      <arg name="arg2" type="SimpleEnum" array="true"/>
+      <arg name="arg3" type="BOOLEAN" array="true"/>
+      <arg name="arg4" type="SimpleEnum"/>
+      <arg name="arg5" type="BOOLEAN"/>
+    </command>
   </cluster>
 </configurator>

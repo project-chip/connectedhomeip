@@ -586,7 +586,7 @@ limitations under the License.
       <arg name="status" type="Status"/>
       <arg name="alarmCode" type="ENUM8"/>
       <arg name="clusterId" type="CLUSTER_ID"/>
-      <arg name="timeStamp" type="INT32U"/>
+      <arg name="timeStamp" type="UTC"/>
     </command>
   </cluster>
   <cluster singleton="true">

@@ -1491,25 +1491,25 @@ limitations under the License.
       <description>
         Indicates lock success or failure
       </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x01" name="UnlockDoorResponse" optional="false" disableDefaultResponse="true">
       <description>
         Indicates unlock success or failure
       </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x02" name="ToggleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
          Response provided to the toggle command, indicates whether the toggle was successful or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x03" name="UnlockWithTimeoutResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
          Response provided to unlock with specific timeout. This command indicates whether the unlock command was successful or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x04" name="GetLogRecordResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
@@ -1542,32 +1542,32 @@ limitations under the License.
       <description>
          Returns success or failure depending on whether the PIN was cleared or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x08" name="ClearAllPinsResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
          Returns success or failure depending on whether the PINs were cleared or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x09" name="SetUserStatusResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
          Returns success or failure depending on whether the user status was set or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x0A" name="GetUserStatusResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
          Returns the user status.
        </description>
       <arg name="userId" type="INT16U"/>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x0B" name="SetWeekdayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
          Returns the status of setting the weekday schedule
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x0C" name="GetWeekdayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
@@ -1575,7 +1575,7 @@ limitations under the License.
        </description>
       <arg name="scheduleId" type="INT8U"/>
       <arg name="userId" type="INT16U"/>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
       <arg name="daysMask" type="INT8U" introducedIn="ha-1.2-05-3520-29"/>
       <arg name="startHour" type="INT8U" introducedIn="ha-1.2-05-3520-29"/>
       <arg name="startMinute" type="INT8U" introducedIn="ha-1.2-05-3520-29"/>
@@ -1586,13 +1586,13 @@ limitations under the License.
       <description>
          Returns the status of clearing the weekday schedule
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x0E" name="SetYeardayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
          Returns success or failure depending on whether the yearday schedule was set or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x0F" name="GetYeardayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
@@ -1600,7 +1600,7 @@ limitations under the License.
        </description>
       <arg name="scheduleId" type="INT8U"/>
       <arg name="userId" type="INT16U"/>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
       <arg name="localStartTime" type="INT32U" introducedIn="ha-1.2-05-3520-29"/>
       <arg name="localEndTime" type="INT32U" introducedIn="ha-1.2-05-3520-29"/>
     </command>
@@ -1608,20 +1608,20 @@ limitations under the License.
       <description>
          Returns success or failure depending on whether the yearday schedule was removed or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x11" name="SetHolidayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
          Returns success or failure depending on whether the holiday schedule was set or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x12" name="GetHolidayScheduleResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
          Returns the holiday schedule requested
        </description>
       <arg name="scheduleId" type="INT8U"/>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
       <arg name="localStartTime" type="INT32U" introducedIn="ha-1.2-05-3520-29"/>
       <arg name="localEndTime" type="INT32U" introducedIn="ha-1.2-05-3520-29"/>
       <arg name="operatingModeDuringHoliday" type="ENUM8" introducedIn="ha-1.2-05-3520-29"/>
@@ -1630,13 +1630,13 @@ limitations under the License.
       <description>
          Returns success or failure depending on whether the holiday schedule was removed or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x14" name="SetUserTypeResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
          returns success or failure depending on whether the user type was set or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x15" name="GetUserTypeResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
@@ -1664,13 +1664,13 @@ limitations under the License.
       <description>
          Returns success or failure depending on whether the RFID ID was cleared or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x19" name="ClearAllRfidsResponse" optional="true" introducedIn="ha-1.2-05-3520-29" disableDefaultResponse="true">
       <description>
          Returns success or failure depending on whether the RFID IDs were cleared or not.
        </description>
-      <arg name="status" type="INT8U"/>
+      <arg name="status" type="Status"/>
     </command>
     <command source="server" code="0x20" name="OperationEventNotification" optional="true" introducedIn="ha-1.2-05-3520-29">
       <description>
@@ -1680,7 +1680,7 @@ limitations under the License.
       <arg name="eventCode" type="DoorLockOperationEventCode"/>
       <arg name="userId" type="INT16U"/>
       <arg name="pin" type="CHAR_STRING"/>
-      <arg name="timeStamp" type="INT32U"/>
+      <arg name="timeStamp" type="UTC"/>
       <arg name="data" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
     </command>
     <command source="server" code="0x21" name="ProgrammingEventNotification" optional="true" introducedIn="ha-1.2-05-3520-29">
@@ -1693,7 +1693,7 @@ limitations under the License.
       <arg name="pin" type="CHAR_STRING"/>
       <arg name="userType" type="DoorLockUserType"/>
       <arg name="userStatus" type="DoorLockUserStatus"/>
-      <arg name="timeStamp" type="INT32U"/>
+      <arg name="timeStamp" type="UTC"/>
       <arg name="data" type="CHAR_STRING" introducedIn="ha-1.2-05-3520-29"/>
     </command>
   </cluster>
@@ -1779,7 +1779,7 @@ limitations under the License.
       </description>
       <arg name="applianceStatus" type="ApplianceStatus"/>
       <arg name="remoteEnableFlagsAndDeviceStatus2" type="RemoteEnableFlagsAndDeviceStatus2"/>
-      <arg name="applianceStatus2" type="INT24U"/>
+      <arg name="applianceStatus2" type="ApplianceStatus"/>
       <!-- optional -->
     </command>
     <command source="server" code="0x01" name="SignalStateNotification" optional="false">
@@ -1788,7 +1788,7 @@ limitations under the License.
       </description>
       <arg name="applianceStatus" type="ApplianceStatus"/>
       <arg name="remoteEnableFlagsAndDeviceStatus2" type="RemoteEnableFlagsAndDeviceStatus2"/>
-      <arg name="applianceStatus2" type="INT24U"/>
+      <arg name="applianceStatus2" type="ApplianceStatus"/>
       <!-- optional -->
     </command>
   </cluster>
@@ -2068,14 +2068,18 @@ limitations under the License.
         This message is used to return household appliance current alerts.
       </description>
       <arg name="alertsCount" type="AlertCount"/>
+      <!--
       <arg name="alertStructures" type="AlertStructure" array="true"/>
+      -->
     </command>
     <command source="server" code="0x01" name="AlertsNotification" optional="false">
       <description>
         This message is used to notify the current modification of warning and/or fault conditions.
       </description>
       <arg name="alertsCount" type="AlertCount"/>
+      <!--
       <arg name="alertStructures" type="AlertStructure" array="true"/>
+      -->
     </command>
     <command source="server" code="0x02" name="EventsNotification" optional="false">
       <description>
@@ -2101,7 +2105,7 @@ limitations under the License.
       <description>
         The Appliance Statistics Cluster server occasionally sends out a Log Notification command to the devices to which it needs to log information related to statistics (e.g., home gateways) which implement the client side of Appliance Statistics Cluster.
       </description>
-      <arg name="timeStamp" type="TIME_OF_DAY"/>
+      <arg name="timeStamp" type="UTC"/>
       <arg name="logId" type="INT32U"/>
       <arg name="logLength" type="INT32U"/>
       <arg name="logPayload" type="INT8U" array="true"/>
@@ -2110,7 +2114,7 @@ limitations under the License.
       <description>
         The Appliance Statistics Cluster server sends out a Log Response command to respond to a Log Request command generated by the client side of the Appliance Statistics cluster.
       </description>
-      <arg name="timeStamp" type="TIME_OF_DAY"/>
+      <arg name="timeStamp" type="UTC"/>
       <arg name="logId" type="INT32U"/>
       <arg name="logLength" type="INT32U"/>
       <arg name="logPayload" type="INT8U" array="true"/>
@@ -2292,7 +2296,7 @@ limitations under the License.
         A function which returns the electricity measurement profile. The electricity measurement profile includes information regarding the amount of time used to capture data related to the flow of electricity as well as the intervals thes
       </description>
       <arg name="startTime" type="INT32U"/>
-      <arg name="status" type="ENUM8"/>
+      <arg name="status" type="Status"/>
       <arg name="profileIntervalPeriod" type="ENUM8"/>
       <arg name="numberOfIntervalsDelivered" type="INT8U"/>
       <arg name="attributeId" type="INT16U"/>
