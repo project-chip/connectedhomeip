@@ -5,7 +5,7 @@ steps:
       entrypoint: "./scripts/run_in_build_env.sh"
       args:
           [
-              "./scripts/build/build_examples.py --platform all
+              "./scripts/build/build_examples.py 
               --enable-flashbundle build --create-archives /workspace/artifacts/",
           ]
       timeout: 7200s
