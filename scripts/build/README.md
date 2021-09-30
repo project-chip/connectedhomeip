@@ -47,13 +47,12 @@ Usage examples:
 3. Generate all the makefiles (but do not compile) using a specific output root
 
     ```
-    ./scripts/build/build_examples.py --target host-arm64-chip-tool generate --out-prefix ./mydir
+    ./scripts/build/build_examples.py --target linux-x64-chip-tool --out-prefix ./mydir gen
     ```
 
 4. Compile the qpg lock app and copy the output in a 'artifact' folder. Note the
    argument order (artifact copying is an argument for the build command)
 
     ```
-    ./scripts/build/build_examples.py --board qpg6100 --app lock build \
-       --copy-artifacts-to /tmp/artifacts
+    ./scripts/build/build_examples.py --target qpg-qpg6100-lock build --copy-artifacts-to /tmp/artifacts
     ```

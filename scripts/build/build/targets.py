@@ -63,11 +63,15 @@ class Target:
 
 
 def HostTargets():
-    target = Target('host', HostBuilder)
+    target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     targets = [
-        target.Extend('native', board=HostBoard.NATIVE),
-        target.Extend('arm64', board=HostBoard.ARM64)
+         target.Extend(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE)
     ]
+
+    # x64 linux  supports cross compile
+    if (HostBoard.NATIVE.PlatformName() == 'linux') and (
+            HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName()):
+        targets.append(target.Extend('arm64', board=HostBoard.ARM64))
 
     for target in targets:
         yield target.Extend('all-clusters', app=HostApp.ALL_CLUSTERS)
