@@ -21,13 +21,8 @@
 #include "MainLoop.h"
 #include "WiFiManager.h"
 
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
-
-WiFiManager WiFiManager::sInstance;
-
-static const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
+namespace {
+const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
 {
     switch (state)
     {
@@ -40,7 +35,7 @@ static const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
     }
 }
 
-static const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
+const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
 {
     switch (state)
     {
@@ -53,7 +48,7 @@ static const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
     }
 }
 
-static const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
+const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
 {
     switch (state)
     {
@@ -72,7 +67,7 @@ static const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e s
     }
 }
 
-static const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
+const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
 {
     switch (state)
     {
@@ -85,7 +80,7 @@ static const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e 
     }
 }
 
-static const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
+const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
 {
     switch (state)
     {
@@ -98,7 +93,7 @@ static const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
     }
 }
 
-static const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
+const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
 {
     switch (type)
     {
@@ -124,6 +119,13 @@ static const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
         return "(unknown)";
     }
 }
+}
+
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
+
+WiFiManager WiFiManager::sInstance;
 
 void WiFiManager::_DeviceStateChangedCb(wifi_manager_device_state_e deviceState, void * userData)
 {
@@ -250,6 +252,8 @@ bool WiFiManager::_FoundAPCb(wifi_manager_ap_h ap, void * userData)
     cbRet = false;
 
 exit:
+    memset(sInstance.mWiFiSSID, 0, sizeof(sInstance.mWiFiSSID));
+    memset(sInstance.mWiFiKey, 0, sizeof(sInstance.mWiFiKey));
     g_free(essid);
     return cbRet;
 }
@@ -260,7 +264,7 @@ void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
 
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {
-        ChipLogProgress(DeviceLayer, "WiFi is connected [%s]", sInstance.mWiFiSSID);
+        ChipLogProgress(DeviceLayer, "WiFi is connected");
     }
     else
     {
@@ -700,7 +704,7 @@ CHIP_ERROR WiFiManager::Disconnect(const char * ssid)
     wifiErr = wifi_manager_forget_ap(sInstance.mWiFiManagerHandle, foundAp);
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {
-        ChipLogProgress(DeviceLayer, "WiFi is disconnected [%s]", sInstance.mWiFiSSID);
+        ChipLogProgress(DeviceLayer, "WiFi is disconnected");
     }
     else
     {

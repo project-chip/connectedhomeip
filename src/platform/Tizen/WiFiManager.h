@@ -29,21 +29,23 @@ namespace Internal {
 
 class WiFiManager
 {
+    friend class ConnectivityManagerImpl;
+
 public:
-    static void Init(void);
-    static void Deinit(void);
+    void Init(void);
+    void Deinit(void);
 
-    static CHIP_ERROR IsActivated(bool * isWifiActivated);
-    static CHIP_ERROR Activate(void);
-    static CHIP_ERROR Deactivate(void);
-    static CHIP_ERROR Connect(const char * ssid, const char * key);
-    static CHIP_ERROR Disconnect(const char * ssid);
-    static CHIP_ERROR RemoveAllConfigs(void);
+    CHIP_ERROR IsActivated(bool * isWifiActivated);
+    CHIP_ERROR Activate(void);
+    CHIP_ERROR Deactivate(void);
+    CHIP_ERROR Connect(const char * ssid, const char * key);
+    CHIP_ERROR Disconnect(const char * ssid);
+    CHIP_ERROR RemoveAllConfigs(void);
 
-    static CHIP_ERROR GetDeviceState(wifi_manager_device_state_e * deviceState);
-    static CHIP_ERROR SetDeviceState(wifi_manager_device_state_e deviceState);
-    static CHIP_ERROR GetModuleState(wifi_manager_module_state_e * moduleState);
-    static CHIP_ERROR GetConnectionState(wifi_manager_connection_state_e * connectionState);
+    CHIP_ERROR GetDeviceState(wifi_manager_device_state_e * deviceState);
+    CHIP_ERROR SetDeviceState(wifi_manager_device_state_e deviceState);
+    CHIP_ERROR GetModuleState(wifi_manager_module_state_e * moduleState);
+    CHIP_ERROR GetConnectionState(wifi_manager_connection_state_e * connectionState);
 
 private:
     static void _DeviceStateChangedCb(wifi_manager_device_state_e deviceState, void * userData);
@@ -75,6 +77,8 @@ private:
     void _WiFiSetConnectionState(wifi_manager_connection_state_e connectionState);
     wifi_manager_ap_h _WiFiGetFoundAP(void);
 
+    friend WiFiManager & WiFiMgr(void);
+
     static WiFiManager sInstance;
 
     wifi_manager_h mWiFiManagerHandle;
@@ -85,6 +89,11 @@ private:
     char mWiFiSSID[kMaxWiFiSSIDLength + 1];
     char mWiFiKey[kMaxWiFiKeyLength];
 };
+
+inline WiFiManager & WiFiMgr()
+{
+    return WiFiManager::sInstance;
+}
 
 } // namespace Internal
 } // namespace DeviceLayer
