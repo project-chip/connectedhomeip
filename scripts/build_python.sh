@@ -41,7 +41,6 @@ ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
 declare chip_detail_logging=false
 declare enable_pybindings=false
 declare chip_mdns
-declare clusters=true
 
 help() {
 
@@ -54,8 +53,6 @@ Input Options:
                                                             By default it is false.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
                                                             By default it is minimal.
-  -c, --clusters_for_ip_commissioning  true/false           Specify whether to use clusters for IP commissioning.
-                                                            By default it is true.
   -p, --enable_pybindings   EnableValue                     Specify whether to enable pybindings as python controller.
 "
 }
@@ -74,10 +71,6 @@ while (($#)); do
             ;;
         --chip_mdns | -m)
             chip_mdns=$2
-            shift
-            ;;
-        --clusters_for_ip_commissioning | -c)
-            clusters=$2
             shift
             ;;
         --enable_pybindings | -p)
@@ -102,7 +95,7 @@ source "$CHIP_ROOT/scripts/activate.sh"
 # Generates ninja files
 [[ -n "$chip_mdns" ]] && chip_mdns_arg="chip_mdns=\"$chip_mdns\"" || chip_mdns_arg=""
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_use_clusters_for_ip_commissioning=$clusters chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg"
 
 # Compiles python files
 # Check pybindings was requested

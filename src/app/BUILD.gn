@@ -103,13 +103,6 @@ static_library("app") {
     "reporting/Engine.h",
   ]
 
-  if (chip_ip_commissioning) {
-    defines = [
-      "CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING=1",
-      "CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY=1",
-    ]
-  }
-
   public_deps = [
     ":app_buildconfig",
     "${chip_root}/src/lib/support",
