@@ -33,6 +33,7 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <lib/support/StackLock.h>
 #include <platform/android/AndroidConfig.h>
 
 namespace chip {
@@ -191,6 +192,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, uint32_t & val)
 
 CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, uint64_t & val)
 {
+    StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gReadConfigValueLongMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -216,6 +218,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, uint64_t & val)
 
 CHIP_ERROR AndroidConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
+    StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gReadConfigValueStrMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -244,6 +247,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize
 
 CHIP_ERROR AndroidConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
+    StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gReadConfigValueBinMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -290,6 +294,7 @@ CHIP_ERROR AndroidConfig::WriteConfigValue(Key key, uint32_t val)
 
 CHIP_ERROR AndroidConfig::WriteConfigValue(Key key, uint64_t val)
 {
+    StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gWriteConfigValueLongMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -314,6 +319,7 @@ CHIP_ERROR AndroidConfig::WriteConfigValue(Key key, uint64_t val)
 
 CHIP_ERROR AndroidConfig::WriteConfigValueStr(Key key, const char * str)
 {
+    StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gWriteConfigValueStrMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -363,6 +369,7 @@ exit:
 
 CHIP_ERROR AndroidConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
+    StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gWriteConfigValueBinMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -387,6 +394,7 @@ CHIP_ERROR AndroidConfig::WriteConfigValueBin(Key key, const uint8_t * data, siz
 
 CHIP_ERROR AndroidConfig::ClearConfigValue(Key key)
 {
+    StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gClearConfigValueMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -410,6 +418,7 @@ CHIP_ERROR AndroidConfig::ClearConfigValue(Key key)
 
 bool AndroidConfig::ConfigValueExists(Key key)
 {
+    StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, false);
     ReturnErrorCodeIf(gConfigValueExistsMethod == nullptr, false);
 

@@ -30,6 +30,7 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <lib/support/StackLock.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -81,6 +82,7 @@ void KeyValueStoreManagerImpl::InitializeWithObject(jobject manager)
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes)
 {
+    StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReturnErrorCodeIf(mKeyValueStoreManagerObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mGetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -142,6 +144,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
+    StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
     ReturnErrorCodeIf(mKeyValueStoreManagerObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mSetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(value_size > kMaxKvsValueBytes, CHIP_ERROR_INVALID_ARGUMENT);
@@ -172,6 +175,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
+    StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
     ReturnErrorCodeIf(mKeyValueStoreManagerObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mDeleteMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
