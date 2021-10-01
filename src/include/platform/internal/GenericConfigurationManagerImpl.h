@@ -139,8 +139,7 @@ protected:
         kIsServiceProvisioned                    = 0x01,
         kIsMemberOfFabric                        = 0x02,
         kIsPairedToAccount                       = 0x04,
-        kOperationalDeviceCredentialsProvisioned = 0x08,
-        kUseManufacturerCredentialsAsOperational = 0x10,
+        kUseManufacturerCredentialsAsOperational = 0x08,
     };
 
     BitFlags<Flags> mFlags;

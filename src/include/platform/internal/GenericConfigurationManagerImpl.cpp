@@ -56,9 +56,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
     mFlags.ClearAll()
         .Set(Flags::kIsServiceProvisioned, Impl()->ConfigValueExists(ImplClass::kConfigKey_ServiceConfig))
         .Set(Flags::kIsMemberOfFabric, Impl()->ConfigValueExists(ImplClass::kConfigKey_FabricId))
-        .Set(Flags::kIsPairedToAccount, Impl()->ConfigValueExists(ImplClass::kConfigKey_PairedAccountId))
-        .Set(Flags::kOperationalDeviceCredentialsProvisioned,
-             Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
+        .Set(Flags::kIsPairedToAccount, Impl()->ConfigValueExists(ImplClass::kConfigKey_PairedAccountId));
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
