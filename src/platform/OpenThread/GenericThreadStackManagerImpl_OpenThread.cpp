@@ -832,7 +832,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDia
  */
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(
-    AttributeId attributeId, const app::AttributeValueEncoder & encoder)
+    AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
     CHIP_ERROR err;
 

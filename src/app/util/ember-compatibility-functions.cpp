@@ -205,12 +205,12 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
     if (attrOverride != nullptr)
     {
-        bool dataRead;
         // TODO: We should probably clone the writer and convert failures here
         // into status responses, unless our caller already does that.
-        ReturnErrorOnFailure(attrOverride->Read(aClusterInfo, AttributeValueEncoder(apWriter), &dataRead));
+        AttributeValueEncoder valueEncoder(apWriter);
+        ReturnErrorOnFailure(attrOverride->Read(aClusterInfo, valueEncoder));
 
-        if (dataRead)
+        if (valueEncoder.TriedEncode())
         {
             if (apDataExists != nullptr)
             {
