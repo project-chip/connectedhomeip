@@ -4,12 +4,14 @@
 #pragma once
 
 #include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
 #include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/ConcreteCommandPath.h>
 #include <lib/support/Span.h>
 
 /** @brief Cluster Init
@@ -172,9 +174,9 @@ void emberAf{{asUpperCamelCase label}}ClusterClientTickCallback(chip::EndpointId
 /**
  * @brief {{parent.name}} Cluster {{name}} Command callback (from {{source}})
  */
-bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(chip::EndpointId endpoint,
-       {{#if (isServer source)}}chip::app::CommandSender{{else}}chip::app::CommandHandler{{/if}} * commandObj
-       {{#zcl_command_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/zcl_command_arguments}});
+bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback({{#if (isServer source)}}chip::app::CommandSender{{else}}chip::app::CommandHandler{{/if}} * commandObj,
+      const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
+      {{#zcl_command_arguments}}{{asUnderlyingZclType type}} {{asSymbol label}},{{/zcl_command_arguments}} chip::app::Clusters::{{asUpperCamelCase parent.label}}::Commands::{{asUpperCamelCase name}}::DecodableType & fields);
 {{/zcl_commands}}
 {{/zcl_clusters}}
 

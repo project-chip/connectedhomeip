@@ -6,7 +6,9 @@
 #include <cinttypes>
 
 #include <app/Command.h>
+#include <app/ConcreteCommandPath.h>
 #include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af.h>
 #include <app/util/af-enums.h>
 #include <app/util/attribute-list-byte-span.h>
@@ -407,7 +409,7 @@ void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttribu
 
 {{#chip_client_clusters}}
 {{#chip_cluster_responses}}
-bool emberAf{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(EndpointId endpoint, app::CommandSender * commandObj{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}})
+bool emberAf{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, {{#chip_cluster_response_arguments}}{{asUnderlyingZclType type}} {{asSymbol label}}, {{/chip_cluster_response_arguments}}app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "{{asUpperCamelCase name}}:");
     {{#chip_cluster_response_arguments}}
