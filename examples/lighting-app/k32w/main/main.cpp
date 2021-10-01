@@ -123,3 +123,11 @@ extern "C" void main_task(void const * argument)
 exit:
     return;
 }
+
+extern "C" void otSysEventSignalPending(void)
+{
+    {
+        BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
+        portYIELD_FROM_ISR(yieldRequired);
+    }
+}
