@@ -40,7 +40,7 @@ device into commissioning mode.
 ### linux builds with an ethernet connection
 
 ```bash
-gn gen out/debug --args='chip_ip_commissioning=true'
+gn gen out/debug
 ninja -C out/debug
 ```
 

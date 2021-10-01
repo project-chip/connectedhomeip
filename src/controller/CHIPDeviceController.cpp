@@ -1009,11 +1009,7 @@ void DeviceCommissioner::OnSessionEstablished()
 
     // TODO: Add code to receive OpCSR from the device, and process the signing request
     // For IP rendezvous, this is sent as part of the state machine.
-#if CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING
     bool usingLegacyFlowWithImmediateStart = !mIsIPRendezvous;
-#else
-    bool usingLegacyFlowWithImmediateStart = true;
-#endif
 
     if (usingLegacyFlowWithImmediateStart)
     {
@@ -1497,13 +1493,11 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(Co
     ChipLogProgress(Controller, "Operational credentials provisioned on device %p", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-#if CONFIG_USE_CLUSTERS_FOR_IP_COMMISSIONING
     if (mIsIPRendezvous)
     {
         AdvanceCommissioningStage(CHIP_NO_ERROR);
     }
     else
-#endif
     {
         mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 

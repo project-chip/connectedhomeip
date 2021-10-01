@@ -139,7 +139,6 @@ class AndroidBuilder(Builder):
             gn_args['target_cpu'] = self.board.TargetCpuName()
             gn_args['android_ndk_root'] = os.environ['ANDROID_NDK_HOME']
             gn_args['android_sdk_root'] = os.environ['ANDROID_HOME']
-            gn_args['chip_use_clusters_for_ip_commissioning'] = True
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""
