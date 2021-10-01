@@ -60,7 +60,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init(void)
     mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    Internal::WiFiManager::Init();
+    WiFiMgr().Init();
     Internal::SoftAPManager::Init();
 #endif
 
@@ -78,7 +78,7 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
 
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        err = Internal::WiFiManager::GetDeviceState(&deviceState);
+        err = WiFiMgr().GetDeviceState(&deviceState);
         SuccessOrExit(err);
 
         if (deviceState == WIFI_MANAGER_DEVICE_STATE_ACTIVATED)
@@ -104,7 +104,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiF
     VerifyOrExit(val != kWiFiStationMode_ApplicationControlled, );
 
     deviceState = (val == kWiFiStationMode_Disabled) ? WIFI_MANAGER_DEVICE_STATE_DEACTIVATED : WIFI_MANAGER_DEVICE_STATE_ACTIVATED;
-    err         = Internal::WiFiManager::SetDeviceState(deviceState);
+    err         = WiFiMgr().SetDeviceState(deviceState);
     SuccessOrExit(err);
 
     if (mWiFiStationMode != val)
@@ -135,7 +135,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 {
     bool isWifiStationEnabled = false;
 
-    Internal::WiFiManager::IsActivated(&isWifiStationEnabled);
+    WiFiMgr().IsActivated(&isWifiStationEnabled);
 
     return isWifiStationEnabled;
 }
@@ -146,7 +146,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
     wifi_manager_connection_state_e connectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
     bool isWifiStationConnected                     = false;
 
-    err = Internal::WiFiManager::GetConnectionState(&connectionState);
+    err = WiFiMgr().GetConnectionState(&connectionState);
     SuccessOrExit(err);
 
     if (connectionState == WIFI_MANAGER_CONNECTION_STATE_CONNECTED)
@@ -162,7 +162,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
     wifi_manager_connection_state_e connectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
     bool isWifiStationProvisioned                   = false;
 
-    err = Internal::WiFiManager::GetConnectionState(&connectionState);
+    err = WiFiMgr().GetConnectionState(&connectionState);
     SuccessOrExit(err);
 
     if (connectionState >= WIFI_MANAGER_CONNECTION_STATE_ASSOCIATION)
@@ -174,7 +174,7 @@ exit:
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
-    Internal::WiFiManager::RemoveAllConfigs();
+    WiFiMgr().RemoveAllConfigs();
 }
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan(void)
@@ -268,12 +268,12 @@ void ConnectivityManagerImpl::StopWiFiManagement(void)
 
 void ConnectivityManagerImpl::ActivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState)
 {
-    Internal::WiFiManager::Activate();
+    WiFiMgr().Activate();
 }
 
 void ConnectivityManagerImpl::DeactivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState)
 {
-    Internal::WiFiManager::Deactivate();
+    WiFiMgr().Deactivate();
 }
 
 void ConnectivityManagerImpl::EnableSoftAPManager(::chip::System::Layer * aLayer, void * aAppState)
@@ -289,7 +289,7 @@ void ConnectivityManagerImpl::DisableSoftAPManager(::chip::System::Layer * aLaye
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
-    return Internal::WiFiManager::Connect(ssid, key);
+    return WiFiMgr().Connect(ssid, key);
 }
 
 } // namespace DeviceLayer
