@@ -20,6 +20,7 @@ set -e
 
 declare -i iterations=2
 declare -i delay=0
+declare -i node_id=0x12344321
 declare -i background_pid=0
 declare test_case_wrapper=()
 
@@ -124,9 +125,9 @@ for j in "${iter_array[@]}"; do
         # the data is there yet.
         background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode MT:D8XA0CQM00KA0648G00
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing qrcode "$node_id" MT:D8XA0CQM00KA0648G00
         echo "          * Starting test run: $i"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$delay"
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i" "$node_id" "$delay"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0

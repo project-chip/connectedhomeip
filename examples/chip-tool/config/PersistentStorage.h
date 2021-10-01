@@ -36,19 +36,13 @@ public:
     uint16_t GetListenPort();
     chip::Logging::LogCategory GetLoggingLevel();
 
-    // Return the stored node ids, or the default ones if nothing is stored.
+    // Return the stored local node id, or the default one if nothing is stored.
     chip::NodeId GetLocalNodeId();
-    chip::NodeId GetRemoteNodeId();
 
-    // Store node ids.
+    // Store local node id.
     CHIP_ERROR SetLocalNodeId(chip::NodeId nodeId);
-    CHIP_ERROR SetRemoteNodeId(chip::NodeId nodeId);
 
 private:
-    // Helpers for node ids.
-    chip::NodeId GetNodeId(const char * key, chip::NodeId defaultVal);
-    CHIP_ERROR SetNodeId(const char * key, chip::NodeId value);
-
     CHIP_ERROR CommitConfig();
     inipp::Ini<char> mConfig;
 };
