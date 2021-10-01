@@ -69,12 +69,12 @@ CHIP_ERROR TimeSyncAttrAccess::Read(ClusterInfo & aClusterInfo, const AttributeV
     *aDataRead = true;
     switch (aClusterInfo.mFieldId)
     {
-    case TimeSync::Attributes::Ids::UTCTime: {
+    case TimeSync::Attributes::UTCTime::Id: {
         uint64_t utcTime = gTimeSource.GetUtcTime();
         return aEncoder.Encode(utcTime);
         break;
     }
-    case TimeSync::Attributes::Ids::LocalTime: {
+    case TimeSync::Attributes::LocalTime::Id: {
         uint64_t localTime = gTimeSource.GetLocalTime();
         return aEncoder.Encode(localTime);
         break;
