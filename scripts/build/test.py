@@ -102,7 +102,7 @@ class TestBuilder(unittest.TestCase):
 
     @unittest.skipUnless(sys.platform == 'linux', 'Build on linux test')
     @unittest.skipUnless(os.uname().machine == 'x86_64', 'Validation x64 and crosscompile, requires linux x64')
-    def test_targets(self):
+    def test_linux_build(self):
         self.assertCommandOutput(
             os.path.join('testdata', 'build_linux_on_x64.txt'),
             '--target-glob {linux}-* build'.split(' ')
