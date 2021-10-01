@@ -43,9 +43,9 @@ PeerAddress AddressFromString(const char * str)
     return PeerAddress::UDP(addr);
 }
 
-const PeerAddress kPeer1Addr = AddressFromString("10.1.2.3");
-const PeerAddress kPeer2Addr = AddressFromString("10.0.0.32");
-const PeerAddress kPeer3Addr = AddressFromString("100.200.0.1");
+const PeerAddress kPeer1Addr = AddressFromString("fe80::1");
+const PeerAddress kPeer2Addr = AddressFromString("fe80::2");
+const PeerAddress kPeer3Addr = AddressFromString("fe80::3");
 
 const NodeId kPeer1NodeId = 123;
 const NodeId kPeer2NodeId = 6;

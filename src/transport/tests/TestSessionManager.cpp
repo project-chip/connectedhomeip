@@ -137,7 +137,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
+    IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
@@ -224,7 +224,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
+    IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
@@ -297,7 +297,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
+    IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;

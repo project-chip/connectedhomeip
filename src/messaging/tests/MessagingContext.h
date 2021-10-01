@@ -50,7 +50,7 @@ public:
     static Inet::IPAddress GetAddress()
     {
         Inet::IPAddress addr;
-        Inet::IPAddress::FromString("127.0.0.1", addr);
+        Inet::IPAddress::FromString("::1", addr);
         return addr;
     }
     NodeId GetBobNodeId() const { return mBobNodeId; }

@@ -81,11 +81,10 @@ private:
     nlTestSuite * mSuite;
 };
 
-#if INET_CONFIG_ENABLE_IPV4
 void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
 {
     IPAddress ipAddress;
-    NL_TEST_ASSERT(inSuite, IPAddress::FromString("10.20.30.40", ipAddress));
+    NL_TEST_ASSERT(inSuite, IPAddress::FromString("2607:f8b0:4005:804::200e", ipAddress));
 
     PtrResponder responder(kNames, kTargetNames);
 
@@ -104,12 +103,9 @@ void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
 
     responder.AddAllResponses(&packetInfo, &acc);
 }
-#endif // INET_CONFIG_ENABLE_IPV4
 
 const nlTest sTests[] = {
-#if INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("TestPtrResponse", TestPtrResponse), //
-#endif                                               // INET_CONFIG_ENABLE_IPV4
     NL_TEST_SENTINEL()                               //
 };
 
