@@ -116,15 +116,9 @@ def ValidateRepoPath(context, parameter, value):
     default=False,
     is_flag=True,
     help='Skip timestaps in log output')
-@click.option(
-    '--rpc',
-    default=False,
-    is_flag=True,
-    help='Build with debug RPCs enabled.'
-)
 @click.pass_context
 def main(context, log_level, target, target_glob, skip_target_glob, repo, out_prefix, clean,
-         dry_run, dry_run_output, enable_flashbundle, no_log_timestamps, rpc):
+         dry_run, dry_run_output, enable_flashbundle, no_log_timestamps):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
