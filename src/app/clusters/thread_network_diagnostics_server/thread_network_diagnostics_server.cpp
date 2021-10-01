@@ -76,7 +76,7 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const At
 
 bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
-    EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::SetOverrunCount(endpoint, 0);
+    EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::OverrunCount::Set(endpoint, 0);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to reset OverrunCount attribute");
