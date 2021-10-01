@@ -52,18 +52,18 @@ std::unordered_map<std::string, uint8_t> g_kvs_map;
 std::list<uint8_t> g_key_ids_list;
 
 /* max no of bytes for a key */
-#define MAX_KEY_VALUE          255
+#define MAX_KEY_VALUE 255
 
 /* used to check if we need to restore values from flash (e.g.: reset) */
 static bool g_restored_from_flash = FALSE;
 
 CHIP_ERROR RestoreFromFlash()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t key_id = 0;
-    char key_string_id[MAX_KEY_VALUE] = {0};
-    size_t key_string_id_size = 0;
-    uint8_t pdm_id_kvs = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVS;
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    uint8_t key_id                    = 0;
+    char key_string_id[MAX_KEY_VALUE] = { 0 };
+    size_t key_string_id_size         = 0;
+    uint8_t pdm_id_kvs                = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVS;
 
     if (g_restored_from_flash)
     {
@@ -78,8 +78,8 @@ CHIP_ERROR RestoreFromFlash()
          */
 
         err = chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueStr(
-                  chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + MAX_NO_OF_KEYS),
-                  key_string_id, MAX_KEY_VALUE, key_string_id_size);
+            chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + MAX_NO_OF_KEYS), key_string_id, MAX_KEY_VALUE,
+            key_string_id_size);
 
         if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
         {
@@ -131,7 +131,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 {
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
     uint8_t key_id;
-    bool_t put_key = FALSE;
+    bool_t put_key     = FALSE;
     uint8_t pdm_id_kvs = chip::DeviceLayer::Internal::K32WConfig::kPDMId_KVS;
     std::unordered_map<std::string, uint8_t>::const_iterator it;
 
@@ -155,7 +155,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     else /* overwrite key */
     {
         put_key = TRUE;
-        key_id = it->second;
+        key_id  = it->second;
     }
 
     if (put_key)
@@ -164,15 +164,14 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
         g_kvs_map.insert(std::make_pair(std::string(key), key_id));
         err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueBin(
-                  chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id), (uint8_t *) value, value_size);
+            chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id), (uint8_t *) value, value_size);
 
         /* save the 'key' in flash such that it can be retrieved later on */
         if (err == CHIP_NO_ERROR)
         {
             ChipLogProgress(DeviceLayer, "KVS, save in flash key [%s] with PDM key: %i", key, key_id + MAX_NO_OF_KEYS);
             err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueStr(
-                      chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + MAX_NO_OF_KEYS),
-                      key, strlen(key));
+                chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + MAX_NO_OF_KEYS), key, strlen(key));
         }
     }
 
@@ -197,14 +196,14 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 
         ChipLogProgress(DeviceLayer, "KVS, delete key [%s] with PDM key: %i", key, key_id);
         err = chip::DeviceLayer::Internal::K32WConfig::ClearConfigValue(
-              chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id));
+            chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id));
 
         /* also delete the 'key string' from flash */
         if (err == CHIP_NO_ERROR)
         {
             ChipLogProgress(DeviceLayer, "KVS, delete key [%s] with PDM key: %i", key, key_id + MAX_NO_OF_KEYS);
             err = chip::DeviceLayer::Internal::K32WConfig::ClearConfigValue(
-                  chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + MAX_NO_OF_KEYS));
+                chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + MAX_NO_OF_KEYS));
         }
     }
 
