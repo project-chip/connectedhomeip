@@ -366,6 +366,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestIdentify : CHIPIdentify
 
+- (void)writeAttributeIdentifyTypeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end

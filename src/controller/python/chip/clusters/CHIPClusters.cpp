@@ -3123,6 +3123,15 @@ chip::ChipError::StorageType chip_ime_AppendCommand_Identify_IdentifyQuery(chip:
     cluster.Associate(device, ZCLendpointId);
     return cluster.IdentifyQuery(nullptr, nullptr).AsInteger();
 }
+chip::ChipError::StorageType chip_ime_AppendCommand_Identify_TriggerEffect(chip::Controller::Device * device,
+                                                                           chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                           uint8_t effectIdentifier, uint8_t effectVariant)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IdentifyCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TriggerEffect(nullptr, nullptr, effectIdentifier, effectVariant).AsInteger();
+}
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_Identify_IdentifyTime(chip::Controller::Device * device,
                                                                           chip::EndpointId ZCLendpointId,
@@ -3144,6 +3153,16 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_Identify_IdentifyTime(chip:
     return cluster.WriteAttributeIdentifyTime(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value)
         .AsInteger();
 }
+chip::ChipError::StorageType chip_ime_ReadAttribute_Identify_IdentifyType(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId,
+                                                                          chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IdentifyCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeIdentifyType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_Identify_ClusterRevision(chip::Controller::Device * device,
                                                                              chip::EndpointId ZCLendpointId,
                                                                              chip::GroupId /* ZCLgroupId */)
