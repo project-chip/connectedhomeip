@@ -32,7 +32,7 @@ using namespace chip::app::Clusters;
 
 struct TimeSyncTimeSource
 {
-    uint64_t GetUtcTime(void) { return (GetLocalTime() - mTimeStemp) + mTimeBase; }
+    uint64_t GetUtcTime(void) { return (GetLocalTime() - mTimeStamp) + mTimeBase; }
     uint64_t GetLocalTime(void) { return System::Clock::GetMonotonicMicroseconds(); }
     void SetTimeBase(uint64_t timeBase) { 
         mTimeBase = timeBase;
