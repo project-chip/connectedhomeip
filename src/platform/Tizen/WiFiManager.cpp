@@ -653,6 +653,7 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key)
     wifi_manager_ap_h foundAp = NULL;
 
     g_strlcpy(sInstance.mWiFiSSID, ssid, kMaxWiFiSSIDLength + 1);
+    sInstance.mWiFiSSID[kMaxWiFiSSIDLength] = '\0';
     g_strlcpy(sInstance.mWiFiKey, key, kMaxWiFiKeyLength);
 
     wifiErr = wifi_manager_is_activated(sInstance.mWiFiManagerHandle, &isWifiActivated);
