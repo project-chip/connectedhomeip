@@ -43,7 +43,7 @@ pw_python_package("build_examples") {
     "runner/shell.py",
   ]
 
-  tests = [ 
+  tests = [
     "test.py",
     "test_glob_matcher.py",
   ]

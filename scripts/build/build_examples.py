@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from glob_matcher import GlobMatcher
 from runner import PrintOnlyRunner, ShellRunner
 
 import build
@@ -24,8 +25,6 @@ import os
 import sys
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
-from glob_matcher import GlobMatcher
 
 
 # Supported log levels, mapping string values required for argument
@@ -66,7 +65,8 @@ def ValidateRepoPath(context, parameter, value):
 @click.option(
     '--target',
     default=['all'],
-    type=click.Choice(['all'] + [t.name for t in build.ALL_TARGETS], case_sensitive=False),
+    type=click.Choice(
+        ['all'] + [t.name for t in build.ALL_TARGETS], case_sensitive=False),
     multiple=True,
     help='Build target(s)'
 )
@@ -145,14 +145,16 @@ before running this script.
         runner = ShellRunner()
 
     if 'all' in target:
-      targets = build.ALL_TARGETS
+        targets = build.ALL_TARGETS
     else:
-      requested_targets = set([t.lower for t in target])
-      targets = [target for target in build.ALL_TARGETS if target.name.lower in requested_targets]
-    
-      actual_targes = set([t.name.lower for t in targets])
-      if requested_targets != actual_targes:
-        logging.error('Targets not found: %s', CommaSeparate(actual_targes))
+        requested_targets = set([t.lower for t in target])
+        targets = [
+            target for target in build.ALL_TARGETS if target.name.lower in requested_targets]
+
+        actual_targes = set([t.name.lower for t in targets])
+        if requested_targets != actual_targes:
+            logging.error('Targets not found: %s',
+                          CommaSeparate(actual_targes))
 
     if target_glob:
         matcher = GlobMatcher(target_glob)
@@ -161,15 +163,16 @@ before running this script.
     if skip_target_glob:
         matcher = GlobMatcher(skip_target_glob)
         targets = [t for t in targets if not matcher.matches(t.name)]
-    
 
     # force consistent sorting
     targets.sort(key=lambda t: t.name)
-    logging.info('Building targets: %s', CommaSeparate([t.name for t in targets]))
+    logging.info('Building targets: %s',
+                 CommaSeparate([t.name for t in targets]))
 
-
-    context.obj = build.Context(repository_path=repo, output_prefix=out_prefix, runner=runner)
-    context.obj.SetupBuilders(targets=targets, enable_flashbundle=enable_flashbundle)
+    context.obj = build.Context(
+        repository_path=repo, output_prefix=out_prefix, runner=runner)
+    context.obj.SetupBuilders(
+        targets=targets, enable_flashbundle=enable_flashbundle)
 
     if clean:
         context.obj.CleanOutputDirectories()
@@ -180,6 +183,7 @@ before running this script.
 @click.pass_context
 def cmd_generate(context):
     context.obj.Generate()
+
 
 @main.command(
     'targets', help='List the targets that would be generated/built given the input arguments')

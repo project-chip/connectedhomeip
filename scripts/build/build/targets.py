@@ -56,7 +56,7 @@ class Target:
             repository_path, runner=runner, **self.create_kw_args)
 
         builder.identifier = self.name
-        builder.output_dir = os.path.join(output_prefix, self.name) 
+        builder.output_dir = os.path.join(output_prefix, self.name)
         builder.enable_flashbundle(enable_flashbundle)
 
         return builder
@@ -65,7 +65,7 @@ class Target:
 def HostTargets():
     target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     targets = [
-         target.Extend(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE)
+        target.Extend(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE)
     ]
 
     # x64 linux  supports cross compile
@@ -98,9 +98,15 @@ def Efr32Targets():
     target = Target('efr32-brd4161a-light', Efr32Builder,
                     board=Efr32Board.BRD4161A)
 
-    yield target.Extend('light', app=Efr32App.LIGHT)
-    yield target.Extend('lock', app=Efr32App.LOCK)
-    yield target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
+    targets = [
+        target.Extend('light', app=Efr32App.LIGHT),
+        target.Extend('lock', app=Efr32App.LOCK),
+        target.Extend('window-covering', app=Efr32App.WINDOW_COVERING),
+    ]
+
+    for target in targets:
+        yield target
+        yield target.Extend('rpc', enable_rpcs=True)
 
 
 def NrfTargets():

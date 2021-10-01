@@ -49,11 +49,20 @@ bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 # Generating efr32-brd4161a-light-light
 gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light-light
 
+# Generating efr32-brd4161a-light-light-rpc
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-light-rpc
+
 # Generating efr32-brd4161a-light-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light-lock
 
+# Generating efr32-brd4161a-light-lock-rpc
+gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-lock-rpc
+
 # Generating efr32-brd4161a-light-window-covering
 gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light-window-covering
+
+# Generating efr32-brd4161a-light-window-covering-rpc
+gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-window-covering-rpc
 
 # Generating esp32-c3devkit-all-clusters
 cd "{root}"
@@ -243,11 +252,20 @@ cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 # Building efr32-brd4161a-light-light
 ninja -C {out}/efr32-brd4161a-light-light
 
+# Building efr32-brd4161a-light-light-rpc
+ninja -C {out}/efr32-brd4161a-light-light-rpc
+
 # Building efr32-brd4161a-light-lock
 ninja -C {out}/efr32-brd4161a-light-lock
 
+# Building efr32-brd4161a-light-lock-rpc
+ninja -C {out}/efr32-brd4161a-light-lock-rpc
+
 # Building efr32-brd4161a-light-window-covering
 ninja -C {out}/efr32-brd4161a-light-window-covering
+
+# Building efr32-brd4161a-light-window-covering-rpc
+ninja -C {out}/efr32-brd4161a-light-window-covering-rpc
 
 # Building esp32-c3devkit-all-clusters
 bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-c3devkit-all-clusters'"'"''

@@ -28,30 +28,30 @@ def _GlobMatch(glob: str, value: str) -> bool:
     glob = glob.replace('**', '*')
 
     while glob and value:
-      if glob[0] == '?':
-          glob, value = glob[1:], value[1:]
-      elif glob[0] == '*':
+        if glob[0] == '?':
+            glob, value = glob[1:], value[1:]
+        elif glob[0] == '*':
             for idx in range(len(value)+1):
                 if _GlobMatch(glob[1:], value[idx:]):
                     return True
             return False
-      elif glob[0] == '{':
-          # Format is comma separated values between {}:
-          # NOTE: this does NOT support nested {} at the  moment
-          closing_idx = glob.find('}')
-          if not closing_idx:
-              raise Exception("Malformed glob expression: missing '}'")
+        elif glob[0] == '{':
+            # Format is comma separated values between {}:
+            # NOTE: this does NOT support nested {} at the  moment
+            closing_idx = glob.find('}')
+            if not closing_idx:
+                raise Exception("Malformed glob expression: missing '}'")
 
-          for choice in glob[1: closing_idx].split(','):
-              if _GlobMatch(choice + glob[closing_idx+1:], value):
-                  return True
+            for choice in glob[1: closing_idx].split(','):
+                if _GlobMatch(choice + glob[closing_idx+1:], value):
+                    return True
 
-          return False
-      else:
-          if glob[0] != value[0]:
-              return False
-          glob, value = glob[1:], value[1:]
-    
+            return False
+        else:
+            if glob[0] != value[0]:
+                return False
+            glob, value = glob[1:], value[1:]
+
     return glob == '*' or (not glob and not value)
 
 

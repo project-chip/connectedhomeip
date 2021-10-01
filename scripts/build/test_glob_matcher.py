@@ -18,6 +18,7 @@ from glob_matcher import GlobMatcher
 
 import unittest
 
+
 class TestGlobMatcher(unittest.TestCase):
 
     def test_exact_match(self):
@@ -56,11 +57,13 @@ class TestGlobMatcher(unittest.TestCase):
         self.assertTrue(GlobMatcher('a*c').matches('athisislongc'))
         self.assertTrue(GlobMatcher('123*').matches('123abc'))
         self.assertTrue(GlobMatcher('123*').matches('123'))
-        self.assertTrue(GlobMatcher('more*stars*here').matches('more_stars___here'))
+        self.assertTrue(GlobMatcher(
+            'more*stars*here').matches('more_stars___here'))
 
         self.assertFalse(GlobMatcher('*x').matches('abc'))
         self.assertFalse(GlobMatcher('x*').matches('abc'))
-        self.assertFalse(GlobMatcher('*some*test').matches('thisissomelongertestcase'))
+        self.assertFalse(GlobMatcher(
+            '*some*test').matches('thisissomelongertestcase'))
 
     def test_group(self):
         self.assertTrue(GlobMatcher('{a,b}').matches('a'))
@@ -75,6 +78,7 @@ class TestGlobMatcher(unittest.TestCase):
         self.assertFalse(GlobMatcher('{a,b}').matches('ca'))
         self.assertFalse(GlobMatcher('{a,b}x{c,d}').matches('axe'))
         self.assertFalse(GlobMatcher('{a,b}x{c,d}').matches('exd'))
+
 
 if __name__ == '__main__':
     unittest.main()

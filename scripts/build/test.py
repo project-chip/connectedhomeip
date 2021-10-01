@@ -66,46 +66,46 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
     # often strips ending double newlines on text files
     while result[-1] == '\n':
         result = result[:-1]
-    
+
     return result
+
 
 class TestBuilder(unittest.TestCase):
 
     def assertCommandOutput(self, expected_file: str, args: List[str]):
         ROOT = '/TEST/BUILD/ROOT'
         OUT = '/OUTPUT/DIR'
-     
+
         expected = [l for l in build_expected_output(expected_file, ROOT, OUT)]
         actual = [l for l in build_actual_output(ROOT, OUT, args)]
-     
+
         diffs = [line for line in difflib.unified_diff(expected, actual)]
-     
+
         if diffs:
             msg = "DIFFERENCE between expected and generated output in %s" % expected_file
             for l in diffs:
-                msg += ("\n   " + l.replace(ROOT, '{root}').replace(OUT, '{out}').strip())
+                msg += ("\n   " + l.replace(ROOT,
+                        '{root}').replace(OUT, '{out}').strip())
             self.fail(msg)
-
-
 
     def test_output(self):
         self.assertCommandOutput(
-           os.path.join('testdata', 'build_all_except_host.txt'),
-           '--skip-target-glob {linux,darwin}-* build'.split(' ')
+            os.path.join('testdata', 'build_all_except_host.txt'),
+            '--skip-target-glob {linux,darwin}-* build'.split(' ')
         )
 
     def test_targets(self):
         self.assertCommandOutput(
-           os.path.join('testdata', 'all_targets_except_host.txt'),
-           '--skip-target-glob {linux,darwin}-* targets'.split(' ')
+            os.path.join('testdata', 'all_targets_except_host.txt'),
+            '--skip-target-glob {linux,darwin}-* targets'.split(' ')
         )
 
     @unittest.skipUnless(sys.platform == 'linux', 'Build on linux test')
     @unittest.skipUnless(os.uname().machine == 'x86_64', 'Validation x64 and crosscompile, requires linux x64')
     def test_targets(self):
         self.assertCommandOutput(
-           os.path.join('testdata', 'build_linux_on_x64.txt'),
-           '--target-glob {linux}-* build'.split(' ')
+            os.path.join('testdata', 'build_linux_on_x64.txt'),
+            '--target-glob {linux}-* build'.split(' ')
         )
 
 
