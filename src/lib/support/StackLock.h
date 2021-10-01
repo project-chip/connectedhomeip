@@ -25,11 +25,11 @@ struct StackLockGuard
 {
 public:
 
-    StackLockGuard(pthread_mutex_t * mutex, std::string function = "") : mMutex(mutex), mFunction(function) { 
+    StackLockGuard(pthread_mutex_t * mutex, std::string function = "") : mMutex(mutex), mFunction(function) {
         ChipLogProgress(Controller, "StackLockGuard: Locking %s", mFunction.c_str());
-        pthread_mutex_lock(mutex); 
+        pthread_mutex_lock(mutex);
         }
-    ~StackLockGuard() { 
+    ~StackLockGuard() {
         ChipLogProgress(Controller, "StackLockGuard: Unlocking %s", mFunction.c_str());
         pthread_mutex_unlock(mMutex); }
 
@@ -45,10 +45,10 @@ private:
 struct StackUnlockGuard
 {
 public:
-    StackUnlockGuard(pthread_mutex_t * mutex, std::string function = "") : mMutex(mutex), mFunction(function) { 
+    StackUnlockGuard(pthread_mutex_t * mutex, std::string function = "") : mMutex(mutex), mFunction(function) {
         ChipLogProgress(Controller, "StackUnlockGuard: Unlocking %s", mFunction.c_str());
         pthread_mutex_unlock(mMutex); }
-    ~StackUnlockGuard() { 
+    ~StackUnlockGuard() {
         ChipLogProgress(Controller, "StackUnlockGuard: Locking %s", mFunction.c_str());
         pthread_mutex_lock(mMutex); }
 

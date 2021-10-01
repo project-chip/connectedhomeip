@@ -339,7 +339,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnCloseConnectionMethod, static_cast<jint>(tmpConnObj));
     }
-    
+
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
