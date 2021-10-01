@@ -46,7 +46,7 @@ class BasicClientFragment : Fragment() {
   override fun onStart() {
     super.onStart()
     // TODO: use the fabric ID that was used to commission the device
-    val testFabricId = "0"//5544332211"
+    val testFabricId = "5544332211"
     basicClusterFabricIdEd.setText(testFabricId)
     basicClusterDeviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
   }
@@ -56,10 +56,6 @@ class BasicClientFragment : Fragment() {
 
     override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
       Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
-    }
-
-    override fun onSendMessageComplete(message: String?) {
-      commandStatusTv.text = requireContext().getString(R.string.echo_status_response, message)
     }
 
     override fun onNotifyChipConnectionClosed() {
@@ -81,7 +77,7 @@ class BasicClientFragment : Fragment() {
   }
 
   private fun updateAddressClick() {
-    try{
+    try {
       deviceController.updateDevice(
               basicClusterFabricIdEd.text.toString().toULong().toLong(),
               basicClusterDeviceIdEd.text.toString().toULong().toLong()
