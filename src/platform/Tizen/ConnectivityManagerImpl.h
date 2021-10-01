@@ -38,7 +38,6 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include "SoftAPManager.h"
 #include "WiFiManager.h"
 #endif
 
@@ -114,8 +113,6 @@ private:
 
     static void ActivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState);
     static void DeactivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState);
-    static void EnableSoftAPManager(::chip::System::Layer * aLayer, void * aAppState);
-    static void DisableSoftAPManager(::chip::System::Layer * aLayer, void * aAppState);
 #endif
 
     // ===== Members for internal use by the following friends.

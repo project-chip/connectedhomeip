@@ -61,7 +61,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init(void)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     WiFiMgr().Init();
-    Internal::SoftAPManager::Init();
 #endif
 
     return err;
@@ -184,73 +183,22 @@ bool ConnectivityManagerImpl::_CanStartWiFiScan(void)
 
 ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    bool apState   = false;
-
-    if (mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
-    {
-        err = Internal::SoftAPManager::GetAPState(&apState);
-        VerifyOrExit(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, mWiFiAPMode = kWiFiAPMode_NotSupported);
-        VerifyOrExit(err == CHIP_NO_ERROR, mWiFiAPMode = kWiFiAPMode_Disabled);
-
-        if (apState == true)
-        {
-            mWiFiAPMode = kWiFiAPMode_Enabled;
-        }
-        else
-        {
-            mWiFiAPMode = kWiFiAPMode_Disabled;
-        }
-    }
-
-exit:
     return mWiFiAPMode;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    bool apState   = false;
-
-    VerifyOrExit(val != kWiFiAPMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(val != kWiFiAPMode_ApplicationControlled, );
-
-    if (val == kWiFiAPMode_Disabled || val == kWiFiAPMode_Enabled)
-    {
-        apState = (val == kWiFiAPMode_Disabled) ? false : true;
-        err     = Internal::SoftAPManager::SetAPState(apState);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-
-        if (mWiFiAPMode != val)
-        {
-            ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
-
-            mWiFiAPMode = val;
-        }
-    }
-
-exit:
-    return err;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiAPActive()
 {
-    bool isWiFiAPEnabled = false;
-
-    Internal::SoftAPManager::IsEnabled(&isWiFiAPEnabled);
-
-    return isWiFiAPEnabled;
+    return mWiFiAPState == kWiFiAPState_Active;
 }
 
-void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
-{
-    SystemLayer().ScheduleWork(EnableSoftAPManager, NULL);
-}
+void ConnectivityManagerImpl::_DemandStartWiFiAP(void) {}
 
-void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
-{
-    SystemLayer().ScheduleWork(DisableSoftAPManager, NULL);
-}
+void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void) {}
 
 void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void) {}
 
@@ -274,16 +222,6 @@ void ConnectivityManagerImpl::ActivateWiFiManager(::chip::System::Layer * aLayer
 void ConnectivityManagerImpl::DeactivateWiFiManager(::chip::System::Layer * aLayer, void * aAppState)
 {
     WiFiMgr().Deactivate();
-}
-
-void ConnectivityManagerImpl::EnableSoftAPManager(::chip::System::Layer * aLayer, void * aAppState)
-{
-    Internal::SoftAPManager::Enable();
-}
-
-void ConnectivityManagerImpl::DisableSoftAPManager(::chip::System::Layer * aLayer, void * aAppState)
-{
-    Internal::SoftAPManager::Disable();
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
