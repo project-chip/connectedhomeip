@@ -59,6 +59,7 @@ from button_service import button_service_pb2
 from device_service import device_service_pb2
 from lighting_service import lighting_service_pb2
 from locking_service import locking_service_pb2
+from thread_service import thread_service_pb2
 from wifi_service import wifi_service_pb2
 from echo_service import echo_pb2
 
@@ -73,6 +74,7 @@ PROTOS = [button_service_pb2,
           attributes_service_pb2,
           lighting_service_pb2,
           locking_service_pb2,
+          thread_service_pb2,
           wifi_service_pb2,
           device_service_pb2,
           echo_pb2]

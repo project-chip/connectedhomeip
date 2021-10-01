@@ -45,6 +45,10 @@ LOG_MODULE_DECLARE(app);
 #include "pigweed/rpc_services/Locking.h"
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
+#if defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+#include "pigweed/rpc_services/Thread.h"
+#endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 #define PW_TRACE_BUFFER_SIZE_BYTES 1024
 #include "pw_trace/trace.h"
@@ -128,6 +132,10 @@ Lighting lighting_service;
 Locking locking;
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
+#if defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+Thread thread;
+#endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 pw::trace::TraceService trace_service;
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
@@ -153,6 +161,10 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
     server.RegisterService(locking);
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
+
+#if defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+    server.RegisterService(thread);
+#endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
     server.RegisterService(trace_service);
