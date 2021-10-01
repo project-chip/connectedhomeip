@@ -34,7 +34,7 @@ struct TimeSyncTimeSource
 {
     uint64_t GetUtcTime(void) { return (GetLocalTime() - mTimeStamp) + mTimeBase; }
     uint64_t GetLocalTime(void) { return System::Clock::GetMonotonicMicroseconds(); }
-    void SetTimeBase(uint64_t timeBase) { 
+    void SetTimeBase(uint64_t timeBase) {
         mTimeBase = timeBase;
         mTimeStamp = GetLocalTime();
     }
