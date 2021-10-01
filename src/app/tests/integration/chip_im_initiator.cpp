@@ -110,7 +110,7 @@ CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
 
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -161,7 +161,7 @@ CHIP_ERROR SendBadCommandRequest(chip::app::CommandSender * commandSender)
 
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -237,7 +237,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVWriter * writer;
-    gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
     chip::app::AttributePathParams attributePathParams;
 
     printf("\nSend write request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
@@ -271,7 +271,7 @@ exit:
 CHIP_ERROR SendSubscribeRequest()
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
-    gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
 
     chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex));
     chip::app::EventPathParams eventPathParams[2];
@@ -333,7 +333,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         printf("Establish secure session failed, err: %s\n", chip::ErrorStr(err));
-        gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
+        gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
     }
     else
     {
@@ -345,7 +345,7 @@ exit:
 
 void HandleReadComplete()
 {
-    uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
+    uint32_t respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
     uint32_t transitTime = respTime - gLastMessageTime;
 
     gReadRespCount++;
@@ -356,7 +356,7 @@ void HandleReadComplete()
 
 void HandleWriteComplete()
 {
-    uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
+    uint32_t respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
     uint32_t transitTime = respTime - gLastMessageTime;
 
     gWriteRespCount++;
@@ -367,7 +367,7 @@ void HandleWriteComplete()
 
 void HandleSubscribeReportComplete()
 {
-    uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
+    uint32_t respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
     uint32_t transitTime = respTime - gLastMessageTime;
     gSubRespCount++;
     printf("Subscribe Complete: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gSubRespCount, gSubCount,
@@ -592,7 +592,7 @@ public:
     CHIP_ERROR CommandResponseProcessed(const chip::app::CommandSender * apCommandSender) override
     {
 
-        uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
+        uint32_t respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
         uint32_t transitTime = respTime - gLastMessageTime;
 
         gCommandRespCount++;

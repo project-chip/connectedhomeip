@@ -653,14 +653,14 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
 
 static void ServiceNetworkUntilDone(uint32_t timeoutMilliseconds)
 {
-    uint64_t timeoutTimeMilliseconds          = System::Clock::GetMonotonicMilliseconds() + timeoutMilliseconds;
+    uint64_t timeoutTimeMilliseconds          = System::SystemClock().GetMonotonicMilliseconds() + timeoutMilliseconds;
     constexpr uint32_t kSleepTimeMilliseconds = 10;
 
     while (!gDone)
     {
         ServiceNetwork(kSleepTimeMilliseconds);
 
-        if (System::Clock::GetMonotonicMilliseconds() >= timeoutTimeMilliseconds)
+        if (System::SystemClock().GetMonotonicMilliseconds() >= timeoutTimeMilliseconds)
         {
             break;
         }
