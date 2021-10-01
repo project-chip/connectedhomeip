@@ -87,6 +87,7 @@ void SetLogRedirectCallback(LogRedirectCallback_t callback);
 
 void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);
 void Log(uint8_t module, uint8_t category, const char * msg, ...) ENFORCE_FORMAT(3, 4);
+void Dump(uint8_t module, uint8_t category, const char *aId, const void *aBuf, const unsigned aLength);
 
 uint8_t GetLogFilter();
 void SetLogFilter(uint8_t category);
@@ -156,6 +157,15 @@ void SetLogFilter(uint8_t category);
 #endif
 #else
 #define ChipLogDetail(MOD, MSG, ...) ((void) 0)
+#endif
+
+#if CHIP_DETAIL_LOGGING
+#ifndef ChipLogDumpDetail
+#define ChipLogDumpDetail(MOD, MSG, BUF, LEN)                                                                                               \
+    chip::Logging::Dump(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Detail, MSG, BUF, LEN)
+#endif
+#else
+#define ChipLogDumpDetail(MOD, MSG, BUF, LEN) ((void) 0)
 #endif
 
 #if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING

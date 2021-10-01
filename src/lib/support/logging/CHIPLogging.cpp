@@ -199,6 +199,116 @@ DLL_EXPORT void SetLogFilter(uint8_t category)
 }
 #endif // CHIP_LOG_FILTERING
 
+
+/**
+ * This static method outputs a line of the memory dump.
+ *
+ * @param[in]  module    The LogModule generating the log message.
+ * @param[in]  category  The LogCategory for filtering log level.
+ * @param[in]  aBuf      A pointer to the buffer.
+ * @param[in]  aLength   Number of bytes in the buffer.
+ *
+ */
+static void DumpLine(uint8_t module, uint8_t category, const void *aBuf, const size_t aLength)
+{
+    char  buf[80];
+    char *cur = buf;
+
+    snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), "|");
+    cur += strlen(cur);
+
+    for (size_t i = 0; i < 16; i++)
+    {
+        if (i < aLength)
+        {
+            snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), " %02X", ((uint8_t *)(aBuf))[i]);
+            cur += strlen(cur);
+        }
+        else
+        {
+            snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), " ..");
+            cur += strlen(cur);
+        }
+
+        if (!((i + 1) % 8))
+        {
+            snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), " |");
+            cur += strlen(cur);
+        }
+    }
+
+    snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), " ");
+    cur += strlen(cur);
+
+    for (size_t i = 0; i < 16; i++)
+    {
+        char c = 0x7f & ((char *)(aBuf))[i];
+
+        if (i < aLength && isprint(c))
+        {
+            snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), "%c", c);
+            cur += strlen(cur);
+        }
+        else
+        {
+            snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), ".");
+            cur += strlen(cur);
+        }
+    }
+
+    Log(module, category, "%s", buf);
+}
+
+/**
+ * This method dumps bytes to the log in a human-readable fashion.
+ *
+ * @param[in]  module    The LogModule generating the log message.
+ * @param[in]  category  The LogCategory for filtering log level.
+ * @param[in]  aId       A pointer to a NULL-terminated string that is printed before the bytes.
+ * @param[in]  aBuf      A pointer to the buffer.
+ * @param[in]  aLength   Number of bytes to print.
+ *
+ */
+void Dump(uint8_t module, uint8_t category, const char *aId, const void *aBuf, const unsigned aLength)
+{
+    size_t       idlen = strlen(aId);
+    const size_t width = 72;
+    char         buf[80];
+    char *       cur = buf;
+
+    for (size_t i = 0; i < (width - idlen) / 2 - 5; i++)
+    {
+        snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), "=");
+        cur += strlen(cur);
+    }
+
+    snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), "[%s len=%03u]", aId, static_cast<uint16_t>(aLength));
+    cur += strlen(cur);
+
+    for (size_t i = 0; i < (width - idlen) / 2 - 4; i++)
+    {
+        snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), "=");
+        cur += strlen(cur);
+    }
+
+    Log(module, category, "%s", buf);
+
+    for (size_t i = 0; i < aLength; i += 16)
+    {
+        DumpLine(module, category, (uint8_t *)(aBuf) + i, (aLength - i) < 16 ? (aLength - i) : 16);
+    }
+
+    cur = buf;
+
+    for (size_t i = 0; i < width; i++)
+    {
+        snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), "-");
+        cur += strlen(cur);
+    }
+
+    Log(module, category, "%s", buf);
+}
+
 #endif /* _CHIP_USE_LOGGING */
 
 } // namespace Logging
