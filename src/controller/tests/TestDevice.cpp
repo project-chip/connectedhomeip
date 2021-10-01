@@ -72,7 +72,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
         BleListenParameters(&blelayer)
 #endif
     );
-    sessionManager.Init(&systemLayer, &transportMgr, fabrics, &messageCounterManager);
+    sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager);
     exchangeMgr.Init(&sessionManager);
     messageCounterManager.Init(&exchangeMgr);
 
@@ -91,7 +91,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     Inet::IPAddress mockAddr;
     Inet::IPAddress::FromString("127.0.0.1", mockAddr);
     PeerAddress addr = PeerAddress::UDP(mockAddr, CHIP_PORT);
-    device.Init(params, CHIP_PORT, mockNodeId, addr, mockFabricIndex);
+    device.Init(params, mockNodeId, addr, mockFabricIndex);
 
     device.OperationalCertProvisioned();
     NL_TEST_ASSERT(inSuite, device.EstablishConnectivity(nullptr, nullptr) == CHIP_NO_ERROR);

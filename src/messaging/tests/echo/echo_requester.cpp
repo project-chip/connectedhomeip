@@ -121,7 +121,7 @@ CHIP_ERROR SendEchoRequest()
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    gLastEchoTime = chip::System::Clock::GetMonotonicMilliseconds();
+    gLastEchoTime = chip::System::SystemClock().GetMonotonicMilliseconds();
 
     err = chip::DeviceLayer::SystemLayer().StartTimer(gEchoInterval, EchoTimerHandler, NULL);
     if (err != CHIP_NO_ERROR)
@@ -173,7 +173,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         printf("Establish secure session failed, err: %s\n", chip::ErrorStr(err));
-        gLastEchoTime = chip::System::Clock::GetMonotonicMilliseconds();
+        gLastEchoTime = chip::System::SystemClock().GetMonotonicMilliseconds();
     }
     else
     {
@@ -185,7 +185,7 @@ exit:
 
 void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
-    uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
+    uint32_t respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
     uint32_t transitTime = respTime - gLastEchoTime;
 
     gEchoRespCount++;
@@ -199,8 +199,6 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    chip::Transport::FabricTable fabrics;
 
     if (argc <= 1)
     {
@@ -234,7 +232,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
@@ -244,7 +242,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
         SuccessOrExit(err);
     }
 

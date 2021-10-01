@@ -255,7 +255,7 @@ CHIP_ERROR LayerImplLwIP::HandlePlatformTimer()
     // Expire each timer in turn until an unexpired timer is reached or the timerlist is emptied.  We set the current expiration
     // time outside the loop; that way timers set after the current tick will not be executed within this expiration window
     // regardless how long the processing of the currently expired timers took
-    Clock::MonotonicMilliseconds currentTime = Clock::GetMonotonicMilliseconds();
+    Clock::MonotonicMilliseconds currentTime = SystemClock().GetMonotonicMilliseconds();
 
     // limit the number of timers handled before the control is returned to the event queue.  The bound is similar to
     // (though not exactly same) as that on the sockets-based systems.
@@ -277,7 +277,7 @@ CHIP_ERROR LayerImplLwIP::HandlePlatformTimer()
         // timers still exist so restart the platform timer.
         uint64_t delayMilliseconds = 0ULL;
 
-        currentTime = Clock::GetMonotonicMilliseconds();
+        currentTime = SystemClock().GetMonotonicMilliseconds();
 
         // the next timer expires in the future, so set the delayMilliseconds to a non-zero value
         if (currentTime < mTimerList.Earliest()->mAwakenTime)

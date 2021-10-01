@@ -20,7 +20,6 @@
 #include <app/util/basic-types.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
-#include <transport/FabricTable.h>
 #include <transport/UnauthenticatedSessionTable.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -34,7 +33,7 @@ public:
     SessionHandle(NodeId peerNodeId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric) {}
 
     SessionHandle(Transport::UnauthenticatedSessionHandle session) :
-        mPeerNodeId(kPlaceholderNodeId), mFabric(Transport::kUndefinedFabricIndex), mUnauthenticatedSessionHandle(session)
+        mPeerNodeId(kPlaceholderNodeId), mFabric(kUndefinedFabricIndex), mUnauthenticatedSessionHandle(session)
     {}
 
     SessionHandle(NodeId peerNodeId, uint16_t localSessionId, uint16_t peerSessionId, FabricIndex fabric) :
@@ -46,7 +45,7 @@ public:
 
     bool IsSecure() const { return !mUnauthenticatedSessionHandle.HasValue(); }
 
-    bool HasFabricIndex() const { return (mFabric != Transport::kUndefinedFabricIndex); }
+    bool HasFabricIndex() const { return (mFabric != kUndefinedFabricIndex); }
     FabricIndex GetFabricIndex() const { return mFabric; }
     void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
 

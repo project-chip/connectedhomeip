@@ -41,3 +41,16 @@ jobs:
                   scripts/helpers/bloat_check.py                        \
                        --github-repository project-chip/connectedhomeip \
                        --github-api-token "${{ secrets.GITHUB_TOKEN }}"
+
+            - name: Report2
+              run: |
+                  scripts/tools/memory/gh_report.py \
+                    --verbose \
+                    --report-increases 1 \
+                    --report-pr \
+                    --github-comment \
+                    --github-limit-artifact-pages 5 \
+                    --github-limit-artifacts 50 \
+                    --github-limit-comments 2 \
+                    --github-repository project-chip/connectedhomeip \
+                    --github-api-token "${{ secrets.GITHUB_TOKEN }}"

@@ -68,7 +68,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::AdministratorCommissioning::Commands::Ids::OpenBasicCommissioningWindow: {
+        case Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id: {
             expectArgumentCount = 1;
             uint16_t CommissioningTimeout;
             bool argExists[1];
@@ -127,7 +127,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::AdministratorCommissioning::Commands::Ids::OpenCommissioningWindow: {
+        case Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Id: {
             expectArgumentCount = 6;
             uint16_t CommissioningTimeout;
             chip::ByteSpan PAKEVerifier;
@@ -206,7 +206,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::AdministratorCommissioning::Commands::Ids::RevokeCommissioning: {
+        case Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Id: {
 
             wasHandled = emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(aEndpointId, apCommandObj);
             break;
@@ -257,7 +257,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::ColorControl::Commands::Ids::ColorLoopSet: {
+        case Clusters::ColorControl::Commands::ColorLoopSet::Id: {
             expectArgumentCount = 7;
             uint8_t updateFlags;
             uint8_t action;
@@ -340,7 +340,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::EnhancedMoveHue: {
+        case Clusters::ColorControl::Commands::EnhancedMoveHue::Id: {
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint16_t rate;
@@ -411,7 +411,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::EnhancedMoveToHue: {
+        case Clusters::ColorControl::Commands::EnhancedMoveToHue::Id: {
             expectArgumentCount = 5;
             uint16_t enhancedHue;
             uint8_t direction;
@@ -486,7 +486,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::EnhancedMoveToHueAndSaturation: {
+        case Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id: {
             expectArgumentCount = 5;
             uint16_t enhancedHue;
             uint8_t saturation;
@@ -561,7 +561,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::EnhancedStepHue: {
+        case Clusters::ColorControl::Commands::EnhancedStepHue::Id: {
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint16_t stepSize;
@@ -636,7 +636,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveColor: {
+        case Clusters::ColorControl::Commands::MoveColor::Id: {
             expectArgumentCount = 4;
             int16_t rateX;
             int16_t rateY;
@@ -707,7 +707,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveColorTemperature: {
+        case Clusters::ColorControl::Commands::MoveColorTemperature::Id: {
             expectArgumentCount = 6;
             uint8_t moveMode;
             uint16_t rate;
@@ -787,7 +787,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveHue: {
+        case Clusters::ColorControl::Commands::MoveHue::Id: {
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint8_t rate;
@@ -858,7 +858,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveSaturation: {
+        case Clusters::ColorControl::Commands::MoveSaturation::Id: {
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint8_t rate;
@@ -929,7 +929,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveToColor: {
+        case Clusters::ColorControl::Commands::MoveToColor::Id: {
             expectArgumentCount = 5;
             uint16_t colorX;
             uint16_t colorY;
@@ -1004,7 +1004,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveToColorTemperature: {
+        case Clusters::ColorControl::Commands::MoveToColorTemperature::Id: {
             expectArgumentCount = 4;
             uint16_t colorTemperature;
             uint16_t transitionTime;
@@ -1075,7 +1075,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveToHue: {
+        case Clusters::ColorControl::Commands::MoveToHue::Id: {
             expectArgumentCount = 5;
             uint8_t hue;
             uint8_t direction;
@@ -1150,7 +1150,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveToHueAndSaturation: {
+        case Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id: {
             expectArgumentCount = 5;
             uint8_t hue;
             uint8_t saturation;
@@ -1225,7 +1225,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::MoveToSaturation: {
+        case Clusters::ColorControl::Commands::MoveToSaturation::Id: {
             expectArgumentCount = 4;
             uint8_t saturation;
             uint16_t transitionTime;
@@ -1296,7 +1296,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::StepColor: {
+        case Clusters::ColorControl::Commands::StepColor::Id: {
             expectArgumentCount = 5;
             int16_t stepX;
             int16_t stepY;
@@ -1371,7 +1371,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::StepColorTemperature: {
+        case Clusters::ColorControl::Commands::StepColorTemperature::Id: {
             expectArgumentCount = 7;
             uint8_t stepMode;
             uint16_t stepSize;
@@ -1455,7 +1455,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::StepHue: {
+        case Clusters::ColorControl::Commands::StepHue::Id: {
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -1530,7 +1530,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::StepSaturation: {
+        case Clusters::ColorControl::Commands::StepSaturation::Id: {
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -1605,7 +1605,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::Ids::StopMoveStep: {
+        case Clusters::ColorControl::Commands::StopMoveStep::Id: {
             expectArgumentCount = 2;
             uint8_t optionsMask;
             uint8_t optionsOverride;
@@ -1713,7 +1713,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::DiagnosticLogs::Commands::Ids::RetrieveLogsRequest: {
+        case Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Id: {
             expectArgumentCount = 3;
             uint8_t intent;
             uint8_t requestedProtocol;
@@ -1825,7 +1825,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::EthernetNetworkDiagnostics::Commands::Ids::ResetCounts: {
+        case Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Id: {
 
             wasHandled = emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(aEndpointId, apCommandObj);
             break;
@@ -1876,7 +1876,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::GeneralCommissioning::Commands::Ids::ArmFailSafe: {
+        case Clusters::GeneralCommissioning::Commands::ArmFailSafe::Id: {
             expectArgumentCount = 3;
             uint16_t expiryLengthSeconds;
             uint64_t breadcrumb;
@@ -1943,12 +1943,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::GeneralCommissioning::Commands::Ids::CommissioningComplete: {
+        case Clusters::GeneralCommissioning::Commands::CommissioningComplete::Id: {
 
             wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::GeneralCommissioning::Commands::Ids::SetRegulatoryConfig: {
+        case Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Id: {
             expectArgumentCount = 4;
             uint8_t location;
             const uint8_t * countryCode;
@@ -2066,7 +2066,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::LevelControl::Commands::Ids::Move: {
+        case Clusters::LevelControl::Commands::Move::Id: {
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint8_t rate;
@@ -2137,7 +2137,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::MoveToLevel: {
+        case Clusters::LevelControl::Commands::MoveToLevel::Id: {
             expectArgumentCount = 4;
             uint8_t level;
             uint16_t transitionTime;
@@ -2208,7 +2208,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::MoveToLevelWithOnOff: {
+        case Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id: {
             expectArgumentCount = 2;
             uint8_t level;
             uint16_t transitionTime;
@@ -2271,7 +2271,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::MoveWithOnOff: {
+        case Clusters::LevelControl::Commands::MoveWithOnOff::Id: {
             expectArgumentCount = 2;
             uint8_t moveMode;
             uint8_t rate;
@@ -2333,7 +2333,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::Step: {
+        case Clusters::LevelControl::Commands::Step::Id: {
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -2408,7 +2408,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::StepWithOnOff: {
+        case Clusters::LevelControl::Commands::StepWithOnOff::Id: {
             expectArgumentCount = 3;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -2475,7 +2475,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::Stop: {
+        case Clusters::LevelControl::Commands::Stop::Id: {
             expectArgumentCount = 2;
             uint8_t optionMask;
             uint8_t optionOverride;
@@ -2537,7 +2537,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Ids::StopWithOnOff: {
+        case Clusters::LevelControl::Commands::StopWithOnOff::Id: {
 
             wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(aEndpointId, apCommandObj);
             break;
@@ -2587,7 +2587,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::NetworkCommissioning::Commands::Ids::AddThreadNetwork: {
+        case Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -2654,7 +2654,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::AddWiFiNetwork: {
+        case Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Id: {
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -2725,7 +2725,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::DisableNetwork: {
+        case Clusters::NetworkCommissioning::Commands::DisableNetwork::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -2792,7 +2792,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::EnableNetwork: {
+        case Clusters::NetworkCommissioning::Commands::EnableNetwork::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -2859,7 +2859,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::GetLastNetworkCommissioningResult: {
+        case Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Id: {
             expectArgumentCount = 1;
             uint32_t timeoutMs;
             bool argExists[1];
@@ -2918,7 +2918,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::RemoveNetwork: {
+        case Clusters::NetworkCommissioning::Commands::RemoveNetwork::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan NetworkID;
             uint64_t Breadcrumb;
@@ -2985,7 +2985,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::ScanNetworks: {
+        case Clusters::NetworkCommissioning::Commands::ScanNetworks::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan ssid;
             uint64_t breadcrumb;
@@ -3052,7 +3052,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::UpdateThreadNetwork: {
+        case Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -3119,7 +3119,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::UpdateWiFiNetwork: {
+        case Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Id: {
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -3236,17 +3236,17 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::OnOff::Commands::Ids::Off: {
+        case Clusters::OnOff::Commands::Off::Id: {
 
             wasHandled = emberAfOnOffClusterOffCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::OnOff::Commands::Ids::On: {
+        case Clusters::OnOff::Commands::On::Id: {
 
             wasHandled = emberAfOnOffClusterOnCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::OnOff::Commands::Ids::Toggle: {
+        case Clusters::OnOff::Commands::Toggle::Id: {
 
             wasHandled = emberAfOnOffClusterToggleCallback(aEndpointId, apCommandObj);
             break;
@@ -3296,7 +3296,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::OperationalCredentials::Commands::Ids::AddNOC: {
+        case Clusters::OperationalCredentials::Commands::AddNOC::Id: {
             expectArgumentCount = 5;
             chip::ByteSpan NOCValue;
             chip::ByteSpan ICACValue;
@@ -3371,7 +3371,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::AddTrustedRootCertificate: {
+        case Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan RootCertificate;
             bool argExists[1];
@@ -3430,7 +3430,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::AttestationRequest: {
+        case Clusters::OperationalCredentials::Commands::AttestationRequest::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan AttestationNonce;
             bool argExists[1];
@@ -3489,7 +3489,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::CertificateChainRequest: {
+        case Clusters::OperationalCredentials::Commands::CertificateChainRequest::Id: {
             expectArgumentCount = 1;
             uint8_t CertificateType;
             bool argExists[1];
@@ -3548,7 +3548,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::OpCSRRequest: {
+        case Clusters::OperationalCredentials::Commands::OpCSRRequest::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan CSRNonce;
             bool argExists[1];
@@ -3606,7 +3606,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::RemoveFabric: {
+        case Clusters::OperationalCredentials::Commands::RemoveFabric::Id: {
             expectArgumentCount = 1;
             uint8_t FabricIndex;
             bool argExists[1];
@@ -3664,7 +3664,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::RemoveTrustedRootCertificate: {
+        case Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan TrustedRootIdentifier;
             bool argExists[1];
@@ -3723,7 +3723,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::UpdateFabricLabel: {
+        case Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id: {
             expectArgumentCount = 1;
             const uint8_t * Label;
             bool argExists[1];
@@ -3783,7 +3783,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::UpdateNOC: {
+        case Clusters::OperationalCredentials::Commands::UpdateNOC::Id: {
             expectArgumentCount = 2;
             chip::ByteSpan NOCValue;
             chip::ByteSpan ICACValue;
@@ -3891,7 +3891,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::SoftwareDiagnostics::Commands::Ids::ResetWatermarks: {
+        case Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Id: {
 
             wasHandled = emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(aEndpointId, apCommandObj);
             break;
@@ -3942,7 +3942,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::ThreadNetworkDiagnostics::Commands::Ids::ResetCounts: {
+        case Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Id: {
 
             wasHandled = emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(aEndpointId, apCommandObj);
             break;
@@ -3993,7 +3993,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::WiFiNetworkDiagnostics::Commands::Ids::ResetCounts: {
+        case Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Id: {
 
             wasHandled = emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(aEndpointId, apCommandObj);
             break;

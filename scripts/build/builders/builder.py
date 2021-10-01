@@ -117,6 +117,8 @@ class Builder(ABC):
             shutil.copyfile(source_name, target_full_name)
             shutil.copymode(source_name, target_full_name)
 
-    def SetIdentifier(self, platform: str, board: str, app: str):
+    def SetIdentifier(self, platform: str, board: str, app: str, enable_rpcs: bool = False):
         self.identifier = '-'.join([platform, board, app])
+        if enable_rpcs:
+            self.identifier = self.identifier + "-rpc"
         self.output_dir = os.path.join(self.output_prefix, self.identifier)

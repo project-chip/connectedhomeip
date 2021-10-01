@@ -68,7 +68,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::AccountLogin::Commands::Ids::GetSetupPINResponse: {
+        case Clusters::AccountLogin::Commands::GetSetupPINResponse::Id: {
             expectArgumentCount = 1;
             const uint8_t * setupPIN;
             bool argExists[1];
@@ -173,7 +173,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::ApplicationLauncher::Commands::Ids::LaunchAppResponse: {
+        case Clusters::ApplicationLauncher::Commands::LaunchAppResponse::Id: {
             expectArgumentCount = 2;
             uint8_t status;
             const uint8_t * data;
@@ -283,7 +283,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::ContentLauncher::Commands::Ids::LaunchContentResponse: {
+        case Clusters::ContentLauncher::Commands::LaunchContentResponse::Id: {
             expectArgumentCount = 2;
             const uint8_t * data;
             uint8_t contentLaunchStatus;
@@ -347,7 +347,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::ContentLauncher::Commands::Ids::LaunchURLResponse: {
+        case Clusters::ContentLauncher::Commands::LaunchURLResponse::Id: {
             expectArgumentCount = 2;
             const uint8_t * data;
             uint8_t contentLaunchStatus;
@@ -456,7 +456,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::DoorLock::Commands::Ids::ClearAllPinsResponse: {
+        case Clusters::DoorLock::Commands::ClearAllPinsResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -514,7 +514,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearAllRfidsResponse: {
+        case Clusters::DoorLock::Commands::ClearAllRfidsResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -572,7 +572,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearHolidayScheduleResponse: {
+        case Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -630,7 +630,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearPinResponse: {
+        case Clusters::DoorLock::Commands::ClearPinResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -688,7 +688,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearRfidResponse: {
+        case Clusters::DoorLock::Commands::ClearRfidResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -746,7 +746,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearWeekdayScheduleResponse: {
+        case Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -804,7 +804,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::ClearYeardayScheduleResponse: {
+        case Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -862,7 +862,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetHolidayScheduleResponse: {
+        case Clusters::DoorLock::Commands::GetHolidayScheduleResponse::Id: {
             expectArgumentCount = 5;
             uint8_t scheduleId;
             uint8_t status;
@@ -937,7 +937,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetLogRecordResponse: {
+        case Clusters::DoorLock::Commands::GetLogRecordResponse::Id: {
             expectArgumentCount = 7;
             uint16_t logEntryId;
             uint32_t timestamp;
@@ -1022,7 +1022,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetPinResponse: {
+        case Clusters::DoorLock::Commands::GetPinResponse::Id: {
             expectArgumentCount = 4;
             uint16_t userId;
             uint8_t userStatus;
@@ -1094,7 +1094,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetRfidResponse: {
+        case Clusters::DoorLock::Commands::GetRfidResponse::Id: {
             expectArgumentCount = 4;
             uint16_t userId;
             uint8_t userStatus;
@@ -1166,7 +1166,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetUserTypeResponse: {
+        case Clusters::DoorLock::Commands::GetUserTypeResponse::Id: {
             expectArgumentCount = 2;
             uint16_t userId;
             uint8_t userType;
@@ -1228,7 +1228,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetWeekdayScheduleResponse: {
+        case Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::Id: {
             expectArgumentCount = 8;
             uint8_t scheduleId;
             uint16_t userId;
@@ -1315,7 +1315,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::GetYeardayScheduleResponse: {
+        case Clusters::DoorLock::Commands::GetYeardayScheduleResponse::Id: {
             expectArgumentCount = 5;
             uint8_t scheduleId;
             uint16_t userId;
@@ -1390,7 +1390,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::LockDoorResponse: {
+        case Clusters::DoorLock::Commands::LockDoorResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -1448,7 +1448,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetHolidayScheduleResponse: {
+        case Clusters::DoorLock::Commands::SetHolidayScheduleResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -1506,7 +1506,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetPinResponse: {
+        case Clusters::DoorLock::Commands::SetPinResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -1564,7 +1564,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetRfidResponse: {
+        case Clusters::DoorLock::Commands::SetRfidResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -1622,7 +1622,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetUserTypeResponse: {
+        case Clusters::DoorLock::Commands::SetUserTypeResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -1680,7 +1680,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetWeekdayScheduleResponse: {
+        case Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -1738,7 +1738,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::SetYeardayScheduleResponse: {
+        case Clusters::DoorLock::Commands::SetYeardayScheduleResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -1796,7 +1796,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::UnlockDoorResponse: {
+        case Clusters::DoorLock::Commands::UnlockDoorResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -1854,7 +1854,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::DoorLock::Commands::Ids::UnlockWithTimeoutResponse: {
+        case Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -1957,7 +1957,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::GeneralCommissioning::Commands::Ids::ArmFailSafeResponse: {
+        case Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::Id: {
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -2021,7 +2021,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::GeneralCommissioning::Commands::Ids::CommissioningCompleteResponse: {
+        case Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::Id: {
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -2085,7 +2085,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::GeneralCommissioning::Commands::Ids::SetRegulatoryConfigResponse: {
+        case Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::Id: {
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -2195,7 +2195,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::Groups::Commands::Ids::AddGroupResponse: {
+        case Clusters::Groups::Commands::AddGroupResponse::Id: {
             expectArgumentCount = 2;
             uint8_t status;
             uint16_t groupId;
@@ -2257,7 +2257,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::Groups::Commands::Ids::GetGroupMembershipResponse: {
+        case Clusters::Groups::Commands::GetGroupMembershipResponse::Id: {
             expectArgumentCount = 3;
             uint8_t capacity;
             uint8_t groupCount;
@@ -2325,7 +2325,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::Groups::Commands::Ids::RemoveGroupResponse: {
+        case Clusters::Groups::Commands::RemoveGroupResponse::Id: {
             expectArgumentCount = 2;
             uint8_t status;
             uint16_t groupId;
@@ -2387,7 +2387,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::Groups::Commands::Ids::ViewGroupResponse: {
+        case Clusters::Groups::Commands::ViewGroupResponse::Id: {
             expectArgumentCount = 3;
             uint8_t status;
             uint16_t groupId;
@@ -2500,7 +2500,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::Identify::Commands::Ids::IdentifyQueryResponse: {
+        case Clusters::Identify::Commands::IdentifyQueryResponse::Id: {
             expectArgumentCount = 1;
             uint16_t timeout;
             bool argExists[1];
@@ -2603,7 +2603,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::KeypadInput::Commands::Ids::SendKeyResponse: {
+        case Clusters::KeypadInput::Commands::SendKeyResponse::Id: {
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -2706,7 +2706,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::MediaPlayback::Commands::Ids::MediaFastForwardResponse: {
+        case Clusters::MediaPlayback::Commands::MediaFastForwardResponse::Id: {
             expectArgumentCount = 1;
             uint8_t mediaPlaybackStatus;
             bool argExists[1];
@@ -2765,7 +2765,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::MediaPlayback::Commands::Ids::MediaNextResponse: {
+        case Clusters::MediaPlayback::Commands::MediaNextResponse::Id: {
             expectArgumentCount = 1;
             uint8_t mediaPlaybackStatus;
             bool argExists[1];
@@ -2823,7 +2823,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::MediaPlayback::Commands::Ids::MediaPauseResponse: {
+        case Clusters::MediaPlayback::Commands::MediaPauseResponse::Id: {
             expectArgumentCount = 1;
             uint8_t mediaPlaybackStatus;
             bool argExists[1];
@@ -2881,7 +2881,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::MediaPlayback::Commands::Ids::MediaPlayResponse: {
+        case Clusters::MediaPlayback::Commands::MediaPlayResponse::Id: {
             expectArgumentCount = 1;
             uint8_t mediaPlaybackStatus;
             bool argExists[1];
@@ -2939,7 +2939,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::MediaPlayback::Commands::Ids::MediaPreviousResponse: {
+        case Clusters::MediaPlayback::Commands::MediaPreviousResponse::Id: {
             expectArgumentCount = 1;
             uint8_t mediaPlaybackStatus;
             bool argExists[1];
@@ -2998,7 +2998,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::MediaPlayback::Commands::Ids::MediaRewindResponse: {
+        case Clusters::MediaPlayback::Commands::MediaRewindResponse::Id: {
             expectArgumentCount = 1;
             uint8_t mediaPlaybackStatus;
             bool argExists[1];
@@ -3056,7 +3056,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::MediaPlayback::Commands::Ids::MediaSeekResponse: {
+        case Clusters::MediaPlayback::Commands::MediaSeekResponse::Id: {
             expectArgumentCount = 1;
             uint8_t mediaPlaybackStatus;
             bool argExists[1];
@@ -3114,7 +3114,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::MediaPlayback::Commands::Ids::MediaSkipBackwardResponse: {
+        case Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::Id: {
             expectArgumentCount = 1;
             uint8_t mediaPlaybackStatus;
             bool argExists[1];
@@ -3173,7 +3173,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::MediaPlayback::Commands::Ids::MediaSkipForwardResponse: {
+        case Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::Id: {
             expectArgumentCount = 1;
             uint8_t mediaPlaybackStatus;
             bool argExists[1];
@@ -3232,7 +3232,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::MediaPlayback::Commands::Ids::MediaStartOverResponse: {
+        case Clusters::MediaPlayback::Commands::MediaStartOverResponse::Id: {
             expectArgumentCount = 1;
             uint8_t mediaPlaybackStatus;
             bool argExists[1];
@@ -3291,7 +3291,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::MediaPlayback::Commands::Ids::MediaStopResponse: {
+        case Clusters::MediaPlayback::Commands::MediaStopResponse::Id: {
             expectArgumentCount = 1;
             uint8_t mediaPlaybackStatus;
             bool argExists[1];
@@ -3394,7 +3394,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::NetworkCommissioning::Commands::Ids::AddThreadNetworkResponse: {
+        case Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::Id: {
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3458,7 +3458,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::AddWiFiNetworkResponse: {
+        case Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::Id: {
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3522,7 +3522,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::DisableNetworkResponse: {
+        case Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::Id: {
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3586,7 +3586,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::EnableNetworkResponse: {
+        case Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::Id: {
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3650,7 +3650,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::RemoveNetworkResponse: {
+        case Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::Id: {
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3714,7 +3714,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::ScanNetworksResponse: {
+        case Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::Id: {
             expectArgumentCount = 4;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3788,7 +3788,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::UpdateThreadNetworkResponse: {
+        case Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::Id: {
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3852,7 +3852,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::Ids::UpdateWiFiNetworkResponse: {
+        case Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::Id: {
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3962,7 +3962,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::OtaSoftwareUpdateProvider::Commands::Ids::ApplyUpdateRequestResponse: {
+        case Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::Id: {
             expectArgumentCount = 2;
             uint8_t action;
             uint32_t delayedActionTime;
@@ -4025,16 +4025,17 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::OtaSoftwareUpdateProvider::Commands::Ids::QueryImageResponse: {
-            expectArgumentCount = 7;
+        case Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id: {
+            expectArgumentCount = 8;
             uint8_t status;
             uint32_t delayedActionTime;
             const uint8_t * imageURI;
             uint32_t softwareVersion;
+            const uint8_t * softwareVersionString;
             chip::ByteSpan updateToken;
             bool userConsentNeeded;
             chip::ByteSpan metadataForRequestor;
-            bool argExists[7];
+            bool argExists[8];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -4047,7 +4048,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 7)
+                if (currentDecodeTagId < 8)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -4077,12 +4078,16 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
                     TLVUnpackError = aDataTlv.Get(softwareVersion);
                     break;
                 case 4:
-                    TLVUnpackError = aDataTlv.Get(updateToken);
+                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
+                    TLVUnpackError = aDataTlv.GetDataPtr(softwareVersionString);
                     break;
                 case 5:
-                    TLVUnpackError = aDataTlv.Get(userConsentNeeded);
+                    TLVUnpackError = aDataTlv.Get(updateToken);
                     break;
                 case 6:
+                    TLVUnpackError = aDataTlv.Get(userConsentNeeded);
+                    break;
+                case 7:
                     TLVUnpackError = aDataTlv.Get(metadataForRequestor);
                     break;
                 default:
@@ -4102,11 +4107,11 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 7 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 8 == validArgumentCount)
             {
                 wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
                     aEndpointId, apCommandObj, status, delayedActionTime, const_cast<uint8_t *>(imageURI), softwareVersion,
-                    updateToken, userConsentNeeded, metadataForRequestor);
+                    const_cast<uint8_t *>(softwareVersionString), updateToken, userConsentNeeded, metadataForRequestor);
             }
             break;
         }
@@ -4156,7 +4161,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::OperationalCredentials::Commands::Ids::AttestationResponse: {
+        case Clusters::OperationalCredentials::Commands::AttestationResponse::Id: {
             expectArgumentCount = 2;
             chip::ByteSpan AttestationElements;
             chip::ByteSpan Signature;
@@ -4219,7 +4224,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::CertificateChainResponse: {
+        case Clusters::OperationalCredentials::Commands::CertificateChainResponse::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan Certificate;
             bool argExists[1];
@@ -4278,7 +4283,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::NOCResponse: {
+        case Clusters::OperationalCredentials::Commands::NOCResponse::Id: {
             expectArgumentCount = 3;
             uint8_t StatusCode;
             uint8_t FabricIndex;
@@ -4345,7 +4350,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::OpCSRResponse: {
+        case Clusters::OperationalCredentials::Commands::OpCSRResponse::Id: {
             expectArgumentCount = 2;
             chip::ByteSpan NOCSRElements;
             chip::ByteSpan AttestationSignature;
@@ -4454,7 +4459,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::Scenes::Commands::Ids::AddSceneResponse: {
+        case Clusters::Scenes::Commands::AddSceneResponse::Id: {
             expectArgumentCount = 3;
             uint8_t status;
             uint16_t groupId;
@@ -4520,7 +4525,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::Scenes::Commands::Ids::GetSceneMembershipResponse: {
+        case Clusters::Scenes::Commands::GetSceneMembershipResponse::Id: {
             expectArgumentCount = 5;
             uint8_t status;
             uint8_t capacity;
@@ -4596,7 +4601,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::Scenes::Commands::Ids::RemoveAllScenesResponse: {
+        case Clusters::Scenes::Commands::RemoveAllScenesResponse::Id: {
             expectArgumentCount = 2;
             uint8_t status;
             uint16_t groupId;
@@ -4658,7 +4663,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::Scenes::Commands::Ids::RemoveSceneResponse: {
+        case Clusters::Scenes::Commands::RemoveSceneResponse::Id: {
             expectArgumentCount = 3;
             uint8_t status;
             uint16_t groupId;
@@ -4724,7 +4729,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::Scenes::Commands::Ids::StoreSceneResponse: {
+        case Clusters::Scenes::Commands::StoreSceneResponse::Id: {
             expectArgumentCount = 3;
             uint8_t status;
             uint16_t groupId;
@@ -4790,7 +4795,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::Scenes::Commands::Ids::ViewSceneResponse: {
+        case Clusters::Scenes::Commands::ViewSceneResponse::Id: {
             expectArgumentCount = 6;
             uint8_t status;
             uint16_t groupId;
@@ -4917,7 +4922,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::TvChannel::Commands::Ids::ChangeChannelResponse: {
+        case Clusters::TvChannel::Commands::ChangeChannelResponse::Id: {
             expectArgumentCount = 2;
             /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch;
             uint8_t ErrorType;
@@ -5026,7 +5031,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::TargetNavigator::Commands::Ids::NavigateTargetResponse: {
+        case Clusters::TargetNavigator::Commands::NavigateTargetResponse::Id: {
             expectArgumentCount = 2;
             uint8_t status;
             const uint8_t * data;
@@ -5135,7 +5140,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::TestCluster::Commands::Ids::TestAddArgumentsResponse: {
+        case Clusters::TestCluster::Commands::TestAddArgumentsResponse::Id: {
             expectArgumentCount = 1;
             uint8_t returnValue;
             bool argExists[1];
@@ -5193,7 +5198,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::TestCluster::Commands::Ids::TestSpecificResponse: {
+        case Clusters::TestCluster::Commands::TestSpecificResponse::Id: {
             expectArgumentCount = 1;
             uint8_t returnValue;
             bool argExists[1];

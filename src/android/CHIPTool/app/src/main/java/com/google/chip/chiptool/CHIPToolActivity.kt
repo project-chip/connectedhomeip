@@ -31,6 +31,7 @@ import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.attestation.AttestationTestFragment
 import com.google.chip.chiptool.clusterclient.MultiAdminClientFragment
+import com.google.chip.chiptool.clusterclient.OpCredClientFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.clusterclient.SensorClientFragment
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
@@ -120,6 +121,10 @@ class CHIPToolActivity :
 
   override fun handleMultiAdminClicked() {
     showFragment(MultiAdminClientFragment.newInstance())
+  }
+
+  override fun handleOpCredClicked() {
+    showFragment(OpCredClientFragment.newInstance())
   }
 
   override fun handleAttestationTestClicked() {

@@ -30,11 +30,9 @@ namespace app {
 namespace clusters {
 
 namespace AccountLogin {
-constexpr ClusterId kClusterId = 0x50E;
 
 } // namespace AccountLogin
 namespace AdministratorCommissioning {
-constexpr ClusterId kClusterId = 0x3C;
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
@@ -45,7 +43,6 @@ enum class StatusCode : uint8_t
 
 } // namespace AdministratorCommissioning
 namespace ApplicationBasic {
-constexpr ClusterId kClusterId = 0x50D;
 // Enum for ApplicationBasicStatus
 enum class ApplicationBasicStatus : uint8_t
 {
@@ -57,7 +54,6 @@ enum class ApplicationBasicStatus : uint8_t
 
 } // namespace ApplicationBasic
 namespace ApplicationLauncher {
-constexpr ClusterId kClusterId = 0x50C;
 // Enum for ApplicationLauncherStatus
 enum class ApplicationLauncherStatus : uint8_t
 {
@@ -87,7 +83,6 @@ public:
 
 } // namespace ApplicationLauncher
 namespace AudioOutput {
-constexpr ClusterId kClusterId = 0x50B;
 // Enum for AudioOutputType
 enum class AudioOutputType : uint8_t
 {
@@ -122,31 +117,24 @@ public:
 
 } // namespace AudioOutput
 namespace BarrierControl {
-constexpr ClusterId kClusterId = 0x103;
 
 } // namespace BarrierControl
 namespace Basic {
-constexpr ClusterId kClusterId = 0x28;
 
 } // namespace Basic
 namespace BinaryInputBasic {
-constexpr ClusterId kClusterId = 0x0F;
 
 } // namespace BinaryInputBasic
 namespace Binding {
-constexpr ClusterId kClusterId = 0xF000;
 
 } // namespace Binding
 namespace BridgedDeviceBasic {
-constexpr ClusterId kClusterId = 0x39;
 
 } // namespace BridgedDeviceBasic
 namespace ColorControl {
-constexpr ClusterId kClusterId = 0x300;
 
 } // namespace ColorControl
 namespace ContentLauncher {
-constexpr ClusterId kClusterId = 0x50A;
 // Enum for ContentLaunchMetricType
 enum class ContentLaunchMetricType : uint8_t
 {
@@ -299,7 +287,6 @@ public:
 
 } // namespace ContentLauncher
 namespace Descriptor {
-constexpr ClusterId kClusterId = 0x1D;
 
 namespace DeviceType {
 enum FieldId
@@ -322,7 +309,6 @@ public:
 
 } // namespace Descriptor
 namespace DiagnosticLogs {
-constexpr ClusterId kClusterId = 0x32;
 // Enum for LogsIntent
 enum class LogsIntent : uint8_t
 {
@@ -348,15 +334,12 @@ enum class LogsTransferProtocol : uint8_t
 
 } // namespace DiagnosticLogs
 namespace DoorLock {
-constexpr ClusterId kClusterId = 0x101;
 
 } // namespace DoorLock
 namespace ElectricalMeasurement {
-constexpr ClusterId kClusterId = 0xB04;
 
 } // namespace ElectricalMeasurement
 namespace EthernetNetworkDiagnostics {
-constexpr ClusterId kClusterId = 0x37;
 // Enum for PHYRateType
 enum class PHYRateType : uint8_t
 {
@@ -374,7 +357,6 @@ enum class PHYRateType : uint8_t
 
 } // namespace EthernetNetworkDiagnostics
 namespace FixedLabel {
-constexpr ClusterId kClusterId = 0x40;
 
 namespace LabelStruct {
 enum FieldId
@@ -397,11 +379,9 @@ public:
 
 } // namespace FixedLabel
 namespace FlowMeasurement {
-constexpr ClusterId kClusterId = 0x404;
 
 } // namespace FlowMeasurement
 namespace GeneralCommissioning {
-constexpr ClusterId kClusterId = 0x30;
 // Enum for GeneralCommissioningError
 enum class GeneralCommissioningError : uint8_t
 {
@@ -436,7 +416,6 @@ public:
 
 } // namespace GeneralCommissioning
 namespace GeneralDiagnostics {
-constexpr ClusterId kClusterId = 0x33;
 // Enum for BootReasonType
 enum class BootReasonType : uint8_t
 {
@@ -521,7 +500,6 @@ public:
 
 } // namespace GeneralDiagnostics
 namespace GroupKeyManagement {
-constexpr ClusterId kClusterId = 0xF004;
 // Enum for GroupKeySecurityPolicy
 enum class GroupKeySecurityPolicy : uint8_t
 {
@@ -576,15 +554,12 @@ public:
 
 } // namespace GroupKeyManagement
 namespace Groups {
-constexpr ClusterId kClusterId = 0x04;
 
 } // namespace Groups
 namespace Identify {
-constexpr ClusterId kClusterId = 0x03;
 
 } // namespace Identify
 namespace KeypadInput {
-constexpr ClusterId kClusterId = 0x509;
 // Enum for KeypadInputCecKeyCode
 enum class KeypadInputCecKeyCode : uint8_t
 {
@@ -685,15 +660,12 @@ enum class KeypadInputStatus : uint8_t
 
 } // namespace KeypadInput
 namespace LevelControl {
-constexpr ClusterId kClusterId = 0x08;
 
 } // namespace LevelControl
 namespace LowPower {
-constexpr ClusterId kClusterId = 0x508;
 
 } // namespace LowPower
 namespace MediaInput {
-constexpr ClusterId kClusterId = 0x507;
 // Enum for MediaInputType
 enum class MediaInputType : uint8_t
 {
@@ -736,7 +708,6 @@ public:
 
 } // namespace MediaInput
 namespace MediaPlayback {
-constexpr ClusterId kClusterId = 0x506;
 // Enum for MediaPlaybackState
 enum class MediaPlaybackState : uint8_t
 {
@@ -777,7 +748,6 @@ public:
 
 } // namespace MediaPlayback
 namespace NetworkCommissioning {
-constexpr ClusterId kClusterId = 0x31;
 // Enum for NetworkCommissioningError
 enum class NetworkCommissioningError : uint8_t
 {
@@ -846,7 +816,6 @@ public:
 
 } // namespace NetworkCommissioning
 namespace OtaSoftwareUpdateProvider {
-constexpr ClusterId kClusterId = 0x29;
 // Enum for OTAApplyUpdateAction
 enum class OTAApplyUpdateAction : uint8_t
 {
@@ -872,22 +841,19 @@ enum class OTAQueryStatus : uint8_t
 
 } // namespace OtaSoftwareUpdateProvider
 namespace OtaSoftwareUpdateRequestor {
-constexpr ClusterId kClusterId = 0x2A;
 // Enum for OTAAnnouncementReason
 enum class OTAAnnouncementReason : uint8_t
 {
-    OTA_ANNOUNCEMENT_REASON_SIMPLE_ANNOUNCEMENT       = 0x00,
-    OTA_ANNOUNCEMENT_REASON_UPDATE_AVAILABLE          = 0x01,
-    OTA_ANNOUNCEMENT_REASON_CRITICAL_UPDATE_AVAILABLE = 0x02,
+    OTA_ANNOUNCEMENT_REASON_SIMPLE_ANNOUNCEMENT     = 0x00,
+    OTA_ANNOUNCEMENT_REASON_UPDATE_AVAILABLE        = 0x01,
+    OTA_ANNOUNCEMENT_REASON_URGENT_UPDATE_AVAILABLE = 0x02,
 };
 
 } // namespace OtaSoftwareUpdateRequestor
 namespace OccupancySensing {
-constexpr ClusterId kClusterId = 0x406;
 
 } // namespace OccupancySensing
 namespace OnOff {
-constexpr ClusterId kClusterId = 0x06;
 // Enum for OnOffDelayedAllOffEffectVariant
 enum class OnOffDelayedAllOffEffectVariant : uint8_t
 {
@@ -909,11 +875,9 @@ enum class OnOffEffectIdentifier : uint8_t
 
 } // namespace OnOff
 namespace OnOffSwitchConfiguration {
-constexpr ClusterId kClusterId = 0x07;
 
 } // namespace OnOffSwitchConfiguration
 namespace OperationalCredentials {
-constexpr ClusterId kClusterId = 0x3E;
 // Enum for NodeOperationalCertStatus
 enum class NodeOperationalCertStatus : uint8_t
 {
@@ -976,15 +940,12 @@ public:
 
 } // namespace OperationalCredentials
 namespace PowerSource {
-constexpr ClusterId kClusterId = 0x2F;
 
 } // namespace PowerSource
 namespace PressureMeasurement {
-constexpr ClusterId kClusterId = 0x403;
 
 } // namespace PressureMeasurement
 namespace PumpConfigurationAndControl {
-constexpr ClusterId kClusterId = 0x200;
 // Enum for PumpControlMode
 enum class PumpControlMode : uint8_t
 {
@@ -1006,15 +967,12 @@ enum class PumpOperationMode : uint8_t
 
 } // namespace PumpConfigurationAndControl
 namespace RelativeHumidityMeasurement {
-constexpr ClusterId kClusterId = 0x405;
 
 } // namespace RelativeHumidityMeasurement
 namespace Scenes {
-constexpr ClusterId kClusterId = 0x05;
 
 } // namespace Scenes
 namespace SoftwareDiagnostics {
-constexpr ClusterId kClusterId = 0x34;
 
 namespace ThreadMetrics {
 enum FieldId
@@ -1043,11 +1001,9 @@ public:
 
 } // namespace SoftwareDiagnostics
 namespace Switch {
-constexpr ClusterId kClusterId = 0x3B;
 
 } // namespace Switch
 namespace TvChannel {
-constexpr ClusterId kClusterId = 0x504;
 // Enum for TvChannelErrorType
 enum class TvChannelErrorType : uint8_t
 {
@@ -1109,7 +1065,6 @@ public:
 
 } // namespace TvChannel
 namespace TargetNavigator {
-constexpr ClusterId kClusterId = 0x505;
 // Enum for NavigateTargetStatus
 enum class NavigateTargetStatus : uint8_t
 {
@@ -1139,11 +1094,9 @@ public:
 
 } // namespace TargetNavigator
 namespace TemperatureMeasurement {
-constexpr ClusterId kClusterId = 0x402;
 
 } // namespace TemperatureMeasurement
 namespace TestCluster {
-constexpr ClusterId kClusterId = 0x50F;
 // Enum for SimpleEnum
 enum class SimpleEnum : uint8_t
 {
@@ -1284,15 +1237,12 @@ public:
 
 } // namespace TestCluster
 namespace Thermostat {
-constexpr ClusterId kClusterId = 0x201;
 
 } // namespace Thermostat
 namespace ThermostatUserInterfaceConfiguration {
-constexpr ClusterId kClusterId = 0x204;
 
 } // namespace ThermostatUserInterfaceConfiguration
 namespace ThreadNetworkDiagnostics {
-constexpr ClusterId kClusterId = 0x35;
 // Enum for NetworkFault
 enum class NetworkFault : uint8_t
 {
@@ -1448,11 +1398,9 @@ public:
 
 } // namespace ThreadNetworkDiagnostics
 namespace WakeOnLan {
-constexpr ClusterId kClusterId = 0x503;
 
 } // namespace WakeOnLan
 namespace WiFiNetworkDiagnostics {
-constexpr ClusterId kClusterId = 0x36;
 // Enum for SecurityType
 enum class SecurityType : uint8_t
 {
@@ -1476,7 +1424,6 @@ enum class WiFiVersionType : uint8_t
 
 } // namespace WiFiNetworkDiagnostics
 namespace WindowCovering {
-constexpr ClusterId kClusterId = 0x102;
 // Enum for WcEndProductType
 enum class WcEndProductType : uint8_t
 {

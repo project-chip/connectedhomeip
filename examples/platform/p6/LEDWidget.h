@@ -34,11 +34,11 @@ public:
     void Animate();
 
 private:
-    int64_t mLastChangeTimeUS = 0;
-    uint32_t mBlinkOnTimeMS   = 0;
-    uint32_t mBlinkOffTimeMS  = 0;
-    int mLedNum               = 0;
-    bool mState               = CYBSP_LED_STATE_OFF;
+    uint64_t mLastChangeTimeUS = 0;
+    uint32_t mBlinkOnTimeMS    = 0;
+    uint32_t mBlinkOffTimeMS   = 0;
+    int mLedNum                = 0;
+    bool mState                = CYBSP_LED_STATE_OFF;
 
     void DoSet(bool state);
 };

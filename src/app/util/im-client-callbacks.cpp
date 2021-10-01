@@ -372,7 +372,7 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
     Callback::Cancelable * onSuccessCallback = nullptr;
     Callback::Cancelable * onFailureCallback = nullptr;
     app::TLVDataFilter tlvFilter             = nullptr;
-    NodeId sourceId                          = apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId();
+    NodeId sourceId                          = apReadClient->GetPeerNodeId();
     // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
     uint8_t sequenceNumber = static_cast<uint8_t>(apReadClient->GetAppIdentifier());
 
@@ -437,8 +437,8 @@ bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     Callback::Cancelable * onSuccessCallback = nullptr;
     Callback::Cancelable * onFailureCallback = nullptr;
-    err = gCallbacks.GetResponseCallback(apSubscribeClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId(),
-                                         sequenceNumber, &onSuccessCallback, &onFailureCallback);
+    err =
+        gCallbacks.GetResponseCallback(apSubscribeClient->GetPeerNodeId(), sequenceNumber, &onSuccessCallback, &onFailureCallback);
 
     if (CHIP_NO_ERROR != err)
     {

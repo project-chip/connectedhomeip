@@ -588,26 +588,6 @@
 #define CHIP_DEVICE_CONFIG_SERVICE_PROVISIONING_REQUEST_TIMEOUT 10000
 #endif
 
-// -------------------- Just-In-Time Provisioning Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
- *
- * Enable just-in-time provisioning functionality in the chip Device Layer.
- *
- * When enabled, device creates and uses its ephemeral operational credentials:
- *   - operational device id
- *   - operational device self-signed certificate
- *   - operational device private key
- * When enabled, device also implements certificate provisioning protocol and uses it to obtain
- * service assigned certificate from the Certification Authority Service.
- *
- * Then, device uses these credentials to authenticate and communicate to other chip nodes.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-#define CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING 0
-#endif
-
 // -------------------- Thread Configuration --------------------
 
 /**

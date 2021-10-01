@@ -16,12 +16,10 @@
  */
 #pragma once
 
-#include <credentials/CHIPOperationalCredentials.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <transport/FabricTable.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -87,8 +85,6 @@ public:
     Messaging::ExchangeContext * NewExchangeToAlice(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewExchangeToBob(Messaging::ExchangeDelegate * delegate);
 
-    Credentials::OperationalCredentialSet & GetOperationalCredentialSet() { return mOperationalCredentialSet; }
-
     System::Layer & GetSystemLayer() { return mIOContext->GetSystemLayer(); }
 
 private:
@@ -106,10 +102,8 @@ private:
     Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;
     SecurePairingUsingTestSecret mPairingBobToAlice;
-    Transport::FabricTable mFabrics;
     FabricIndex mSrcFabricIndex  = 0;
     FabricIndex mDestFabricIndex = 0;
-    Credentials::OperationalCredentialSet mOperationalCredentialSet;
 };
 
 } // namespace Test

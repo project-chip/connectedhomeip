@@ -113,9 +113,15 @@ def ValidateRepoPath(context, parameter, value):
     default=False,
     is_flag=True,
     help='Skip timestaps in log output')
+@click.option(
+    '--rpc',
+    default=False,
+    is_flag=True,
+    help='Build with debug RPCs enabled.'
+)
 @click.pass_context
 def main(context, log_level, platform, board, app, repo, out_prefix, clean,
-         dry_run, dry_run_output, enable_flashbundle, no_log_timestamps):
+         dry_run, dry_run_output, enable_flashbundle, no_log_timestamps, rpc):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -145,6 +151,7 @@ before running this script.
         platforms=[build.Platform.FromArgName(name) for name in platform],
         boards=[build.Board.FromArgName(name) for name in board],
         applications=[build.Application.FromArgName(name) for name in app],
+        enable_rpcs=rpc,
         enable_flashbundle=enable_flashbundle)
 
     if clean:

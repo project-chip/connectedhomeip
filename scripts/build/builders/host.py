@@ -125,6 +125,7 @@ class HostBuilder(GnBuilder):
             self.map_name: os.path.join(self.output_dir, self.map_name)
         }
 
-    def SetIdentifier(self, platform: str, board: str, app: str):
+# todo
+    def SetIdentifier(self, platform: str, board: str, app: str, enable_rpcs: bool = False):
         super(HostBuilder, self).SetIdentifier(
-            self.board.PlatformName(), self.board.BoardName(), app)
+            self.board.PlatformName(), self.board.BoardName(), app, enable_rpcs)
