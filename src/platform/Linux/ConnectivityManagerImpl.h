@@ -172,6 +172,8 @@ private:
 
     // ==================== ConnectivityManager Private Methods ====================
 
+    CHIP_ERROR ResetEthernetStatsCount();
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void DriveAPState();
     CHIP_ERROR ConfigureWiFiAP();
@@ -187,6 +189,12 @@ private:
     static ConnectivityManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
+
+    uint64_t mEthPacketRxCount  = 0;
+    uint64_t mEthPacketTxCount  = 0;
+    uint64_t mEthTxErrCount     = 0;
+    uint64_t mEthCollisionCount = 0;
+    uint64_t mEthOverrunCount   = 0;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;

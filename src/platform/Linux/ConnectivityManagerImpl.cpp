@@ -223,6 +223,11 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiStationMode                = kWiFiStationMode_Disabled;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
 
+    if (ResetEthernetStatsCount() != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to reset Ethernet statistic counts");
+    }
+
     // Initialize the generic base classes that require it.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
@@ -1012,34 +1017,112 @@ exit:
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthPacketRxCount(uint64_t & packetRxCount)
 {
-    return GetEthernetStatsCount(EthernetStatsCountType::kEthPacketRxCount, packetRxCount);
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthPacketRxCount, count));
+    VerifyOrReturnError(count >= mEthPacketRxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    packetRxCount = count - mEthPacketRxCount;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthPacketTxCount(uint64_t & packetTxCount)
 {
-    return GetEthernetStatsCount(EthernetStatsCountType::kEthPacketTxCount, packetTxCount);
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthPacketTxCount, count));
+    VerifyOrReturnError(count >= mEthPacketTxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    packetTxCount = count - mEthPacketTxCount;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthTxErrCount(uint64_t & txErrCount)
 {
-    return GetEthernetStatsCount(EthernetStatsCountType::kEthTxErrCount, txErrCount);
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthTxErrCount, count));
+    VerifyOrReturnError(count >= mEthTxErrCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    txErrCount = count - mEthTxErrCount;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthCollisionCount(uint64_t & collisionCount)
 {
-    return GetEthernetStatsCount(EthernetStatsCountType::kEthCollisionCount, collisionCount);
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthCollisionCount, count));
+    VerifyOrReturnError(count >= mEthCollisionCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    collisionCount = count - mEthCollisionCount;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetEthOverrunCount(uint64_t & overrunCount)
 {
-    return GetEthernetStatsCount(EthernetStatsCountType::kEthOverrunCount, overrunCount);
+    uint64_t count;
+
+    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthOverrunCount, count));
+    VerifyOrReturnError(count >= mEthOverrunCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+    overrunCount = count - mEthOverrunCount;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_ResetEthNetworkDiagnosticsCounts()
 {
-    // On Linux simulation, the packet statistic informations are shared by all running programs,
-    // the current running program does not have permission to reset those counts.
-    return CHIP_NO_ERROR;
+    return ResetEthernetStatsCount();
+}
+
+CHIP_ERROR ConnectivityManagerImpl::ResetEthernetStatsCount()
+{
+    CHIP_ERROR ret          = CHIP_ERROR_READ_FAILED;
+    struct ifaddrs * ifaddr = nullptr;
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+    }
+    else
+    {
+        struct ifaddrs * ifa = nullptr;
+
+        /* Walk through linked list, maintaining head pointer so we
+          can free list later */
+        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            {
+                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
+                break;
+            }
+        }
+
+        if (ifa != nullptr)
+        {
+            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
+            {
+                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
+
+                mEthPacketRxCount  = stats->rx_packets;
+                mEthPacketTxCount  = stats->tx_packets;
+                mEthTxErrCount     = stats->tx_errors;
+                mEthCollisionCount = stats->collisions;
+                mEthOverrunCount   = stats->rx_over_errors;
+                ret                = CHIP_NO_ERROR;
+            }
+        }
+
+        freeifaddrs(ifaddr);
+    }
+
+    return ret;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

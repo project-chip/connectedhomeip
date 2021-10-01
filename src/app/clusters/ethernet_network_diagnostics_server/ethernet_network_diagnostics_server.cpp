@@ -107,7 +107,7 @@ bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(EndpointId endp
     VerifyOrExit(DeviceLayer::ConnectivityMgr().ResetEthNetworkDiagnosticsCounts() == CHIP_NO_ERROR,
                  status = EMBER_ZCL_STATUS_FAILURE);
 
-    status = EmberAfStatus status = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Set(endpoint, 0);
+    status = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketRxCount attribute"));
 
     status = EthernetNetworkDiagnostics::Attributes::PacketTxCount::Set(endpoint, 0);
