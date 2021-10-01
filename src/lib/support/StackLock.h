@@ -16,17 +16,26 @@
  */
 
 #include <pthread.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <string>
 
 namespace chip {
 /** A scoped lock/unlock around a mutex. */
 struct StackLockGuard
 {
 public:
-    StackLockGuard(pthread_mutex_t * mutex) : mMutex(mutex) { pthread_mutex_lock(mMutex); }
-    ~StackLockGuard() { pthread_mutex_unlock(mMutex); }
+
+    StackLockGuard(pthread_mutex_t * mutex, std::string function = "") : mMutex(mutex), mFunction(function) { 
+        ChipLogProgress(Controller, "StackLockGuard: Locking %s", mFunction.c_str());
+        pthread_mutex_lock(mutex); 
+        }
+    ~StackLockGuard() { 
+        ChipLogProgress(Controller, "StackLockGuard: Unlocking %s", mFunction.c_str());
+        pthread_mutex_unlock(mMutex); }
 
 private:
     pthread_mutex_t * mMutex;
+    std::string mFunction;
 };
 
 /**
@@ -36,10 +45,15 @@ private:
 struct StackUnlockGuard
 {
 public:
-    StackUnlockGuard(pthread_mutex_t * mutex) : mMutex(mutex) { pthread_mutex_unlock(mMutex); }
-    ~StackUnlockGuard() { pthread_mutex_lock(mMutex); }
+    StackUnlockGuard(pthread_mutex_t * mutex, std::string function = "") : mMutex(mutex), mFunction(function) { 
+        ChipLogProgress(Controller, "StackUnlockGuard: Unlocking %s", mFunction.c_str());
+        pthread_mutex_unlock(mMutex); }
+    ~StackUnlockGuard() { 
+        ChipLogProgress(Controller, "StackUnlockGuard: Locking %s", mFunction.c_str());
+        pthread_mutex_lock(mMutex); }
 
 private:
     pthread_mutex_t * mMutex;
+    std::string mFunction = "";
 };
 } // namespace chip

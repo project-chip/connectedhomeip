@@ -28,6 +28,8 @@ class AddressCommissioningFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
+    addressEditText.setText("10.0.0.176")
+
     commissionBtn.setOnClickListener {
       val address = addressEditText.text.toString()
       val discriminator = discriminatorEditText.text.toString()

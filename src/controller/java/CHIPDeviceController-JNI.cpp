@@ -185,7 +185,7 @@ exit:
 JNI_METHOD(void, pairDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode, jbyteArray csrNonce)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock(), "pairDevice");
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
@@ -213,7 +213,7 @@ JNI_METHOD(void, pairDeviceWithAddress)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jint discriminator, jint pinCode,
  jbyteArray csrNonce)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock(), "pairDeviceWithAddress");
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
@@ -278,7 +278,7 @@ JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jl
 
 JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock(), "getDevicePointer");
     Device * chipDevice = nullptr;
 
     ChipLogProgress(Controller, "getDevicePointer() called with device ID");
@@ -291,7 +291,7 @@ JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jl
 
 JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jlong callbackHandle)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock(), "getConnectedDevicePointer");
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
@@ -385,7 +385,7 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
 
 JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong fabricId, jlong deviceId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock(), "updateDevice");
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 

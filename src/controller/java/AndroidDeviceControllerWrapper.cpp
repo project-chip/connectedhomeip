@@ -280,7 +280,7 @@ void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePair
 
 void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 {
-    StackUnlockGuard unlockGuard(mStackLock);
+    StackUnlockGuard unlockGuard(mStackLock, "OnPairingComplete");
     CallJavaMethod("onPairingComplete", static_cast<jint>(error.AsInteger()));
 }
 
@@ -292,7 +292,7 @@ void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 
 void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
 {
-    StackUnlockGuard unlockGuard(mStackLock);
+    StackUnlockGuard unlockGuard(mStackLock, "OnCommissioningComplete");
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onCommissioningCompleteMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningComplete", "(JI)V",
