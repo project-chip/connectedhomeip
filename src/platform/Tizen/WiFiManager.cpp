@@ -119,7 +119,7 @@ const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
         return "(unknown)";
     }
 }
-}
+} // namespace
 
 namespace chip {
 namespace DeviceLayer {
