@@ -30,7 +30,6 @@
 #include <support/CHIPJNIError.h>
 #include <support/CodeUtils.h>
 #include <support/JniReferences.h>
-#include <support/StackLock.h>
 #include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>

@@ -26,7 +26,6 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <lib/support/StackLock.h>
 
 #include <app/chip-zcl-zpro-codec.h>
 #include <atomic>
@@ -113,7 +112,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ThrowError(env, err);
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         JNI_OnUnload(jvm, reserved);
     }
 
@@ -122,7 +121,7 @@ exit:
 
 void JNI_OnUnload(JavaVM * jvm, void * reserved)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Controller, "JNI_OnUnload() called");
 
     // If the IO thread has been started, shut it down and wait for it to exit.
@@ -130,7 +129,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     {
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         pthread_join(sIOThread, NULL);
     }
 
@@ -141,7 +140,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
 
 JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = NULL;
     long result                              = 0;
@@ -152,8 +151,8 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, JniReferences::GetInstance().GetStackLock(), kLocalDeviceId,
-                                                          &DeviceLayer::SystemLayer(), &DeviceLayer::InetLayer, &err);
+    wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, &DeviceLayer::SystemLayer(),
+                                                          &DeviceLayer::InetLayer, &err);
     SuccessOrExit(err);
 
     // Create and start the IO thread. Must be called after Controller()->Init
@@ -185,7 +184,7 @@ exit:
 JNI_METHOD(void, pairDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode, jbyteArray csrNonce)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
@@ -213,7 +212,7 @@ JNI_METHOD(void, pairDeviceWithAddress)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jint discriminator, jint pinCode,
  jbyteArray csrNonce)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
@@ -244,7 +243,7 @@ JNI_METHOD(void, pairDeviceWithAddress)
 
 JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
@@ -261,7 +260,7 @@ JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong d
 
 JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
@@ -278,7 +277,7 @@ JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jl
 
 JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     Device * chipDevice = nullptr;
 
     ChipLogProgress(Controller, "getDevicePointer() called with device ID");
@@ -291,7 +290,7 @@ JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jl
 
 JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jlong callbackHandle)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
@@ -301,7 +300,7 @@ JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong ha
 
 JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     chip::Inet::IPAddress deviceIPAddr;
@@ -325,7 +324,7 @@ JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlon
 
 JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     Device * chipDevice                      = nullptr;
@@ -345,7 +344,7 @@ JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlo
 
 JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
 
     Device * chipDevice = reinterpret_cast<Device *>(handle);
     return chipDevice->IsActive();
@@ -367,7 +366,7 @@ void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device *
 
 JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     Device * chipDevice = nullptr;
 
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
@@ -385,7 +384,7 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
 
 JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong fabricId, jlong deviceId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
@@ -399,7 +398,7 @@ JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong f
 
 JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint duration)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     Device * chipDevice = nullptr;
     chip::SetupPayload setupPayload;
@@ -421,7 +420,7 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 JNI_METHOD(jboolean, openPairingWindowWithPIN)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint duration, jint iteration, jint discriminator, jlong setupPinCode)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     Device * chipDevice = nullptr;
     chip::SetupPayload setupPayload;
@@ -444,7 +443,7 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
 
 JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handle)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "deleteDeviceController() called");

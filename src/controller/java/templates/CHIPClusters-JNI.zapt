@@ -7,11 +7,11 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <lib/support/StackLock.h>
 #include <jni.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <platform/PlatformManager.h>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
@@ -111,7 +111,7 @@ class CHIPDefaultSuccessCallback : public Callback::Callback<DefaultSuccessCallb
 
         static void CallbackFn(void * context)
         {
-            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;
             jmethodID javaMethod;
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -174,7 +174,7 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
 
         static void CallbackFn(void * context, uint8_t status)
         {
-            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;
             jmethodID javaMethod;
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -240,7 +240,7 @@ class CHIP{{chipCallback.name}}AttributeCallback : public Callback::Callback<{{c
 
         static void CallbackFn(void * context, {{chipCallback.type}} value)
         {
-            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;
 
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -317,7 +317,7 @@ class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callba
 
         static void CallbackFn(void * context{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}})
         {
-            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
             jobject javaCallbackRef;
@@ -413,7 +413,7 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
 
         static void CallbackFn(void * context, uint16_t count, {{chipType}} * entries)
         {
-            StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+            chip::DeviceLayer::StackUnlock unlock;
             CHIP_ERROR err = CHIP_NO_ERROR;
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
             jobject javaCallbackRef;
@@ -502,7 +502,7 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
 
 JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlong clusterPtr)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ClusterBase * cluster = reinterpret_cast<ClusterBase *>(clusterPtr);
     if (cluster != nullptr) {
         delete cluster;
@@ -512,7 +512,7 @@ JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlo
 {{#chip_client_clusters}}
 JNI_METHOD(jlong, {{asUpperCamelCase name}}Cluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     {{asUpperCamelCase name}}Cluster * cppCluster = new {{asUpperCamelCase name}}Cluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -526,7 +526,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {{/if}}
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     {{asUpperCamelCase ../name}}Cluster * cppCluster;
     
@@ -586,7 +586,7 @@ exit:
 
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, read{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
 {{#if isList}}
     CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback * onSuccess = new CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(callback);
 {{else}}
@@ -624,7 +624,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, read{{asUpperCamelCase nam
 
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{asJniBasicType type}} value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess) {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());

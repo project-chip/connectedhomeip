@@ -122,7 +122,6 @@ static_library("support") {
       "JniReferences.cpp",
       "JniReferences.h",
       "JniTypeWrappers.h",
-      "StackLock.h",
     ]
   }
 
