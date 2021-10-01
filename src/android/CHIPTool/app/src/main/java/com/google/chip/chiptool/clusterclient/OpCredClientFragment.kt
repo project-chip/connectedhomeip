@@ -74,7 +74,7 @@ class OpCredClientFragment : Fragment() {
   }
 
   private fun updateAddressClick() {
-    try{
+    try {
       deviceController.updateDevice(
               opCredClusterFabricIdEd.text.toString().toULong().toLong(),
               opCredClusterDeviceIdEd.text.toString().toULong().toLong()
