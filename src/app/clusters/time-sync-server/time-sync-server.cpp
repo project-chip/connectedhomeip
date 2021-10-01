@@ -32,13 +32,16 @@ using namespace chip::app::Clusters;
 
 struct TimeSyncTimeSource
 {
-    uint64_t GetUtcTime(void) { return GetLocalTime() + mTimeBase; }
+    uint64_t GetUtcTime(void) { return (GetLocalTime() - mTimeStemp) + mTimeBase; }
     uint64_t GetLocalTime(void) { return System::Clock::GetMonotonicMicroseconds(); }
-    void SetTimeBase(uint64_t timeBase) { mTimeBase = timeBase; }
+    void SetTimeBase(uint64_t timeBase) { 
+        mTimeBase = timeBase;
+        mTimeStamp = GetLocalTime();
+    }
 
 private:
-    // TODO store TimeBase in Flash ?
-    uint64_t mTimeBase;
+    uint64_t mTimeBase = 0; // TODO store TimeBase in Flash ?
+    uint64_t mTimeStamp = 0;
 };
 
 namespace {
