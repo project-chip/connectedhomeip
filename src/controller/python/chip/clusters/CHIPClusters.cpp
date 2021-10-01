@@ -6516,6 +6516,108 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Clu
 }
 
 // End of Cluster ThreadNetworkDiagnostics
+// Cluster TimeSync
+
+chip::ChipError::StorageType chip_ime_AppendCommand_TimeSync_SetUtcTime(chip::Controller::Device * device,
+                                                                        chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                        uint64_t utcTime, uint8_t granularity, uint8_t timeSource)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TimeSyncCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.SetUtcTime(nullptr, nullptr, utcTime, granularity, timeSource).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_TimeSync_UTCTime(chip::Controller::Device * device,
+                                                                     chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TimeSyncCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeUTCTime(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_TimeSync_Granularity(chip::Controller::Device * device,
+                                                                         chip::EndpointId ZCLendpointId,
+                                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TimeSyncCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeGranularity(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_TimeSync_TimeSource(chip::Controller::Device * device,
+                                                                        chip::EndpointId ZCLendpointId,
+                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TimeSyncCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTimeSource(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_TimeSync_TrustedTimeNodeId(chip::Controller::Device * device,
+                                                                               chip::EndpointId ZCLendpointId,
+                                                                               chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TimeSyncCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTrustedTimeNodeId(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_TimeSync_TrustedTimeNodeId(chip::Controller::Device * device,
+                                                                                chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                chip::NodeId value)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TimeSyncCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.WriteAttributeTrustedTimeNodeId(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value)
+        .AsInteger();
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_TimeSync_LocalTime(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId,
+                                                                       chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TimeSyncCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeLocalTime(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_TimeSync_TimeZoneDatabase(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId,
+                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TimeSyncCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTimeZoneDatabase(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_TimeSync_FeatureMap(chip::Controller::Device * device,
+                                                                        chip::EndpointId ZCLendpointId,
+                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TimeSyncCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeFeatureMap(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_TimeSync_ClusterRevision(chip::Controller::Device * device,
+                                                                             chip::EndpointId ZCLendpointId,
+                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::TimeSyncCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+// End of Cluster TimeSync
 // Cluster WakeOnLan
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_WakeOnLan_WakeOnLanMacAddress(chip::Controller::Device * device,

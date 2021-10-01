@@ -176,22 +176,6 @@
 // Server attributes
 #define ZCL_ALARM_COUNT_ATTRIBUTE_ID (0x0000)
 
-// Attribute ids for cluster: Time
-
-// Client attributes
-
-// Server attributes
-#define ZCL_TIME_ATTRIBUTE_ID (0x0000)
-#define ZCL_TIME_STATUS_ATTRIBUTE_ID (0x0001)
-#define ZCL_TIME_ZONE_ATTRIBUTE_ID (0x0002)
-#define ZCL_DST_START_ATTRIBUTE_ID (0x0003)
-#define ZCL_DST_END_ATTRIBUTE_ID (0x0004)
-#define ZCL_DST_SHIFT_ATTRIBUTE_ID (0x0005)
-#define ZCL_STANDARD_TIME_ATTRIBUTE_ID (0x0006)
-#define ZCL_LOCAL_TIME_ATTRIBUTE_ID (0x0007)
-#define ZCL_LAST_SET_TIME_ATTRIBUTE_ID (0x0008)
-#define ZCL_VALID_UNTIL_TIME_ATTRIBUTE_ID (0x0009)
-
 // Attribute ids for cluster: Binary Input (Basic)
 
 // Client attributes
@@ -473,6 +457,20 @@
 #define ZCL_ETHERNET_OVERRUN_COUNT_ATTRIBUTE_ID (0x0006)
 #define ZCL_CARRIER_DETECT_ATTRIBUTE_ID (0x0007)
 #define ZCL_TIME_SINCE_RESET_ATTRIBUTE_ID (0x0008)
+
+// Attribute ids for cluster: Time Sync
+
+// Client attributes
+
+// Server attributes
+#define ZCL_UTC_TIME_ATTRIBUTE_ID (0x0000)
+#define ZCL_GRANULARITY_ATTRIBUTE_ID (0x0001)
+#define ZCL_TIME_SOURCE_ATTRIBUTE_ID (0x0002)
+#define ZCL_TRUSTED_TIME_NODEID_ATTRIBUTE_ID (0x0003)
+#define ZCL_DEFAULT_NTP_ATTRIBUTE_ID (0x0004)
+#define ZCL_LOCAL_TIME_ATTRIBUTE_ID (0x0007)
+#define ZCL_TIME_ZONE_DATABASE_ATTRIBUTE_ID (0x0008)
+#define ZCL_NTP_SERVER_PORT_ATTRIBUTE_ID (0x0009)
 
 // Attribute ids for cluster: Bridged Device Basic
 

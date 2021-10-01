@@ -986,6 +986,28 @@ public:
                                              uint16_t value);
 };
 
+class DLL_EXPORT TimeSyncClusterTest : public TimeSyncCluster
+{
+public:
+    TimeSyncClusterTest() : TimeSyncCluster() {}
+    ~TimeSyncClusterTest() {}
+
+    CHIP_ERROR WriteAttributeUTCTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint64_t value);
+    CHIP_ERROR WriteAttributeGranularity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         uint8_t value);
+    CHIP_ERROR WriteAttributeTimeSource(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint8_t value);
+    CHIP_ERROR WriteAttributeLocalTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint64_t value);
+    CHIP_ERROR WriteAttributeTimeZoneDatabase(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              bool value);
+    CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint32_t value);
+    CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t value);
+};
+
 class DLL_EXPORT WakeOnLanClusterTest : public WakeOnLanCluster
 {
 public:

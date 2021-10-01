@@ -755,6 +755,22 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Time Sync
+ *
+ */
+@interface CHIPTestTimeSync : CHIPTimeSync
+
+- (void)writeAttributeUTCTimeWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeGranularityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeTimeSourceWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeLocalTimeWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeTimeZoneDatabaseWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeFeatureMapWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Wake on LAN
  *
  */

@@ -214,6 +214,9 @@
 // Commands for cluster: Ethernet Network Diagnostics
 #define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
+// Commands for cluster: Time Sync
+#define ZCL_SET_UTC_TIME_COMMAND_ID (0x00)
+
 // Commands for cluster: Bridged Device Basic
 #define ZCL_START_UP_COMMAND_ID (0x00)
 #define ZCL_SHUT_DOWN_COMMAND_ID (0x01)

@@ -260,31 +260,6 @@ EmberAfStatus SetAlarmCount(chip::EndpointId endpoint, uint16_t alarmCount);
 } // namespace Attributes
 } // namespace Alarms
 
-namespace Time {
-namespace Attributes {
-EmberAfStatus GetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** time); // utc
-EmberAfStatus SetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * time);
-EmberAfStatus GetTimeStatus(chip::EndpointId endpoint, uint8_t * timeStatus); // bitmap8
-EmberAfStatus SetTimeStatus(chip::EndpointId endpoint, uint8_t timeStatus);
-EmberAfStatus GetTimeZone(chip::EndpointId endpoint, int32_t * timeZone); // int32s
-EmberAfStatus SetTimeZone(chip::EndpointId endpoint, int32_t timeZone);
-EmberAfStatus GetDstStart(chip::EndpointId endpoint, uint32_t * dstStart); // int32u
-EmberAfStatus SetDstStart(chip::EndpointId endpoint, uint32_t dstStart);
-EmberAfStatus GetDstEnd(chip::EndpointId endpoint, uint32_t * dstEnd); // int32u
-EmberAfStatus SetDstEnd(chip::EndpointId endpoint, uint32_t dstEnd);
-EmberAfStatus GetDstShift(chip::EndpointId endpoint, int32_t * dstShift); // int32s
-EmberAfStatus SetDstShift(chip::EndpointId endpoint, int32_t dstShift);
-EmberAfStatus GetStandardTime(chip::EndpointId endpoint, uint32_t * standardTime); // int32u
-EmberAfStatus SetStandardTime(chip::EndpointId endpoint, uint32_t standardTime);
-EmberAfStatus GetLocalTime(chip::EndpointId endpoint, uint32_t * localTime); // int32u
-EmberAfStatus SetLocalTime(chip::EndpointId endpoint, uint32_t localTime);
-EmberAfStatus GetLastSetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** lastSetTime); // utc
-EmberAfStatus SetLastSetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * lastSetTime);
-EmberAfStatus GetValidUntilTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** validUntilTime); // utc
-EmberAfStatus SetValidUntilTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * validUntilTime);
-} // namespace Attributes
-} // namespace Time
-
 namespace BinaryInputBasic {
 namespace Attributes {
 EmberAfStatus GetOutOfService(chip::EndpointId endpoint, bool * outOfService); // boolean
@@ -629,6 +604,25 @@ EmberAfStatus GetTimeSinceReset(chip::EndpointId endpoint, uint64_t * timeSinceR
 EmberAfStatus SetTimeSinceReset(chip::EndpointId endpoint, uint64_t timeSinceReset);
 } // namespace Attributes
 } // namespace EthernetNetworkDiagnostics
+
+namespace TimeSync {
+namespace Attributes {
+EmberAfStatus GetUTCTime(chip::EndpointId endpoint, uint64_t * uTCTime); // epoch_us
+EmberAfStatus SetUTCTime(chip::EndpointId endpoint, uint64_t uTCTime);
+EmberAfStatus GetGranularity(chip::EndpointId endpoint, uint8_t * granularity); // enum8
+EmberAfStatus SetGranularity(chip::EndpointId endpoint, uint8_t granularity);
+EmberAfStatus GetTimeSource(chip::EndpointId endpoint, uint8_t * timeSource); // enum8
+EmberAfStatus SetTimeSource(chip::EndpointId endpoint, uint8_t timeSource);
+EmberAfStatus GetTrustedTimeNodeId(chip::EndpointId endpoint, chip::NodeId * trustedTimeNodeId); // node_id
+EmberAfStatus SetTrustedTimeNodeId(chip::EndpointId endpoint, chip::NodeId trustedTimeNodeId);
+EmberAfStatus GetLocalTime(chip::EndpointId endpoint, uint64_t * localTime); // epoch_us
+EmberAfStatus SetLocalTime(chip::EndpointId endpoint, uint64_t localTime);
+EmberAfStatus GetTimeZoneDatabase(chip::EndpointId endpoint, bool * timeZoneDatabase); // boolean
+EmberAfStatus SetTimeZoneDatabase(chip::EndpointId endpoint, bool timeZoneDatabase);
+EmberAfStatus GetNtpServerPort(chip::EndpointId endpoint, int16_t * ntpServerPort); // int16s
+EmberAfStatus SetNtpServerPort(chip::EndpointId endpoint, int16_t ntpServerPort);
+} // namespace Attributes
+} // namespace TimeSync
 
 namespace BridgedDeviceBasic {
 namespace Attributes {

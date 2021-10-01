@@ -1466,6 +1466,31 @@ public:
 private:
 };
 
+class DLL_EXPORT TimeSyncCluster : public ClusterBase
+{
+public:
+    TimeSyncCluster() : ClusterBase(app::Clusters::TimeSync::Id) {}
+    ~TimeSyncCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR SetUtcTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t utcTime,
+                          uint8_t granularity, uint8_t timeSource);
+
+    // Cluster Attributes
+    CHIP_ERROR ReadAttributeUTCTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeGranularity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTimeSource(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTrustedTimeNodeId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeLocalTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTimeZoneDatabase(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeTrustedTimeNodeId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               chip::NodeId value);
+
+private:
+};
+
 class DLL_EXPORT WakeOnLanCluster : public ClusterBase
 {
 public:

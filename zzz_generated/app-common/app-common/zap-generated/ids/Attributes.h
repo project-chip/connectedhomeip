@@ -513,56 +513,6 @@ namespace ClusterRevision = Globals::Attributes::ClusterRevision;
 } // namespace Attributes
 } // namespace Alarms
 
-namespace Time {
-namespace Attributes {
-
-namespace Time {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Time
-
-namespace TimeStatus {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace TimeStatus
-
-namespace TimeZone {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace TimeZone
-
-namespace DstStart {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace DstStart
-
-namespace DstEnd {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace DstEnd
-
-namespace DstShift {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace DstShift
-
-namespace StandardTime {
-static constexpr AttributeId Id = 0x00000006;
-} // namespace StandardTime
-
-namespace LocalTime {
-static constexpr AttributeId Id = 0x00000007;
-} // namespace LocalTime
-
-namespace LastSetTime {
-static constexpr AttributeId Id = 0x00000008;
-} // namespace LastSetTime
-
-namespace ValidUntilTime {
-static constexpr AttributeId Id = 0x00000009;
-} // namespace ValidUntilTime
-
-namespace FeatureMap = Globals::Attributes::FeatureMap;
-
-namespace ClusterRevision = Globals::Attributes::ClusterRevision;
-
-} // namespace Attributes
-} // namespace Time
-
 namespace BinaryInputBasic {
 namespace Attributes {
 
@@ -1422,6 +1372,48 @@ namespace ClusterRevision = Globals::Attributes::ClusterRevision;
 
 } // namespace Attributes
 } // namespace EthernetNetworkDiagnostics
+
+namespace TimeSync {
+namespace Attributes {
+
+namespace UTCTime {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace UTCTime
+
+namespace Granularity {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Granularity
+
+namespace TimeSource {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace TimeSource
+
+namespace TrustedTimeNodeId {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace TrustedTimeNodeId
+
+namespace DefaultNtp {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace DefaultNtp
+
+namespace LocalTime {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace LocalTime
+
+namespace TimeZoneDatabase {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace TimeZoneDatabase
+
+namespace NtpServerPort {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace NtpServerPort
+
+namespace FeatureMap = Globals::Attributes::FeatureMap;
+
+namespace ClusterRevision = Globals::Attributes::ClusterRevision;
+
+} // namespace Attributes
+} // namespace TimeSync
 
 namespace BridgedDeviceBasic {
 namespace Attributes {

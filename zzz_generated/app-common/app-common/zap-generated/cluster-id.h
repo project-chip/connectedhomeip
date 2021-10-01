@@ -49,9 +49,6 @@ static constexpr chip::ClusterId ZCL_LEVEL_CONTROL_CLUSTER_ID = 0x0008;
 // Definitions for cluster: Alarms
 static constexpr chip::ClusterId ZCL_ALARM_CLUSTER_ID = 0x0009;
 
-// Definitions for cluster: Time
-static constexpr chip::ClusterId ZCL_TIME_CLUSTER_ID = 0x000A;
-
 // Definitions for cluster: Binary Input (Basic)
 static constexpr chip::ClusterId ZCL_BINARY_INPUT_BASIC_CLUSTER_ID = 0x000F;
 
@@ -102,6 +99,9 @@ static constexpr chip::ClusterId ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID = 0x003
 
 // Definitions for cluster: Ethernet Network Diagnostics
 static constexpr chip::ClusterId ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID = 0x0037;
+
+// Definitions for cluster: Time Sync
+static constexpr chip::ClusterId ZCL_TIME_SYNC_CLUSTER_ID = 0x0038;
 
 // Definitions for cluster: Bridged Device Basic
 static constexpr chip::ClusterId ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID = 0x0039;

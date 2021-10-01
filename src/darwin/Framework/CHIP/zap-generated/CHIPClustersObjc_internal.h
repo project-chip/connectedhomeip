@@ -221,6 +221,10 @@
 @property (readonly) chip::Controller::ThreadNetworkDiagnosticsCluster cppCluster;
 @end
 
+@interface CHIPTimeSync ()
+@property (readonly) chip::Controller::TimeSyncCluster cppCluster;
+@end
+
 @interface CHIPWakeOnLan ()
 @property (readonly) chip::Controller::WakeOnLanCluster cppCluster;
 @end

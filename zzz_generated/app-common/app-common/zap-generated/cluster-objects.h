@@ -1397,6 +1397,9 @@ public:
 } // namespace SecurityPolicy
 
 } // namespace ThreadNetworkDiagnostics
+namespace TimeSync {
+
+} // namespace TimeSync
 namespace WakeOnLan {
 
 } // namespace WakeOnLan

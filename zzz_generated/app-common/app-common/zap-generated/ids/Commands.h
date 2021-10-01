@@ -665,6 +665,16 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace EthernetNetworkDiagnostics
 
+namespace TimeSync {
+namespace Commands {
+
+namespace SetUtcTime {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetUtcTime
+
+} // namespace Commands
+} // namespace TimeSync
+
 namespace BridgedDeviceBasic {
 namespace Commands {
 

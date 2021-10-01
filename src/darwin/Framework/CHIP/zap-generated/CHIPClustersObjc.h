@@ -1694,6 +1694,36 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Time Sync
+ *
+ */
+@interface CHIPTimeSync : CHIPCluster
+
+- (void)setUtcTime:(uint64_t)utcTime
+        granularity:(uint8_t)granularity
+         timeSource:(uint8_t)timeSource
+    responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeUTCTimeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeGranularityWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeTimeSourceWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeTrustedTimeNodeIdWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeTrustedTimeNodeIdWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeLocalTimeWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeTimeZoneDatabaseWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Wake on LAN
  *
  */

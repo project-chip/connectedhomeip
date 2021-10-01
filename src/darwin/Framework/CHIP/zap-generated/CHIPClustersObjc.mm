@@ -5163,6 +5163,88 @@ using chip::Callback::Cancelable;
 
 @end
 
+@implementation CHIPTimeSync
+
+- (chip::Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)setUtcTime:(uint64_t)utcTime
+        granularity:(uint8_t)granularity
+         timeSource:(uint8_t)timeSource
+    responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SetUtcTime(success, failure, utcTime, granularity, timeSource);
+    });
+}
+
+- (void)readAttributeUTCTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeUTCTime(success, failure);
+    });
+}
+
+- (void)readAttributeGranularityWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeGranularity(success, failure);
+    });
+}
+
+- (void)readAttributeTimeSourceWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeTimeSource(success, failure);
+    });
+}
+
+- (void)readAttributeTrustedTimeNodeIdWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeTrustedTimeNodeId(success, failure);
+    });
+}
+
+- (void)writeAttributeTrustedTimeNodeIdWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeTrustedTimeNodeId(success, failure, value);
+    });
+}
+
+- (void)readAttributeLocalTimeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeLocalTime(success, failure);
+    });
+}
+
+- (void)readAttributeTimeZoneDatabaseWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeTimeZoneDatabase(success, failure);
+    });
+}
+
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeFeatureMap(success, failure);
+    });
+}
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeClusterRevision(success, failure);
+    });
+}
+
+@end
+
 @implementation CHIPWakeOnLan
 
 - (chip::Controller::ClusterBase *)getCluster

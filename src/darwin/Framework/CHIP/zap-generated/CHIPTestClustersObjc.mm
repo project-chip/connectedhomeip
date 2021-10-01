@@ -2652,6 +2652,68 @@ using chip::Callback::Cancelable;
 
 @end
 
+@interface CHIPTestTimeSync ()
+@property (readonly) chip::Controller::TimeSyncClusterTest cppCluster;
+@end
+
+@implementation CHIPTestTimeSync
+
+- (chip::Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)writeAttributeUTCTimeWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeUTCTime(success, failure, value);
+    });
+}
+
+- (void)writeAttributeGranularityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeGranularity(success, failure, value);
+    });
+}
+
+- (void)writeAttributeTimeSourceWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeTimeSource(success, failure, value);
+    });
+}
+
+- (void)writeAttributeLocalTimeWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeLocalTime(success, failure, value);
+    });
+}
+
+- (void)writeAttributeTimeZoneDatabaseWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeTimeZoneDatabase(success, failure, value);
+    });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeFeatureMap(success, failure, value);
+    });
+}
+
+- (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.WriteAttributeClusterRevision(success, failure, value);
+    });
+}
+
+@end
+
 @interface CHIPTestWakeOnLan ()
 @property (readonly) chip::Controller::WakeOnLanClusterTest cppCluster;
 @end

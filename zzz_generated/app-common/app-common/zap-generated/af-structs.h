@@ -430,6 +430,22 @@ typedef struct _ThreadMetrics
     uint32_t StackSize;
 } ThreadMetrics;
 
+// Struct for TimeSyncDstOffsetType
+typedef struct _TimeSyncDstOffsetType
+{
+    int32_t Offset;
+    uint64_t ValidStarting;
+    uint64_t ValidUntil;
+} TimeSyncDstOffsetType;
+
+// Struct for TimeSyncTimeZoneType
+typedef struct _TimeSyncTimeZoneType
+{
+    int32_t Offset;
+    uint64_t ValidAt;
+    uint8_t * Name;
+} TimeSyncTimeZoneType;
+
 // Struct for TransferredPhase
 typedef struct _TransferredPhase
 {

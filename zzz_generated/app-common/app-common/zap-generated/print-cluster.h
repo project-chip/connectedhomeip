@@ -78,12 +78,6 @@
 #define CHIP_PRINTCLUSTER_ALARM_CLUSTER
 #endif
 
-#if defined(ZCL_USING_TIME_CLUSTER_SERVER) || defined(ZCL_USING_TIME_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TIME_CLUSTER { ZCL_TIME_CLUSTER_ID, 10, "Time" },
-#else
-#define CHIP_PRINTCLUSTER_TIME_CLUSTER
-#endif
-
 #if defined(ZCL_USING_BINARY_INPUT_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BINARY_INPUT_BASIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_BINARY_INPUT_BASIC_CLUSTER { ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, 15, "Binary Input (Basic)" },
 #else
@@ -187,6 +181,12 @@
     { ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID, 55, "Ethernet Network Diagnostics" },
 #else
 #define CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER
+#endif
+
+#if defined(ZCL_USING_TIME_SYNC_CLUSTER_SERVER) || defined(ZCL_USING_TIME_SYNC_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TIME_SYNC_CLUSTER { ZCL_TIME_SYNC_CLUSTER_ID, 56, "Time Sync" },
+#else
+#define CHIP_PRINTCLUSTER_TIME_SYNC_CLUSTER
 #endif
 
 #if defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_CLIENT)
@@ -741,7 +741,6 @@
     CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIG_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_LEVEL_CONTROL_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ALARM_CLUSTER                                                                                                \
-    CHIP_PRINTCLUSTER_TIME_CLUSTER                                                                                                 \
     CHIP_PRINTCLUSTER_BINARY_INPUT_BASIC_CLUSTER                                                                                   \
     CHIP_PRINTCLUSTER_POWER_PROFILE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER                                                                                    \
@@ -759,6 +758,7 @@
     CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_TIME_SYNC_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                          \

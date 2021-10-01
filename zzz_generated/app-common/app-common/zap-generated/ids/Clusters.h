@@ -52,9 +52,6 @@ static constexpr ClusterId Id = 0x00000008;
 namespace Alarms {
 static constexpr ClusterId Id = 0x00000009;
 } // namespace Alarms
-namespace Time {
-static constexpr ClusterId Id = 0x0000000A;
-} // namespace Time
 namespace BinaryInputBasic {
 static constexpr ClusterId Id = 0x0000000F;
 } // namespace BinaryInputBasic
@@ -106,6 +103,9 @@ static constexpr ClusterId Id = 0x00000036;
 namespace EthernetNetworkDiagnostics {
 static constexpr ClusterId Id = 0x00000037;
 } // namespace EthernetNetworkDiagnostics
+namespace TimeSync {
+static constexpr ClusterId Id = 0x00000038;
+} // namespace TimeSync
 namespace BridgedDeviceBasic {
 static constexpr ClusterId Id = 0x00000039;
 } // namespace BridgedDeviceBasic

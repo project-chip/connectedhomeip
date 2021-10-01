@@ -181,6 +181,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
+    case ZCL_TIME_SYNC_CLUSTER_ID:
+        emberAfTimeSyncClusterInitCallback(endpoint);
+        break;
     case ZCL_WAKE_ON_LAN_CLUSTER_ID:
         emberAfWakeOnLanClusterInitCallback(endpoint);
         break;
@@ -447,6 +450,11 @@ void __attribute__((weak)) emberAfThermostatUserInterfaceConfigurationClusterIni
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfTimeSyncClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

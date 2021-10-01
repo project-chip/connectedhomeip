@@ -114,14 +114,6 @@ void emberAfLevelControlClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfAlarmsClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Time Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfTimeClusterInitCallback(chip::EndpointId endpoint);
-
 /** @brief Binary Input (Basic) Cluster Init
  *
  * Cluster Init
@@ -257,6 +249,14 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoint)
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfEthernetNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Time Sync Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTimeSyncClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Bridged Device Basic Cluster Init
  *
@@ -2091,136 +2091,6 @@ void emberAfAlarmsClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfAlarmsClusterClientTickCallback(chip::EndpointId endpoint);
-
-//
-// Time Cluster
-//
-
-/** @brief Time Cluster Server Init
- *
- * Server Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfTimeClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Time Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfTimeClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Time Cluster Server Attribute Changed
- *
- * Server Attribute Changed
- *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
- */
-void emberAfTimeClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Time Cluster Client Attribute Changed
- *
- * Client Attribute Changed
- *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
- */
-void emberAfTimeClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Time Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTimeClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          uint16_t manufacturerCode);
-
-/** @brief Time Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTimeClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          uint16_t manufacturerCode);
-
-/** @brief Time Cluster Server Message Sent
- *
- * Server Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfTimeClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
-
-/** @brief Time Cluster Client Message Sent
- *
- * Client Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfTimeClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
-
-/** @brief Time Cluster Server Pre Attribute Changed
- *
- * Server Pre Attribute Changed
- *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-EmberAfStatus emberAfTimeClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                  EmberAfAttributeType attributeType, uint16_t size,
-                                                                  uint8_t * value);
-
-/** @brief Time Cluster Client Pre Attribute Changed
- *
- * Client Pre Attribute Changed
- *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-EmberAfStatus emberAfTimeClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                  EmberAfAttributeType attributeType, uint16_t size,
-                                                                  uint8_t * value);
-
-/** @brief Time Cluster Server Tick
- *
- * Server Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfTimeClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Time Cluster Client Tick
- *
- * Client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfTimeClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Binary Input (Basic) Cluster
@@ -4517,6 +4387,138 @@ void emberAfEthernetNetworkDiagnosticsClusterServerTickCallback(chip::EndpointId
  * @param endpoint  Endpoint that is being served
  */
 void emberAfEthernetNetworkDiagnosticsClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Time Sync Cluster
+//
+
+/** @brief Time Sync Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTimeSyncClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Time Sync Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTimeSyncClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Time Sync Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfTimeSyncClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief Time Sync Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfTimeSyncClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief Time Sync Cluster Server Manufacturer Specific Attribute Changed
+ *
+ * Server Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfTimeSyncClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
+                                                                              uint16_t manufacturerCode);
+
+/** @brief Time Sync Cluster Client Manufacturer Specific Attribute Changed
+ *
+ * Client Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfTimeSyncClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
+                                                                              uint16_t manufacturerCode);
+
+/** @brief Time Sync Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfTimeSyncClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                     uint16_t msgLen, uint8_t * message, EmberStatus status);
+
+/** @brief Time Sync Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfTimeSyncClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                     uint16_t msgLen, uint8_t * message, EmberStatus status);
+
+/** @brief Time Sync Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfTimeSyncClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
+                                                                      EmberAfAttributeType attributeType, uint16_t size,
+                                                                      uint8_t * value);
+
+/** @brief Time Sync Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfTimeSyncClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
+                                                                      EmberAfAttributeType attributeType, uint16_t size,
+                                                                      uint8_t * value);
+
+/** @brief Time Sync Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTimeSyncClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Time Sync Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTimeSyncClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Bridged Device Basic Cluster
@@ -15850,6 +15852,11 @@ bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(chip::EndpointId en
  * @brief Ethernet Network Diagnostics Cluster ResetCounts Command callback (from client)
  */
 bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj);
+/**
+ * @brief Time Sync Cluster SetUtcTime Command callback (from client)
+ */
+bool emberAfTimeSyncClusterSetUtcTimeCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint64_t UtcTime,
+                                              uint8_t Granularity, uint8_t TimeSource);
 /**
  * @brief Bridged Device Basic Cluster StartUp Command callback (from server)
  */

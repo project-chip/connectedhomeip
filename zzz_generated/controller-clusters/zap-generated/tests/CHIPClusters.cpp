@@ -5010,6 +5010,125 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(Ca
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR TimeSyncClusterTest::WriteAttributeUTCTime(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback, uint64_t uTCTime)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = TimeSync::Attributes::UTCTime::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, uTCTime));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TimeSyncClusterTest::WriteAttributeGranularity(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback, uint8_t granularity)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = TimeSync::Attributes::Granularity::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, granularity));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TimeSyncClusterTest::WriteAttributeTimeSource(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback, uint8_t timeSource)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = TimeSync::Attributes::TimeSource::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, timeSource));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TimeSyncClusterTest::WriteAttributeLocalTime(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, uint64_t localTime)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = TimeSync::Attributes::LocalTime::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, localTime));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TimeSyncClusterTest::WriteAttributeTimeZoneDatabase(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, bool timeZoneDatabase)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = TimeSync::Attributes::TimeZoneDatabase::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, timeZoneDatabase));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TimeSyncClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback, uint32_t featureMap)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = Globals::Attributes::FeatureMap::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, featureMap));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TimeSyncClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback, uint16_t clusterRevision)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = Globals::Attributes::ClusterRevision::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, clusterRevision));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
 CHIP_ERROR WakeOnLanClusterTest::WriteAttributeWakeOnLanMacAddress(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback,
                                                                    chip::ByteSpan wakeOnLanMacAddress)
