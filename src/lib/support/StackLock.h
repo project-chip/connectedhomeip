@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <pthread.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <pthread.h>
 #include <string>
 
 namespace chip {
@@ -24,14 +24,16 @@ namespace chip {
 struct StackLockGuard
 {
 public:
-
-    StackLockGuard(pthread_mutex_t * mutex, std::string function = "") : mMutex(mutex), mFunction(function) {
+    StackLockGuard(pthread_mutex_t * mutex, std::string function = "") : mMutex(mutex), mFunction(function)
+    {
         ChipLogProgress(Controller, "StackLockGuard: Locking %s", mFunction.c_str());
         pthread_mutex_lock(mutex);
-        }
-    ~StackLockGuard() {
+    }
+    ~StackLockGuard()
+    {
         ChipLogProgress(Controller, "StackLockGuard: Unlocking %s", mFunction.c_str());
-        pthread_mutex_unlock(mMutex); }
+        pthread_mutex_unlock(mMutex);
+    }
 
 private:
     pthread_mutex_t * mMutex;
@@ -45,12 +47,16 @@ private:
 struct StackUnlockGuard
 {
 public:
-    StackUnlockGuard(pthread_mutex_t * mutex, std::string function = "") : mMutex(mutex), mFunction(function) {
+    StackUnlockGuard(pthread_mutex_t * mutex, std::string function = "") : mMutex(mutex), mFunction(function)
+    {
         ChipLogProgress(Controller, "StackUnlockGuard: Unlocking %s", mFunction.c_str());
-        pthread_mutex_unlock(mMutex); }
-    ~StackUnlockGuard() {
+        pthread_mutex_unlock(mMutex);
+    }
+    ~StackUnlockGuard()
+    {
         ChipLogProgress(Controller, "StackUnlockGuard: Locking %s", mFunction.c_str());
-        pthread_mutex_lock(mMutex); }
+        pthread_mutex_lock(mMutex);
+    }
 
 private:
     pthread_mutex_t * mMutex;

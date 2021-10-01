@@ -263,8 +263,8 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
-        rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnSubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj), svcIdObj,
-                                        charIdObj);
+        rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnSubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj),
+                                           svcIdObj, charIdObj);
     }
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
@@ -304,8 +304,8 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
-        rc         = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnUnsubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj),
-                                       svcIdObj, charIdObj);
+        rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnUnsubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj),
+                                           svcIdObj, charIdObj);
     }
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
@@ -420,7 +420,7 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         rc = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnSendWriteRequestMethod, static_cast<jint>(tmpConnObj), svcIdObj,
-                                       charIdObj, characteristicDataObj);
+                                           charIdObj, characteristicDataObj);
     }
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
