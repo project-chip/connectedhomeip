@@ -87,7 +87,7 @@ private:
     wifi_manager_connection_state_e mConnectionState;
 
     char mWiFiSSID[kMaxWiFiSSIDLength + 1];
-    char mWiFiKey[kMaxWiFiKeyLength];
+    char mWiFiKey[kMaxWiFiKeyLength + 1];
 };
 
 inline WiFiManager & WiFiMgr()
