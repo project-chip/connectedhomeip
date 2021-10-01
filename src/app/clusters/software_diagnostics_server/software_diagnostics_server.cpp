@@ -59,13 +59,13 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const 
     *aDataRead = true;
     switch (aClusterInfo.mFieldId)
     {
-    case Ids::CurrentHeapFree: {
+    case CurrentHeapFree::Id: {
         return ReadIfSupported(&PlatformManager::GetCurrentHeapFree, aEncoder);
     }
-    case Ids::CurrentHeapUsed: {
+    case CurrentHeapUsed::Id: {
         return ReadIfSupported(&PlatformManager::GetCurrentHeapUsed, aEncoder);
     }
-    case Ids::CurrentHeapHighWatermark: {
+    case CurrentHeapHighWatermark::Id: {
         return ReadIfSupported(&PlatformManager::GetCurrentHeapHighWatermark, aEncoder);
     }
     default: {
@@ -98,10 +98,10 @@ bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(EndpointId endpoin
 {
     uint64_t currentHeapUsed;
 
-    EmberAfStatus status = SoftwareDiagnostics::Attributes::GetCurrentHeapUsed(endpoint, &currentHeapUsed);
+    EmberAfStatus status = SoftwareDiagnostics::Attributes::CurrentHeapUsed::Get(endpoint, &currentHeapUsed);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to get the value of the CurrentHeapUsed attribute"));
 
-    status = SoftwareDiagnostics::Attributes::SetCurrentHeapHighWatermark(endpoint, currentHeapUsed);
+    status = SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Set(endpoint, currentHeapUsed);
     VerifyOrExit(
         status == EMBER_ZCL_STATUS_SUCCESS,
         ChipLogError(

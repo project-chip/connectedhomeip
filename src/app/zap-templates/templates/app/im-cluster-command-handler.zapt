@@ -57,7 +57,7 @@ void Dispatch{{asUpperCamelCase side}}Command({{#if (isServer side)}}CommandHand
         switch (aCommandId)
         {
     {{/first}}
-        case Clusters::{{asUpperCamelCase parent.name}}::Commands::Ids::{{asUpperCamelCase name}}: {
+        case Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id: {
         {{> im_command_handler_cluster_commands}}
             break;
         }

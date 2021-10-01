@@ -621,7 +621,7 @@ void BLEManagerImpl::HandleInitComplete(bool no_error)
         /*const Passkey_t passkey        */ nullptr,
         /*bool signing                   */ true,
         /*const char *dbFilepath         */ nullptr);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
     mbed_err = security_mgr.setPairingRequestAuthorisation(true);
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
@@ -787,7 +787,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
     mbed_err = gap.startAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
     ChipLogDetail(DeviceLayer, "Advertising started, type: 0x%x (%sconnectable), interval: [%lu:%lu] ms, device name: %s)",
                   adv_params.getType().value(), connectable ? "" : "non-", adv_params.getMinPrimaryInterval().valueInMs(),
@@ -814,7 +814,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         return err;
     }
     mbed_err = gap.stopAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
 exit:
     if (mbed_err != BLE_ERROR_NONE)
@@ -1028,7 +1028,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                   conId, att_handle, pBuf->DataLength());
 
     mbed_err = gatt_server.write(att_handle, pBuf->Start(), pBuf->DataLength(), false);
-    VerifyOrExit(mbed_err == BLE_ERROR_NONE, CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
+    VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
 exit:
     if (mbed_err != BLE_ERROR_NONE)

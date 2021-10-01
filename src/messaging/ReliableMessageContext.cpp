@@ -255,9 +255,9 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
 
         // Replace the Pending ack message counter.
         SetPendingPeerAckMessageCounter(messageCounter);
-        mNextAckTimeTick =
-            static_cast<uint16_t>(CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK +
-                                  GetReliableMessageMgr()->GetTickCounterFromTimeDelta(System::Clock::GetMonotonicMilliseconds()));
+        mNextAckTimeTick = static_cast<uint16_t>(
+            CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK +
+            GetReliableMessageMgr()->GetTickCounterFromTimeDelta(System::SystemClock().GetMonotonicMilliseconds()));
         return CHIP_NO_ERROR;
     }
 }

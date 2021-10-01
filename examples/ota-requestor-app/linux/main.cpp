@@ -64,7 +64,8 @@ chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
 Device * providerDevice                        = nullptr;
 BdxDownloader bdxDownloader;
 void OnQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-                          chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
+                          uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
+                          chip::ByteSpan metadataForRequestor)
 {
     ChipLogDetail(SoftwareUpdate, "%s", __FUNCTION__);
 
@@ -113,11 +114,10 @@ void OnConnection(void * context, Device * device)
     chip::Callback::Cancelable * failureCallback = mOnQueryFailureCallback.Cancel();
 
     // These QueryImage params have been chosen arbitrarily
-    constexpr VendorId kExampleVendorId      = VendorId::Common;
-    constexpr uint16_t kExampleProductId     = 77;
-    constexpr uint16_t kExampleImageType     = 0;
-    constexpr uint16_t kExampleHWVersion     = 3;
-    constexpr uint16_t kExampleCurentVersion = 0;
+    constexpr VendorId kExampleVendorId        = VendorId::Common;
+    constexpr uint16_t kExampleProductId       = 77;
+    constexpr uint16_t kExampleHWVersion       = 3;
+    constexpr uint16_t kExampleSoftwareVersion = 0;
     constexpr uint8_t kExampleProtocolsSupported =
         EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS; // TODO: support this as a list once ember adds list support
     const uint8_t locationBuf[] = { 'U', 'S' };
@@ -131,9 +131,9 @@ void OnConnection(void * context, Device * device)
         ChipLogError(SoftwareUpdate, "Associate() failed: %s", chip::ErrorStr(err));
         return;
     }
-    err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleImageType,
-                             kExampleHWVersion, kExampleCurentVersion, kExampleProtocolsSupported, exampleLocation,
-                             kExampleClientCanConsent, metadata);
+    err = cluster.QueryImage(successCallback, failureCallback, kExampleVendorId, kExampleProductId, kExampleHWVersion,
+                             kExampleSoftwareVersion, kExampleProtocolsSupported, exampleLocation, kExampleClientCanConsent,
+                             metadata);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "QueryImage() failed: %s", chip::ErrorStr(err));

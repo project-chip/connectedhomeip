@@ -26,7 +26,6 @@ jobs:
     unit_tests:
         name: Unit / Interation Tests
         timeout-minutes: 60
-        
         if: github.actor != 'restyled-io[bot]'
 
         strategy:
@@ -88,7 +87,7 @@ jobs:
               timeout-minutes: 5
               run: scripts/build/gn_build.sh
             - name: Run Tests
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: RUN_HAPPY_TESTS=1 scripts/tests/gn_tests.sh
             - name: Uploading Happy Test Log
               uses: actions/upload-artifact@v2

@@ -56,8 +56,8 @@ void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::Cluster
             break;
 
         case ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID:
-            Attributes::GetTargetPositionLiftPercent100ths(endpoint, &target);
-            Attributes::GetCurrentPositionLiftPercent100ths(endpoint, &current);
+            Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &target);
+            Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, &current);
             if (current > target)
             {
                 app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftDown, endpoint));
@@ -69,8 +69,8 @@ void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::Cluster
             break;
 
         case ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID:
-            Attributes::GetTargetPositionTiltPercent100ths(endpoint, &target);
-            Attributes::GetCurrentPositionTiltPercent100ths(endpoint, &current);
+            Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &target);
+            Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, &current);
             if (current > target)
             {
                 app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltDown, endpoint));

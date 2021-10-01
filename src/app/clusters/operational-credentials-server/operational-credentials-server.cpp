@@ -170,7 +170,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     }
 
     if (err == CHIP_NO_ERROR &&
-        app::Clusters::OperationalCredentials::Attributes::SetCommissionedFabrics(0, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+        app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::Set(0, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fabrics",
                        fabricIndex);
@@ -178,7 +178,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     }
 
     if (err == CHIP_NO_ERROR &&
-        app::Clusters::OperationalCredentials::Attributes::SetSupportedFabrics(0, CHIP_CONFIG_MAX_DEVICE_ADMINS) !=
+        app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::Set(0, CHIP_CONFIG_MAX_DEVICE_ADMINS) !=
             EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write %" PRIu8 " in supported fabrics count attribute",

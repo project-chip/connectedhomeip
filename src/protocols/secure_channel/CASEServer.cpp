@@ -31,7 +31,7 @@ namespace chip {
 
 CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
                                                      Ble::BleLayer * bleLayer, SessionManager * sessionManager,
-                                                     Transport::FabricTable * fabrics, SessionIDAllocator * idAllocator)
+                                                     FabricTable * fabrics, SessionIDAllocator * idAllocator)
 {
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

@@ -35,8 +35,9 @@ using namespace chip;
 using chip::app::clusters::OTAProviderDelegate;
 
 namespace {
-constexpr size_t kMaxMetadataLen         = 512; // The maximum length of Metadata in any OTA Provider command
-constexpr size_t kUpdateTokenParamLength = 32;  // The expected length of the Update Token parameter used in multiple commands
+constexpr size_t kMaxMetadataLen       = 512; // The maximum length of Metadata in any OTA Provider command
+constexpr size_t kUpdateTokenMaxLength = 32;  // The expected length of the Update Token parameter used in multiple commands
+constexpr size_t kUpdateTokenMinLength = 8;   // The expected length of the Update Token parameter used in multiple commands
 
 OTAProviderDelegate * gDelegateTable[EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
 
@@ -80,9 +81,9 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(EndpointI
         return true;
     }
 
-    if (updateToken.size() != kUpdateTokenParamLength)
+    if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenParamLength, updateToken.size());
+        ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenMaxLength, updateToken.size());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
@@ -100,12 +101,13 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(EndpointI
  *
  *
  * @param updateToken Identifier for the Software Image that was applied. Should be 32 octets long.
- * @param currentVersion The current SoftwareVersion value. Should match the SoftwarVersion attribute in the
+ * @param softwareVersion The current SoftwareVersion value. Should match the SoftwarVersion attribute in the
  *                       OTA Requestor's Basic Information Cluster.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                        ByteSpan updateToken, uint32_t currentVersion)
+bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::EndpointId endpoint,
+                                                                        chip::app::CommandHandler * commandObj,
+                                                                        chip::ByteSpan updateToken, uint32_t softwareVersion)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
@@ -117,13 +119,13 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(Endpoint
         return true;
     }
 
-    if (updateToken.size() != kUpdateTokenParamLength)
+    if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenParamLength, updateToken.size());
+        ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenMaxLength, updateToken.size());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    status = delegate->HandleNotifyUpdateApplied(updateToken, currentVersion);
+    status = delegate->HandleNotifyUpdateApplied(updateToken, softwareVersion);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
@@ -140,7 +142,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(Endpoint
  * @param imageType A Vendor-specific numerical value that may help an OTA Provider select the correct payload.
  * @param hardwareVersion The OTA Requestor’s hardware version. Should match the HardwareVersion attribute of the Client's Basic
  *                        Information Cluster.
- * @param currentVersion The current version running on the OTA Requestor. Should match the SoftwareVersion attribute of the
+ * @param softwareVersion The current version running on the OTA Requestor. Should match the SoftwareVersion attribute of the
  * Client's Basic Information Cluster.
  * @param protocolsSupported A list of OTADownloadProtocol enum values indicating download protocols supported by the OTA Requestor
  *                           (max length 8 entries).
@@ -149,12 +151,11 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(Endpoint
  * @param metadataForProvider Optional, max 512 octets. A TLV-encoded Vendor-specific payload.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                               uint16_t vendorId, uint16_t productId, uint16_t imageType,
-                                                               uint16_t hardwareVersion, uint32_t currentVersion,
-                                                               /* TODO(#8605): change this to list */ uint8_t protocolsSupported,
-                                                               uint8_t * location, bool clientCanConsent,
-                                                               ByteSpan metadataForProvider)
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                               uint16_t vendorId, uint16_t productId, uint16_t hardwareVersion,
+                                                               uint32_t softwareVersion, uint8_t protocolsSupported,
+                                                               uint8_t * location, bool requestorCanConsent,
+                                                               chip::ByteSpan metadataForProvider)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
@@ -177,8 +178,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(EndpointId endpoi
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    status = delegate->HandleQueryImage(commandObj, vendorId, productId, imageType, hardwareVersion, currentVersion,
-                                        protocolsSupported, locationSpan, clientCanConsent, metadataForProvider);
+    status = delegate->HandleQueryImage(commandObj, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
+                                        locationSpan, requestorCanConsent, metadataForProvider);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);

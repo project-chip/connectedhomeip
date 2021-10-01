@@ -68,17 +68,18 @@ class Esp32App(Enum):
         return self.AppNamePrefix + '.flashbundle.txt'
 
 
-def DefaultsFileName(board: Esp32Board, app: Esp32App):
+def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
     if app != Esp32App.ALL_CLUSTERS:
         # only all-clusters has a specific defaults name
         return None
 
+    rpc = "_rpc" if enable_rpcs else ""
     if board == Esp32Board.DevKitC:
-        return 'sdkconfig.defaults'
+        return 'sdkconfig{}.defaults'.format(rpc)
     elif board == Esp32Board.M5Stack:
-        return 'sdkconfig_m5stack.defaults'
+        return 'sdkconfig_m5stack{}.defaults'.format(rpc)
     elif board == Esp32Board.C3DevKit:
-        return 'sdkconfig_c3devkit.defaults'
+        return 'sdkconfig_c3devkit{}.defaults'.format(rpc)
     else:
         raise Exception('Unknown board type')
 
@@ -90,10 +91,12 @@ class Esp32Builder(Builder):
                  runner,
                  output_prefix: str,
                  board: Esp32Board = Esp32Board.M5Stack,
-                 app: Esp32App = Esp32App.ALL_CLUSTERS):
+                 app: Esp32App = Esp32App.ALL_CLUSTERS,
+                 enable_rpcs: bool = False):
         super(Esp32Builder, self).__init__(root, runner, output_prefix)
         self.board = board
         self.app = app
+        self.enable_rpcs = enable_rpcs
 
     def _IdfEnvExecute(self, cmd, cwd=None, title=None):
         self._Execute(
@@ -105,7 +108,7 @@ class Esp32Builder(Builder):
         if os.path.exists(os.path.join(self.output_dir, 'build.ninja')):
             return
 
-        defaults = DefaultsFileName(self.board, self.app)
+        defaults = DefaultsFileName(self.board, self.app, self.enable_rpcs)
 
         cmd = 'idf.py'
 

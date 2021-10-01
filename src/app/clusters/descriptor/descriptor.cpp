@@ -57,7 +57,7 @@ EmberAfStatus writeAttribute(EndpointId endpoint, AttributeId attributeId, uint8
 EmberAfStatus writeClientServerAttribute(EndpointId endpoint, bool server)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
-    AttributeId attributeId = server ? Descriptor::Attributes::Ids::ServerList : Descriptor::Attributes::Ids::ClientList;
+    AttributeId attributeId = server ? Descriptor::Attributes::ServerList::Id : Descriptor::Attributes::ClientList::Id;
 
     uint16_t clusterCount = emberAfClusterCount(endpoint, server);
 
@@ -85,7 +85,7 @@ EmberAfStatus writeClientAttribute(EndpointId endpoint)
 EmberAfStatus writeDeviceAttribute(EndpointId endpoint, uint16_t index)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
-    AttributeId attributeId = Descriptor::Attributes::Ids::DeviceList;
+    AttributeId attributeId = Descriptor::Attributes::DeviceList::Id;
 
     uint16_t deviceTypeCount  = 1;
     DeviceTypeId deviceTypeId = emberAfDeviceIdFromIndex(index);
@@ -104,7 +104,7 @@ EmberAfStatus writeDeviceAttribute(EndpointId endpoint, uint16_t index)
 EmberAfStatus writePartsAttribute(EndpointId endpoint)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
-    AttributeId attributeId = Descriptor::Attributes::Ids::PartsList;
+    AttributeId attributeId = Descriptor::Attributes::PartsList::Id;
 
     uint16_t partsCount = 0;
 

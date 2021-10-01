@@ -36,16 +36,20 @@
 #include <sys/time.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#include <stdint.h>
+
 namespace chip {
 namespace System {
 
 class ClockBase
 {
 public:
+    using Tick = uint64_t;
+    static_assert(std::is_unsigned<Tick>::value, "Tick must be unsigned");
+
     // Note: these provide documentation, not type safety.
-    using MonotonicMicroseconds = uint64_t;
-    using MonotonicMilliseconds = uint64_t;
-    using UnixTimeMicroseconds  = uint64_t;
+    using MonotonicMicroseconds = Tick;
+    using MonotonicMilliseconds = Tick;
 
     virtual ~ClockBase() = default;
 
@@ -90,40 +94,52 @@ public:
 };
 
 namespace Internal {
-// These should only be used via the public Clock:: functions below.
-extern ClockImpl gClockImpl;
+// This should only be used via SystemClock() below.
 extern ClockBase * gClockBase;
 } // namespace Internal
+
+inline ClockBase & SystemClock()
+{
+    return *Internal::gClockBase;
+}
+
+inline void SetSystemClockForTesting(System::ClockBase * clock)
+{
+    Internal::gClockBase = clock;
+}
 
 namespace Clock {
 using MonotonicMicroseconds = ClockBase::MonotonicMicroseconds;
 using MonotonicMilliseconds = ClockBase::MonotonicMicroseconds;
-using UnixTimeMicroseconds  = ClockBase::MonotonicMicroseconds;
 
+// DO NOT USE - Temporary backward compatibility functions. TODO: remove.
 inline MonotonicMicroseconds GetMonotonicMicroseconds()
 {
-    return Internal::gClockBase->GetMonotonicMicroseconds();
+    return SystemClock().GetMonotonicMicroseconds();
 }
-
 inline MonotonicMilliseconds GetMonotonicMilliseconds()
 {
-    return Internal::gClockBase->GetMonotonicMilliseconds();
+    return SystemClock().GetMonotonicMilliseconds();
 }
 
 /**
- *  Compares two Clock::MonotonicMilliseconds values and returns true if the first value is earlier than the second value.
+ *  Compares two time values and returns true if the first value is earlier than the second value.
  *
- *  @brief
- *      A static API that gets called to compare 2 time values.  This API attempts to account for timer wrap by assuming that
- * the difference between the 2 input values will only be more than half the timestamp scalar range if a timer wrap has occurred
- *      between the 2 samples.
+ *  A static API that gets called to compare 2 time values. This API attempts to account for timer wrap by assuming that
+ *  the difference between the 2 input values will only be more than half the timestamp scalar range if a timer wrap has
+ *  occurred between the 2 samples.
  *
  *  @note
- *      This implementation assumes that Clock::MonotonicMilliseconds is an unsigned scalar type.
+ *      This implementation assumes that ClockBase::Tick is an unsigned scalar type.
  *
  *  @return true if the first param is earlier than the second, false otherwise.
  */
-bool IsEarlier(const Clock::MonotonicMilliseconds & first, const Clock::MonotonicMilliseconds & second);
+bool IsEarlier(const ClockBase::Tick & first, const ClockBase::Tick & second);
+
+/**
+ *  Returns a time value plus an offset, with the offset clamped below half the time range.
+ */
+ClockBase::Tick AddOffset(const ClockBase::Tick & base, const ClockBase::Tick & offset);
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 Clock::MonotonicMilliseconds TimevalToMilliseconds(const timeval & in);

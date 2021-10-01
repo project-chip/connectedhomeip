@@ -33,15 +33,15 @@ class OTAProviderDelegate
 {
 public:
     // TODO(#8605): protocolsSupported should be list of OTADownloadProtocol enums, not uint8_t
-    virtual EmberAfStatus HandleQueryImage(CommandHandler * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType,
-                                           uint16_t hardwareVersion, uint32_t currentVersion, uint8_t protocolsSupported,
-                                           const chip::Span<const char> & location, bool clientCanConsent,
+    virtual EmberAfStatus HandleQueryImage(CommandHandler * commandObj, uint16_t vendorId, uint16_t productId,
+                                           uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported,
+                                           const chip::Span<const char> & location, bool requestorCanConsent,
                                            const chip::ByteSpan & metadataForProvider) = 0;
 
     virtual EmberAfStatus HandleApplyUpdateRequest(CommandHandler * commandObj, const chip::ByteSpan & updateToken,
                                                    uint32_t newVersion) = 0;
 
-    virtual EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t currentVersion) = 0;
+    virtual EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t softwareVersion) = 0;
 
     virtual ~OTAProviderDelegate() = default;
 };
