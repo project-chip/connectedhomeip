@@ -28,7 +28,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/StackLock.h>
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -239,6 +238,7 @@ BleLayer * BLEManagerImpl::_GetBleLayer()
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     jbyteArray svcIdObj;
@@ -277,6 +277,7 @@ exit:
 
 bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     jbyteArray svcIdObj;
@@ -315,6 +316,7 @@ exit:
 
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     intptr_t tmpConnObj;
@@ -343,6 +345,7 @@ exit:
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
+    chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     intptr_t tmpConnObj;
@@ -379,6 +382,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                                       chip::System::PacketBufferHandle pBuf)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     jbyteArray svcIdObj;
@@ -438,6 +442,7 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     intptr_t tmpConnObj;
@@ -464,6 +469,7 @@ exit:
 
 void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -495,6 +501,7 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
 
 CHIP_ERROR BLEManagerImpl::HasFlag(BLEManagerImpl::Flags flag, bool & has)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     long f = static_cast<long>(flag);
 
     VerifyOrReturnLogError(mBLEManagerObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -517,6 +524,7 @@ CHIP_ERROR BLEManagerImpl::HasFlag(BLEManagerImpl::Flags flag, bool & has)
 
 CHIP_ERROR BLEManagerImpl::SetFlag(BLEManagerImpl::Flags flag, bool isSet)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     long jFlag      = static_cast<long>(flag);
     jboolean jIsSet = static_cast<jboolean>(isSet);
 

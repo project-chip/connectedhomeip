@@ -56,8 +56,6 @@ System::LayerSocketsLoop & SystemLayerSocketsLoop()
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
-    mChipStackLock = PTHREAD_MUTEX_INITIALIZER;
-
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 

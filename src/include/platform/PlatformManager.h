@@ -254,6 +254,18 @@ public:
     ~StackLock() { PlatformMgr().UnlockChipStack(); }
 };
 
+/**
+ * @brief
+ * RAII unlocking for PlatformManager to simplify management of
+ * LockChipStack()/UnlockChipStack calls.
+ */
+class StackUnlock
+{
+public:
+    StackUnlock() { PlatformMgr().UnlockChipStack(); }
+    ~StackUnlock() { PlatformMgr().LockChipStack(); }
+};
+
 } // namespace DeviceLayer
 } // namespace chip
 
