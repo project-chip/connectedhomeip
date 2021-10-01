@@ -21,12 +21,10 @@
 #include <app/Command.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 
-using chip::app::clusters::OTAProviderDelegate;
-
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.
  */
-class OTAProviderExample : public OTAProviderDelegate
+class OTAProviderExample : public chip::app::Clusters::OTAProviderDelegate
 {
 public:
     OTAProviderExample();

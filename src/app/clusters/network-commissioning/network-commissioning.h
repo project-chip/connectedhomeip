@@ -25,7 +25,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace NetworkCommissioning {
 EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::CommandHandler *, EndpointId,
                                                                            ByteSpan operationalDataset, uint64_t breadcrumb,
@@ -37,6 +37,6 @@ EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Com
                                                                         uint64_t breadcrumb, uint32_t timeoutMs);
 } // namespace NetworkCommissioning
 
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

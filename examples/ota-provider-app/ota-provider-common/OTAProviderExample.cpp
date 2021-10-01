@@ -34,7 +34,7 @@ using chip::ByteSpan;
 using chip::Span;
 using chip::app::CommandPathFlags;
 using chip::app::CommandPathParams;
-using chip::app::clusters::OTAProviderDelegate;
+using chip::app::Clusters::OTAProviderDelegate;
 using chip::TLV::ContextTag;
 using chip::TLV::TLVWriter;
 
