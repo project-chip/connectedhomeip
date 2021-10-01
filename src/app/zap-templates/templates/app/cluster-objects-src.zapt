@@ -7,9 +7,8 @@
 namespace chip {
 namespace app {
 namespace clusters {
-{{#all_user_clusters}}
-{{#if (user_cluster_has_enabled_command name side)}}
-namespace {{asCamelCased name false}} {
+{{#zcl_clusters}}
+namespace {{asUpperCamelCase name}} {
 {{#zcl_structs}}
 namespace {{asType label}} {
 CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) const{
@@ -91,8 +90,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 {{/zcl_structs}}
 }
 
-{{/if}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
 } // namespace clusters
 } // namespace app
