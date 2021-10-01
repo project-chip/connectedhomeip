@@ -475,6 +475,8 @@ public:
     IdentifyClusterTest() : IdentifyCluster() {}
     ~IdentifyClusterTest() {}
 
+    CHIP_ERROR WriteAttributeIdentifyType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

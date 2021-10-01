@@ -823,9 +823,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)identify:(uint16_t)identifyTime responseHandler:(ResponseHandler)responseHandler;
 - (void)identifyQuery:(ResponseHandler)responseHandler;
+- (void)triggerEffect:(uint8_t)effectIdentifier
+        effectVariant:(uint8_t)effectVariant
+      responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeIdentifyTimeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeIdentifyTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeIdentifyTypeWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
