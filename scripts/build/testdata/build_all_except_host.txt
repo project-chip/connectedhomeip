@@ -163,7 +163,7 @@ source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {root}/examples/lighting-app/telink'
 
 # Generating tizen-arm-light
-bash -c 'gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '"'"'--args= target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"'"'"' {out}/tizen-arm-light'
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light
 
 # Building JNI android-arm-chip-tool
 ninja -C {out}/android-arm-chip-tool
