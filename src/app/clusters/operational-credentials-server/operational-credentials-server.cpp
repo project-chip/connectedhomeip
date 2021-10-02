@@ -270,8 +270,10 @@ FabricCleanupExchangeDelegate gFabricCleanupExchangeDelegate;
 
 } // namespace
 
-bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                              FabricIndex fabricBeingRemoved)
+bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                              FabricIndex fabricBeingRemoved,
+                                                              Commands::RemoveFabric::DecodableType & fields)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
@@ -304,8 +306,10 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                   uint8_t * Label)
+bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandHandler * commandObj,
+                                                                   const app::ConcreteCommandPath & commandPath,
+                                                                   EndpointId endpoint, uint8_t * Label,
+                                                                   Commands::UpdateFabricLabel::DecodableType & fields)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
 
@@ -395,9 +399,11 @@ bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(EndpointId end
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCValue,
-                                                        ByteSpan ICACValue, ByteSpan IPKValue, NodeId adminNodeId,
-                                                        uint16_t adminVendorId)
+bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * commandObj,
+                                                        const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                        ByteSpan NOCValue, ByteSpan ICACValue, ByteSpan IPKValue,
+                                                        NodeId adminNodeId, uint16_t adminVendorId,
+                                                        Commands::AddNOC::DecodableType & fields)
 {
     EmberAfNodeOperationalCertStatus nocResponse = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
 
@@ -436,8 +442,10 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterUpdateNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCValue,
-                                                           ByteSpan ICACValue)
+bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler * commandObj,
+                                                           const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                           ByteSpan NOCValue, ByteSpan ICACValue,
+                                                           Commands::UpdateNOC::DecodableType & fields)
 {
     EmberAfNodeOperationalCertStatus nocResponse = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
 
@@ -476,8 +484,10 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                         uint8_t certificateType)
+bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(app::CommandHandler * commandObj,
+                                                                         const app::ConcreteCommandPath & commandPath,
+                                                                         EndpointId endpoint, uint8_t certificateType,
+                                                                         Commands::CertificateChainRequest::DecodableType & fields)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -532,8 +542,10 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAttestationRequestCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                    ByteSpan attestationNonce)
+bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::CommandHandler * commandObj,
+                                                                    const app::ConcreteCommandPath & commandPath,
+                                                                    EndpointId endpoint, ByteSpan attestationNonce,
+                                                                    Commands::AttestationRequest::DecodableType & fields)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -616,8 +628,9 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                              ByteSpan CSRNonce)
+bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                              ByteSpan CSRNonce, Commands::OpCSRRequest::DecodableType & fields)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -692,8 +705,9 @@ bool emberAfOperationalCredentialsClusterUpdateOpCertCallback(EndpointId endpoin
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                           ByteSpan RootCertificate)
+bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, ByteSpan RootCertificate,
+    Commands::AddTrustedRootCertificate::DecodableType & fields)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -712,8 +726,9 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                              ByteSpan TrustedRootIdentifier)
+bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+    ByteSpan TrustedRootIdentifier, Commands::RemoveTrustedRootCertificate::DecodableType & fields)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);

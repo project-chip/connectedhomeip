@@ -49,8 +49,9 @@ exit:
     }
 }
 
-bool emberAfAccountLoginClusterGetSetupPINCallback(EndpointId endpoint, app::CommandHandler * command,
-                                                   uint8_t * tempAccountIdentifier)
+bool emberAfAccountLoginClusterGetSetupPINCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                   EndpointId endpoint, uint8_t * tempAccountIdentifier,
+                                                   Commands::GetSetupPIN::DecodableType & fields)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));
@@ -59,8 +60,9 @@ bool emberAfAccountLoginClusterGetSetupPINCallback(EndpointId endpoint, app::Com
     return true;
 }
 
-bool emberAfAccountLoginClusterLoginCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t * tempAccountIdentifier,
-                                             uint8_t * tempSetupPin)
+bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                             EndpointId endpoint, uint8_t * tempAccountIdentifier, uint8_t * tempSetupPin,
+                                             Commands::Login::DecodableType & fields)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));

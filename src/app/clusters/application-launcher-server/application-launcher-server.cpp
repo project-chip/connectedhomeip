@@ -34,7 +34,9 @@ using namespace chip;
 
 ApplicationLauncherResponse applicationLauncherClusterLaunchApp(ApplicationLauncherApp application, std::string data);
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t *, uint8_t *)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * commandObj,
+                                                        const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                        uint8_t *, uint8_t *, Commands::LaunchApp::DecodableType & fields)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
@@ -67,8 +69,10 @@ ApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, uint8
     return application;
 }
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t * requestData,
-                                                        uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                        EndpointId endpoint, uint8_t * requestData,
+                                                        uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId,
+                                                        Commands::LaunchApp::DecodableType & fields)
 {
     ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
     // TODO: Char is not null terminated, verify this code once #7963 gets merged.

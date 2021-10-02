@@ -32,10 +32,10 @@ using namespace chip;
 // Specifications section 5.4.2.3. Announcement Duration
 constexpr uint32_t kMaxCommissionioningTimeoutSeconds = 15 * 60;
 
-bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                             uint16_t commissioningTimeout, ByteSpan pakeVerifier,
-                                                                             uint16_t discriminator, uint32_t iterations,
-                                                                             ByteSpan salt, uint16_t passcodeID)
+bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+    uint16_t commissioningTimeout, ByteSpan pakeVerifier, uint16_t discriminator, uint32_t iterations, ByteSpan salt,
+    uint16_t passcodeID, Commands::OpenCommissioningWindow::DecodableType & fields)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     PASEVerifier verifier;
@@ -70,9 +70,9 @@ exit:
     return true;
 }
 
-bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(EndpointId endpoint,
-                                                                                  app::CommandHandler * commandObj,
-                                                                                  uint16_t commissioningTimeout)
+bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+    uint16_t commissioningTimeout, Commands::OpenBasicCommissioningWindow::DecodableType & fields)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
@@ -93,7 +93,10 @@ exit:
     return true;
 }
 
-bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(app::CommandHandler * commandObj,
+                                                                         const app::ConcreteCommandPath & commandPath,
+                                                                         EndpointId endpoint,
+                                                                         Commands::RevokeCommissioning::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "Received command to close commissioning window");
     Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();

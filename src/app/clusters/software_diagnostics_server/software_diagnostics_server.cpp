@@ -94,7 +94,9 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMan
 }
 } // anonymous namespace
 
-bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                              Commands::ResetWatermarks::DecodableType & fields)
 {
     uint64_t currentHeapUsed;
 

@@ -20,8 +20,11 @@
 
 using namespace chip;
 
-bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t intent,
-                                                             uint8_t requestedProtocol, ByteSpan transferFileDesignator)
+bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(app::CommandHandler * commandObj,
+                                                             const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                             uint8_t intent, uint8_t requestedProtocol,
+                                                             ByteSpan transferFileDesignator,
+                                                             Commands::RetrieveLogsRequest::DecodableType & fields)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);

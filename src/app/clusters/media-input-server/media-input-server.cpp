@@ -46,7 +46,8 @@ static void storeCurrentInput(EndpointId endpoint, uint8_t currentInput)
     }
 }
 
-bool emberAfMediaInputClusterSelectInputCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t input)
+bool emberAfMediaInputClusterSelectInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                 EndpointId endpoint, uint8_t input, Commands::SelectInput::DecodableType & fields)
 {
     bool success         = mediaInputClusterSelectInput(input);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -58,7 +59,8 @@ bool emberAfMediaInputClusterSelectInputCallback(EndpointId endpoint, app::Comma
     return true;
 }
 
-bool emberAfMediaInputClusterShowInputStatusCallback(EndpointId endpoint, app::CommandHandler * command)
+bool emberAfMediaInputClusterShowInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     EndpointId endpoint, Commands::ShowInputStatus::DecodableType & fields)
 {
     bool success         = mediaInputClusterShowInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -66,7 +68,8 @@ bool emberAfMediaInputClusterShowInputStatusCallback(EndpointId endpoint, app::C
     return true;
 }
 
-bool emberAfMediaInputClusterHideInputStatusCallback(EndpointId endpoint, app::CommandHandler * command)
+bool emberAfMediaInputClusterHideInputStatusCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                     EndpointId endpoint, Commands::HideInputStatus::DecodableType & fields)
 {
     bool success         = mediaInputClusterHideInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -74,7 +77,9 @@ bool emberAfMediaInputClusterHideInputStatusCallback(EndpointId endpoint, app::C
     return true;
 }
 
-bool emberAfMediaInputClusterRenameInputCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t input, uint8_t * name)
+bool emberAfMediaInputClusterRenameInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                 EndpointId endpoint, uint8_t input, uint8_t * name,
+                                                 Commands::RenameInput::DecodableType & fields)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string nameString(reinterpret_cast<char *>(name));

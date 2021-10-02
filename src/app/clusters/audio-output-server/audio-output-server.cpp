@@ -30,8 +30,9 @@ using namespace chip;
 bool audioOutputClusterSelectOutput(uint8_t index);
 bool audioOutputClusterRenameOutput(uint8_t index, uint8_t * name);
 
-bool emberAfAudioOutputClusterRenameOutputCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t index,
-                                                   uint8_t * name)
+bool emberAfAudioOutputClusterRenameOutputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                   EndpointId endpoint, uint8_t index, uint8_t * name,
+                                                   Commands::RenameOutput::DecodableType & fields)
 {
     bool success         = audioOutputClusterRenameOutput(index, name);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -39,7 +40,9 @@ bool emberAfAudioOutputClusterRenameOutputCallback(EndpointId endpoint, app::Com
     return true;
 }
 
-bool emberAfAudioOutputClusterSelectOutputCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t index)
+bool emberAfAudioOutputClusterSelectOutputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                   EndpointId endpoint, uint8_t index,
+                                                   Commands::SelectOutput::DecodableType & fields)
 {
     bool success         = audioOutputClusterSelectOutput(index);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;

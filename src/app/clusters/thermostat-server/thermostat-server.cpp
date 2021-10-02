@@ -253,27 +253,35 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
     return status;
 }
 
-bool emberAfThermostatClusterClearWeeklyScheduleCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj)
+bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * commandObj,
+                                                         const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
+                                                         Commands::ClearWeeklySchedule::DecodableType & fields)
 {
     // TODO
     return false;
 }
-bool emberAfThermostatClusterGetRelayStatusLogCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj)
+bool emberAfThermostatClusterGetRelayStatusLogCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
+                                                       Commands::GetRelayStatusLog::DecodableType & fields)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterGetWeeklyScheduleCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj,
-                                                       uint8_t daysToReturn, uint8_t modeToReturn)
+bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
+                                                       uint8_t daysToReturn, uint8_t modeToReturn,
+                                                       Commands::GetWeeklySchedule::DecodableType & fields)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterSetWeeklyScheduleCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj,
+bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
                                                        uint8_t numberOfTransitionsForSequence, uint8_t daysOfWeekForSequence,
-                                                       uint8_t modeForSequence, uint8_t * payload)
+                                                       uint8_t modeForSequence, uint8_t * payload,
+                                                       Commands::SetWeeklySchedule::DecodableType & fields)
 {
     // TODO
     return false;
@@ -422,8 +430,10 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
 
     return CoolingSetpoint;
 }
-bool emberAfThermostatClusterSetpointRaiseLowerCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj,
-                                                        uint8_t mode, int8_t amount)
+bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * commandObj,
+                                                        const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
+                                                        uint8_t mode, int8_t amount,
+                                                        Commands::SetpointRaiseLower::DecodableType & fields)
 {
     int16_t HeatingSetpoint = kDefaultHeatingSetpoint, CoolingSetpoint = kDefaultCoolingSetpoint; // Set to defaults to be safe
     EmberAfStatus status                     = EMBER_ZCL_STATUS_FAILURE;
