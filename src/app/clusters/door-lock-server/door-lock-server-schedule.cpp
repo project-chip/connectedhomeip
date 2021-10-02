@@ -40,13 +40,16 @@
 #include "door-lock-server.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/util/af.h>
 
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::DoorLock;
 
 static EmberAfPluginDoorLockServerWeekdayScheduleEntry
     weekdayScheduleTable[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE];

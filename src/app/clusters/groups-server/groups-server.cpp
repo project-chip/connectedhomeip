@@ -50,8 +50,10 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 
@@ -60,6 +62,7 @@
 #endif // EMBER_AF_PLUGIN_SCENES
 
 using namespace chip;
+using namespace chip::app::Clusters::Groups;
 
 static bool isGroupPresent(EndpointId endpoint, GroupId groupId);
 

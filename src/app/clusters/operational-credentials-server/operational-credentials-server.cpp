@@ -25,9 +25,11 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
@@ -48,6 +50,7 @@
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
+using namespace chip::app::Clusters::OperationalCredentials;
 
 namespace {
 
@@ -101,7 +104,7 @@ EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nod
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    FabricDescriptor * fabricDescriptor = chip::Platform::New<FabricDescriptor>();
+    auto * fabricDescriptor = chip::Platform::New<::FabricDescriptor>();
     VerifyOrReturnError(fabricDescriptor != nullptr, EMBER_ZCL_STATUS_FAILURE);
 
     fabricDescriptor->FabricIndex   = fabricIndex;
@@ -169,17 +172,14 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    if (err == CHIP_NO_ERROR &&
-        app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::Set(0, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+    if (err == CHIP_NO_ERROR && Attributes::CommissionedFabrics::Set(0, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fabrics",
                        fabricIndex);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    if (err == CHIP_NO_ERROR &&
-        app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::Set(0, CHIP_CONFIG_MAX_DEVICE_ADMINS) !=
-            EMBER_ZCL_STATUS_SUCCESS)
+    if (err == CHIP_NO_ERROR && Attributes::SupportedFabrics::Set(0, CHIP_CONFIG_MAX_DEVICE_ADMINS) != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write %" PRIu8 " in supported fabrics count attribute",
                        CHIP_CONFIG_MAX_DEVICE_ADMINS);

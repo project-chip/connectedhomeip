@@ -20,7 +20,9 @@
  * @brief Implementation for the Administrator Commissioning Cluster
  ***************************************************************************/
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CodeUtils.h>
@@ -28,6 +30,7 @@
 #include <setup_payload/SetupPayload.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::AdministratorCommissioning;
 
 // Specifications section 5.4.2.3. Announcement Duration
 constexpr uint32_t kMaxCommissionioningTimeoutSeconds = 15 * 60;

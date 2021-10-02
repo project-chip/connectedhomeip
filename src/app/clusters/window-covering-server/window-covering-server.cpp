@@ -37,8 +37,10 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af-types.h>
@@ -51,6 +53,7 @@
 #include <app/clusters/scenes/scenes.h>
 #endif // EMBER_AF_PLUGIN_SCENES
 
+using namespace chip;
 using namespace chip::app::Clusters::WindowCovering;
 
 #define WC_PERCENT100THS_MAX 10000
@@ -417,7 +420,8 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
  * @brief  Cluster StopMotion Command callback (from client)
  */
 bool __attribute__((weak))
-emberAfWindowCoveringClusterStopMotionCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                               EndpointId endpoint, Commands::StopMotion::DecodableType & fields)
 {
     emberAfWindowCoveringClusterPrint("StopMotion command received");
 

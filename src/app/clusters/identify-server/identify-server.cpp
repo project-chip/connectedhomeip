@@ -38,11 +38,13 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 
 #include <app/util/af.h>
 #include <app/util/common.h>
@@ -60,6 +62,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters::Identify;
 
 static std::array<Identify *, EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT> instances = { 0 };
 

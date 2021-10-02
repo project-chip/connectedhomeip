@@ -21,10 +21,12 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 
 #include <app/Command.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -103,9 +105,9 @@ static void sendResponse(const char * responseName, ContentLaunchResponse launch
     }
 }
 
-bool emberAfContentLauncherClusterLaunchContentCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                        EndpointId endpoint, bool autoplay, unsigned char * data,
-                                                        Commands::LaunchContent::DecodableType & commandData)
+bool emberAfContentLauncherClusterLaunchContentCallback(
+    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
+    bool autoplay, unsigned char * data, chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
 
     string dataString(reinterpret_cast<char *>(data));
@@ -115,9 +117,10 @@ bool emberAfContentLauncherClusterLaunchContentCallback(app::CommandHandler * co
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                    EndpointId endpoint, unsigned char * contentUrl, unsigned char * displayString,
-                                                    Commands::LaunchURL::DecodableType & commandData)
+bool emberAfContentLauncherClusterLaunchURLCallback(
+    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
+    unsigned char * contentUrl, unsigned char * displayString,
+    chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
     string contentUrlString(reinterpret_cast<char *>(contentUrl));
     string displayStringString(reinterpret_cast<char *>(displayString));
