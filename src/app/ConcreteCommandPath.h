@@ -31,14 +31,11 @@ namespace app {
 struct ConcreteCommandPath
 {
     ConcreteCommandPath(EndpointId aEndpointId, ClusterId aClusterId, CommandId aCommandId) :
-        mEndpointId(aEndpointId),
-        mClusterId(aClusterId), mCommandId(aCommandId)
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mCommandId(aCommandId)
     {}
 
     ConcreteCommandPath(EndpointId aEndpointId, ClusterId aClusterId, CommandId aCommandId, CommandId aResponseId) :
-        mEndpointId(aEndpointId),
-        mClusterId(aClusterId), mCommandId(aCommandId),
-        mResponseCommand(aResponseId)
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mCommandId(aCommandId), mResponseCommand(aResponseId)
     {}
 
     const EndpointId mEndpointId = 0;
