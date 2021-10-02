@@ -12,8 +12,8 @@ namespace chip {
 namespace app {
 namespace clusters {
 
-{{#all_user_clusters}}
-namespace {{asCamelCased name false}} {
+{{#zcl_clusters}}
+namespace {{asUpperCamelCase name}} {
 {{#zcl_enums}}
 // Enum for {{label}}
 enum class {{asType label}} : {{asUnderlyingZclType type}} {
@@ -60,11 +60,11 @@ namespace {{name}} {
     };
     {{/if}}
 
-}// namespace for {{name}}
+} // namespace {{name}}
 {{/zcl_structs}}
 
-}// namespace for {{name}}
-{{/all_user_clusters}}
+} // namespace {{asUpperCamelCase name}}
+{{/zcl_clusters}}
 
 } // namespace clusters
 } // namespace app
