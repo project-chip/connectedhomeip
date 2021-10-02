@@ -21,13 +21,16 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/DeviceControlServer.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::GeneralCommissioning;
 
 bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler * commandObj,
                                                            const app::ConcreteCommandPath & commandPath, EndpointId endpoint,

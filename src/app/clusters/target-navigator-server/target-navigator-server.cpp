@@ -24,13 +24,16 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::TargetNavigator;
 
 TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data);
 

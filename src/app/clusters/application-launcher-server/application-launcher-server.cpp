@@ -24,15 +24,18 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::ApplicationLauncher;
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(ApplicationLauncherApp application, std::string data);
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(::ApplicationLauncherApp application, std::string data);
 
 bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * commandObj,
                                                         const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
@@ -61,11 +64,11 @@ exit:
     }
 }
 
-ApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, uint8_t * applicationId)
+::ApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, uint8_t * applicationId)
 {
-    ApplicationLauncherApp application = {};
-    application.applicationId          = applicationId;
-    application.catalogVendorId        = catalogVendorId;
+    ::ApplicationLauncherApp application = {};
+    application.applicationId            = applicationId;
+    application.catalogVendorId          = catalogVendorId;
     return application;
 }
 
@@ -74,7 +77,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
                                                         uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId,
                                                         Commands::LaunchApp::DecodableType & fields)
 {
-    ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
+    ::ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
     // TODO: Char is not null terminated, verify this code once #7963 gets merged.
     std::string reqestDataString(reinterpret_cast<char *>(requestData));
     ApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);

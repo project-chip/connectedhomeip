@@ -15,10 +15,13 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::DiagnosticLogs;
 
 bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(app::CommandHandler * commandObj,
                                                              const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
