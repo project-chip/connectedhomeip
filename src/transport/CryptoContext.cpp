@@ -79,17 +79,17 @@ CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan
     //      44 D4 3C 91 D2 27 F3 BA 08 24 C5 D8 7C B8 1B 33
     //      AC C1 8F 06 C7 BC 9B E8 24 6A 67 8C B1 F8 BA 3D
 
-    const char * kTestSecret = "Test secret for key derivation";
-    size_t secretLen = strlen(kTestSecret);
+    const char * kTestSecret    = "Test secret for key derivation";
+    size_t secretLen            = strlen(kTestSecret);
     const ByteSpan & testSecret = ByteSpan(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen);
-    const ByteSpan & testSalt = ByteSpan(nullptr, 0);
+    const ByteSpan & testSalt   = ByteSpan(nullptr, 0);
     (void) info;
     (void) infoLen;
 
     ChipLogError(SecureChannel, "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation...");
 
-    ReturnErrorOnFailure(
-        mHKDF.HKDF_SHA256(testSecret.data(), testSecret.size(), testSalt.data(), testSalt.size(), SEKeysInfo, sizeof(SEKeysInfo), &mKeys[0][0], sizeof(mKeys)));
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(testSecret.data(), testSecret.size(), testSalt.data(), testSalt.size(), SEKeysInfo,
+                                           sizeof(SEKeysInfo), &mKeys[0][0], sizeof(mKeys)));
 
 #else
 
@@ -104,8 +104,9 @@ CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CryptoContext::InitFromKeyPair(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
-                                          const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
+CHIP_ERROR CryptoContext::InitFromKeyPair(const Crypto::P256Keypair & local_keypair,
+                                          const Crypto::P256PublicKey & remote_public_key, const ByteSpan & salt,
+                                          SessionInfoType infoType, SessionRole role)
 {
 
     VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
