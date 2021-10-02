@@ -10,7 +10,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
@@ -66,6 +66,6 @@ namespace {{name}} {
 } // namespace {{asUpperCamelCase name}}
 {{/zcl_clusters}}
 
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

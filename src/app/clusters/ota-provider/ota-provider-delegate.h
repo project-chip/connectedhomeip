@@ -24,8 +24,9 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 
+// TODO: Should this be OTAProvider::Delegate?
 /** @brief
  *    Defines methods for implementing application-specific logic for the OTA Provider Cluster.
  */
@@ -46,6 +47,6 @@ public:
     virtual ~OTAProviderDelegate() = default;
 };
 
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

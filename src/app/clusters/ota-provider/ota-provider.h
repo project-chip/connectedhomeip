@@ -22,12 +22,12 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace OTAProvider {
 
 void SetDelegate(chip::EndpointId endpointId, OTAProviderDelegate * delegate);
 
 }
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -6,7 +6,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
 {{#zcl_structs}}
@@ -92,6 +92,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 
 {{/zcl_clusters}}
 
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

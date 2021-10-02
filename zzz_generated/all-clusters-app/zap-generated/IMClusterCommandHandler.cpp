@@ -49,7 +49,7 @@ void ReportCommandUnsupported(Command * aCommandObj, EndpointId aEndpointId, Clu
 
 // Cluster specific command parsing
 
-namespace clusters {
+namespace Clusters {
 
 namespace AdministratorCommissioning {
 
@@ -68,7 +68,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id: {
+        case Commands::OpenBasicCommissioningWindow::Id: {
             expectArgumentCount = 1;
             uint16_t CommissioningTimeout;
             bool argExists[1];
@@ -127,7 +127,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Id: {
+        case Commands::OpenCommissioningWindow::Id: {
             expectArgumentCount = 6;
             uint16_t CommissioningTimeout;
             chip::ByteSpan PAKEVerifier;
@@ -206,14 +206,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Id: {
+        case Commands::RevokeCommissioning::Id: {
 
             wasHandled = emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::AdministratorCommissioning::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, AdministratorCommissioning::Id, aCommandId);
             return;
         }
         }
@@ -223,8 +223,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::AdministratorCommissioning::Id, aCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
+                                                AdministratorCommissioning::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -257,7 +256,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Id: {
+        case Commands::BarrierControlGoToPercent::Id: {
             expectArgumentCount = 1;
             uint8_t percentOpen;
             bool argExists[1];
@@ -315,14 +314,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::BarrierControl::Commands::BarrierControlStop::Id: {
+        case Commands::BarrierControlStop::Id: {
 
             wasHandled = emberAfBarrierControlClusterBarrierControlStopCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::BarrierControl::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, BarrierControl::Id, aCommandId);
             return;
         }
         }
@@ -332,7 +331,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::BarrierControl::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                BarrierControl::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -352,7 +351,7 @@ namespace Basic {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
-    ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::Basic::Id, aCommandId);
+    ReportCommandUnsupported(apCommandObj, aEndpointId, Basic::Id, aCommandId);
 }
 
 } // namespace Basic
@@ -374,7 +373,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::Binding::Commands::Bind::Id: {
+        case Commands::Bind::Id: {
             expectArgumentCount = 4;
             chip::NodeId nodeId;
             chip::GroupId groupId;
@@ -444,7 +443,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Binding::Commands::Unbind::Id: {
+        case Commands::Unbind::Id: {
             expectArgumentCount = 4;
             chip::NodeId nodeId;
             chip::GroupId groupId;
@@ -516,7 +515,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::Binding::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, Binding::Id, aCommandId);
             return;
         }
         }
@@ -526,7 +525,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::Binding::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                Binding::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -559,7 +558,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::ColorControl::Commands::ColorLoopSet::Id: {
+        case Commands::ColorLoopSet::Id: {
             expectArgumentCount = 7;
             uint8_t updateFlags;
             uint8_t action;
@@ -642,7 +641,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::EnhancedMoveHue::Id: {
+        case Commands::EnhancedMoveHue::Id: {
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint16_t rate;
@@ -713,7 +712,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::EnhancedMoveToHue::Id: {
+        case Commands::EnhancedMoveToHue::Id: {
             expectArgumentCount = 5;
             uint16_t enhancedHue;
             uint8_t direction;
@@ -788,7 +787,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id: {
+        case Commands::EnhancedMoveToHueAndSaturation::Id: {
             expectArgumentCount = 5;
             uint16_t enhancedHue;
             uint8_t saturation;
@@ -863,7 +862,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::EnhancedStepHue::Id: {
+        case Commands::EnhancedStepHue::Id: {
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint16_t stepSize;
@@ -938,7 +937,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::MoveColor::Id: {
+        case Commands::MoveColor::Id: {
             expectArgumentCount = 4;
             int16_t rateX;
             int16_t rateY;
@@ -1009,7 +1008,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::MoveColorTemperature::Id: {
+        case Commands::MoveColorTemperature::Id: {
             expectArgumentCount = 6;
             uint8_t moveMode;
             uint16_t rate;
@@ -1089,7 +1088,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::MoveHue::Id: {
+        case Commands::MoveHue::Id: {
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint8_t rate;
@@ -1160,7 +1159,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::MoveSaturation::Id: {
+        case Commands::MoveSaturation::Id: {
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint8_t rate;
@@ -1231,7 +1230,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::MoveToColor::Id: {
+        case Commands::MoveToColor::Id: {
             expectArgumentCount = 5;
             uint16_t colorX;
             uint16_t colorY;
@@ -1306,7 +1305,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::MoveToColorTemperature::Id: {
+        case Commands::MoveToColorTemperature::Id: {
             expectArgumentCount = 4;
             uint16_t colorTemperature;
             uint16_t transitionTime;
@@ -1377,7 +1376,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::MoveToHue::Id: {
+        case Commands::MoveToHue::Id: {
             expectArgumentCount = 5;
             uint8_t hue;
             uint8_t direction;
@@ -1452,7 +1451,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::MoveToHueAndSaturation::Id: {
+        case Commands::MoveToHueAndSaturation::Id: {
             expectArgumentCount = 5;
             uint8_t hue;
             uint8_t saturation;
@@ -1527,7 +1526,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::MoveToSaturation::Id: {
+        case Commands::MoveToSaturation::Id: {
             expectArgumentCount = 4;
             uint8_t saturation;
             uint16_t transitionTime;
@@ -1598,7 +1597,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::StepColor::Id: {
+        case Commands::StepColor::Id: {
             expectArgumentCount = 5;
             int16_t stepX;
             int16_t stepY;
@@ -1673,7 +1672,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::StepColorTemperature::Id: {
+        case Commands::StepColorTemperature::Id: {
             expectArgumentCount = 7;
             uint8_t stepMode;
             uint16_t stepSize;
@@ -1757,7 +1756,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::StepHue::Id: {
+        case Commands::StepHue::Id: {
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -1832,7 +1831,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::StepSaturation::Id: {
+        case Commands::StepSaturation::Id: {
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -1907,7 +1906,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::ColorControl::Commands::StopMoveStep::Id: {
+        case Commands::StopMoveStep::Id: {
             expectArgumentCount = 2;
             uint8_t optionsMask;
             uint8_t optionsOverride;
@@ -1972,7 +1971,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::ColorControl::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, ColorControl::Id, aCommandId);
             return;
         }
         }
@@ -1982,7 +1981,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::ColorControl::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                ColorControl::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -2015,7 +2014,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Id: {
+        case Commands::RetrieveLogsRequest::Id: {
             expectArgumentCount = 3;
             uint8_t intent;
             uint8_t requestedProtocol;
@@ -2084,7 +2083,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::DiagnosticLogs::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, DiagnosticLogs::Id, aCommandId);
             return;
         }
         }
@@ -2094,7 +2093,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::DiagnosticLogs::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                DiagnosticLogs::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -2127,17 +2126,17 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::DoorLock::Commands::ClearAllPins::Id: {
+        case Commands::ClearAllPins::Id: {
 
             wasHandled = emberAfDoorLockClusterClearAllPinsCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::DoorLock::Commands::ClearAllRfids::Id: {
+        case Commands::ClearAllRfids::Id: {
 
             wasHandled = emberAfDoorLockClusterClearAllRfidsCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::DoorLock::Commands::ClearHolidaySchedule::Id: {
+        case Commands::ClearHolidaySchedule::Id: {
             expectArgumentCount = 1;
             uint8_t scheduleId;
             bool argExists[1];
@@ -2195,7 +2194,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::ClearPin::Id: {
+        case Commands::ClearPin::Id: {
             expectArgumentCount = 1;
             uint16_t userId;
             bool argExists[1];
@@ -2253,7 +2252,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::ClearRfid::Id: {
+        case Commands::ClearRfid::Id: {
             expectArgumentCount = 1;
             uint16_t userId;
             bool argExists[1];
@@ -2311,7 +2310,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::ClearWeekdaySchedule::Id: {
+        case Commands::ClearWeekdaySchedule::Id: {
             expectArgumentCount = 2;
             uint8_t scheduleId;
             uint16_t userId;
@@ -2373,7 +2372,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::ClearYeardaySchedule::Id: {
+        case Commands::ClearYeardaySchedule::Id: {
             expectArgumentCount = 2;
             uint8_t scheduleId;
             uint16_t userId;
@@ -2435,7 +2434,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::GetHolidaySchedule::Id: {
+        case Commands::GetHolidaySchedule::Id: {
             expectArgumentCount = 1;
             uint8_t scheduleId;
             bool argExists[1];
@@ -2493,7 +2492,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::GetLogRecord::Id: {
+        case Commands::GetLogRecord::Id: {
             expectArgumentCount = 1;
             uint16_t logIndex;
             bool argExists[1];
@@ -2551,7 +2550,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::GetPin::Id: {
+        case Commands::GetPin::Id: {
             expectArgumentCount = 1;
             uint16_t userId;
             bool argExists[1];
@@ -2609,7 +2608,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::GetRfid::Id: {
+        case Commands::GetRfid::Id: {
             expectArgumentCount = 1;
             uint16_t userId;
             bool argExists[1];
@@ -2667,7 +2666,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::GetUserType::Id: {
+        case Commands::GetUserType::Id: {
             expectArgumentCount = 1;
             uint16_t userId;
             bool argExists[1];
@@ -2725,7 +2724,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::GetWeekdaySchedule::Id: {
+        case Commands::GetWeekdaySchedule::Id: {
             expectArgumentCount = 2;
             uint8_t scheduleId;
             uint16_t userId;
@@ -2787,7 +2786,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::GetYeardaySchedule::Id: {
+        case Commands::GetYeardaySchedule::Id: {
             expectArgumentCount = 2;
             uint8_t scheduleId;
             uint16_t userId;
@@ -2849,7 +2848,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::LockDoor::Id: {
+        case Commands::LockDoor::Id: {
             expectArgumentCount = 1;
             const uint8_t * PIN;
             bool argExists[1];
@@ -2908,7 +2907,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::SetHolidaySchedule::Id: {
+        case Commands::SetHolidaySchedule::Id: {
             expectArgumentCount = 4;
             uint8_t scheduleId;
             uint32_t localStartTime;
@@ -2979,7 +2978,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::SetPin::Id: {
+        case Commands::SetPin::Id: {
             expectArgumentCount = 4;
             uint16_t userId;
             uint8_t userStatus;
@@ -3051,7 +3050,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::SetRfid::Id: {
+        case Commands::SetRfid::Id: {
             expectArgumentCount = 4;
             uint16_t userId;
             uint8_t userStatus;
@@ -3123,7 +3122,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::SetUserType::Id: {
+        case Commands::SetUserType::Id: {
             expectArgumentCount = 2;
             uint16_t userId;
             uint8_t userType;
@@ -3185,7 +3184,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::SetWeekdaySchedule::Id: {
+        case Commands::SetWeekdaySchedule::Id: {
             expectArgumentCount = 7;
             uint8_t scheduleId;
             uint16_t userId;
@@ -3268,7 +3267,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::SetYeardaySchedule::Id: {
+        case Commands::SetYeardaySchedule::Id: {
             expectArgumentCount = 4;
             uint8_t scheduleId;
             uint16_t userId;
@@ -3339,7 +3338,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::UnlockDoor::Id: {
+        case Commands::UnlockDoor::Id: {
             expectArgumentCount = 1;
             const uint8_t * PIN;
             bool argExists[1];
@@ -3398,7 +3397,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::DoorLock::Commands::UnlockWithTimeout::Id: {
+        case Commands::UnlockWithTimeout::Id: {
             expectArgumentCount = 2;
             uint16_t timeoutInSeconds;
             const uint8_t * pin;
@@ -3464,7 +3463,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::DoorLock::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, DoorLock::Id, aCommandId);
             return;
         }
         }
@@ -3474,7 +3473,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::DoorLock::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                DoorLock::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -3507,14 +3506,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Id: {
+        case Commands::ResetCounts::Id: {
 
             wasHandled = emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::EthernetNetworkDiagnostics::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, EthernetNetworkDiagnostics::Id, aCommandId);
             return;
         }
         }
@@ -3524,8 +3523,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::EthernetNetworkDiagnostics::Id, aCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
+                                                EthernetNetworkDiagnostics::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -3558,7 +3556,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::GeneralCommissioning::Commands::ArmFailSafe::Id: {
+        case Commands::ArmFailSafe::Id: {
             expectArgumentCount = 3;
             uint16_t expiryLengthSeconds;
             uint64_t breadcrumb;
@@ -3625,12 +3623,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::GeneralCommissioning::Commands::CommissioningComplete::Id: {
+        case Commands::CommissioningComplete::Id: {
 
             wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Id: {
+        case Commands::SetRegulatoryConfig::Id: {
             expectArgumentCount = 4;
             uint8_t location;
             const uint8_t * countryCode;
@@ -3704,7 +3702,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::GeneralCommissioning::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, GeneralCommissioning::Id, aCommandId);
             return;
         }
         }
@@ -3714,8 +3712,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::GeneralCommissioning::Id, aCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
+                                                GeneralCommissioning::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -3748,7 +3745,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::Groups::Commands::AddGroup::Id: {
+        case Commands::AddGroup::Id: {
             expectArgumentCount = 2;
             uint16_t groupId;
             const uint8_t * groupName;
@@ -3812,7 +3809,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Groups::Commands::AddGroupIfIdentifying::Id: {
+        case Commands::AddGroupIfIdentifying::Id: {
             expectArgumentCount = 2;
             uint16_t groupId;
             const uint8_t * groupName;
@@ -3876,7 +3873,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Groups::Commands::GetGroupMembership::Id: {
+        case Commands::GetGroupMembership::Id: {
             expectArgumentCount = 2;
             uint8_t groupCount;
             /* TYPE WARNING: array array defaults to */ uint8_t * groupList;
@@ -3939,12 +3936,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Groups::Commands::RemoveAllGroups::Id: {
+        case Commands::RemoveAllGroups::Id: {
 
             wasHandled = emberAfGroupsClusterRemoveAllGroupsCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::Groups::Commands::RemoveGroup::Id: {
+        case Commands::RemoveGroup::Id: {
             expectArgumentCount = 1;
             uint16_t groupId;
             bool argExists[1];
@@ -4002,7 +3999,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Groups::Commands::ViewGroup::Id: {
+        case Commands::ViewGroup::Id: {
             expectArgumentCount = 1;
             uint16_t groupId;
             bool argExists[1];
@@ -4062,7 +4059,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::Groups::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, Groups::Id, aCommandId);
             return;
         }
         }
@@ -4072,7 +4069,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::Groups::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                Groups::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4105,7 +4102,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::IasZone::Commands::ZoneEnrollResponse::Id: {
+        case Commands::ZoneEnrollResponse::Id: {
             expectArgumentCount = 2;
             uint8_t enrollResponseCode;
             uint8_t zoneId;
@@ -4169,7 +4166,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::IasZone::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, IasZone::Id, aCommandId);
             return;
         }
         }
@@ -4179,7 +4176,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::IasZone::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                IasZone::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4212,7 +4209,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::Identify::Commands::Identify::Id: {
+        case Commands::Identify::Id: {
             expectArgumentCount = 1;
             uint16_t identifyTime;
             bool argExists[1];
@@ -4270,14 +4267,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Identify::Commands::IdentifyQuery::Id: {
+        case Commands::IdentifyQuery::Id: {
 
             wasHandled = emberAfIdentifyClusterIdentifyQueryCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::Identify::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, Identify::Id, aCommandId);
             return;
         }
         }
@@ -4287,7 +4284,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::Identify::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                Identify::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4320,7 +4317,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::LevelControl::Commands::Move::Id: {
+        case Commands::Move::Id: {
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint8_t rate;
@@ -4391,7 +4388,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::MoveToLevel::Id: {
+        case Commands::MoveToLevel::Id: {
             expectArgumentCount = 4;
             uint8_t level;
             uint16_t transitionTime;
@@ -4462,7 +4459,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id: {
+        case Commands::MoveToLevelWithOnOff::Id: {
             expectArgumentCount = 2;
             uint8_t level;
             uint16_t transitionTime;
@@ -4525,7 +4522,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::MoveWithOnOff::Id: {
+        case Commands::MoveWithOnOff::Id: {
             expectArgumentCount = 2;
             uint8_t moveMode;
             uint8_t rate;
@@ -4587,7 +4584,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Step::Id: {
+        case Commands::Step::Id: {
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -4662,7 +4659,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::StepWithOnOff::Id: {
+        case Commands::StepWithOnOff::Id: {
             expectArgumentCount = 3;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -4729,7 +4726,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::Stop::Id: {
+        case Commands::Stop::Id: {
             expectArgumentCount = 2;
             uint8_t optionMask;
             uint8_t optionOverride;
@@ -4791,14 +4788,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::LevelControl::Commands::StopWithOnOff::Id: {
+        case Commands::StopWithOnOff::Id: {
 
             wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::LevelControl::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, LevelControl::Id, aCommandId);
             return;
         }
         }
@@ -4808,7 +4805,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::LevelControl::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                LevelControl::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4841,14 +4838,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::LowPower::Commands::Sleep::Id: {
+        case Commands::Sleep::Id: {
 
             wasHandled = emberAfLowPowerClusterSleepCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::LowPower::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, LowPower::Id, aCommandId);
             return;
         }
         }
@@ -4858,7 +4855,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::LowPower::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                LowPower::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4891,7 +4888,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Id: {
+        case Commands::AddThreadNetwork::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -4958,7 +4955,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Id: {
+        case Commands::AddWiFiNetwork::Id: {
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -5029,7 +5026,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::DisableNetwork::Id: {
+        case Commands::DisableNetwork::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -5096,7 +5093,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::EnableNetwork::Id: {
+        case Commands::EnableNetwork::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -5163,7 +5160,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Id: {
+        case Commands::GetLastNetworkCommissioningResult::Id: {
             expectArgumentCount = 1;
             uint32_t timeoutMs;
             bool argExists[1];
@@ -5222,7 +5219,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::RemoveNetwork::Id: {
+        case Commands::RemoveNetwork::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan NetworkID;
             uint64_t Breadcrumb;
@@ -5289,7 +5286,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::ScanNetworks::Id: {
+        case Commands::ScanNetworks::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan ssid;
             uint64_t breadcrumb;
@@ -5356,7 +5353,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Id: {
+        case Commands::UpdateThreadNetwork::Id: {
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -5423,7 +5420,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Id: {
+        case Commands::UpdateWiFiNetwork::Id: {
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -5496,7 +5493,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::NetworkCommissioning::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, NetworkCommissioning::Id, aCommandId);
             return;
         }
         }
@@ -5506,8 +5503,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::NetworkCommissioning::Id, aCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
+                                                NetworkCommissioning::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -5540,7 +5536,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id: {
+        case Commands::ApplyUpdateRequest::Id: {
             expectArgumentCount = 2;
             chip::ByteSpan updateToken;
             uint32_t newVersion;
@@ -5603,7 +5599,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id: {
+        case Commands::NotifyUpdateApplied::Id: {
             expectArgumentCount = 2;
             chip::ByteSpan updateToken;
             uint32_t softwareVersion;
@@ -5666,7 +5662,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Id: {
+        case Commands::QueryImage::Id: {
             expectArgumentCount = 8;
             uint16_t vendorId;
             uint16_t productId;
@@ -5757,7 +5753,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::OtaSoftwareUpdateProvider::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, OtaSoftwareUpdateProvider::Id, aCommandId);
             return;
         }
         }
@@ -5767,8 +5763,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::OtaSoftwareUpdateProvider::Id, aCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
+                                                OtaSoftwareUpdateProvider::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -5801,24 +5796,24 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::OnOff::Commands::Off::Id: {
+        case Commands::Off::Id: {
 
             wasHandled = emberAfOnOffClusterOffCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::OnOff::Commands::On::Id: {
+        case Commands::On::Id: {
 
             wasHandled = emberAfOnOffClusterOnCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::OnOff::Commands::Toggle::Id: {
+        case Commands::Toggle::Id: {
 
             wasHandled = emberAfOnOffClusterToggleCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::OnOff::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, OnOff::Id, aCommandId);
             return;
         }
         }
@@ -5828,7 +5823,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::OnOff::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                OnOff::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -5861,7 +5856,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::OperationalCredentials::Commands::AddNOC::Id: {
+        case Commands::AddNOC::Id: {
             expectArgumentCount = 5;
             chip::ByteSpan NOCValue;
             chip::ByteSpan ICACValue;
@@ -5936,7 +5931,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id: {
+        case Commands::AddTrustedRootCertificate::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan RootCertificate;
             bool argExists[1];
@@ -5995,7 +5990,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::AttestationRequest::Id: {
+        case Commands::AttestationRequest::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan AttestationNonce;
             bool argExists[1];
@@ -6054,7 +6049,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::CertificateChainRequest::Id: {
+        case Commands::CertificateChainRequest::Id: {
             expectArgumentCount = 1;
             uint8_t CertificateType;
             bool argExists[1];
@@ -6113,7 +6108,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::OpCSRRequest::Id: {
+        case Commands::OpCSRRequest::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan CSRNonce;
             bool argExists[1];
@@ -6171,7 +6166,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::RemoveFabric::Id: {
+        case Commands::RemoveFabric::Id: {
             expectArgumentCount = 1;
             uint8_t FabricIndex;
             bool argExists[1];
@@ -6229,7 +6224,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Id: {
+        case Commands::RemoveTrustedRootCertificate::Id: {
             expectArgumentCount = 1;
             chip::ByteSpan TrustedRootIdentifier;
             bool argExists[1];
@@ -6288,7 +6283,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id: {
+        case Commands::UpdateFabricLabel::Id: {
             expectArgumentCount = 1;
             const uint8_t * Label;
             bool argExists[1];
@@ -6348,7 +6343,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::UpdateNOC::Id: {
+        case Commands::UpdateNOC::Id: {
             expectArgumentCount = 2;
             chip::ByteSpan NOCValue;
             chip::ByteSpan ICACValue;
@@ -6412,7 +6407,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::OperationalCredentials::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, OperationalCredentials::Id, aCommandId);
             return;
         }
         }
@@ -6422,8 +6417,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::OperationalCredentials::Id, aCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
+                                                OperationalCredentials::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -6456,7 +6450,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::Scenes::Commands::AddScene::Id: {
+        case Commands::AddScene::Id: {
             expectArgumentCount = 5;
             uint16_t groupId;
             uint8_t sceneId;
@@ -6533,7 +6527,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Scenes::Commands::GetSceneMembership::Id: {
+        case Commands::GetSceneMembership::Id: {
             expectArgumentCount = 1;
             uint16_t groupId;
             bool argExists[1];
@@ -6591,7 +6585,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Scenes::Commands::RecallScene::Id: {
+        case Commands::RecallScene::Id: {
             expectArgumentCount = 3;
             uint16_t groupId;
             uint8_t sceneId;
@@ -6657,7 +6651,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Scenes::Commands::RemoveAllScenes::Id: {
+        case Commands::RemoveAllScenes::Id: {
             expectArgumentCount = 1;
             uint16_t groupId;
             bool argExists[1];
@@ -6715,7 +6709,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Scenes::Commands::RemoveScene::Id: {
+        case Commands::RemoveScene::Id: {
             expectArgumentCount = 2;
             uint16_t groupId;
             uint8_t sceneId;
@@ -6777,7 +6771,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Scenes::Commands::StoreScene::Id: {
+        case Commands::StoreScene::Id: {
             expectArgumentCount = 2;
             uint16_t groupId;
             uint8_t sceneId;
@@ -6839,7 +6833,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::Scenes::Commands::ViewScene::Id: {
+        case Commands::ViewScene::Id: {
             expectArgumentCount = 2;
             uint16_t groupId;
             uint8_t sceneId;
@@ -6903,7 +6897,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::Scenes::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, Scenes::Id, aCommandId);
             return;
         }
         }
@@ -6913,7 +6907,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::Scenes::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                Scenes::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -6946,14 +6940,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Id: {
+        case Commands::ResetWatermarks::Id: {
 
             wasHandled = emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::SoftwareDiagnostics::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, SoftwareDiagnostics::Id, aCommandId);
             return;
         }
         }
@@ -6963,8 +6957,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::SoftwareDiagnostics::Id, aCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
+                                                SoftwareDiagnostics::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -6997,12 +6990,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::TestCluster::Commands::Test::Id: {
+        case Commands::Test::Id: {
 
             wasHandled = emberAfTestClusterClusterTestCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::TestCluster::Commands::TestAddArguments::Id: {
+        case Commands::TestAddArguments::Id: {
             expectArgumentCount = 2;
             uint8_t arg1;
             uint8_t arg2;
@@ -7064,19 +7057,19 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             }
             break;
         }
-        case Clusters::TestCluster::Commands::TestNotHandled::Id: {
+        case Commands::TestNotHandled::Id: {
 
             wasHandled = emberAfTestClusterClusterTestNotHandledCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::TestCluster::Commands::TestSpecific::Id: {
+        case Commands::TestSpecific::Id: {
 
             wasHandled = emberAfTestClusterClusterTestSpecificCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::TestCluster::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, TestCluster::Id, aCommandId);
             return;
         }
         }
@@ -7086,7 +7079,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::TestCluster::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                TestCluster::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -7119,14 +7112,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Id: {
+        case Commands::ResetCounts::Id: {
 
             wasHandled = emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::ThreadNetworkDiagnostics::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, ThreadNetworkDiagnostics::Id, aCommandId);
             return;
         }
         }
@@ -7136,8 +7129,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::ThreadNetworkDiagnostics::Id, aCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
+                                                ThreadNetworkDiagnostics::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -7170,14 +7162,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Id: {
+        case Commands::ResetCounts::Id: {
 
             wasHandled = emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::WiFiNetworkDiagnostics::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, WiFiNetworkDiagnostics::Id, aCommandId);
             return;
         }
         }
@@ -7187,8 +7179,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::WiFiNetworkDiagnostics::Id, aCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
+                                                WiFiNetworkDiagnostics::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -7221,24 +7212,24 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         switch (aCommandId)
         {
-        case Clusters::WindowCovering::Commands::DownOrClose::Id: {
+        case Commands::DownOrClose::Id: {
 
             wasHandled = emberAfWindowCoveringClusterDownOrCloseCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::WindowCovering::Commands::StopMotion::Id: {
+        case Commands::StopMotion::Id: {
 
             wasHandled = emberAfWindowCoveringClusterStopMotionCallback(aEndpointId, apCommandObj);
             break;
         }
-        case Clusters::WindowCovering::Commands::UpOrOpen::Id: {
+        case Commands::UpOrOpen::Id: {
 
             wasHandled = emberAfWindowCoveringClusterUpOrOpenCallback(aEndpointId, apCommandObj);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::WindowCovering::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, WindowCovering::Id, aCommandId);
             return;
         }
         }
@@ -7248,7 +7239,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::WindowCovering::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                WindowCovering::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -7264,7 +7255,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 } // namespace WindowCovering
 
-} // namespace clusters
+} // namespace Clusters
 
 void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, EndpointId aEndPointId, TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
@@ -7277,76 +7268,76 @@ void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, En
     switch (aClusterId)
     {
     case Clusters::AdministratorCommissioning::Id:
-        clusters::AdministratorCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::AdministratorCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::BarrierControl::Id:
-        clusters::BarrierControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::BarrierControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::Basic::Id:
-        clusters::Basic::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::Basic::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::Binding::Id:
-        clusters::Binding::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::Binding::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::ColorControl::Id:
-        clusters::ColorControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::ColorControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::DiagnosticLogs::Id:
-        clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::DoorLock::Id:
-        clusters::DoorLock::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::DoorLock::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::EthernetNetworkDiagnostics::Id:
-        clusters::EthernetNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::EthernetNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::GeneralCommissioning::Id:
-        clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::Groups::Id:
-        clusters::Groups::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::Groups::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::IasZone::Id:
-        clusters::IasZone::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::IasZone::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::Identify::Id:
-        clusters::Identify::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::Identify::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::LevelControl::Id:
-        clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::LowPower::Id:
-        clusters::LowPower::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::LowPower::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::NetworkCommissioning::Id:
-        clusters::NetworkCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::NetworkCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::OtaSoftwareUpdateProvider::Id:
-        clusters::OtaSoftwareUpdateProvider::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::OtaSoftwareUpdateProvider::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::OnOff::Id:
-        clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::OperationalCredentials::Id:
-        clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::Scenes::Id:
-        clusters::Scenes::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::Scenes::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::SoftwareDiagnostics::Id:
-        clusters::SoftwareDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::SoftwareDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::TestCluster::Id:
-        clusters::TestCluster::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::TestCluster::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::ThreadNetworkDiagnostics::Id:
-        clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::WiFiNetworkDiagnostics::Id:
-        clusters::WiFiNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::WiFiNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::WindowCovering::Id:
-        clusters::WindowCovering::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::WindowCovering::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     default:
         // Unrecognized cluster ID, error status will apply.

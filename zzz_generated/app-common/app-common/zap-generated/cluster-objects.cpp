@@ -23,7 +23,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace PowerConfiguration {
 }
 
@@ -1892,6 +1892,6 @@ namespace SampleMfgSpecificCluster {
 namespace SampleMfgSpecificCluster2 {
 }
 
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip
