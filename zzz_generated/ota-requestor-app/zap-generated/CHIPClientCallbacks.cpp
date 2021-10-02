@@ -21,8 +21,10 @@
 
 #include <cinttypes>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/Command.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
@@ -351,8 +353,10 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                               uint8_t action, uint32_t delayedActionTime)
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t action,
+    uint32_t delayedActionTime,
+    app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ApplyUpdateRequestResponse:");
     ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
@@ -366,11 +370,11 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(E
     return true;
 }
 
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                       uint8_t status, uint32_t delayedActionTime,
-                                                                       uint8_t * imageURI, uint32_t softwareVersion,
-                                                                       uint8_t * softwareVersionString, chip::ByteSpan updateToken,
-                                                                       bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion, uint8_t * softwareVersionString,
+    chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor,
+    app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "QueryImageResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);

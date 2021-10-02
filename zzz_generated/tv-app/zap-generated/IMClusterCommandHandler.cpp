@@ -23,6 +23,7 @@
 #include "app/util/util.h"
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 
@@ -69,6 +70,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::GetSetupPIN::Id: {
+            Commands::GetSetupPIN::DecodableType fieldStruct;
             expectArgumentCount = 1;
             const uint8_t * tempAccountIdentifier;
             bool argExists[1];
@@ -123,12 +125,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfAccountLoginClusterGetSetupPINCallback(aEndpointId, apCommandObj,
-                                                                           const_cast<uint8_t *>(tempAccountIdentifier));
+                ConcreteCommandPath path(aEndpointId, AccountLogin::Id, Commands::GetSetupPIN::Id);
+                wasHandled = emberAfAccountLoginClusterGetSetupPINCallback(
+                    apCommandObj, path, aEndpointId, const_cast<uint8_t *>(tempAccountIdentifier), fieldStruct);
             }
             break;
         }
         case Commands::Login::Id: {
+            Commands::Login::DecodableType fieldStruct;
             expectArgumentCount = 2;
             const uint8_t * tempAccountIdentifier;
             const uint8_t * setupPIN;
@@ -188,8 +192,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfAccountLoginClusterLoginCallback(
-                    aEndpointId, apCommandObj, const_cast<uint8_t *>(tempAccountIdentifier), const_cast<uint8_t *>(setupPIN));
+                ConcreteCommandPath path(aEndpointId, AccountLogin::Id, Commands::Login::Id);
+                wasHandled = emberAfAccountLoginClusterLoginCallback(apCommandObj, path, aEndpointId,
+                                                                     const_cast<uint8_t *>(tempAccountIdentifier),
+                                                                     const_cast<uint8_t *>(setupPIN), fieldStruct);
             }
             break;
         }
@@ -239,6 +245,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::OpenBasicCommissioningWindow::Id: {
+            Commands::OpenBasicCommissioningWindow::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint16_t CommissioningTimeout;
             bool argExists[1];
@@ -292,12 +299,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(aEndpointId, apCommandObj,
-                                                                                                          CommissioningTimeout);
+                ConcreteCommandPath path(aEndpointId, AdministratorCommissioning::Id, Commands::OpenBasicCommissioningWindow::Id);
+                wasHandled = emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
+                    apCommandObj, path, aEndpointId, CommissioningTimeout, fieldStruct);
             }
             break;
         }
         case Commands::OpenCommissioningWindow::Id: {
+            Commands::OpenCommissioningWindow::DecodableType fieldStruct;
             expectArgumentCount = 6;
             uint16_t CommissioningTimeout;
             chip::ByteSpan PAKEVerifier;
@@ -371,14 +380,19 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 6 == validArgumentCount)
             {
+                ConcreteCommandPath path(aEndpointId, AdministratorCommissioning::Id, Commands::OpenCommissioningWindow::Id);
                 wasHandled = emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
-                    aEndpointId, apCommandObj, CommissioningTimeout, PAKEVerifier, Discriminator, Iterations, Salt, PasscodeID);
+                    apCommandObj, path, aEndpointId, CommissioningTimeout, PAKEVerifier, Discriminator, Iterations, Salt,
+                    PasscodeID, fieldStruct);
             }
             break;
         }
         case Commands::RevokeCommissioning::Id: {
+            Commands::RevokeCommissioning::DecodableType fieldStruct;
 
-            wasHandled = emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, AdministratorCommissioning::Id, Commands::RevokeCommissioning::Id);
+            wasHandled =
+                emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         default: {
@@ -427,6 +441,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::ChangeStatus::Id: {
+            Commands::ChangeStatus::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -480,7 +495,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfApplicationBasicClusterChangeStatusCallback(aEndpointId, apCommandObj, status);
+                ConcreteCommandPath path(aEndpointId, ApplicationBasic::Id, Commands::ChangeStatus::Id);
+                wasHandled =
+                    emberAfApplicationBasicClusterChangeStatusCallback(apCommandObj, path, aEndpointId, status, fieldStruct);
             }
             break;
         }
@@ -530,6 +547,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::LaunchApp::Id: {
+            Commands::LaunchApp::DecodableType fieldStruct;
             expectArgumentCount = 3;
             const uint8_t * data;
             uint16_t catalogVendorId;
@@ -593,8 +611,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfApplicationLauncherClusterLaunchAppCallback(
-                    aEndpointId, apCommandObj, const_cast<uint8_t *>(data), catalogVendorId, const_cast<uint8_t *>(applicationId));
+                ConcreteCommandPath path(aEndpointId, ApplicationLauncher::Id, Commands::LaunchApp::Id);
+                wasHandled = emberAfApplicationLauncherClusterLaunchAppCallback(apCommandObj, path, aEndpointId,
+                                                                                const_cast<uint8_t *>(data), catalogVendorId,
+                                                                                const_cast<uint8_t *>(applicationId), fieldStruct);
             }
             break;
         }
@@ -644,6 +664,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::RenameOutput::Id: {
+            Commands::RenameOutput::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t index;
             const uint8_t * name;
@@ -702,12 +723,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfAudioOutputClusterRenameOutputCallback(aEndpointId, apCommandObj, index, const_cast<uint8_t *>(name));
+                ConcreteCommandPath path(aEndpointId, AudioOutput::Id, Commands::RenameOutput::Id);
+                wasHandled = emberAfAudioOutputClusterRenameOutputCallback(apCommandObj, path, aEndpointId, index,
+                                                                           const_cast<uint8_t *>(name), fieldStruct);
             }
             break;
         }
         case Commands::SelectOutput::Id: {
+            Commands::SelectOutput::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint8_t index;
             bool argExists[1];
@@ -761,7 +784,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfAudioOutputClusterSelectOutputCallback(aEndpointId, apCommandObj, index);
+                ConcreteCommandPath path(aEndpointId, AudioOutput::Id, Commands::SelectOutput::Id);
+                wasHandled = emberAfAudioOutputClusterSelectOutputCallback(apCommandObj, path, aEndpointId, index, fieldStruct);
             }
             break;
         }
@@ -820,6 +844,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::Bind::Id: {
+            Commands::Bind::DecodableType fieldStruct;
             expectArgumentCount = 4;
             chip::NodeId nodeId;
             chip::GroupId groupId;
@@ -885,11 +910,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfBindingClusterBindCallback(aEndpointId, apCommandObj, nodeId, groupId, endpointId, clusterId);
+                ConcreteCommandPath path(aEndpointId, Binding::Id, Commands::Bind::Id);
+                wasHandled = emberAfBindingClusterBindCallback(apCommandObj, path, aEndpointId, nodeId, groupId, endpointId,
+                                                               clusterId, fieldStruct);
             }
             break;
         }
         case Commands::Unbind::Id: {
+            Commands::Unbind::DecodableType fieldStruct;
             expectArgumentCount = 4;
             chip::NodeId nodeId;
             chip::GroupId groupId;
@@ -955,7 +983,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfBindingClusterUnbindCallback(aEndpointId, apCommandObj, nodeId, groupId, endpointId, clusterId);
+                ConcreteCommandPath path(aEndpointId, Binding::Id, Commands::Unbind::Id);
+                wasHandled = emberAfBindingClusterUnbindCallback(apCommandObj, path, aEndpointId, nodeId, groupId, endpointId,
+                                                                 clusterId, fieldStruct);
             }
             break;
         }
@@ -1005,6 +1035,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::LaunchContent::Id: {
+            Commands::LaunchContent::DecodableType fieldStruct;
             expectArgumentCount = 2;
             bool autoPlay;
             const uint8_t * data;
@@ -1063,12 +1094,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfContentLauncherClusterLaunchContentCallback(aEndpointId, apCommandObj, autoPlay,
-                                                                                const_cast<uint8_t *>(data));
+                ConcreteCommandPath path(aEndpointId, ContentLauncher::Id, Commands::LaunchContent::Id);
+                wasHandled = emberAfContentLauncherClusterLaunchContentCallback(apCommandObj, path, aEndpointId, autoPlay,
+                                                                                const_cast<uint8_t *>(data), fieldStruct);
             }
             break;
         }
         case Commands::LaunchURL::Id: {
+            Commands::LaunchURL::DecodableType fieldStruct;
             expectArgumentCount = 2;
             const uint8_t * contentURL;
             const uint8_t * displayString;
@@ -1128,8 +1161,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfContentLauncherClusterLaunchURLCallback(
-                    aEndpointId, apCommandObj, const_cast<uint8_t *>(contentURL), const_cast<uint8_t *>(displayString));
+                ConcreteCommandPath path(aEndpointId, ContentLauncher::Id, Commands::LaunchURL::Id);
+                wasHandled = emberAfContentLauncherClusterLaunchURLCallback(apCommandObj, path, aEndpointId,
+                                                                            const_cast<uint8_t *>(contentURL),
+                                                                            const_cast<uint8_t *>(displayString), fieldStruct);
             }
             break;
         }
@@ -1179,6 +1214,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::RetrieveLogsRequest::Id: {
+            Commands::RetrieveLogsRequest::DecodableType fieldStruct;
             expectArgumentCount = 3;
             uint8_t intent;
             uint8_t requestedProtocol;
@@ -1240,8 +1276,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(aEndpointId, apCommandObj, intent,
-                                                                                     requestedProtocol, transferFileDesignator);
+                ConcreteCommandPath path(aEndpointId, DiagnosticLogs::Id, Commands::RetrieveLogsRequest::Id);
+                wasHandled = emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
+                    apCommandObj, path, aEndpointId, intent, requestedProtocol, transferFileDesignator, fieldStruct);
             }
             break;
         }
@@ -1291,6 +1328,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
         switch (aCommandId)
         {
         case Commands::ArmFailSafeResponse::Id: {
+            Commands::ArmFailSafeResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -1349,12 +1387,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(aEndpointId, apCommandObj, errorCode,
-                                                                                           const_cast<uint8_t *>(debugText));
+                ConcreteCommandPath path(aEndpointId, GeneralCommissioning::Id, Commands::ArmFailSafeResponse::Id);
+                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(
+                    apCommandObj, path, aEndpointId, errorCode, const_cast<uint8_t *>(debugText), fieldStruct);
             }
             break;
         }
         case Commands::CommissioningCompleteResponse::Id: {
+            Commands::CommissioningCompleteResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -1413,12 +1453,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
+                ConcreteCommandPath path(aEndpointId, GeneralCommissioning::Id, Commands::CommissioningCompleteResponse::Id);
                 wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    apCommandObj, path, aEndpointId, errorCode, const_cast<uint8_t *>(debugText), fieldStruct);
             }
             break;
         }
         case Commands::SetRegulatoryConfigResponse::Id: {
+            Commands::SetRegulatoryConfigResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -1477,8 +1519,9 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
+                ConcreteCommandPath path(aEndpointId, GeneralCommissioning::Id, Commands::SetRegulatoryConfigResponse::Id);
                 wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    apCommandObj, path, aEndpointId, errorCode, const_cast<uint8_t *>(debugText), fieldStruct);
             }
             break;
         }
@@ -1528,6 +1571,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::ArmFailSafe::Id: {
+            Commands::ArmFailSafe::DecodableType fieldStruct;
             expectArgumentCount = 3;
             uint16_t expiryLengthSeconds;
             uint64_t breadcrumb;
@@ -1589,17 +1633,22 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeCallback(aEndpointId, apCommandObj, expiryLengthSeconds,
-                                                                                   breadcrumb, timeoutMs);
+                ConcreteCommandPath path(aEndpointId, GeneralCommissioning::Id, Commands::ArmFailSafe::Id);
+                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeCallback(
+                    apCommandObj, path, aEndpointId, expiryLengthSeconds, breadcrumb, timeoutMs, fieldStruct);
             }
             break;
         }
         case Commands::CommissioningComplete::Id: {
+            Commands::CommissioningComplete::DecodableType fieldStruct;
 
-            wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, GeneralCommissioning::Id, Commands::CommissioningComplete::Id);
+            wasHandled =
+                emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         case Commands::SetRegulatoryConfig::Id: {
+            Commands::SetRegulatoryConfig::DecodableType fieldStruct;
             expectArgumentCount = 4;
             uint8_t location;
             const uint8_t * countryCode;
@@ -1666,8 +1715,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
+                ConcreteCommandPath path(aEndpointId, GeneralCommissioning::Id, Commands::SetRegulatoryConfig::Id);
                 wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(
-                    aEndpointId, apCommandObj, location, const_cast<uint8_t *>(countryCode), breadcrumb, timeoutMs);
+                    apCommandObj, path, aEndpointId, location, const_cast<uint8_t *>(countryCode), breadcrumb, timeoutMs,
+                    fieldStruct);
             }
             break;
         }
@@ -1717,6 +1768,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::SendKey::Id: {
+            Commands::SendKey::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint8_t keyCode;
             bool argExists[1];
@@ -1770,7 +1822,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfKeypadInputClusterSendKeyCallback(aEndpointId, apCommandObj, keyCode);
+                ConcreteCommandPath path(aEndpointId, KeypadInput::Id, Commands::SendKey::Id);
+                wasHandled = emberAfKeypadInputClusterSendKeyCallback(apCommandObj, path, aEndpointId, keyCode, fieldStruct);
             }
             break;
         }
@@ -1820,6 +1873,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::Move::Id: {
+            Commands::Move::DecodableType fieldStruct;
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint8_t rate;
@@ -1885,12 +1939,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfLevelControlClusterMoveCallback(aEndpointId, apCommandObj, moveMode, rate, optionMask, optionOverride);
+                ConcreteCommandPath path(aEndpointId, LevelControl::Id, Commands::Move::Id);
+                wasHandled = emberAfLevelControlClusterMoveCallback(apCommandObj, path, aEndpointId, moveMode, rate, optionMask,
+                                                                    optionOverride, fieldStruct);
             }
             break;
         }
         case Commands::MoveToLevel::Id: {
+            Commands::MoveToLevel::DecodableType fieldStruct;
             expectArgumentCount = 4;
             uint8_t level;
             uint16_t transitionTime;
@@ -1956,12 +2012,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfLevelControlClusterMoveToLevelCallback(aEndpointId, apCommandObj, level, transitionTime,
-                                                                           optionMask, optionOverride);
+                ConcreteCommandPath path(aEndpointId, LevelControl::Id, Commands::MoveToLevel::Id);
+                wasHandled = emberAfLevelControlClusterMoveToLevelCallback(apCommandObj, path, aEndpointId, level, transitionTime,
+                                                                           optionMask, optionOverride, fieldStruct);
             }
             break;
         }
         case Commands::MoveToLevelWithOnOff::Id: {
+            Commands::MoveToLevelWithOnOff::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t level;
             uint16_t transitionTime;
@@ -2019,12 +2077,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfLevelControlClusterMoveToLevelWithOnOffCallback(aEndpointId, apCommandObj, level, transitionTime);
+                ConcreteCommandPath path(aEndpointId, LevelControl::Id, Commands::MoveToLevelWithOnOff::Id);
+                wasHandled = emberAfLevelControlClusterMoveToLevelWithOnOffCallback(apCommandObj, path, aEndpointId, level,
+                                                                                    transitionTime, fieldStruct);
             }
             break;
         }
         case Commands::MoveWithOnOff::Id: {
+            Commands::MoveWithOnOff::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t moveMode;
             uint8_t rate;
@@ -2082,11 +2142,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfLevelControlClusterMoveWithOnOffCallback(aEndpointId, apCommandObj, moveMode, rate);
+                ConcreteCommandPath path(aEndpointId, LevelControl::Id, Commands::MoveWithOnOff::Id);
+                wasHandled =
+                    emberAfLevelControlClusterMoveWithOnOffCallback(apCommandObj, path, aEndpointId, moveMode, rate, fieldStruct);
             }
             break;
         }
         case Commands::Step::Id: {
+            Commands::Step::DecodableType fieldStruct;
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -2156,12 +2219,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
-                wasHandled = emberAfLevelControlClusterStepCallback(aEndpointId, apCommandObj, stepMode, stepSize, transitionTime,
-                                                                    optionMask, optionOverride);
+                ConcreteCommandPath path(aEndpointId, LevelControl::Id, Commands::Step::Id);
+                wasHandled = emberAfLevelControlClusterStepCallback(apCommandObj, path, aEndpointId, stepMode, stepSize,
+                                                                    transitionTime, optionMask, optionOverride, fieldStruct);
             }
             break;
         }
         case Commands::StepWithOnOff::Id: {
+            Commands::StepWithOnOff::DecodableType fieldStruct;
             expectArgumentCount = 3;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -2223,12 +2288,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfLevelControlClusterStepWithOnOffCallback(aEndpointId, apCommandObj, stepMode, stepSize, transitionTime);
+                ConcreteCommandPath path(aEndpointId, LevelControl::Id, Commands::StepWithOnOff::Id);
+                wasHandled = emberAfLevelControlClusterStepWithOnOffCallback(apCommandObj, path, aEndpointId, stepMode, stepSize,
+                                                                             transitionTime, fieldStruct);
             }
             break;
         }
         case Commands::Stop::Id: {
+            Commands::Stop::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t optionMask;
             uint8_t optionOverride;
@@ -2286,13 +2353,17 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfLevelControlClusterStopCallback(aEndpointId, apCommandObj, optionMask, optionOverride);
+                ConcreteCommandPath path(aEndpointId, LevelControl::Id, Commands::Stop::Id);
+                wasHandled = emberAfLevelControlClusterStopCallback(apCommandObj, path, aEndpointId, optionMask, optionOverride,
+                                                                    fieldStruct);
             }
             break;
         }
         case Commands::StopWithOnOff::Id: {
+            Commands::StopWithOnOff::DecodableType fieldStruct;
 
-            wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, LevelControl::Id, Commands::StopWithOnOff::Id);
+            wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         default: {
@@ -2341,8 +2412,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::Sleep::Id: {
+            Commands::Sleep::DecodableType fieldStruct;
 
-            wasHandled = emberAfLowPowerClusterSleepCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, LowPower::Id, Commands::Sleep::Id);
+            wasHandled = emberAfLowPowerClusterSleepCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         default: {
@@ -2391,11 +2464,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::HideInputStatus::Id: {
+            Commands::HideInputStatus::DecodableType fieldStruct;
 
-            wasHandled = emberAfMediaInputClusterHideInputStatusCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, MediaInput::Id, Commands::HideInputStatus::Id);
+            wasHandled = emberAfMediaInputClusterHideInputStatusCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         case Commands::RenameInput::Id: {
+            Commands::RenameInput::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t index;
             const uint8_t * name;
@@ -2454,12 +2530,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfMediaInputClusterRenameInputCallback(aEndpointId, apCommandObj, index, const_cast<uint8_t *>(name));
+                ConcreteCommandPath path(aEndpointId, MediaInput::Id, Commands::RenameInput::Id);
+                wasHandled = emberAfMediaInputClusterRenameInputCallback(apCommandObj, path, aEndpointId, index,
+                                                                         const_cast<uint8_t *>(name), fieldStruct);
             }
             break;
         }
         case Commands::SelectInput::Id: {
+            Commands::SelectInput::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint8_t index;
             bool argExists[1];
@@ -2513,13 +2591,16 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfMediaInputClusterSelectInputCallback(aEndpointId, apCommandObj, index);
+                ConcreteCommandPath path(aEndpointId, MediaInput::Id, Commands::SelectInput::Id);
+                wasHandled = emberAfMediaInputClusterSelectInputCallback(apCommandObj, path, aEndpointId, index, fieldStruct);
             }
             break;
         }
         case Commands::ShowInputStatus::Id: {
+            Commands::ShowInputStatus::DecodableType fieldStruct;
 
-            wasHandled = emberAfMediaInputClusterShowInputStatusCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, MediaInput::Id, Commands::ShowInputStatus::Id);
+            wasHandled = emberAfMediaInputClusterShowInputStatusCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         default: {
@@ -2568,36 +2649,49 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::MediaFastForward::Id: {
+            Commands::MediaFastForward::DecodableType fieldStruct;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaFastForwardCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, MediaPlayback::Id, Commands::MediaFastForward::Id);
+            wasHandled = emberAfMediaPlaybackClusterMediaFastForwardCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         case Commands::MediaNext::Id: {
+            Commands::MediaNext::DecodableType fieldStruct;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaNextCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, MediaPlayback::Id, Commands::MediaNext::Id);
+            wasHandled = emberAfMediaPlaybackClusterMediaNextCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         case Commands::MediaPause::Id: {
+            Commands::MediaPause::DecodableType fieldStruct;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaPauseCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, MediaPlayback::Id, Commands::MediaPause::Id);
+            wasHandled = emberAfMediaPlaybackClusterMediaPauseCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         case Commands::MediaPlay::Id: {
+            Commands::MediaPlay::DecodableType fieldStruct;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaPlayCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, MediaPlayback::Id, Commands::MediaPlay::Id);
+            wasHandled = emberAfMediaPlaybackClusterMediaPlayCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         case Commands::MediaPrevious::Id: {
+            Commands::MediaPrevious::DecodableType fieldStruct;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaPreviousCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, MediaPlayback::Id, Commands::MediaPrevious::Id);
+            wasHandled = emberAfMediaPlaybackClusterMediaPreviousCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         case Commands::MediaRewind::Id: {
+            Commands::MediaRewind::DecodableType fieldStruct;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaRewindCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, MediaPlayback::Id, Commands::MediaRewind::Id);
+            wasHandled = emberAfMediaPlaybackClusterMediaRewindCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         case Commands::MediaSeek::Id: {
+            Commands::MediaSeek::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint64_t position;
             bool argExists[1];
@@ -2651,11 +2745,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaSeekCallback(aEndpointId, apCommandObj, position);
+                ConcreteCommandPath path(aEndpointId, MediaPlayback::Id, Commands::MediaSeek::Id);
+                wasHandled = emberAfMediaPlaybackClusterMediaSeekCallback(apCommandObj, path, aEndpointId, position, fieldStruct);
             }
             break;
         }
         case Commands::MediaSkipBackward::Id: {
+            Commands::MediaSkipBackward::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint64_t deltaPositionMilliseconds;
             bool argExists[1];
@@ -2709,12 +2805,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfMediaPlaybackClusterMediaSkipBackwardCallback(aEndpointId, apCommandObj, deltaPositionMilliseconds);
+                ConcreteCommandPath path(aEndpointId, MediaPlayback::Id, Commands::MediaSkipBackward::Id);
+                wasHandled = emberAfMediaPlaybackClusterMediaSkipBackwardCallback(apCommandObj, path, aEndpointId,
+                                                                                  deltaPositionMilliseconds, fieldStruct);
             }
             break;
         }
         case Commands::MediaSkipForward::Id: {
+            Commands::MediaSkipForward::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint64_t deltaPositionMilliseconds;
             bool argExists[1];
@@ -2768,19 +2866,24 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfMediaPlaybackClusterMediaSkipForwardCallback(aEndpointId, apCommandObj, deltaPositionMilliseconds);
+                ConcreteCommandPath path(aEndpointId, MediaPlayback::Id, Commands::MediaSkipForward::Id);
+                wasHandled = emberAfMediaPlaybackClusterMediaSkipForwardCallback(apCommandObj, path, aEndpointId,
+                                                                                 deltaPositionMilliseconds, fieldStruct);
             }
             break;
         }
         case Commands::MediaStartOver::Id: {
+            Commands::MediaStartOver::DecodableType fieldStruct;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaStartOverCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, MediaPlayback::Id, Commands::MediaStartOver::Id);
+            wasHandled = emberAfMediaPlaybackClusterMediaStartOverCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         case Commands::MediaStop::Id: {
+            Commands::MediaStop::DecodableType fieldStruct;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaStopCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, MediaPlayback::Id, Commands::MediaStop::Id);
+            wasHandled = emberAfMediaPlaybackClusterMediaStopCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         default: {
@@ -2829,6 +2932,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
         switch (aCommandId)
         {
         case Commands::AddThreadNetworkResponse::Id: {
+            Commands::AddThreadNetworkResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -2887,12 +2991,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::AddThreadNetworkResponse::Id);
                 wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    apCommandObj, path, aEndpointId, errorCode, const_cast<uint8_t *>(debugText), fieldStruct);
             }
             break;
         }
         case Commands::AddWiFiNetworkResponse::Id: {
+            Commands::AddWiFiNetworkResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -2951,12 +3057,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
-                                                                                              const_cast<uint8_t *>(debugText));
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::AddWiFiNetworkResponse::Id);
+                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(
+                    apCommandObj, path, aEndpointId, errorCode, const_cast<uint8_t *>(debugText), fieldStruct);
             }
             break;
         }
         case Commands::DisableNetworkResponse::Id: {
+            Commands::DisableNetworkResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3015,12 +3123,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
-                                                                                              const_cast<uint8_t *>(debugText));
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::DisableNetworkResponse::Id);
+                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(
+                    apCommandObj, path, aEndpointId, errorCode, const_cast<uint8_t *>(debugText), fieldStruct);
             }
             break;
         }
         case Commands::EnableNetworkResponse::Id: {
+            Commands::EnableNetworkResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3079,12 +3189,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
-                                                                                             const_cast<uint8_t *>(debugText));
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::EnableNetworkResponse::Id);
+                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(
+                    apCommandObj, path, aEndpointId, errorCode, const_cast<uint8_t *>(debugText), fieldStruct);
             }
             break;
         }
         case Commands::RemoveNetworkResponse::Id: {
+            Commands::RemoveNetworkResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3143,12 +3255,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
-                                                                                             const_cast<uint8_t *>(debugText));
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::RemoveNetworkResponse::Id);
+                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(
+                    apCommandObj, path, aEndpointId, errorCode, const_cast<uint8_t *>(debugText), fieldStruct);
             }
             break;
         }
         case Commands::ScanNetworksResponse::Id: {
+            Commands::ScanNetworksResponse::DecodableType fieldStruct;
             expectArgumentCount = 4;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3217,12 +3331,15 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id);
                 wasHandled = emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText), wifiScanResults, threadScanResults);
+                    apCommandObj, path, aEndpointId, errorCode, const_cast<uint8_t *>(debugText), wifiScanResults,
+                    threadScanResults, fieldStruct);
             }
             break;
         }
         case Commands::UpdateThreadNetworkResponse::Id: {
+            Commands::UpdateThreadNetworkResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3281,12 +3398,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::UpdateThreadNetworkResponse::Id);
                 wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    apCommandObj, path, aEndpointId, errorCode, const_cast<uint8_t *>(debugText), fieldStruct);
             }
             break;
         }
         case Commands::UpdateWiFiNetworkResponse::Id: {
+            Commands::UpdateWiFiNetworkResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t errorCode;
             const uint8_t * debugText;
@@ -3345,8 +3464,9 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::UpdateWiFiNetworkResponse::Id);
                 wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    apCommandObj, path, aEndpointId, errorCode, const_cast<uint8_t *>(debugText), fieldStruct);
             }
             break;
         }
@@ -3396,6 +3516,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::AddThreadNetwork::Id: {
+            Commands::AddThreadNetwork::DecodableType fieldStruct;
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -3457,12 +3578,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkCallback(aEndpointId, apCommandObj,
-                                                                                        operationalDataset, breadcrumb, timeoutMs);
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::AddThreadNetwork::Id);
+                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkCallback(
+                    apCommandObj, path, aEndpointId, operationalDataset, breadcrumb, timeoutMs, fieldStruct);
             }
             break;
         }
         case Commands::AddWiFiNetwork::Id: {
+            Commands::AddWiFiNetwork::DecodableType fieldStruct;
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -3528,12 +3651,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(aEndpointId, apCommandObj, ssid, credentials,
-                                                                                      breadcrumb, timeoutMs);
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::AddWiFiNetwork::Id);
+                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(
+                    apCommandObj, path, aEndpointId, ssid, credentials, breadcrumb, timeoutMs, fieldStruct);
             }
             break;
         }
         case Commands::DisableNetwork::Id: {
+            Commands::DisableNetwork::DecodableType fieldStruct;
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -3595,12 +3720,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(aEndpointId, apCommandObj, networkID,
-                                                                                      breadcrumb, timeoutMs);
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::DisableNetwork::Id);
+                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(apCommandObj, path, aEndpointId, networkID,
+                                                                                      breadcrumb, timeoutMs, fieldStruct);
             }
             break;
         }
         case Commands::EnableNetwork::Id: {
+            Commands::EnableNetwork::DecodableType fieldStruct;
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -3662,12 +3789,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(aEndpointId, apCommandObj, networkID,
-                                                                                     breadcrumb, timeoutMs);
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::EnableNetwork::Id);
+                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(apCommandObj, path, aEndpointId, networkID,
+                                                                                     breadcrumb, timeoutMs, fieldStruct);
             }
             break;
         }
         case Commands::GetLastNetworkCommissioningResult::Id: {
+            Commands::GetLastNetworkCommissioningResult::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint32_t timeoutMs;
             bool argExists[1];
@@ -3721,12 +3850,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(aEndpointId, apCommandObj,
-                                                                                                         timeoutMs);
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::GetLastNetworkCommissioningResult::Id);
+                wasHandled = emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(
+                    apCommandObj, path, aEndpointId, timeoutMs, fieldStruct);
             }
             break;
         }
         case Commands::RemoveNetwork::Id: {
+            Commands::RemoveNetwork::DecodableType fieldStruct;
             expectArgumentCount = 3;
             chip::ByteSpan NetworkID;
             uint64_t Breadcrumb;
@@ -3788,12 +3919,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkCallback(aEndpointId, apCommandObj, NetworkID,
-                                                                                     Breadcrumb, TimeoutMs);
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::RemoveNetwork::Id);
+                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkCallback(apCommandObj, path, aEndpointId, NetworkID,
+                                                                                     Breadcrumb, TimeoutMs, fieldStruct);
             }
             break;
         }
         case Commands::ScanNetworks::Id: {
+            Commands::ScanNetworks::DecodableType fieldStruct;
             expectArgumentCount = 3;
             chip::ByteSpan ssid;
             uint64_t breadcrumb;
@@ -3855,12 +3988,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfNetworkCommissioningClusterScanNetworksCallback(aEndpointId, apCommandObj, ssid, breadcrumb, timeoutMs);
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::ScanNetworks::Id);
+                wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(apCommandObj, path, aEndpointId, ssid,
+                                                                                    breadcrumb, timeoutMs, fieldStruct);
             }
             break;
         }
         case Commands::UpdateThreadNetwork::Id: {
+            Commands::UpdateThreadNetwork::DecodableType fieldStruct;
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -3922,12 +4057,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::UpdateThreadNetwork::Id);
                 wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(
-                    aEndpointId, apCommandObj, operationalDataset, breadcrumb, timeoutMs);
+                    apCommandObj, path, aEndpointId, operationalDataset, breadcrumb, timeoutMs, fieldStruct);
             }
             break;
         }
         case Commands::UpdateWiFiNetwork::Id: {
+            Commands::UpdateWiFiNetwork::DecodableType fieldStruct;
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -3993,8 +4130,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(aEndpointId, apCommandObj, ssid,
-                                                                                         credentials, breadcrumb, timeoutMs);
+                ConcreteCommandPath path(aEndpointId, NetworkCommissioning::Id, Commands::UpdateWiFiNetwork::Id);
+                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(
+                    apCommandObj, path, aEndpointId, ssid, credentials, breadcrumb, timeoutMs, fieldStruct);
             }
             break;
         }
@@ -4044,6 +4182,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::ApplyUpdateRequest::Id: {
+            Commands::ApplyUpdateRequest::DecodableType fieldStruct;
             expectArgumentCount = 2;
             chip::ByteSpan updateToken;
             uint32_t newVersion;
@@ -4101,12 +4240,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(aEndpointId, apCommandObj,
-                                                                                               updateToken, newVersion);
+                ConcreteCommandPath path(aEndpointId, OtaSoftwareUpdateProvider::Id, Commands::ApplyUpdateRequest::Id);
+                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
+                    apCommandObj, path, aEndpointId, updateToken, newVersion, fieldStruct);
             }
             break;
         }
         case Commands::NotifyUpdateApplied::Id: {
+            Commands::NotifyUpdateApplied::DecodableType fieldStruct;
             expectArgumentCount = 2;
             chip::ByteSpan updateToken;
             uint32_t softwareVersion;
@@ -4164,12 +4305,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(aEndpointId, apCommandObj,
-                                                                                                updateToken, softwareVersion);
+                ConcreteCommandPath path(aEndpointId, OtaSoftwareUpdateProvider::Id, Commands::NotifyUpdateApplied::Id);
+                wasHandled = emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
+                    apCommandObj, path, aEndpointId, updateToken, softwareVersion, fieldStruct);
             }
             break;
         }
         case Commands::QueryImage::Id: {
+            Commands::QueryImage::DecodableType fieldStruct;
             expectArgumentCount = 8;
             uint16_t vendorId;
             uint16_t productId;
@@ -4252,9 +4395,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 8 == validArgumentCount)
             {
+                ConcreteCommandPath path(aEndpointId, OtaSoftwareUpdateProvider::Id, Commands::QueryImage::Id);
                 wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-                    aEndpointId, apCommandObj, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
-                    const_cast<uint8_t *>(location), requestorCanConsent, metadataForProvider);
+                    apCommandObj, path, aEndpointId, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
+                    const_cast<uint8_t *>(location), requestorCanConsent, metadataForProvider, fieldStruct);
             }
             break;
         }
@@ -4304,18 +4448,24 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::Off::Id: {
+            Commands::Off::DecodableType fieldStruct;
 
-            wasHandled = emberAfOnOffClusterOffCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, OnOff::Id, Commands::Off::Id);
+            wasHandled = emberAfOnOffClusterOffCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         case Commands::On::Id: {
+            Commands::On::DecodableType fieldStruct;
 
-            wasHandled = emberAfOnOffClusterOnCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, OnOff::Id, Commands::On::Id);
+            wasHandled = emberAfOnOffClusterOnCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         case Commands::Toggle::Id: {
+            Commands::Toggle::DecodableType fieldStruct;
 
-            wasHandled = emberAfOnOffClusterToggleCallback(aEndpointId, apCommandObj);
+            ConcreteCommandPath path(aEndpointId, OnOff::Id, Commands::Toggle::Id);
+            wasHandled = emberAfOnOffClusterToggleCallback(apCommandObj, path, aEndpointId, fieldStruct);
             break;
         }
         default: {
@@ -4364,6 +4514,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
         switch (aCommandId)
         {
         case Commands::AttestationResponse::Id: {
+            Commands::AttestationResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             chip::ByteSpan AttestationElements;
             chip::ByteSpan Signature;
@@ -4421,12 +4572,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAttestationResponseCallback(aEndpointId, apCommandObj,
-                                                                                             AttestationElements, Signature);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::AttestationResponse::Id);
+                wasHandled = emberAfOperationalCredentialsClusterAttestationResponseCallback(
+                    apCommandObj, path, aEndpointId, AttestationElements, Signature, fieldStruct);
             }
             break;
         }
         case Commands::CertificateChainResponse::Id: {
+            Commands::CertificateChainResponse::DecodableType fieldStruct;
             expectArgumentCount = 1;
             chip::ByteSpan Certificate;
             bool argExists[1];
@@ -4480,12 +4633,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfOperationalCredentialsClusterCertificateChainResponseCallback(aEndpointId, apCommandObj, Certificate);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::CertificateChainResponse::Id);
+                wasHandled = emberAfOperationalCredentialsClusterCertificateChainResponseCallback(apCommandObj, path, aEndpointId,
+                                                                                                  Certificate, fieldStruct);
             }
             break;
         }
         case Commands::NOCResponse::Id: {
+            Commands::NOCResponse::DecodableType fieldStruct;
             expectArgumentCount = 3;
             uint8_t StatusCode;
             uint8_t FabricIndex;
@@ -4547,12 +4702,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterNOCResponseCallback(aEndpointId, apCommandObj, StatusCode,
-                                                                                     FabricIndex, DebugText);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::NOCResponse::Id);
+                wasHandled = emberAfOperationalCredentialsClusterNOCResponseCallback(apCommandObj, path, aEndpointId, StatusCode,
+                                                                                     FabricIndex, DebugText, fieldStruct);
             }
             break;
         }
         case Commands::OpCSRResponse::Id: {
+            Commands::OpCSRResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             chip::ByteSpan NOCSRElements;
             chip::ByteSpan AttestationSignature;
@@ -4610,8 +4767,9 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(aEndpointId, apCommandObj, NOCSRElements,
-                                                                                       AttestationSignature);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::OpCSRResponse::Id);
+                wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(
+                    apCommandObj, path, aEndpointId, NOCSRElements, AttestationSignature, fieldStruct);
             }
             break;
         }
@@ -4661,6 +4819,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::AddNOC::Id: {
+            Commands::AddNOC::DecodableType fieldStruct;
             expectArgumentCount = 5;
             chip::ByteSpan NOCValue;
             chip::ByteSpan ICACValue;
@@ -4730,12 +4889,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(aEndpointId, apCommandObj, NOCValue, ICACValue,
-                                                                                IPKValue, CaseAdminNode, AdminVendorId);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::AddNOC::Id);
+                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(
+                    apCommandObj, path, aEndpointId, NOCValue, ICACValue, IPKValue, CaseAdminNode, AdminVendorId, fieldStruct);
             }
             break;
         }
         case Commands::AddTrustedRootCertificate::Id: {
+            Commands::AddTrustedRootCertificate::DecodableType fieldStruct;
             expectArgumentCount = 1;
             chip::ByteSpan RootCertificate;
             bool argExists[1];
@@ -4789,12 +4950,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(aEndpointId, apCommandObj,
-                                                                                                   RootCertificate);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::AddTrustedRootCertificate::Id);
+                wasHandled = emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(apCommandObj, path, aEndpointId,
+                                                                                                   RootCertificate, fieldStruct);
             }
             break;
         }
         case Commands::AttestationRequest::Id: {
+            Commands::AttestationRequest::DecodableType fieldStruct;
             expectArgumentCount = 1;
             chip::ByteSpan AttestationNonce;
             bool argExists[1];
@@ -4848,12 +5011,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfOperationalCredentialsClusterAttestationRequestCallback(aEndpointId, apCommandObj, AttestationNonce);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::AttestationRequest::Id);
+                wasHandled = emberAfOperationalCredentialsClusterAttestationRequestCallback(apCommandObj, path, aEndpointId,
+                                                                                            AttestationNonce, fieldStruct);
             }
             break;
         }
         case Commands::CertificateChainRequest::Id: {
+            Commands::CertificateChainRequest::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint8_t CertificateType;
             bool argExists[1];
@@ -4907,12 +5072,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfOperationalCredentialsClusterCertificateChainRequestCallback(aEndpointId, apCommandObj, CertificateType);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::CertificateChainRequest::Id);
+                wasHandled = emberAfOperationalCredentialsClusterCertificateChainRequestCallback(apCommandObj, path, aEndpointId,
+                                                                                                 CertificateType, fieldStruct);
             }
             break;
         }
         case Commands::OpCSRRequest::Id: {
+            Commands::OpCSRRequest::DecodableType fieldStruct;
             expectArgumentCount = 1;
             chip::ByteSpan CSRNonce;
             bool argExists[1];
@@ -4966,11 +5133,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(aEndpointId, apCommandObj, CSRNonce);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::OpCSRRequest::Id);
+                wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(apCommandObj, path, aEndpointId, CSRNonce,
+                                                                                      fieldStruct);
             }
             break;
         }
         case Commands::RemoveFabric::Id: {
+            Commands::RemoveFabric::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint8_t FabricIndex;
             bool argExists[1];
@@ -5024,11 +5194,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(aEndpointId, apCommandObj, FabricIndex);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::RemoveFabric::Id);
+                wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(apCommandObj, path, aEndpointId, FabricIndex,
+                                                                                      fieldStruct);
             }
             break;
         }
         case Commands::RemoveTrustedRootCertificate::Id: {
+            Commands::RemoveTrustedRootCertificate::DecodableType fieldStruct;
             expectArgumentCount = 1;
             chip::ByteSpan TrustedRootIdentifier;
             bool argExists[1];
@@ -5082,12 +5255,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(aEndpointId, apCommandObj,
-                                                                                                      TrustedRootIdentifier);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::RemoveTrustedRootCertificate::Id);
+                wasHandled = emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
+                    apCommandObj, path, aEndpointId, TrustedRootIdentifier, fieldStruct);
             }
             break;
         }
         case Commands::UpdateFabricLabel::Id: {
+            Commands::UpdateFabricLabel::DecodableType fieldStruct;
             expectArgumentCount = 1;
             const uint8_t * Label;
             bool argExists[1];
@@ -5142,12 +5317,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(aEndpointId, apCommandObj,
-                                                                                           const_cast<uint8_t *>(Label));
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::UpdateFabricLabel::Id);
+                wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(
+                    apCommandObj, path, aEndpointId, const_cast<uint8_t *>(Label), fieldStruct);
             }
             break;
         }
         case Commands::UpdateNOC::Id: {
+            Commands::UpdateNOC::DecodableType fieldStruct;
             expectArgumentCount = 2;
             chip::ByteSpan NOCValue;
             chip::ByteSpan ICACValue;
@@ -5205,7 +5382,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(aEndpointId, apCommandObj, NOCValue, ICACValue);
+                ConcreteCommandPath path(aEndpointId, OperationalCredentials::Id, Commands::UpdateNOC::Id);
+                wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(apCommandObj, path, aEndpointId, NOCValue,
+                                                                                   ICACValue, fieldStruct);
             }
             break;
         }
@@ -5255,6 +5434,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::ChangeChannel::Id: {
+            Commands::ChangeChannel::DecodableType fieldStruct;
             expectArgumentCount = 1;
             const uint8_t * match;
             bool argExists[1];
@@ -5309,11 +5489,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfTvChannelClusterChangeChannelCallback(aEndpointId, apCommandObj, const_cast<uint8_t *>(match));
+                ConcreteCommandPath path(aEndpointId, TvChannel::Id, Commands::ChangeChannel::Id);
+                wasHandled = emberAfTvChannelClusterChangeChannelCallback(apCommandObj, path, aEndpointId,
+                                                                          const_cast<uint8_t *>(match), fieldStruct);
             }
             break;
         }
         case Commands::ChangeChannelByNumber::Id: {
+            Commands::ChangeChannelByNumber::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint16_t majorNumber;
             uint16_t minorNumber;
@@ -5371,12 +5554,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfTvChannelClusterChangeChannelByNumberCallback(aEndpointId, apCommandObj, majorNumber, minorNumber);
+                ConcreteCommandPath path(aEndpointId, TvChannel::Id, Commands::ChangeChannelByNumber::Id);
+                wasHandled = emberAfTvChannelClusterChangeChannelByNumberCallback(apCommandObj, path, aEndpointId, majorNumber,
+                                                                                  minorNumber, fieldStruct);
             }
             break;
         }
         case Commands::SkipChannel::Id: {
+            Commands::SkipChannel::DecodableType fieldStruct;
             expectArgumentCount = 1;
             uint16_t Count;
             bool argExists[1];
@@ -5430,7 +5615,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfTvChannelClusterSkipChannelCallback(aEndpointId, apCommandObj, Count);
+                ConcreteCommandPath path(aEndpointId, TvChannel::Id, Commands::SkipChannel::Id);
+                wasHandled = emberAfTvChannelClusterSkipChannelCallback(apCommandObj, path, aEndpointId, Count, fieldStruct);
             }
             break;
         }
@@ -5480,6 +5666,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         switch (aCommandId)
         {
         case Commands::NavigateTarget::Id: {
+            Commands::NavigateTarget::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t target;
             const uint8_t * data;
@@ -5538,8 +5725,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfTargetNavigatorClusterNavigateTargetCallback(aEndpointId, apCommandObj, target,
-                                                                                 const_cast<uint8_t *>(data));
+                ConcreteCommandPath path(aEndpointId, TargetNavigator::Id, Commands::NavigateTarget::Id);
+                wasHandled = emberAfTargetNavigatorClusterNavigateTargetCallback(apCommandObj, path, aEndpointId, target,
+                                                                                 const_cast<uint8_t *>(data), fieldStruct);
             }
             break;
         }

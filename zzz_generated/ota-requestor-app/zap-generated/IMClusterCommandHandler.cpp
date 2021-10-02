@@ -23,6 +23,7 @@
 #include "app/util/util.h"
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 
@@ -69,6 +70,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
         switch (aCommandId)
         {
         case Commands::ApplyUpdateRequestResponse::Id: {
+            Commands::ApplyUpdateRequestResponse::DecodableType fieldStruct;
             expectArgumentCount = 2;
             uint8_t action;
             uint32_t delayedActionTime;
@@ -126,12 +128,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(aEndpointId, apCommandObj,
-                                                                                                       action, delayedActionTime);
+                ConcreteCommandPath path(aEndpointId, OtaSoftwareUpdateProvider::Id, Commands::ApplyUpdateRequestResponse::Id);
+                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(
+                    apCommandObj, path, aEndpointId, action, delayedActionTime, fieldStruct);
             }
             break;
         }
         case Commands::QueryImageResponse::Id: {
+            Commands::QueryImageResponse::DecodableType fieldStruct;
             expectArgumentCount = 8;
             uint8_t status;
             uint32_t delayedActionTime;
@@ -215,9 +219,11 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 8 == validArgumentCount)
             {
+                ConcreteCommandPath path(aEndpointId, OtaSoftwareUpdateProvider::Id, Commands::QueryImageResponse::Id);
                 wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
-                    aEndpointId, apCommandObj, status, delayedActionTime, const_cast<uint8_t *>(imageURI), softwareVersion,
-                    const_cast<uint8_t *>(softwareVersionString), updateToken, userConsentNeeded, metadataForRequestor);
+                    apCommandObj, path, aEndpointId, status, delayedActionTime, const_cast<uint8_t *>(imageURI), softwareVersion,
+                    const_cast<uint8_t *>(softwareVersionString), updateToken, userConsentNeeded, metadataForRequestor,
+                    fieldStruct);
             }
             break;
         }

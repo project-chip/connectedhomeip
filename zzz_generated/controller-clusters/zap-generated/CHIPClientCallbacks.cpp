@@ -21,8 +21,10 @@
 
 #include <cinttypes>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/Command.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
@@ -1645,7 +1647,9 @@ void ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter(T
 #pragma GCC diagnostic pop
 #endif // __clang__
 
-bool emberAfAccountLoginClusterGetSetupPINResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t * setupPIN)
+bool emberAfAccountLoginClusterGetSetupPINResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t * setupPIN,
+    app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "GetSetupPINResponse:");
     // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
@@ -1659,8 +1663,9 @@ bool emberAfAccountLoginClusterGetSetupPINResponseCallback(EndpointId endpoint, 
     return true;
 }
 
-bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t status, uint8_t * data)
+bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    uint8_t * data, app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "LaunchAppResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1675,8 +1680,9 @@ bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(EndpointId endpo
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchContentResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t * data, uint8_t contentLaunchStatus)
+bool emberAfContentLauncherClusterLaunchContentResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t * data,
+    uint8_t contentLaunchStatus, app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "LaunchContentResponse:");
     // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
@@ -1691,8 +1697,9 @@ bool emberAfContentLauncherClusterLaunchContentResponseCallback(EndpointId endpo
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t * data,
-                                                            uint8_t contentLaunchStatus)
+bool emberAfContentLauncherClusterLaunchURLResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t * data,
+    uint8_t contentLaunchStatus, app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "LaunchURLResponse:");
     // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
@@ -1707,7 +1714,9 @@ bool emberAfContentLauncherClusterLaunchURLResponseCallback(EndpointId endpoint,
     return true;
 }
 
-bool emberAfDoorLockClusterClearAllPinsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterClearAllPinsResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ClearAllPinsResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1720,7 +1729,9 @@ bool emberAfDoorLockClusterClearAllPinsResponseCallback(EndpointId endpoint, app
     return true;
 }
 
-bool emberAfDoorLockClusterClearAllRfidsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterClearAllRfidsResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    app::Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ClearAllRfidsResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1733,8 +1744,9 @@ bool emberAfDoorLockClusterClearAllRfidsResponseCallback(EndpointId endpoint, ap
     return true;
 }
 
-bool emberAfDoorLockClusterClearHolidayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t status)
+bool emberAfDoorLockClusterClearHolidayScheduleResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    app::Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ClearHolidayScheduleResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1747,7 +1759,9 @@ bool emberAfDoorLockClusterClearHolidayScheduleResponseCallback(EndpointId endpo
     return true;
 }
 
-bool emberAfDoorLockClusterClearPinResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterClearPinResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                    EndpointId endpoint, uint8_t status,
+                                                    app::Clusters::DoorLock::Commands::ClearPinResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ClearPinResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1760,7 +1774,9 @@ bool emberAfDoorLockClusterClearPinResponseCallback(EndpointId endpoint, app::Co
     return true;
 }
 
-bool emberAfDoorLockClusterClearRfidResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterClearRfidResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                     EndpointId endpoint, uint8_t status,
+                                                     app::Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ClearRfidResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1773,8 +1789,9 @@ bool emberAfDoorLockClusterClearRfidResponseCallback(EndpointId endpoint, app::C
     return true;
 }
 
-bool emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t status)
+bool emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    app::Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ClearWeekdayScheduleResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1787,8 +1804,9 @@ bool emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(EndpointId endpo
     return true;
 }
 
-bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t status)
+bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    app::Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ClearYeardayScheduleResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1801,9 +1819,10 @@ bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(EndpointId endpo
     return true;
 }
 
-bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t scheduleId, uint8_t status, uint32_t localStartTime,
-                                                              uint32_t localEndTime, uint8_t operatingModeDuringHoliday)
+bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t scheduleId,
+    uint8_t status, uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingModeDuringHoliday,
+    app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "GetHolidayScheduleResponse:");
     ChipLogProgress(Zcl, "  scheduleId: %" PRIu8 "", scheduleId);
@@ -1820,9 +1839,10 @@ bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(EndpointId endpoin
     return true;
 }
 
-bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t logEntryId,
-                                                        uint32_t timestamp, uint8_t eventType, uint8_t source,
-                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+bool emberAfDoorLockClusterGetLogRecordResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint16_t logEntryId,
+    uint32_t timestamp, uint8_t eventType, uint8_t source, uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin,
+    app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "GetLogRecordResponse:");
     ChipLogProgress(Zcl, "  logEntryId: %" PRIu16 "", logEntryId);
@@ -1842,8 +1862,10 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app
     return true;
 }
 
-bool emberAfDoorLockClusterGetPinResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                  uint8_t userStatus, uint8_t userType, uint8_t * pin)
+bool emberAfDoorLockClusterGetPinResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                  EndpointId endpoint, uint16_t userId, uint8_t userStatus, uint8_t userType,
+                                                  uint8_t * pin,
+                                                  app::Clusters::DoorLock::Commands::GetPinResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "GetPinResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
@@ -1860,8 +1882,10 @@ bool emberAfDoorLockClusterGetPinResponseCallback(EndpointId endpoint, app::Comm
     return true;
 }
 
-bool emberAfDoorLockClusterGetRfidResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                   uint8_t userStatus, uint8_t userType, uint8_t * rfid)
+bool emberAfDoorLockClusterGetRfidResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                   EndpointId endpoint, uint16_t userId, uint8_t userStatus, uint8_t userType,
+                                                   uint8_t * rfid,
+                                                   app::Clusters::DoorLock::Commands::GetRfidResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "GetRfidResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
@@ -1878,8 +1902,9 @@ bool emberAfDoorLockClusterGetRfidResponseCallback(EndpointId endpoint, app::Com
     return true;
 }
 
-bool emberAfDoorLockClusterGetUserTypeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                       uint8_t userType)
+bool emberAfDoorLockClusterGetUserTypeResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint16_t userId,
+    uint8_t userType, app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "GetUserTypeResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
@@ -1893,10 +1918,10 @@ bool emberAfDoorLockClusterGetUserTypeResponseCallback(EndpointId endpoint, app:
     return true;
 }
 
-bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t scheduleId, uint16_t userId, uint8_t status, uint8_t daysMask,
-                                                              uint8_t startHour, uint8_t startMinute, uint8_t endHour,
-                                                              uint8_t endMinute)
+bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t scheduleId,
+    uint16_t userId, uint8_t status, uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute,
+    app::Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "GetWeekdayScheduleResponse:");
     ChipLogProgress(Zcl, "  scheduleId: %" PRIu8 "", scheduleId);
@@ -1916,9 +1941,10 @@ bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(EndpointId endpoin
     return true;
 }
 
-bool emberAfDoorLockClusterGetYeardayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t scheduleId, uint16_t userId, uint8_t status,
-                                                              uint32_t localStartTime, uint32_t localEndTime)
+bool emberAfDoorLockClusterGetYeardayScheduleResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t scheduleId,
+    uint16_t userId, uint8_t status, uint32_t localStartTime, uint32_t localEndTime,
+    app::Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "GetYeardayScheduleResponse:");
     ChipLogProgress(Zcl, "  scheduleId: %" PRIu8 "", scheduleId);
@@ -1935,7 +1961,9 @@ bool emberAfDoorLockClusterGetYeardayScheduleResponseCallback(EndpointId endpoin
     return true;
 }
 
-bool emberAfDoorLockClusterLockDoorResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterLockDoorResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                    EndpointId endpoint, uint8_t status,
+                                                    app::Clusters::DoorLock::Commands::LockDoorResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "LockDoorResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1948,7 +1976,9 @@ bool emberAfDoorLockClusterLockDoorResponseCallback(EndpointId endpoint, app::Co
     return true;
 }
 
-bool emberAfDoorLockClusterSetHolidayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterSetHolidayScheduleResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    app::Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "SetHolidayScheduleResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1961,7 +1991,9 @@ bool emberAfDoorLockClusterSetHolidayScheduleResponseCallback(EndpointId endpoin
     return true;
 }
 
-bool emberAfDoorLockClusterSetPinResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterSetPinResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                  EndpointId endpoint, uint8_t status,
+                                                  app::Clusters::DoorLock::Commands::SetPinResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "SetPinResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1974,7 +2006,9 @@ bool emberAfDoorLockClusterSetPinResponseCallback(EndpointId endpoint, app::Comm
     return true;
 }
 
-bool emberAfDoorLockClusterSetRfidResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterSetRfidResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                   EndpointId endpoint, uint8_t status,
+                                                   app::Clusters::DoorLock::Commands::SetRfidResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "SetRfidResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -1987,7 +2021,9 @@ bool emberAfDoorLockClusterSetRfidResponseCallback(EndpointId endpoint, app::Com
     return true;
 }
 
-bool emberAfDoorLockClusterSetUserTypeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterSetUserTypeResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    app::Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "SetUserTypeResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2000,7 +2036,9 @@ bool emberAfDoorLockClusterSetUserTypeResponseCallback(EndpointId endpoint, app:
     return true;
 }
 
-bool emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    app::Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "SetWeekdayScheduleResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2013,7 +2051,9 @@ bool emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(EndpointId endpoin
     return true;
 }
 
-bool emberAfDoorLockClusterSetYeardayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterSetYeardayScheduleResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    app::Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "SetYeardayScheduleResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2026,7 +2066,9 @@ bool emberAfDoorLockClusterSetYeardayScheduleResponseCallback(EndpointId endpoin
     return true;
 }
 
-bool emberAfDoorLockClusterUnlockDoorResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterUnlockDoorResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                      EndpointId endpoint, uint8_t status,
+                                                      app::Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "UnlockDoorResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2039,7 +2081,9 @@ bool emberAfDoorLockClusterUnlockDoorResponseCallback(EndpointId endpoint, app::
     return true;
 }
 
-bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    app::Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "UnlockWithTimeoutResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2052,8 +2096,9 @@ bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(EndpointId endpoint
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                   uint8_t errorCode, uint8_t * debugText)
+bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ArmFailSafeResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -2068,8 +2113,9 @@ bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(EndpointId en
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                             uint8_t errorCode, uint8_t * debugText)
+bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "CommissioningCompleteResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -2084,8 +2130,9 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(End
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                           uint8_t errorCode, uint8_t * debugText)
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "SetRegulatoryConfigResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -2100,8 +2147,9 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(Endpo
     return true;
 }
 
-bool emberAfGroupsClusterAddGroupResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                  uint16_t groupId)
+bool emberAfGroupsClusterAddGroupResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                  EndpointId endpoint, uint8_t status, uint16_t groupId,
+                                                  app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "AddGroupResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2115,9 +2163,10 @@ bool emberAfGroupsClusterAddGroupResponseCallback(EndpointId endpoint, app::Comm
     return true;
 }
 
-bool emberAfGroupsClusterGetGroupMembershipResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t capacity,
-                                                            uint8_t groupCount,
-                                                            /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
+bool emberAfGroupsClusterGetGroupMembershipResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t capacity,
+    uint8_t groupCount, /* TYPE WARNING: array array defaults to */ uint8_t * groupList,
+    app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "GetGroupMembershipResponse:");
     ChipLogProgress(Zcl, "  capacity: %" PRIu8 "", capacity);
@@ -2132,8 +2181,9 @@ bool emberAfGroupsClusterGetGroupMembershipResponseCallback(EndpointId endpoint,
     return true;
 }
 
-bool emberAfGroupsClusterRemoveGroupResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                     uint16_t groupId)
+bool emberAfGroupsClusterRemoveGroupResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                     EndpointId endpoint, uint8_t status, uint16_t groupId,
+                                                     app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "RemoveGroupResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2147,8 +2197,9 @@ bool emberAfGroupsClusterRemoveGroupResponseCallback(EndpointId endpoint, app::C
     return true;
 }
 
-bool emberAfGroupsClusterViewGroupResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                   uint16_t groupId, uint8_t * groupName)
+bool emberAfGroupsClusterViewGroupResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                   EndpointId endpoint, uint8_t status, uint16_t groupId, uint8_t * groupName,
+                                                   app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ViewGroupResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2164,7 +2215,9 @@ bool emberAfGroupsClusterViewGroupResponseCallback(EndpointId endpoint, app::Com
     return true;
 }
 
-bool emberAfIdentifyClusterIdentifyQueryResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t timeout)
+bool emberAfIdentifyClusterIdentifyQueryResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint16_t timeout,
+    app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "IdentifyQueryResponse:");
     ChipLogProgress(Zcl, "  timeout: %" PRIu16 "", timeout);
@@ -2177,7 +2230,9 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(EndpointId endpoint, ap
     return true;
 }
 
-bool emberAfKeypadInputClusterSendKeyResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
+bool emberAfKeypadInputClusterSendKeyResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                      EndpointId endpoint, uint8_t status,
+                                                      app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "SendKeyResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2190,8 +2245,9 @@ bool emberAfKeypadInputClusterSendKeyResponseCallback(EndpointId endpoint, app::
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                 uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t mediaPlaybackStatus,
+    app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "MediaFastForwardResponse:");
     ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
@@ -2204,8 +2260,9 @@ bool emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(EndpointId endp
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaNextResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterMediaNextResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t mediaPlaybackStatus,
+    app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "MediaNextResponse:");
     ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
@@ -2218,8 +2275,9 @@ bool emberAfMediaPlaybackClusterMediaNextResponseCallback(EndpointId endpoint, a
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaPauseResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                           uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterMediaPauseResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t mediaPlaybackStatus,
+    app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "MediaPauseResponse:");
     ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
@@ -2232,8 +2290,9 @@ bool emberAfMediaPlaybackClusterMediaPauseResponseCallback(EndpointId endpoint, 
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaPlayResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterMediaPlayResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t mediaPlaybackStatus,
+    app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "MediaPlayResponse:");
     ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
@@ -2246,8 +2305,9 @@ bool emberAfMediaPlaybackClusterMediaPlayResponseCallback(EndpointId endpoint, a
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaPreviousResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterMediaPreviousResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t mediaPlaybackStatus,
+    app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "MediaPreviousResponse:");
     ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
@@ -2260,8 +2320,9 @@ bool emberAfMediaPlaybackClusterMediaPreviousResponseCallback(EndpointId endpoin
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                            uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t mediaPlaybackStatus,
+    app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "MediaRewindResponse:");
     ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
@@ -2274,8 +2335,9 @@ bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(EndpointId endpoint,
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSeekResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterMediaSeekResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t mediaPlaybackStatus,
+    app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "MediaSeekResponse:");
     ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
@@ -2288,8 +2350,9 @@ bool emberAfMediaPlaybackClusterMediaSeekResponseCallback(EndpointId endpoint, a
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                  uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t mediaPlaybackStatus,
+    app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "MediaSkipBackwardResponse:");
     ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
@@ -2302,8 +2365,9 @@ bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(EndpointId end
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                 uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t mediaPlaybackStatus,
+    app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "MediaSkipForwardResponse:");
     ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
@@ -2316,8 +2380,9 @@ bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(EndpointId endp
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaStartOverResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                               uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterMediaStartOverResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t mediaPlaybackStatus,
+    app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "MediaStartOverResponse:");
     ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
@@ -2330,8 +2395,9 @@ bool emberAfMediaPlaybackClusterMediaStartOverResponseCallback(EndpointId endpoi
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaStopResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterMediaStopResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t mediaPlaybackStatus,
+    app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "MediaStopResponse:");
     ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
@@ -2344,8 +2410,9 @@ bool emberAfMediaPlaybackClusterMediaStopResponseCallback(EndpointId endpoint, a
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                        uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "AddThreadNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -2360,8 +2427,9 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(Endpoint
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                      uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "AddWiFiNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -2376,8 +2444,9 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(EndpointId
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                      uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "DisableNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -2392,8 +2461,9 @@ bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(EndpointId
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                     uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "EnableNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -2408,8 +2478,9 @@ bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(EndpointId 
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                     uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "RemoveNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -2425,9 +2496,10 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(EndpointId 
 }
 
 bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
-    EndpointId endpoint, app::CommandSender * commandObj, uint8_t errorCode, uint8_t * debugText,
-    /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
-    /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
+    /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults,
+    app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ScanNetworksResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -2444,8 +2516,9 @@ bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                           uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "UpdateThreadNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -2460,8 +2533,9 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(Endpo
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                         uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "UpdateWiFiNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -2476,8 +2550,10 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(Endpoin
     return true;
 }
 
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                               uint8_t action, uint32_t delayedActionTime)
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t action,
+    uint32_t delayedActionTime,
+    app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ApplyUpdateRequestResponse:");
     ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
@@ -2491,11 +2567,11 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(E
     return true;
 }
 
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                       uint8_t status, uint32_t delayedActionTime,
-                                                                       uint8_t * imageURI, uint32_t softwareVersion,
-                                                                       uint8_t * softwareVersionString, chip::ByteSpan updateToken,
-                                                                       bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion, uint8_t * softwareVersionString,
+    chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor,
+    app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "QueryImageResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2518,8 +2594,10 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(EndpointI
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAttestationResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                     chip::ByteSpan AttestationElements, chip::ByteSpan Signature)
+bool emberAfOperationalCredentialsClusterAttestationResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+    chip::ByteSpan AttestationElements, chip::ByteSpan Signature,
+    app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "AttestationResponse:");
     ChipLogProgress(Zcl, "  AttestationElements: %zu", AttestationElements.size());
@@ -2533,8 +2611,9 @@ bool emberAfOperationalCredentialsClusterAttestationResponseCallback(EndpointId 
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                          chip::ByteSpan Certificate)
+bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, chip::ByteSpan Certificate,
+    app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "CertificateChainResponse:");
     ChipLogProgress(Zcl, "  Certificate: %zu", Certificate.size());
@@ -2547,8 +2626,10 @@ bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(Endpoi
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterNOCResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                             uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText)
+bool emberAfOperationalCredentialsClusterNOCResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t StatusCode,
+    uint8_t FabricIndex, chip::ByteSpan DebugText,
+    app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "NOCResponse:");
     ChipLogProgress(Zcl, "  StatusCode: %" PRIu8 "", StatusCode);
@@ -2563,8 +2644,10 @@ bool emberAfOperationalCredentialsClusterNOCResponseCallback(EndpointId endpoint
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                               chip::ByteSpan NOCSRElements, chip::ByteSpan AttestationSignature)
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+    chip::ByteSpan NOCSRElements, chip::ByteSpan AttestationSignature,
+    app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "OpCSRResponse:");
     ChipLogProgress(Zcl, "  NOCSRElements: %zu", NOCSRElements.size());
@@ -2578,8 +2661,9 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(EndpointId endpoi
     return true;
 }
 
-bool emberAfScenesClusterAddSceneResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                  uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterAddSceneResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                  EndpointId endpoint, uint8_t status, uint16_t groupId, uint8_t sceneId,
+                                                  app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "AddSceneResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2594,9 +2678,10 @@ bool emberAfScenesClusterAddSceneResponseCallback(EndpointId endpoint, app::Comm
     return true;
 }
 
-bool emberAfScenesClusterGetSceneMembershipResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                            uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
-                                                            /* TYPE WARNING: array array defaults to */ uint8_t * sceneList)
+bool emberAfScenesClusterGetSceneMembershipResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    uint8_t capacity, uint16_t groupId, uint8_t sceneCount, /* TYPE WARNING: array array defaults to */ uint8_t * sceneList,
+    app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "GetSceneMembershipResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2613,8 +2698,9 @@ bool emberAfScenesClusterGetSceneMembershipResponseCallback(EndpointId endpoint,
     return true;
 }
 
-bool emberAfScenesClusterRemoveAllScenesResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                         uint16_t groupId)
+bool emberAfScenesClusterRemoveAllScenesResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    uint16_t groupId, app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "RemoveAllScenesResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2628,8 +2714,9 @@ bool emberAfScenesClusterRemoveAllScenesResponseCallback(EndpointId endpoint, ap
     return true;
 }
 
-bool emberAfScenesClusterRemoveSceneResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                     uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterRemoveSceneResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                     EndpointId endpoint, uint8_t status, uint16_t groupId, uint8_t sceneId,
+                                                     app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "RemoveSceneResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2644,8 +2731,9 @@ bool emberAfScenesClusterRemoveSceneResponseCallback(EndpointId endpoint, app::C
     return true;
 }
 
-bool emberAfScenesClusterStoreSceneResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                    uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterStoreSceneResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                    EndpointId endpoint, uint8_t status, uint16_t groupId, uint8_t sceneId,
+                                                    app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "StoreSceneResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2660,9 +2748,11 @@ bool emberAfScenesClusterStoreSceneResponseCallback(EndpointId endpoint, app::Co
     return true;
 }
 
-bool emberAfScenesClusterViewSceneResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                                   /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
+bool emberAfScenesClusterViewSceneResponseCallback(app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                   EndpointId endpoint, uint8_t status, uint16_t groupId, uint8_t sceneId,
+                                                   uint16_t transitionTime, uint8_t * sceneName,
+                                                   /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets,
+                                                   app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ViewSceneResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2681,9 +2771,10 @@ bool emberAfScenesClusterViewSceneResponseCallback(EndpointId endpoint, app::Com
     return true;
 }
 
-bool emberAfTvChannelClusterChangeChannelResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
-                                                          uint8_t ErrorType)
+bool emberAfTvChannelClusterChangeChannelResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+    /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch, uint8_t ErrorType,
+    app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ChangeChannelResponse:");
     ChipLogProgress(Zcl, "  ChannelMatch: %p", ChannelMatch);
@@ -2697,8 +2788,9 @@ bool emberAfTvChannelClusterChangeChannelResponseCallback(EndpointId endpoint, a
     return true;
 }
 
-bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                 uint8_t status, uint8_t * data)
+bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t status,
+    uint8_t * data, app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "NavigateTargetResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
@@ -2713,8 +2805,9 @@ bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(EndpointId endp
     return true;
 }
 
-bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                               uint8_t returnValue)
+bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t returnValue,
+    app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "TestAddArgumentsResponse:");
     ChipLogProgress(Zcl, "  returnValue: %" PRIu8 "", returnValue);
@@ -2727,8 +2820,9 @@ bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(EndpointId endpoi
     return true;
 }
 
-bool emberAfTestClusterClusterTestSpecificResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                           uint8_t returnValue)
+bool emberAfTestClusterClusterTestSpecificResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t returnValue,
+    app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "TestSpecificResponse:");
     ChipLogProgress(Zcl, "  returnValue: %" PRIu8 "", returnValue);

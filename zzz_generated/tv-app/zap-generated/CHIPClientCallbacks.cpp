@@ -21,8 +21,10 @@
 
 #include <cinttypes>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/Command.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
@@ -495,8 +497,9 @@ void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV
 #pragma GCC diagnostic pop
 #endif // __clang__
 
-bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                   uint8_t errorCode, uint8_t * debugText)
+bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ArmFailSafeResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -511,8 +514,9 @@ bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(EndpointId en
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                             uint8_t errorCode, uint8_t * debugText)
+bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "CommissioningCompleteResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -527,8 +531,9 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(End
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                           uint8_t errorCode, uint8_t * debugText)
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "SetRegulatoryConfigResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -543,8 +548,9 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(Endpo
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                        uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "AddThreadNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -559,8 +565,9 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(Endpoint
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                      uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "AddWiFiNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -575,8 +582,9 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(EndpointId
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                      uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "DisableNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -591,8 +599,9 @@ bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(EndpointId
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                     uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "EnableNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -607,8 +616,9 @@ bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(EndpointId 
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                     uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "RemoveNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -624,9 +634,10 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(EndpointId 
 }
 
 bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
-    EndpointId endpoint, app::CommandSender * commandObj, uint8_t errorCode, uint8_t * debugText,
-    /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
-    /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
+    /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults,
+    app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "ScanNetworksResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -643,8 +654,9 @@ bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                           uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "UpdateThreadNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -659,8 +671,9 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(Endpo
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                         uint8_t errorCode, uint8_t * debugText)
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t errorCode,
+    uint8_t * debugText, app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "UpdateWiFiNetworkResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
@@ -675,8 +688,10 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(Endpoin
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAttestationResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                     chip::ByteSpan AttestationElements, chip::ByteSpan Signature)
+bool emberAfOperationalCredentialsClusterAttestationResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+    chip::ByteSpan AttestationElements, chip::ByteSpan Signature,
+    app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "AttestationResponse:");
     ChipLogProgress(Zcl, "  AttestationElements: %zu", AttestationElements.size());
@@ -690,8 +705,9 @@ bool emberAfOperationalCredentialsClusterAttestationResponseCallback(EndpointId 
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                          chip::ByteSpan Certificate)
+bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, chip::ByteSpan Certificate,
+    app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "CertificateChainResponse:");
     ChipLogProgress(Zcl, "  Certificate: %zu", Certificate.size());
@@ -704,8 +720,10 @@ bool emberAfOperationalCredentialsClusterCertificateChainResponseCallback(Endpoi
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterNOCResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                             uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText)
+bool emberAfOperationalCredentialsClusterNOCResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint8_t StatusCode,
+    uint8_t FabricIndex, chip::ByteSpan DebugText,
+    app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "NOCResponse:");
     ChipLogProgress(Zcl, "  StatusCode: %" PRIu8 "", StatusCode);
@@ -720,8 +738,10 @@ bool emberAfOperationalCredentialsClusterNOCResponseCallback(EndpointId endpoint
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                               chip::ByteSpan NOCSRElements, chip::ByteSpan AttestationSignature)
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(
+    app::CommandSender * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+    chip::ByteSpan NOCSRElements, chip::ByteSpan AttestationSignature,
+    app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & fields)
 {
     ChipLogProgress(Zcl, "OpCSRResponse:");
     ChipLogProgress(Zcl, "  NOCSRElements: %zu", NOCSRElements.size());
