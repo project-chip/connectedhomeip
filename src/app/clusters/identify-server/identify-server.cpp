@@ -205,14 +205,17 @@ void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, A
     }
 }
 
-bool emberAfIdentifyClusterIdentifyCallback(EndpointId endpoint, CommandHandler * commandObj, uint16_t identifyTime)
+bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                            EndpointId endpoint, uint16_t identifyTime,
+                                            Commands::Identify::DecodableType & commandData)
 {
     // cmd Identify
     return EMBER_SUCCESS ==
         emberAfSendImmediateDefaultResponse(Clusters::Identify::Attributes::IdentifyTime::Set(endpoint, identifyTime));
 }
 
-bool emberAfIdentifyClusterIdentifyQueryCallback(EndpointId endpoint, CommandHandler * commandObj)
+bool emberAfIdentifyClusterIdentifyQueryCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                 EndpointId endpoint, Commands::IdentifyQuery::DecodableType & commandData)
 {
     // cmd IdentifyQuery
     uint16_t identifyTime  = 0;
@@ -265,8 +268,9 @@ exit:
     return true;
 }
 
-bool emberAfIdentifyClusterTriggerEffectCallback(EndpointId endpoint, CommandHandler * commandObj, uint8_t effectIdentifier,
-                                                 uint8_t effectVariant)
+bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                 EndpointId endpoint, uint8_t effectIdentifier, uint8_t effectVariant,
+                                                 Commands::TriggerEffect::DecodableType & commandData)
 {
     // cmd TriggerEffect
     Identify * identify                      = inst(endpoint);

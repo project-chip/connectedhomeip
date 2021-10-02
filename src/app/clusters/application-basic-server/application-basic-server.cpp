@@ -31,8 +31,10 @@ using namespace chip;
 
 bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatus status, EndpointId endpoint);
 
-bool emberAfApplicationBasicClusterChangeStatusCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                        uint8_t newApplicationStatus)
+bool emberAfApplicationBasicClusterChangeStatusCallback(app::CommandHandler * commandObj,
+                                                        const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                        uint8_t newApplicationStatus,
+                                                        Commands::ChangeStatus::DecodableType & commandData)
 {
     bool success = applicationBasicClusterChangeApplicationStatus(static_cast<EmberAfApplicationBasicStatus>(newApplicationStatus),
                                                                   emberAfCurrentEndpoint());

@@ -103,8 +103,9 @@ static void sendResponse(const char * responseName, ContentLaunchResponse launch
     }
 }
 
-bool emberAfContentLauncherClusterLaunchContentCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
-                                                        bool autoplay, unsigned char * data)
+bool emberAfContentLauncherClusterLaunchContentCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                        EndpointId endpoint, bool autoplay, unsigned char * data,
+                                                        Commands::LaunchContent::DecodableType & commandData)
 {
 
     string dataString(reinterpret_cast<char *>(data));
@@ -114,8 +115,9 @@ bool emberAfContentLauncherClusterLaunchContentCallback(chip::EndpointId endpoin
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
-                                                    unsigned char * contentUrl, unsigned char * displayString)
+bool emberAfContentLauncherClusterLaunchURLCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                    EndpointId endpoint, unsigned char * contentUrl, unsigned char * displayString,
+                                                    Commands::LaunchURL::DecodableType & commandData)
 {
     string contentUrlString(reinterpret_cast<char *>(contentUrl));
     string displayStringString(reinterpret_cast<char *>(displayString));

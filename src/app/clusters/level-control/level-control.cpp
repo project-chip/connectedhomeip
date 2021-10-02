@@ -406,8 +406,9 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, uint8_t
 #endif
 }
 
-bool emberAfLevelControlClusterMoveToLevelCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t level,
-                                                   uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                   EndpointId endpoint, uint8_t level, uint16_t transitionTime, uint8_t optionMask,
+                                                   uint8_t optionOverride, Commands::MoveToLevel::DecodableType & commandData)
 {
     emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL %x %2x %x %x", "RX level-control:", level, transitionTime, optionMask,
                                       optionOverride);
@@ -416,8 +417,10 @@ bool emberAfLevelControlClusterMoveToLevelCallback(EndpointId endpoint, app::Com
     return true;
 }
 
-bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t level,
-                                                            uint16_t transitionTime)
+bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler * commandObj,
+                                                            const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                            uint8_t level, uint16_t transitionTime,
+                                                            Commands::MoveToLevelWithOnOff::DecodableType & commandData)
 {
     emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL_WITH_ON_OFF %x %2x", "RX level-control:", level, transitionTime);
     moveToLevelHandler(ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID, level, transitionTime, 0xFF, 0xFF,
@@ -425,47 +428,53 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(EndpointId endpoint,
     return true;
 }
 
-bool emberAfLevelControlClusterMoveCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t moveMode, uint8_t rate,
-                                            uint8_t optionMask, uint8_t optionOverride)
+bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                            EndpointId endpoint, uint8_t moveMode, uint8_t rate, uint8_t optionMask,
+                                            uint8_t optionOverride, Commands::Move::DecodableType & commandData)
 {
     emberAfLevelControlClusterPrintln("%pMOVE %x %x", "RX level-control:", moveMode, rate);
     moveHandler(ZCL_MOVE_COMMAND_ID, moveMode, rate, optionMask, optionOverride);
     return true;
 }
 
-bool emberAfLevelControlClusterMoveWithOnOffCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t moveMode,
-                                                     uint8_t rate)
+bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                     EndpointId endpoint, uint8_t moveMode, uint8_t rate,
+                                                     Commands::MoveWithOnOff::DecodableType & commandData)
 {
     emberAfLevelControlClusterPrintln("%pMOVE_WITH_ON_OFF %x %x", "RX level-control:", moveMode, rate);
     moveHandler(ZCL_MOVE_WITH_ON_OFF_COMMAND_ID, moveMode, rate, 0xFF, 0xFF);
     return true;
 }
 
-bool emberAfLevelControlClusterStepCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t stepMode,
-                                            uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                            EndpointId endpoint, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime,
+                                            uint8_t optionMask, uint8_t optionOverride, Commands::Step::DecodableType & commandData)
 {
     emberAfLevelControlClusterPrintln("%pSTEP %x %x %2x", "RX level-control:", stepMode, stepSize, transitionTime);
     stepHandler(ZCL_STEP_COMMAND_ID, stepMode, stepSize, transitionTime, optionMask, optionOverride);
     return true;
 }
 
-bool emberAfLevelControlClusterStepWithOnOffCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t stepMode,
-                                                     uint8_t stepSize, uint16_t transitionTime)
+bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                     EndpointId endpoint, uint8_t stepMode, uint8_t stepSize,
+                                                     uint16_t transitionTime, Commands::StepWithOnOff::DecodableType & commandData)
 {
     emberAfLevelControlClusterPrintln("%pSTEP_WITH_ON_OFF %x %x %2x", "RX level-control:", stepMode, stepSize, transitionTime);
     stepHandler(ZCL_STEP_WITH_ON_OFF_COMMAND_ID, stepMode, stepSize, transitionTime, 0xFF, 0xFF);
     return true;
 }
 
-bool emberAfLevelControlClusterStopCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t optionMask,
-                                            uint8_t optionOverride)
+bool emberAfLevelControlClusterStopCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                            EndpointId endpoint, uint8_t optionMask, uint8_t optionOverride,
+                                            Commands::Stop::DecodableType & commandData)
 {
     emberAfLevelControlClusterPrintln("%pSTOP", "RX level-control:");
     stopHandler(ZCL_STOP_COMMAND_ID, optionMask, optionOverride);
     return true;
 }
 
-bool emberAfLevelControlClusterStopWithOnOffCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfLevelControlClusterStopWithOnOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                     EndpointId endpoint, Commands::StopWithOnOff::DecodableType & commandData)
 {
     emberAfLevelControlClusterPrintln("%pSTOP_WITH_ON_OFF", "RX level-control:");
     stopHandler(ZCL_STOP_WITH_ON_OFF_COMMAND_ID, 0xFF, 0xFF);

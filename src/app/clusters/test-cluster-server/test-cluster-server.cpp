@@ -148,7 +148,8 @@ void emberAfPluginTestClusterServerInitCallback(void)
     }
 }
 
-bool emberAfTestClusterClusterTestCallback(EndpointId endpoint, app::CommandHandler *)
+bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                           Commands::Test::DecodableType & commandData)
 {
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -177,18 +178,22 @@ exit:
     return true;
 }
 
-bool emberAfTestClusterClusterTestSpecificCallback(EndpointId endpoint, app::CommandHandler * apCommandObj)
+bool emberAfTestClusterClusterTestSpecificCallback(app::CommandHandler * apCommandObj, const app::ConcreteCommandPath & commandPath,
+                                                   EndpointId endpoint, Commands::TestSpecific::DecodableType & commandData)
 {
     return sendNumericResponse(endpoint, apCommandObj, Commands::TestSpecificResponse::Id, 7);
 }
 
-bool emberAfTestClusterClusterTestNotHandledCallback(EndpointId endpoint, app::CommandHandler *)
+bool emberAfTestClusterClusterTestNotHandledCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
+                                                     EndpointId endpoint, Commands::TestNotHandled::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfTestClusterClusterTestAddArgumentsCallback(EndpointId endpoint, app::CommandHandler * apCommandObj, uint8_t arg1,
-                                                       uint8_t arg2)
+bool emberAfTestClusterClusterTestAddArgumentsCallback(app::CommandHandler * apCommandObj,
+                                                       const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                       uint8_t arg1, uint8_t arg2,
+                                                       Commands::TestAddArguments::DecodableType & commandData)
 {
     if (arg1 > UINT8_MAX - arg2)
     {

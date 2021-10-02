@@ -68,8 +68,11 @@ bool SendStatusIfDelegateNull(EndpointId endpoint)
  * @param newVersion The SoftwareVersion value of the new Software Image that the client is ready to apply.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                       ByteSpan updateToken, uint32_t newVersion)
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(app::CommandHandler * commandObj,
+                                                                       const app::ConcreteCommandPath & commandPath,
+                                                                       EndpointId endpoint, ByteSpan updateToken,
+                                                                       uint32_t newVersion,
+                                                                       Commands::ApplyUpdateRequest::DecodableType & commandData)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
@@ -105,9 +108,11 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(EndpointI
  *                       OTA Requestor's Basic Information Cluster.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::EndpointId endpoint,
-                                                                        chip::app::CommandHandler * commandObj,
-                                                                        chip::ByteSpan updateToken, uint32_t softwareVersion)
+bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(app::CommandHandler * commandObj,
+                                                                        const app::ConcreteCommandPath & commandPath,
+                                                                        EndpointId endpoint, chip::ByteSpan updateToken,
+                                                                        uint32_t softwareVersion,
+                                                                        Commands::NotifyUpdateApplied::DecodableType & commandData)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
@@ -151,11 +156,10 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::En
  * @param metadataForProvider Optional, max 512 octets. A TLV-encoded Vendor-specific payload.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                               uint16_t vendorId, uint16_t productId, uint16_t hardwareVersion,
-                                                               uint32_t softwareVersion, uint8_t protocolsSupported,
-                                                               uint8_t * location, bool requestorCanConsent,
-                                                               chip::ByteSpan metadataForProvider)
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint16_t vendorId,
+    uint16_t productId, uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported, uint8_t * location,
+    bool requestorCanConsent, chip::ByteSpan metadataForProvider, Commands::QueryImage::DecodableType & commandData)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);

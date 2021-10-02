@@ -52,8 +52,10 @@ exit:
     }
 }
 
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t target,
-                                                         uint8_t * data)
+bool emberAfTargetNavigatorClusterNavigateTargetCallback(app::CommandHandler * command,
+                                                         const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                         uint8_t target, uint8_t * data,
+                                                         Commands::NavigateTarget::DecodableType & commandData)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string dataString(reinterpret_cast<char *>(data));
