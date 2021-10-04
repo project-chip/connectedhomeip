@@ -24,27 +24,962 @@
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/util/basic-types.h>
+#include <protocols/interaction_model/Constants.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
 namespace PowerConfiguration {
+constexpr ClusterId kClusterId = 0x01;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace PowerConfiguration
 namespace DeviceTemperatureConfiguration {
+constexpr ClusterId kClusterId = 0x02;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace DeviceTemperatureConfiguration
 namespace Identify {
+constexpr ClusterId kClusterId = 0x03;
+
+ClusterId GetClusterId();
+
+// Enum for IdentifyEffectIdentifier
+enum class IdentifyEffectIdentifier : uint8_t
+{
+    IDENTIFY_EFFECT_IDENTIFIER_BLINK          = 0x00,
+    IDENTIFY_EFFECT_IDENTIFIER_BREATHE        = 0x01,
+    IDENTIFY_EFFECT_IDENTIFIER_OKAY           = 0x02,
+    IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE = 0x0B,
+    IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT  = 0xFE,
+    IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT    = 0xFF,
+};
+// Enum for IdentifyEffectVariant
+enum class IdentifyEffectVariant : uint8_t
+{
+    IDENTIFY_EFFECT_VARIANT_DEFAULT = 0x00,
+};
+// Enum for IdentifyIdentifyType
+enum class IdentifyIdentifyType : uint8_t
+{
+    IDENTIFY_IDENTIFY_TYPE_NONE          = 0x00,
+    IDENTIFY_IDENTIFY_TYPE_VISIBLE_LIGHT = 0x01,
+    IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED   = 0x02,
+    IDENTIFY_IDENTIFY_TYPE_AUDIBLE_BEEP  = 0x03,
+    IDENTIFY_IDENTIFY_TYPE_DISPLAY       = 0x04,
+    IDENTIFY_IDENTIFY_TYPE_ACTUATOR      = 0x05,
+};
+
+namespace Commands {
+namespace IdentifyCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kIdentifyTimeFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t identifyTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace IdentifyCommandParams
+namespace IdentifyQueryCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace IdentifyQueryCommandParams
+namespace IdentifyQueryResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kTimeoutFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t timeout;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace IdentifyQueryResponseCommandParams
+namespace TriggerEffectCommandParams {
+constexpr CommandId kCommandId = 0x40;
+
+enum FieldId
+{
+    kEffectIdentifierFieldId = 0,
+    kEffectVariantFieldId    = 1,
+};
+
+struct Type
+{
+public:
+    IdentifyEffectIdentifier effectIdentifier;
+    IdentifyEffectVariant effectVariant;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace TriggerEffectCommandParams
+
+} // namespace Commands
 
 } // namespace Identify
 namespace Groups {
+constexpr ClusterId kClusterId = 0x04;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace AddGroupCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kGroupIdFieldId   = 0,
+    kGroupNameFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+    Span<const char> groupName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AddGroupCommandParams
+namespace AddGroupIfIdentifyingCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kGroupIdFieldId   = 0,
+    kGroupNameFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+    Span<const char> groupName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AddGroupIfIdentifyingCommandParams
+namespace AddGroupResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kStatusFieldId  = 0,
+    kGroupIdFieldId = 1,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AddGroupResponseCommandParams
+namespace GetGroupMembershipCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kGroupCountFieldId = 0,
+    kGroupListFieldId  = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t groupCount;
+    DataModel::List<uint16_t> groupList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t groupCount;
+    DataModel::DecodableList<uint16_t> groupList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetGroupMembershipCommandParams
+namespace GetGroupMembershipResponseCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kCapacityFieldId   = 0,
+    kGroupCountFieldId = 1,
+    kGroupListFieldId  = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t capacity;
+    uint8_t groupCount;
+    DataModel::List<uint16_t> groupList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t capacity;
+    uint8_t groupCount;
+    DataModel::DecodableList<uint16_t> groupList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetGroupMembershipResponseCommandParams
+namespace RemoveAllGroupsCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RemoveAllGroupsCommandParams
+namespace RemoveGroupCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kGroupIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RemoveGroupCommandParams
+namespace RemoveGroupResponseCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kStatusFieldId  = 0,
+    kGroupIdFieldId = 1,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RemoveGroupResponseCommandParams
+namespace ViewGroupCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kGroupIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ViewGroupCommandParams
+namespace ViewGroupResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kStatusFieldId    = 0,
+    kGroupIdFieldId   = 1,
+    kGroupNameFieldId = 2,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+    Span<const char> groupName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ViewGroupResponseCommandParams
+
+} // namespace Commands
 
 } // namespace Groups
 namespace Scenes {
+constexpr ClusterId kClusterId = 0x05;
+
+ClusterId GetClusterId();
+
+namespace SceneExtensionFieldSet {
+enum FieldId
+{
+    kClusterIdFieldId = 0,
+    kLengthFieldId    = 1,
+    kValueFieldId     = 2,
+};
+
+struct Type
+{
+public:
+    chip::ClusterId clusterId;
+    uint8_t length;
+    uint8_t value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace SceneExtensionFieldSet
+
+namespace Commands {
+namespace AddSceneCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kGroupIdFieldId            = 0,
+    kSceneIdFieldId            = 1,
+    kTransitionTimeFieldId     = 2,
+    kSceneNameFieldId          = 3,
+    kExtensionFieldSetsFieldId = 4,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    Span<const char> sceneName;
+    DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    Span<const char> sceneName;
+    DataModel::DecodableList<SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AddSceneCommandParams
+namespace AddSceneResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kStatusFieldId  = 0,
+    kGroupIdFieldId = 1,
+    kSceneIdFieldId = 2,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AddSceneResponseCommandParams
+namespace CopySceneCommandParams {
+constexpr CommandId kCommandId = 0x42;
+
+enum FieldId
+{
+    kModeFieldId        = 0,
+    kGroupIdFromFieldId = 1,
+    kSceneIdFromFieldId = 2,
+    kGroupIdToFieldId   = 3,
+    kSceneIdToFieldId   = 4,
+};
+
+struct Type
+{
+public:
+    uint8_t mode;
+    uint16_t groupIdFrom;
+    uint8_t sceneIdFrom;
+    uint16_t groupIdTo;
+    uint8_t sceneIdTo;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CopySceneCommandParams
+namespace CopySceneResponseCommandParams {
+constexpr CommandId kCommandId = 0x42;
+
+enum FieldId
+{
+    kStatusFieldId      = 0,
+    kGroupIdFromFieldId = 1,
+    kSceneIdFromFieldId = 2,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupIdFrom;
+    uint8_t sceneIdFrom;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CopySceneResponseCommandParams
+namespace EnhancedAddSceneCommandParams {
+constexpr CommandId kCommandId = 0x40;
+
+enum FieldId
+{
+    kGroupIdFieldId            = 0,
+    kSceneIdFieldId            = 1,
+    kTransitionTimeFieldId     = 2,
+    kSceneNameFieldId          = 3,
+    kExtensionFieldSetsFieldId = 4,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    Span<const char> sceneName;
+    DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    Span<const char> sceneName;
+    DataModel::DecodableList<SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnhancedAddSceneCommandParams
+namespace EnhancedAddSceneResponseCommandParams {
+constexpr CommandId kCommandId = 0x40;
+
+enum FieldId
+{
+    kStatusFieldId  = 0,
+    kGroupIdFieldId = 1,
+    kSceneIdFieldId = 2,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnhancedAddSceneResponseCommandParams
+namespace EnhancedViewSceneCommandParams {
+constexpr CommandId kCommandId = 0x41;
+
+enum FieldId
+{
+    kGroupIdFieldId = 0,
+    kSceneIdFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnhancedViewSceneCommandParams
+namespace EnhancedViewSceneResponseCommandParams {
+constexpr CommandId kCommandId = 0x41;
+
+enum FieldId
+{
+    kStatusFieldId             = 0,
+    kGroupIdFieldId            = 1,
+    kSceneIdFieldId            = 2,
+    kTransitionTimeFieldId     = 3,
+    kSceneNameFieldId          = 4,
+    kExtensionFieldSetsFieldId = 5,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    Span<const char> sceneName;
+    DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    Span<const char> sceneName;
+    DataModel::DecodableList<SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnhancedViewSceneResponseCommandParams
+namespace GetSceneMembershipCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kGroupIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetSceneMembershipCommandParams
+namespace GetSceneMembershipResponseCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kStatusFieldId     = 0,
+    kCapacityFieldId   = 1,
+    kGroupIdFieldId    = 2,
+    kSceneCountFieldId = 3,
+    kSceneListFieldId  = 4,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint8_t capacity;
+    uint16_t groupId;
+    uint8_t sceneCount;
+    DataModel::List<uint8_t> sceneList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint8_t capacity;
+    uint16_t groupId;
+    uint8_t sceneCount;
+    DataModel::DecodableList<uint8_t> sceneList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetSceneMembershipResponseCommandParams
+namespace RecallSceneCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kGroupIdFieldId        = 0,
+    kSceneIdFieldId        = 1,
+    kTransitionTimeFieldId = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RecallSceneCommandParams
+namespace RemoveAllScenesCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kGroupIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RemoveAllScenesCommandParams
+namespace RemoveAllScenesResponseCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kStatusFieldId  = 0,
+    kGroupIdFieldId = 1,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RemoveAllScenesResponseCommandParams
+namespace RemoveSceneCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kGroupIdFieldId = 0,
+    kSceneIdFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RemoveSceneCommandParams
+namespace RemoveSceneResponseCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kStatusFieldId  = 0,
+    kGroupIdFieldId = 1,
+    kSceneIdFieldId = 2,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RemoveSceneResponseCommandParams
+namespace StoreSceneCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kGroupIdFieldId = 0,
+    kSceneIdFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StoreSceneCommandParams
+namespace StoreSceneResponseCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kStatusFieldId  = 0,
+    kGroupIdFieldId = 1,
+    kSceneIdFieldId = 2,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StoreSceneResponseCommandParams
+namespace ViewSceneCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kGroupIdFieldId = 0,
+    kSceneIdFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t groupId;
+    uint8_t sceneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ViewSceneCommandParams
+namespace ViewSceneResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kStatusFieldId             = 0,
+    kGroupIdFieldId            = 1,
+    kSceneIdFieldId            = 2,
+    kTransitionTimeFieldId     = 3,
+    kSceneNameFieldId          = 4,
+    kExtensionFieldSetsFieldId = 5,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    Span<const char> sceneName;
+    DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint16_t groupId;
+    uint8_t sceneId;
+    uint16_t transitionTime;
+    Span<const char> sceneName;
+    DataModel::DecodableList<SceneExtensionFieldSet::Type> extensionFieldSets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ViewSceneResponseCommandParams
+
+} // namespace Commands
 
 } // namespace Scenes
 namespace OnOff {
+constexpr ClusterId kClusterId = 0x06;
+
+ClusterId GetClusterId();
+
 // Enum for OnOffDelayedAllOffEffectVariant
 enum class OnOffDelayedAllOffEffectVariant : uint8_t
 {
@@ -64,29 +999,1452 @@ enum class OnOffEffectIdentifier : uint8_t
     ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT     = 0x01,
 };
 
+namespace Commands {
+namespace OffCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OffCommandParams
+namespace OffWithEffectCommandParams {
+constexpr CommandId kCommandId = 0x40;
+
+enum FieldId
+{
+    kEffectIdFieldId      = 0,
+    kEffectVariantFieldId = 1,
+};
+
+struct Type
+{
+public:
+    OnOffEffectIdentifier effectId;
+    OnOffDelayedAllOffEffectVariant effectVariant;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OffWithEffectCommandParams
+namespace OnCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OnCommandParams
+namespace OnWithRecallGlobalSceneCommandParams {
+constexpr CommandId kCommandId = 0x41;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OnWithRecallGlobalSceneCommandParams
+namespace OnWithTimedOffCommandParams {
+constexpr CommandId kCommandId = 0x42;
+
+enum FieldId
+{
+    kOnOffControlFieldId = 0,
+    kOnTimeFieldId       = 1,
+    kOffWaitTimeFieldId  = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t onOffControl;
+    uint16_t onTime;
+    uint16_t offWaitTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OnWithTimedOffCommandParams
+namespace SampleMfgSpecificOffWithTransitionCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SampleMfgSpecificOffWithTransitionCommandParams
+namespace SampleMfgSpecificOnWithTransitionCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SampleMfgSpecificOnWithTransitionCommandParams
+namespace SampleMfgSpecificOnWithTransition2CommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SampleMfgSpecificOnWithTransition2CommandParams
+namespace SampleMfgSpecificToggleWithTransitionCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SampleMfgSpecificToggleWithTransitionCommandParams
+namespace SampleMfgSpecificToggleWithTransition2CommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SampleMfgSpecificToggleWithTransition2CommandParams
+namespace ToggleCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ToggleCommandParams
+
+} // namespace Commands
+
 } // namespace OnOff
 namespace OnOffSwitchConfiguration {
+constexpr ClusterId kClusterId = 0x07;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace OnOffSwitchConfiguration
 namespace LevelControl {
+constexpr ClusterId kClusterId = 0x08;
+
+ClusterId GetClusterId();
+
+// Enum for MoveMode
+enum class MoveMode : uint8_t
+{
+    MOVE_MODE_UP   = 0x00,
+    MOVE_MODE_DOWN = 0x01,
+};
+// Enum for StepMode
+enum class StepMode : uint8_t
+{
+    STEP_MODE_UP   = 0x00,
+    STEP_MODE_DOWN = 0x01,
+};
+
+namespace Commands {
+namespace MoveCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kMoveModeFieldId       = 0,
+    kRateFieldId           = 1,
+    kOptionMaskFieldId     = 2,
+    kOptionOverrideFieldId = 3,
+};
+
+struct Type
+{
+public:
+    MoveMode moveMode;
+    uint8_t rate;
+    uint8_t optionMask;
+    uint8_t optionOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveCommandParams
+namespace MoveToLevelCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kLevelFieldId          = 0,
+    kTransitionTimeFieldId = 1,
+    kOptionMaskFieldId     = 2,
+    kOptionOverrideFieldId = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t level;
+    uint16_t transitionTime;
+    uint8_t optionMask;
+    uint8_t optionOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveToLevelCommandParams
+namespace MoveToLevelWithOnOffCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kLevelFieldId          = 0,
+    kTransitionTimeFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t level;
+    uint16_t transitionTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveToLevelWithOnOffCommandParams
+namespace MoveWithOnOffCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kMoveModeFieldId = 0,
+    kRateFieldId     = 1,
+};
+
+struct Type
+{
+public:
+    MoveMode moveMode;
+    uint8_t rate;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveWithOnOffCommandParams
+namespace StepCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kStepModeFieldId       = 0,
+    kStepSizeFieldId       = 1,
+    kTransitionTimeFieldId = 2,
+    kOptionMaskFieldId     = 3,
+    kOptionOverrideFieldId = 4,
+};
+
+struct Type
+{
+public:
+    StepMode stepMode;
+    uint8_t stepSize;
+    uint16_t transitionTime;
+    uint8_t optionMask;
+    uint8_t optionOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StepCommandParams
+namespace StepWithOnOffCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kStepModeFieldId       = 0,
+    kStepSizeFieldId       = 1,
+    kTransitionTimeFieldId = 2,
+};
+
+struct Type
+{
+public:
+    StepMode stepMode;
+    uint8_t stepSize;
+    uint16_t transitionTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StepWithOnOffCommandParams
+namespace StopCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kOptionMaskFieldId     = 0,
+    kOptionOverrideFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t optionMask;
+    uint8_t optionOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StopCommandParams
+namespace StopWithOnOffCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StopWithOnOffCommandParams
+
+} // namespace Commands
 
 } // namespace LevelControl
 namespace Alarms {
+constexpr ClusterId kClusterId = 0x09;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace AlarmCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kAlarmCodeFieldId = 0,
+    kClusterIdFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t alarmCode;
+    chip::ClusterId clusterId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AlarmCommandParams
+namespace GetAlarmCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetAlarmCommandParams
+namespace GetAlarmResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kStatusFieldId    = 0,
+    kAlarmCodeFieldId = 1,
+    kClusterIdFieldId = 2,
+    kTimeStampFieldId = 3,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+    uint8_t alarmCode;
+    chip::ClusterId clusterId;
+    chip::UTC timeStamp;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetAlarmResponseCommandParams
+namespace ResetAlarmCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kAlarmCodeFieldId = 0,
+    kClusterIdFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t alarmCode;
+    chip::ClusterId clusterId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ResetAlarmCommandParams
+namespace ResetAlarmLogCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ResetAlarmLogCommandParams
+namespace ResetAllAlarmsCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ResetAllAlarmsCommandParams
+
+} // namespace Commands
 
 } // namespace Alarms
 namespace Time {
+constexpr ClusterId kClusterId = 0x0A;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace Time
 namespace BinaryInputBasic {
+constexpr ClusterId kClusterId = 0x0F;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace BinaryInputBasic
 namespace PowerProfile {
+constexpr ClusterId kClusterId = 0x1A;
+
+ClusterId GetClusterId();
+
+namespace PowerProfileRecord {
+enum FieldId
+{
+    kPowerProfileIdFieldId            = 0,
+    kEnergyPhaseIdFieldId             = 1,
+    kPowerProfileRemoteControlFieldId = 2,
+    kPowerProfileStateFieldId         = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+    uint8_t energyPhaseId;
+    bool powerProfileRemoteControl;
+    uint8_t powerProfileState;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace PowerProfileRecord
+namespace ScheduledPhase {
+enum FieldId
+{
+    kEnergyPhaseIdFieldId = 0,
+    kScheduledTimeFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t energyPhaseId;
+    uint16_t scheduledTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace ScheduledPhase
+namespace TransferredPhase {
+enum FieldId
+{
+    kEnergyPhaseIdFieldId      = 0,
+    kMacroPhaseIdFieldId       = 1,
+    kExpectedDurationFieldId   = 2,
+    kPeakPowerFieldId          = 3,
+    kEnergyFieldId             = 4,
+    kMaxActivationDelayFieldId = 5,
+};
+
+struct Type
+{
+public:
+    uint8_t energyPhaseId;
+    uint8_t macroPhaseId;
+    uint16_t expectedDuration;
+    uint16_t peakPower;
+    uint16_t energy;
+    uint16_t maxActivationDelay;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace TransferredPhase
+
+namespace Commands {
+namespace EnergyPhasesScheduleNotificationCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId       = 0,
+    kNumOfScheduledPhasesFieldId = 1,
+    kScheduledPhasesFieldId      = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::List<ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::DecodableList<ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnergyPhasesScheduleNotificationCommandParams
+namespace EnergyPhasesScheduleRequestCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnergyPhasesScheduleRequestCommandParams
+namespace EnergyPhasesScheduleResponseCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId       = 0,
+    kNumOfScheduledPhasesFieldId = 1,
+    kScheduledPhasesFieldId      = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::List<ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::DecodableList<ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnergyPhasesScheduleResponseCommandParams
+namespace EnergyPhasesScheduleStateNotificationCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId       = 0,
+    kNumOfScheduledPhasesFieldId = 1,
+    kScheduledPhasesFieldId      = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::List<ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::DecodableList<ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnergyPhasesScheduleStateNotificationCommandParams
+namespace EnergyPhasesScheduleStateRequestCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnergyPhasesScheduleStateRequestCommandParams
+namespace EnergyPhasesScheduleStateResponseCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId       = 0,
+    kNumOfScheduledPhasesFieldId = 1,
+    kScheduledPhasesFieldId      = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::List<ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t powerProfileId;
+    uint8_t numOfScheduledPhases;
+    DataModel::DecodableList<ScheduledPhase::Type> scheduledPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnergyPhasesScheduleStateResponseCommandParams
+namespace GetOverallSchedulePriceCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetOverallSchedulePriceCommandParams
+namespace GetOverallSchedulePriceResponseCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kCurrencyFieldId           = 0,
+    kPriceFieldId              = 1,
+    kPriceTrailingDigitFieldId = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t currency;
+    uint32_t price;
+    uint8_t priceTrailingDigit;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetOverallSchedulePriceResponseCommandParams
+namespace GetPowerProfilePriceCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetPowerProfilePriceCommandParams
+namespace GetPowerProfilePriceExtendedCommandParams {
+constexpr CommandId kCommandId = 0x0B;
+
+enum FieldId
+{
+    kOptionsFieldId               = 0,
+    kPowerProfileIdFieldId        = 1,
+    kPowerProfileStartTimeFieldId = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t options;
+    uint8_t powerProfileId;
+    uint16_t powerProfileStartTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetPowerProfilePriceExtendedCommandParams
+namespace GetPowerProfilePriceExtendedResponseCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId     = 0,
+    kCurrencyFieldId           = 1,
+    kPriceFieldId              = 2,
+    kPriceTrailingDigitFieldId = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+    uint16_t currency;
+    uint32_t price;
+    uint8_t priceTrailingDigit;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetPowerProfilePriceExtendedResponseCommandParams
+namespace GetPowerProfilePriceResponseCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId     = 0,
+    kCurrencyFieldId           = 1,
+    kPriceFieldId              = 2,
+    kPriceTrailingDigitFieldId = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+    uint16_t currency;
+    uint32_t price;
+    uint8_t priceTrailingDigit;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetPowerProfilePriceResponseCommandParams
+namespace PowerProfileNotificationCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kTotalProfileNumFieldId        = 0,
+    kPowerProfileIdFieldId         = 1,
+    kNumOfTransferredPhasesFieldId = 2,
+    kTransferredPhasesFieldId      = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t totalProfileNum;
+    uint8_t powerProfileId;
+    uint8_t numOfTransferredPhases;
+    DataModel::List<TransferredPhase::Type> transferredPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t totalProfileNum;
+    uint8_t powerProfileId;
+    uint8_t numOfTransferredPhases;
+    DataModel::DecodableList<TransferredPhase::Type> transferredPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace PowerProfileNotificationCommandParams
+namespace PowerProfileRequestCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace PowerProfileRequestCommandParams
+namespace PowerProfileResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kTotalProfileNumFieldId        = 0,
+    kPowerProfileIdFieldId         = 1,
+    kNumOfTransferredPhasesFieldId = 2,
+    kTransferredPhasesFieldId      = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t totalProfileNum;
+    uint8_t powerProfileId;
+    uint8_t numOfTransferredPhases;
+    DataModel::List<TransferredPhase::Type> transferredPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t totalProfileNum;
+    uint8_t powerProfileId;
+    uint8_t numOfTransferredPhases;
+    DataModel::DecodableList<TransferredPhase::Type> transferredPhases;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace PowerProfileResponseCommandParams
+namespace PowerProfileScheduleConstraintsNotificationCommandParams {
+constexpr CommandId kCommandId = 0x09;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId = 0,
+    kStartAfterFieldId     = 1,
+    kStopBeforeFieldId     = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+    uint16_t startAfter;
+    uint16_t stopBefore;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace PowerProfileScheduleConstraintsNotificationCommandParams
+namespace PowerProfileScheduleConstraintsRequestCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace PowerProfileScheduleConstraintsRequestCommandParams
+namespace PowerProfileScheduleConstraintsResponseCommandParams {
+constexpr CommandId kCommandId = 0x0A;
+
+enum FieldId
+{
+    kPowerProfileIdFieldId = 0,
+    kStartAfterFieldId     = 1,
+    kStopBeforeFieldId     = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+    uint16_t startAfter;
+    uint16_t stopBefore;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace PowerProfileScheduleConstraintsResponseCommandParams
+namespace PowerProfileStateRequestCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace PowerProfileStateRequestCommandParams
+namespace PowerProfileStateResponseCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kPowerProfileCountFieldId   = 0,
+    kPowerProfileRecordsFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileCount;
+    DataModel::List<PowerProfileRecord::Type> powerProfileRecords;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t powerProfileCount;
+    DataModel::DecodableList<PowerProfileRecord::Type> powerProfileRecords;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace PowerProfileStateResponseCommandParams
+namespace PowerProfilesStateNotificationCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kPowerProfileCountFieldId   = 0,
+    kPowerProfileRecordsFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileCount;
+    DataModel::List<PowerProfileRecord::Type> powerProfileRecords;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t powerProfileCount;
+    DataModel::DecodableList<PowerProfileRecord::Type> powerProfileRecords;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace PowerProfilesStateNotificationCommandParams
+
+} // namespace Commands
 
 } // namespace PowerProfile
 namespace ApplianceControl {
+constexpr ClusterId kClusterId = 0x1B;
+
+ClusterId GetClusterId();
+
+// Enum for ApplianceStatus
+enum class ApplianceStatus : uint8_t
+{
+    APPLIANCE_STATUS_OFF                         = 0x01,
+    APPLIANCE_STATUS_STAND_BY                    = 0x02,
+    APPLIANCE_STATUS_PROGRAMMED                  = 0x03,
+    APPLIANCE_STATUS_PROGRAMMED_WAITING_TO_START = 0x04,
+    APPLIANCE_STATUS_RUNNING                     = 0x05,
+    APPLIANCE_STATUS_PAUSE                       = 0x06,
+    APPLIANCE_STATUS_END_PROGRAMMED              = 0x07,
+    APPLIANCE_STATUS_FAILURE                     = 0x08,
+    APPLIANCE_STATUS_PROGRAMME_INTERRUPTED       = 0x09,
+    APPLIANCE_STATUS_IDLE                        = 0x0A,
+    APPLIANCE_STATUS_RINSE_HOLD                  = 0x0B,
+    APPLIANCE_STATUS_SERVICE                     = 0x0C,
+    APPLIANCE_STATUS_SUPERFREEZING               = 0x0D,
+    APPLIANCE_STATUS_SUPERCOOLING                = 0x0E,
+    APPLIANCE_STATUS_SUPERHEATING                = 0x0F,
+};
+// Enum for CommandIdentification
+enum class CommandIdentification : uint8_t
+{
+    COMMAND_IDENTIFICATION_START                  = 0x01,
+    COMMAND_IDENTIFICATION_STOP                   = 0x02,
+    COMMAND_IDENTIFICATION_PAUSE                  = 0x03,
+    COMMAND_IDENTIFICATION_START_SUPERFREEZING    = 0x04,
+    COMMAND_IDENTIFICATION_STOP_SUPERFREEZING     = 0x05,
+    COMMAND_IDENTIFICATION_START_SUPERCOOLING     = 0x06,
+    COMMAND_IDENTIFICATION_STOP_SUPERCOOLING      = 0x07,
+    COMMAND_IDENTIFICATION_DISABLE_GAS            = 0x08,
+    COMMAND_IDENTIFICATION_ENABLE_GAS             = 0x09,
+    COMMAND_IDENTIFICATION_ENABLE_ENERGY_CONTROL  = 0x0A,
+    COMMAND_IDENTIFICATION_DISABLE_ENERGY_CONTROL = 0x0B,
+};
+// Enum for WarningEvent
+enum class WarningEvent : uint8_t
+{
+    WARNING_EVENT_WARNING1_OVERALL_POWER_ABOVE_AVAILABLE_POWER_LEVEL                                             = 0x00,
+    WARNING_EVENT_WARNING2_OVERALL_POWER_ABOVE_POWER_THRESHOLD_LEVEL                                             = 0x01,
+    WARNING_EVENT_WARNING3_OVERALL_POWER_BACK_BELOW_THE_AVAILABLE_POWER_LEVEL                                    = 0x02,
+    WARNING_EVENT_WARNING4_OVERALL_POWER_BACK_BELOW_THE_POWER_THRESHOLD_LEVEL                                    = 0x03,
+    WARNING_EVENT_WARNING5_OVERALL_POWER_WILL_BE_POTENTIALLY_ABOVE_AVAILABLE_POWER_LEVEL_IF_THE_APPLIANCE_STARTS = 0x04,
+};
+
+namespace Commands {
+namespace ExecutionOfACommandCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kCommandIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    CommandIdentification commandId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ExecutionOfACommandCommandParams
+namespace OverloadPauseCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OverloadPauseCommandParams
+namespace OverloadPauseResumeCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OverloadPauseResumeCommandParams
+namespace OverloadWarningCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kWarningEventFieldId = 0,
+};
+
+struct Type
+{
+public:
+    WarningEvent warningEvent;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OverloadWarningCommandParams
+namespace SignalStateCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SignalStateCommandParams
+namespace SignalStateNotificationCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kApplianceStatusFieldId                   = 0,
+    kRemoteEnableFlagsAndDeviceStatus2FieldId = 1,
+    kApplianceStatus2FieldId                  = 2,
+};
+
+struct Type
+{
+public:
+    ApplianceStatus applianceStatus;
+    uint8_t remoteEnableFlagsAndDeviceStatus2;
+    ApplianceStatus applianceStatus2;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SignalStateNotificationCommandParams
+namespace SignalStateResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kApplianceStatusFieldId                   = 0,
+    kRemoteEnableFlagsAndDeviceStatus2FieldId = 1,
+    kApplianceStatus2FieldId                  = 2,
+};
+
+struct Type
+{
+public:
+    ApplianceStatus applianceStatus;
+    uint8_t remoteEnableFlagsAndDeviceStatus2;
+    ApplianceStatus applianceStatus2;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SignalStateResponseCommandParams
+namespace WriteFunctionsCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kFunctionIdFieldId       = 0,
+    kFunctionDataTypeFieldId = 1,
+    kFunctionDataFieldId     = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t functionId;
+    uint8_t functionDataType;
+    DataModel::List<uint8_t> functionData;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint16_t functionId;
+    uint8_t functionDataType;
+    DataModel::DecodableList<uint8_t> functionData;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace WriteFunctionsCommandParams
+
+} // namespace Commands
 
 } // namespace ApplianceControl
 namespace Descriptor {
+constexpr ClusterId kClusterId = 0x1D;
+
+ClusterId GetClusterId();
 
 namespace DeviceType {
 enum FieldId
@@ -98,7 +2456,7 @@ enum FieldId
 struct Type
 {
 public:
-    uint32_t type;
+    chip::DeviceTypeId type;
     uint16_t revision;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
@@ -107,14 +2465,200 @@ public:
 
 } // namespace DeviceType
 
+namespace Commands {
+
+} // namespace Commands
+
 } // namespace Descriptor
 namespace PollControl {
+constexpr ClusterId kClusterId = 0x20;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace CheckInCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CheckInCommandParams
+namespace CheckInResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kStartFastPollingFieldId = 0,
+    kFastPollTimeoutFieldId  = 1,
+};
+
+struct Type
+{
+public:
+    bool startFastPolling;
+    uint16_t fastPollTimeout;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CheckInResponseCommandParams
+namespace FastPollStopCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace FastPollStopCommandParams
+namespace SetLongPollIntervalCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kNewLongPollIntervalFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint32_t newLongPollInterval;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetLongPollIntervalCommandParams
+namespace SetShortPollIntervalCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kNewShortPollIntervalFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t newShortPollInterval;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetShortPollIntervalCommandParams
+
+} // namespace Commands
 
 } // namespace PollControl
 namespace Basic {
+constexpr ClusterId kClusterId = 0x28;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace LeaveCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LeaveCommandParams
+namespace MfgSpecificPingCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MfgSpecificPingCommandParams
+namespace ShutDownCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ShutDownCommandParams
+namespace StartUpCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StartUpCommandParams
+
+} // namespace Commands
 
 } // namespace Basic
 namespace OtaSoftwareUpdateProvider {
+constexpr ClusterId kClusterId = 0x29;
+
+ClusterId GetClusterId();
+
 // Enum for OTAApplyUpdateAction
 enum class OTAApplyUpdateAction : uint8_t
 {
@@ -138,8 +2682,150 @@ enum class OTAQueryStatus : uint8_t
     OTA_QUERY_STATUS_NOT_AVAILABLE    = 0x02,
 };
 
+namespace Commands {
+namespace ApplyUpdateRequestCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kUpdateTokenFieldId = 0,
+    kNewVersionFieldId  = 1,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan updateToken;
+    uint32_t newVersion;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ApplyUpdateRequestCommandParams
+namespace ApplyUpdateRequestResponseCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kActionFieldId            = 0,
+    kDelayedActionTimeFieldId = 1,
+};
+
+struct Type
+{
+public:
+    OTAApplyUpdateAction action;
+    uint32_t delayedActionTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ApplyUpdateRequestResponseCommandParams
+namespace NotifyUpdateAppliedCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kUpdateTokenFieldId     = 0,
+    kSoftwareVersionFieldId = 1,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan updateToken;
+    uint32_t softwareVersion;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace NotifyUpdateAppliedCommandParams
+namespace QueryImageCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kVendorIdFieldId            = 0,
+    kProductIdFieldId           = 1,
+    kHardwareVersionFieldId     = 2,
+    kSoftwareVersionFieldId     = 3,
+    kProtocolsSupportedFieldId  = 4,
+    kLocationFieldId            = 5,
+    kRequestorCanConsentFieldId = 6,
+    kMetadataForProviderFieldId = 7,
+};
+
+struct Type
+{
+public:
+    uint16_t vendorId;
+    uint16_t productId;
+    uint16_t hardwareVersion;
+    uint32_t softwareVersion;
+    OTADownloadProtocol protocolsSupported;
+    Span<const char> location;
+    bool requestorCanConsent;
+    chip::ByteSpan metadataForProvider;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace QueryImageCommandParams
+namespace QueryImageResponseCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kStatusFieldId                = 0,
+    kDelayedActionTimeFieldId     = 1,
+    kImageURIFieldId              = 2,
+    kSoftwareVersionFieldId       = 3,
+    kSoftwareVersionStringFieldId = 4,
+    kUpdateTokenFieldId           = 5,
+    kUserConsentNeededFieldId     = 6,
+    kMetadataForRequestorFieldId  = 7,
+};
+
+struct Type
+{
+public:
+    OTAQueryStatus status;
+    uint32_t delayedActionTime;
+    Span<const char> imageURI;
+    uint32_t softwareVersion;
+    Span<const char> softwareVersionString;
+    chip::ByteSpan updateToken;
+    bool userConsentNeeded;
+    chip::ByteSpan metadataForRequestor;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace QueryImageResponseCommandParams
+
+} // namespace Commands
+
 } // namespace OtaSoftwareUpdateProvider
 namespace OtaSoftwareUpdateRequestor {
+constexpr ClusterId kClusterId = 0x2A;
+
+ClusterId GetClusterId();
+
 // Enum for OTAAnnouncementReason
 enum class OTAAnnouncementReason : uint8_t
 {
@@ -148,11 +2834,52 @@ enum class OTAAnnouncementReason : uint8_t
     OTA_ANNOUNCEMENT_REASON_URGENT_UPDATE_AVAILABLE = 0x02,
 };
 
+namespace Commands {
+namespace AnnounceOtaProviderCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kProviderLocationFieldId   = 0,
+    kVendorIdFieldId           = 1,
+    kAnnouncementReasonFieldId = 2,
+    kMetadataForNodeFieldId    = 3,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan providerLocation;
+    uint16_t vendorId;
+    OTAAnnouncementReason announcementReason;
+    chip::ByteSpan metadataForNode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AnnounceOtaProviderCommandParams
+
+} // namespace Commands
+
 } // namespace OtaSoftwareUpdateRequestor
 namespace PowerSource {
+constexpr ClusterId kClusterId = 0x2F;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace PowerSource
 namespace GeneralCommissioning {
+constexpr ClusterId kClusterId = 0x30;
+
+ClusterId GetClusterId();
+
 // Enum for GeneralCommissioningError
 enum class GeneralCommissioningError : uint8_t
 {
@@ -185,8 +2912,149 @@ public:
 
 } // namespace BasicCommissioningInfoType
 
+namespace Commands {
+namespace ArmFailSafeCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kExpiryLengthSecondsFieldId = 0,
+    kBreadcrumbFieldId          = 1,
+    kTimeoutMsFieldId           = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t expiryLengthSeconds;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ArmFailSafeCommandParams
+namespace ArmFailSafeResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kErrorCodeFieldId = 0,
+    kDebugTextFieldId = 1,
+};
+
+struct Type
+{
+public:
+    GeneralCommissioningError errorCode;
+    Span<const char> debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ArmFailSafeResponseCommandParams
+namespace CommissioningCompleteCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CommissioningCompleteCommandParams
+namespace CommissioningCompleteResponseCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kErrorCodeFieldId = 0,
+    kDebugTextFieldId = 1,
+};
+
+struct Type
+{
+public:
+    GeneralCommissioningError errorCode;
+    Span<const char> debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CommissioningCompleteResponseCommandParams
+namespace SetRegulatoryConfigCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kLocationFieldId    = 0,
+    kCountryCodeFieldId = 1,
+    kBreadcrumbFieldId  = 2,
+    kTimeoutMsFieldId   = 3,
+};
+
+struct Type
+{
+public:
+    RegulatoryLocationType location;
+    Span<const char> countryCode;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetRegulatoryConfigCommandParams
+namespace SetRegulatoryConfigResponseCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kErrorCodeFieldId = 0,
+    kDebugTextFieldId = 1,
+};
+
+struct Type
+{
+public:
+    GeneralCommissioningError errorCode;
+    Span<const char> debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetRegulatoryConfigResponseCommandParams
+
+} // namespace Commands
+
 } // namespace GeneralCommissioning
 namespace NetworkCommissioning {
+constexpr ClusterId kClusterId = 0x31;
+
+ClusterId GetClusterId();
+
 // Enum for NetworkCommissioningError
 enum class NetworkCommissioningError : uint8_t
 {
@@ -253,8 +3121,424 @@ public:
 
 } // namespace WiFiInterfaceScanResult
 
+namespace Commands {
+namespace AddThreadNetworkCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kOperationalDatasetFieldId = 0,
+    kBreadcrumbFieldId         = 1,
+    kTimeoutMsFieldId          = 2,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan operationalDataset;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AddThreadNetworkCommandParams
+namespace AddThreadNetworkResponseCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+    kErrorCodeFieldId = 0,
+    kDebugTextFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t errorCode;
+    Span<const char> debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AddThreadNetworkResponseCommandParams
+namespace AddWiFiNetworkCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kSsidFieldId        = 0,
+    kCredentialsFieldId = 1,
+    kBreadcrumbFieldId  = 2,
+    kTimeoutMsFieldId   = 3,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan ssid;
+    chip::ByteSpan credentials;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AddWiFiNetworkCommandParams
+namespace AddWiFiNetworkResponseCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kErrorCodeFieldId = 0,
+    kDebugTextFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t errorCode;
+    Span<const char> debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AddWiFiNetworkResponseCommandParams
+namespace DisableNetworkCommandParams {
+constexpr CommandId kCommandId = 0x0E;
+
+enum FieldId
+{
+    kNetworkIDFieldId  = 0,
+    kBreadcrumbFieldId = 1,
+    kTimeoutMsFieldId  = 2,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan networkID;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace DisableNetworkCommandParams
+namespace DisableNetworkResponseCommandParams {
+constexpr CommandId kCommandId = 0x0F;
+
+enum FieldId
+{
+    kErrorCodeFieldId = 0,
+    kDebugTextFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t errorCode;
+    Span<const char> debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace DisableNetworkResponseCommandParams
+namespace EnableNetworkCommandParams {
+constexpr CommandId kCommandId = 0x0C;
+
+enum FieldId
+{
+    kNetworkIDFieldId  = 0,
+    kBreadcrumbFieldId = 1,
+    kTimeoutMsFieldId  = 2,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan networkID;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnableNetworkCommandParams
+namespace EnableNetworkResponseCommandParams {
+constexpr CommandId kCommandId = 0x0D;
+
+enum FieldId
+{
+    kErrorCodeFieldId = 0,
+    kDebugTextFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t errorCode;
+    Span<const char> debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnableNetworkResponseCommandParams
+namespace GetLastNetworkCommissioningResultCommandParams {
+constexpr CommandId kCommandId = 0x10;
+
+enum FieldId
+{
+    kTimeoutMsFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetLastNetworkCommissioningResultCommandParams
+namespace RemoveNetworkCommandParams {
+constexpr CommandId kCommandId = 0x0A;
+
+enum FieldId
+{
+    kNetworkIDFieldId  = 0,
+    kBreadcrumbFieldId = 1,
+    kTimeoutMsFieldId  = 2,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan networkID;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RemoveNetworkCommandParams
+namespace RemoveNetworkResponseCommandParams {
+constexpr CommandId kCommandId = 0x0B;
+
+enum FieldId
+{
+    kErrorCodeFieldId = 0,
+    kDebugTextFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t errorCode;
+    Span<const char> debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RemoveNetworkResponseCommandParams
+namespace ScanNetworksCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kSsidFieldId       = 0,
+    kBreadcrumbFieldId = 1,
+    kTimeoutMsFieldId  = 2,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan ssid;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ScanNetworksCommandParams
+namespace ScanNetworksResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kErrorCodeFieldId         = 0,
+    kDebugTextFieldId         = 1,
+    kWifiScanResultsFieldId   = 2,
+    kThreadScanResultsFieldId = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t errorCode;
+    Span<const char> debugText;
+    DataModel::List<WiFiInterfaceScanResult::Type> wifiScanResults;
+    DataModel::List<ThreadInterfaceScanResult::Type> threadScanResults;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t errorCode;
+    Span<const char> debugText;
+    DataModel::DecodableList<WiFiInterfaceScanResult::Type> wifiScanResults;
+    DataModel::DecodableList<ThreadInterfaceScanResult::Type> threadScanResults;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ScanNetworksResponseCommandParams
+namespace UpdateThreadNetworkCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+    kOperationalDatasetFieldId = 0,
+    kBreadcrumbFieldId         = 1,
+    kTimeoutMsFieldId          = 2,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan operationalDataset;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UpdateThreadNetworkCommandParams
+namespace UpdateThreadNetworkResponseCommandParams {
+constexpr CommandId kCommandId = 0x09;
+
+enum FieldId
+{
+    kErrorCodeFieldId = 0,
+    kDebugTextFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t errorCode;
+    Span<const char> debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UpdateThreadNetworkResponseCommandParams
+namespace UpdateWiFiNetworkCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kSsidFieldId        = 0,
+    kCredentialsFieldId = 1,
+    kBreadcrumbFieldId  = 2,
+    kTimeoutMsFieldId   = 3,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan ssid;
+    chip::ByteSpan credentials;
+    uint64_t breadcrumb;
+    uint32_t timeoutMs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UpdateWiFiNetworkCommandParams
+namespace UpdateWiFiNetworkResponseCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kErrorCodeFieldId = 0,
+    kDebugTextFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t errorCode;
+    Span<const char> debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UpdateWiFiNetworkResponseCommandParams
+
+} // namespace Commands
+
 } // namespace NetworkCommissioning
 namespace DiagnosticLogs {
+constexpr ClusterId kClusterId = 0x32;
+
+ClusterId GetClusterId();
+
 // Enum for LogsIntent
 enum class LogsIntent : uint8_t
 {
@@ -278,8 +3562,66 @@ enum class LogsTransferProtocol : uint8_t
     LOGS_TRANSFER_PROTOCOL_BDX              = 0x01,
 };
 
+namespace Commands {
+namespace RetrieveLogsRequestCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kIntentFieldId                 = 0,
+    kRequestedProtocolFieldId      = 1,
+    kTransferFileDesignatorFieldId = 2,
+};
+
+struct Type
+{
+public:
+    LogsIntent intent;
+    LogsTransferProtocol requestedProtocol;
+    chip::ByteSpan transferFileDesignator;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RetrieveLogsRequestCommandParams
+namespace RetrieveLogsResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kStatusFieldId        = 0,
+    kContentFieldId       = 1,
+    kTimeStampFieldId     = 2,
+    kTimeSinceBootFieldId = 3,
+};
+
+struct Type
+{
+public:
+    LogsStatus status;
+    chip::ByteSpan content;
+    chip::UTC timeStamp;
+    uint32_t timeSinceBoot;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RetrieveLogsResponseCommandParams
+
+} // namespace Commands
+
 } // namespace DiagnosticLogs
 namespace GeneralDiagnostics {
+constexpr ClusterId kClusterId = 0x33;
+
+ClusterId GetClusterId();
+
 // Enum for BootReasonType
 enum class BootReasonType : uint8_t
 {
@@ -362,8 +3704,15 @@ public:
 
 } // namespace NetworkInterfaceType
 
+namespace Commands {
+
+} // namespace Commands
+
 } // namespace GeneralDiagnostics
 namespace SoftwareDiagnostics {
+constexpr ClusterId kClusterId = 0x34;
+
+ClusterId GetClusterId();
 
 namespace ThreadMetrics {
 enum FieldId
@@ -390,8 +3739,33 @@ public:
 
 } // namespace ThreadMetrics
 
+namespace Commands {
+namespace ResetWatermarksCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ResetWatermarksCommandParams
+
+} // namespace Commands
+
 } // namespace SoftwareDiagnostics
 namespace ThreadNetworkDiagnostics {
+constexpr ClusterId kClusterId = 0x35;
+
+ClusterId GetClusterId();
+
 // Enum for NetworkFault
 enum class NetworkFault : uint8_t
 {
@@ -545,8 +3919,33 @@ public:
 
 } // namespace SecurityPolicy
 
+namespace Commands {
+namespace ResetCountsCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ResetCountsCommandParams
+
+} // namespace Commands
+
 } // namespace ThreadNetworkDiagnostics
 namespace WiFiNetworkDiagnostics {
+constexpr ClusterId kClusterId = 0x36;
+
+ClusterId GetClusterId();
+
 // Enum for SecurityType
 enum class SecurityType : uint8_t
 {
@@ -568,8 +3967,33 @@ enum class WiFiVersionType : uint8_t
     WI_FI_VERSION_TYPE_802__11AX = 0x05,
 };
 
+namespace Commands {
+namespace ResetCountsCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ResetCountsCommandParams
+
+} // namespace Commands
+
 } // namespace WiFiNetworkDiagnostics
 namespace EthernetNetworkDiagnostics {
+constexpr ClusterId kClusterId = 0x37;
+
+ClusterId GetClusterId();
+
 // Enum for PHYRateType
 enum class PHYRateType : uint8_t
 {
@@ -585,14 +4009,121 @@ enum class PHYRateType : uint8_t
     PHY_RATE_TYPE_400_G  = 0x09,
 };
 
+namespace Commands {
+namespace ResetCountsCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ResetCountsCommandParams
+
+} // namespace Commands
+
 } // namespace EthernetNetworkDiagnostics
 namespace BridgedDeviceBasic {
+constexpr ClusterId kClusterId = 0x39;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace LeaveCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LeaveCommandParams
+namespace ReachableChangedCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ReachableChangedCommandParams
+namespace ShutDownCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ShutDownCommandParams
+namespace StartUpCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StartUpCommandParams
+
+} // namespace Commands
 
 } // namespace BridgedDeviceBasic
 namespace Switch {
+constexpr ClusterId kClusterId = 0x3B;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace Switch
 namespace AdministratorCommissioning {
+constexpr ClusterId kClusterId = 0x3C;
+
+ClusterId GetClusterId();
+
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
@@ -601,8 +4132,83 @@ enum class StatusCode : uint8_t
     STATUS_CODE_GENERAL_ERROR = 0x02,
 };
 
+namespace Commands {
+namespace OpenBasicCommissioningWindowCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kCommissioningTimeoutFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t commissioningTimeout;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OpenBasicCommissioningWindowCommandParams
+namespace OpenCommissioningWindowCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kCommissioningTimeoutFieldId = 0,
+    kPAKEVerifierFieldId         = 1,
+    kDiscriminatorFieldId        = 2,
+    kIterationsFieldId           = 3,
+    kSaltFieldId                 = 4,
+    kPasscodeIDFieldId           = 5,
+};
+
+struct Type
+{
+public:
+    uint16_t commissioningTimeout;
+    chip::ByteSpan pAKEVerifier;
+    uint16_t discriminator;
+    uint32_t iterations;
+    chip::ByteSpan salt;
+    uint16_t passcodeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OpenCommissioningWindowCommandParams
+namespace RevokeCommissioningCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RevokeCommissioningCommandParams
+
+} // namespace Commands
+
 } // namespace AdministratorCommissioning
 namespace OperationalCredentials {
+constexpr ClusterId kClusterId = 0x3E;
+
+ClusterId GetClusterId();
+
 // Enum for NodeOperationalCertStatus
 enum class NodeOperationalCertStatus : uint8_t
 {
@@ -635,8 +4241,8 @@ public:
     uint8_t fabricIndex;
     chip::ByteSpan rootPublicKey;
     uint16_t vendorId;
-    uint64_t fabricId;
-    uint64_t nodeId;
+    chip::FabricId fabricId;
+    chip::NodeId nodeId;
     chip::ByteSpan label;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
@@ -663,8 +4269,293 @@ public:
 
 } // namespace NOCStruct
 
+namespace Commands {
+namespace AddNOCCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kNOCValueFieldId      = 0,
+    kICACValueFieldId     = 1,
+    kIPKValueFieldId      = 2,
+    kCaseAdminNodeFieldId = 3,
+    kAdminVendorIdFieldId = 4,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan nOCValue;
+    chip::ByteSpan iCACValue;
+    chip::ByteSpan iPKValue;
+    chip::NodeId caseAdminNode;
+    uint16_t adminVendorId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AddNOCCommandParams
+namespace AddTrustedRootCertificateCommandParams {
+constexpr CommandId kCommandId = 0x0B;
+
+enum FieldId
+{
+    kRootCertificateFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan rootCertificate;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AddTrustedRootCertificateCommandParams
+namespace AttestationRequestCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kAttestationNonceFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan attestationNonce;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AttestationRequestCommandParams
+namespace AttestationResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kAttestationElementsFieldId = 0,
+    kSignatureFieldId           = 1,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan attestationElements;
+    chip::ByteSpan signature;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AttestationResponseCommandParams
+namespace CertificateChainRequestCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kCertificateTypeFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t certificateType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CertificateChainRequestCommandParams
+namespace CertificateChainResponseCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kCertificateFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan certificate;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CertificateChainResponseCommandParams
+namespace NOCResponseCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+    kStatusCodeFieldId  = 0,
+    kFabricIndexFieldId = 1,
+    kDebugTextFieldId   = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t statusCode;
+    uint8_t fabricIndex;
+    chip::ByteSpan debugText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace NOCResponseCommandParams
+namespace OpCSRRequestCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kCSRNonceFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan cSRNonce;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OpCSRRequestCommandParams
+namespace OpCSRResponseCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kNOCSRElementsFieldId        = 0,
+    kAttestationSignatureFieldId = 1,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan nOCSRElements;
+    chip::ByteSpan attestationSignature;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OpCSRResponseCommandParams
+namespace RemoveFabricCommandParams {
+constexpr CommandId kCommandId = 0x0A;
+
+enum FieldId
+{
+    kFabricIndexFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t fabricIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RemoveFabricCommandParams
+namespace RemoveTrustedRootCertificateCommandParams {
+constexpr CommandId kCommandId = 0x0C;
+
+enum FieldId
+{
+    kTrustedRootIdentifierFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan trustedRootIdentifier;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RemoveTrustedRootCertificateCommandParams
+namespace UpdateFabricLabelCommandParams {
+constexpr CommandId kCommandId = 0x09;
+
+enum FieldId
+{
+    kLabelFieldId = 0,
+};
+
+struct Type
+{
+public:
+    Span<const char> label;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UpdateFabricLabelCommandParams
+namespace UpdateNOCCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+    kNOCValueFieldId  = 0,
+    kICACValueFieldId = 1,
+};
+
+struct Type
+{
+public:
+    chip::ByteSpan nOCValue;
+    chip::ByteSpan iCACValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UpdateNOCCommandParams
+
+} // namespace Commands
+
 } // namespace OperationalCredentials
 namespace FixedLabel {
+constexpr ClusterId kClusterId = 0x40;
+
+ClusterId GetClusterId();
 
 namespace LabelStruct {
 enum FieldId
@@ -685,14 +4576,1299 @@ public:
 
 } // namespace LabelStruct
 
+namespace Commands {
+
+} // namespace Commands
+
 } // namespace FixedLabel
 namespace ShadeConfiguration {
+constexpr ClusterId kClusterId = 0x100;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace ShadeConfiguration
 namespace DoorLock {
+constexpr ClusterId kClusterId = 0x101;
+
+ClusterId GetClusterId();
+
+// Enum for DoorLockOperationEventCode
+enum class DoorLockOperationEventCode : uint8_t
+{
+    DOOR_LOCK_OPERATION_EVENT_CODE_UNKNOWN_OR_MFG_SPECIFIC  = 0x00,
+    DOOR_LOCK_OPERATION_EVENT_CODE_LOCK                     = 0x01,
+    DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK                   = 0x02,
+    DOOR_LOCK_OPERATION_EVENT_CODE_LOCK_INVALID_PIN_OR_ID   = 0x03,
+    DOOR_LOCK_OPERATION_EVENT_CODE_LOCK_INVALID_SCHEDULE    = 0x04,
+    DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK_INVALID_PIN_OR_ID = 0x05,
+    DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK_INVALID_SCHEDULE  = 0x06,
+    DOOR_LOCK_OPERATION_EVENT_CODE_ONE_TOUCH_LOCK           = 0x07,
+    DOOR_LOCK_OPERATION_EVENT_CODE_KEY_LOCK                 = 0x08,
+    DOOR_LOCK_OPERATION_EVENT_CODE_KEY_UNLOCK               = 0x09,
+    DOOR_LOCK_OPERATION_EVENT_CODE_AUTO_LOCK                = 0x0A,
+    DOOR_LOCK_OPERATION_EVENT_CODE_SCHEDULE_LOCK            = 0x0B,
+    DOOR_LOCK_OPERATION_EVENT_CODE_SCHEDULE_UNLOCK          = 0x0C,
+    DOOR_LOCK_OPERATION_EVENT_CODE_MANUAL_LOCK              = 0x0D,
+    DOOR_LOCK_OPERATION_EVENT_CODE_MANUAL_UNLOCK            = 0x0E,
+};
+// Enum for DoorLockProgrammingEventCode
+enum class DoorLockProgrammingEventCode : uint8_t
+{
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_UNKNOWN_OR_MFG_SPECIFIC = 0x00,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_MASTER_CODE_CHANGED     = 0x01,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_ADDED               = 0x02,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_DELETED             = 0x03,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_CHANGED             = 0x04,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_ID_ADDED                = 0x05,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_ID_DELETED              = 0x06,
+};
+// Enum for DoorLockSetPinOrIdStatus
+enum class DoorLockSetPinOrIdStatus : uint8_t
+{
+    DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS              = 0x00,
+    DOOR_LOCK_SET_PIN_OR_ID_STATUS_GENERAL_FAILURE      = 0x01,
+    DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL          = 0x02,
+    DOOR_LOCK_SET_PIN_OR_ID_STATUS_DUPLICATE_CODE_ERROR = 0x03,
+};
+// Enum for DoorLockUserStatus
+enum class DoorLockUserStatus : uint8_t
+{
+    DOOR_LOCK_USER_STATUS_AVAILABLE         = 0x00,
+    DOOR_LOCK_USER_STATUS_OCCUPIED_ENABLED  = 0x01,
+    DOOR_LOCK_USER_STATUS_OCCUPIED_DISABLED = 0x03,
+    DOOR_LOCK_USER_STATUS_NOT_SUPPORTED     = 0xFF,
+};
+// Enum for DoorLockUserType
+enum class DoorLockUserType : uint8_t
+{
+    DOOR_LOCK_USER_TYPE_UNRESTRICTED           = 0x00,
+    DOOR_LOCK_USER_TYPE_YEAR_DAY_SCHEDULE_USER = 0x01,
+    DOOR_LOCK_USER_TYPE_WEEK_DAY_SCHEDULE_USER = 0x02,
+    DOOR_LOCK_USER_TYPE_MASTER_USER            = 0x03,
+    DOOR_LOCK_USER_TYPE_NON_ACCESS_USER        = 0x04,
+    DOOR_LOCK_USER_TYPE_NOT_SUPPORTED          = 0xFF,
+};
+
+namespace Commands {
+namespace ClearAllPinsCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearAllPinsCommandParams
+namespace ClearAllPinsResponseCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearAllPinsResponseCommandParams
+namespace ClearAllRfidsCommandParams {
+constexpr CommandId kCommandId = 0x19;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearAllRfidsCommandParams
+namespace ClearAllRfidsResponseCommandParams {
+constexpr CommandId kCommandId = 0x19;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearAllRfidsResponseCommandParams
+namespace ClearHolidayScheduleCommandParams {
+constexpr CommandId kCommandId = 0x13;
+
+enum FieldId
+{
+    kScheduleIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearHolidayScheduleCommandParams
+namespace ClearHolidayScheduleResponseCommandParams {
+constexpr CommandId kCommandId = 0x13;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearHolidayScheduleResponseCommandParams
+namespace ClearPinCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+    kUserIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearPinCommandParams
+namespace ClearPinResponseCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearPinResponseCommandParams
+namespace ClearRfidCommandParams {
+constexpr CommandId kCommandId = 0x18;
+
+enum FieldId
+{
+    kUserIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearRfidCommandParams
+namespace ClearRfidResponseCommandParams {
+constexpr CommandId kCommandId = 0x18;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearRfidResponseCommandParams
+namespace ClearWeekdayScheduleCommandParams {
+constexpr CommandId kCommandId = 0x0D;
+
+enum FieldId
+{
+    kScheduleIdFieldId = 0,
+    kUserIdFieldId     = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearWeekdayScheduleCommandParams
+namespace ClearWeekdayScheduleResponseCommandParams {
+constexpr CommandId kCommandId = 0x0D;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearWeekdayScheduleResponseCommandParams
+namespace ClearYeardayScheduleCommandParams {
+constexpr CommandId kCommandId = 0x10;
+
+enum FieldId
+{
+    kScheduleIdFieldId = 0,
+    kUserIdFieldId     = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearYeardayScheduleCommandParams
+namespace ClearYeardayScheduleResponseCommandParams {
+constexpr CommandId kCommandId = 0x10;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearYeardayScheduleResponseCommandParams
+namespace GetHolidayScheduleCommandParams {
+constexpr CommandId kCommandId = 0x12;
+
+enum FieldId
+{
+    kScheduleIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetHolidayScheduleCommandParams
+namespace GetHolidayScheduleResponseCommandParams {
+constexpr CommandId kCommandId = 0x12;
+
+enum FieldId
+{
+    kScheduleIdFieldId                 = 0,
+    kStatusFieldId                     = 1,
+    kLocalStartTimeFieldId             = 2,
+    kLocalEndTimeFieldId               = 3,
+    kOperatingModeDuringHolidayFieldId = 4,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+    chip::Protocols::InteractionModel::Status status;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+    uint8_t operatingModeDuringHoliday;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetHolidayScheduleResponseCommandParams
+namespace GetLogRecordCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kLogIndexFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t logIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetLogRecordCommandParams
+namespace GetLogRecordResponseCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kLogEntryIdFieldId         = 0,
+    kTimestampFieldId          = 1,
+    kEventTypeFieldId          = 2,
+    kSourceFieldId             = 3,
+    kEventIdOrAlarmCodeFieldId = 4,
+    kUserIdFieldId             = 5,
+    kPinFieldId                = 6,
+};
+
+struct Type
+{
+public:
+    uint16_t logEntryId;
+    uint32_t timestamp;
+    uint8_t eventType;
+    uint8_t source;
+    uint8_t eventIdOrAlarmCode;
+    uint16_t userId;
+    Span<const char> pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetLogRecordResponseCommandParams
+namespace GetPinCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kUserIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetPinCommandParams
+namespace GetPinResponseCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kUserIdFieldId     = 0,
+    kUserStatusFieldId = 1,
+    kUserTypeFieldId   = 2,
+    kPinFieldId        = 3,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    Span<const char> pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetPinResponseCommandParams
+namespace GetRfidCommandParams {
+constexpr CommandId kCommandId = 0x17;
+
+enum FieldId
+{
+    kUserIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetRfidCommandParams
+namespace GetRfidResponseCommandParams {
+constexpr CommandId kCommandId = 0x17;
+
+enum FieldId
+{
+    kUserIdFieldId     = 0,
+    kUserStatusFieldId = 1,
+    kUserTypeFieldId   = 2,
+    kRfidFieldId       = 3,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    Span<const char> rfid;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetRfidResponseCommandParams
+namespace GetUserStatusCommandParams {
+constexpr CommandId kCommandId = 0x0A;
+
+enum FieldId
+{
+    kUserIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetUserStatusCommandParams
+namespace GetUserStatusResponseCommandParams {
+constexpr CommandId kCommandId = 0x0A;
+
+enum FieldId
+{
+    kUserIdFieldId = 0,
+    kStatusFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetUserStatusResponseCommandParams
+namespace GetUserTypeCommandParams {
+constexpr CommandId kCommandId = 0x15;
+
+enum FieldId
+{
+    kUserIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetUserTypeCommandParams
+namespace GetUserTypeResponseCommandParams {
+constexpr CommandId kCommandId = 0x15;
+
+enum FieldId
+{
+    kUserIdFieldId   = 0,
+    kUserTypeFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+    DoorLockUserType userType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetUserTypeResponseCommandParams
+namespace GetWeekdayScheduleCommandParams {
+constexpr CommandId kCommandId = 0x0C;
+
+enum FieldId
+{
+    kScheduleIdFieldId = 0,
+    kUserIdFieldId     = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetWeekdayScheduleCommandParams
+namespace GetWeekdayScheduleResponseCommandParams {
+constexpr CommandId kCommandId = 0x0C;
+
+enum FieldId
+{
+    kScheduleIdFieldId  = 0,
+    kUserIdFieldId      = 1,
+    kStatusFieldId      = 2,
+    kDaysMaskFieldId    = 3,
+    kStartHourFieldId   = 4,
+    kStartMinuteFieldId = 5,
+    kEndHourFieldId     = 6,
+    kEndMinuteFieldId   = 7,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+    uint16_t userId;
+    chip::Protocols::InteractionModel::Status status;
+    uint8_t daysMask;
+    uint8_t startHour;
+    uint8_t startMinute;
+    uint8_t endHour;
+    uint8_t endMinute;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetWeekdayScheduleResponseCommandParams
+namespace GetYeardayScheduleCommandParams {
+constexpr CommandId kCommandId = 0x0F;
+
+enum FieldId
+{
+    kScheduleIdFieldId = 0,
+    kUserIdFieldId     = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+    uint16_t userId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetYeardayScheduleCommandParams
+namespace GetYeardayScheduleResponseCommandParams {
+constexpr CommandId kCommandId = 0x0F;
+
+enum FieldId
+{
+    kScheduleIdFieldId     = 0,
+    kUserIdFieldId         = 1,
+    kStatusFieldId         = 2,
+    kLocalStartTimeFieldId = 3,
+    kLocalEndTimeFieldId   = 4,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+    uint16_t userId;
+    chip::Protocols::InteractionModel::Status status;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetYeardayScheduleResponseCommandParams
+namespace LockDoorCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kPinFieldId = 0,
+};
+
+struct Type
+{
+public:
+    Span<const char> pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LockDoorCommandParams
+namespace LockDoorResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LockDoorResponseCommandParams
+namespace OperationEventNotificationCommandParams {
+constexpr CommandId kCommandId = 0x20;
+
+enum FieldId
+{
+    kSourceFieldId    = 0,
+    kEventCodeFieldId = 1,
+    kUserIdFieldId    = 2,
+    kPinFieldId       = 3,
+    kTimeStampFieldId = 4,
+    kDataFieldId      = 5,
+};
+
+struct Type
+{
+public:
+    uint8_t source;
+    DoorLockOperationEventCode eventCode;
+    uint16_t userId;
+    Span<const char> pin;
+    chip::UTC timeStamp;
+    Span<const char> data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace OperationEventNotificationCommandParams
+namespace ProgrammingEventNotificationCommandParams {
+constexpr CommandId kCommandId = 0x21;
+
+enum FieldId
+{
+    kSourceFieldId     = 0,
+    kEventCodeFieldId  = 1,
+    kUserIdFieldId     = 2,
+    kPinFieldId        = 3,
+    kUserTypeFieldId   = 4,
+    kUserStatusFieldId = 5,
+    kTimeStampFieldId  = 6,
+    kDataFieldId       = 7,
+};
+
+struct Type
+{
+public:
+    uint8_t source;
+    DoorLockProgrammingEventCode eventCode;
+    uint16_t userId;
+    Span<const char> pin;
+    DoorLockUserType userType;
+    DoorLockUserStatus userStatus;
+    chip::UTC timeStamp;
+    Span<const char> data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ProgrammingEventNotificationCommandParams
+namespace SetHolidayScheduleCommandParams {
+constexpr CommandId kCommandId = 0x11;
+
+enum FieldId
+{
+    kScheduleIdFieldId                 = 0,
+    kLocalStartTimeFieldId             = 1,
+    kLocalEndTimeFieldId               = 2,
+    kOperatingModeDuringHolidayFieldId = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+    uint8_t operatingModeDuringHoliday;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetHolidayScheduleCommandParams
+namespace SetHolidayScheduleResponseCommandParams {
+constexpr CommandId kCommandId = 0x11;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetHolidayScheduleResponseCommandParams
+namespace SetPinCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kUserIdFieldId     = 0,
+    kUserStatusFieldId = 1,
+    kUserTypeFieldId   = 2,
+    kPinFieldId        = 3,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    Span<const char> pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetPinCommandParams
+namespace SetPinResponseCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    DoorLockSetPinOrIdStatus status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetPinResponseCommandParams
+namespace SetRfidCommandParams {
+constexpr CommandId kCommandId = 0x16;
+
+enum FieldId
+{
+    kUserIdFieldId     = 0,
+    kUserStatusFieldId = 1,
+    kUserTypeFieldId   = 2,
+    kIdFieldId         = 3,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+    DoorLockUserStatus userStatus;
+    DoorLockUserType userType;
+    Span<const char> id;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetRfidCommandParams
+namespace SetRfidResponseCommandParams {
+constexpr CommandId kCommandId = 0x16;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    DoorLockSetPinOrIdStatus status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetRfidResponseCommandParams
+namespace SetUserStatusCommandParams {
+constexpr CommandId kCommandId = 0x09;
+
+enum FieldId
+{
+    kUserIdFieldId     = 0,
+    kUserStatusFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+    uint8_t userStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetUserStatusCommandParams
+namespace SetUserStatusResponseCommandParams {
+constexpr CommandId kCommandId = 0x09;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetUserStatusResponseCommandParams
+namespace SetUserTypeCommandParams {
+constexpr CommandId kCommandId = 0x14;
+
+enum FieldId
+{
+    kUserIdFieldId   = 0,
+    kUserTypeFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t userId;
+    DoorLockUserType userType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetUserTypeCommandParams
+namespace SetUserTypeResponseCommandParams {
+constexpr CommandId kCommandId = 0x14;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetUserTypeResponseCommandParams
+namespace SetWeekdayScheduleCommandParams {
+constexpr CommandId kCommandId = 0x0B;
+
+enum FieldId
+{
+    kScheduleIdFieldId  = 0,
+    kUserIdFieldId      = 1,
+    kDaysMaskFieldId    = 2,
+    kStartHourFieldId   = 3,
+    kStartMinuteFieldId = 4,
+    kEndHourFieldId     = 5,
+    kEndMinuteFieldId   = 6,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+    uint16_t userId;
+    uint8_t daysMask;
+    uint8_t startHour;
+    uint8_t startMinute;
+    uint8_t endHour;
+    uint8_t endMinute;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetWeekdayScheduleCommandParams
+namespace SetWeekdayScheduleResponseCommandParams {
+constexpr CommandId kCommandId = 0x0B;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetWeekdayScheduleResponseCommandParams
+namespace SetYeardayScheduleCommandParams {
+constexpr CommandId kCommandId = 0x0E;
+
+enum FieldId
+{
+    kScheduleIdFieldId     = 0,
+    kUserIdFieldId         = 1,
+    kLocalStartTimeFieldId = 2,
+    kLocalEndTimeFieldId   = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t scheduleId;
+    uint16_t userId;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetYeardayScheduleCommandParams
+namespace SetYeardayScheduleResponseCommandParams {
+constexpr CommandId kCommandId = 0x0E;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetYeardayScheduleResponseCommandParams
+namespace ToggleCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kPinFieldId = 0,
+};
+
+struct Type
+{
+public:
+    Span<const char> pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ToggleCommandParams
+namespace ToggleResponseCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ToggleResponseCommandParams
+namespace UnlockDoorCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kPinFieldId = 0,
+};
+
+struct Type
+{
+public:
+    Span<const char> pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UnlockDoorCommandParams
+namespace UnlockDoorResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UnlockDoorResponseCommandParams
+namespace UnlockWithTimeoutCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kTimeoutInSecondsFieldId = 0,
+    kPinFieldId              = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t timeoutInSeconds;
+    Span<const char> pin;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UnlockWithTimeoutCommandParams
+namespace UnlockWithTimeoutResponseCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::Protocols::InteractionModel::Status status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UnlockWithTimeoutResponseCommandParams
+
+} // namespace Commands
 
 } // namespace DoorLock
 namespace WindowCovering {
+constexpr ClusterId kClusterId = 0x102;
+
+ClusterId GetClusterId();
+
 // Enum for WcEndProductType
 enum class WcEndProductType : uint8_t
 {
@@ -738,11 +5914,198 @@ enum class WcType : uint8_t
     WC_TYPE_UNKNOWN                     = 0xFF,
 };
 
+namespace Commands {
+namespace DownOrCloseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace DownOrCloseCommandParams
+namespace GoToLiftPercentageCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kLiftPercentageValueFieldId    = 0,
+    kLiftPercent100thsValueFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t liftPercentageValue;
+    uint16_t liftPercent100thsValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GoToLiftPercentageCommandParams
+namespace GoToLiftValueCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kLiftValueFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t liftValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GoToLiftValueCommandParams
+namespace GoToTiltPercentageCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+    kTiltPercentageValueFieldId    = 0,
+    kTiltPercent100thsValueFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t tiltPercentageValue;
+    uint16_t tiltPercent100thsValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GoToTiltPercentageCommandParams
+namespace GoToTiltValueCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+    kTiltValueFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t tiltValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GoToTiltValueCommandParams
+namespace StopMotionCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StopMotionCommandParams
+namespace UpOrOpenCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UpOrOpenCommandParams
+
+} // namespace Commands
+
 } // namespace WindowCovering
 namespace BarrierControl {
+constexpr ClusterId kClusterId = 0x103;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace BarrierControlGoToPercentCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kPercentOpenFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t percentOpen;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace BarrierControlGoToPercentCommandParams
+namespace BarrierControlStopCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace BarrierControlStopCommandParams
+
+} // namespace Commands
 
 } // namespace BarrierControl
 namespace PumpConfigurationAndControl {
+constexpr ClusterId kClusterId = 0x200;
+
+ClusterId GetClusterId();
+
 // Enum for PumpControlMode
 enum class PumpControlMode : uint8_t
 {
@@ -762,149 +6125,2056 @@ enum class PumpOperationMode : uint8_t
     PUMP_OPERATION_MODE_LOCAL   = 0x03,
 };
 
+namespace Commands {
+
+} // namespace Commands
+
 } // namespace PumpConfigurationAndControl
 namespace Thermostat {
+constexpr ClusterId kClusterId = 0x201;
+
+ClusterId GetClusterId();
+
+// Enum for SetpointAdjustMode
+enum class SetpointAdjustMode : uint8_t
+{
+    SETPOINT_ADJUST_MODE_HEAT_SETPOINT           = 0x00,
+    SETPOINT_ADJUST_MODE_COOL_SETPOINT           = 0x01,
+    SETPOINT_ADJUST_MODE_HEAT_AND_COOL_SETPOINTS = 0x02,
+};
+
+namespace Commands {
+namespace ClearWeeklyScheduleCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ClearWeeklyScheduleCommandParams
+namespace CurrentWeeklyScheduleCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kNumberOfTransitionsForSequenceFieldId = 0,
+    kDayOfWeekForSequenceFieldId           = 1,
+    kModeForSequenceFieldId                = 2,
+    kPayloadFieldId                        = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t numberOfTransitionsForSequence;
+    uint8_t dayOfWeekForSequence;
+    uint8_t modeForSequence;
+    DataModel::List<uint8_t> payload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t numberOfTransitionsForSequence;
+    uint8_t dayOfWeekForSequence;
+    uint8_t modeForSequence;
+    DataModel::DecodableList<uint8_t> payload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CurrentWeeklyScheduleCommandParams
+namespace GetRelayStatusLogCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetRelayStatusLogCommandParams
+namespace GetWeeklyScheduleCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kDaysToReturnFieldId = 0,
+    kModeToReturnFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t daysToReturn;
+    uint8_t modeToReturn;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetWeeklyScheduleCommandParams
+namespace RelayStatusLogCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kTimeOfDayFieldId            = 0,
+    kRelayStatusFieldId          = 1,
+    kLocalTemperatureFieldId     = 2,
+    kHumidityInPercentageFieldId = 3,
+    kSetpointFieldId             = 4,
+    kUnreadEntriesFieldId        = 5,
+};
+
+struct Type
+{
+public:
+    uint16_t timeOfDay;
+    uint16_t relayStatus;
+    int16_t localTemperature;
+    uint8_t humidityInPercentage;
+    int16_t setpoint;
+    uint16_t unreadEntries;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RelayStatusLogCommandParams
+namespace SetWeeklyScheduleCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kNumberOfTransitionsForSequenceFieldId = 0,
+    kDayOfWeekForSequenceFieldId           = 1,
+    kModeForSequenceFieldId                = 2,
+    kPayloadFieldId                        = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t numberOfTransitionsForSequence;
+    uint8_t dayOfWeekForSequence;
+    uint8_t modeForSequence;
+    DataModel::List<uint8_t> payload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t numberOfTransitionsForSequence;
+    uint8_t dayOfWeekForSequence;
+    uint8_t modeForSequence;
+    DataModel::DecodableList<uint8_t> payload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetWeeklyScheduleCommandParams
+namespace SetpointRaiseLowerCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kModeFieldId   = 0,
+    kAmountFieldId = 1,
+};
+
+struct Type
+{
+public:
+    SetpointAdjustMode mode;
+    int8_t amount;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetpointRaiseLowerCommandParams
+
+} // namespace Commands
 
 } // namespace Thermostat
 namespace FanControl {
+constexpr ClusterId kClusterId = 0x202;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace FanControl
 namespace DehumidificationControl {
+constexpr ClusterId kClusterId = 0x203;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace DehumidificationControl
 namespace ThermostatUserInterfaceConfiguration {
+constexpr ClusterId kClusterId = 0x204;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace ThermostatUserInterfaceConfiguration
 namespace ColorControl {
+constexpr ClusterId kClusterId = 0x300;
+
+ClusterId GetClusterId();
+
+// Enum for ColorLoopAction
+enum class ColorLoopAction : uint8_t
+{
+    COLOR_LOOP_ACTION_DEACTIVATE                                  = 0x00,
+    COLOR_LOOP_ACTION_ACTIVATE_FROM_COLOR_LOOP_START_ENHANCED_HUE = 0x01,
+    COLOR_LOOP_ACTION_ACTIVATE_FROM_ENHANCED_CURRENT_HUE          = 0x02,
+};
+// Enum for ColorLoopDirection
+enum class ColorLoopDirection : uint8_t
+{
+    COLOR_LOOP_DIRECTION_DECREMENT_HUE = 0x00,
+    COLOR_LOOP_DIRECTION_INCREMENT_HUE = 0x01,
+};
+// Enum for ColorMode
+enum class ColorMode : uint8_t
+{
+    COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION = 0x00,
+    COLOR_MODE_CURRENT_X_AND_CURRENT_Y            = 0x01,
+    COLOR_MODE_COLOR_TEMPERATURE                  = 0x02,
+};
+// Enum for HueDirection
+enum class HueDirection : uint8_t
+{
+    HUE_DIRECTION_SHORTEST_DISTANCE = 0x00,
+    HUE_DIRECTION_LONGEST_DISTANCE  = 0x01,
+    HUE_DIRECTION_UP                = 0x02,
+    HUE_DIRECTION_DOWN              = 0x03,
+};
+// Enum for HueMoveMode
+enum class HueMoveMode : uint8_t
+{
+    HUE_MOVE_MODE_STOP = 0x00,
+    HUE_MOVE_MODE_UP   = 0x01,
+    HUE_MOVE_MODE_DOWN = 0x03,
+};
+// Enum for HueStepMode
+enum class HueStepMode : uint8_t
+{
+    HUE_STEP_MODE_UP   = 0x01,
+    HUE_STEP_MODE_DOWN = 0x03,
+};
+// Enum for SaturationMoveMode
+enum class SaturationMoveMode : uint8_t
+{
+    SATURATION_MOVE_MODE_STOP = 0x00,
+    SATURATION_MOVE_MODE_UP   = 0x01,
+    SATURATION_MOVE_MODE_DOWN = 0x03,
+};
+// Enum for SaturationStepMode
+enum class SaturationStepMode : uint8_t
+{
+    SATURATION_STEP_MODE_UP   = 0x01,
+    SATURATION_STEP_MODE_DOWN = 0x03,
+};
+
+namespace Commands {
+namespace ColorLoopSetCommandParams {
+constexpr CommandId kCommandId = 0x44;
+
+enum FieldId
+{
+    kUpdateFlagsFieldId     = 0,
+    kActionFieldId          = 1,
+    kDirectionFieldId       = 2,
+    kTimeFieldId            = 3,
+    kStartHueFieldId        = 4,
+    kOptionsMaskFieldId     = 5,
+    kOptionsOverrideFieldId = 6,
+};
+
+struct Type
+{
+public:
+    uint8_t updateFlags;
+    ColorLoopAction action;
+    ColorLoopDirection direction;
+    uint16_t time;
+    uint16_t startHue;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ColorLoopSetCommandParams
+namespace EnhancedMoveHueCommandParams {
+constexpr CommandId kCommandId = 0x41;
+
+enum FieldId
+{
+    kMoveModeFieldId        = 0,
+    kRateFieldId            = 1,
+    kOptionsMaskFieldId     = 2,
+    kOptionsOverrideFieldId = 3,
+};
+
+struct Type
+{
+public:
+    HueMoveMode moveMode;
+    uint16_t rate;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnhancedMoveHueCommandParams
+namespace EnhancedMoveToHueCommandParams {
+constexpr CommandId kCommandId = 0x40;
+
+enum FieldId
+{
+    kEnhancedHueFieldId     = 0,
+    kDirectionFieldId       = 1,
+    kTransitionTimeFieldId  = 2,
+    kOptionsMaskFieldId     = 3,
+    kOptionsOverrideFieldId = 4,
+};
+
+struct Type
+{
+public:
+    uint16_t enhancedHue;
+    HueDirection direction;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnhancedMoveToHueCommandParams
+namespace EnhancedMoveToHueAndSaturationCommandParams {
+constexpr CommandId kCommandId = 0x43;
+
+enum FieldId
+{
+    kEnhancedHueFieldId     = 0,
+    kSaturationFieldId      = 1,
+    kTransitionTimeFieldId  = 2,
+    kOptionsMaskFieldId     = 3,
+    kOptionsOverrideFieldId = 4,
+};
+
+struct Type
+{
+public:
+    uint16_t enhancedHue;
+    uint8_t saturation;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnhancedMoveToHueAndSaturationCommandParams
+namespace EnhancedStepHueCommandParams {
+constexpr CommandId kCommandId = 0x42;
+
+enum FieldId
+{
+    kStepModeFieldId        = 0,
+    kStepSizeFieldId        = 1,
+    kTransitionTimeFieldId  = 2,
+    kOptionsMaskFieldId     = 3,
+    kOptionsOverrideFieldId = 4,
+};
+
+struct Type
+{
+public:
+    HueStepMode stepMode;
+    uint16_t stepSize;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EnhancedStepHueCommandParams
+namespace MoveColorCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+    kRateXFieldId           = 0,
+    kRateYFieldId           = 1,
+    kOptionsMaskFieldId     = 2,
+    kOptionsOverrideFieldId = 3,
+};
+
+struct Type
+{
+public:
+    int16_t rateX;
+    int16_t rateY;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveColorCommandParams
+namespace MoveColorTemperatureCommandParams {
+constexpr CommandId kCommandId = 0x4B;
+
+enum FieldId
+{
+    kMoveModeFieldId                = 0,
+    kRateFieldId                    = 1,
+    kColorTemperatureMinimumFieldId = 2,
+    kColorTemperatureMaximumFieldId = 3,
+    kOptionsMaskFieldId             = 4,
+    kOptionsOverrideFieldId         = 5,
+};
+
+struct Type
+{
+public:
+    HueMoveMode moveMode;
+    uint16_t rate;
+    uint16_t colorTemperatureMinimum;
+    uint16_t colorTemperatureMaximum;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveColorTemperatureCommandParams
+namespace MoveHueCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kMoveModeFieldId        = 0,
+    kRateFieldId            = 1,
+    kOptionsMaskFieldId     = 2,
+    kOptionsOverrideFieldId = 3,
+};
+
+struct Type
+{
+public:
+    HueMoveMode moveMode;
+    uint8_t rate;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveHueCommandParams
+namespace MoveSaturationCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kMoveModeFieldId        = 0,
+    kRateFieldId            = 1,
+    kOptionsMaskFieldId     = 2,
+    kOptionsOverrideFieldId = 3,
+};
+
+struct Type
+{
+public:
+    SaturationMoveMode moveMode;
+    uint8_t rate;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveSaturationCommandParams
+namespace MoveToColorCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+    kColorXFieldId          = 0,
+    kColorYFieldId          = 1,
+    kTransitionTimeFieldId  = 2,
+    kOptionsMaskFieldId     = 3,
+    kOptionsOverrideFieldId = 4,
+};
+
+struct Type
+{
+public:
+    uint16_t colorX;
+    uint16_t colorY;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveToColorCommandParams
+namespace MoveToColorTemperatureCommandParams {
+constexpr CommandId kCommandId = 0x0A;
+
+enum FieldId
+{
+    kColorTemperatureFieldId = 0,
+    kTransitionTimeFieldId   = 1,
+    kOptionsMaskFieldId      = 2,
+    kOptionsOverrideFieldId  = 3,
+};
+
+struct Type
+{
+public:
+    uint16_t colorTemperature;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveToColorTemperatureCommandParams
+namespace MoveToHueCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kHueFieldId             = 0,
+    kDirectionFieldId       = 1,
+    kTransitionTimeFieldId  = 2,
+    kOptionsMaskFieldId     = 3,
+    kOptionsOverrideFieldId = 4,
+};
+
+struct Type
+{
+public:
+    uint8_t hue;
+    HueDirection direction;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveToHueCommandParams
+namespace MoveToHueAndSaturationCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kHueFieldId             = 0,
+    kSaturationFieldId      = 1,
+    kTransitionTimeFieldId  = 2,
+    kOptionsMaskFieldId     = 3,
+    kOptionsOverrideFieldId = 4,
+};
+
+struct Type
+{
+public:
+    uint8_t hue;
+    uint8_t saturation;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveToHueAndSaturationCommandParams
+namespace MoveToSaturationCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kSaturationFieldId      = 0,
+    kTransitionTimeFieldId  = 1,
+    kOptionsMaskFieldId     = 2,
+    kOptionsOverrideFieldId = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t saturation;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MoveToSaturationCommandParams
+namespace StepColorCommandParams {
+constexpr CommandId kCommandId = 0x09;
+
+enum FieldId
+{
+    kStepXFieldId           = 0,
+    kStepYFieldId           = 1,
+    kTransitionTimeFieldId  = 2,
+    kOptionsMaskFieldId     = 3,
+    kOptionsOverrideFieldId = 4,
+};
+
+struct Type
+{
+public:
+    int16_t stepX;
+    int16_t stepY;
+    uint16_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StepColorCommandParams
+namespace StepColorTemperatureCommandParams {
+constexpr CommandId kCommandId = 0x4C;
+
+enum FieldId
+{
+    kStepModeFieldId                = 0,
+    kStepSizeFieldId                = 1,
+    kTransitionTimeFieldId          = 2,
+    kColorTemperatureMinimumFieldId = 3,
+    kColorTemperatureMaximumFieldId = 4,
+    kOptionsMaskFieldId             = 5,
+    kOptionsOverrideFieldId         = 6,
+};
+
+struct Type
+{
+public:
+    HueStepMode stepMode;
+    uint16_t stepSize;
+    uint16_t transitionTime;
+    uint16_t colorTemperatureMinimum;
+    uint16_t colorTemperatureMaximum;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StepColorTemperatureCommandParams
+namespace StepHueCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kStepModeFieldId        = 0,
+    kStepSizeFieldId        = 1,
+    kTransitionTimeFieldId  = 2,
+    kOptionsMaskFieldId     = 3,
+    kOptionsOverrideFieldId = 4,
+};
+
+struct Type
+{
+public:
+    HueStepMode stepMode;
+    uint8_t stepSize;
+    uint8_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StepHueCommandParams
+namespace StepSaturationCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kStepModeFieldId        = 0,
+    kStepSizeFieldId        = 1,
+    kTransitionTimeFieldId  = 2,
+    kOptionsMaskFieldId     = 3,
+    kOptionsOverrideFieldId = 4,
+};
+
+struct Type
+{
+public:
+    SaturationStepMode stepMode;
+    uint8_t stepSize;
+    uint8_t transitionTime;
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StepSaturationCommandParams
+namespace StopMoveStepCommandParams {
+constexpr CommandId kCommandId = 0x47;
+
+enum FieldId
+{
+    kOptionsMaskFieldId     = 0,
+    kOptionsOverrideFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t optionsMask;
+    uint8_t optionsOverride;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StopMoveStepCommandParams
+
+} // namespace Commands
 
 } // namespace ColorControl
 namespace BallastConfiguration {
+constexpr ClusterId kClusterId = 0x301;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace BallastConfiguration
 namespace IlluminanceMeasurement {
+constexpr ClusterId kClusterId = 0x400;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace IlluminanceMeasurement
 namespace IlluminanceLevelSensing {
+constexpr ClusterId kClusterId = 0x401;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace IlluminanceLevelSensing
 namespace TemperatureMeasurement {
+constexpr ClusterId kClusterId = 0x402;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace TemperatureMeasurement
 namespace PressureMeasurement {
+constexpr ClusterId kClusterId = 0x403;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace PressureMeasurement
 namespace FlowMeasurement {
+constexpr ClusterId kClusterId = 0x404;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace FlowMeasurement
 namespace RelativeHumidityMeasurement {
+constexpr ClusterId kClusterId = 0x405;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace RelativeHumidityMeasurement
 namespace OccupancySensing {
+constexpr ClusterId kClusterId = 0x406;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace OccupancySensing
 namespace CarbonMonoxideConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x40C;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace CarbonMonoxideConcentrationMeasurement
 namespace CarbonDioxideConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x40D;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace CarbonDioxideConcentrationMeasurement
 namespace EthyleneConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x40E;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace EthyleneConcentrationMeasurement
 namespace EthyleneOxideConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x40F;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace EthyleneOxideConcentrationMeasurement
 namespace HydrogenConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x410;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace HydrogenConcentrationMeasurement
 namespace HydrogenSulphideConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x411;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace HydrogenSulphideConcentrationMeasurement
 namespace NitricOxideConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x412;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace NitricOxideConcentrationMeasurement
 namespace NitrogenDioxideConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x413;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace NitrogenDioxideConcentrationMeasurement
 namespace OxygenConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x414;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace OxygenConcentrationMeasurement
 namespace OzoneConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x415;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace OzoneConcentrationMeasurement
 namespace SulfurDioxideConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x416;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace SulfurDioxideConcentrationMeasurement
 namespace DissolvedOxygenConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x417;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace DissolvedOxygenConcentrationMeasurement
 namespace BromateConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x418;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace BromateConcentrationMeasurement
 namespace ChloraminesConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x419;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace ChloraminesConcentrationMeasurement
 namespace ChlorineConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x41A;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace ChlorineConcentrationMeasurement
 namespace FecalColiformAndEColiConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x41B;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace FecalColiformAndEColiConcentrationMeasurement
 namespace FluorideConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x41C;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace FluorideConcentrationMeasurement
 namespace HaloaceticAcidsConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x41D;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace HaloaceticAcidsConcentrationMeasurement
 namespace TotalTrihalomethanesConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x41E;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace TotalTrihalomethanesConcentrationMeasurement
 namespace TotalColiformBacteriaConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x41F;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace TotalColiformBacteriaConcentrationMeasurement
 namespace TurbidityConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x420;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace TurbidityConcentrationMeasurement
 namespace CopperConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x421;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace CopperConcentrationMeasurement
 namespace LeadConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x422;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace LeadConcentrationMeasurement
 namespace ManganeseConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x423;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace ManganeseConcentrationMeasurement
 namespace SulfateConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x424;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace SulfateConcentrationMeasurement
 namespace BromodichloromethaneConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x425;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace BromodichloromethaneConcentrationMeasurement
 namespace BromoformConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x426;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace BromoformConcentrationMeasurement
 namespace ChlorodibromomethaneConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x427;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace ChlorodibromomethaneConcentrationMeasurement
 namespace ChloroformConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x428;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace ChloroformConcentrationMeasurement
 namespace SodiumConcentrationMeasurement {
+constexpr ClusterId kClusterId = 0x429;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace SodiumConcentrationMeasurement
 namespace IasZone {
+constexpr ClusterId kClusterId = 0x500;
+
+ClusterId GetClusterId();
+
+// Enum for IasEnrollResponseCode
+enum class IasEnrollResponseCode : uint8_t
+{
+    IAS_ENROLL_RESPONSE_CODE_SUCCESS          = 0x00,
+    IAS_ENROLL_RESPONSE_CODE_NOT_SUPPORTED    = 0x01,
+    IAS_ENROLL_RESPONSE_CODE_NO_ENROLL_PERMIT = 0x02,
+    IAS_ENROLL_RESPONSE_CODE_TOO_MANY_ZONES   = 0x03,
+};
+// Enum for IasZoneType
+enum class IasZoneType : uint16_t
+{
+    IAS_ZONE_TYPE_STANDARD_CIE              = 0x00,
+    IAS_ZONE_TYPE_MOTION_SENSOR             = 0x0D,
+    IAS_ZONE_TYPE_CONTACT_SWITCH            = 0x15,
+    IAS_ZONE_TYPE_FIRE_SENSOR               = 0x28,
+    IAS_ZONE_TYPE_WATER_SENSOR              = 0x2A,
+    IAS_ZONE_TYPE_GAS_SENSOR                = 0x2B,
+    IAS_ZONE_TYPE_PERSONAL_EMERGENCY_DEVICE = 0x2C,
+    IAS_ZONE_TYPE_VIBRATION_MOVEMENT_SENSOR = 0x2D,
+    IAS_ZONE_TYPE_REMOTE_CONTROL            = 0x10F,
+    IAS_ZONE_TYPE_KEY_FOB                   = 0x115,
+    IAS_ZONE_TYPE_KEYPAD                    = 0x21D,
+    IAS_ZONE_TYPE_STANDARD_WARNING_DEVICE   = 0x225,
+    IAS_ZONE_TYPE_GLASS_BREAK_SENSOR        = 0x226,
+    IAS_ZONE_TYPE_CARBON_MONOXIDE_SENSOR    = 0x227,
+    IAS_ZONE_TYPE_SECURITY_REPEATER         = 0x229,
+    IAS_ZONE_TYPE_INVALID_ZONE_TYPE         = 0xFFFF,
+};
+
+namespace Commands {
+namespace InitiateNormalOperationModeCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace InitiateNormalOperationModeCommandParams
+namespace InitiateNormalOperationModeResponseCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace InitiateNormalOperationModeResponseCommandParams
+namespace InitiateTestModeCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kTestModeDurationFieldId            = 0,
+    kCurrentZoneSensitivityLevelFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t testModeDuration;
+    uint8_t currentZoneSensitivityLevel;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace InitiateTestModeCommandParams
+namespace InitiateTestModeResponseCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace InitiateTestModeResponseCommandParams
+namespace ZoneEnrollRequestCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kZoneTypeFieldId         = 0,
+    kManufacturerCodeFieldId = 1,
+};
+
+struct Type
+{
+public:
+    IasZoneType zoneType;
+    uint16_t manufacturerCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ZoneEnrollRequestCommandParams
+namespace ZoneEnrollResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kEnrollResponseCodeFieldId = 0,
+    kZoneIdFieldId             = 1,
+};
+
+struct Type
+{
+public:
+    IasEnrollResponseCode enrollResponseCode;
+    uint8_t zoneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ZoneEnrollResponseCommandParams
+namespace ZoneStatusChangeNotificationCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kZoneStatusFieldId     = 0,
+    kExtendedStatusFieldId = 1,
+    kZoneIdFieldId         = 2,
+    kDelayFieldId          = 3,
+};
+
+struct Type
+{
+public:
+    uint16_t zoneStatus;
+    uint8_t extendedStatus;
+    uint8_t zoneId;
+    uint16_t delay;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ZoneStatusChangeNotificationCommandParams
+
+} // namespace Commands
 
 } // namespace IasZone
 namespace IasAce {
+constexpr ClusterId kClusterId = 0x501;
+
+ClusterId GetClusterId();
+
+// Enum for IasAceAlarmStatus
+enum class IasAceAlarmStatus : uint8_t
+{
+    IAS_ACE_ALARM_STATUS_NO_ALARM        = 0x00,
+    IAS_ACE_ALARM_STATUS_BURGLAR         = 0x01,
+    IAS_ACE_ALARM_STATUS_FIRE            = 0x02,
+    IAS_ACE_ALARM_STATUS_EMERGENCY       = 0x03,
+    IAS_ACE_ALARM_STATUS_POLICE_PANIC    = 0x04,
+    IAS_ACE_ALARM_STATUS_FIRE_PANIC      = 0x05,
+    IAS_ACE_ALARM_STATUS_EMERGENCY_PANIC = 0x06,
+};
+// Enum for IasAceArmMode
+enum class IasAceArmMode : uint8_t
+{
+    IAS_ACE_ARM_MODE_DISARM                     = 0x00,
+    IAS_ACE_ARM_MODE_ARM_DAY_HOME_ZONES_ONLY    = 0x01,
+    IAS_ACE_ARM_MODE_ARM_NIGHT_SLEEP_ZONES_ONLY = 0x02,
+    IAS_ACE_ARM_MODE_ARM_ALL_ZONES              = 0x03,
+};
+// Enum for IasAceArmNotification
+enum class IasAceArmNotification : uint8_t
+{
+    IAS_ACE_ARM_NOTIFICATION_ALL_ZONES_DISARMED           = 0x00,
+    IAS_ACE_ARM_NOTIFICATION_ONLY_DAY_HOME_ZONES_ARMED    = 0x01,
+    IAS_ACE_ARM_NOTIFICATION_ONLY_NIGHT_SLEEP_ZONES_ARMED = 0x02,
+    IAS_ACE_ARM_NOTIFICATION_ALL_ZONES_ARMED              = 0x03,
+    IAS_ACE_ARM_NOTIFICATION_INVALID_ARM_DISARM_CODE      = 0x04,
+    IAS_ACE_ARM_NOTIFICATION_NOT_READY_TO_ARM             = 0x05,
+    IAS_ACE_ARM_NOTIFICATION_ALREADY_DISARMED             = 0x06,
+};
+// Enum for IasAceAudibleNotification
+enum class IasAceAudibleNotification : uint8_t
+{
+    IAS_ACE_AUDIBLE_NOTIFICATION_MUTE          = 0x00,
+    IAS_ACE_AUDIBLE_NOTIFICATION_DEFAULT_SOUND = 0x01,
+};
+// Enum for IasAceBypassResult
+enum class IasAceBypassResult : uint8_t
+{
+    IAS_ACE_BYPASS_RESULT_ZONE_BYPASSED           = 0x00,
+    IAS_ACE_BYPASS_RESULT_ZONE_NOT_BYPASSED       = 0x01,
+    IAS_ACE_BYPASS_RESULT_NOT_ALLOWED             = 0x02,
+    IAS_ACE_BYPASS_RESULT_INVALID_ZONE_ID         = 0x03,
+    IAS_ACE_BYPASS_RESULT_UNKNOWN_ZONE_ID         = 0x04,
+    IAS_ACE_BYPASS_RESULT_INVALID_ARM_DISARM_CODE = 0x05,
+};
+// Enum for IasAcePanelStatus
+enum class IasAcePanelStatus : uint8_t
+{
+    IAS_ACE_PANEL_STATUS_PANEL_DISARMED   = 0x00,
+    IAS_ACE_PANEL_STATUS_ARMED_STAY       = 0x01,
+    IAS_ACE_PANEL_STATUS_ARMED_NIGHT      = 0x02,
+    IAS_ACE_PANEL_STATUS_ARMED_AWAY       = 0x03,
+    IAS_ACE_PANEL_STATUS_EXIT_DELAY       = 0x04,
+    IAS_ACE_PANEL_STATUS_ENTRY_DELAY      = 0x05,
+    IAS_ACE_PANEL_STATUS_NOT_READY_TO_ARM = 0x06,
+    IAS_ACE_PANEL_STATUS_IN_ALARM         = 0x07,
+    IAS_ACE_PANEL_STATUS_ARMING_STAY      = 0x08,
+    IAS_ACE_PANEL_STATUS_ARMING_NIGHT     = 0x09,
+    IAS_ACE_PANEL_STATUS_ARMING_AWAY      = 0x0A,
+};
+// Enum for IasZoneType
+enum class IasZoneType : uint16_t
+{
+    IAS_ZONE_TYPE_STANDARD_CIE              = 0x00,
+    IAS_ZONE_TYPE_MOTION_SENSOR             = 0x0D,
+    IAS_ZONE_TYPE_CONTACT_SWITCH            = 0x15,
+    IAS_ZONE_TYPE_FIRE_SENSOR               = 0x28,
+    IAS_ZONE_TYPE_WATER_SENSOR              = 0x2A,
+    IAS_ZONE_TYPE_GAS_SENSOR                = 0x2B,
+    IAS_ZONE_TYPE_PERSONAL_EMERGENCY_DEVICE = 0x2C,
+    IAS_ZONE_TYPE_VIBRATION_MOVEMENT_SENSOR = 0x2D,
+    IAS_ZONE_TYPE_REMOTE_CONTROL            = 0x10F,
+    IAS_ZONE_TYPE_KEY_FOB                   = 0x115,
+    IAS_ZONE_TYPE_KEYPAD                    = 0x21D,
+    IAS_ZONE_TYPE_STANDARD_WARNING_DEVICE   = 0x225,
+    IAS_ZONE_TYPE_GLASS_BREAK_SENSOR        = 0x226,
+    IAS_ZONE_TYPE_CARBON_MONOXIDE_SENSOR    = 0x227,
+    IAS_ZONE_TYPE_SECURITY_REPEATER         = 0x229,
+    IAS_ZONE_TYPE_INVALID_ZONE_TYPE         = 0xFFFF,
+};
+
+namespace IasAceZoneStatusResult {
+enum FieldId
+{
+    kZoneIdFieldId     = 0,
+    kZoneStatusFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t zoneId;
+    uint16_t zoneStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace IasAceZoneStatusResult
+
+namespace Commands {
+namespace ArmCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kArmModeFieldId       = 0,
+    kArmDisarmCodeFieldId = 1,
+    kZoneIdFieldId        = 2,
+};
+
+struct Type
+{
+public:
+    IasAceArmMode armMode;
+    Span<const char> armDisarmCode;
+    uint8_t zoneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ArmCommandParams
+namespace ArmResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kArmNotificationFieldId = 0,
+};
+
+struct Type
+{
+public:
+    IasAceArmNotification armNotification;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ArmResponseCommandParams
+namespace BypassCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kNumberOfZonesFieldId = 0,
+    kZoneIdsFieldId       = 1,
+    kArmDisarmCodeFieldId = 2,
+};
+
+struct Type
+{
+public:
+    uint8_t numberOfZones;
+    DataModel::List<uint8_t> zoneIds;
+    Span<const char> armDisarmCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t numberOfZones;
+    DataModel::DecodableList<uint8_t> zoneIds;
+    Span<const char> armDisarmCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace BypassCommandParams
+namespace BypassResponseCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+    kNumberOfZonesFieldId = 0,
+    kBypassResultFieldId  = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t numberOfZones;
+    DataModel::List<IasAceBypassResult> bypassResult;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t numberOfZones;
+    DataModel::DecodableList<IasAceBypassResult> bypassResult;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace BypassResponseCommandParams
+namespace EmergencyCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EmergencyCommandParams
+namespace FireCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace FireCommandParams
+namespace GetBypassedZoneListCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetBypassedZoneListCommandParams
+namespace GetPanelStatusCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetPanelStatusCommandParams
+namespace GetPanelStatusResponseCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kPanelStatusFieldId         = 0,
+    kSecondsRemainingFieldId    = 1,
+    kAudibleNotificationFieldId = 2,
+    kAlarmStatusFieldId         = 3,
+};
+
+struct Type
+{
+public:
+    IasAcePanelStatus panelStatus;
+    uint8_t secondsRemaining;
+    IasAceAudibleNotification audibleNotification;
+    IasAceAlarmStatus alarmStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetPanelStatusResponseCommandParams
+namespace GetZoneIdMapCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetZoneIdMapCommandParams
+namespace GetZoneIdMapResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kSection0FieldId  = 0,
+    kSection1FieldId  = 1,
+    kSection2FieldId  = 2,
+    kSection3FieldId  = 3,
+    kSection4FieldId  = 4,
+    kSection5FieldId  = 5,
+    kSection6FieldId  = 6,
+    kSection7FieldId  = 7,
+    kSection8FieldId  = 8,
+    kSection9FieldId  = 9,
+    kSection10FieldId = 10,
+    kSection11FieldId = 11,
+    kSection12FieldId = 12,
+    kSection13FieldId = 13,
+    kSection14FieldId = 14,
+    kSection15FieldId = 15,
+};
+
+struct Type
+{
+public:
+    uint16_t section0;
+    uint16_t section1;
+    uint16_t section2;
+    uint16_t section3;
+    uint16_t section4;
+    uint16_t section5;
+    uint16_t section6;
+    uint16_t section7;
+    uint16_t section8;
+    uint16_t section9;
+    uint16_t section10;
+    uint16_t section11;
+    uint16_t section12;
+    uint16_t section13;
+    uint16_t section14;
+    uint16_t section15;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetZoneIdMapResponseCommandParams
+namespace GetZoneInformationCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kZoneIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t zoneId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetZoneInformationCommandParams
+namespace GetZoneInformationResponseCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kZoneIdFieldId      = 0,
+    kZoneTypeFieldId    = 1,
+    kIeeeAddressFieldId = 2,
+    kZoneLabelFieldId   = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t zoneId;
+    IasZoneType zoneType;
+    chip::NodeId ieeeAddress;
+    Span<const char> zoneLabel;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetZoneInformationResponseCommandParams
+namespace GetZoneStatusCommandParams {
+constexpr CommandId kCommandId = 0x09;
+
+enum FieldId
+{
+    kStartingZoneIdFieldId     = 0,
+    kMaxNumberOfZoneIdsFieldId = 1,
+    kZoneStatusMaskFlagFieldId = 2,
+    kZoneStatusMaskFieldId     = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t startingZoneId;
+    uint8_t maxNumberOfZoneIds;
+    bool zoneStatusMaskFlag;
+    uint16_t zoneStatusMask;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetZoneStatusCommandParams
+namespace GetZoneStatusResponseCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+    kZoneStatusCompleteFieldId = 0,
+    kNumberOfZonesFieldId      = 1,
+    kZoneStatusResultFieldId   = 2,
+};
+
+struct Type
+{
+public:
+    bool zoneStatusComplete;
+    uint8_t numberOfZones;
+    DataModel::List<IasAceZoneStatusResult::Type> zoneStatusResult;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    bool zoneStatusComplete;
+    uint8_t numberOfZones;
+    DataModel::DecodableList<IasAceZoneStatusResult::Type> zoneStatusResult;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetZoneStatusResponseCommandParams
+namespace PanelStatusChangedCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kPanelStatusFieldId         = 0,
+    kSecondsRemainingFieldId    = 1,
+    kAudibleNotificationFieldId = 2,
+    kAlarmStatusFieldId         = 3,
+};
+
+struct Type
+{
+public:
+    IasAcePanelStatus panelStatus;
+    uint8_t secondsRemaining;
+    IasAceAudibleNotification audibleNotification;
+    IasAceAlarmStatus alarmStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace PanelStatusChangedCommandParams
+namespace PanicCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace PanicCommandParams
+namespace SetBypassedZoneListCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kNumberOfZonesFieldId = 0,
+    kZoneIdsFieldId       = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t numberOfZones;
+    DataModel::List<uint8_t> zoneIds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t numberOfZones;
+    DataModel::DecodableList<uint8_t> zoneIds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SetBypassedZoneListCommandParams
+namespace ZoneStatusChangedCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kZoneIdFieldId              = 0,
+    kZoneStatusFieldId          = 1,
+    kAudibleNotificationFieldId = 2,
+    kZoneLabelFieldId           = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t zoneId;
+    uint16_t zoneStatus;
+    IasAceAudibleNotification audibleNotification;
+    Span<const char> zoneLabel;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ZoneStatusChangedCommandParams
+
+} // namespace Commands
 
 } // namespace IasAce
 namespace IasWd {
+constexpr ClusterId kClusterId = 0x502;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace SquawkCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kSquawkInfoFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t squawkInfo;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SquawkCommandParams
+namespace StartWarningCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kWarningInfoFieldId     = 0,
+    kWarningDurationFieldId = 1,
+    kStrobeDutyCycleFieldId = 2,
+    kStrobeLevelFieldId     = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t warningInfo;
+    uint16_t warningDuration;
+    uint8_t strobeDutyCycle;
+    uint8_t strobeLevel;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StartWarningCommandParams
+
+} // namespace Commands
 
 } // namespace IasWd
 namespace WakeOnLan {
+constexpr ClusterId kClusterId = 0x503;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace WakeOnLan
 namespace TvChannel {
+constexpr ClusterId kClusterId = 0x504;
+
+ClusterId GetClusterId();
+
 // Enum for TvChannelErrorType
 enum class TvChannelErrorType : uint8_t
 {
@@ -964,8 +8234,110 @@ public:
 
 } // namespace TvChannelLineupInfo
 
+namespace Commands {
+namespace ChangeChannelCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kMatchFieldId = 0,
+};
+
+struct Type
+{
+public:
+    Span<const char> match;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ChangeChannelCommandParams
+namespace ChangeChannelByNumberCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kMajorNumberFieldId = 0,
+    kMinorNumberFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t majorNumber;
+    uint16_t minorNumber;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ChangeChannelByNumberCommandParams
+namespace ChangeChannelResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kChannelMatchFieldId = 0,
+    kErrorTypeFieldId    = 1,
+};
+
+struct Type
+{
+public:
+    DataModel::List<TvChannelInfo::Type> channelMatch;
+    TvChannelErrorType errorType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    DataModel::DecodableList<TvChannelInfo::Type> channelMatch;
+    TvChannelErrorType errorType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ChangeChannelResponseCommandParams
+namespace SkipChannelCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kCountFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint16_t count;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SkipChannelCommandParams
+
+} // namespace Commands
+
 } // namespace TvChannel
 namespace TargetNavigator {
+constexpr ClusterId kClusterId = 0x505;
+
+ClusterId GetClusterId();
+
 // Enum for NavigateTargetStatus
 enum class NavigateTargetStatus : uint8_t
 {
@@ -993,8 +8365,60 @@ public:
 
 } // namespace NavigateTargetTargetInfo
 
+namespace Commands {
+namespace NavigateTargetCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kTargetFieldId = 0,
+    kDataFieldId   = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t target;
+    Span<const char> data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace NavigateTargetCommandParams
+namespace NavigateTargetResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+    kDataFieldId   = 1,
+};
+
+struct Type
+{
+public:
+    NavigateTargetStatus status;
+    Span<const char> data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace NavigateTargetResponseCommandParams
+
+} // namespace Commands
+
 } // namespace TargetNavigator
 namespace MediaPlayback {
+constexpr ClusterId kClusterId = 0x506;
+
+ClusterId GetClusterId();
+
 // Enum for MediaPlaybackState
 enum class MediaPlaybackState : uint8_t
 {
@@ -1033,8 +8457,432 @@ public:
 
 } // namespace MediaPlaybackPosition
 
+namespace Commands {
+namespace MediaFastForwardCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaFastForwardCommandParams
+namespace MediaFastForwardResponseCommandParams {
+constexpr CommandId kCommandId = 0x07;
+
+enum FieldId
+{
+    kMediaPlaybackStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaFastForwardResponseCommandParams
+namespace MediaNextCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaNextCommandParams
+namespace MediaNextResponseCommandParams {
+constexpr CommandId kCommandId = 0x05;
+
+enum FieldId
+{
+    kMediaPlaybackStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaNextResponseCommandParams
+namespace MediaPauseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaPauseCommandParams
+namespace MediaPauseResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kMediaPlaybackStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaPauseResponseCommandParams
+namespace MediaPlayCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaPlayCommandParams
+namespace MediaPlayResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kMediaPlaybackStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaPlayResponseCommandParams
+namespace MediaPreviousCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaPreviousCommandParams
+namespace MediaPreviousResponseCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kMediaPlaybackStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaPreviousResponseCommandParams
+namespace MediaRewindCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaRewindCommandParams
+namespace MediaRewindResponseCommandParams {
+constexpr CommandId kCommandId = 0x06;
+
+enum FieldId
+{
+    kMediaPlaybackStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaRewindResponseCommandParams
+namespace MediaSeekCommandParams {
+constexpr CommandId kCommandId = 0x0A;
+
+enum FieldId
+{
+    kPositionFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint64_t position;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaSeekCommandParams
+namespace MediaSeekResponseCommandParams {
+constexpr CommandId kCommandId = 0x0B;
+
+enum FieldId
+{
+    kMediaPlaybackStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaSeekResponseCommandParams
+namespace MediaSkipBackwardCommandParams {
+constexpr CommandId kCommandId = 0x09;
+
+enum FieldId
+{
+    kDeltaPositionMillisecondsFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint64_t deltaPositionMilliseconds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaSkipBackwardCommandParams
+namespace MediaSkipBackwardResponseCommandParams {
+constexpr CommandId kCommandId = 0x09;
+
+enum FieldId
+{
+    kMediaPlaybackStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaSkipBackwardResponseCommandParams
+namespace MediaSkipForwardCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+    kDeltaPositionMillisecondsFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint64_t deltaPositionMilliseconds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaSkipForwardCommandParams
+namespace MediaSkipForwardResponseCommandParams {
+constexpr CommandId kCommandId = 0x08;
+
+enum FieldId
+{
+    kMediaPlaybackStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaSkipForwardResponseCommandParams
+namespace MediaStartOverCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaStartOverCommandParams
+namespace MediaStartOverResponseCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kMediaPlaybackStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaStartOverResponseCommandParams
+namespace MediaStopCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaStopCommandParams
+namespace MediaStopResponseCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kMediaPlaybackStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    MediaPlaybackStatus mediaPlaybackStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MediaStopResponseCommandParams
+
+} // namespace Commands
+
 } // namespace MediaPlayback
 namespace MediaInput {
+constexpr ClusterId kClusterId = 0x507;
+
+ClusterId GetClusterId();
+
 // Enum for MediaInputType
 enum class MediaInputType : uint8_t
 {
@@ -1075,11 +8923,119 @@ public:
 
 } // namespace MediaInputInfo
 
+namespace Commands {
+namespace HideInputStatusCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace HideInputStatusCommandParams
+namespace RenameInputCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kIndexFieldId = 0,
+    kNameFieldId  = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t index;
+    Span<const char> name;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RenameInputCommandParams
+namespace SelectInputCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kIndexFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t index;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SelectInputCommandParams
+namespace ShowInputStatusCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ShowInputStatusCommandParams
+
+} // namespace Commands
+
 } // namespace MediaInput
 namespace LowPower {
+constexpr ClusterId kClusterId = 0x508;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace SleepCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SleepCommandParams
+
+} // namespace Commands
 
 } // namespace LowPower
 namespace KeypadInput {
+constexpr ClusterId kClusterId = 0x509;
+
+ClusterId GetClusterId();
+
 // Enum for KeypadInputCecKeyCode
 enum class KeypadInputCecKeyCode : uint8_t
 {
@@ -1178,8 +9134,56 @@ enum class KeypadInputStatus : uint8_t
     KEYPAD_INPUT_STATUS_INVALID_KEY_IN_CURRENT_STATE = 0x02,
 };
 
+namespace Commands {
+namespace SendKeyCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kKeyCodeFieldId = 0,
+};
+
+struct Type
+{
+public:
+    KeypadInputCecKeyCode keyCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SendKeyCommandParams
+namespace SendKeyResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    KeypadInputStatus status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SendKeyResponseCommandParams
+
+} // namespace Commands
+
 } // namespace KeypadInput
 namespace ContentLauncher {
+constexpr ClusterId kClusterId = 0x50A;
+
+ClusterId GetClusterId();
+
 // Enum for ContentLaunchMetricType
 enum class ContentLaunchMetricType : uint8_t
 {
@@ -1258,6 +9262,7 @@ public:
     ContentLaunchParameterEnum type;
     Span<const char> value;
     DataModel::DecodableList<ContentLaunchAdditionalInfo::Type> externalIDList;
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1330,8 +9335,104 @@ public:
 
 } // namespace ContentLaunchStyleInformation
 
+namespace Commands {
+namespace LaunchContentCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kAutoPlayFieldId = 0,
+    kDataFieldId     = 1,
+};
+
+struct Type
+{
+public:
+    bool autoPlay;
+    Span<const char> data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LaunchContentCommandParams
+namespace LaunchContentResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kDataFieldId                = 0,
+    kContentLaunchStatusFieldId = 1,
+};
+
+struct Type
+{
+public:
+    Span<const char> data;
+    ContentLaunchStatus contentLaunchStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LaunchContentResponseCommandParams
+namespace LaunchURLCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kContentURLFieldId    = 0,
+    kDisplayStringFieldId = 1,
+};
+
+struct Type
+{
+public:
+    Span<const char> contentURL;
+    Span<const char> displayString;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LaunchURLCommandParams
+namespace LaunchURLResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kDataFieldId                = 0,
+    kContentLaunchStatusFieldId = 1,
+};
+
+struct Type
+{
+public:
+    Span<const char> data;
+    ContentLaunchStatus contentLaunchStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LaunchURLResponseCommandParams
+
+} // namespace Commands
+
 } // namespace ContentLauncher
 namespace AudioOutput {
+constexpr ClusterId kClusterId = 0x50B;
+
+ClusterId GetClusterId();
+
 // Enum for AudioOutputType
 enum class AudioOutputType : uint8_t
 {
@@ -1364,8 +9465,58 @@ public:
 
 } // namespace AudioOutputInfo
 
+namespace Commands {
+namespace RenameOutputCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kIndexFieldId = 0,
+    kNameFieldId  = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t index;
+    Span<const char> name;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace RenameOutputCommandParams
+namespace SelectOutputCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kIndexFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t index;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace SelectOutputCommandParams
+
+} // namespace Commands
+
 } // namespace AudioOutput
 namespace ApplicationLauncher {
+constexpr ClusterId kClusterId = 0x50C;
+
+ClusterId GetClusterId();
+
 // Enum for ApplicationLauncherStatus
 enum class ApplicationLauncherStatus : uint8_t
 {
@@ -1393,8 +9544,62 @@ public:
 
 } // namespace ApplicationLauncherApp
 
+namespace Commands {
+namespace LaunchAppCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kDataFieldId            = 0,
+    kCatalogVendorIdFieldId = 1,
+    kApplicationIdFieldId   = 2,
+};
+
+struct Type
+{
+public:
+    Span<const char> data;
+    uint16_t catalogVendorId;
+    Span<const char> applicationId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LaunchAppCommandParams
+namespace LaunchAppResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+    kDataFieldId   = 1,
+};
+
+struct Type
+{
+public:
+    ApplicationLauncherStatus status;
+    Span<const char> data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LaunchAppResponseCommandParams
+
+} // namespace Commands
+
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
+constexpr ClusterId kClusterId = 0x50D;
+
+ClusterId GetClusterId();
+
 // Enum for ApplicationBasicStatus
 enum class ApplicationBasicStatus : uint8_t
 {
@@ -1404,11 +9609,108 @@ enum class ApplicationBasicStatus : uint8_t
     APPLICATION_BASIC_STATUS_ACTIVE_VISIBLE_NOT_FOCUS = 0x03,
 };
 
+namespace Commands {
+namespace ChangeStatusCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kStatusFieldId = 0,
+};
+
+struct Type
+{
+public:
+    ApplicationBasicStatus status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace ChangeStatusCommandParams
+
+} // namespace Commands
+
 } // namespace ApplicationBasic
 namespace AccountLogin {
+constexpr ClusterId kClusterId = 0x50E;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace GetSetupPINCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kTempAccountIdentifierFieldId = 0,
+};
+
+struct Type
+{
+public:
+    Span<const char> tempAccountIdentifier;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetSetupPINCommandParams
+namespace GetSetupPINResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kSetupPINFieldId = 0,
+};
+
+struct Type
+{
+public:
+    Span<const char> setupPIN;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetSetupPINResponseCommandParams
+namespace LoginCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kTempAccountIdentifierFieldId = 0,
+    kSetupPINFieldId              = 1,
+};
+
+struct Type
+{
+public:
+    Span<const char> tempAccountIdentifier;
+    Span<const char> setupPIN;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LoginCommandParams
+
+} // namespace Commands
 
 } // namespace AccountLogin
 namespace TestCluster {
+constexpr ClusterId kClusterId = 0x50F;
+
+ClusterId GetClusterId();
+
 // Enum for SimpleEnum
 enum class SimpleEnum : uint8_t
 {
@@ -1499,6 +9801,7 @@ public:
     DataModel::DecodableList<uint32_t> e;
     DataModel::DecodableList<chip::ByteSpan> f;
     DataModel::DecodableList<uint8_t> g;
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1523,6 +9826,7 @@ struct DecodableType
 {
 public:
     DataModel::DecodableList<NestedStructList::DecodableType> a;
+
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -1547,8 +9851,216 @@ public:
 
 } // namespace TestListStructOctet
 
+namespace Commands {
+namespace TestCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace TestCommandParams
+namespace TestAddArgumentsCommandParams {
+constexpr CommandId kCommandId = 0x04;
+
+enum FieldId
+{
+    kArg1FieldId = 0,
+    kArg2FieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t arg1;
+    uint8_t arg2;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace TestAddArgumentsCommandParams
+namespace TestAddArgumentsResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kReturnValueFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t returnValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace TestAddArgumentsResponseCommandParams
+namespace TestAddArrayofStructArgumentsCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kArg1FieldId = 0,
+};
+
+struct Type
+{
+public:
+    DataModel::List<SimpleStruct::Type> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    DataModel::DecodableList<SimpleStruct::Type> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace TestAddArrayofStructArgumentsCommandParams
+namespace TestAddNestedArrayArgumentsCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kArg1FieldId = 0,
+    kArg2FieldId = 1,
+    kArg3FieldId = 2,
+    kArg4FieldId = 3,
+    kArg5FieldId = 4,
+};
+
+struct Type
+{
+public:
+    DataModel::List<NestedStructList::Type> arg1;
+    DataModel::List<SimpleEnum> arg2;
+    DataModel::List<bool> arg3;
+    SimpleEnum arg4;
+    bool arg5;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    DataModel::DecodableList<NestedStructList::DecodableType> arg1;
+    DataModel::DecodableList<SimpleEnum> arg2;
+    DataModel::DecodableList<bool> arg3;
+    SimpleEnum arg4;
+    bool arg5;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace TestAddNestedArrayArgumentsCommandParams
+namespace TestNotHandledCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace TestNotHandledCommandParams
+namespace TestSpecificCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace TestSpecificCommandParams
+namespace TestSpecificResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kReturnValueFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t returnValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace TestSpecificResponseCommandParams
+namespace TestUnknownCommandCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace TestUnknownCommandCommandParams
+
+} // namespace Commands
+
 } // namespace TestCluster
 namespace Messaging {
+constexpr ClusterId kClusterId = 0x703;
+
+ClusterId GetClusterId();
+
 // Enum for EventId
 enum class EventId : uint8_t
 {
@@ -1663,26 +10175,682 @@ enum class MessagingControlTransmission : uint8_t
     MESSAGING_CONTROL_TRANSMISSION_RESERVED             = 0x03,
 };
 
+namespace Commands {
+namespace CancelAllMessagesCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kImplementationDateTimeFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::UTC implementationDateTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CancelAllMessagesCommandParams
+namespace CancelMessageCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kMessageIdFieldId      = 0,
+    kMessageControlFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint32_t messageId;
+    uint8_t messageControl;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CancelMessageCommandParams
+namespace DisplayMessageCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kMessageIdFieldId                      = 0,
+    kMessageControlFieldId                 = 1,
+    kStartTimeFieldId                      = 2,
+    kDurationInMinutesFieldId              = 3,
+    kMessageFieldId                        = 4,
+    kOptionalExtendedMessageControlFieldId = 5,
+};
+
+struct Type
+{
+public:
+    uint32_t messageId;
+    uint8_t messageControl;
+    chip::UTC startTime;
+    uint16_t durationInMinutes;
+    Span<const char> message;
+    uint8_t optionalExtendedMessageControl;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace DisplayMessageCommandParams
+namespace DisplayProtectedMessageCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kMessageIdFieldId                      = 0,
+    kMessageControlFieldId                 = 1,
+    kStartTimeFieldId                      = 2,
+    kDurationInMinutesFieldId              = 3,
+    kMessageFieldId                        = 4,
+    kOptionalExtendedMessageControlFieldId = 5,
+};
+
+struct Type
+{
+public:
+    uint32_t messageId;
+    uint8_t messageControl;
+    chip::UTC startTime;
+    uint16_t durationInMinutes;
+    Span<const char> message;
+    uint8_t optionalExtendedMessageControl;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace DisplayProtectedMessageCommandParams
+namespace GetLastMessageCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetLastMessageCommandParams
+namespace GetMessageCancellationCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kEarliestImplementationTimeFieldId = 0,
+};
+
+struct Type
+{
+public:
+    chip::UTC earliestImplementationTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetMessageCancellationCommandParams
+namespace MessageConfirmationCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kMessageIdFieldId                  = 0,
+    kConfirmationTimeFieldId           = 1,
+    kMessageConfirmationControlFieldId = 2,
+    kMessageResponseFieldId            = 3,
+};
+
+struct Type
+{
+public:
+    uint32_t messageId;
+    chip::UTC confirmationTime;
+    uint8_t messageConfirmationControl;
+    chip::ByteSpan messageResponse;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace MessageConfirmationCommandParams
+
+} // namespace Commands
+
 } // namespace Messaging
 namespace ApplianceIdentification {
+constexpr ClusterId kClusterId = 0xB00;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace ApplianceIdentification
 namespace MeterIdentification {
+constexpr ClusterId kClusterId = 0xB01;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+
+} // namespace Commands
 
 } // namespace MeterIdentification
 namespace ApplianceEventsAndAlert {
+constexpr ClusterId kClusterId = 0xB02;
+
+ClusterId GetClusterId();
+
+// Enum for EventIdentification
+enum class EventIdentification : uint8_t
+{
+    EVENT_IDENTIFICATION_END_OF_CYCLE        = 0x01,
+    EVENT_IDENTIFICATION_TEMPERATURE_REACHED = 0x04,
+    EVENT_IDENTIFICATION_END_OF_COOKING      = 0x05,
+    EVENT_IDENTIFICATION_SWITCHING_OFF       = 0x06,
+    EVENT_IDENTIFICATION_WRONG_DATA          = 0x07,
+};
+
+namespace Commands {
+namespace AlertsNotificationCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kAlertsCountFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t alertsCount;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace AlertsNotificationCommandParams
+namespace EventsNotificationCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kEventHeaderFieldId = 0,
+    kEventIdFieldId     = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t eventHeader;
+    EventIdentification eventId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace EventsNotificationCommandParams
+namespace GetAlertsCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetAlertsCommandParams
+namespace GetAlertsResponseCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kAlertsCountFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t alertsCount;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetAlertsResponseCommandParams
+
+} // namespace Commands
 
 } // namespace ApplianceEventsAndAlert
 namespace ApplianceStatistics {
+constexpr ClusterId kClusterId = 0xB03;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace LogNotificationCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kTimeStampFieldId  = 0,
+    kLogIdFieldId      = 1,
+    kLogLengthFieldId  = 2,
+    kLogPayloadFieldId = 3,
+};
+
+struct Type
+{
+public:
+    chip::UTC timeStamp;
+    uint32_t logId;
+    uint32_t logLength;
+    DataModel::List<uint8_t> logPayload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    chip::UTC timeStamp;
+    uint32_t logId;
+    uint32_t logLength;
+    DataModel::DecodableList<uint8_t> logPayload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LogNotificationCommandParams
+namespace LogQueueRequestCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LogQueueRequestCommandParams
+namespace LogQueueResponseCommandParams {
+constexpr CommandId kCommandId = 0x02;
+
+enum FieldId
+{
+    kLogQueueSizeFieldId = 0,
+    kLogIdsFieldId       = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t logQueueSize;
+    DataModel::List<uint32_t> logIds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t logQueueSize;
+    DataModel::DecodableList<uint32_t> logIds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LogQueueResponseCommandParams
+namespace LogRequestCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kLogIdFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint32_t logId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LogRequestCommandParams
+namespace LogResponseCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kTimeStampFieldId  = 0,
+    kLogIdFieldId      = 1,
+    kLogLengthFieldId  = 2,
+    kLogPayloadFieldId = 3,
+};
+
+struct Type
+{
+public:
+    chip::UTC timeStamp;
+    uint32_t logId;
+    uint32_t logLength;
+    DataModel::List<uint8_t> logPayload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    chip::UTC timeStamp;
+    uint32_t logId;
+    uint32_t logLength;
+    DataModel::DecodableList<uint8_t> logPayload;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace LogResponseCommandParams
+namespace StatisticsAvailableCommandParams {
+constexpr CommandId kCommandId = 0x03;
+
+enum FieldId
+{
+    kLogQueueSizeFieldId = 0,
+    kLogIdsFieldId       = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t logQueueSize;
+    DataModel::List<uint32_t> logIds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t logQueueSize;
+    DataModel::DecodableList<uint32_t> logIds;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace StatisticsAvailableCommandParams
+
+} // namespace Commands
 
 } // namespace ApplianceStatistics
 namespace ElectricalMeasurement {
+constexpr ClusterId kClusterId = 0xB04;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace GetMeasurementProfileCommandCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kAttributeIdFieldId       = 0,
+    kStartTimeFieldId         = 1,
+    kNumberOfIntervalsFieldId = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t attributeId;
+    uint32_t startTime;
+    uint8_t numberOfIntervals;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetMeasurementProfileCommandCommandParams
+namespace GetMeasurementProfileResponseCommandCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kStartTimeFieldId                  = 0,
+    kStatusFieldId                     = 1,
+    kProfileIntervalPeriodFieldId      = 2,
+    kNumberOfIntervalsDeliveredFieldId = 3,
+    kAttributeIdFieldId                = 4,
+    kIntervalsFieldId                  = 5,
+};
+
+struct Type
+{
+public:
+    uint32_t startTime;
+    chip::Protocols::InteractionModel::Status status;
+    uint8_t profileIntervalPeriod;
+    uint8_t numberOfIntervalsDelivered;
+    uint16_t attributeId;
+    DataModel::List<uint8_t> intervals;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint32_t startTime;
+    chip::Protocols::InteractionModel::Status status;
+    uint8_t profileIntervalPeriod;
+    uint8_t numberOfIntervalsDelivered;
+    uint16_t attributeId;
+    DataModel::DecodableList<uint8_t> intervals;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetMeasurementProfileResponseCommandCommandParams
+namespace GetProfileInfoCommandCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+};
+
+struct Type
+{
+public:
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetProfileInfoCommandCommandParams
+namespace GetProfileInfoResponseCommandCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kProfileCountFieldId          = 0,
+    kProfileIntervalPeriodFieldId = 1,
+    kMaxNumberOfIntervalsFieldId  = 2,
+    kListOfAttributesFieldId      = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t profileCount;
+    uint8_t profileIntervalPeriod;
+    uint8_t maxNumberOfIntervals;
+    DataModel::List<uint16_t> listOfAttributes;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+struct DecodableType
+{
+public:
+    uint8_t profileCount;
+    uint8_t profileIntervalPeriod;
+    uint8_t maxNumberOfIntervals;
+    DataModel::DecodableList<uint16_t> listOfAttributes;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace GetProfileInfoResponseCommandCommandParams
+
+} // namespace Commands
 
 } // namespace ElectricalMeasurement
 namespace Binding {
+constexpr ClusterId kClusterId = 0xF000;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace BindCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kNodeIdFieldId     = 0,
+    kGroupIdFieldId    = 1,
+    kEndpointIdFieldId = 2,
+    kClusterIdFieldId  = 3,
+};
+
+struct Type
+{
+public:
+    chip::NodeId nodeId;
+    chip::GroupId groupId;
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace BindCommandParams
+namespace UnbindCommandParams {
+constexpr CommandId kCommandId = 0x01;
+
+enum FieldId
+{
+    kNodeIdFieldId     = 0,
+    kGroupIdFieldId    = 1,
+    kEndpointIdFieldId = 2,
+    kClusterIdFieldId  = 3,
+};
+
+struct Type
+{
+public:
+    chip::NodeId nodeId;
+    chip::GroupId groupId;
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace UnbindCommandParams
+
+} // namespace Commands
 
 } // namespace Binding
 namespace GroupKeyManagement {
+constexpr ClusterId kClusterId = 0xF004;
+
+ClusterId GetClusterId();
+
 // Enum for GroupKeySecurityPolicy
 enum class GroupKeySecurityPolicy : uint8_t
 {
@@ -1735,11 +10903,69 @@ public:
 
 } // namespace GroupState
 
+namespace Commands {
+
+} // namespace Commands
+
 } // namespace GroupKeyManagement
 namespace SampleMfgSpecificCluster {
+constexpr ClusterId kClusterId = 0xFC00;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace CommandOneCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kArgOneFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t argOne;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CommandOneCommandParams
+
+} // namespace Commands
 
 } // namespace SampleMfgSpecificCluster
 namespace SampleMfgSpecificCluster2 {
+constexpr ClusterId kClusterId = 0xFC00;
+
+ClusterId GetClusterId();
+
+namespace Commands {
+namespace CommandTwoCommandParams {
+constexpr CommandId kCommandId = 0x00;
+
+enum FieldId
+{
+    kArgOneFieldId = 0,
+};
+
+struct Type
+{
+public:
+    uint8_t argOne;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+CommandId GetCommandId();
+
+} // namespace CommandTwoCommandParams
+
+} // namespace Commands
 
 } // namespace SampleMfgSpecificCluster2
 

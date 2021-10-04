@@ -539,8 +539,8 @@ namespace Time {
 namespace Attributes {
 
 namespace Time {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** time); // utc
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * time);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::UTC * time); // utc
+EmberAfStatus Set(chip::EndpointId endpoint, chip::UTC time);
 } // namespace Time
 
 namespace TimeStatus {
@@ -579,13 +579,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t localTime);
 } // namespace LocalTime
 
 namespace LastSetTime {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** lastSetTime); // utc
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * lastSetTime);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::UTC * lastSetTime); // utc
+EmberAfStatus Set(chip::EndpointId endpoint, chip::UTC lastSetTime);
 } // namespace LastSetTime
 
 namespace ValidUntilTime {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** validUntilTime); // utc
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * validUntilTime);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::UTC * validUntilTime); // utc
+EmberAfStatus Set(chip::EndpointId endpoint, chip::UTC validUntilTime);
 } // namespace ValidUntilTime
 
 } // namespace Attributes
@@ -2153,8 +2153,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t setpointChangeAmount);
 } // namespace SetpointChangeAmount
 
 namespace SetpointChangeSourceTimestamp {
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** setpointChangeSourceTimestamp); // utc
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * setpointChangeSourceTimestamp);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::UTC * setpointChangeSourceTimestamp); // utc
+EmberAfStatus Set(chip::EndpointId endpoint, chip::UTC setpointChangeSourceTimestamp);
 } // namespace SetpointChangeSourceTimestamp
 
 namespace AcType {

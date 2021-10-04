@@ -926,7 +926,7 @@
  *
  * Command: OffWithEffect
  * @param EffectId OnOffEffectIdentifier
- * @param EffectVariant enum8
+ * @param EffectVariant OnOffDelayedAllOffEffectVariant
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
@@ -1114,7 +1114,7 @@
  * @param status Status
  * @param alarmCode ENUM8
  * @param clusterId CLUSTER_ID
- * @param timeStamp INT32U
+ * @param timeStamp UTC
  */
 #define emberAfFillCommandAlarmsClusterGetAlarmResponse(status, alarmCode, clusterId, timeStamp)                                   \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -1545,7 +1545,7 @@
  * Command: SignalStateResponse
  * @param applianceStatus ApplianceStatus
  * @param remoteEnableFlagsAndDeviceStatus2 RemoteEnableFlagsAndDeviceStatus2
- * @param applianceStatus2 INT24U
+ * @param applianceStatus2 ApplianceStatus
  */
 #define emberAfFillCommandAppliance                                                                                                \
     ControlClusterSignalStateResponse(applianceStatus, remoteEnableFlagsAndDeviceStatus2, applianceStatus2)                        \
@@ -1568,7 +1568,7 @@
  * Command: SignalStateNotification
  * @param applianceStatus ApplianceStatus
  * @param remoteEnableFlagsAndDeviceStatus2 RemoteEnableFlagsAndDeviceStatus2
- * @param applianceStatus2 INT24U
+ * @param applianceStatus2 ApplianceStatus
  */
 #define emberAfFillCommandAppliance                                                                                                \
     ControlClusterSignalStateNotification(applianceStatus, remoteEnableFlagsAndDeviceStatus2, applianceStatus2)                    \
@@ -2386,7 +2386,7 @@
 /** @brief Command description for LockDoorResponse
  *
  * Command: LockDoorResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterLockDoorResponse(status) emberAfFillExternalBuffer(mask,                                                            \
@@ -2406,7 +2406,7 @@
 /** @brief Command description for UnlockDoorResponse
  *
  * Command: UnlockDoorResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterUnlockDoorResponse(status) emberAfFillExternalBuffer(mask,                                                          \
@@ -2426,7 +2426,7 @@
 /** @brief Command description for ToggleResponse
  *
  * Command: ToggleResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterToggleResponse(status) emberAfFillExternalBuffer(mask,                                                              \
@@ -2447,7 +2447,7 @@
 /** @brief Command description for UnlockWithTimeoutResponse
  *
  * Command: UnlockWithTimeoutResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterUnlockWithTimeoutResponse(status)                                                                                   \
@@ -2563,7 +2563,7 @@
 /** @brief Command description for ClearPinResponse
  *
  * Command: ClearPinResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterClearPinResponse(status) emberAfFillExternalBuffer(mask,                                                            \
@@ -2582,7 +2582,7 @@
 /** @brief Command description for ClearAllPinsResponse
  *
  * Command: ClearAllPinsResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterClearAllPinsResponse(status) emberAfFillExternalBuffer(mask,                                                        \
@@ -2602,7 +2602,7 @@
 /** @brief Command description for SetUserStatusResponse
  *
  * Command: SetUserStatusResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterSetUserStatusResponse(status) emberAfFillExternalBuffer(mask,                                                       \
@@ -2633,7 +2633,7 @@
  *
  * Command: GetUserStatusResponse
  * @param userId INT16U
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterGetUserStatusResponse(userId, status)                                                                               \
@@ -2654,7 +2654,7 @@
 /** @brief Command description for SetWeekdayScheduleResponse
  *
  * Command: SetWeekdayScheduleResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterSetWeekdayScheduleResponse(status)                                                                                  \
@@ -2713,7 +2713,7 @@
  *
  * Command: GetWeekdayScheduleResponse
  * @param userId INT16U
- * @param status INT8U
+ * @param status Status
  * @param daysMask INT8U
  * @param startHour INT8U
  * @param startMinute INT8U
@@ -2740,7 +2740,7 @@
 /** @brief Command description for ClearWeekdayScheduleResponse
  *
  * Command: ClearWeekdayScheduleResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterClearWeekdayScheduleResponse(status)                                                                                \
@@ -2771,7 +2771,7 @@
 /** @brief Command description for SetYeardayScheduleResponse
  *
  * Command: SetYeardayScheduleResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterSetYeardayScheduleResponse(status)                                                                                  \
@@ -2827,7 +2827,7 @@
  *
  * Command: GetYeardayScheduleResponse
  * @param userId INT16U
- * @param status INT8U
+ * @param status Status
  * @param localStartTime INT32U
  * @param localEndTime INT32U
  */
@@ -2850,7 +2850,7 @@
 /** @brief Command description for ClearYeardayScheduleResponse
  *
  * Command: ClearYeardayScheduleResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterClearYeardayScheduleResponse(status)                                                                                \
@@ -2881,7 +2881,7 @@
 /** @brief Command description for SetHolidayScheduleResponse
  *
  * Command: SetHolidayScheduleResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterSetHolidayScheduleResponse(status)                                                                                  \
@@ -2916,7 +2916,7 @@
  *
  * Command: GetHolidayScheduleResponse
  * @param scheduleId INT8U
- * @param status INT8U
+ * @param status Status
  * @param localStartTime INT32U
  * @param localEndTime INT32U
  * @param operatingModeDuringHoliday ENUM8
@@ -2941,7 +2941,7 @@
 /** @brief Command description for ClearHolidayScheduleResponse
  *
  * Command: ClearHolidayScheduleResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterClearHolidayScheduleResponse(status)                                                                                \
@@ -2962,7 +2962,7 @@
 /** @brief Command description for SetUserTypeResponse
  *
  * Command: SetUserTypeResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterSetUserTypeResponse(status) emberAfFillExternalBuffer(mask,                                                         \
@@ -3071,7 +3071,7 @@
 /** @brief Command description for ClearRfidResponse
  *
  * Command: ClearRfidResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterClearRfidResponse(status) emberAfFillExternalBuffer(mask,                                                           \
@@ -3090,7 +3090,7 @@
 /** @brief Command description for ClearAllRfidsResponse
  *
  * Command: ClearAllRfidsResponse
- * @param status INT8U
+ * @param status Status
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterClearAllRfidsResponse(status) emberAfFillExternalBuffer(mask,                                                       \
@@ -3104,7 +3104,7 @@
  * @param eventCode DoorLockOperationEventCode
  * @param userId INT16U
  * @param pin CHAR_STRING
- * @param timeStamp INT32U
+ * @param timeStamp UTC
  * @param data CHAR_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
@@ -3122,7 +3122,7 @@
  * @param pin CHAR_STRING
  * @param userType DoorLockUserType
  * @param userStatus DoorLockUserStatus
- * @param timeStamp INT32U
+ * @param timeStamp UTC
  * @param data CHAR_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
@@ -4697,6 +4697,18 @@
                                                                                                                                    \
                                                            ZCL_TEST_SPECIFIC_COMMAND_ID, "", );
 
+/** @brief Command description for TestAddArrayofStructArguments
+ *
+ * Command: TestAddArrayofStructArguments
+ * @param arg1 SimpleStruct []
+ * @param arg1Len int
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestAddArrayofStructArguments(arg1, arg1Len)                                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_ADD_ARRAYOF_STRUCT_ARGUMENTS_COMMAND_ID, "b", arg1, arg1Len);
+
 /** @brief Command description for TestUnknownCommand
  *
  * Command: TestUnknownCommand
@@ -4705,6 +4717,24 @@
     ClusterClusterTestUnknownCommand() emberAfFillExternalBuffer(mask,                                                             \
                                                                                                                                    \
                                                                  ZCL_TEST_UNKNOWN_COMMAND_COMMAND_ID, "", );
+
+/** @brief Command description for TestAddNestedArrayArguments
+ *
+ * Command: TestAddNestedArrayArguments
+ * @param arg1 NestedStructList []
+ * @param arg1Len int
+ * @param arg2 SimpleEnum []
+ * @param arg2Len int
+ * @param arg3 BOOLEAN []
+ * @param arg3Len int
+ * @param arg4 SimpleEnum
+ * @param arg5 BOOLEAN
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestAddNestedArrayArguments(arg1, arg1Len, arg2, arg2Len, arg3, arg3Len, arg4, arg5) emberAfFillExternalBuffer(  \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_TEST_ADD_NESTED_ARRAY_ARGUMENTS_COMMAND_ID, "bbbuu", arg1, arg1Len, arg2, arg2Len, arg3, arg3Len, arg4, arg5);
 
 /** @brief Command description for TestAddArguments
  *
@@ -4845,27 +4875,23 @@
  *
  * Command: GetAlertsResponse
  * @param alertsCount AlertCount
- * @param alertStructures AlertStructure []
- * @param alertStructuresLen int
  */
 #define emberAfFillCommandAppliance                                                                                                \
-    Events and AlertClusterGetAlertsResponse(alertsCount, alertStructures, alertStructuresLen)                                     \
+    Events and AlertClusterGetAlertsResponse(alertsCount)                                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_GET_ALERTS_RESPONSE_COMMAND_ID, "ub", alertsCount, alertStructures, alertStructuresLen);
+                                  ZCL_GET_ALERTS_RESPONSE_COMMAND_ID, "u", alertsCount);
 
 /** @brief Command description for AlertsNotification
  *
  * Command: AlertsNotification
  * @param alertsCount AlertCount
- * @param alertStructures AlertStructure []
- * @param alertStructuresLen int
  */
 #define emberAfFillCommandAppliance                                                                                                \
-    Events and AlertClusterAlertsNotification(alertsCount, alertStructures, alertStructuresLen)                                    \
+    Events and AlertClusterAlertsNotification(alertsCount)                                                                         \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ALERTS_NOTIFICATION_COMMAND_ID, "ub", alertsCount, alertStructures, alertStructuresLen);
+                                  ZCL_ALERTS_NOTIFICATION_COMMAND_ID, "u", alertsCount);
 
 /** @brief Command description for EventsNotification
  *
@@ -4882,7 +4908,7 @@
 /** @brief Command description for LogNotification
  *
  * Command: LogNotification
- * @param timeStamp TIME_OF_DAY
+ * @param timeStamp UTC
  */
 #define emberAfFillCommandAppliance                                                                                                \
     StatisticsClusterLogNotification(timeStamp) emberAfFillExternalBuffer(mask,                                                    \
@@ -4925,7 +4951,7 @@
 /** @brief Command description for LogResponse
  *
  * Command: LogResponse
- * @param timeStamp TIME_OF_DAY
+ * @param timeStamp UTC
  * @param logId INT32U
  * @param logLength INT32U
  * @param logPayload INT8U []
@@ -5014,7 +5040,7 @@
 /** @brief Command description for GetMeasurementProfileResponseCommand
  *
  * Command: GetMeasurementProfileResponseCommand
- * @param status ENUM8
+ * @param status Status
  */
 #define emberAfFillCommandElectrical                                                                                               \
     MeasurementClusterGetMeasurementProfileResponseCommand(status)                                                                 \
