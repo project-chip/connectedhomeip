@@ -19,7 +19,7 @@
 
 // Platform specific includes for test_utils
 #include <platform/CHIPDeviceBuildConfig.h>
-#ifdef CHIP_DEVICE_LAYER_TARGET_EFR32
+#if CHIP_DEVICE_LAYER_TARGET_EFR32 || CHIP_DEVICE_LAYER_TARGET_AMEBA
 #include <FreeRTOS.h>
 #include <task.h>
 #else
@@ -30,7 +30,7 @@
 namespace chip {
 namespace test_utils {
 
-#ifdef CHIP_DEVICE_LAYER_TARGET_EFR32
+#if CHIP_DEVICE_LAYER_TARGET_EFR32 || CHIP_DEVICE_LAYER_TARGET_AMEBA
 
 namespace {
 
