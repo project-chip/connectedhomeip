@@ -24,7 +24,7 @@
 #import "CHIPDevice_Internal.h"
 
 #import "zap-generated/CHIPTestClustersObjc.h"
-#import "zap-generated/tests/CHIPClusters.h"
+#import "zap-generated/tests/CHIPClustersTest.h"
 
 using chip::Callback::Cancelable;
 
