@@ -67,6 +67,7 @@ limitations under the License.
     <field name="occupied" mask="0x1"/>
   </bitmap>
   <bitmap name="IasZoneStatus" type="BITMAP16">
+    <cluster code="0x0500"/>
     <field name="alarm1" mask="0x1"/>
     <field name="alarm2" mask="0x2"/>
     <field name="tamper" mask="0x4"/>
@@ -179,10 +180,12 @@ limitations under the License.
     <item name="Toggle" value="0x2"/>
   </enum>
   <enum name="MoveMode" type="ENUM8">
+    <cluster code="0x0008"/>
     <item name="Up" value="0x0"/>
     <item name="Down" value="0x1"/>
   </enum>
   <enum name="StepMode" type="ENUM8">
+    <cluster code="0x0008"/>
     <item name="Up" value="0x0"/>
     <item name="Down" value="0x1"/>
   </enum>
@@ -204,6 +207,7 @@ limitations under the License.
     <item name="fanOnly" value="0x7"/>
   </enum>
   <enum name="SetpointAdjustMode" type="ENUM8">
+    <cluster code="0x0201"/>
     <item name="heatSetpoint" value="0x0"/>
     <item name="coolSetpoint" value="0x1"/>
     <item name="heatAndCoolSetpoints" value="0x2"/>
@@ -249,30 +253,36 @@ limitations under the License.
     <item name="levelfiveLockout" value="0x5"/>
   </enum>
   <enum name="HueDirection" type="ENUM8">
+    <cluster code="0x0300"/>
     <item name="ShortestDistance" value="0x0"/>
     <item name="LongestDistance" value="0x1"/>
     <item name="Up" value="0x2"/>
     <item name="Down" value="0x3"/>
   </enum>
   <enum name="HueMoveMode" type="ENUM8">
+    <cluster code="0x0300"/>
     <item name="stop" value="0x0"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>
   <enum name="HueStepMode" type="ENUM8">
+    <cluster code="0x0300"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>
   <enum name="SaturationMoveMode" type="ENUM8">
+    <cluster code="0x0300"/>
     <item name="stop" value="0x0"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>
   <enum name="SaturationStepMode" type="ENUM8">
+    <cluster code="0x0300"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>
   <enum name="ColorMode" type="ENUM8">
+    <cluster code="0x0300"/>
     <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
     <item name="CurrentXAndCurrentY" value="0x01"/>
     <item name="ColorTemperature" value="0x02"/>
@@ -309,6 +319,8 @@ limitations under the License.
     <item name="enrolled" value="0x1"/>
   </enum>
   <enum name="IasZoneType" type="ENUM16">
+    <cluster code="0x0500"/>
+    <cluster code="0x0501"/>
     <item name="standardCie" value="0x0"/>
     <item name="motionSensor" value="0xd"/>
     <item name="contactSwitch" value="0x15"/>
@@ -328,18 +340,21 @@ limitations under the License.
     <item name="invalidZoneType" value="0xFFFF"/>
   </enum>
   <enum name="IasEnrollResponseCode" type="ENUM8">
+    <cluster code="0x0500"/>
     <item name="success" value="0x0"/>
     <item name="notSupported" value="0x1"/>
     <item name="noEnrollPermit" value="0x2"/>
     <item name="tooManyZones" value="0x3"/>
   </enum>
   <enum name="IasAceArmMode" type="ENUM8">
+    <cluster code="0x0501"/>
     <item name="disarm" value="0x0"/>
     <item name="armDayHomeZonesOnly" value="0x1"/>
     <item name="armNightSleepZonesOnly" value="0x2"/>
     <item name="armAllZones" value="0x3"/>
   </enum>
   <enum name="IasAceArmNotification" type="ENUM8">
+    <cluster code="0x0501"/>
     <item name="allZonesDisarmed" value="0x0"/>
     <item name="onlyDayHomeZonesArmed" value="0x1"/>
     <item name="onlyNightSleepZonesArmed" value="0x2"/>
@@ -349,10 +364,12 @@ limitations under the License.
     <item name="alreadyDisarmed" value="0x06"/>
   </enum>
   <enum name="IasAceAudibleNotification" type="ENUM8">
+    <cluster code="0x0501"/>
     <item name="mute" value="0x0"/>
     <item name="defaultSound" value="0x1"/>
   </enum>
   <enum name="IasAceAlarmStatus" type="ENUM8">
+    <cluster code="0x0501"/>
     <item name="noAlarm" value="0x0"/>
     <item name="burglar" value="0x1"/>
     <item name="fire" value="0x2"/>
@@ -362,6 +379,7 @@ limitations under the License.
     <item name="emergencyPanic" value="0x6"/>
   </enum>
   <enum name="IasAcePanelStatus" type="ENUM8">
+    <cluster code="0x0501"/>
     <item name="panelDisarmed" value="0x00"/>
     <item name="armedStay" value="0x01"/>
     <item name="armedNight" value="0x02"/>
@@ -375,6 +393,7 @@ limitations under the License.
     <item name="armingAway" value="0x0A"/>
   </enum>
   <enum name="IasAceBypassResult" type="ENUM8">
+    <cluster code="0x0501"/>
     <item name="zoneBypassed" value="0x0"/>
     <item name="zoneNotBypassed" value="0x1"/>
     <item name="notAllowed" value="0x2"/>
@@ -383,6 +402,7 @@ limitations under the License.
     <item name="invalidArmDisarmCode" value="0x5"/>
   </enum>
   <struct name="IasAceZoneStatusResult">
+    <cluster code="0x0501"/>
     <item name="zoneId" type="INT8U"/>
     <item name="zoneStatus" type="IasZoneStatus"/>
   </struct>
@@ -519,6 +539,7 @@ limitations under the License.
     <item name="attributeLocation" type="NO_DATA"/>
   </struct>
   <struct name="SceneExtensionFieldSet">
+    <cluster code="0x0005"/>
     <item name="clusterId" type="CLUSTER_ID"/>
     <item name="length" type="INT8U"/>
     <item name="value" type="INT8U"/>
@@ -533,10 +554,12 @@ limitations under the License.
     <field name="SuppressLeadingZeros" mask="0x80"/>
   </bitmap>
   <struct name="ScheduledPhase">
+    <cluster code="0x001A"/>
     <item name="energyPhaseId" type="INT8U"/>
     <item name="scheduledTime" type="INT16U"/>
   </struct>
   <struct name="TransferredPhase">
+    <cluster code="0x001A"/>
     <item name="energyPhaseId" type="INT8U"/>
     <item name="macroPhaseId" type="INT8U"/>
     <item name="expectedDuration" type="INT16U"/>
@@ -545,6 +568,7 @@ limitations under the License.
     <item name="maxActivationDelay" type="INT16U"/>
   </struct>
   <struct name="PowerProfileRecord">
+    <cluster code="0x001A"/>
     <item name="powerProfileId" type="INT8U"/>
     <item name="energyPhaseId" type="INT8U"/>
     <item name="powerProfileRemoteControl" type="BOOLEAN"/>
@@ -562,6 +586,7 @@ limitations under the License.
     <item name="PowerProfileScheduled" value="0x09"/>
   </enum>
   <enum name="ApplianceStatus" type="ENUM8">
+    <cluster code="0x001B"/>
     <item name="Off" value="0x01"/>
     <item name="StandBy" value="0x02"/>
     <item name="Programmed" value="0x03"/>
@@ -601,6 +626,7 @@ limitations under the License.
     <item name="Absolute" value="0x40"/>
   </enum>
   <enum name="CommandIdentification" type="ENUM8">
+    <cluster code="0x001B"/>
     <item name="Start" value="0x01"/>
     <item name="Stop" value="0x02"/>
     <item name="Pause" value="0x03"/>
@@ -614,6 +640,7 @@ limitations under the License.
     <item name="DisableEnergyControl" value="0x0B"/>
   </enum>
   <enum name="WarningEvent" type="ENUM8">
+    <cluster code="0x001B"/>
     <item name="Warning1OverallPowerAboveAvailablePowerLevel" value="0x00"/>
     <item name="Warning2OverallPowerAbovePowerThresholdLevel" value="0x01"/>
     <item name="Warning3OverallPowerBackBelowTheAvailablePowerLevel" value="0x02"/>
@@ -662,12 +689,14 @@ limitations under the License.
     <item name="ApsSecurity" value="0x01"/>
   </enum>
   <enum name="DoorLockUserStatus" type="ENUM8">
+    <cluster code="0x0101"/>
     <item name="Available" value="0x00"/>
     <item name="OccupiedEnabled" value="0x01"/>
     <item name="OccupiedDisabled" value="0x03"/>
     <item name="NotSupported" value="0xFF"/>
   </enum>
   <enum name="DoorLockUserType" type="ENUM8">
+    <cluster code="0x0101"/>
     <item name="Unrestricted" value="0x00"/>
     <item name="YearDayScheduleUser" value="0x01"/>
     <item name="WeekDayScheduleUser" value="0x02"/>
@@ -697,12 +726,14 @@ limitations under the License.
     <item name="Indeterminate" value="0xFF"/>
   </enum>
   <enum name="DoorLockSetPinOrIdStatus" type="ENUM8">
+    <cluster code="0x0101"/>
     <item name="Success" value="0x00"/>
     <item name="GeneralFailure" value="0x01"/>
     <item name="MemoryFull" value="0x02"/>
     <item name="DuplicateCodeError" value="0x03"/>
   </enum>
   <enum name="DoorLockOperationEventCode" type="ENUM8">
+    <cluster code="0x0101"/>
     <item name="UnknownOrMfgSpecific" value="0x00"/>
     <item name="Lock" value="0x01"/>
     <item name="Unlock" value="0x02"/>
@@ -720,6 +751,7 @@ limitations under the License.
     <item name="ManualUnlock" value="0x0E"/>
   </enum>
   <enum name="DoorLockProgrammingEventCode" type="ENUM8">
+    <cluster code="0x0101"/>
     <item name="UnknownOrMfgSpecific" value="0x00"/>
     <item name="MasterCodeChanged" value="0x01"/>
     <item name="PinAdded" value="0x02"/>
@@ -823,6 +855,7 @@ limitations under the License.
     <item name="Unstructured" value="0x00"/>
   </enum>
   <enum name="EventIdentification" type="ENUM8">
+    <cluster code="0x0B02"/>
     <item name="EndOfCycle" value="0x01"/>
     <item name="TemperatureReached" value="0x04"/>
     <item name="EndOfCooking" value="0x05"/>
