@@ -463,8 +463,6 @@ static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(Cluste
         return Protocols::InteractionModel::Status::InvalidValue;
     }
 
-    // TODO (#8442): emberAfWriteAttributeExternal is doing additional ACL check, however true ACL support is missing in ember /
-    // IM. Should invesgate this function and integrate ACL support with related interactions.
     return ToInteractionModelStatus(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
                                                                   aClusterInfo.mFieldId, CLUSTER_MASK_SERVER, 0, attributeData,
                                                                   attributeMetadata->attributeType));
