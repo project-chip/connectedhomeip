@@ -21,8 +21,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) const{
     return CHIP_NO_ERROR;
 }
 
-{{#if struct_contains_array}}
-{{else}}
+{{#unless struct_contains_array}}
 CHIP_ERROR Type::Decode(TLV::TLVReader &reader) {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -53,7 +52,7 @@ CHIP_ERROR Type::Decode(TLV::TLVReader &reader) {
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-{{/if}}
+{{/unless}}
 
 {{#if struct_contains_array}}
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {

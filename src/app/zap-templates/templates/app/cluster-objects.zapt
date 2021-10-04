@@ -42,10 +42,9 @@ namespace {{name}} {
         {{/zcl_struct_items}}
 
         CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) const;
-        {{#if struct_contains_array}}
-        {{else}}
+        {{#unless struct_contains_array}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
-        {{/if}}
+        {{/unless}}
     };
 
     {{#if struct_contains_array}}
