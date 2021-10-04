@@ -32,7 +32,7 @@ controller.
 
 #### IP Pairing
 
-`chip-tool pairing onnetwork 0 34567890 3840 ::1 5540` will use PASE over IP to
+`chip-tool pairing onnetwork 34567890` will use PASE over IP to
 pair a device.
 
 NOTE: to run both the Node and Controller as separate processes on the same
