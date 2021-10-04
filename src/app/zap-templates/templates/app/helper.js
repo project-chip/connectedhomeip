@@ -403,9 +403,9 @@ function asChipZapType(type, makeDecodable)
         return basicType;
       default:
         if (makeDecodable) {
-            return type + '::DecodableType'
+          return type + '::DecodableType'
         } else {
-            return type + '::Type'
+          return type + '::Type'
         }
       }
     })

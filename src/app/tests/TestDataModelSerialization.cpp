@@ -803,7 +803,7 @@ int Finalize(void * aContext)
     return SUCCESS;
 }
 
-}
+} // namespace
 
 // clang-format off
 const nlTest sTests[] =
