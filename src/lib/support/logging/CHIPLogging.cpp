@@ -199,7 +199,6 @@ DLL_EXPORT void SetLogFilter(uint8_t category)
 }
 #endif // CHIP_LOG_FILTERING
 
-
 /**
  * This static method outputs a line of the memory dump.
  *
@@ -209,10 +208,10 @@ DLL_EXPORT void SetLogFilter(uint8_t category)
  * @param[in]  aLength   Number of bytes in the buffer.
  *
  */
-static void DumpLine(uint8_t module, uint8_t category, const void *aBuf, const size_t aLength)
+static void DumpLine(uint8_t module, uint8_t category, const void * aBuf, const size_t aLength)
 {
-    char  buf[80];
-    char *cur = buf;
+    char buf[80];
+    char * cur = buf;
 
     snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), "|");
     cur += strlen(cur);
@@ -221,7 +220,7 @@ static void DumpLine(uint8_t module, uint8_t category, const void *aBuf, const s
     {
         if (i < aLength)
         {
-            snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), " %02X", ((uint8_t *)(aBuf))[i]);
+            snprintf(cur, sizeof(buf) - static_cast<size_t>(cur - buf), " %02X", ((uint8_t *) (aBuf))[i]);
             cur += strlen(cur);
         }
         else
@@ -242,7 +241,7 @@ static void DumpLine(uint8_t module, uint8_t category, const void *aBuf, const s
 
     for (size_t i = 0; i < 16; i++)
     {
-        char c = 0x7f & ((char *)(aBuf))[i];
+        char c = 0x7f & ((char *) (aBuf))[i];
 
         if (i < aLength && isprint(c))
         {
@@ -269,12 +268,12 @@ static void DumpLine(uint8_t module, uint8_t category, const void *aBuf, const s
  * @param[in]  aLength   Number of bytes to print.
  *
  */
-void Dump(uint8_t module, uint8_t category, const char *aId, const void *aBuf, const unsigned aLength)
+void Dump(uint8_t module, uint8_t category, const char * aId, const void * aBuf, const unsigned aLength)
 {
-    size_t       idlen = strlen(aId);
+    size_t idlen       = strlen(aId);
     const size_t width = 72;
-    char         buf[80];
-    char *       cur = buf;
+    char buf[80];
+    char * cur = buf;
 
     for (size_t i = 0; i < (width - idlen) / 2 - 5; i++)
     {
@@ -295,7 +294,7 @@ void Dump(uint8_t module, uint8_t category, const char *aId, const void *aBuf, c
 
     for (size_t i = 0; i < aLength; i += 16)
     {
-        DumpLine(module, category, (uint8_t *)(aBuf) + i, (aLength - i) < 16 ? (aLength - i) : 16);
+        DumpLine(module, category, (uint8_t *) (aBuf) + i, (aLength - i) < 16 ? (aLength - i) : 16);
     }
 
     cur = buf;
