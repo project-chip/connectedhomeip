@@ -108,6 +108,7 @@ public:
     static void TestCommandSenderWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendSimpleCommandData(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerCommandDataEncoding(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendEmptyResponse(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
@@ -357,6 +358,53 @@ void TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData(nlTestS
     ValidateCommandHandlerWithSendCommand(apSuite, apContext, false /*aNeedStatusCode=false*/);
 }
 
+struct Fields
+{
+    static constexpr chip::CommandId CommandId = 4;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, uint64_t aTag) const
+    {
+        TLV::TLVType outerContainerType;
+        ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outerContainerType));
+        ReturnErrorOnFailure(aWriter.PutBoolean(TLV::ContextTag(1), true));
+        return aWriter.EndContainer(outerContainerType);
+    }
+};
+
+void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    app::CommandHandler commandHandler;
+    System::PacketBufferHandle commandPacket;
+    err = commandHandler.Init(&chip::gExchangeManager, nullptr);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    commandHandler.mpExchangeCtx = gExchangeManager.NewContext(SessionHandle(0, 0, 0, 0), nullptr);
+    TestExchangeDelegate delegate;
+    commandHandler.mpExchangeCtx->SetDelegate(&delegate);
+
+    ConcreteCommandPath path(1, // Endpoint
+                             3, // ClusterId
+                             4  // CommandId
+    );
+
+    err = commandHandler.AddResponseData(path, Fields());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = commandHandler.FinalizeCommandsMessage(commandPacket);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    chip::System::PacketBufferTLVReader reader;
+    InvokeCommand::Parser invokeCommandParser;
+    reader.Init(std::move(commandPacket));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = invokeCommandParser.Init(reader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = invokeCommandParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+}
+
 void TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext)
 {
     // Send response which has simple status code and command path
@@ -446,6 +494,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandHandlerWithSendEmptyCommand", chip::app::TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand),
     NL_TEST_DEF("TestCommandSenderWithProcessReceivedMsg", chip::app::TestCommandInteraction::TestCommandSenderWithProcessReceivedMsg),
     NL_TEST_DEF("TestCommandHandlerWithSendSimpleCommandData", chip::app::TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData),
+    NL_TEST_DEF("TestCommandHandlerCommandDataEncoding", chip::app::TestCommandInteraction::TestCommandHandlerCommandDataEncoding),
     NL_TEST_DEF("TestCommandHandlerWithSendSimpleStatusCode", chip::app::TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedMsg", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedNotExistCommand", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistCommand),

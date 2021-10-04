@@ -91,9 +91,9 @@ public:
      */
     CHIP_ERROR FinalizeCommandsMessage(System::PacketBufferHandle & commandPacket);
 
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus = false);
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
     TLV::TLVWriter * GetCommandDataElementTLVWriter();
-    CHIP_ERROR FinishCommand(bool aIsStatus = false);
+    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     virtual CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                      const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
