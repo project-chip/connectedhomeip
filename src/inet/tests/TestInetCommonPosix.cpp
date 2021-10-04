@@ -50,6 +50,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/ScopedBuffer.h>
+#include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -477,7 +478,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
         if (sRemainingSystemLayerEventDelay == 0)
         {
-            gSystemLayer.DispatchEvents();
+            chip::DeviceLayer::PlatformMgr().RunEventLoop();
             sRemainingSystemLayerEventDelay = gNetworkOptions.EventDelay;
         }
         else
