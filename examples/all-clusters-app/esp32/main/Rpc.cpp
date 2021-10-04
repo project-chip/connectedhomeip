@@ -27,6 +27,7 @@
 #include "pw_log/log.h"
 #include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
+#include "rpc_services/Attributes.h"
 #include "rpc_services/Button.h"
 #include "rpc_services/Device.h"
 #include "rpc_services/Lighting.h"
@@ -300,6 +301,7 @@ constexpr uint8_t kRpcTaskPriority  = 5;
 
 TaskHandle_t rpcTaskHandle;
 
+Attributes attributes_service;
 Esp32Button button_service;
 Esp32Device device_service;
 Lighting lighting_service;
@@ -308,6 +310,7 @@ pw::trace::TraceService trace_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
+    server.RegisterService(attributes_service);
     server.RegisterService(button_service);
     server.RegisterService(device_service);
     server.RegisterService(lighting_service);
