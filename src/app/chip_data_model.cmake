@@ -59,7 +59,7 @@ function(chip_configure_data_model APP_TARGET)
     if (ARG_INCLUDE_SERVER)
         target_sources(${APP_TARGET} PRIVATE
             ${CHIP_APP_BASE_DIR}/server/EchoHandler.cpp
-            ${CHIP_APP_BASE_DIR}/server/Mdns.cpp
+            ${CHIP_APP_BASE_DIR}/server/Dnssd.cpp
             ${CHIP_APP_BASE_DIR}/server/OnboardingCodesUtil.cpp
             ${CHIP_APP_BASE_DIR}/server/Server.cpp
             ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp

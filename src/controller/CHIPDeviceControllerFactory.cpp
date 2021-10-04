@@ -151,7 +151,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
 void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     controllerParams.deviceAddressUpdateDelegate = params.deviceAddressUpdateDelegate;
 #endif
     controllerParams.operationalCredentialsDelegate = params.operationalCredentialsDelegate;

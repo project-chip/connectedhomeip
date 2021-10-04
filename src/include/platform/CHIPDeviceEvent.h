@@ -217,9 +217,9 @@ enum PublicEventTypes
     kOperationalNetworkEnabled,
 
     /**
-     * Signals that mDNS platform layer was initialized and is ready to operate.
+     * Signals that DNS-SD platform layer was initialized and is ready to operate.
      */
-    kMdnsPlatformInitialized,
+    kDnssdPlatformInitialized,
 };
 
 /**

@@ -836,7 +836,7 @@ INPUT                  = README.md \
                          src/crypto \
                          src/include \
                          src/inet \
-                         src/lib/mdns \
+                         src/lib/dnssd \
                          src/lib/core \
                          src/lib/support \
                          src/lib/shell \
