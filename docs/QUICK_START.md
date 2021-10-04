@@ -32,8 +32,7 @@ controller.
 
 #### IP Pairing
 
-`chip-tool pairing onnetwork 34567890` will use PASE over IP to
-pair a device.
+`chip-tool pairing onnetwork 34567890` will use PASE over IP to pair a device.
 
 NOTE: to run both the Node and Controller as separate processes on the same
 Linux or Mac machine, build the all-clusters-app with BLE disabled as follows:
