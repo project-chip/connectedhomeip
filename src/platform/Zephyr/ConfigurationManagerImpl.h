@@ -93,8 +93,7 @@ inline bool ConfigurationManagerImpl::_CanFactoryReset()
     return true;
 }
 
-inline CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key,
-                                                                      uint32_t & value)
+inline CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
     return ReadConfigValueCounter(key, value);
 }

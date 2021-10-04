@@ -68,38 +68,38 @@ public:
         kMaxMACAddressLength = 8,
     };
 
-    virtual CHIP_ERROR GetVendorName(char * buf, size_t bufSize) = 0;
-    virtual CHIP_ERROR GetVendorId(uint16_t & vendorId) = 0;
-    virtual CHIP_ERROR GetProductName(char * buf, size_t bufSize) = 0;
-    virtual CHIP_ERROR GetProductId(uint16_t & productId) = 0;
-    virtual CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize) = 0;
-    virtual CHIP_ERROR GetProductRevision(uint16_t & productRev) = 0;
-    virtual CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen) = 0;
-    virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) = 0;
-    virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) = 0;
-    virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) = 0;
+    virtual CHIP_ERROR GetVendorName(char * buf, size_t bufSize)                                    = 0;
+    virtual CHIP_ERROR GetVendorId(uint16_t & vendorId)                                             = 0;
+    virtual CHIP_ERROR GetProductName(char * buf, size_t bufSize)                                   = 0;
+    virtual CHIP_ERROR GetProductId(uint16_t & productId)                                           = 0;
+    virtual CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize)                         = 0;
+    virtual CHIP_ERROR GetProductRevision(uint16_t & productRev)                                    = 0;
+    virtual CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)           = 0;
+    virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)                                    = 0;
+    virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf)                                      = 0;
+    virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                                    = 0;
     virtual CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) = 0;
-    virtual CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize) = 0;
-    virtual CHIP_ERROR GetFirmwareRevision(uint32_t & firmwareRev) = 0;
-    virtual CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode) = 0;
-    virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) = 0;
+    virtual CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize)                        = 0;
+    virtual CHIP_ERROR GetFirmwareRevision(uint32_t & firmwareRev)                                  = 0;
+    virtual CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode)                                     = 0;
+    virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator)                         = 0;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
     virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) = 0;
 #endif
-    virtual CHIP_ERROR GetRegulatoryLocation(uint32_t & location) = 0;
-    virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) = 0;
-    virtual CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) = 0;
-    virtual CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) = 0;
-    virtual CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf) = 0;
-    virtual CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf) = 0;
+    virtual CHIP_ERROR GetRegulatoryLocation(uint32_t & location)                      = 0;
+    virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
+    virtual CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb)                            = 0;
+    virtual CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen)  = 0;
+    virtual CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf)                 = 0;
+    virtual CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf)               = 0;
     virtual CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) = 0;
-    virtual CHIP_ERROR StoreProductRevision(uint16_t productRev) = 0;
-    virtual CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) = 0;
-    virtual CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) = 0;
-    virtual CHIP_ERROR StoreRegulatoryLocation(uint32_t location) = 0;
-    virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) = 0;
-    virtual CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) = 0;
+    virtual CHIP_ERROR StoreProductRevision(uint16_t productRev)                       = 0;
+    virtual CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode)                        = 0;
+    virtual CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator)            = 0;
+    virtual CHIP_ERROR StoreRegulatoryLocation(uint32_t location)                      = 0;
+    virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen)             = 0;
+    virtual CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb)                            = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 
@@ -107,18 +107,18 @@ public:
     virtual CHIP_ERROR RunUnitTests() = 0;
 #endif
 
-    virtual bool IsFullyProvisioned() = 0;
+    virtual bool IsFullyProvisioned()   = 0;
     virtual void InitiateFactoryReset() = 0;
 
     virtual void LogDeviceConfig() = 0;
 
-    virtual bool IsCommissionableDeviceTypeEnabled() = 0;
-    virtual CHIP_ERROR GetDeviceType(uint16_t & deviceType) = 0;
-    virtual bool IsCommissionableDeviceNameEnabled() = 0;
-    virtual CHIP_ERROR GetDeviceName(char * buf, size_t bufSize) = 0;
-    virtual CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) = 0;
-    virtual CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize) = 0;
-    virtual CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint) = 0;
+    virtual bool IsCommissionableDeviceTypeEnabled()                              = 0;
+    virtual CHIP_ERROR GetDeviceType(uint16_t & deviceType)                       = 0;
+    virtual bool IsCommissionableDeviceNameEnabled()                              = 0;
+    virtual CHIP_ERROR GetDeviceName(char * buf, size_t bufSize)                  = 0;
+    virtual CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint)              = 0;
+    virtual CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize)   = 0;
+    virtual CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint)            = 0;
     virtual CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) = 0;
 
 protected:
@@ -133,15 +133,15 @@ protected:
     friend CHIP_ERROR(::chip::Platform::PersistedStorage::Read)(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
     friend CHIP_ERROR(::chip::Platform::PersistedStorage::Write)(::chip::Platform::PersistedStorage::Key key, uint32_t value);
 
-    virtual CHIP_ERROR Init() = 0;
-    virtual bool CanFactoryReset() = 0;
-    virtual CHIP_ERROR GetFailSafeArmed(bool & val) = 0;
-    virtual CHIP_ERROR SetFailSafeArmed(bool val) = 0;
+    virtual CHIP_ERROR Init()                                                                                   = 0;
+    virtual bool CanFactoryReset()                                                                              = 0;
+    virtual CHIP_ERROR GetFailSafeArmed(bool & val)                                                             = 0;
+    virtual CHIP_ERROR SetFailSafeArmed(bool val)                                                               = 0;
     virtual CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) = 0;
-    virtual CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) = 0;
+    virtual CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)  = 0;
 
     // Construction/destruction limited to subclasses.
-    ConfigurationManager() = default;
+    ConfigurationManager()          = default;
     virtual ~ConfigurationManager() = default;
 
     // No copy, move or assignment.

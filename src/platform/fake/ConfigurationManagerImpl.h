@@ -47,7 +47,10 @@ private:
     CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -58,7 +61,10 @@ private:
 #endif
     CHIP_ERROR GetFailSafeArmed(bool & val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR SetFailSafeArmed(bool val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
     bool IsCommissionableDeviceTypeEnabled() override { return false; }
     CHIP_ERROR GetDeviceType(uint16_t & deviceType) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     bool IsCommissionableDeviceNameEnabled() override { return false; }
