@@ -991,6 +991,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace DeviceType
 
 } // namespace Descriptor
@@ -1227,6 +1229,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace BasicCommissioningInfoType
 
 namespace Commands {
@@ -1333,6 +1337,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ThreadInterfaceScanResult
 namespace WiFiInterfaceScanResult {
 enum FieldId
@@ -1356,6 +1362,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace WiFiInterfaceScanResult
 
@@ -1660,6 +1668,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace NetworkInterfaceType
 
 } // namespace GeneralDiagnostics
@@ -1687,6 +1697,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace ThreadMetrics
 
@@ -1765,6 +1777,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace NeighborTable
 namespace OperationalDatasetComponents {
 enum FieldId
@@ -1803,6 +1817,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace OperationalDatasetComponents
 namespace RouteTable {
 enum FieldId
@@ -1837,6 +1853,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace RouteTable
 namespace SecurityPolicy {
 enum FieldId
@@ -1854,6 +1872,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace SecurityPolicy
 
@@ -2065,6 +2085,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace FabricDescriptor
 namespace NOCStruct {
 enum FieldId
@@ -2082,6 +2104,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace NOCStruct
 
@@ -2236,6 +2260,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace LabelStruct
 
@@ -3680,6 +3706,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace TvChannelInfo
 namespace TvChannelLineupInfo {
 enum FieldId
@@ -3701,6 +3729,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace TvChannelLineupInfo
 
@@ -3773,6 +3803,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace NavigateTargetTargetInfo
 
 namespace Commands {
@@ -3834,6 +3866,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace MediaPlaybackPosition
 
@@ -4099,6 +4133,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace MediaInputInfo
 
 namespace Commands {
@@ -4334,6 +4370,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ContentLaunchAdditionalInfo
 namespace ContentLaunchParamater {
 enum FieldId
@@ -4351,7 +4389,6 @@ public:
     DataModel::List<ContentLaunchAdditionalInfo::Type> externalIDList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
 struct DecodableType
@@ -4359,8 +4396,7 @@ struct DecodableType
 public:
     ContentLaunchParameterEnum type;
     Span<const char> value;
-    DataModel::DecodableList<ContentLaunchAdditionalInfo::Type> externalIDList;
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    DataModel::DecodableList<ContentLaunchAdditionalInfo::DecodableType> externalIDList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -4390,6 +4426,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ContentLaunchBrandingInformation
 namespace ContentLaunchDimension {
 enum FieldId
@@ -4410,6 +4448,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ContentLaunchDimension
 namespace ContentLaunchStyleInformation {
 enum FieldId
@@ -4429,6 +4469,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace ContentLaunchStyleInformation
 
@@ -4506,6 +4548,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace AudioOutputInfo
 
 namespace Commands {
@@ -4556,6 +4600,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace ApplicationLauncherApp
 
@@ -4673,6 +4719,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace SimpleStruct
 namespace NestedStruct {
 enum FieldId
@@ -4692,6 +4740,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace NestedStruct
 namespace NestedStructList {
@@ -4718,7 +4768,6 @@ public:
     DataModel::List<uint8_t> g;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
 struct DecodableType
@@ -4726,12 +4775,11 @@ struct DecodableType
 public:
     uint8_t a;
     bool b;
-    SimpleStruct::Type c;
-    DataModel::DecodableList<SimpleStruct::Type> d;
+    SimpleStruct::DecodableType c;
+    DataModel::DecodableList<SimpleStruct::DecodableType> d;
     DataModel::DecodableList<uint32_t> e;
     DataModel::DecodableList<chip::ByteSpan> f;
     DataModel::DecodableList<uint8_t> g;
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -4748,14 +4796,12 @@ public:
     DataModel::List<NestedStructList::Type> a;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
 struct DecodableType
 {
 public:
     DataModel::DecodableList<NestedStructList::DecodableType> a;
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -4776,6 +4822,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace TestListStructOctet
 
@@ -5257,6 +5305,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace GroupKey
 namespace GroupState {
 enum FieldId
@@ -5276,6 +5326,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace GroupState
 
