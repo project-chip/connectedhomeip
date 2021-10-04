@@ -20,7 +20,7 @@ set -e
 
 # Build script for GN test examples GitHub workflow.
 
-CHIP_ROOT="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"/../..
+CHIP_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"/../..
 
 INPUT_DIR="$CHIP_ROOT/examples/placeholder/linux"
 OUTPUT_DIR="$CHIP_ROOT/out/debug/placeholder"
@@ -39,7 +39,7 @@ function runZAP() {
     # https://github.com/project-chip/connectedhomeip/issues/3637
     # af-gen-event.h is not generated, but the build process needs it. Just creates an empty file for now.
     if [ ! -f "$ZAP_OUTPUT_DIR/af-gen-event.h" ]; then
-      touch "$ZAP_OUTPUT_DIR"/af-gen-event.h
+        touch "$ZAP_OUTPUT_DIR"/af-gen-event.h
     fi
 
     "$CHIP_ROOT"/scripts/tools/zap/generate.py "$ZAP_INPUT_FILE" -o "$ZAP_OUTPUT_DIR"
