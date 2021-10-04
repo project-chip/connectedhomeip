@@ -149,24 +149,24 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 
 CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
 {
-    Mdns::DiscoveryFilter filter(mFilterType);
+    Dnssd::DiscoveryFilter filter(mFilterType);
     switch (mFilterType)
     {
-    case chip::Mdns::DiscoveryFilterType::kNone:
+    case chip::Dnssd::DiscoveryFilterType::kNone:
         break;
-    case chip::Mdns::DiscoveryFilterType::kShort:
-    case chip::Mdns::DiscoveryFilterType::kLong:
-    case chip::Mdns::DiscoveryFilterType::kCompressedFabricId:
-    case chip::Mdns::DiscoveryFilterType::kVendor:
-    case chip::Mdns::DiscoveryFilterType::kDeviceType:
+    case chip::Dnssd::DiscoveryFilterType::kShort:
+    case chip::Dnssd::DiscoveryFilterType::kLong:
+    case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
+    case chip::Dnssd::DiscoveryFilterType::kVendor:
+    case chip::Dnssd::DiscoveryFilterType::kDeviceType:
         filter.code = mDiscoveryFilterCode;
         break;
-    case chip::Mdns::DiscoveryFilterType::kCommissioningMode:
+    case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
         break;
-    case chip::Mdns::DiscoveryFilterType::kCommissioner:
+    case chip::Dnssd::DiscoveryFilterType::kCommissioner:
         filter.code = 1;
         break;
-    case chip::Mdns::DiscoveryFilterType::kInstanceName:
+    case chip::Dnssd::DiscoveryFilterType::kInstanceName:
         filter.code         = 0;
         filter.instanceName = mDiscoveryFilterInstanceName;
         break;
@@ -453,7 +453,7 @@ void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
     }
 }
 
-void PairingCommand::OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData)
+void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     const uint16_t port = nodeData.port;
     char buf[chip::Inet::kMaxIPAddressStringLength];

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <lib/mdns/minimal/Parser.h>
+#include <lib/dnssd/minimal_mdns/Parser.h>
 
 namespace MdnsExample {
 

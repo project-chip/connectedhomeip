@@ -26,7 +26,7 @@ public:
     DiscoverCommissionablesCommand() : Command("commissionables") {}
 
     /////////// DeviceDiscoveryDelegate Interface /////////
-    void OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData) override;
+    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;

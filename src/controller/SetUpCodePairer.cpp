@@ -27,7 +27,7 @@
 #include <controller/SetUpCodePairer.h>
 
 #include <controller/CHIPDeviceController.h>
-#include <lib/mdns/Resolver.h>
+#include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
@@ -106,20 +106,20 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverBle()
 
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(uint16_t discriminator, bool isShort)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     mCommissioner->RegisterDeviceDiscoveryDelegate(this);
-    Mdns::DiscoveryFilter filter(isShort ? Mdns::DiscoveryFilterType::kShort : Mdns::DiscoveryFilterType::kLong, discriminator);
+    Dnssd::DiscoveryFilter filter(isShort ? Dnssd::DiscoveryFilterType::kShort : Dnssd::DiscoveryFilterType::kLong, discriminator);
     return mCommissioner->DiscoverCommissionableNodes(filter);
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 }
 
 CHIP_ERROR SetUpCodePairer::StopConnectOverIP()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     mCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     return CHIP_NO_ERROR;
 }
 
@@ -160,8 +160,8 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-void SetUpCodePairer::OnDiscoveredDevice(const Mdns::DiscoveredNodeData & nodeData)
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+void SetUpCodePairer::OnDiscoveredDevice(const Dnssd::DiscoveredNodeData & nodeData)
 {
     LogErrorOnFailure(StopConnectOverBle());
     LogErrorOnFailure(StopConnectOverIP());
@@ -172,7 +172,7 @@ void SetUpCodePairer::OnDiscoveredDevice(const Mdns::DiscoveredNodeData & nodeDa
     RendezvousParameters params        = RendezvousParameters().SetPeerAddress(peerAddress);
     OnDeviceDiscovered(params);
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 } // namespace Controller
 } // namespace chip

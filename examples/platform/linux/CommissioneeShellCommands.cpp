@@ -20,7 +20,7 @@
  */
 
 #include <CommissioneeShellCommands.h>
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
@@ -99,7 +99,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
     {
         char * eptr;
         int16_t timeout = (int16_t) strtol(argv[1], &eptr, 10);
-        chip::app::MdnsServer::Instance().SetDiscoveryTimeoutSecs(timeout);
+        chip::app::DnssdServer::Instance().SetDiscoveryTimeoutSecs(timeout);
         return CHIP_NO_ERROR;
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -107,7 +107,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
     {
         char * eptr;
         int16_t timeout = (int16_t) strtol(argv[1], &eptr, 10);
-        chip::app::MdnsServer::Instance().SetExtendedDiscoveryTimeoutSecs(timeout);
+        chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(timeout);
         return CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -119,17 +119,17 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         }
         if (strcmp(argv[1], "disabled") == 0)
         {
-            chip::app::MdnsServer::Instance().StartServer(chip::Mdns::CommissioningMode::kDisabled);
+            chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kDisabled);
             return CHIP_NO_ERROR;
         }
         if (strcmp(argv[1], "enabled_basic") == 0)
         {
-            chip::app::MdnsServer::Instance().StartServer(chip::Mdns::CommissioningMode::kEnabledBasic);
+            chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledBasic);
             return CHIP_NO_ERROR;
         }
         else if (strcmp(argv[1], "enabled_enhanced") == 0)
         {
-            chip::app::MdnsServer::Instance().StartServer(chip::Mdns::CommissioningMode::kEnabledEnhanced);
+            chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledEnhanced);
             return CHIP_NO_ERROR;
         }
         return PrintAllCommands();
