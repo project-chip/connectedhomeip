@@ -112,12 +112,8 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     mbedtls_ccm_context context;
     mbedtls_ccm_init(&context);
 
-    if (plaintext_length != 0)
-    {
-        VerifyOrExit(plaintext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrExit(ciphertext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
+    VerifyOrExit(plaintext != nullptr || plaintext_length == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ciphertext != nullptr || plaintext_length == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_UNSUPPORTED_ENCRYPTION_TYPE);
     VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -157,12 +153,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     mbedtls_ccm_context context;
     mbedtls_ccm_init(&context);
 
-    if (ciphertext_len != 0)
-    {
-        VerifyOrExit(ciphertext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrExit(plaintext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
+    VerifyOrExit(plaintext != nullptr || ciphertext_len == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ciphertext != nullptr || ciphertext_len == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
