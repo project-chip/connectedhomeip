@@ -35,14 +35,17 @@ namespace {{name}} {
     public:
         {{#zcl_struct_items}}
         {{#if isArray}}
-        DataModel::List<{{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
+        DataModel::List<{{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type false}}{{/if_is_enum}}> {{asLowerCamelCase label}};
         {{else}}
-        {{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}} {{asLowerCamelCase label}};
+        {{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type false}}{{/if_is_enum}} {{asLowerCamelCase label}};
         {{/if}}
         {{/zcl_struct_items}}
 
         CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) const;
+        {{#if struct_contains_array}}
+        {{else}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
+        {{/if}}
     };
 
     {{#if struct_contains_array}}
@@ -50,14 +53,15 @@ namespace {{name}} {
     public:
         {{#zcl_struct_items checkForDoubleNestedArray="true"}}
         {{#if isArray}}
-        DataModel::DecodableList<{{#if struct_item_contains_nested_array}}{{type}}::DecodableType{{else}}{{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}{{/if}}> {{asLowerCamelCase label}};
+        DataModel::DecodableList<{{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type true}}{{/if_is_enum}}> {{asLowerCamelCase label}};
         {{else}}
-        {{#if struct_item_contains_nested_array}}{{type}}::DecodableType{{else}}{{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}{{/if}} {{asLowerCamelCase label}};
+        {{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type true}}{{/if_is_enum}} {{asLowerCamelCase label}};
         {{/if}}
         {{/zcl_struct_items}}
-        CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) const;
         CHIP_ERROR Decode(TLV::TLVReader &reader);
     };
+    {{else}}
+    using DecodableType = Type;
     {{/if}}
 
 } // namespace {{name}}

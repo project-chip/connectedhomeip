@@ -30,6 +30,8 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
+namespace {
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -241,7 +243,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
     // Decode
     //
     {
-        TestCluster::NestedStruct::Type t;
+        TestCluster::NestedStruct::DecodableType t;
 
         _this->SetupReader();
 
@@ -530,7 +532,7 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
     // Decode
     //
     {
-        TestCluster::SimpleStruct::Type t;
+        TestCluster::SimpleStruct::DecodableType t;
 
         _this->SetupReader();
 
@@ -602,7 +604,7 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
     // Decode
     //
     {
-        TestCluster::SimpleStruct::Type t;
+        TestCluster::SimpleStruct::DecodableType t;
 
         _this->SetupReader();
 
@@ -673,7 +675,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
         // Decode
         //
         {
-            TestCluster::SimpleStruct::Type t;
+            TestCluster::SimpleStruct::DecodableType t;
 
             _this->SetupReader();
 
@@ -724,7 +726,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
         // Decode
         //
         {
-            TestCluster::SimpleStruct::Type t;
+            TestCluster::SimpleStruct::DecodableType t;
 
             _this->SetupReader();
 
@@ -799,6 +801,8 @@ int Finalize(void * aContext)
     gTestDataModelSerialization.Shutdown();
     chip::Platform::MemoryShutdown();
     return SUCCESS;
+}
+
 }
 
 // clang-format off

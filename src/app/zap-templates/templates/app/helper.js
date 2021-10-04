@@ -348,7 +348,7 @@ function asMEI(prefix, suffix)
   return cHelper.asHex((prefix << 16) + suffix, 8);
 }
 
-function asChipZapType(type)
+function asChipZapType(type, makeDecodable)
 {
   if (StringHelper.isOctetString(type)) {
     return 'chip::ByteSpan';
@@ -402,7 +402,11 @@ function asChipZapType(type)
       case 'uint64_t':
         return basicType;
       default:
-        return type + '::Type'
+        if (makeDecodable) {
+            return type + '::DecodableType'
+        } else {
+            return type + '::Type'
+        }
       }
     })
   }
