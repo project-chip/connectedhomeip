@@ -34,15 +34,15 @@ function runZAP() {
     ZAP_OUTPUT_DIR=$OUTPUT_DIR/$APP_DIR/zap-generated
 
     # Create the folder to host the generated content if needed
-    mkdir -p $ZAP_OUTPUT_DIR
+    mkdir -p "$ZAP_OUTPUT_DIR"
 
     # https://github.com/project-chip/connectedhomeip/issues/3637
     # af-gen-event.h is not generated, but the build process needs it. Just creates an empty file for now.
     if [ ! -f "$ZAP_OUTPUT_DIR/af-gen-event.h" ]; then
-      touch $ZAP_OUTPUT_DIR/af-gen-event.h
+      touch "$ZAP_OUTPUT_DIR"/af-gen-event.h
     fi
 
-    $CHIP_ROOT/scripts/tools/zap/generate.py $ZAP_INPUT_FILE -o $ZAP_OUTPUT_DIR
+    "$CHIP_ROOT"/scripts/tools/zap/generate.py "$ZAP_INPUT_FILE" -o "$ZAP_OUTPUT_DIR"
 }
 
 function runGN() {
