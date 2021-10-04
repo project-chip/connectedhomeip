@@ -23,6 +23,7 @@
  *
  */
 
+#include <lib/core/CHIPSafeCasts.h>
 #include "UserDirectedCommissioning.h"
 
 namespace chip {
