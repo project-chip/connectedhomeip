@@ -32,7 +32,7 @@
 #include "ota-provider.h"
 
 using namespace chip;
-using chip::app::clusters::OTAProviderDelegate;
+using chip::app::Clusters::OTAProviderDelegate;
 
 namespace {
 constexpr size_t kMaxMetadataLen       = 512; // The maximum length of Metadata in any OTA Provider command
@@ -190,9 +190,10 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::EndpointId 
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
+namespace OTAProvider {
 
-void OTAProvider::SetDelegate(EndpointId endpoint, OTAProviderDelegate * delegate)
+void SetDelegate(EndpointId endpoint, OTAProviderDelegate * delegate)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_OTA_PROVIDER_CLUSTER_ID);
     if (ep != 0xFFFF)
@@ -201,6 +202,7 @@ void OTAProvider::SetDelegate(EndpointId endpoint, OTAProviderDelegate * delegat
     }
 }
 
-} // namespace clusters
+} // namespace OTAProvider
+} // namespace Clusters
 } // namespace app
 } // namespace chip

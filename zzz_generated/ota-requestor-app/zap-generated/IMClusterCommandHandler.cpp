@@ -49,7 +49,7 @@ void ReportCommandUnsupported(Command * aCommandObj, EndpointId aEndpointId, Clu
 
 // Cluster specific command parsing
 
-namespace clusters {
+namespace Clusters {
 
 namespace OtaSoftwareUpdateProvider {
 
@@ -68,7 +68,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         switch (aCommandId)
         {
-        case Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::Id: {
+        case Commands::ApplyUpdateRequestResponse::Id: {
             expectArgumentCount = 2;
             uint8_t action;
             uint32_t delayedActionTime;
@@ -131,7 +131,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             }
             break;
         }
-        case Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id: {
+        case Commands::QueryImageResponse::Id: {
             expectArgumentCount = 8;
             uint8_t status;
             uint32_t delayedActionTime;
@@ -223,7 +223,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::OtaSoftwareUpdateProvider::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, OtaSoftwareUpdateProvider::Id, aCommandId);
             return;
         }
         }
@@ -233,8 +233,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     {
         CommandPathParams returnStatusParam = { aEndpointId,
                                                 0, // GroupId
-                                                Clusters::OtaSoftwareUpdateProvider::Id, aCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
+                                                OtaSoftwareUpdateProvider::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -250,7 +249,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
 } // namespace OtaSoftwareUpdateProvider
 
-} // namespace clusters
+} // namespace Clusters
 
 void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, EndpointId aEndPointId, TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
@@ -288,7 +287,7 @@ void DispatchSingleClusterResponseCommand(ClusterId aClusterId, CommandId aComma
     switch (aClusterId)
     {
     case Clusters::OtaSoftwareUpdateProvider::Id:
-        clusters::OtaSoftwareUpdateProvider::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::OtaSoftwareUpdateProvider::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     default:
         // Unrecognized cluster ID, error status will apply.

@@ -257,14 +257,17 @@ ConnectionType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname
         return ConnectionType::kConnectionWiFi;
 
     // Test ethtool for CONNECTION_ETHERNET
-    struct ethtool_cmd ecmd = {};
-    ecmd.cmd                = ETHTOOL_GSET;
-    struct ifreq ifr        = {};
-    ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
-    strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+    if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
+    {
+        struct ethtool_cmd ecmd = {};
+        ecmd.cmd                = ETHTOOL_GSET;
+        struct ifreq ifr        = {};
+        ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
+        strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
 
-    if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
-        return ConnectionType::kConnectionEthernet;
+        if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
+            return ConnectionType::kConnectionEthernet;
+    }
 
     return ConnectionType::kConnectionUnknown;
 }

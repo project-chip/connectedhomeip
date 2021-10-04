@@ -18,16 +18,19 @@
 
 #pragma once
 
-#include "ota-provider-delegate.h"
+#include <lib/mdns/Resolver.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
-namespace app {
-namespace Clusters {
-namespace OTAProvider {
+namespace Controller {
 
-void SetDelegate(chip::EndpointId endpointId, OTAProviderDelegate * delegate);
+/// Callbacks for CHIP device discovery
+class DLL_EXPORT DeviceDiscoveryDelegate
+{
+public:
+    virtual ~DeviceDiscoveryDelegate() {}
+    virtual void OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData) = 0;
+};
 
-}
-} // namespace Clusters
-} // namespace app
+} // namespace Controller
 } // namespace chip

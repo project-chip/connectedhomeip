@@ -386,15 +386,6 @@ EmberAfNodeOperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
 
 } // namespace
 
-// Up for discussion in Multi-Admin TT: chip-spec:#2891
-bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
-{
-    // TODO - Delete RemoveAll fabrics command as this is not spec compliant
-    ChipLogError(Zcl, "operational-credentials cluster received remove all fabric command, which is not supported");
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
-
 bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCValue,
                                                         ByteSpan ICACValue, ByteSpan IPKValue, NodeId adminNodeId,
                                                         uint16_t adminVendorId)
@@ -681,14 +672,6 @@ exit:
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
-    return true;
-}
-
-bool emberAfOperationalCredentialsClusterUpdateOpCertCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOC,
-                                                              ByteSpan ICACertificate)
-{
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 

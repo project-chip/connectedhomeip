@@ -41,6 +41,10 @@ void AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(const chip::Mdns::
         if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0)
         {
             discoveredNode = nodeData;
+            if (mDeviceDiscoveryDelegate != nullptr)
+            {
+                mDeviceDiscoveryDelegate->OnDiscoveredDevice(nodeData);
+            }
             return;
         }
     }
@@ -50,6 +54,10 @@ void AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(const chip::Mdns::
         if (!discoveredNode.IsValid())
         {
             discoveredNode = nodeData;
+            if (mDeviceDiscoveryDelegate != nullptr)
+            {
+                mDeviceDiscoveryDelegate->OnDiscoveredDevice(nodeData);
+            }
             return;
         }
     }

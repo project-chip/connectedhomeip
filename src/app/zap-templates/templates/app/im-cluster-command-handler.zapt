@@ -33,7 +33,7 @@ void ReportCommandUnsupported(Command * aCommandObj, EndpointId aEndpointId, Clu
 
 // Cluster specific command parsing
 
-namespace clusters {
+namespace Clusters {
 
 {{#all_user_clusters}}
 {{#if (user_cluster_has_enabled_command name side)}}
@@ -57,14 +57,14 @@ void Dispatch{{asUpperCamelCase side}}Command({{#if (isServer side)}}CommandHand
         switch (aCommandId)
         {
     {{/first}}
-        case Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id: {
+        case Commands::{{asUpperCamelCase name}}::Id: {
         {{> im_command_handler_cluster_commands}}
             break;
         }
     {{#last}}
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::{{asUpperCamelCase parent.name}}::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aEndpointId, {{asUpperCamelCase parent.name}}::Id, aCommandId);
             return;
         }
         }
@@ -74,7 +74,7 @@ void Dispatch{{asUpperCamelCase side}}Command({{#if (isServer side)}}CommandHand
     {
       CommandPathParams returnStatusParam = { aEndpointId,
                                                        0, // GroupId
-                                                       Clusters::{{asUpperCamelCase parent.name}}::Id,
+                                                       {{asUpperCamelCase parent.name}}::Id,
                                                        aCommandId,
                                                        (CommandPathFlags::kEndpointIdValid) };
       apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest, Protocols::SecureChannel::Id,
@@ -87,7 +87,7 @@ void Dispatch{{asUpperCamelCase side}}Command({{#if (isServer side)}}CommandHand
     }
     {{/last}}
     {{else}}
-    ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::{{asUpperCamelCase parent.name}}::Id, aCommandId);
+    ReportCommandUnsupported(apCommandObj, aEndpointId, {{asUpperCamelCase parent.name}}::Id, aCommandId);
     {{/chip_available_cluster_commands}}
 }
 
@@ -96,7 +96,7 @@ void Dispatch{{asUpperCamelCase side}}Command({{#if (isServer side)}}CommandHand
 {{/if}}
 {{/all_user_clusters}}
 
-} // namespace clusters
+} // namespace Clusters
 
 void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, EndpointId aEndPointId,
                              TLV::TLVReader & aReader, CommandHandler * apCommandObj)
@@ -111,7 +111,7 @@ void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, En
     {{#chip_server_clusters}}
     {{#if (user_cluster_has_enabled_command name side)}}
     case Clusters::{{asUpperCamelCase name}}::Id:
-        clusters::{{asUpperCamelCase name}}::Dispatch{{asUpperCamelCase side}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::{{asUpperCamelCase name}}::Dispatch{{asUpperCamelCase side}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     {{/if}}
     {{/chip_server_clusters}}
@@ -145,7 +145,7 @@ void DispatchSingleClusterResponseCommand(ClusterId aClusterId, CommandId aComma
     {{#chip_client_clusters}}
     {{#if (user_cluster_has_enabled_command name side)}}
     case Clusters::{{asUpperCamelCase name}}::Id:
-        clusters::{{asUpperCamelCase name}}::Dispatch{{asUpperCamelCase side}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::{{asUpperCamelCase name}}::Dispatch{{asUpperCamelCase side}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     {{/if}}
     {{/chip_client_clusters}}
