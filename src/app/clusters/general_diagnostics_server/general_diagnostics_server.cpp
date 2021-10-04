@@ -74,16 +74,16 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const A
     *aDataRead = true;
     switch (aClusterInfo.mFieldId)
     {
-    case Ids::RebootCount: {
+    case RebootCount::Id: {
         return ReadIfSupported(&PlatformManager::GetRebootCount, aEncoder);
     }
-    case Ids::UpTime: {
+    case UpTime::Id: {
         return ReadIfSupported(&PlatformManager::GetUpTime, aEncoder);
     }
-    case Ids::TotalOperationalHours: {
+    case TotalOperationalHours::Id: {
         return ReadIfSupported(&PlatformManager::GetTotalOperationalHours, aEncoder);
     }
-    case Ids::BootReasons: {
+    case BootReasons::Id: {
         return ReadIfSupported(&PlatformManager::GetBootReasons, aEncoder);
     }
     default: {

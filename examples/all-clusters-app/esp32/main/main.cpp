@@ -23,6 +23,7 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "ListScreen.h"
+#include "OpenThreadLaunch.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
 #include "WiFiWidget.h"
@@ -68,6 +69,10 @@
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
+#endif
+
+#if CONFIG_OPENTHREAD_ENABLED
+#include <platform/ThreadStackManager.h>
 #endif
 
 using namespace ::chip;
@@ -610,6 +615,11 @@ extern "C" void app_main()
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
 #endif // CONFIG_ENABLE_CHIP_SHELL
+
+#if CONFIG_OPENTHREAD_ENABLED
+    LaunchOpenThread();
+    ThreadStackMgr().InitThreadStack();
+#endif
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 

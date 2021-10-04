@@ -19,7 +19,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <system/TimeSource.h>
-#include <transport/FabricTable.h>
 #include <transport/SecureSession.h>
 
 namespace chip {

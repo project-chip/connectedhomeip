@@ -40,6 +40,7 @@ class Context:
     def SetupBuilders(self, platforms: Sequence[Platform],
                       boards: Sequence[Board],
                       applications: Sequence[Application],
+                      enable_rpcs: bool,
                       enable_flashbundle: bool):
         """Configures internal builders for the given platform/board/app combination.
 
@@ -67,7 +68,7 @@ class Context:
 
         if not applications:
             applications = set().union(*[
-                TargetRelations.ApplicationsForPlatform(platform)
+                TargetRelations.ApplicationsForPlatform(platform, enable_rpcs)
                 for platform in platforms
             ])
 
@@ -89,7 +90,8 @@ class Context:
             for board in sorted(boards):
                 for application in sorted(applications):
                     builder = self.builder_factory.Create(
-                        platform, board, application, enable_flashbundle=enable_flashbundle)
+                        platform, board, application, enable_flashbundle=enable_flashbundle,
+                        enable_rpcs=enable_rpcs)
                     if not builder:
                         logging.debug('Builder not supported for tuple %s/%s/%s', platform,
                                       board, application)

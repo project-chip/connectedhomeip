@@ -1712,21 +1712,20 @@
  * Command: QueryImage
  * @param vendorId INT16U
  * @param productId INT16U
- * @param imageType INT16U
  * @param hardwareVersion INT16U
- * @param currentVersion INT32U
+ * @param softwareVersion INT32U
  * @param protocolsSupported OTADownloadProtocol
  * @param location CHAR_STRING
  * @param requestorCanConsent BOOLEAN
  * @param metadataForProvider OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ProviderClusterQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported, \
-                                              location, requestorCanConsent, metadataForProvider)                                  \
+    Software Update ProviderClusterQueryImage(vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported, location, \
+                                              requestorCanConsent, metadataForProvider)                                            \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_QUERY_IMAGE_COMMAND_ID, "uuuuuuuuu", vendorId, productId, imageType, hardwareVersion,        \
-                                  currentVersion, protocolsSupported, location, requestorCanConsent, metadataForProvider);
+                                  ZCL_QUERY_IMAGE_COMMAND_ID, "uuuuuuuu", vendorId, productId, hardwareVersion, softwareVersion,   \
+                                  protocolsSupported, location, requestorCanConsent, metadataForProvider);
 
 /** @brief Command description for ApplyUpdateRequest
  *
@@ -1744,13 +1743,13 @@
  *
  * Command: NotifyUpdateApplied
  * @param updateToken OCTET_STRING
- * @param currentVersion INT32U
+ * @param softwareVersion INT32U
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ProviderClusterNotifyUpdateApplied(updateToken, currentVersion)                                                \
+    Software Update ProviderClusterNotifyUpdateApplied(updateToken, softwareVersion)                                               \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID, "uu", updateToken, currentVersion);
+                                  ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID, "uu", updateToken, softwareVersion);
 
 /** @brief Command description for QueryImageResponse
  *
@@ -1759,17 +1758,18 @@
  * @param delayedActionTime INT32U
  * @param imageURI CHAR_STRING
  * @param softwareVersion INT32U
+ * @param softwareVersionString CHAR_STRING
  * @param updateToken OCTET_STRING
  * @param userConsentNeeded BOOLEAN
  * @param metadataForRequestor OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update ProviderClusterQueryImageResponse(status, delayedActionTime, imageURI, softwareVersion, updateToken,           \
-                                                      userConsentNeeded, metadataForRequestor)                                     \
+    Software Update ProviderClusterQueryImageResponse(status, delayedActionTime, imageURI, softwareVersion, softwareVersionString, \
+                                                      updateToken, userConsentNeeded, metadataForRequestor)                        \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_QUERY_IMAGE_RESPONSE_COMMAND_ID, "uuuuuuu", status, delayedActionTime, imageURI,             \
-                                  softwareVersion, updateToken, userConsentNeeded, metadataForRequestor);
+                                  ZCL_QUERY_IMAGE_RESPONSE_COMMAND_ID, "uuuuuuuu", status, delayedActionTime, imageURI,            \
+                                  softwareVersion, softwareVersionString, updateToken, userConsentNeeded, metadataForRequestor);
 
 /** @brief Command description for ApplyUpdateRequestResponse
  *
@@ -1786,16 +1786,16 @@
 /** @brief Command description for AnnounceOtaProvider
  *
  * Command: AnnounceOtaProvider
- * @param serverLocation OCTET_STRING
+ * @param providerLocation OCTET_STRING
  * @param vendorId INT16U
  * @param announcementReason OTAAnnouncementReason
  * @param metadataForNode OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
-    Software Update RequestorClusterAnnounceOtaProvider(serverLocation, vendorId, announcementReason, metadataForNode)             \
+    Software Update RequestorClusterAnnounceOtaProvider(providerLocation, vendorId, announcementReason, metadataForNode)           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ANNOUNCE_OTA_PROVIDER_COMMAND_ID, "uuuu", serverLocation, vendorId, announcementReason,      \
+                                  ZCL_ANNOUNCE_OTA_PROVIDER_COMMAND_ID, "uuuu", providerLocation, vendorId, announcementReason,    \
                                   metadataForNode);
 
 /** @brief Command description for ArmFailSafe
@@ -3413,7 +3413,7 @@
  * Command: StepHue
  * @param stepMode HueStepMode
  * @param stepSize INT8U
- * @param transitionTime INT16U
+ * @param transitionTime INT8U
  * @param optionsMask BITMAP8
  * @param optionsOverride BITMAP8
  */
@@ -3456,7 +3456,7 @@
  * Command: StepSaturation
  * @param stepMode SaturationStepMode
  * @param stepSize INT8U
- * @param transitionTime INT16U
+ * @param transitionTime INT8U
  * @param optionsMask BITMAP8
  * @param optionsOverride BITMAP8
  */

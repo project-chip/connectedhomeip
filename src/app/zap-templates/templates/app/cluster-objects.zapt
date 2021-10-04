@@ -1,0 +1,71 @@
+{{> header}}
+
+#pragma once
+
+#include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
+#include <app/data-model/List.h>
+#include <app/util/basic-types.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+{{#zcl_clusters}}
+namespace {{asUpperCamelCase name}} {
+{{#zcl_enums}}
+// Enum for {{label}}
+enum class {{asType label}} : {{asUnderlyingZclType type}} {
+{{#zcl_enum_items}}
+{{ident}}{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} = {{asHex value 2}},
+{{/zcl_enum_items}}
+};
+{{/zcl_enums}}
+
+{{#zcl_structs}}
+namespace {{name}} {
+    enum FieldId {
+    {{#zcl_struct_items}}
+    k{{asUpperCamelCase label}}FieldId = {{index}},
+    {{/zcl_struct_items}}
+    };
+
+    struct Type {
+    public:
+        {{#zcl_struct_items}}
+        {{#if isArray}}
+        DataModel::List<{{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
+        {{else}}
+        {{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}} {{asLowerCamelCase label}};
+        {{/if}}
+        {{/zcl_struct_items}}
+
+        CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) const;
+        CHIP_ERROR Decode(TLV::TLVReader &reader);
+    };
+
+    {{#if struct_contains_array}}
+    struct DecodableType {
+    public:
+        {{#zcl_struct_items checkForDoubleNestedArray="true"}}
+        {{#if isArray}}
+        DataModel::DecodableList<{{#if struct_item_contains_nested_array}}{{type}}::DecodableType{{else}}{{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}{{/if}}> {{asLowerCamelCase label}};
+        {{else}}
+        {{#if struct_item_contains_nested_array}}{{type}}::DecodableType{{else}}{{#if_is_enum type}}{{type}}{{else}}{{asChipZapType type}}{{/if_is_enum}}{{/if}} {{asLowerCamelCase label}};
+        {{/if}}
+        {{/zcl_struct_items}}
+        CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) const;
+        CHIP_ERROR Decode(TLV::TLVReader &reader);
+    };
+    {{/if}}
+
+} // namespace {{name}}
+{{/zcl_structs}}
+
+} // namespace {{asUpperCamelCase name}}
+{{/zcl_clusters}}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

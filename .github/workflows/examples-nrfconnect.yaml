@@ -170,6 +170,7 @@ jobs:
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
               with:
                   name: Size,nRFConnect-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
                   path: |

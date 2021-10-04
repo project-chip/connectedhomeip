@@ -95,6 +95,16 @@
             "path": "../../zap-templates/templates/app/ids/Commands.zapt",
             "name": "Commands Ids header",
             "output": "ids/Commands.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-objects.zapt",
+            "name": "Cluster objects header for Interaction Model",
+            "output": "cluster-objects.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-objects-src.zapt",
+            "name": "Cluster objects header for Interaction Model",
+            "output": "cluster-objects.cpp"
         }
     ]
 }

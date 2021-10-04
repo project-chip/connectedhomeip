@@ -29,7 +29,7 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}ClusterTest::WriteAttribute{{asUpperC
     attributePath.mNodeId         = mDevice->GetDeviceId();
     attributePath.mEndpointId     = mEndpoint;
     attributePath.mClusterId      = mClusterId;
-    attributePath.mFieldId        = {{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::Ids::{{asUpperCamelCase name}};
+    attributePath.mFieldId        = {{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));

@@ -328,7 +328,7 @@ void LayerImplSelect::PrepareEvents()
 
     constexpr Clock::MonotonicMilliseconds kMaxTimeout =
         static_cast<Clock::MonotonicMilliseconds>(DEFAULT_MIN_SLEEP_PERIOD) * kMillisecondsPerSecond;
-    const Clock::MonotonicMilliseconds currentTime = Clock::GetMonotonicMilliseconds();
+    const Clock::MonotonicMilliseconds currentTime = SystemClock().GetMonotonicMilliseconds();
     Clock::MonotonicMilliseconds awakenTime        = currentTime + kMaxTimeout;
 
     Timer * timer = mTimerList.Earliest();
@@ -385,7 +385,7 @@ void LayerImplSelect::HandleEvents()
 
     // Obtain the list of currently expired timers. Any new timers added by timer callback are NOT handled on this pass,
     // since that could result in infinite handling of new timers blocking any other progress.
-    Timer::List expiredTimers(mTimerList.ExtractEarlier(1 + Clock::GetMonotonicMilliseconds()));
+    Timer::List expiredTimers(mTimerList.ExtractEarlier(1 + SystemClock().GetMonotonicMilliseconds()));
     Timer * timer = nullptr;
     while ((timer = expiredTimers.PopEarliest()) != nullptr)
     {

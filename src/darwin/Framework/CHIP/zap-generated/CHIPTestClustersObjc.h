@@ -366,6 +366,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestIdentify : CHIPIdentify
 
+- (void)writeAttributeIdentifyTypeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -776,6 +777,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeWiFiVersionWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeChannelNumberWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeRssiWithValue:(int8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeBeaconLostCountWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeBeaconRxCountWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePacketMulticastRxCountWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePacketMulticastTxCountWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePacketUnicastRxCountWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePacketUnicastTxCountWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeCurrentMaxRateWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOverrunCountWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeClusterRevisionWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
 
 @end

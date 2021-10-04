@@ -311,7 +311,7 @@ limitations under the License.
       </description>
       <arg name="stepMode" type="HueStepMode"/>
       <arg name="stepSize" type="INT8U"/>
-      <arg name="transitionTime" type="INT16U"/>
+      <arg name="transitionTime" type="INT8U"/>
       <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
       <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
     </command>
@@ -339,7 +339,7 @@ limitations under the License.
       </description>
       <arg name="stepMode" type="SaturationStepMode"/>
       <arg name="stepSize" type="INT8U"/>
-      <arg name="transitionTime" type="INT16U"/>
+      <arg name="transitionTime" type="INT8U"/>
       <arg name="optionsMask" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
       <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl6-errata-14-0129-15" optional="1"/>
     </command>

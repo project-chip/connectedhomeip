@@ -156,10 +156,10 @@ bool IsOpen(chip::EndpointId endpoint)
     uint16_t tiltPosition = 0;
     uint16_t tiltLimit    = 0;
 
-    Attributes::GetTargetPositionLiftPercent100ths(endpoint, &liftPosition);
-    Attributes::GetInstalledOpenLimitLift(endpoint, &liftLimit);
-    Attributes::GetTargetPositionTiltPercent100ths(endpoint, &tiltPosition);
-    Attributes::GetInstalledOpenLimitTilt(endpoint, &tiltLimit);
+    Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &liftPosition);
+    Attributes::InstalledOpenLimitLift::Get(endpoint, &liftLimit);
+    Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &tiltPosition);
+    Attributes::InstalledOpenLimitTilt::Get(endpoint, &tiltLimit);
     return liftPosition == liftLimit && tiltPosition == tiltLimit;
 }
 
@@ -170,22 +170,22 @@ bool IsClosed(chip::EndpointId endpoint)
     uint16_t tiltPosition = 0;
     uint16_t tiltLimit    = 0;
 
-    Attributes::GetTargetPositionLiftPercent100ths(endpoint, &liftPosition);
-    Attributes::GetInstalledClosedLimitLift(endpoint, &liftLimit);
-    Attributes::GetTargetPositionTiltPercent100ths(endpoint, &tiltPosition);
-    Attributes::GetInstalledClosedLimitTilt(endpoint, &tiltLimit);
+    Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &liftPosition);
+    Attributes::InstalledClosedLimitLift::Get(endpoint, &liftLimit);
+    Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &tiltPosition);
+    Attributes::InstalledClosedLimitTilt::Get(endpoint, &tiltLimit);
     return liftPosition == liftLimit && tiltPosition == tiltLimit;
 }
 
 void TypeSet(chip::EndpointId endpoint, EmberAfWcType type)
 {
-    Attributes::SetType(endpoint, chip::to_underlying(type));
+    Attributes::Type::Set(endpoint, chip::to_underlying(type));
 }
 
 EmberAfWcType TypeGet(chip::EndpointId endpoint)
 {
     std::underlying_type<EmberAfWcType>::type value;
-    Attributes::GetType(endpoint, &value);
+    Attributes::Type::Get(endpoint, &value);
     return static_cast<EmberAfWcType>(value);
 }
 
@@ -194,7 +194,7 @@ void ConfigStatusSet(chip::EndpointId endpoint, const ConfigStatus & status)
     uint8_t value = (status.operational ? 0x01 : 0) | (status.online ? 0x02 : 0) | (status.liftIsReversed ? 0x04 : 0) |
         (status.liftIsPA ? 0x08 : 0) | (status.tiltIsPA ? 0x10 : 0) | (status.liftIsEncoderControlled ? 0x20 : 0) |
         (status.tiltIsEncoderControlled ? 0x40 : 0);
-    Attributes::SetConfigStatus(endpoint, value);
+    Attributes::ConfigStatus::Set(endpoint, value);
 }
 
 const ConfigStatus ConfigStatusGet(chip::EndpointId endpoint)
@@ -202,7 +202,7 @@ const ConfigStatus ConfigStatusGet(chip::EndpointId endpoint)
     uint8_t value = 0;
     ConfigStatus status;
 
-    Attributes::GetConfigStatus(endpoint, &value);
+    Attributes::ConfigStatus::Get(endpoint, &value);
     status.operational             = (value & 0x01) ? 1 : 0;
     status.online                  = (value & 0x02) ? 1 : 0;
     status.liftIsReversed          = (value & 0x04) ? 1 : 0;
@@ -219,7 +219,7 @@ void OperationalStatusSet(chip::EndpointId endpoint, const OperationalStatus & s
     uint8_t lift   = OperationalStateToValue(status.lift);
     uint8_t tilt   = OperationalStateToValue(status.tilt);
     uint8_t value  = (global & 0x03) | static_cast<uint8_t>((lift & 0x03) << 2) | static_cast<uint8_t>((tilt & 0x03) << 4);
-    Attributes::SetOperationalStatus(endpoint, value);
+    Attributes::OperationalStatus::Set(endpoint, value);
 }
 
 const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint)
@@ -227,7 +227,7 @@ const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint)
     uint8_t value = 0;
     OperationalStatus status;
 
-    Attributes::GetOperationalStatus(endpoint, &value);
+    Attributes::OperationalStatus::Get(endpoint, &value);
     status.global = ValueToOperationalState(value & 0x03);
     status.lift   = ValueToOperationalState((value >> 2) & 0x03);
     status.tilt   = ValueToOperationalState((value >> 4) & 0x03);
@@ -236,13 +236,13 @@ const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint)
 
 void EndProductTypeSet(chip::EndpointId endpoint, EmberAfWcEndProductType type)
 {
-    Attributes::SetEndProductType(endpoint, chip::to_underlying(type));
+    Attributes::EndProductType::Set(endpoint, chip::to_underlying(type));
 }
 
 EmberAfWcEndProductType EndProductTypeGet(chip::EndpointId endpoint)
 {
     std::underlying_type<EmberAfWcType>::type value;
-    Attributes::GetEndProductType(endpoint, &value);
+    Attributes::EndProductType::Get(endpoint, &value);
     return static_cast<EmberAfWcEndProductType>(value);
 }
 
@@ -250,7 +250,7 @@ void ModeSet(chip::EndpointId endpoint, const Mode & mode)
 {
     uint8_t value = (mode.motorDirReversed ? 0x01 : 0) | (mode.calibrationMode ? 0x02 : 0) | (mode.maintenanceMode ? 0x04 : 0) |
         (mode.ledDisplay ? 0x08 : 0);
-    Attributes::SetMode(endpoint, value);
+    Attributes::Mode::Set(endpoint, value);
 }
 
 const Mode ModeGet(chip::EndpointId endpoint)
@@ -258,7 +258,7 @@ const Mode ModeGet(chip::EndpointId endpoint)
     uint8_t value = 0;
     Mode mode;
 
-    Attributes::GetMode(endpoint, &value);
+    Attributes::Mode::Get(endpoint, &value);
     mode.motorDirReversed = (value & 0x01) ? 1 : 0;
     mode.calibrationMode  = (value & 0x02) ? 1 : 0;
     mode.maintenanceMode  = (value & 0x04) ? 1 : 0;
@@ -274,7 +274,7 @@ void SafetyStatusSet(chip::EndpointId endpoint, SafetyStatus & status)
         (status.stopInput ? 0x0080 : 0);
     value |= (uint16_t)(status.motorJammed ? 0x0100 : 0) | (uint16_t)(status.hardwareFailure ? 0x0200 : 0) |
         (uint16_t)(status.manualOperation ? 0x0400 : 0);
-    Attributes::SetSafetyStatus(endpoint, value);
+    Attributes::SafetyStatus::Set(endpoint, value);
 }
 
 const SafetyStatus SafetyStatusGet(chip::EndpointId endpoint)
@@ -282,7 +282,7 @@ const SafetyStatus SafetyStatusGet(chip::EndpointId endpoint)
     uint16_t value = 0;
     SafetyStatus status;
 
-    Attributes::GetSafetyStatus(endpoint, &value);
+    Attributes::SafetyStatus::Get(endpoint, &value);
     status.remoteLockout       = (value & 0x0001) ? 1 : 0;
     status.tamperDetection     = (value & 0x0002) ? 1 : 0;
     status.failedCommunication = (value & 0x0004) ? 1 : 0;
@@ -301,8 +301,8 @@ uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)
 {
     uint16_t openLimit   = 0;
     uint16_t closedLimit = 0;
-    Attributes::GetInstalledOpenLimitLift(endpoint, &openLimit);
-    Attributes::GetInstalledClosedLimitLift(endpoint, &closedLimit);
+    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
     return ValueToPercent100ths(openLimit, closedLimit, lift);
 }
 
@@ -310,8 +310,8 @@ uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
 {
     uint16_t openLimit   = 0;
     uint16_t closedLimit = 0;
-    Attributes::GetInstalledOpenLimitLift(endpoint, &openLimit);
-    Attributes::GetInstalledClosedLimitLift(endpoint, &closedLimit);
+    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
     return Percent100thsToValue(openLimit, closedLimit, percent100ths);
 }
 
@@ -320,9 +320,9 @@ void LiftPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
     uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
     uint16_t lift   = Percent100thsToLift(endpoint, percent100ths);
 
-    Attributes::SetCurrentPositionLift(endpoint, lift);
-    Attributes::SetCurrentPositionLiftPercentage(endpoint, percent);
-    Attributes::SetCurrentPositionLiftPercent100ths(endpoint, percent100ths);
+    Attributes::CurrentPositionLift::Set(endpoint, lift);
+    Attributes::CurrentPositionLiftPercentage::Set(endpoint, percent);
+    Attributes::CurrentPositionLiftPercent100ths::Set(endpoint, percent100ths);
     emberAfWindowCoveringClusterPrint("Lift Position Set: %u%%", percent);
 }
 
@@ -330,8 +330,8 @@ uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt)
 {
     uint16_t openLimit   = 0;
     uint16_t closedLimit = 0;
-    Attributes::GetInstalledOpenLimitTilt(endpoint, &openLimit);
-    Attributes::GetInstalledClosedLimitTilt(endpoint, &closedLimit);
+    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
     return ValueToPercent100ths(openLimit, closedLimit, tilt);
 }
 
@@ -339,8 +339,8 @@ uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
 {
     uint16_t openLimit   = 0;
     uint16_t closedLimit = 0;
-    Attributes::GetInstalledOpenLimitTilt(endpoint, &openLimit);
-    Attributes::GetInstalledClosedLimitTilt(endpoint, &closedLimit);
+    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
+    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
     return Percent100thsToValue(openLimit, closedLimit, percent100ths);
 }
 
@@ -349,9 +349,9 @@ void TiltPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
     uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
     uint16_t tilt   = Percent100thsToTilt(endpoint, percent100ths);
 
-    Attributes::SetCurrentPositionTilt(endpoint, tilt);
-    Attributes::SetCurrentPositionTiltPercentage(endpoint, percent);
-    Attributes::SetCurrentPositionTiltPercent100ths(endpoint, percent100ths);
+    Attributes::CurrentPositionTilt::Set(endpoint, tilt);
+    Attributes::CurrentPositionTiltPercentage::Set(endpoint, percent);
+    Attributes::CurrentPositionTiltPercent100ths::Set(endpoint, percent100ths);
     emberAfWindowCoveringClusterPrint("Tilt Position Set: %u%%", percent);
 }
 
@@ -383,11 +383,11 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(chip::EndpointId endpoint, chi
     emberAfWindowCoveringClusterPrint("UpOrOpen command received");
     if (HasFeature(endpoint, Features::Lift))
     {
-        Attributes::SetTargetPositionLiftPercent100ths(endpoint, 0);
+        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, 0);
     }
     if (HasFeature(endpoint, Features::Tilt))
     {
-        Attributes::SetTargetPositionTiltPercent100ths(endpoint, 0);
+        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, 0);
     }
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -401,11 +401,11 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::EndpointId endpoint, 
     emberAfWindowCoveringClusterPrint("DownOrClose command received");
     if (HasFeature(endpoint, Features::Lift))
     {
-        Attributes::SetTargetPositionLiftPercent100ths(endpoint, WC_PERCENT100THS_MAX);
+        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX);
     }
     if (HasFeature(endpoint, Features::Tilt))
     {
-        Attributes::SetTargetPositionTiltPercent100ths(endpoint, WC_PERCENT100THS_MAX);
+        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX);
     }
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -435,7 +435,7 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(chip::EndpointId endpoint
     emberAfWindowCoveringClusterPrint("GoToLiftValue Value command received");
     if (hasLift && isPositionAware)
     {
-        Attributes::SetTargetPositionLiftPercent100ths(endpoint, LiftToPercent100ths(endpoint, liftValue));
+        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, LiftToPercent100ths(endpoint, liftValue));
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     }
     else
@@ -458,7 +458,7 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::EndpointId end
     emberAfWindowCoveringClusterPrint("GoToLiftPercentage Percentage command received");
     if (hasLift && isPositionAware)
     {
-        Attributes::SetTargetPositionLiftPercent100ths(
+        Attributes::TargetPositionLiftPercent100ths::Set(
             endpoint, static_cast<uint16_t>(liftPercentageValue > 100 ? liftPercent100thsValue : liftPercentageValue * 100));
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     }
@@ -482,7 +482,7 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(chip::EndpointId endpoint
     emberAfWindowCoveringClusterPrint("GoToTiltValue command received");
     if (hasTilt && isPositionAware)
     {
-        Attributes::SetTargetPositionTiltPercent100ths(endpoint, TiltToPercent100ths(endpoint, tiltValue));
+        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, TiltToPercent100ths(endpoint, tiltValue));
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     }
     else
@@ -505,7 +505,7 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::EndpointId end
     emberAfWindowCoveringClusterPrint("GoToTiltPercentage command received");
     if (hasTilt && isPositionAware)
     {
-        Attributes::SetTargetPositionTiltPercent100ths(
+        Attributes::TargetPositionTiltPercent100ths::Set(
             endpoint, static_cast<uint16_t>(tiltPercentageValue > 100 ? tiltPercent100thsValue : tiltPercentageValue * 100));
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     }

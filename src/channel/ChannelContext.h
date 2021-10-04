@@ -80,7 +80,7 @@ class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDel
 public:
     ChannelContext(ExchangeManager * exchangeManager, ChannelManager * channelManager) :
         mState(ChannelState::kNone), mExchangeManager(exchangeManager), mChannelManager(channelManager), mFabricsTable(nullptr),
-        mFabricIndex(Transport::kUndefinedFabricIndex)
+        mFabricIndex(kUndefinedFabricIndex)
     {}
 
     void Start(const ChannelBuilder & builder);
@@ -123,7 +123,7 @@ private:
     ChannelState mState;
     ExchangeManager * mExchangeManager;
     ChannelManager * mChannelManager;
-    Transport::FabricTable * mFabricsTable;
+    FabricTable * mFabricsTable;
     FabricIndex mFabricIndex;
 
     enum class PrepareState

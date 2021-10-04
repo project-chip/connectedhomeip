@@ -48,9 +48,11 @@ AvahiProtocol ToAvahiProtocol(chip::Inet::IPAddressType addressType)
 
     switch (addressType)
     {
+#if INET_CONFIG_ENABLE_IPV4
     case chip::Inet::IPAddressType::kIPAddressType_IPv4:
         protocol = AVAHI_PROTO_INET;
         break;
+#endif
     case chip::Inet::IPAddressType::kIPAddressType_IPv6:
         protocol = AVAHI_PROTO_INET6;
         break;
@@ -68,9 +70,11 @@ chip::Inet::IPAddressType ToAddressType(AvahiProtocol protocol)
 
     switch (protocol)
     {
+#if INET_CONFIG_ENABLE_IPV4
     case AVAHI_PROTO_INET:
         type = chip::Inet::IPAddressType::kIPAddressType_IPv4;
         break;
+#endif
     case AVAHI_PROTO_INET6:
         type = chip::Inet::IPAddressType::kIPAddressType_IPv6;
         break;
@@ -685,7 +689,8 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         context->mCallback(context->mContext, nullptr, CHIP_ERROR_INTERNAL);
         break;
     case AVAHI_RESOLVER_FOUND:
-        MdnsService result = {};
+        MdnsService result    = {};
+        CHIP_ERROR result_err = CHIP_NO_ERROR;
 
         result.mAddress.SetValue(chip::Inet::IPAddress());
         ChipLogError(DeviceLayer, "Avahi resolve found");
@@ -713,10 +718,15 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
             switch (address->proto)
             {
             case AVAHI_PROTO_INET:
+#if INET_CONFIG_ENABLE_IPV4
                 struct in_addr addr4;
 
                 memcpy(&addr4, &(address->data.ipv4), sizeof(addr4));
                 result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv4(addr4));
+#else
+                result_err = CHIP_ERROR_INVALID_ADDRESS;
+                ChipLogError(Discovery, "Ignoring IPv4 mDNS address.");
+#endif
                 break;
             case AVAHI_PROTO_INET6:
                 struct in6_addr addr6;
@@ -749,7 +759,14 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         }
         result.mTextEntrySize = textEntries.size();
 
-        context->mCallback(context->mContext, &result, CHIP_NO_ERROR);
+        if (result_err == CHIP_NO_ERROR)
+        {
+            context->mCallback(context->mContext, &result, CHIP_NO_ERROR);
+        }
+        else
+        {
+            context->mCallback(context->mContext, nullptr, result_err);
+        }
         break;
     }
 

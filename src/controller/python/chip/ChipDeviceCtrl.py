@@ -211,12 +211,6 @@ class ChipDeviceController(object):
 
         return (address.value.decode(), port.value) if error == 0 else None
 
-    def CommissioningComplete(self, nodeid):
-        return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_CommissioningComplete(
-                self.devCtrl, nodeid)
-        )
-
     def DiscoverCommissionableNodesLongDiscriminator(self, long_discriminator):
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(
@@ -356,10 +350,10 @@ class ChipDeviceController(object):
         if blocking:
             return im.GetAttributeWriteResponse(im.DEFAULT_ATTRIBUTEWRITE_APPID)
 
-    def ZCLConfigureAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, change, blocking=True):
+    def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
         device = c_void_p(None)
         # We should really use pychip_GetConnectedDeviceByNodeId and do the
-        # ConfigureAttribute off its callback....
+        # SubscribeAttribute off its callback....
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(
             self.devCtrl, nodeid, pointer(device)))
         if res != 0:
@@ -367,8 +361,8 @@ class ChipDeviceController(object):
 
         commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
         im.ClearCommandStatus(commandSenderHandle)
-        res = self._Cluster.ConfigureAttribute(
-            device, cluster, attribute, endpoint, minInterval, maxInterval, change, commandSenderHandle != 0)
+        res = self._Cluster.SubscribeAttribute(
+            device, cluster, attribute, endpoint, minInterval, maxInterval, commandSenderHandle != 0)
         if blocking:
             # We only send 1 command by this function, so index is always 0
             return im.WaitCommandIndexStatus(commandSenderHandle, 1)

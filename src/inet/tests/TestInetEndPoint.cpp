@@ -413,10 +413,12 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // TODO: err is not validated EXCEPT the last call
     for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS + 1; i++)
         err = gInet.NewUDPEndPoint(&testUDPEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
 
+    // TODO: err is not validated EXCEPT the last call
     for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS + 1; i++)
         err = gInet.NewTCPEndPoint(&testTCPEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
@@ -440,12 +442,20 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 
     // Release UDP endpoints
     for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS; i++)
-        testUDPEP[i]->Free();
+    {
+        if (testUDPEP[i] != nullptr)
+        {
+            testUDPEP[i]->Free();
+        }
+    }
 
     // Release TCP endpoints
     for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
     {
-        testTCPEP[i]->Free();
+        if (testTCPEP[i] != nullptr)
+        {
+            testTCPEP[i]->Free();
+        }
     }
 }
 #endif

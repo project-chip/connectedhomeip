@@ -170,7 +170,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     }
 
     if (err == CHIP_NO_ERROR &&
-        app::Clusters::OperationalCredentials::Attributes::SetCommissionedFabrics(0, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+        app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::Set(0, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fabrics",
                        fabricIndex);
@@ -178,7 +178,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     }
 
     if (err == CHIP_NO_ERROR &&
-        app::Clusters::OperationalCredentials::Attributes::SetSupportedFabrics(0, CHIP_CONFIG_MAX_DEVICE_ADMINS) !=
+        app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::Set(0, CHIP_CONFIG_MAX_DEVICE_ADMINS) !=
             EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write %" PRIu8 " in supported fabrics count attribute",
@@ -385,15 +385,6 @@ EmberAfNodeOperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
 }
 
 } // namespace
-
-// Up for discussion in Multi-Admin TT: chip-spec:#2891
-bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
-{
-    // TODO - Delete RemoveAll fabrics command as this is not spec compliant
-    ChipLogError(Zcl, "operational-credentials cluster received remove all fabric command, which is not supported");
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
 
 bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCValue,
                                                         ByteSpan ICACValue, ByteSpan IPKValue, NodeId adminNodeId,
@@ -681,14 +672,6 @@ exit:
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
-    return true;
-}
-
-bool emberAfOperationalCredentialsClusterUpdateOpCertCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOC,
-                                                              ByteSpan ICACertificate)
-{
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 

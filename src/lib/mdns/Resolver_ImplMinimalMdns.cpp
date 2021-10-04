@@ -24,6 +24,7 @@
 #include <lib/mdns/MinimalMdnsServer.h>
 #include <lib/mdns/ServiceNaming.h>
 #include <lib/mdns/TxtFields.h>
+#include <lib/mdns/minimal/ActiveResolveAttempts.h>
 #include <lib/mdns/minimal/Parser.h>
 #include <lib/mdns/minimal/QueryBuilder.h>
 #include <lib/mdns/minimal/RecordData.h>
@@ -82,9 +83,10 @@ public:
     void OnHeader(ConstHeaderRef & header) override;
     void OnQuery(const QueryData & data) override;
     void OnResource(ResourceType type, const ResourceData & data) override;
+
     // Called after ParsePacket is complete to send final notifications to the delegate.
     // Used to ensure all the available IP addresses are attached before completion.
-    void OnComplete();
+    void OnComplete(ActiveResolveAttempts & activeAttempts);
 
 private:
     ResolverDelegate * mDelegate = nullptr;
@@ -311,7 +313,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
     }
 }
 
-void PacketDataReporter::OnComplete()
+void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
 {
     if ((mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode) &&
         mDiscoveredNodeData.IsValid())
@@ -320,6 +322,8 @@ void PacketDataReporter::OnComplete()
     }
     else if (mDiscoveryType == DiscoveryType::kOperational && mHasIP && mHasNodePort)
     {
+        activeAttempts.Complete(mNodeData.mPeerId);
+
         mNodeData.LogNodeIdResolved();
         mDelegate->OnNodeIdResolved(mNodeData);
     }
@@ -328,7 +332,10 @@ void PacketDataReporter::OnComplete()
 class MinMdnsResolver : public Resolver, public MdnsPacketDelegate
 {
 public:
-    MinMdnsResolver() { GlobalMinimalMdnsServer::Instance().SetResponseDelegate(this); }
+    MinMdnsResolver() : mActiveResolves(&chip::System::SystemClock())
+    {
+        GlobalMinimalMdnsServer::Instance().SetResponseDelegate(this);
+    }
 
     //// MdnsPacketDelegate implementation
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -344,6 +351,13 @@ public:
 private:
     ResolverDelegate * mDelegate = nullptr;
     DiscoveryType mDiscoveryType = DiscoveryType::kUnknown;
+    System::Layer * mSystemLayer = nullptr;
+    ActiveResolveAttempts mActiveResolves;
+
+    CHIP_ERROR SendPendingResolveQueries();
+    CHIP_ERROR ScheduleResolveRetries();
+
+    static void ResolveRetryCallback(System::Layer *, void * self);
 
     CHIP_ERROR SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type);
     CHIP_ERROR BrowseNodes(DiscoveryType type, DiscoveryFilter subtype);
@@ -379,7 +393,8 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
     }
     else
     {
-        reporter.OnComplete();
+        reporter.OnComplete(mActiveResolves);
+        ScheduleResolveRetries();
     }
 }
 
@@ -391,6 +406,8 @@ CHIP_ERROR MinMdnsResolver::StartResolver(chip::Inet::InetLayer * inetLayer, uin
     {
         return CHIP_NO_ERROR;
     }
+
+    mSystemLayer = inetLayer->SystemLayer();
 
     return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, port);
 }
@@ -491,47 +508,86 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
 
 CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
-    mDiscoveryType                    = DiscoveryType::kOperational;
-    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
-    ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+    mDiscoveryType = DiscoveryType::kOperational;
+    mActiveResolves.MarkPending(peerId);
 
-    QueryBuilder builder(std::move(buffer));
-    builder.Header().SetMessageId(0);
+    return SendPendingResolveQueries();
+}
 
+CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
+{
+    ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mSystemLayer->CancelTimer(&ResolveRetryCallback, this);
+
+    Optional<uint32_t> delayMs = mActiveResolves.GetMsUntilNextExpectedResponse();
+
+    if (!delayMs.HasValue())
     {
-        char nameBuffer[64] = "";
-
-        // Node and fabricid are encoded in server names.
-        ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId));
-
-        const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
-        Query query(instanceQName);
-
-        query
-            .SetClass(QClass::IN)       //
-            .SetType(QType::ANY)        //
-            .SetAnswerViaUnicast(false) //
-            ;
-
-        // NOTE: type above is NOT A or AAAA because the name searched for is
-        // a SRV record. The layout is:
-        //    SRV -> hostname
-        //    Hostname -> A
-        //    Hostname -> AAAA
-        //
-        // Query is sent for ANY and expectation is to receive A/AAAA records
-        // in the additional section of the reply.
-        //
-        // Sending a A/AAAA query will return no results
-        // Sending a SRV query will return the srv only and an additional query
-        // would be needed to resolve the host name to an IP address
-
-        builder.AddQuery(query);
+        return CHIP_NO_ERROR;
     }
 
-    ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
+    return mSystemLayer->StartTimer(delayMs.Value(), &ResolveRetryCallback, this);
+}
 
-    return GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort);
+void MinMdnsResolver::ResolveRetryCallback(System::Layer *, void * self)
+{
+    reinterpret_cast<MinMdnsResolver *>(self)->SendPendingResolveQueries();
+}
+
+CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
+{
+    while (true)
+    {
+        Optional<PeerId> peerId = mActiveResolves.NextScheduledPeer();
+
+        if (!peerId.HasValue())
+        {
+            break;
+        }
+
+        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
+        ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+        QueryBuilder builder(std::move(buffer));
+        builder.Header().SetMessageId(0);
+
+        {
+            char nameBuffer[kMaxOperationalServiceNameSize] = "";
+
+            // Node and fabricid are encoded in server names.
+            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), peerId.Value()));
+
+            const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
+            Query query(instanceQName);
+
+            query
+                .SetClass(QClass::IN)       //
+                .SetType(QType::ANY)        //
+                .SetAnswerViaUnicast(false) //
+                ;
+
+            // NOTE: type above is NOT A or AAAA because the name searched for is
+            // a SRV record. The layout is:
+            //    SRV -> hostname
+            //    Hostname -> A
+            //    Hostname -> AAAA
+            //
+            // Query is sent for ANY and expectation is to receive A/AAAA records
+            // in the additional section of the reply.
+            //
+            // Sending a A/AAAA query will return no results
+            // Sending a SRV query will return the srv only and an additional query
+            // would be needed to resolve the host name to an IP address
+
+            builder.AddQuery(query);
+        }
+
+        ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
+
+        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+    }
+
+    return ScheduleResolveRetries();
 }
 
 MinMdnsResolver gResolver;

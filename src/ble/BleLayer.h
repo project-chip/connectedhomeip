@@ -320,6 +320,8 @@ public:
     BLEEndPoint * mTestBleEndPoint;
 #endif
 
+    BLEEndPoint * mBleEndPoint;
+
 private:
     // Private data members:
 

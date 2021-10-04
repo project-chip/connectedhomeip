@@ -48,12 +48,10 @@
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::clusters;
-using namespace chip::app::clusters::NetworkCommissioning;
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace NetworkCommissioning {
 
 constexpr uint8_t kMaxNetworkIDLen       = 32;
@@ -291,6 +289,6 @@ exit:
 }
 
 } // namespace NetworkCommissioning
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

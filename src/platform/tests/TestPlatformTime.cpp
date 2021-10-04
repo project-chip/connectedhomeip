@@ -80,11 +80,11 @@ static void TestDevice_GetMonotonicMicroseconds(nlTestSuite * inSuite, void * in
     {
         test_params = &test_vector_system_time_us[vectorIndex];
         Tdelay      = test_params->delay;
-        Tstart      = System::Clock::GetMonotonicMicroseconds();
+        Tstart      = System::SystemClock().GetMonotonicMicroseconds();
 
         chip::test_utils::SleepMicros(test_params->delay);
 
-        Tend   = System::Clock::GetMonotonicMicroseconds();
+        Tend   = System::SystemClock().GetMonotonicMicroseconds();
         Tdelta = Tend - Tstart;
 
         ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart, Tend, Tdelta,
@@ -111,11 +111,11 @@ static void TestDevice_GetMonotonicMilliseconds(nlTestSuite * inSuite, void * in
     {
         test_params = &test_vector_system_time_ms[vectorIndex];
         Tdelay      = test_params->delay;
-        Tstart      = System::Clock::GetMonotonicMilliseconds();
+        Tstart      = System::SystemClock().GetMonotonicMilliseconds();
 
         chip::test_utils::SleepMillis(test_params->delay);
 
-        Tend   = System::Clock::GetMonotonicMilliseconds();
+        Tend   = System::SystemClock().GetMonotonicMilliseconds();
         Tdelta = Tend - Tstart;
 
         ChipLogProgress(DeviceLayer, "Start=%" PRIu64 " End=%" PRIu64 " Delta=%" PRIu64 " Expected=%" PRIu64, Tstart, Tend, Tdelta,
