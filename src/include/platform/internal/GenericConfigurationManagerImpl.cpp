@@ -645,8 +645,8 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreServiceProvisioningData(uint64_t serviceId,
                                                                                     const uint8_t * serviceConfig,
-                                                                                    size_t serviceConfigLen,
-                                                                                    const char * accountId, size_t accountIdLen)
+                                                                                    size_t serviceConfigLen, const char * accountId,
+                                                                                    size_t accountIdLen)
 {
     CHIP_ERROR err;
 

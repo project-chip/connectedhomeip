@@ -41,7 +41,7 @@ private:
     CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetFirmwareRevision(uint32_t & firmwareRev) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
-                                     uint8_t & second) override
+                                    uint8_t & second) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -51,7 +51,10 @@ private:
     CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetDeviceId(uint64_t & deviceId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -66,7 +69,10 @@ private:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreManufacturerDeviceCertificate(const uint8_t * cert, size_t certLen) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
     CHIP_ERROR GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -90,12 +96,18 @@ private:
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
     CHIP_ERROR GetServiceId(uint64_t & serviceId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
     CHIP_ERROR GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StorePairedAccountId(const char * accountId, size_t accountIdLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreServiceProvisioningData(uint64_t serviceId, const uint8_t * serviceConfig, size_t serviceConfigLen,
-                                             const char * accountId, size_t accountIdLen) override
+                                            const char * accountId, size_t accountIdLen) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -104,7 +116,10 @@ private:
     CHIP_ERROR SetFailSafeArmed(bool val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetQRCodeString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetWiFiAPSSID(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
     bool IsCommissionableDeviceTypeEnabled() override { return false; }
     CHIP_ERROR GetDeviceType(uint16_t & deviceType) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     bool IsCommissionableDeviceNameEnabled() override { return false; }
