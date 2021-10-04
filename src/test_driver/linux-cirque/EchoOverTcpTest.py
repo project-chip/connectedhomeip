@@ -71,7 +71,7 @@ class TestEchoOverTCP(CHIPVirtualHome):
         self.run_data_model_test()
 
     def run_data_model_test(self):
-        resp_ips = [device['description']['ipv4_addr'] for device in self.non_ap_devices
+        resp_ips = [device['description']['ipv6_addr'] for device in self.non_ap_devices
                     if device['type'] == 'CHIP-Echo-Responder']
         resp_ids = [device['id'] for device in self.non_ap_devices
                     if device['type'] == 'CHIP-Echo-Responder']

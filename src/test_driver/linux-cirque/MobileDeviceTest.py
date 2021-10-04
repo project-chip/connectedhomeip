@@ -71,7 +71,7 @@ class TestPythonController(CHIPVirtualHome):
         self.run_controller_test()
 
     def run_controller_test(self):
-        ethernet_ip = [device['description']['ipv4_addr'] for device in self.non_ap_devices
+        ethernet_ip = [device['description']['ipv6_addr'] for device in self.non_ap_devices
                        if device['type'] == 'CHIPEndDevice'][0]
         server_ids = [device['id'] for device in self.non_ap_devices
                       if device['type'] == 'CHIPEndDevice']
