@@ -258,7 +258,7 @@ public:
      * The method must be called before other methods of this class.
      * If the resolver has already been initialized, the method exits immediately with no error.
      */
-    virtual CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer, uint16_t port) = 0;
+    virtual CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) = 0;
 
     /**
      * Shuts down the resolver if it has been initialized before.
@@ -266,7 +266,8 @@ public:
     virtual void Shutdown() = 0;
 
     /**
-     * Registers a resolver delegate.
+     * Registers a resolver delegate. If nullptr is passed, the previously registered delegate
+     * is unregistered.
      */
     virtual void SetResolverDelegate(ResolverDelegate * delegate) = 0;
 

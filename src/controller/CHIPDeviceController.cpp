@@ -135,7 +135,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     params.systemState->ExchangeMgr()->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    Mdns::Resolver::Instance().Init(params.systemState->InetLayer(), kMdnsPort);
+    Mdns::Resolver::Instance().Init(params.systemState->InetLayer());
     Mdns::Resolver::Instance().SetResolverDelegate(this);
     RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);

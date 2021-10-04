@@ -148,7 +148,7 @@ bool MdnsServer::OnExpiration(uint64_t expirationMs)
 
     ChipLogDetail(Discovery, "OnExpiration - valid time out");
 
-    CHIP_ERROR err = Mdns::ServiceAdvertiser::Instance().Init(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    CHIP_ERROR err = Mdns::ServiceAdvertiser::Instance().Init(&chip::DeviceLayer::InetLayer);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to initialize advertiser: %s", chip::ErrorStr(err));
@@ -412,7 +412,7 @@ void MdnsServer::StartServer(chip::Mdns::CommissioningMode mode)
 
     ClearTimeouts();
 
-    CHIP_ERROR err = Mdns::ServiceAdvertiser::Instance().Init(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    CHIP_ERROR err = Mdns::ServiceAdvertiser::Instance().Init(&chip::DeviceLayer::InetLayer);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to initialize advertiser: %s", chip::ErrorStr(err));

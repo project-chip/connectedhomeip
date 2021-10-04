@@ -26,7 +26,7 @@ namespace {
 class NoneAdvertiser : public ServiceAdvertiser
 {
 public:
-    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayet, uint16_t port) override
+    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayet) override
     {
         ChipLogError(Discovery, "mDNS advertising not available. mDNS init disabled.");
         return CHIP_ERROR_NOT_IMPLEMENTED;

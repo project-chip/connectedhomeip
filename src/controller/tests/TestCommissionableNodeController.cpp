@@ -31,7 +31,7 @@ namespace {
 class MockResolver : public Resolver
 {
 public:
-    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer, uint16_t port) override { return InitStatus; }
+    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override { return InitStatus; }
     void Shutdown() override {}
     void SetResolverDelegate(ResolverDelegate *) override {}
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override { return ResolveNodeIdStatus; }

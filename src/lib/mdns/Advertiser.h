@@ -307,7 +307,7 @@ public:
      * The method must be called before other methods of this class.
      * If the advertiser has already been initialized, the method exits immediately with no error.
      */
-    virtual CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer, uint16_t port) = 0;
+    virtual CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) = 0;
 
     /**
      * Shuts down the advertiser.

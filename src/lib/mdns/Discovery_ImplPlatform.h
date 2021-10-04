@@ -36,8 +36,8 @@ namespace Mdns {
 class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 {
 public:
-    /// Members that implement both ServiceAdveriser and Resolver interfaces.
-    CHIP_ERROR Init(Inet::InetLayer *, uint16_t /* port */) override { return InitImpl(); }
+    // Members that implement both ServiceAdveriser and Resolver interfaces.
+    CHIP_ERROR Init(Inet::InetLayer *) override { return InitImpl(); }
     void Shutdown() override;
 
     // Members that implement ServiceAdvertiser interface.

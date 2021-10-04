@@ -140,7 +140,7 @@ CHIP_ERROR ChipMdnsShutdown();
 CHIP_ERROR ChipMdnsRemoveServices();
 
 /**
- * This function publishes a service via mDNS or SRP.
+ * This function publishes a service via DNS-SD.
  *
  * Calling the function again with the same service name, type, protocol,
  * interface and port but different text will update the text published.
@@ -160,7 +160,8 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service);
  *
  * This function can be used by some implementations to apply changes made with the
  * `ChipMdnsRemoveServices` and `ChipMdnsPublishService` functions in case they could
- * not be applied immediately (like in case of implementations using SRP).
+ * not be applied immediately (like in case of, but not limited to, implementations
+ * using SRP).
  *
  * @retval CHIP_NO_ERROR  The service update completion succeeds.
  * @retval Error code     The service update completion fails.

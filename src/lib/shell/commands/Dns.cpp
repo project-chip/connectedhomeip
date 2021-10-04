@@ -218,7 +218,7 @@ CHIP_ERROR DnsHandler(int argc, char ** argv)
         return CHIP_NO_ERROR;
     }
 
-    Mdns::Resolver::Instance().Init(&DeviceLayer::InetLayer, Mdns::kMdnsPort);
+    Mdns::Resolver::Instance().Init(&DeviceLayer::InetLayer);
     Mdns::Resolver::Instance().SetResolverDelegate(&sDnsShellResolverDelegate);
 
     return sShellDnsSubcommands.ExecCommand(argc, argv);

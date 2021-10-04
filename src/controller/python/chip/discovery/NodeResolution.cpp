@@ -33,8 +33,6 @@ namespace {
 using DiscoverSuccessCallback = void (*)(uint64_t fabricId, uint64_t nodeId, uint32_t interfaceId, const char * ip, uint16_t port);
 using DiscoverFailureCallback = void (*)(uint64_t fabricId, uint64_t nodeId, ChipError::StorageType error_code);
 
-constexpr uint16_t kMdnsPort = 5353;
-
 class PythonResolverDelegate : public ResolverDelegate
 {
 public:
@@ -95,7 +93,7 @@ extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, ui
     CHIP_ERROR result = CHIP_NO_ERROR;
 
     chip::python::ChipMainThreadScheduleAndWait([&] {
-        result = Resolver::Instance().Init(&chip::DeviceLayer::InetLayer, kMdnsPort);
+        result = Resolver::Instance().Init(&chip::DeviceLayer::InetLayer);
         ReturnOnFailure(result);
         Resolver::Instance().SetResolverDelegate(&gPythonResolverDelegate);
 

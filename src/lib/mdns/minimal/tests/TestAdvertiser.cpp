@@ -553,7 +553,7 @@ int TestAdvertiser(void)
     CheckOnlyServer server(&theSuite);
     test::ServerSwapper swapper(&server);
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
-    mdnsAdvertiser.Init(nullptr, CHIP_PORT);
+    mdnsAdvertiser.Init(nullptr);
     nlTestRunner(&theSuite, &server);
     return nlTestRunnerStats(&theSuite);
 }

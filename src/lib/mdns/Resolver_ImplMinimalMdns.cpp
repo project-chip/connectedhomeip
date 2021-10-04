@@ -341,7 +341,7 @@ public:
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
 
     ///// Resolver implementation
-    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
+    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override;
     void Shutdown() override;
     void SetResolverDelegate(ResolverDelegate * delegate) override { mDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
@@ -398,7 +398,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
     }
 }
 
-CHIP_ERROR MinMdnsResolver::Init(chip::Inet::InetLayer * inetLayer, uint16_t port)
+CHIP_ERROR MinMdnsResolver::Init(chip::Inet::InetLayer * inetLayer)
 {
     /// Note: we do not double-check the port as we assume the APP will always use
     /// the same inetLayer and port for mDNS.
@@ -409,7 +409,7 @@ CHIP_ERROR MinMdnsResolver::Init(chip::Inet::InetLayer * inetLayer, uint16_t por
 
     mSystemLayer = inetLayer->SystemLayer();
 
-    return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, port);
+    return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, kMdnsPort);
 }
 
 void MinMdnsResolver::Shutdown()

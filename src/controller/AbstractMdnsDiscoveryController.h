@@ -27,8 +27,6 @@ namespace chip {
 
 namespace Controller {
 
-constexpr uint16_t kMdnsPort = 5353;
-
 /**
  * @brief
  *   Convenient superclass for controller implementations that need to discover
