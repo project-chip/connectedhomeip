@@ -151,8 +151,8 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId,
-                                                          &DeviceLayer::SystemLayer(), &DeviceLayer::InetLayer, &err);
+    wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, &DeviceLayer::SystemLayer(),
+                                                          &DeviceLayer::InetLayer, &err);
     SuccessOrExit(err);
 
     // Create and start the IO thread. Must be called after Controller()->Init
