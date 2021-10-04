@@ -22,9 +22,9 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-#include <lib/mdns/minimal/QueryBuilder.h>
-#include <lib/mdns/minimal/Server.h>
-#include <lib/mdns/minimal/core/QName.h>
+#include <lib/dnssd/minimal_mdns/QueryBuilder.h>
+#include <lib/dnssd/minimal_mdns/Server.h>
+#include <lib/dnssd/minimal_mdns/core/QName.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>

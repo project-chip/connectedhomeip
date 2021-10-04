@@ -1053,12 +1053,12 @@
 // -------------------- Device DNS-SD Configuration --------------------
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_MDNS
+ * CHIP_DEVICE_CONFIG_ENABLE_DNSSD
  *
- * Enable support to use MDNS for service advertising and discovery in CHIP.
+ * Enable support to use DNS-SD for service advertising and discovery in CHIP.
  */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_MDNS
-#define CHIP_DEVICE_CONFIG_ENABLE_MDNS 0
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+#define CHIP_DEVICE_CONFIG_ENABLE_DNSSD 0
 #endif
 
 /**
