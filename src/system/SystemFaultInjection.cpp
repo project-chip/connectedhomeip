@@ -26,8 +26,6 @@
 /* module header, also carries config, comes first */
 #include <system/SystemFaultInjection.h>
 
-#include "SystemLayerPrivate.h"
-
 #include <nlassert.h>
 #include <string.h>
 

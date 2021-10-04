@@ -26,9 +26,6 @@
 // Include module header
 #include <system/SystemTimer.h>
 
-// Include common private header
-#include "SystemLayerPrivate.h"
-
 // Include local headers
 #include <string.h>
 

@@ -25,9 +25,6 @@
 // Include module header
 #include <system/SystemMutex.h>
 
-// Include common private header
-#include "SystemLayerPrivate.h"
-
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 // Include system headers
