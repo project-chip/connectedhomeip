@@ -38,7 +38,7 @@ namespace DeviceLayer {
 namespace PersistedStorage {
 
 /* TODO: adjust these values */
-constexpr size_t kMaxNumberOfKeys = 20;
+constexpr size_t kMaxNumberOfKeys  = 20;
 constexpr size_t kMaxKeyValueBytes = 255;
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
@@ -76,8 +76,8 @@ CHIP_ERROR RestoreFromFlash()
          */
 
         err = chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueStr(
-            chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + kMaxNumberOfKeys), key_string_id,
-			kMaxKeyValueBytes, key_string_id_size);
+            chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id + kMaxNumberOfKeys), key_string_id, kMaxKeyValueBytes,
+            key_string_id_size);
 
         if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
         {
