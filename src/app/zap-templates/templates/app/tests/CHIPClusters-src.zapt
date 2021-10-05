@@ -1,7 +1,7 @@
 {{#if (chip_has_client_clusters)}}
 {{> header}}
 
-#include "CHIPClusters.h"
+#include <zap-generated/tests/CHIPClustersTest.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/util/basic-types.h>
