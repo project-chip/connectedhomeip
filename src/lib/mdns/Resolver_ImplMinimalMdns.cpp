@@ -332,7 +332,7 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
 class MinMdnsResolver : public Resolver, public MdnsPacketDelegate
 {
 public:
-    MinMdnsResolver() : mActiveResolves(chip::System::Internal::gClockBase)
+    MinMdnsResolver() : mActiveResolves(&chip::System::SystemClock())
     {
         GlobalMinimalMdnsServer::Instance().SetResponseDelegate(this);
     }

@@ -10864,9 +10864,11 @@ private:
 | Commands:                                                           |        |
 | * Identify                                                          |   0x00 |
 | * IdentifyQuery                                                     |   0x01 |
+| * TriggerEffect                                                     |   0x40 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * IdentifyTime                                                      | 0x0000 |
+| * IdentifyType                                                      | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -10934,6 +10936,42 @@ private:
 };
 
 /*
+ * Command TriggerEffect
+ */
+class IdentifyTriggerEffect : public ModelCommand
+{
+public:
+    IdentifyTriggerEffect() : ModelCommand("trigger-effect")
+    {
+        AddArgument("EffectIdentifier", 0, UINT8_MAX, &mEffectIdentifier);
+        AddArgument("EffectVariant", 0, UINT8_MAX, &mEffectVariant);
+        ModelCommand::AddArguments();
+    }
+    ~IdentifyTriggerEffect()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0003) command (0x40) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::IdentifyCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.TriggerEffect(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mEffectIdentifier, mEffectVariant);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mEffectIdentifier;
+    uint8_t mEffectVariant;
+};
+
+/*
  * Attribute IdentifyTime
  */
 class ReadIdentifyIdentifyTime : public ModelCommand
@@ -10998,6 +11036,40 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint16_t mValue;
+};
+
+/*
+ * Attribute IdentifyType
+ */
+class ReadIdentifyIdentifyType : public ModelCommand
+{
+public:
+    ReadIdentifyIdentifyType() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "identify-type");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadIdentifyIdentifyType()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0003) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::IdentifyCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeIdentifyType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -25160,8 +25232,10 @@ void registerClusterIdentify(Commands & commands)
     commands_list clusterCommands = {
         make_unique<IdentifyIdentify>(),            //
         make_unique<IdentifyIdentifyQuery>(),       //
+        make_unique<IdentifyTriggerEffect>(),       //
         make_unique<ReadIdentifyIdentifyTime>(),    //
         make_unique<WriteIdentifyIdentifyTime>(),   //
+        make_unique<ReadIdentifyIdentifyType>(),    //
         make_unique<ReadIdentifyClusterRevision>(), //
     };
 

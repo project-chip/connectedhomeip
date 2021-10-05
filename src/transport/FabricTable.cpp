@@ -31,8 +31,6 @@ namespace chip {
 using namespace Credentials;
 using namespace Crypto;
 
-namespace Transport {
-
 CHIP_ERROR FabricInfo::SetFabricLabel(const uint8_t * fabricLabel)
 {
     const char * charFabricLabel = Uint8::to_const_char(fabricLabel);
@@ -588,5 +586,4 @@ CHIP_ERROR FabricTable::SetFabricDelegate(FabricTableDelegate * delegate)
     return CHIP_NO_ERROR;
 }
 
-} // namespace Transport
 } // namespace chip

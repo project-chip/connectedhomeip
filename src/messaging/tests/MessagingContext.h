@@ -20,7 +20,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <transport/FabricTable.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -51,7 +50,7 @@ public:
     static Inet::IPAddress GetAddress()
     {
         Inet::IPAddress addr;
-        Inet::IPAddress::FromString("127.0.0.1", addr);
+        Inet::IPAddress::FromString("::1", addr);
         return addr;
     }
     NodeId GetBobNodeId() const { return mBobNodeId; }
@@ -103,7 +102,6 @@ private:
     Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;
     SecurePairingUsingTestSecret mPairingBobToAlice;
-    Transport::FabricTable mFabrics;
     FabricIndex mSrcFabricIndex  = 0;
     FabricIndex mDestFabricIndex = 0;
 };

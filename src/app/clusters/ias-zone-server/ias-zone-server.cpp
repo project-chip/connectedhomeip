@@ -56,14 +56,17 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 #include <system/SystemLayer.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::IasZone;
 
 #define UNDEFINED_ZONE_ID 0xFF
 #define DELAY_TIMER_MS (1 * MILLISECOND_TICKS_PER_SECOND)
@@ -348,8 +351,9 @@ static void updateEnrollState(EndpointId endpoint, bool enrolled)
     emberAfIasZoneClusterPrintln("IAS Zone Server State: %pEnrolled", (enrolled ? "" : "NOT "));
 }
 
-bool emberAfIasZoneClusterZoneEnrollResponseCallback(EndpointId aEndpoint, app::CommandHandler * commandObj,
-                                                     uint8_t enrollResponseCode, uint8_t zoneId)
+bool emberAfIasZoneClusterZoneEnrollResponseCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                     EndpointId aEndpoint, uint8_t enrollResponseCode, uint8_t zoneId,
+                                                     Commands::ZoneEnrollResponse::DecodableType & commandData)
 {
     EndpointId endpoint;
     uint8_t epZoneId;
@@ -408,7 +412,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
     IasZoneStatusQueueEntry newBufferEntry;
     newBufferEntry.endpoint    = endpoint;
     newBufferEntry.status      = newStatus;
-    newBufferEntry.eventTimeMs = System::Clock::GetMonotonicMilliseconds();
+    newBufferEntry.eventTimeMs = System::SystemClock().GetMonotonicMilliseconds();
 #endif
     EmberStatus sendStatus = EMBER_SUCCESS;
 
@@ -906,7 +910,7 @@ static int16_t popFromBuffer(IasZoneStatusQueue * ring, IasZoneStatusQueueEntry 
 
 uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry)
 {
-    uint32_t currentTimeMs = System::Clock::GetMonotonicMilliseconds();
+    uint64_t currentTimeMs = System::SystemClock().GetMonotonicMilliseconds();
     int64_t deltaTimeMs    = currentTimeMs - entry->eventTimeMs;
 
     if (deltaTimeMs < 0)

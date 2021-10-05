@@ -121,8 +121,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    Transport::FabricTable fabrics;
-    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -138,7 +137,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
+    IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
@@ -148,8 +147,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    Transport::FabricTable fabrics;
-    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -226,7 +224,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
+    IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
@@ -236,8 +234,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    Transport::FabricTable fabrics;
-    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -300,7 +297,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
+    IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
@@ -310,8 +307,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    Transport::FabricTable fabrics;
-    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -415,8 +411,7 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    Transport::FabricTable fabrics;
-    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;

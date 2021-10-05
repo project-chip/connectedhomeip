@@ -2924,10 +2924,21 @@ public class ChipClusters {
       identifyQuery(chipClusterPtr, callback);
     }
 
+    public void triggerEffect(
+        DefaultClusterCallback callback, int effectIdentifier, int effectVariant) {
+      triggerEffect(chipClusterPtr, callback, effectIdentifier, effectVariant);
+    }
+
     private native void identify(
         long chipClusterPtr, DefaultClusterCallback callback, int identifyTime);
 
     private native void identifyQuery(long chipClusterPtr, IdentifyQueryResponseCallback callback);
+
+    private native void triggerEffect(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int effectIdentifier,
+        int effectVariant);
 
     public interface IdentifyQueryResponseCallback {
       void onSuccess(int timeout);
@@ -2943,6 +2954,10 @@ public class ChipClusters {
       writeIdentifyTimeAttribute(chipClusterPtr, callback, value);
     }
 
+    public void readIdentifyTypeAttribute(IntegerAttributeCallback callback) {
+      readIdentifyTypeAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -2952,6 +2967,9 @@ public class ChipClusters {
 
     private native void writeIdentifyTimeAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readIdentifyTypeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

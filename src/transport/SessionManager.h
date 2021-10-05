@@ -34,7 +34,6 @@
 #include <lib/support/DLLUtil.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/CryptoContext.h>
-#include <transport/FabricTable.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/SecureSessionTable.h>
 #include <transport/SessionHandle.h>
@@ -241,10 +240,9 @@ public:
      *
      * @param systemLayer           System, layer to use
      * @param transportMgr          Transport to use
-     * @param fabrics                A table of device administrators
      * @param messageCounterManager The message counter manager
      */
-    CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
+    CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
                     Transport::MessageCounterManagerInterface * messageCounterManager);
 
     /**
@@ -297,7 +295,6 @@ private:
 
     SessionManagerDelegate * mCB                                       = nullptr;
     TransportMgrBase * mTransportMgr                                   = nullptr;
-    Transport::FabricTable * mFabrics                                  = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;

@@ -18460,6 +18460,52 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
+JNI_METHOD(void, IdentifyCluster, triggerEffect)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint effectIdentifier, jint effectVariant)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    IdentifyCluster * cppCluster;
+
+    CHIPDefaultSuccessCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<IdentifyCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPDefaultSuccessCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->TriggerEffect(onSuccess->Cancel(), onFailure->Cancel(), effectIdentifier, effectVariant);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err.Format(), exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
 
 JNI_METHOD(void, IdentifyCluster, readIdentifyTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -18533,6 +18579,43 @@ JNI_METHOD(void, IdentifyCluster, writeIdentifyTimeAttribute)
         delete onSuccess;
         delete onFailure;
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
+    }
+}
+
+JNI_METHOD(void, IdentifyCluster, readIdentifyTypeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    IdentifyCluster * cppCluster = reinterpret_cast<IdentifyCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributeIdentifyType(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
 

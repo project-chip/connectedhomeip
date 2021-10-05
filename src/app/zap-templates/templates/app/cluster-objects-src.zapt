@@ -6,10 +6,9 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
-{{#all_user_clusters}}
-{{#if (user_cluster_has_enabled_command name side)}}
-namespace {{asCamelCased name false}} {
+namespace Clusters {
+{{#zcl_clusters}}
+namespace {{asUpperCamelCase name}} {
 {{#zcl_structs}}
 namespace {{asType label}} {
 CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) const{
@@ -22,6 +21,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) const{
     return CHIP_NO_ERROR;
 }
 
+{{#unless struct_contains_array}}
 CHIP_ERROR Type::Decode(TLV::TLVReader &reader) {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -52,11 +52,9 @@ CHIP_ERROR Type::Decode(TLV::TLVReader &reader) {
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-{{#if struct_contains_array}}
-CHIP_ERROR DecodableType::Encode(TLV::TLVWriter &writer, uint64_t tag) const{
-    return CHIP_ERROR_BAD_REQUEST;
-}
+{{/unless}}
 
+{{#if struct_contains_array}}
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -91,9 +89,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 {{/zcl_structs}}
 }
 
-{{/if}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

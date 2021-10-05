@@ -39,7 +39,7 @@
 #include <unistd.h>
 
 using chip::BitFlags;
-using chip::app::clusters::OTAProviderDelegate;
+using chip::app::Clusters::OTAProviderDelegate;
 using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
@@ -184,7 +184,7 @@ int main(int argc, char * argv[])
     otaProvider.SetQueryImageBehavior(gQueryImageBehavior);
     otaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
 
-    chip::app::clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
+    chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
 
     BitFlags<TransferControlFlags> bdxFlags;
     bdxFlags.Set(TransferControlFlags::kReceiverDrive);

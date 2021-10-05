@@ -33,7 +33,7 @@ public:
     void Animate();
 
 private:
-    int64_t mLastChangeTimeUS;
+    uint64_t mLastChangeTimeUS;
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
     gpio_num_t mGPIONum;

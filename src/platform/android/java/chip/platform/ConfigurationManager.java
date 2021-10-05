@@ -45,10 +45,6 @@ public interface ConfigurationManager {
   String kConfigKey_LastUsedEpochKeyId = "last-ek-id";
   String kConfigKey_FailSafeArmed = "fail-safe-armed";
   String kConfigKey_WiFiStationSecType = "sta-sec-type";
-  String kConfigKey_OperationalDeviceId = "op-device-id";
-  String kConfigKey_OperationalDeviceCert = "op-device-cert";
-  String kConfigKey_OperationalDeviceICACerts = "op-device-ca-certs";
-  String kConfigKey_OperationalDevicePrivateKey = "op-device-key";
   String kConfigKey_RegulatoryLocation = "regulatory-location";
   String kConfigKey_CountryCode = "country-code";
   String kConfigKey_Breadcrumb = "breadcrumb";

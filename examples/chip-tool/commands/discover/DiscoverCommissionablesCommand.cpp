@@ -23,41 +23,34 @@ using namespace ::chip;
 
 CHIP_ERROR DiscoverCommissionablesCommand::Run()
 {
-    mCommissioner = GetExecContext()->commissioner;
+    GetExecContext()->commissioner->RegisterDeviceDiscoveryDelegate(this);
+
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint64_t) 0);
-    return mCommissioner->DiscoverCommissionableNodes(filter);
+    return GetExecContext()->commissioner->DiscoverCommissionableNodes(filter);
 }
 
-void DiscoverCommissionablesCommand::Shutdown()
+void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData)
 {
-    for (int i = 0; i < mCommissioner->GetMaxCommissionableNodesSupported(); ++i)
+    char rotatingId[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
+    Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
+
+    ChipLogProgress(Discovery, "Discovered Node: ");
+    ChipLogProgress(Discovery, "\tHost name:\t\t%s", nodeData.hostName);
+    ChipLogProgress(Discovery, "\tPort:\t\t\t%u", nodeData.port);
+    ChipLogProgress(Discovery, "\tLong discriminator:\t%u", nodeData.longDiscriminator);
+    ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", nodeData.vendorId);
+    ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", nodeData.productId);
+    ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", nodeData.commissioningMode);
+    ChipLogProgress(Discovery, "\tDevice Type\t\t%u", nodeData.deviceType);
+    ChipLogProgress(Discovery, "\tDevice Name\t\t%s", nodeData.deviceName);
+    ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
+    ChipLogProgress(Discovery, "\tPairing Instruction\t%s", nodeData.pairingInstruction);
+    ChipLogProgress(Discovery, "\tPairing Hint\t\t0x%x", nodeData.pairingHint);
+    for (int i = 0; i < nodeData.numIPs; i++)
     {
-        const chip::Mdns::DiscoveredNodeData * dnsSdInfo = mCommissioner->GetDiscoveredDevice(i);
-        if (dnsSdInfo == nullptr)
-        {
-            continue;
-        }
+        char buf[chip::Inet::kMaxIPAddressStringLength];
+        nodeData.ipAddress[i].ToString(buf);
 
-        char rotatingId[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
-
-        ChipLogProgress(Discovery, "Commissionable Node %d", i);
-        ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
-        ChipLogProgress(Discovery, "\tPort:\t\t\t%u", dnsSdInfo->port);
-        ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);
-        ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->vendorId);
-        ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->productId);
-        ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", dnsSdInfo->commissioningMode);
-        ChipLogProgress(Discovery, "\tDevice Type\t\t%u", dnsSdInfo->deviceType);
-        ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->deviceName);
-        ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
-        ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
-        ChipLogProgress(Discovery, "\tPairing Hint\t\t0x%x", dnsSdInfo->pairingHint);
-        for (int j = 0; j < dnsSdInfo->numIPs; ++j)
-        {
-            char buf[chip::Inet::kMaxIPAddressStringLength];
-            dnsSdInfo->ipAddress[j].ToString(buf);
-            ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", j, buf);
-        }
+        ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", i, buf);
     }
 }

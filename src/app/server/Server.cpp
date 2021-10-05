@@ -41,14 +41,13 @@
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/FabricTable.h>
 #include <transport/SessionManager.h>
 
+using chip::kMinValidFabricIndex;
 using chip::RendezvousInformationFlag;
 using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 using chip::Inet::IPAddressType;
 using chip::Transport::BleListenParameters;
-using chip::Transport::kMinValidFabricIndex;
 using chip::Transport::PeerAddress;
 using chip::Transport::UdpListenParameters;
 
@@ -117,7 +116,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     SuccessOrExit(err);
 
-    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mFabrics, &mMessageCounterManager);
+    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager);
     SuccessOrExit(err);
 
     err = mExchangeMgr.Init(&mSessions);

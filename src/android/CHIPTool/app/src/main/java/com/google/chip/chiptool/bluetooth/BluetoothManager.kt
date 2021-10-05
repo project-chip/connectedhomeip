@@ -130,7 +130,7 @@ class BluetoothManager : BleCallback {
         wrappedCallback.onServicesDiscovered(gatt, status)
 
         Log.i("$TAG|onServicesDiscovered", "Services Discovered")
-        gatt?.requestMtu(131);
+        gatt?.requestMtu(247);
       }
 
       override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {

@@ -13,26 +13,31 @@
 # limitations under the License.
 
 name: Lint Code Base
-# yamllint disable-line rule:truthy
-on: workflow_dispatch 
-
-# On-push disabled until the workflow can run fully green
-# At that point the workflow should be enabled both on push and on PRs to not
-# allow failing links to be checked in. 
-#
-# on:
-#  push:
-#    branches:
-#      - 'master'
+on:
+    push:
+    pull_request:
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 jobs:
-  check-broken-links:
+  code-lints:
     runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]'
+
     steps:
       - uses: actions/checkout@v2
       - name: Check broken links
+        # On-push disabled until the job can run fully green
+        # At that point the step should be enabled.
+        if: github.event_name == 'workflow_dispatch'
         uses: gaurav-nelson/github-action-markdown-link-check@v1
+
+      # git grep exits with 0 if it finds a match, but we want
+      # to fail (exit nonzero) on match.  And we wasnt to exclude this file,
+      # to avoid our grep regexp matching itself.
+      - name: Check for incorrect error use in VerifyOrExit
+        run: |
+          git grep -n "VerifyOrExit(.*, [A-Za-z]*_ERROR" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0

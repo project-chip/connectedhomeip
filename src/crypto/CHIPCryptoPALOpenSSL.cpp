@@ -55,6 +55,8 @@ namespace Crypto {
 
 typedef struct stack_st_X509 X509_LIST;
 
+constexpr char kEmptyCryptoText[] = "";
+
 enum class DigestType
 {
     SHA256
@@ -131,6 +133,16 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     CHIP_ERROR error         = CHIP_NO_ERROR;
     int result               = 1;
     const EVP_CIPHER * type  = nullptr;
+
+    if (plaintext_length != 0)
+    {
+        VerifyOrExit(plaintext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(ciphertext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else if (plaintext == nullptr)
+    {
+        plaintext = Uint8::from_const_char(kEmptyCryptoText);
+    }
 
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidKeyLength(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -213,6 +225,16 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     int bytesOutput          = 0;
     int result               = 1;
     const EVP_CIPHER * type  = nullptr;
+
+    if (ciphertext_length != 0)
+    {
+        VerifyOrExit(ciphertext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(plaintext != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else if (ciphertext == nullptr)
+    {
+        ciphertext = Uint8::from_const_char(kEmptyCryptoText);
+    }
 
     VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
