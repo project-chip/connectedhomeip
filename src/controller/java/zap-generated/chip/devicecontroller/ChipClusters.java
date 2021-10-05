@@ -2430,6 +2430,14 @@ public class ChipClusters {
 
     private native void resetCounts(long chipClusterPtr, DefaultClusterCallback callback);
 
+    public void readPHYRateAttribute(IntegerAttributeCallback callback) {
+      readPHYRateAttribute(chipClusterPtr, callback);
+    }
+
+    public void readFullDuplexAttribute(BooleanAttributeCallback callback) {
+      readFullDuplexAttribute(chipClusterPtr, callback);
+    }
+
     public void readPacketRxCountAttribute(LongAttributeCallback callback) {
       readPacketRxCountAttribute(chipClusterPtr, callback);
     }
@@ -2450,9 +2458,23 @@ public class ChipClusters {
       readOverrunCountAttribute(chipClusterPtr, callback);
     }
 
+    public void readCarrierDetectAttribute(BooleanAttributeCallback callback) {
+      readCarrierDetectAttribute(chipClusterPtr, callback);
+    }
+
+    public void readTimeSinceResetAttribute(LongAttributeCallback callback) {
+      readTimeSinceResetAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
+
+    private native void readPHYRateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readFullDuplexAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
 
     private native void readPacketRxCountAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
@@ -2467,6 +2489,12 @@ public class ChipClusters {
         long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readOverrunCountAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void readCarrierDetectAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void readTimeSinceResetAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(

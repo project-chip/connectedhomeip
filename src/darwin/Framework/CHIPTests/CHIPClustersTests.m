@@ -10829,6 +10829,48 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterEthernetNetworkDiagnosticsReadAttributePHYRateWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"EthernetNetworkDiagnosticsReadAttributePHYRateWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributePHYRateWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"EthernetNetworkDiagnostics PHYRate Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterEthernetNetworkDiagnosticsReadAttributeFullDuplexWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"EthernetNetworkDiagnosticsReadAttributeFullDuplexWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFullDuplexWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"EthernetNetworkDiagnostics FullDuplex Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterEthernetNetworkDiagnosticsReadAttributePacketRxCountWithResponseHandler
 {
     XCTestExpectation * expectation =
@@ -10927,6 +10969,48 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
 
     [cluster readAttributeOverrunCountWithResponseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"EthernetNetworkDiagnostics OverrunCount Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterEthernetNetworkDiagnosticsReadAttributeCarrierDetectWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"EthernetNetworkDiagnosticsReadAttributeCarrierDetectWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCarrierDetectWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"EthernetNetworkDiagnostics CarrierDetect Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterEthernetNetworkDiagnosticsReadAttributeTimeSinceResetWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"EthernetNetworkDiagnosticsReadAttributeTimeSinceResetWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPEthernetNetworkDiagnostics * cluster = [[CHIPEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTimeSinceResetWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"EthernetNetworkDiagnostics TimeSinceReset Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

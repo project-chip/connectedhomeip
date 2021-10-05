@@ -1985,6 +1985,41 @@ CHIP_ERROR ElectricalMeasurementClusterTest::WriteAttributeClusterRevision(Callb
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePHYRate(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback, uint8_t pHYRate)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::PHYRate::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, pHYRate));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeFullDuplex(Callback::Cancelable * onSuccessCallback,
+                                                                           Callback::Cancelable * onFailureCallback,
+                                                                           bool fullDuplex)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::FullDuplex::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, fullDuplex));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
 CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributePacketRxCount(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint64_t packetRxCount)
@@ -2071,6 +2106,42 @@ CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeOverrunCount(Cal
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
     ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, overrunCount));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeCarrierDetect(Callback::Cancelable * onSuccessCallback,
+                                                                              Callback::Cancelable * onFailureCallback,
+                                                                              bool carrierDetect)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, carrierDetect));
+
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR EthernetNetworkDiagnosticsClusterTest::WriteAttributeTimeSinceReset(Callback::Cancelable * onSuccessCallback,
+                                                                               Callback::Cancelable * onFailureCallback,
+                                                                               uint64_t timeSinceReset)
+{
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle.EncodeScalarAttributeWritePayload(attributePath, timeSinceReset));
 
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }

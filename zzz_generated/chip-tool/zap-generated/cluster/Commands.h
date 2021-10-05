@@ -9502,11 +9502,15 @@ private:
 | * ResetCounts                                                       |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * PHYRate                                                           | 0x0000 |
+| * FullDuplex                                                        | 0x0001 |
 | * PacketRxCount                                                     | 0x0002 |
 | * PacketTxCount                                                     | 0x0003 |
 | * TxErrCount                                                        | 0x0004 |
 | * CollisionCount                                                    | 0x0005 |
 | * OverrunCount                                                      | 0x0006 |
+| * CarrierDetect                                                     | 0x0007 |
+| * TimeSinceReset                                                    | 0x0008 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -9535,6 +9539,74 @@ public:
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute PHYRate
+ */
+class ReadEthernetNetworkDiagnosticsPHYRate : public ModelCommand
+{
+public:
+    ReadEthernetNetworkDiagnosticsPHYRate() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "phyrate");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadEthernetNetworkDiagnosticsPHYRate()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0037) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributePHYRate(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute FullDuplex
+ */
+class ReadEthernetNetworkDiagnosticsFullDuplex : public ModelCommand
+{
+public:
+    ReadEthernetNetworkDiagnosticsFullDuplex() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "full-duplex");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadEthernetNetworkDiagnosticsFullDuplex()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0037) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFullDuplex(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -9700,6 +9772,74 @@ public:
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeOverrunCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute CarrierDetect
+ */
+class ReadEthernetNetworkDiagnosticsCarrierDetect : public ModelCommand
+{
+public:
+    ReadEthernetNetworkDiagnosticsCarrierDetect() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "carrier-detect");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadEthernetNetworkDiagnosticsCarrierDetect()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0037) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCarrierDetect(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute TimeSinceReset
+ */
+class ReadEthernetNetworkDiagnosticsTimeSinceReset : public ModelCommand
+{
+public:
+    ReadEthernetNetworkDiagnosticsTimeSinceReset() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "time-since-reset");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadEthernetNetworkDiagnosticsTimeSinceReset()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0037) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeTimeSinceReset(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -25131,11 +25271,15 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<EthernetNetworkDiagnosticsResetCounts>(),         //
+        make_unique<ReadEthernetNetworkDiagnosticsPHYRate>(),         //
+        make_unique<ReadEthernetNetworkDiagnosticsFullDuplex>(),      //
         make_unique<ReadEthernetNetworkDiagnosticsPacketRxCount>(),   //
         make_unique<ReadEthernetNetworkDiagnosticsPacketTxCount>(),   //
         make_unique<ReadEthernetNetworkDiagnosticsTxErrCount>(),      //
         make_unique<ReadEthernetNetworkDiagnosticsCollisionCount>(),  //
         make_unique<ReadEthernetNetworkDiagnosticsOverrunCount>(),    //
+        make_unique<ReadEthernetNetworkDiagnosticsCarrierDetect>(),   //
+        make_unique<ReadEthernetNetworkDiagnosticsTimeSinceReset>(),  //
         make_unique<ReadEthernetNetworkDiagnosticsClusterRevision>(), //
     };
 

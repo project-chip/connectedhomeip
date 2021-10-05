@@ -2027,6 +2027,20 @@ using chip::Callback::Cancelable;
     });
 }
 
+- (void)readAttributePHYRateWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributePHYRate(success, failure);
+    });
+}
+
+- (void)readAttributeFullDuplexWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeFullDuplex(success, failure);
+    });
+}
+
 - (void)readAttributePacketRxCountWithResponseHandler:(ResponseHandler)responseHandler
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -2059,6 +2073,20 @@ using chip::Callback::Cancelable;
 {
     new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
         return self.cppCluster.ReadAttributeOverrunCount(success, failure);
+    });
+}
+
+- (void)readAttributeCarrierDetectWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeCarrierDetect(success, failure);
+    });
+}
+
+- (void)readAttributeTimeSinceResetWithResponseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.ReadAttributeTimeSinceReset(success, failure);
     });
 }
 

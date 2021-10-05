@@ -4903,6 +4903,30 @@ exit:
 }
 
 // EthernetNetworkDiagnostics Cluster Attributes
+CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributePHYRate(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000000;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeFullDuplex(Callback::Cancelable * onSuccessCallback,
+                                                                      Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000001;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<BooleanAttributeCallback>);
+}
+
 CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributePacketRxCount(Callback::Cancelable * onSuccessCallback,
                                                                          Callback::Cancelable * onFailureCallback)
 {
@@ -4958,6 +4982,30 @@ CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeOverrunCount(Callback
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000006;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int64uAttributeCallback>);
+}
+
+CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeCarrierDetect(Callback::Cancelable * onSuccessCallback,
+                                                                         Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000007;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<BooleanAttributeCallback>);
+}
+
+CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeTimeSinceReset(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000008;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<Int64uAttributeCallback>);
