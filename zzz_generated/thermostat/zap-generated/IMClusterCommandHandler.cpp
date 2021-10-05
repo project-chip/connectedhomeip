@@ -38,12 +38,8 @@ namespace app {
 namespace {
 void ReportCommandUnsupported(Command * aCommandObj, const ConcreteCommandPath & aCommandPath)
 {
-    CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                            0, // GroupId
-                                            aCommandPath.mClusterId, aCommandPath.mCommandId,
-                                            (CommandPathFlags::kEndpointIdValid) };
-    aCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                               Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::UnsupportedCommand);
+    aCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
+                               Protocols::InteractionModel::Status::UnsupportedCommand);
     ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
                  ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
 }
@@ -228,11 +224,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                AdministratorCommissioning::Id, aCommandPath.mCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -341,10 +333,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                BarrierControl::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -539,10 +528,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                Binding::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -1639,10 +1625,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                ColorControl::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -1753,10 +1736,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                DiagnosticLogs::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -3177,10 +3157,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                DoorLock::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -3371,11 +3348,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                GeneralCommissioning::Id, aCommandPath.mCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -3739,10 +3712,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                Groups::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -3848,10 +3818,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                IasZone::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -3960,10 +3927,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                Identify::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -4494,10 +4458,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                LevelControl::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -4545,10 +4506,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                LowPower::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -5202,11 +5160,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                NetworkCommissioning::Id, aCommandPath.mCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -5466,11 +5420,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                OtaSoftwareUpdateProvider::Id, aCommandPath.mCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -5530,10 +5480,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                OnOff::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -6137,11 +6084,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                OperationalCredentials::Id, aCommandPath.mCommandId,
-                                                (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -6642,10 +6585,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                Scenes::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -6707,10 +6647,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                TestCluster::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -6961,10 +6898,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
-                                                0, // GroupId
-                                                Thermostat::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
@@ -7054,10 +6988,7 @@ void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, En
         break;
     default:
         // Unrecognized cluster ID, error status will apply.
-        CommandPathParams returnStatusParam = { aEndPointId,
-                                                0, // GroupId
-                                                aClusterId, aCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+        apCommandObj->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogError(Zcl, "Unknown cluster %" PRIx32, aClusterId);
         break;
@@ -7080,10 +7011,7 @@ void DispatchSingleClusterResponseCommand(ClusterId aClusterId, CommandId aComma
     {
     default:
         // Unrecognized cluster ID, error status will apply.
-        CommandPathParams returnStatusParam = { aEndPointId,
-                                                0, // GroupId
-                                                aClusterId, aCommandId, (CommandPathFlags::kEndpointIdValid) };
-        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+        apCommandObj->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aClusterId));
         break;
