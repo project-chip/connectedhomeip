@@ -1,4 +1,4 @@
-# NOTE: /workspace/ is the persistent directory across steps for
+# NOTE: /workspace/ is the persistent directory across steps
 steps:
     - name: "connectedhomeip/chip-build-vscode:0.5.11"
       id: "CompileAll"
