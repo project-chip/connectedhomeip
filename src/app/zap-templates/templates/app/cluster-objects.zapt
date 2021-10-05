@@ -63,6 +63,20 @@ namespace {{name}} {
 } // namespace {{name}}
 {{/zcl_structs}}
 
+{{#zcl_commands}}
+{{#first}}
+namespace Commands {
+{{/first}}
+namespace {{asUpperCamelCase name}} {
+struct Type {};
+
+struct DecodableType {};
+} // namespace {{asUpperCamelCase name}}
+
+{{#last}}
+} // namespace Commands
+{{/last}}
+{{/zcl_commands}}
 } // namespace {{asUpperCamelCase name}}
 {{/zcl_clusters}}
 

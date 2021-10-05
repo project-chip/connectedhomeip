@@ -22,12 +22,15 @@
  ******************************************************************************/
 
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <string>
 
 using namespace chip;
+using namespace chip::app::Clusters::AccountLogin;
 
 bool accountLoginClusterIsUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin);
 std::string accountLoginClusterGetSetupPin(std::string requestTempAccountIdentifier, EndpointId endpoint);
@@ -49,8 +52,9 @@ exit:
     }
 }
 
-bool emberAfAccountLoginClusterGetSetupPINCallback(EndpointId endpoint, app::CommandHandler * command,
-                                                   uint8_t * tempAccountIdentifier)
+bool emberAfAccountLoginClusterGetSetupPINCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                   EndpointId endpoint, uint8_t * tempAccountIdentifier,
+                                                   Commands::GetSetupPIN::DecodableType & commandData)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));
@@ -59,8 +63,9 @@ bool emberAfAccountLoginClusterGetSetupPINCallback(EndpointId endpoint, app::Com
     return true;
 }
 
-bool emberAfAccountLoginClusterLoginCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t * tempAccountIdentifier,
-                                             uint8_t * tempSetupPin)
+bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                             EndpointId endpoint, uint8_t * tempAccountIdentifier, uint8_t * tempSetupPin,
+                                             Commands::Login::DecodableType & commandData)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));

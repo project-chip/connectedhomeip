@@ -23,6 +23,7 @@
 #include "app/util/util.h"
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 
@@ -35,15 +36,16 @@ namespace chip {
 namespace app {
 
 namespace {
-void ReportCommandUnsupported(Command * aCommandObj, EndpointId aEndpointId, ClusterId aClusterId, CommandId aCommandId)
+void ReportCommandUnsupported(Command * aCommandObj, const ConcreteCommandPath & aCommandPath)
 {
-    CommandPathParams returnStatusParam = { aEndpointId,
+    CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                             0, // GroupId
-                                            aClusterId, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                            aCommandPath.mClusterId, aCommandPath.mCommandId,
+                                            (CommandPathFlags::kEndpointIdValid) };
     aCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::UnsupportedCommand);
-    ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandId),
-                 ChipLogValueMEI(aClusterId));
+    ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
+                 ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
 }
 } // anonymous namespace
 
@@ -53,7 +55,7 @@ namespace Clusters {
 
 namespace AccountLogin {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -66,9 +68,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::GetSetupPIN::Id: {
+            Commands::GetSetupPIN::DecodableType commandData;
             expectArgumentCount = 1;
             const uint8_t * tempAccountIdentifier;
             bool argExists[1];
@@ -123,12 +126,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfAccountLoginClusterGetSetupPINCallback(aEndpointId, apCommandObj,
-                                                                           const_cast<uint8_t *>(tempAccountIdentifier));
+                wasHandled =
+                    emberAfAccountLoginClusterGetSetupPINCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                  const_cast<uint8_t *>(tempAccountIdentifier), commandData);
             }
             break;
         }
         case Commands::Login::Id: {
+            Commands::Login::DecodableType commandData;
             expectArgumentCount = 2;
             const uint8_t * tempAccountIdentifier;
             const uint8_t * setupPIN;
@@ -188,14 +193,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfAccountLoginClusterLoginCallback(
-                    aEndpointId, apCommandObj, const_cast<uint8_t *>(tempAccountIdentifier), const_cast<uint8_t *>(setupPIN));
+                wasHandled = emberAfAccountLoginClusterLoginCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                     const_cast<uint8_t *>(tempAccountIdentifier),
+                                                                     const_cast<uint8_t *>(setupPIN), commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, AccountLogin::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -203,9 +209,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                AccountLogin::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                AccountLogin::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -223,7 +229,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace AdministratorCommissioning {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -236,9 +242,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::OpenBasicCommissioningWindow::Id: {
+            Commands::OpenBasicCommissioningWindow::DecodableType commandData;
             expectArgumentCount = 1;
             uint16_t CommissioningTimeout;
             bool argExists[1];
@@ -292,12 +299,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(aEndpointId, apCommandObj,
-                                                                                                          CommissioningTimeout);
+                wasHandled = emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, CommissioningTimeout, commandData);
             }
             break;
         }
         case Commands::OpenCommissioningWindow::Id: {
+            Commands::OpenCommissioningWindow::DecodableType commandData;
             expectArgumentCount = 6;
             uint16_t CommissioningTimeout;
             chip::ByteSpan PAKEVerifier;
@@ -372,18 +380,21 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 6 == validArgumentCount)
             {
                 wasHandled = emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
-                    aEndpointId, apCommandObj, CommissioningTimeout, PAKEVerifier, Discriminator, Iterations, Salt, PasscodeID);
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, CommissioningTimeout, PAKEVerifier, Discriminator,
+                    Iterations, Salt, PasscodeID, commandData);
             }
             break;
         }
         case Commands::RevokeCommissioning::Id: {
+            Commands::RevokeCommissioning::DecodableType commandData;
 
-            wasHandled = emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(aEndpointId, apCommandObj);
+            wasHandled = emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(apCommandObj, aCommandPath,
+                                                                                             aCommandPath.mEndpointId, commandData);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, AdministratorCommissioning::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -391,9 +402,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                AdministratorCommissioning::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                AdministratorCommissioning::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -411,7 +423,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace ApplicationBasic {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -424,9 +436,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::ChangeStatus::Id: {
+            Commands::ChangeStatus::DecodableType commandData;
             expectArgumentCount = 1;
             uint8_t status;
             bool argExists[1];
@@ -480,13 +493,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfApplicationBasicClusterChangeStatusCallback(aEndpointId, apCommandObj, status);
+                wasHandled = emberAfApplicationBasicClusterChangeStatusCallback(apCommandObj, aCommandPath,
+                                                                                aCommandPath.mEndpointId, status, commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, ApplicationBasic::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -494,9 +508,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                ApplicationBasic::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                ApplicationBasic::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -514,7 +529,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace ApplicationLauncher {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -527,9 +542,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::LaunchApp::Id: {
+            Commands::LaunchApp::DecodableType commandData;
             expectArgumentCount = 3;
             const uint8_t * data;
             uint16_t catalogVendorId;
@@ -594,13 +610,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
                 wasHandled = emberAfApplicationLauncherClusterLaunchAppCallback(
-                    aEndpointId, apCommandObj, const_cast<uint8_t *>(data), catalogVendorId, const_cast<uint8_t *>(applicationId));
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, const_cast<uint8_t *>(data), catalogVendorId,
+                    const_cast<uint8_t *>(applicationId), commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, ApplicationLauncher::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -608,9 +625,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                ApplicationLauncher::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                ApplicationLauncher::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -628,7 +646,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace AudioOutput {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -641,9 +659,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::RenameOutput::Id: {
+            Commands::RenameOutput::DecodableType commandData;
             expectArgumentCount = 2;
             uint8_t index;
             const uint8_t * name;
@@ -702,12 +721,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfAudioOutputClusterRenameOutputCallback(aEndpointId, apCommandObj, index, const_cast<uint8_t *>(name));
+                wasHandled = emberAfAudioOutputClusterRenameOutputCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                           index, const_cast<uint8_t *>(name), commandData);
             }
             break;
         }
         case Commands::SelectOutput::Id: {
+            Commands::SelectOutput::DecodableType commandData;
             expectArgumentCount = 1;
             uint8_t index;
             bool argExists[1];
@@ -761,13 +781,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfAudioOutputClusterSelectOutputCallback(aEndpointId, apCommandObj, index);
+                wasHandled = emberAfAudioOutputClusterSelectOutputCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                           index, commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, AudioOutput::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -775,9 +796,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                AudioOutput::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                AudioOutput::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -795,16 +816,16 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace Basic {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
-    ReportCommandUnsupported(apCommandObj, aEndpointId, Basic::Id, aCommandId);
+    ReportCommandUnsupported(apCommandObj, aCommandPath);
 }
 
 } // namespace Basic
 
 namespace Binding {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -817,9 +838,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::Bind::Id: {
+            Commands::Bind::DecodableType commandData;
             expectArgumentCount = 4;
             chip::NodeId nodeId;
             chip::GroupId groupId;
@@ -885,11 +907,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfBindingClusterBindCallback(aEndpointId, apCommandObj, nodeId, groupId, endpointId, clusterId);
+                wasHandled = emberAfBindingClusterBindCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, nodeId,
+                                                               groupId, endpointId, clusterId, commandData);
             }
             break;
         }
         case Commands::Unbind::Id: {
+            Commands::Unbind::DecodableType commandData;
             expectArgumentCount = 4;
             chip::NodeId nodeId;
             chip::GroupId groupId;
@@ -955,13 +979,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfBindingClusterUnbindCallback(aEndpointId, apCommandObj, nodeId, groupId, endpointId, clusterId);
+                wasHandled = emberAfBindingClusterUnbindCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, nodeId,
+                                                                 groupId, endpointId, clusterId, commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, Binding::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -969,9 +994,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                Binding::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                Binding::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -989,7 +1014,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace ContentLauncher {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -1002,9 +1027,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::LaunchContent::Id: {
+            Commands::LaunchContent::DecodableType commandData;
             expectArgumentCount = 2;
             bool autoPlay;
             const uint8_t * data;
@@ -1063,12 +1089,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfContentLauncherClusterLaunchContentCallback(aEndpointId, apCommandObj, autoPlay,
-                                                                                const_cast<uint8_t *>(data));
+                wasHandled = emberAfContentLauncherClusterLaunchContentCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, autoPlay, const_cast<uint8_t *>(data), commandData);
             }
             break;
         }
         case Commands::LaunchURL::Id: {
+            Commands::LaunchURL::DecodableType commandData;
             expectArgumentCount = 2;
             const uint8_t * contentURL;
             const uint8_t * displayString;
@@ -1128,14 +1155,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfContentLauncherClusterLaunchURLCallback(
-                    aEndpointId, apCommandObj, const_cast<uint8_t *>(contentURL), const_cast<uint8_t *>(displayString));
+                wasHandled = emberAfContentLauncherClusterLaunchURLCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                            const_cast<uint8_t *>(contentURL),
+                                                                            const_cast<uint8_t *>(displayString), commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, ContentLauncher::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -1143,9 +1171,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                ContentLauncher::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                ContentLauncher::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -1163,7 +1192,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace DiagnosticLogs {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -1176,9 +1205,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::RetrieveLogsRequest::Id: {
+            Commands::RetrieveLogsRequest::DecodableType commandData;
             expectArgumentCount = 3;
             uint8_t intent;
             uint8_t requestedProtocol;
@@ -1240,14 +1270,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(aEndpointId, apCommandObj, intent,
-                                                                                     requestedProtocol, transferFileDesignator);
+                wasHandled = emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, intent, requestedProtocol, transferFileDesignator,
+                    commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, DiagnosticLogs::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -1255,9 +1286,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                DiagnosticLogs::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                DiagnosticLogs::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -1275,7 +1306,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace GeneralCommissioning {
 
-void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -1288,7 +1319,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::ArmFailSafeResponse::Id: {
             expectArgumentCount = 2;
@@ -1349,8 +1380,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(aEndpointId, apCommandObj, errorCode,
-                                                                                           const_cast<uint8_t *>(debugText));
+                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(
+                    aCommandPath.mEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -1414,7 +1445,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    aCommandPath.mEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -1478,13 +1509,13 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    aCommandPath.mEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, GeneralCommissioning::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -1492,9 +1523,10 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                GeneralCommissioning::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                GeneralCommissioning::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -1512,7 +1544,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
 namespace GeneralCommissioning {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -1525,9 +1557,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::ArmFailSafe::Id: {
+            Commands::ArmFailSafe::DecodableType commandData;
             expectArgumentCount = 3;
             uint16_t expiryLengthSeconds;
             uint64_t breadcrumb;
@@ -1589,17 +1622,20 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeCallback(aEndpointId, apCommandObj, expiryLengthSeconds,
-                                                                                   breadcrumb, timeoutMs);
+                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, expiryLengthSeconds, breadcrumb, timeoutMs, commandData);
             }
             break;
         }
         case Commands::CommissioningComplete::Id: {
+            Commands::CommissioningComplete::DecodableType commandData;
 
-            wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(aEndpointId, apCommandObj);
+            wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj, aCommandPath,
+                                                                                         aCommandPath.mEndpointId, commandData);
             break;
         }
         case Commands::SetRegulatoryConfig::Id: {
+            Commands::SetRegulatoryConfig::DecodableType commandData;
             expectArgumentCount = 4;
             uint8_t location;
             const uint8_t * countryCode;
@@ -1667,13 +1703,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
                 wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(
-                    aEndpointId, apCommandObj, location, const_cast<uint8_t *>(countryCode), breadcrumb, timeoutMs);
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, location, const_cast<uint8_t *>(countryCode), breadcrumb,
+                    timeoutMs, commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, GeneralCommissioning::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -1681,9 +1718,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                GeneralCommissioning::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                GeneralCommissioning::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -1701,7 +1739,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace KeypadInput {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -1714,9 +1752,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::SendKey::Id: {
+            Commands::SendKey::DecodableType commandData;
             expectArgumentCount = 1;
             uint8_t keyCode;
             bool argExists[1];
@@ -1770,13 +1809,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfKeypadInputClusterSendKeyCallback(aEndpointId, apCommandObj, keyCode);
+                wasHandled = emberAfKeypadInputClusterSendKeyCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, keyCode,
+                                                                      commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, KeypadInput::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -1784,9 +1824,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                KeypadInput::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                KeypadInput::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -1804,7 +1844,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace LevelControl {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -1817,9 +1857,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::Move::Id: {
+            Commands::Move::DecodableType commandData;
             expectArgumentCount = 4;
             uint8_t moveMode;
             uint8_t rate;
@@ -1885,12 +1926,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfLevelControlClusterMoveCallback(aEndpointId, apCommandObj, moveMode, rate, optionMask, optionOverride);
+                wasHandled = emberAfLevelControlClusterMoveCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, moveMode,
+                                                                    rate, optionMask, optionOverride, commandData);
             }
             break;
         }
         case Commands::MoveToLevel::Id: {
+            Commands::MoveToLevel::DecodableType commandData;
             expectArgumentCount = 4;
             uint8_t level;
             uint16_t transitionTime;
@@ -1956,12 +1998,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfLevelControlClusterMoveToLevelCallback(aEndpointId, apCommandObj, level, transitionTime,
-                                                                           optionMask, optionOverride);
+                wasHandled =
+                    emberAfLevelControlClusterMoveToLevelCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, level,
+                                                                  transitionTime, optionMask, optionOverride, commandData);
             }
             break;
         }
         case Commands::MoveToLevelWithOnOff::Id: {
+            Commands::MoveToLevelWithOnOff::DecodableType commandData;
             expectArgumentCount = 2;
             uint8_t level;
             uint16_t transitionTime;
@@ -2019,12 +2063,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfLevelControlClusterMoveToLevelWithOnOffCallback(aEndpointId, apCommandObj, level, transitionTime);
+                wasHandled = emberAfLevelControlClusterMoveToLevelWithOnOffCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, level, transitionTime, commandData);
             }
             break;
         }
         case Commands::MoveWithOnOff::Id: {
+            Commands::MoveWithOnOff::DecodableType commandData;
             expectArgumentCount = 2;
             uint8_t moveMode;
             uint8_t rate;
@@ -2082,11 +2127,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfLevelControlClusterMoveWithOnOffCallback(aEndpointId, apCommandObj, moveMode, rate);
+                wasHandled = emberAfLevelControlClusterMoveWithOnOffCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                             moveMode, rate, commandData);
             }
             break;
         }
         case Commands::Step::Id: {
+            Commands::Step::DecodableType commandData;
             expectArgumentCount = 5;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -2156,12 +2203,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
-                wasHandled = emberAfLevelControlClusterStepCallback(aEndpointId, apCommandObj, stepMode, stepSize, transitionTime,
-                                                                    optionMask, optionOverride);
+                wasHandled =
+                    emberAfLevelControlClusterStepCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, stepMode, stepSize,
+                                                           transitionTime, optionMask, optionOverride, commandData);
             }
             break;
         }
         case Commands::StepWithOnOff::Id: {
+            Commands::StepWithOnOff::DecodableType commandData;
             expectArgumentCount = 3;
             uint8_t stepMode;
             uint8_t stepSize;
@@ -2223,12 +2272,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfLevelControlClusterStepWithOnOffCallback(aEndpointId, apCommandObj, stepMode, stepSize, transitionTime);
+                wasHandled = emberAfLevelControlClusterStepWithOnOffCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                             stepMode, stepSize, transitionTime, commandData);
             }
             break;
         }
         case Commands::Stop::Id: {
+            Commands::Stop::DecodableType commandData;
             expectArgumentCount = 2;
             uint8_t optionMask;
             uint8_t optionOverride;
@@ -2286,18 +2336,21 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfLevelControlClusterStopCallback(aEndpointId, apCommandObj, optionMask, optionOverride);
+                wasHandled = emberAfLevelControlClusterStopCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                    optionMask, optionOverride, commandData);
             }
             break;
         }
         case Commands::StopWithOnOff::Id: {
+            Commands::StopWithOnOff::DecodableType commandData;
 
-            wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(aEndpointId, apCommandObj);
+            wasHandled =
+                emberAfLevelControlClusterStopWithOnOffCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, LevelControl::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -2305,9 +2358,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                LevelControl::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                LevelControl::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -2325,7 +2378,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace LowPower {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2338,16 +2391,17 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::Sleep::Id: {
+            Commands::Sleep::DecodableType commandData;
 
-            wasHandled = emberAfLowPowerClusterSleepCallback(aEndpointId, apCommandObj);
+            wasHandled = emberAfLowPowerClusterSleepCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, LowPower::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -2355,9 +2409,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                LowPower::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                LowPower::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -2375,7 +2429,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace MediaInput {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2388,14 +2442,17 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::HideInputStatus::Id: {
+            Commands::HideInputStatus::DecodableType commandData;
 
-            wasHandled = emberAfMediaInputClusterHideInputStatusCallback(aEndpointId, apCommandObj);
+            wasHandled =
+                emberAfMediaInputClusterHideInputStatusCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         case Commands::RenameInput::Id: {
+            Commands::RenameInput::DecodableType commandData;
             expectArgumentCount = 2;
             uint8_t index;
             const uint8_t * name;
@@ -2454,12 +2511,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfMediaInputClusterRenameInputCallback(aEndpointId, apCommandObj, index, const_cast<uint8_t *>(name));
+                wasHandled = emberAfMediaInputClusterRenameInputCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                         index, const_cast<uint8_t *>(name), commandData);
             }
             break;
         }
         case Commands::SelectInput::Id: {
+            Commands::SelectInput::DecodableType commandData;
             expectArgumentCount = 1;
             uint8_t index;
             bool argExists[1];
@@ -2513,18 +2571,21 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfMediaInputClusterSelectInputCallback(aEndpointId, apCommandObj, index);
+                wasHandled = emberAfMediaInputClusterSelectInputCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                         index, commandData);
             }
             break;
         }
         case Commands::ShowInputStatus::Id: {
+            Commands::ShowInputStatus::DecodableType commandData;
 
-            wasHandled = emberAfMediaInputClusterShowInputStatusCallback(aEndpointId, apCommandObj);
+            wasHandled =
+                emberAfMediaInputClusterShowInputStatusCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, MediaInput::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -2532,9 +2593,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                MediaInput::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                MediaInput::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -2552,7 +2613,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace MediaPlayback {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2565,39 +2626,52 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::MediaFastForward::Id: {
+            Commands::MediaFastForward::DecodableType commandData;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaFastForwardCallback(aEndpointId, apCommandObj);
+            wasHandled = emberAfMediaPlaybackClusterMediaFastForwardCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                             commandData);
             break;
         }
         case Commands::MediaNext::Id: {
+            Commands::MediaNext::DecodableType commandData;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaNextCallback(aEndpointId, apCommandObj);
+            wasHandled =
+                emberAfMediaPlaybackClusterMediaNextCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         case Commands::MediaPause::Id: {
+            Commands::MediaPause::DecodableType commandData;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaPauseCallback(aEndpointId, apCommandObj);
+            wasHandled =
+                emberAfMediaPlaybackClusterMediaPauseCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         case Commands::MediaPlay::Id: {
+            Commands::MediaPlay::DecodableType commandData;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaPlayCallback(aEndpointId, apCommandObj);
+            wasHandled =
+                emberAfMediaPlaybackClusterMediaPlayCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         case Commands::MediaPrevious::Id: {
+            Commands::MediaPrevious::DecodableType commandData;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaPreviousCallback(aEndpointId, apCommandObj);
+            wasHandled =
+                emberAfMediaPlaybackClusterMediaPreviousCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         case Commands::MediaRewind::Id: {
+            Commands::MediaRewind::DecodableType commandData;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaRewindCallback(aEndpointId, apCommandObj);
+            wasHandled =
+                emberAfMediaPlaybackClusterMediaRewindCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         case Commands::MediaSeek::Id: {
+            Commands::MediaSeek::DecodableType commandData;
             expectArgumentCount = 1;
             uint64_t position;
             bool argExists[1];
@@ -2651,11 +2725,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaSeekCallback(aEndpointId, apCommandObj, position);
+                wasHandled = emberAfMediaPlaybackClusterMediaSeekCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                          position, commandData);
             }
             break;
         }
         case Commands::MediaSkipBackward::Id: {
+            Commands::MediaSkipBackward::DecodableType commandData;
             expectArgumentCount = 1;
             uint64_t deltaPositionMilliseconds;
             bool argExists[1];
@@ -2709,12 +2785,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfMediaPlaybackClusterMediaSkipBackwardCallback(aEndpointId, apCommandObj, deltaPositionMilliseconds);
+                wasHandled = emberAfMediaPlaybackClusterMediaSkipBackwardCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, deltaPositionMilliseconds, commandData);
             }
             break;
         }
         case Commands::MediaSkipForward::Id: {
+            Commands::MediaSkipForward::DecodableType commandData;
             expectArgumentCount = 1;
             uint64_t deltaPositionMilliseconds;
             bool argExists[1];
@@ -2768,24 +2845,28 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfMediaPlaybackClusterMediaSkipForwardCallback(aEndpointId, apCommandObj, deltaPositionMilliseconds);
+                wasHandled = emberAfMediaPlaybackClusterMediaSkipForwardCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, deltaPositionMilliseconds, commandData);
             }
             break;
         }
         case Commands::MediaStartOver::Id: {
+            Commands::MediaStartOver::DecodableType commandData;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaStartOverCallback(aEndpointId, apCommandObj);
+            wasHandled = emberAfMediaPlaybackClusterMediaStartOverCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                           commandData);
             break;
         }
         case Commands::MediaStop::Id: {
+            Commands::MediaStop::DecodableType commandData;
 
-            wasHandled = emberAfMediaPlaybackClusterMediaStopCallback(aEndpointId, apCommandObj);
+            wasHandled =
+                emberAfMediaPlaybackClusterMediaStopCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, MediaPlayback::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -2793,9 +2874,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                MediaPlayback::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                MediaPlayback::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -2813,7 +2894,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace NetworkCommissioning {
 
-void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2826,7 +2907,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::AddThreadNetworkResponse::Id: {
             expectArgumentCount = 2;
@@ -2888,7 +2969,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    aCommandPath.mEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -2951,8 +3032,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
-                                                                                              const_cast<uint8_t *>(debugText));
+                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(
+                    aCommandPath.mEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -3015,8 +3096,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
-                                                                                              const_cast<uint8_t *>(debugText));
+                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(
+                    aCommandPath.mEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -3079,8 +3160,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
-                                                                                             const_cast<uint8_t *>(debugText));
+                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(
+                    aCommandPath.mEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -3143,8 +3224,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
-                                                                                             const_cast<uint8_t *>(debugText));
+                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(
+                    aCommandPath.mEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -3218,7 +3299,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
                 wasHandled = emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText), wifiScanResults, threadScanResults);
+                    aCommandPath.mEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText), wifiScanResults,
+                    threadScanResults);
             }
             break;
         }
@@ -3282,7 +3364,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    aCommandPath.mEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -3346,13 +3428,13 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(
-                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    aCommandPath.mEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, NetworkCommissioning::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -3360,9 +3442,10 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                NetworkCommissioning::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                NetworkCommissioning::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -3380,7 +3463,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
 namespace NetworkCommissioning {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -3393,9 +3476,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::AddThreadNetwork::Id: {
+            Commands::AddThreadNetwork::DecodableType commandData;
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -3457,12 +3541,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkCallback(aEndpointId, apCommandObj,
-                                                                                        operationalDataset, breadcrumb, timeoutMs);
+                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, operationalDataset, breadcrumb, timeoutMs, commandData);
             }
             break;
         }
         case Commands::AddWiFiNetwork::Id: {
+            Commands::AddWiFiNetwork::DecodableType commandData;
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -3528,12 +3613,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(aEndpointId, apCommandObj, ssid, credentials,
-                                                                                      breadcrumb, timeoutMs);
+                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, ssid, credentials, breadcrumb, timeoutMs, commandData);
             }
             break;
         }
         case Commands::DisableNetwork::Id: {
+            Commands::DisableNetwork::DecodableType commandData;
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -3595,12 +3681,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(aEndpointId, apCommandObj, networkID,
-                                                                                      breadcrumb, timeoutMs);
+                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, networkID, breadcrumb, timeoutMs, commandData);
             }
             break;
         }
         case Commands::EnableNetwork::Id: {
+            Commands::EnableNetwork::DecodableType commandData;
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -3662,12 +3749,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(aEndpointId, apCommandObj, networkID,
-                                                                                     breadcrumb, timeoutMs);
+                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, networkID, breadcrumb, timeoutMs, commandData);
             }
             break;
         }
         case Commands::GetLastNetworkCommissioningResult::Id: {
+            Commands::GetLastNetworkCommissioningResult::DecodableType commandData;
             expectArgumentCount = 1;
             uint32_t timeoutMs;
             bool argExists[1];
@@ -3721,12 +3809,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(aEndpointId, apCommandObj,
-                                                                                                         timeoutMs);
+                wasHandled = emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, timeoutMs, commandData);
             }
             break;
         }
         case Commands::RemoveNetwork::Id: {
+            Commands::RemoveNetwork::DecodableType commandData;
             expectArgumentCount = 3;
             chip::ByteSpan NetworkID;
             uint64_t Breadcrumb;
@@ -3788,12 +3877,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkCallback(aEndpointId, apCommandObj, NetworkID,
-                                                                                     Breadcrumb, TimeoutMs);
+                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, NetworkID, Breadcrumb, TimeoutMs, commandData);
             }
             break;
         }
         case Commands::ScanNetworks::Id: {
+            Commands::ScanNetworks::DecodableType commandData;
             expectArgumentCount = 3;
             chip::ByteSpan ssid;
             uint64_t breadcrumb;
@@ -3855,12 +3945,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfNetworkCommissioningClusterScanNetworksCallback(aEndpointId, apCommandObj, ssid, breadcrumb, timeoutMs);
+                wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, ssid, breadcrumb, timeoutMs, commandData);
             }
             break;
         }
         case Commands::UpdateThreadNetwork::Id: {
+            Commands::UpdateThreadNetwork::DecodableType commandData;
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -3923,11 +4014,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
                 wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(
-                    aEndpointId, apCommandObj, operationalDataset, breadcrumb, timeoutMs);
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, operationalDataset, breadcrumb, timeoutMs, commandData);
             }
             break;
         }
         case Commands::UpdateWiFiNetwork::Id: {
+            Commands::UpdateWiFiNetwork::DecodableType commandData;
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -3993,14 +4085,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(aEndpointId, apCommandObj, ssid,
-                                                                                         credentials, breadcrumb, timeoutMs);
+                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, ssid, credentials, breadcrumb, timeoutMs, commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, NetworkCommissioning::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -4008,9 +4100,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                NetworkCommissioning::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                NetworkCommissioning::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4028,7 +4121,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace OtaSoftwareUpdateProvider {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4041,9 +4134,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::ApplyUpdateRequest::Id: {
+            Commands::ApplyUpdateRequest::DecodableType commandData;
             expectArgumentCount = 2;
             chip::ByteSpan updateToken;
             uint32_t newVersion;
@@ -4101,12 +4195,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(aEndpointId, apCommandObj,
-                                                                                               updateToken, newVersion);
+                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, updateToken, newVersion, commandData);
             }
             break;
         }
         case Commands::NotifyUpdateApplied::Id: {
+            Commands::NotifyUpdateApplied::DecodableType commandData;
             expectArgumentCount = 2;
             chip::ByteSpan updateToken;
             uint32_t softwareVersion;
@@ -4164,12 +4259,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(aEndpointId, apCommandObj,
-                                                                                                updateToken, softwareVersion);
+                wasHandled = emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, updateToken, softwareVersion, commandData);
             }
             break;
         }
         case Commands::QueryImage::Id: {
+            Commands::QueryImage::DecodableType commandData;
             expectArgumentCount = 8;
             uint16_t vendorId;
             uint16_t productId;
@@ -4253,14 +4349,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 8 == validArgumentCount)
             {
                 wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-                    aEndpointId, apCommandObj, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
-                    const_cast<uint8_t *>(location), requestorCanConsent, metadataForProvider);
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, vendorId, productId, hardwareVersion, softwareVersion,
+                    protocolsSupported, const_cast<uint8_t *>(location), requestorCanConsent, metadataForProvider, commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, OtaSoftwareUpdateProvider::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -4268,9 +4364,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                OtaSoftwareUpdateProvider::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                OtaSoftwareUpdateProvider::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4288,7 +4385,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace OnOff {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4301,26 +4398,29 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::Off::Id: {
+            Commands::Off::DecodableType commandData;
 
-            wasHandled = emberAfOnOffClusterOffCallback(aEndpointId, apCommandObj);
+            wasHandled = emberAfOnOffClusterOffCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         case Commands::On::Id: {
+            Commands::On::DecodableType commandData;
 
-            wasHandled = emberAfOnOffClusterOnCallback(aEndpointId, apCommandObj);
+            wasHandled = emberAfOnOffClusterOnCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         case Commands::Toggle::Id: {
+            Commands::Toggle::DecodableType commandData;
 
-            wasHandled = emberAfOnOffClusterToggleCallback(aEndpointId, apCommandObj);
+            wasHandled = emberAfOnOffClusterToggleCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, commandData);
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, OnOff::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -4328,9 +4428,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                OnOff::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                OnOff::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4348,7 +4448,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace OperationalCredentials {
 
-void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4361,7 +4461,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::AttestationResponse::Id: {
             expectArgumentCount = 2;
@@ -4421,7 +4521,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAttestationResponseCallback(aEndpointId, apCommandObj,
+                wasHandled = emberAfOperationalCredentialsClusterAttestationResponseCallback(aCommandPath.mEndpointId, apCommandObj,
                                                                                              AttestationElements, Signature);
             }
             break;
@@ -4480,8 +4580,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfOperationalCredentialsClusterCertificateChainResponseCallback(aEndpointId, apCommandObj, Certificate);
+                wasHandled = emberAfOperationalCredentialsClusterCertificateChainResponseCallback(aCommandPath.mEndpointId,
+                                                                                                  apCommandObj, Certificate);
             }
             break;
         }
@@ -4547,8 +4647,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterNOCResponseCallback(aEndpointId, apCommandObj, StatusCode,
-                                                                                     FabricIndex, DebugText);
+                wasHandled = emberAfOperationalCredentialsClusterNOCResponseCallback(aCommandPath.mEndpointId, apCommandObj,
+                                                                                     StatusCode, FabricIndex, DebugText);
             }
             break;
         }
@@ -4610,14 +4710,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(aEndpointId, apCommandObj, NOCSRElements,
-                                                                                       AttestationSignature);
+                wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(aCommandPath.mEndpointId, apCommandObj,
+                                                                                       NOCSRElements, AttestationSignature);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, OperationalCredentials::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -4625,9 +4725,10 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                OperationalCredentials::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                OperationalCredentials::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4645,7 +4746,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, E
 
 namespace OperationalCredentials {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4658,9 +4759,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::AddNOC::Id: {
+            Commands::AddNOC::DecodableType commandData;
             expectArgumentCount = 5;
             chip::ByteSpan NOCValue;
             chip::ByteSpan ICACValue;
@@ -4730,12 +4832,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(aEndpointId, apCommandObj, NOCValue, ICACValue,
-                                                                                IPKValue, CaseAdminNode, AdminVendorId);
+                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, NOCValue, ICACValue, IPKValue, CaseAdminNode,
+                    AdminVendorId, commandData);
             }
             break;
         }
         case Commands::AddTrustedRootCertificate::Id: {
+            Commands::AddTrustedRootCertificate::DecodableType commandData;
             expectArgumentCount = 1;
             chip::ByteSpan RootCertificate;
             bool argExists[1];
@@ -4789,12 +4893,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(aEndpointId, apCommandObj,
-                                                                                                   RootCertificate);
+                wasHandled = emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, RootCertificate, commandData);
             }
             break;
         }
         case Commands::AttestationRequest::Id: {
+            Commands::AttestationRequest::DecodableType commandData;
             expectArgumentCount = 1;
             chip::ByteSpan AttestationNonce;
             bool argExists[1];
@@ -4848,12 +4953,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfOperationalCredentialsClusterAttestationRequestCallback(aEndpointId, apCommandObj, AttestationNonce);
+                wasHandled = emberAfOperationalCredentialsClusterAttestationRequestCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, AttestationNonce, commandData);
             }
             break;
         }
         case Commands::CertificateChainRequest::Id: {
+            Commands::CertificateChainRequest::DecodableType commandData;
             expectArgumentCount = 1;
             uint8_t CertificateType;
             bool argExists[1];
@@ -4907,12 +5013,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfOperationalCredentialsClusterCertificateChainRequestCallback(aEndpointId, apCommandObj, CertificateType);
+                wasHandled = emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, CertificateType, commandData);
             }
             break;
         }
         case Commands::OpCSRRequest::Id: {
+            Commands::OpCSRRequest::DecodableType commandData;
             expectArgumentCount = 1;
             chip::ByteSpan CSRNonce;
             bool argExists[1];
@@ -4966,11 +5073,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(aEndpointId, apCommandObj, CSRNonce);
+                wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, CSRNonce, commandData);
             }
             break;
         }
         case Commands::RemoveFabric::Id: {
+            Commands::RemoveFabric::DecodableType commandData;
             expectArgumentCount = 1;
             uint8_t FabricIndex;
             bool argExists[1];
@@ -5024,11 +5133,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(aEndpointId, apCommandObj, FabricIndex);
+                wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, FabricIndex, commandData);
             }
             break;
         }
         case Commands::RemoveTrustedRootCertificate::Id: {
+            Commands::RemoveTrustedRootCertificate::DecodableType commandData;
             expectArgumentCount = 1;
             chip::ByteSpan TrustedRootIdentifier;
             bool argExists[1];
@@ -5082,12 +5193,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(aEndpointId, apCommandObj,
-                                                                                                      TrustedRootIdentifier);
+                wasHandled = emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, TrustedRootIdentifier, commandData);
             }
             break;
         }
         case Commands::UpdateFabricLabel::Id: {
+            Commands::UpdateFabricLabel::DecodableType commandData;
             expectArgumentCount = 1;
             const uint8_t * Label;
             bool argExists[1];
@@ -5142,12 +5254,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(aEndpointId, apCommandObj,
-                                                                                           const_cast<uint8_t *>(Label));
+                wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, const_cast<uint8_t *>(Label), commandData);
             }
             break;
         }
         case Commands::UpdateNOC::Id: {
+            Commands::UpdateNOC::DecodableType commandData;
             expectArgumentCount = 2;
             chip::ByteSpan NOCValue;
             chip::ByteSpan ICACValue;
@@ -5205,13 +5318,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(aEndpointId, apCommandObj, NOCValue, ICACValue);
+                wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, NOCValue, ICACValue, commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, OperationalCredentials::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -5219,9 +5333,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                OperationalCredentials::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                OperationalCredentials::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -5239,7 +5354,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace TvChannel {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -5252,9 +5367,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::ChangeChannel::Id: {
+            Commands::ChangeChannel::DecodableType commandData;
             expectArgumentCount = 1;
             const uint8_t * match;
             bool argExists[1];
@@ -5309,11 +5425,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfTvChannelClusterChangeChannelCallback(aEndpointId, apCommandObj, const_cast<uint8_t *>(match));
+                wasHandled = emberAfTvChannelClusterChangeChannelCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId,
+                                                                          const_cast<uint8_t *>(match), commandData);
             }
             break;
         }
         case Commands::ChangeChannelByNumber::Id: {
+            Commands::ChangeChannelByNumber::DecodableType commandData;
             expectArgumentCount = 2;
             uint16_t majorNumber;
             uint16_t minorNumber;
@@ -5371,12 +5489,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfTvChannelClusterChangeChannelByNumberCallback(aEndpointId, apCommandObj, majorNumber, minorNumber);
+                wasHandled = emberAfTvChannelClusterChangeChannelByNumberCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, majorNumber, minorNumber, commandData);
             }
             break;
         }
         case Commands::SkipChannel::Id: {
+            Commands::SkipChannel::DecodableType commandData;
             expectArgumentCount = 1;
             uint16_t Count;
             bool argExists[1];
@@ -5430,13 +5549,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfTvChannelClusterSkipChannelCallback(aEndpointId, apCommandObj, Count);
+                wasHandled = emberAfTvChannelClusterSkipChannelCallback(apCommandObj, aCommandPath, aCommandPath.mEndpointId, Count,
+                                                                        commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, TvChannel::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -5444,9 +5564,9 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                TvChannel::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                TvChannel::Id, aCommandPath.mCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -5464,7 +5584,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 namespace TargetNavigator {
 
-void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -5477,9 +5597,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
     uint32_t currentDecodeTagId  = 0;
     bool wasHandled              = false;
     {
-        switch (aCommandId)
+        switch (aCommandPath.mCommandId)
         {
         case Commands::NavigateTarget::Id: {
+            Commands::NavigateTarget::DecodableType commandData;
             expectArgumentCount = 2;
             uint8_t target;
             const uint8_t * data;
@@ -5538,14 +5659,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfTargetNavigatorClusterNavigateTargetCallback(aEndpointId, apCommandObj, target,
-                                                                                 const_cast<uint8_t *>(data));
+                wasHandled = emberAfTargetNavigatorClusterNavigateTargetCallback(
+                    apCommandObj, aCommandPath, aCommandPath.mEndpointId, target, const_cast<uint8_t *>(data), commandData);
             }
             break;
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            ReportCommandUnsupported(apCommandObj, aEndpointId, TargetNavigator::Id, aCommandId);
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
             return;
         }
         }
@@ -5553,9 +5674,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        CommandPathParams returnStatusParam = { aEndpointId,
+        CommandPathParams returnStatusParam = { aCommandPath.mEndpointId,
                                                 0, // GroupId
-                                                TargetNavigator::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+                                                TargetNavigator::Id, aCommandPath.mCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -5579,72 +5701,73 @@ void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, En
     ChipLogDetail(Zcl, "Received Cluster Command: Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " Endpoint=%" PRIx16,
                   ChipLogValueMEI(aClusterId), ChipLogValueMEI(aCommandId), aEndPointId);
     Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
+    ConcreteCommandPath commandPath(aEndPointId, aClusterId, aCommandId);
     TLV::TLVType dataTlvType;
     SuccessOrExit(aReader.EnterContainer(dataTlvType));
     switch (aClusterId)
     {
     case Clusters::AccountLogin::Id:
-        Clusters::AccountLogin::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::AccountLogin::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::AdministratorCommissioning::Id:
-        Clusters::AdministratorCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::AdministratorCommissioning::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::ApplicationBasic::Id:
-        Clusters::ApplicationBasic::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::ApplicationBasic::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::ApplicationLauncher::Id:
-        Clusters::ApplicationLauncher::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::ApplicationLauncher::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::AudioOutput::Id:
-        Clusters::AudioOutput::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::AudioOutput::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::Basic::Id:
-        Clusters::Basic::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::Basic::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::Binding::Id:
-        Clusters::Binding::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::Binding::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::ContentLauncher::Id:
-        Clusters::ContentLauncher::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::ContentLauncher::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::DiagnosticLogs::Id:
-        Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::GeneralCommissioning::Id:
-        Clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::KeypadInput::Id:
-        Clusters::KeypadInput::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::KeypadInput::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::LevelControl::Id:
-        Clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::LevelControl::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::LowPower::Id:
-        Clusters::LowPower::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::LowPower::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::MediaInput::Id:
-        Clusters::MediaInput::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::MediaInput::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::MediaPlayback::Id:
-        Clusters::MediaPlayback::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::MediaPlayback::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::NetworkCommissioning::Id:
-        Clusters::NetworkCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::NetworkCommissioning::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::OtaSoftwareUpdateProvider::Id:
-        Clusters::OtaSoftwareUpdateProvider::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::OtaSoftwareUpdateProvider::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::OnOff::Id:
-        Clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::OnOff::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::OperationalCredentials::Id:
-        Clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::TvChannel::Id:
-        Clusters::TvChannel::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::TvChannel::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::TargetNavigator::Id:
-        Clusters::TargetNavigator::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::TargetNavigator::DispatchServerCommand(apCommandObj, commandPath, aReader);
         break;
     default:
         // Unrecognized cluster ID, error status will apply.
@@ -5667,18 +5790,19 @@ void DispatchSingleClusterResponseCommand(ClusterId aClusterId, CommandId aComma
     ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
                   aCommandId, aEndPointId);
     Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
+    ConcreteCommandPath commandPath(aEndPointId, aClusterId, aCommandId);
     TLV::TLVType dataTlvType;
     SuccessOrExit(aReader.EnterContainer(dataTlvType));
     switch (aClusterId)
     {
     case Clusters::GeneralCommissioning::Id:
-        Clusters::GeneralCommissioning::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::GeneralCommissioning::DispatchClientCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::NetworkCommissioning::Id:
-        Clusters::NetworkCommissioning::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::NetworkCommissioning::DispatchClientCommand(apCommandObj, commandPath, aReader);
         break;
     case Clusters::OperationalCredentials::Id:
-        Clusters::OperationalCredentials::DispatchClientCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        Clusters::OperationalCredentials::DispatchClientCommand(apCommandObj, commandPath, aReader);
         break;
     default:
         // Unrecognized cluster ID, error status will apply.

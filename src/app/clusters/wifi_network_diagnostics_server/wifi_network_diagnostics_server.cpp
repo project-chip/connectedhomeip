@@ -16,10 +16,12 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -29,6 +31,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WiFiNetworkDiagnostics;
 using namespace chip::app::Clusters::WiFiNetworkDiagnostics::Attributes;
 using chip::DeviceLayer::ConnectivityManager;
 
@@ -78,7 +81,7 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const Attr
     *aDataRead = true;
     switch (aClusterInfo.mFieldId)
     {
-    case SecurityType::Id: {
+    case Attributes::SecurityType::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiSecurityType, aEncoder);
     }
     case WiFiVersion::Id: {
@@ -123,7 +126,9 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const Attr
 }
 } // anonymous namespace
 
-bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
+                                                             const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                             Commands::ResetCounts::DecodableType & commandData)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
