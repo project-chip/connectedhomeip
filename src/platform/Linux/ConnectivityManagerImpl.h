@@ -174,6 +174,10 @@ private:
 
     CHIP_ERROR ResetEthernetStatsCount();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    CHIP_ERROR ResetWiFiStatsCount();
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void DriveAPState();
     CHIP_ERROR ConfigureWiFiAP();
@@ -206,6 +210,12 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    uint32_t mBeaconLostCount        = 0;
+    uint32_t mPacketMulticastRxCount = 0;
+    uint32_t mPacketMulticastTxCount = 0;
+    uint32_t mPacketUnicastRxCount   = 0;
+    uint32_t mPacketUnicastTxCount   = 0;
+    uint64_t mOverrunCount           = 0;
     char mWiFiIfName[IFNAMSIZ];
 #endif
 };
