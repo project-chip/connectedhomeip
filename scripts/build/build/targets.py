@@ -95,18 +95,19 @@ def Esp32Targets():
 
 
 def Efr32Targets():
-    target = Target('efr32-brd4161a-light', Efr32Builder,
-                    board=Efr32Board.BRD4161A)
+    efr_target = Target('efr32-brd4161a', Efr32Builder, board=Efr32Board.BRD4161A)
 
-    targets = [
-        target.Extend('light', app=Efr32App.LIGHT),
-        target.Extend('lock', app=Efr32App.LOCK),
-        target.Extend('window-covering', app=Efr32App.WINDOW_COVERING),
+    yield efr_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
+
+    rpc_aware_targets = [
+        efr_target.Extend('light', app=Efr32App.LIGHT),
+        efr_target.Extend('lock', app=Efr32App.LOCK),
     ]
 
-    for target in targets:
+    for target in rpc_aware_targets:
         yield target
         yield target.Extend('rpc', enable_rpcs=True)
+
 
 
 def NrfTargets():
