@@ -121,7 +121,7 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle session, PayloadHeader &
         }
 
         MessageCounter & counter = GetSendCounterForPacket(payloadHeader, *state);
-        ReturnErrorOnFailure(SecureMessageCodec::Encode(state, payloadHeader, packetHeader, message, counter));
+        ReturnErrorOnFailure(SecureMessageCodec::Encrypt(state, payloadHeader, packetHeader, message, counter));
 
 #if CHIP_PROGRESS_LOGGING
         destination = state->GetPeerNodeId();
@@ -396,6 +396,10 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
         ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
     }
 
+    // Decrypt and verify the message before message counter verification or any further processing.
+    VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decrypt(state, payloadHeader, packetHeader, msg),
+                 ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding"));
+
     // Verify message counter
     if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
     {
@@ -441,10 +445,6 @@ void SessionManager::SecureMessageDispatch(const PacketHeader & packetHeader, co
     }
 
     mPeerConnections.MarkConnectionActive(state);
-
-    // Decode the message
-    VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
-                 ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
 
     if (isDuplicate == SessionManagerDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {
