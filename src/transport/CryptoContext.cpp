@@ -75,23 +75,24 @@ CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan
 #if CHIP_CONFIG_SECURITY_TEST_MODE
 
     // If enabled, override the generated session key with a known key pair
-    // to allow man-in-the-middle session key recovery for testing purposes:
-    //      44 D4 3C 91 D2 27 F3 BA 08 24 C5 D8 7C B8 1B 33
-    //      AC C1 8F 06 C7 BC 9B E8 24 6A 67 8C B1 F8 BA 3D
+    // to allow man-in-the-middle session key recovery for testing purposes.
 
-    const char * kTestSecret    = "Test secret for key derivation";
-    size_t secretLen            = strlen(kTestSecret);
-    const ByteSpan & testSecret = ByteSpan(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen);
-    const ByteSpan & testSalt   = ByteSpan(nullptr, 0);
+#define TEST_SECRET_SIZE 32
+    constexpr uint8_t kTestSharedSecret[TEST_SECRET_SIZE] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
+    static_assert(sizeof(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE) == TEST_SECRET_SIZE,
+                  "CHIP_CONFIG_TEST_SHARED_SECRET_VALUE must be 32 bytes");
+    const ByteSpan & testSalt = ByteSpan(nullptr, 0);
     (void) info;
     (void) infoLen;
 
-    #pragma message "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  Node can only communicate with other nodes built with this flag set."
-    ChipLogError(SecureChannel, "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  Node can only communicate with other nodes built with this flag set.");
+#pragma message                                                                                                                    \
+    "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  Node can only communicate with other nodes built with this flag set."
+    ChipLogError(SecureChannel,
+                 "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  "
+                 "Node can only communicate with other nodes built with this flag set.");
 
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(testSecret.data(), testSecret.size(), testSalt.data(), testSalt.size(), SEKeysInfo,
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(kTestSharedSecret, TEST_SECRET_SIZE, testSalt.data(), testSalt.size(), SEKeysInfo,
                                            sizeof(SEKeysInfo), &mKeys[0][0], sizeof(mKeys)));
-
 #else
 
     ReturnErrorOnFailure(
