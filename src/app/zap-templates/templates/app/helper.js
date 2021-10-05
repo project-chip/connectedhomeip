@@ -431,9 +431,9 @@ function zapTypeToClusterObjectType(type, isDecodable)
         return zclType;
       default:
         if (isDecodable) {
-          return type + '::DecodableType'
+          return "Structs::" + type + '::DecodableType'
         } else {
-          return type + '::Type'
+          return "Structs::" + type + '::Type'
         }
       }
     })
