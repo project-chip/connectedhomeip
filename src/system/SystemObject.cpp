@@ -25,9 +25,6 @@
 // Include module header
 #include <system/SystemObject.h>
 
-// Include common private header
-#include "SystemLayerPrivate.h"
-
 // Include local headers
 #include <lib/support/CodeUtils.h>
 #include <system/SystemLayer.h>

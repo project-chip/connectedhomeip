@@ -221,13 +221,6 @@ void InetLayer::DroppableEventDequeued(void)
  *  LwIP-based adaptations, this will typically be a pointer to the
  *  event queue associated with the InetLayer instance.
  *
- *  Platforms may choose to assert
- *  #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS in their
- *  platform-specific configuration header and enable the
- *  Platform::InetLayer::WillInit and Platform::InetLayer::DidInit
- *  hooks to effect platform-specific customizations or data extensions
- *  to InetLayer.
- *
  *  @param[in]  aSystemLayer  A required instance of the chip System Layer
  *                            already successfully initialized.
  *
@@ -247,8 +240,6 @@ void InetLayer::DroppableEventDequeued(void)
  */
 CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     Inet::RegisterLayerErrorFormatter();
 
     if (State != kState_NotInitialized)
@@ -260,43 +251,27 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
 
     mPlatformData = nullptr;
 
-    err = Platform::InetLayer::WillInit(this, aContext);
-    SuccessOrExit(err);
-
     mSystemLayer = &aSystemLayer;
     mContext     = aContext;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    err = InitQueueLimiter();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(InitQueueLimiter());
 
     static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     State = kState_Initialized;
 
-#if INET_CONFIG_ENABLE_DNS_RESOLVER
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-    err = mAsyncDNSResolver.Init(this);
-    SuccessOrExit(err);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
-#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+    ReturnErrorOnFailure(mAsyncDNSResolver.Init(this));
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
-exit:
-    Platform::InetLayer::DidInit(this, mContext, err);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 /**
  *  This is the InetLayer explicit deinitializer and should be called
  *  prior to disposing of an instantiated InetLayer instance.
- *
- *  Platforms may choose to assert
- *  #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS in their
- *  platform-specific configuration header and enable the
- *  Platform::InetLayer::WillShutdown and
- *  Platform::InetLayer::DidShutdown hooks to effect clean-up of
- *  platform-specific customizations or data extensions to InetLayer.
  *
  *  @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating
  *          the reason for shutdown failure.
@@ -304,10 +279,7 @@ exit:
  */
 CHIP_ERROR InetLayer::Shutdown()
 {
-    CHIP_ERROR err;
-
-    err = Platform::InetLayer::WillShutdown(this, mContext);
-    SuccessOrExit(err);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (State == kState_Initialized)
     {
@@ -352,9 +324,6 @@ CHIP_ERROR InetLayer::Shutdown()
     }
 
     State = kState_NotInitialized;
-
-exit:
-    Platform::InetLayer::DidShutdown(this, mContext, err);
 
     return err;
 }
@@ -1019,111 +988,6 @@ void IPPacketInfo::Clear()
     SrcPort     = 0;
     DestPort    = 0;
 }
-
-#if !INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
-
-// MARK: InetLayer platform- and system-specific functions for InetLayer
-//       construction and destruction.
-
-namespace Platform {
-namespace InetLayer {
-
-/**
- * This is a platform-specific InetLayer pre-initialization hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          initialized.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating
- *         the reason for initialization failure. Returning non-successful
- *         status will abort initialization.
- *
- */
-DLL_EXPORT CHIP_ERROR WillInit(Inet::InetLayer * aLayer, void * aContext)
-{
-    (void) aLayer;
-    (void) aContext;
-
-    return CHIP_NO_ERROR;
-}
-
-/**
- * This is a platform-specific InetLayer post-initialization hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          initialized.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @param[in]     anError   The overall status being returned via the
- *                          InetLayer \::Init method.
- *
- */
-DLL_EXPORT void DidInit(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError)
-{
-    (void) aLayer;
-    (void) aContext;
-    (void) anError;
-}
-
-/**
- * This is a platform-specific InetLayer pre-shutdown hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          shutdown.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating
- *         the reason for shutdown failure. Returning non-successful
- *         status will abort shutdown.
- *
- */
-DLL_EXPORT CHIP_ERROR WillShutdown(Inet::InetLayer * aLayer, void * aContext)
-{
-    (void) aLayer;
-    (void) aContext;
-
-    return CHIP_NO_ERROR;
-}
-
-/**
- * This is a platform-specific InetLayer post-shutdown hook. This
- * may be overridden by assserting the preprocessor definition,
- * #INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS.
- *
- * @param[in,out] aLayer    A pointer to the InetLayer instance being
- *                          shutdown.
- *
- * @param[in,out] aContext  Platform-specific context data passed to
- *                          the layer initialization method, \::Init.
- *
- * @param[in]     anError   The overall status being returned via the
- *                          InetLayer \::Shutdown method.
- *
- */
-DLL_EXPORT void DidShutdown(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError)
-{
-    (void) aLayer;
-    (void) aContext;
-    (void) anError;
-}
-
-} // namespace InetLayer
-} // namespace Platform
-
-#endif // !INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
 
 } // namespace Inet
 } // namespace chip

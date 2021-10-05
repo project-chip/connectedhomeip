@@ -114,19 +114,6 @@
 #endif // INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
 
 /**
- *  @def INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
- *
- *  @brief
- *    This defines whether (1) or not (0) your platform will override
- *    the platform- and system-specific InetLayer WillInit, DidInit,
- *    WillShutdown, and DidShutdown.
- *
- */
-#ifndef INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
-#define INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS       0
-#endif // INET_CONFIG_WILL_OVERRIDE_PLATFORM_XTOR_FUNCS
-
-/**
  *  @def INET_CONFIG_MAX_DROPPABLE_EVENTS
  *
  *  @brief
