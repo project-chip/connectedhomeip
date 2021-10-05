@@ -43,16 +43,16 @@ public:
     // Register for the WiFiNetworkDiagnostics cluster on all endpoints.
     WiFiDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), WiFiNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) override;
+    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &), const AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &), AttributeValueEncoder & aEncoder);
 };
 
 template <typename T>
 CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &),
-                                                     const AttributeValueEncoder & aEncoder)
+                                                     AttributeValueEncoder & aEncoder)
 {
     T data;
     CHIP_ERROR err = (DeviceLayer::ConnectivityMgr().*getter)(data);
@@ -70,7 +70,7 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityMan
 
 WiFiDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead)
+CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
 {
     if (aClusterInfo.mClusterId != WiFiNetworkDiagnostics::Id)
     {
@@ -78,7 +78,6 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const Attr
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    *aDataRead = true;
     switch (aClusterInfo.mFieldId)
     {
     case Attributes::SecurityType::Id: {
@@ -118,7 +117,6 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const Attr
         return ReadIfSupported(&ConnectivityManager::GetWiFiOverrunCount, aEncoder);
     }
     default: {
-        *aDataRead = false;
         break;
     }
     }

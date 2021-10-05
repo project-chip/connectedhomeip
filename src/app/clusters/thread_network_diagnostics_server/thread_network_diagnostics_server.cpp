@@ -47,12 +47,12 @@ public:
     // Register for the ThreadNetworkDiagnostics cluster on all endpoints.
     ThreadDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) override;
+    CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) override;
 };
 
 ThreadDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead)
+CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder)
 {
     if (aClusterInfo.mClusterId != ThreadNetworkDiagnostics::Id)
     {
@@ -62,15 +62,17 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const At
 
     CHIP_ERROR err = ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aClusterInfo.mFieldId, aEncoder);
 
-    *aDataRead = true;
-
-    // If it isn't a run time assigned attribute, e.j ClusterRevision, or if
-    // not implemented, use standard read.
-    // Clear error and no data read
+    // If it isn't a run time assigned attribute, e.g. ClusterRevision, or if
+    // not implemented, clear the error so we fall back to the standard read
+    // path.
+    //
+    // TODO: This is probably broken in practice.  The standard read path is not
+    // going to produce useful values for these things.  We need to either have
+    // fallbacks in the connectivity manager that encode some sort of default
+    // values or error out on reads we can't actually handle.
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE || err == CHIP_ERROR_NOT_IMPLEMENTED)
     {
-        err        = CHIP_NO_ERROR;
-        *aDataRead = false;
+        err = CHIP_NO_ERROR;
     }
 
     return err;

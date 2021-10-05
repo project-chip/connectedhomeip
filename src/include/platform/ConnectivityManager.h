@@ -165,7 +165,7 @@ public:
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
     void ResetThreadNetworkDiagnosticsCounts();
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
+    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     // Ethernet network diagnostics methods
     CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount);
@@ -555,7 +555,7 @@ inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
  *         All other errors should be treated as a read error and reported as such.
  */
 inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                  const app::AttributeValueEncoder & encoder)
+                                                                                  app::AttributeValueEncoder & encoder)
 {
     return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
