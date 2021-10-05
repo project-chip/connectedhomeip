@@ -286,9 +286,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             ReturnErrorOnFailure(DataModel::Decode(reader, hardwareAddress));
             break;
         case kTypeFieldId:
-            uint8_t v;
-            ReturnErrorOnFailure(DataModel::Decode(reader, v));
-            type = static_cast<InterfaceType>(v);
+            ReturnErrorOnFailure(DataModel::Decode(reader, type));
             break;
         default:
             break;
@@ -1012,9 +1010,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             ReturnErrorOnFailure(DataModel::Decode(reader, postalCode));
             break;
         case kLineupInfoTypeFieldId:
-            uint8_t v;
-            ReturnErrorOnFailure(DataModel::Decode(reader, v));
-            lineupInfoType = static_cast<TvChannelLineupInfoType>(v);
+            ReturnErrorOnFailure(DataModel::Decode(reader, lineupInfoType));
             break;
         default:
             break;
@@ -1136,9 +1132,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             ReturnErrorOnFailure(DataModel::Decode(reader, index));
             break;
         case kInputTypeFieldId:
-            uint8_t v;
-            ReturnErrorOnFailure(DataModel::Decode(reader, v));
-            inputType = static_cast<MediaInputType>(v);
+            ReturnErrorOnFailure(DataModel::Decode(reader, inputType));
             break;
         case kNameFieldId:
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
@@ -1225,9 +1219,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         switch (chip::TLV::TagNumFromTag(reader.GetTag()))
         {
         case kTypeFieldId:
-            uint8_t v;
-            ReturnErrorOnFailure(DataModel::Decode(reader, v));
-            type = static_cast<ContentLaunchParameterEnum>(v);
+            ReturnErrorOnFailure(DataModel::Decode(reader, type));
             break;
         case kValueFieldId:
             ReturnErrorOnFailure(DataModel::Decode(reader, value));
@@ -1327,9 +1319,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             ReturnErrorOnFailure(DataModel::Decode(reader, height));
             break;
         case kMetricFieldId:
-            uint8_t v;
-            ReturnErrorOnFailure(DataModel::Decode(reader, v));
-            metric = static_cast<ContentLaunchMetricType>(v);
+            ReturnErrorOnFailure(DataModel::Decode(reader, metric));
             break;
         default:
             break;
@@ -1411,9 +1401,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             ReturnErrorOnFailure(DataModel::Decode(reader, index));
             break;
         case kOutputTypeFieldId:
-            uint8_t v;
-            ReturnErrorOnFailure(DataModel::Decode(reader, v));
-            outputType = static_cast<AudioOutputType>(v);
+            ReturnErrorOnFailure(DataModel::Decode(reader, outputType));
             break;
         case kNameFieldId:
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
@@ -1508,9 +1496,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             ReturnErrorOnFailure(DataModel::Decode(reader, b));
             break;
         case kCFieldId:
-            uint8_t v;
-            ReturnErrorOnFailure(DataModel::Decode(reader, v));
-            c = static_cast<SimpleEnum>(v);
+            ReturnErrorOnFailure(DataModel::Decode(reader, c));
             break;
         case kDFieldId:
             ReturnErrorOnFailure(DataModel::Decode(reader, d));
@@ -1757,9 +1743,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             ReturnErrorOnFailure(DataModel::Decode(reader, groupKeyEpochStartTime));
             break;
         case kGroupKeySecurityPolicyFieldId:
-            uint8_t v;
-            ReturnErrorOnFailure(DataModel::Decode(reader, v));
-            groupKeySecurityPolicy = static_cast<GroupKeySecurityPolicy>(v);
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySecurityPolicy));
             break;
         default:
             break;
