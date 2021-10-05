@@ -16,10 +16,12 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -29,6 +31,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::EthernetNetworkDiagnostics;
 using namespace chip::app::Clusters::EthernetNetworkDiagnostics::Attributes;
 using chip::DeviceLayer::ConnectivityManager;
 
@@ -59,19 +62,19 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, const 
     *aDataRead = true;
     switch (aClusterInfo.mFieldId)
     {
-    case Ids::PacketRxCount: {
+    case PacketRxCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthPacketRxCount, aEncoder);
     }
-    case Ids::PacketTxCount: {
+    case PacketTxCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthPacketTxCount, aEncoder);
     }
-    case Ids::TxErrCount: {
+    case TxErrCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthTxErrCount, aEncoder);
     }
-    case Ids::CollisionCount: {
+    case CollisionCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthCollisionCount, aEncoder);
     }
-    case Ids::OverrunCount: {
+    case OverrunCount::Id: {
         return ReadIfSupported(&ConnectivityManager::GetEthOverrunCount, aEncoder);
     }
     default: {
@@ -100,21 +103,28 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (Connectivit
 }
 } // anonymous namespace
 
-bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
+                                                                 const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                                 Commands::ResetCounts::DecodableType & commandData)
 {
-    EmberAfStatus status = EthernetNetworkDiagnostics::Attributes::SetPacketRxCount(endpoint, 0);
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    VerifyOrExit(DeviceLayer::ConnectivityMgr().ResetEthNetworkDiagnosticsCounts() == CHIP_NO_ERROR,
+                 status = EMBER_ZCL_STATUS_FAILURE);
+
+    status = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketRxCount attribute"));
 
-    status = EthernetNetworkDiagnostics::Attributes::SetPacketTxCount(endpoint, 0);
+    status = EthernetNetworkDiagnostics::Attributes::PacketTxCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketTxCount attribute"));
 
-    status = EthernetNetworkDiagnostics::Attributes::SetTxErrCount(endpoint, 0);
+    status = EthernetNetworkDiagnostics::Attributes::TxErrCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset TxErrCount attribute"));
 
-    status = EthernetNetworkDiagnostics::Attributes::SetCollisionCount(endpoint, 0);
+    status = EthernetNetworkDiagnostics::Attributes::CollisionCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset CollisionCount attribute"));
 
-    status = EthernetNetworkDiagnostics::Attributes::SetOverrunCount(endpoint, 0);
+    status = EthernetNetworkDiagnostics::Attributes::OverrunCount::Set(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset OverrunCount attribute"));
 
 exit:

@@ -32,9 +32,10 @@
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
+#include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/DeviceControllerInteractionModelDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
-#include <credentials/CHIPOperationalCredentials.h>
+#include <controller/SetUpCodePairer.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
@@ -62,6 +63,7 @@
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <controller/DeviceAddressUpdateDelegate.h>
+#include <controller/DeviceDiscoveryDelegate.h>
 #include <lib/mdns/Resolver.h>
 #endif
 
@@ -83,15 +85,10 @@ void BasicFailure(void * context, uint8_t status);
 struct ControllerInitParams
 {
     PersistentStorageDelegate * storageDelegate = nullptr;
-    System::Layer * systemLayer                 = nullptr;
-    Inet::InetLayer * inetLayer                 = nullptr;
-
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * bleLayer = nullptr;
-#endif
-    DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
+    DeviceControllerSystemState * systemState   = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
+    DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate = nullptr;
+    DeviceDiscoveryDelegate * deviceDiscoveryDelegate         = nullptr;
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
@@ -106,9 +103,7 @@ struct ControllerInitParams
 
     uint16_t controllerVendorId;
 
-    /* The port used for operational communication to listen for and send messages over UDP/TCP.
-     * The default value of `0` will pick any available port. */
-    uint16_t listenPort = 0;
+    FabricId fabricId = kUndefinedFabricId;
 };
 
 enum CommissioningStage : uint8_t
@@ -248,21 +243,12 @@ public:
 
     void PersistDevice(Device * device);
 
-    CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
-
     virtual void ReleaseDevice(Device * device);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
+    void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
 #endif
-
-    // ----- IO -----
-    /**
-     * @brief
-     * Start the event loop task within the CHIP stack
-     * @return CHIP_ERROR   The return status
-     */
-    CHIP_ERROR ServiceEvents();
 
     /**
      * @brief Get the Compressed Fabric ID assigned to the device.
@@ -274,7 +260,14 @@ public:
      */
     uint64_t GetFabricId() const { return mFabricId; }
 
-    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() { return mInteractionModelDelegate; }
+    DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate()
+    {
+        if (mSystemState != nullptr)
+        {
+            return mSystemState->IMDelegate();
+        }
+        return nullptr;
+    }
 
 protected:
     enum class State
@@ -297,26 +290,15 @@ protected:
     PeerId mLocalId    = PeerId();
     FabricId mFabricId = kUndefinedFabricId;
 
-    DeviceTransportMgr * mTransportMgr                             = nullptr;
-    SessionManager * mSessionManager                               = nullptr;
-    Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
-    secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
-    PersistentStorageDelegate * mStorageDelegate                   = nullptr;
-    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate  = nullptr;
+    PersistentStorageDelegate * mStorageDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Mdns::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
 #endif
-    Inet::InetLayer * mInetLayer = nullptr;
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * mBleLayer = nullptr;
-#endif
-    System::Layer * mSystemLayer                                         = nullptr;
-    DeviceControllerInteractionModelDelegate * mInteractionModelDelegate = nullptr;
+    DeviceControllerSystemState * mSystemState = nullptr;
 
-    uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
     uint16_t FindDeviceIndex(SessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
@@ -328,8 +310,7 @@ protected:
 
     void PersistNextKeyId();
 
-    FabricIndex mFabricIndex = Transport::kMinValidFabricIndex;
-    Transport::FabricTable mFabrics;
+    FabricIndex mFabricIndex = kMinValidFabricIndex;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
@@ -399,6 +380,21 @@ public:
     CHIP_ERROR Shutdown() override;
 
     // ----- Connection Management -----
+    /**
+     * @brief
+     *   Pair a CHIP device with the provided code. The code can be either a QRCode
+     *   or a Manual Setup Code.
+     *   Use registered DevicePairingDelegate object to receive notifications on
+     *   pairing status updates.
+     *
+     *   Note: Pairing process requires that the caller has registered PersistentStorageDelegate
+     *         in the Init() call.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] setUpCode             The setup code for connecting to the device
+     */
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode);
+
     /**
      * @brief
      *   Pair a CHIP device with the provided Rendezvous connection parameters.
@@ -708,6 +704,7 @@ private:
     Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
+    SetUpCodePairer mSetUpCodePairer;
 
     PASESession mPairingSession;
 };

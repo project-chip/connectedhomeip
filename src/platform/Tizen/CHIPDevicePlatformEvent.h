@@ -43,7 +43,11 @@ enum PublicPlatformSpecificEventTypes
  */
 enum InternalPlatformSpecificEventTypes
 {
-    /* None currently defined */
+    kPlatformTizenEvent = kRange_InternalPlatformSpecific,
+    kPlatformTizenBLEPeripheralGATTServerRegisterComplete,
+    kPlatformTizenBLEPeripheralAdvConfiguredComplete,
+    kPlatformTizenBLEPeripheralAdvStartComplete,
+    kPlatformTizenBLEPeripheralAdvStopComplete
 };
 
 } // namespace DeviceEventType
@@ -55,7 +59,26 @@ struct ChipDevicePlatformEvent
 {
     union
     {
-        /* None currently defined */
+        struct
+        {
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralGATTServerRegisterComplete;
+        struct
+        {
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralAdvConfiguredComplete;
+        struct
+        {
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralAdvStartComplete;
+        struct
+        {
+            bool mIsSuccess;
+            void * mpAppstate;
+        } BLEPeripheralAdvStopComplete;
     };
 };
 

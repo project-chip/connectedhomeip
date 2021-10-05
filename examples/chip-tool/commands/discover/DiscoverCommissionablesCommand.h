@@ -20,14 +20,15 @@
 
 #include "../common/Command.h"
 
-class DiscoverCommissionablesCommand : public Command
+class DiscoverCommissionablesCommand : public Command, public chip::Controller::DeviceDiscoveryDelegate
 {
 public:
     DiscoverCommissionablesCommand() : Command("commissionables") {}
-    CHIP_ERROR Run() override;
-    uint16_t GetWaitDurationInSeconds() const override { return 3; }
-    void Shutdown() override;
 
-private:
-    ChipDeviceCommissioner * mCommissioner;
+    /////////// DeviceDiscoveryDelegate Interface /////////
+    void OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData) override;
+
+    /////////// Command Interface /////////
+    CHIP_ERROR Run() override;
+    uint16_t GetWaitDurationInSeconds() const override { return 30; }
 };

@@ -177,19 +177,23 @@ static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inCo
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
                                              vector->iv, vector->iv_len, out_ct.Get(), out_tag.Get(), vector->tag_len);
-            bool areCTsEqual  = memcmp(out_ct.Get(), vector->ct, vector->ct_len) == 0;
-            bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
-            NL_TEST_ASSERT(inSuite, areCTsEqual);
-            NL_TEST_ASSERT(inSuite, areTagsEqual);
-            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, err == vector->result);
 
-            if (!areCTsEqual)
+            if (vector->result == CHIP_NO_ERROR)
             {
-                printf("\n Test %d failed due to mismatching ciphertext", vector->tcId);
-            }
-            if (!areTagsEqual)
-            {
-                printf("\n Test %d failed due to mismatching tags", vector->tcId);
+                bool areCTsEqual  = memcmp(out_ct.Get(), vector->ct, vector->ct_len) == 0;
+                bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
+                NL_TEST_ASSERT(inSuite, areCTsEqual);
+                NL_TEST_ASSERT(inSuite, areTagsEqual);
+
+                if (!areCTsEqual)
+                {
+                    printf("\n Test %d failed due to mismatching ciphertext", vector->tcId);
+                }
+                if (!areTagsEqual)
+                {
+                    printf("\n Test %d failed due to mismatching tags", vector->tcId);
+                }
             }
         }
     }
@@ -216,12 +220,16 @@ static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inCo
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
                                              vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt.Get());
 
-            bool arePTsEqual = memcmp(vector->pt, out_pt.Get(), vector->pt_len) == 0;
-            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, arePTsEqual);
-            if (!arePTsEqual)
+            NL_TEST_ASSERT(inSuite, err == vector->result);
+
+            if (vector->result == CHIP_NO_ERROR)
             {
-                printf("\n Test %d failed due to mismatching plaintext", vector->tcId);
+                bool arePTsEqual = memcmp(vector->pt, out_pt.Get(), vector->pt_len) == 0;
+                NL_TEST_ASSERT(inSuite, arePTsEqual);
+                if (!arePTsEqual)
+                {
+                    printf("\n Test %d failed due to mismatching plaintext", vector->tcId);
+                }
             }
         }
     }

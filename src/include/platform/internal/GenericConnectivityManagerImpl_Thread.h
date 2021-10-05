@@ -68,6 +68,7 @@ protected:
     bool _IsThreadAttached();
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
+    void _ResetThreadNetworkDiagnosticsCounts();
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
 
     // ===== Members for use by the implementation subclass.
@@ -149,6 +150,12 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadPo
     const ConnectivityManager::ThreadPollingConfig & pollingConfig)
 {
     return ThreadStackMgrImpl().SetThreadPollingConfig(pollingConfig);
+}
+
+template <class ImplClass>
+inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()
+{
+    ThreadStackMgrImpl().ResetThreadNetworkDiagnosticsCounts();
 }
 
 template <class ImplClass>

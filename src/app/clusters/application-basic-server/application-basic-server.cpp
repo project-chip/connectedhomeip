@@ -22,17 +22,22 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <string>
 
 using namespace chip;
+using namespace chip::app::Clusters::ApplicationBasic;
 
 bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatus status, EndpointId endpoint);
 
-bool emberAfApplicationBasicClusterChangeStatusCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                        uint8_t newApplicationStatus)
+bool emberAfApplicationBasicClusterChangeStatusCallback(app::CommandHandler * commandObj,
+                                                        const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                        uint8_t newApplicationStatus,
+                                                        Commands::ChangeStatus::DecodableType & commandData)
 {
     bool success = applicationBasicClusterChangeApplicationStatus(static_cast<EmberAfApplicationBasicStatus>(newApplicationStatus),
                                                                   emberAfCurrentEndpoint());

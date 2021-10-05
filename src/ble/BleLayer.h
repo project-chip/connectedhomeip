@@ -77,8 +77,8 @@ namespace Ble {
  */
 #define NUM_SUPPORTED_PROTOCOL_VERSIONS 8
 /// Version(s) of the CHIP BLE Transport Protocol that this stack supports.
-#define CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION kBleTransportProtocolVersion_V2
-#define CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION kBleTransportProtocolVersion_V3
+#define CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION kBleTransportProtocolVersion_V4
+#define CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION kBleTransportProtocolVersion_V4
 
 /// Forward declarations.
 class BleLayer;
@@ -88,9 +88,7 @@ class BLEEndPoint;
 typedef enum
 {
     kBleTransportProtocolVersion_None = 0,
-    kBleTransportProtocolVersion_V1   = 1, // Prototype BTP version without ACKs or flow-control.
-    kBleTransportProtocolVersion_V2   = 2, // First BTP version with ACKs and flow-control.
-    kBleTransportProtocolVersion_V3   = 3  // First BTP version with asymetric fragement sizes.
+    kBleTransportProtocolVersion_V4   = 4 // BTP as defined by CHIP v1.0
 } BleTransportProtocolVersion;
 
 constexpr size_t kCapabilitiesRequestMagicnumLength          = 2;
@@ -247,7 +245,9 @@ public:
     CHIP_ERROR Shutdown();
 
     CHIP_ERROR CancelBleIncompleteConnection();
-    CHIP_ERROR NewBleConnectionByDiscriminator(uint16_t connDiscriminator);
+    CHIP_ERROR NewBleConnectionByDiscriminator(uint16_t connDiscriminator, void * appState = nullptr,
+                                               BleConnectionDelegate::OnConnectionCompleteFunct onSucess = OnConnectionComplete,
+                                               BleConnectionDelegate::OnConnectionErrorFunct onError     = OnConnectionError);
     CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
     CHIP_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
@@ -319,6 +319,8 @@ public:
 #if CHIP_ENABLE_CHIPOBLE_TEST
     BLEEndPoint * mTestBleEndPoint;
 #endif
+
+    BLEEndPoint * mBleEndPoint;
 
 private:
     // Private data members:

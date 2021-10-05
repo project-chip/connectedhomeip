@@ -43,16 +43,6 @@ ReliableMessageContext::ReliableMessageContext() :
     mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0), mPendingPeerAckMessageCounter(0)
 {}
 
-void ReliableMessageContext::RetainContext()
-{
-    GetExchangeContext()->Retain();
-}
-
-void ReliableMessageContext::ReleaseContext()
-{
-    GetExchangeContext()->Release();
-}
-
 bool ReliableMessageContext::AutoRequestAck() const
 {
     return mFlags.Has(Flags::kFlagAutoRequestAck);
@@ -88,14 +78,14 @@ void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
     mFlags.Set(Flags::kFlagDropAckDebug, inDropAckDebug);
 }
 
-bool ReliableMessageContext::IsOccupied() const
+bool ReliableMessageContext::IsMessageNotAcked() const
 {
-    return mFlags.Has(Flags::kFlagOccupied);
+    return mFlags.Has(Flags::kFlagMesageNotAcked);
 }
 
-void ReliableMessageContext::SetOccupied(bool inOccupied)
+void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
 {
-    mFlags.Set(Flags::kFlagOccupied, inOccupied);
+    mFlags.Set(Flags::kFlagMesageNotAcked, messageNotAcked);
 }
 
 bool ReliableMessageContext::ShouldDropAckDebug() const
@@ -265,9 +255,9 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
 
         // Replace the Pending ack message counter.
         SetPendingPeerAckMessageCounter(messageCounter);
-        mNextAckTimeTick =
-            static_cast<uint16_t>(CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK +
-                                  GetReliableMessageMgr()->GetTickCounterFromTimeDelta(System::Clock::GetMonotonicMilliseconds()));
+        mNextAckTimeTick = static_cast<uint16_t>(
+            CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK +
+            GetReliableMessageMgr()->GetTickCounterFromTimeDelta(System::SystemClock().GetMonotonicMilliseconds()));
         return CHIP_NO_ERROR;
     }
 }

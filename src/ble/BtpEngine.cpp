@@ -74,7 +74,7 @@ static void PrintBufDebug(const System::PacketBufferHandle & buf)
 }
 
 const uint16_t BtpEngine::sDefaultFragmentSize = 20;  // 23-byte minimum ATT_MTU - 3 bytes for ATT operation header
-const uint16_t BtpEngine::sMaxFragmentSize     = 128; // Size of write and indication characteristics
+const uint16_t BtpEngine::sMaxFragmentSize     = 244; // Maximum size of BTP segment
 
 CHIP_ERROR BtpEngine::Init(void * an_app_state, bool expect_first_ack)
 {

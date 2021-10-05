@@ -73,6 +73,34 @@ GITHUB_CONFIG: ConfigDescription = {
             'alias': ['--keep'],
         },
     },
+    'github.dryrun-comment': {
+        'help': 'Dry run for sending output as github PR comments',
+        'default': False,
+    },
+    'github.limit-comments': {
+        'help': 'Send no more than COUNT comments',
+        'metavar': 'COUNT',
+        'default': 0,
+        'argparse': {
+            'type': int,
+        },
+    },
+    'github.limit-artifacts': {
+        'help': 'Download no more than COUNT artifacts',
+        'metavar': 'COUNT',
+        'default': 0,
+        'argparse': {
+            'type': int,
+        },
+    },
+    'github.limit-artifact-pages': {
+        'help': 'Examine no more than COUNT pages of artifacts',
+        'metavar': 'COUNT',
+        'default': 0,
+        'argparse': {
+            'type': int,
+        },
+    },
     Config.group_map('report'): {
         'group': 'output'
     },
@@ -208,10 +236,14 @@ class SizeDatabase(memdf.util.sqlite.Database):
         if not self.gh:
             return
 
+        artifact_limit = self.config['github.limit-artifacts']
+        artifact_pages = self.config['github.limit-artifact-pages']
+
         # Size artifacts have names of the form
         #   Size,{group},{pr},{commit_hash},{parent_hash}
         # Record them keyed by group and commit_hash to match them up
         # after we have the entire list.
+        page = 0
         size_artifacts: Dict[str, Dict[str, fastcore.basics.AttrDict]] = {}
         for i in ghapi.all.paged(self.gh.actions.list_artifacts_for_repo):
             if not i.artifacts:
@@ -226,6 +258,10 @@ class SizeDatabase(memdf.util.sqlite.Database):
                     if group not in size_artifacts:
                         size_artifacts[group] = {}
                     size_artifacts[group][commit] = a
+            page += 1
+            logging.debug('Artifact list page %d of %d', page, artifact_pages)
+            if artifact_pages and page >= artifact_pages:
+                break
 
         # Determine required size artifacts.
         required_artifact_ids: set[int] = set()
@@ -235,6 +271,9 @@ class SizeDatabase(memdf.util.sqlite.Database):
                 if self.config['report.pr' if report.pr else 'report.push']:
                     if report.parent not in group_reports:
                         logging.info('  No match for %s', report.name)
+                        continue
+                    if (artifact_limit
+                            and len(required_artifact_ids) >= artifact_limit):
                         continue
                     # We have size information for both this report and its
                     # parent, so ensure that both artifacts are downloaded.
@@ -291,7 +330,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         self.commit()
 
     def delete_artifact(self, artifact_id: int):
-        if self.gh and artifact_id not in self.deleted_artifacts:
+        if self.gh and artifact_id and artifact_id not in self.deleted_artifacts:
             self.deleted_artifacts.add(artifact_id)
             self.gh.actions.delete_artifact(artifact_id)
 
@@ -450,6 +489,15 @@ def gh_send_change_report(db: SizeDatabase, df: pd.DataFrame,
     text = md.getvalue()
     md.close()
 
+    if existing_comment_id:
+        comment = f'updating comment {existing_comment_id}'
+    else:
+        comment = 'as new comment'
+    logging.info('%s for %s %s', df.attrs['title'], summary, comment)
+
+    if db.config['github.dryrun-comment']:
+        return False
+
     try:
         if existing_comment_id:
             db.gh.issues.update_comment(existing_comment_id, text)
@@ -464,6 +512,12 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
     """Report on all new comparable commits."""
     if not (db.config['report.pr'] or db.config['report.push']):
         return {}
+
+    comment_count = 0
+    comment_limit = db.config['github.limit-comments']
+    comment_enabled = (db.config['github.comment']
+                       or db.config['github.dryrun-comment'])
+
     dfs = {}
     for pr, commit, parent in db.select_matching_commits().fetchall():
         if not db.config['report.pr' if pr else 'report.push']:
@@ -483,7 +537,9 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
                 f'Increases above {threshold:.1f}% from {commit} to {parent}')
             dfs[tdf.attrs['name']] = tdf
 
-        if pr and db.config['github.comment']:
+        if (pr and comment_enabled
+                and (comment_limit == 0 or comment_limit > comment_count)):
+            comment_count += 1
             if gh_send_change_report(db, df, tdf):
                 # Mark the originating builds, and remove the originating
                 # artifacts, so that they don't generate duplicate report

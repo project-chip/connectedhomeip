@@ -129,7 +129,6 @@ private:
 } gPingArguments;
 
 Protocols::Echo::EchoClient gEchoClient;
-Transport::FabricTable gFabrics;
 
 CHIP_ERROR SendEchoRequest(streamer_t * stream);
 void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState);
@@ -211,7 +210,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
         sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
     }
 
-    gPingArguments.SetLastEchoTime(System::Clock::GetMonotonicMilliseconds());
+    gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicMilliseconds());
     SuccessOrExit(chip::DeviceLayer::SystemLayer().StartTimer(gPingArguments.GetEchoInterval(), EchoTimerHandler, NULL));
 
     streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
@@ -256,7 +255,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Establish secure session failed, err: %s\n", ErrorStr(err));
-        gPingArguments.SetLastEchoTime(System::Clock::GetMonotonicMilliseconds());
+        gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicMilliseconds());
     }
     else
     {
@@ -268,8 +267,8 @@ exit:
 
 void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload)
 {
-    uint32_t respTime    = System::Clock::GetMonotonicMilliseconds();
-    uint32_t transitTime = respTime - gPingArguments.GetLastEchoTime();
+    uint64_t respTime    = System::SystemClock().GetMonotonicMilliseconds();
+    uint64_t transitTime = respTime - gPingArguments.GetLastEchoTime();
     streamer_t * sout    = streamer_get();
 
     gPingArguments.SetWaitingForEchoResp(false);
@@ -306,7 +305,7 @@ void StartPinging(streamer_t * stream, char * destination)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gFabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);
@@ -315,7 +314,7 @@ void StartPinging(streamer_t * stream, char * destination)
     else
 #endif
     {
-        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gFabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(&gSessionManager);

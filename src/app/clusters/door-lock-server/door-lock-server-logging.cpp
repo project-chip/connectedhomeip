@@ -42,14 +42,17 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/util/af.h>
 #include <assert.h>
 
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::DoorLock;
 
 static EmberAfPluginDoorLockServerLogEntry entries[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_LOG_ENTRIES];
 static uint8_t nextEntryId = 1;
@@ -117,7 +120,9 @@ bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoo
     return true;
 }
 
-bool emberAfDoorLockClusterGetLogRecordCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint16_t entryId)
+bool emberAfDoorLockClusterGetLogRecordCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                EndpointId endpoint, uint16_t entryId,
+                                                Commands::GetLogRecord::DecodableType & commandData)
 {
     EmberStatus status;
     EmberAfPluginDoorLockServerLogEntry entry;

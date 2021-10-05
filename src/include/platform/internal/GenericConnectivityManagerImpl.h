@@ -52,6 +52,7 @@ public:
     CHIP_ERROR _GetEthTxErrCount(uint64_t & txErrCount);
     CHIP_ERROR _GetEthCollisionCount(uint64_t & collisionCount);
     CHIP_ERROR _GetEthOverrunCount(uint64_t & overrunCount);
+    CHIP_ERROR _ResetEthNetworkDiagnosticsCounts();
 
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
@@ -103,6 +104,12 @@ inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_GetEthCollisionCou
 
 template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_GetEthOverrunCount(uint64_t & overrunCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl<ImplClass>::_ResetEthNetworkDiagnosticsCounts()
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

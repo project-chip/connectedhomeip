@@ -52,11 +52,13 @@ namespace System {
 
 namespace Internal {
 
-ClockBase * gClockBase = &gClockImpl;
-
-#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+#if CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+extern ClockImpl gClockImpl;
+#else  // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 ClockImpl gClockImpl;
-#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+#endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+
+ClockBase * gClockBase = &gClockImpl;
 
 } // namespace Internal
 
@@ -171,15 +173,22 @@ Clock::MonotonicMilliseconds ClockImpl::GetMonotonicMilliseconds(void)
 
 namespace Clock {
 
-bool IsEarlier(const Clock::MonotonicMilliseconds & inFirst, const Clock::MonotonicMilliseconds & inSecond)
-{
-    static const Clock::MonotonicMilliseconds kMaxTime_2 = static_cast<Clock::MonotonicMilliseconds>(
-        (static_cast<Clock::MonotonicMilliseconds>(0) - static_cast<Clock::MonotonicMilliseconds>(1)) / 2);
+static_assert(std::is_unsigned<ClockBase::Tick>::value, "ClockBase::Tick must be unsigned");
+constexpr ClockBase::Tick kMaxTick     = static_cast<ClockBase::Tick>(0) - static_cast<ClockBase::Tick>(1);
+constexpr ClockBase::Tick kHalfMaxTick = static_cast<ClockBase::Tick>(kMaxTick / 2);
 
+bool IsEarlier(const ClockBase::Tick & inFirst, const ClockBase::Tick & inSecond)
+{
     // account for timer wrap with the assumption that no two input times will "naturally"
     // be more than half the timer range apart.
-    return (((inFirst < inSecond) && (inSecond - inFirst < kMaxTime_2)) ||
-            ((inFirst > inSecond) && (inFirst - inSecond > kMaxTime_2)));
+    return (((inFirst < inSecond) && (inSecond - inFirst < kHalfMaxTick)) ||
+            ((inFirst > inSecond) && (inFirst - inSecond > kHalfMaxTick)));
+}
+
+ClockBase::Tick AddOffset(const ClockBase::Tick & base, const ClockBase::Tick & offset)
+{
+    const ClockBase::Tick increment = (offset < kHalfMaxTick) ? offset : (kHalfMaxTick - 1);
+    return base + increment;
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS

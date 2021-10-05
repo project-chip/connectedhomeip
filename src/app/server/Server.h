@@ -61,7 +61,7 @@ public:
 
     CHIP_ERROR AddTestCommissioning();
 
-    Transport::FabricTable & GetFabricTable() { return mFabrics; }
+    FabricTable & GetFabricTable() { return mFabrics; }
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
@@ -70,6 +70,10 @@ public:
     SessionManager & GetSecureSessionManager() { return mSessions; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
+
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * getBleLayerObject() { return mBleLayer; }
+#endif
 
     CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
 
@@ -113,11 +117,15 @@ private:
 
     AppDelegate * mAppDelegate = nullptr;
 
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * mBleLayer = nullptr;
+#endif
+
     ServerTransportMgr mTransports;
     SessionManager mSessions;
     CASEServer mCASEServer;
     Messaging::ExchangeManager mExchangeMgr;
-    Transport::FabricTable mFabrics;
+    FabricTable mFabrics;
     SessionIDAllocator mSessionIDAllocator;
     secure_channel::MessageCounterManager mMessageCounterManager;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT

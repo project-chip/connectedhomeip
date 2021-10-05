@@ -21,7 +21,6 @@
 #pragma once
 
 #include <transport/CryptoContext.h>
-#include <transport/FabricTable.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
 #include <transport/raw/Base.h>
