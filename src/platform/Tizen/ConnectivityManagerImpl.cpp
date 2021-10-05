@@ -75,22 +75,13 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     wifi_manager_device_state_e deviceState = WIFI_MANAGER_DEVICE_STATE_DEACTIVATED;
 
-    if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
-    {
-        err = WiFiMgr().GetDeviceState(&deviceState);
-        SuccessOrExit(err);
+    ReturnErrorCodeIf(mWiFiStationMode == kWiFiStationMode_ApplicationControlled, mWiFiStationMode);
 
-        if (deviceState == WIFI_MANAGER_DEVICE_STATE_ACTIVATED)
-        {
-            mWiFiStationMode = kWiFiStationMode_Enabled;
-        }
-        else
-        {
-            mWiFiStationMode = kWiFiStationMode_Disabled;
-        }
-    }
+    err = WiFiMgr().GetDeviceState(&deviceState);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, mWiFiStationMode);
 
-exit:
+    mWiFiStationMode = (deviceState == WIFI_MANAGER_DEVICE_STATE_ACTIVATED) ? kWiFiStationMode_Enabled : kWiFiStationMode_Disabled;
+
     return mWiFiStationMode;
 }
 
@@ -99,12 +90,12 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiF
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     wifi_manager_device_state_e deviceState = WIFI_MANAGER_DEVICE_STATE_DEACTIVATED;
 
-    VerifyOrExit(val != kWiFiStationMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(val != kWiFiStationMode_ApplicationControlled, );
+    ReturnErrorCodeIf(val == kWiFiStationMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(val == kWiFiStationMode_ApplicationControlled, CHIP_NO_ERROR);
 
     deviceState = (val == kWiFiStationMode_Disabled) ? WIFI_MANAGER_DEVICE_STATE_DEACTIVATED : WIFI_MANAGER_DEVICE_STATE_ACTIVATED;
     err         = WiFiMgr().SetDeviceState(deviceState);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
     if (mWiFiStationMode != val)
     {
@@ -114,7 +105,6 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiF
         mWiFiStationMode = val;
     }
 
-exit:
     return err;
 }
 
@@ -146,12 +136,11 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
     bool isWifiStationConnected                     = false;
 
     err = WiFiMgr().GetConnectionState(&connectionState);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, isWifiStationConnected);
 
     if (connectionState == WIFI_MANAGER_CONNECTION_STATE_CONNECTED)
         isWifiStationConnected = true;
 
-exit:
     return isWifiStationConnected;
 }
 
@@ -162,12 +151,11 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
     bool isWifiStationProvisioned                   = false;
 
     err = WiFiMgr().GetConnectionState(&connectionState);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, isWifiStationProvisioned);
 
     if (connectionState >= WIFI_MANAGER_CONNECTION_STATE_ASSOCIATION)
         isWifiStationProvisioned = true;
 
-exit:
     return isWifiStationProvisioned;
 }
 
