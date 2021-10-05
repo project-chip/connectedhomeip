@@ -139,7 +139,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathP
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
 
-    err = PrepareCommand(aCommandPathParams, true /* isStatus */);
+    err = PrepareCommand(aCommandPathParams, false /* aStartDataStruct */);
     SuccessOrExit(err);
 
     statusElementBuilder =
@@ -149,10 +149,18 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathP
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);
 
-    err = FinishCommand(true /* isStatus */);
+    err = FinishCommand(false /* aEndDataStruct */);
 
 exit:
     return err;
+}
+
+CHIP_ERROR CommandHandler::PrepareResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommand)
+{
+    CommandPathParams params = { aRequestCommandPath.mEndpointId,
+                                 0, // GroupId
+                                 aRequestCommandPath.mClusterId, aResponseCommand, (CommandPathFlags::kEndpointIdValid) };
+    return PrepareCommand(params, false /* aStartDataStruct */);
 }
 
 } // namespace app
