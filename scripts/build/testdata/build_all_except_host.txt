@@ -46,23 +46,20 @@ gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating efr32-brd4161a-light-light
-gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light-light
+# Generating efr32-brd4161a-light
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light
 
-# Generating efr32-brd4161a-light-light-rpc
-gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-light-rpc
+# Generating efr32-brd4161a-light-rpc
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-rpc
 
-# Generating efr32-brd4161a-light-lock
-gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light-lock
+# Generating efr32-brd4161a-lock
+gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-lock
 
-# Generating efr32-brd4161a-light-lock-rpc
-gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-lock-rpc
+# Generating efr32-brd4161a-lock-rpc
+gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-lock-rpc
 
-# Generating efr32-brd4161a-light-window-covering
-gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light-window-covering
-
-# Generating efr32-brd4161a-light-window-covering-rpc
-gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-window-covering-rpc
+# Generating efr32-brd4161a-window-covering
+gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
 
 # Generating esp32-c3devkit-all-clusters
 cd "{root}"
@@ -249,23 +246,20 @@ cp {out}/android-x86-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 # Building APP android-x86-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PbuildDir={out}/android-x86-chip-tool assembleDebug
 
-# Building efr32-brd4161a-light-light
-ninja -C {out}/efr32-brd4161a-light-light
+# Building efr32-brd4161a-light
+ninja -C {out}/efr32-brd4161a-light
 
-# Building efr32-brd4161a-light-light-rpc
-ninja -C {out}/efr32-brd4161a-light-light-rpc
+# Building efr32-brd4161a-light-rpc
+ninja -C {out}/efr32-brd4161a-light-rpc
 
-# Building efr32-brd4161a-light-lock
-ninja -C {out}/efr32-brd4161a-light-lock
+# Building efr32-brd4161a-lock
+ninja -C {out}/efr32-brd4161a-lock
 
-# Building efr32-brd4161a-light-lock-rpc
-ninja -C {out}/efr32-brd4161a-light-lock-rpc
+# Building efr32-brd4161a-lock-rpc
+ninja -C {out}/efr32-brd4161a-lock-rpc
 
-# Building efr32-brd4161a-light-window-covering
-ninja -C {out}/efr32-brd4161a-light-window-covering
-
-# Building efr32-brd4161a-light-window-covering-rpc
-ninja -C {out}/efr32-brd4161a-light-window-covering-rpc
+# Building efr32-brd4161a-window-covering
+ninja -C {out}/efr32-brd4161a-window-covering
 
 # Building esp32-c3devkit-all-clusters
 bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-c3devkit-all-clusters'"'"''
