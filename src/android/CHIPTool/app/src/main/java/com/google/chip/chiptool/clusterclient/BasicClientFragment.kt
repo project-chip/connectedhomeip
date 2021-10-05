@@ -79,8 +79,8 @@ class BasicClientFragment : Fragment() {
   private fun updateAddressClick() {
     try {
       deviceController.updateDevice(
-              basicClusterFabricIdEd.text.toString().toULong().toLong(),
-              basicClusterDeviceIdEd.text.toString().toULong().toLong()
+        basicClusterFabricIdEd.text.toString().toULong().toLong(),
+        basicClusterDeviceIdEd.text.toString().toULong().toLong()
       )
       showMessage("Address update started")
     } catch (ex: Exception) {
@@ -136,7 +136,7 @@ class BasicClientFragment : Fragment() {
 
   private suspend fun getBasicClusterForDevice(): BasicCluster {
     return BasicCluster(
-            ChipClient.getConnectedDevicePointer(requireContext(), basicClusterDeviceIdEd.text.toString().toLong()), 0
+      ChipClient.getConnectedDevicePointer(requireContext(), basicClusterDeviceIdEd.text.toString().toLong()), 0
     )
   }
 
