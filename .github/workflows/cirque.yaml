@@ -27,9 +27,9 @@ jobs:
     cirque:
         name: Cirque
         timeout-minutes: 60
-        
+
         env:
-            DOCKER_RUN_VERSION: 0.4.21
+            DOCKER_RUN_VERSION: latest
             GITHUB_CACHE_PATH: /tmp/cirque-cache/
 
         runs-on: ubuntu-latest
