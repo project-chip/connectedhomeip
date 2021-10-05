@@ -23,7 +23,7 @@ from builders.qpg import QpgBuilder
 from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
-from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder 
+from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 
 
 class Target:
