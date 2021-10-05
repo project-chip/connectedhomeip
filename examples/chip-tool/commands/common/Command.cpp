@@ -87,6 +87,7 @@ static bool ParseAddressWithInterface(const char * addressString, Command::Addre
 bool Command::InitArgument(size_t argIndex, char * argValue)
 {
     bool isValidArgument = false;
+    bool isHexNotation   = strncmp(argValue, "0x", 2) == 0 || strncmp(argValue, "0X", 2) == 0;
 
     Argument arg = mArgs.at(argIndex);
     switch (arg.type)
@@ -163,7 +164,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
         // stringstream treats uint8_t as char, which is not what we want here.
         uint16_t tmpValue;
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> tmpValue;
         if (chip::CanCastTo<uint8_t>(tmpValue))
         {
@@ -182,7 +184,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint16: {
         uint16_t * value = reinterpret_cast<uint16_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
@@ -193,7 +196,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint32: {
         uint32_t * value = reinterpret_cast<uint32_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
@@ -204,7 +208,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_uint64: {
         uint64_t * value = reinterpret_cast<uint64_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         uint64_t min    = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
@@ -218,7 +223,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
         // stringstream treats int8_t as char, which is not what we want here.
         int16_t tmpValue;
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> tmpValue;
         if (chip::CanCastTo<int8_t>(tmpValue))
         {
@@ -237,7 +243,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int16: {
         int16_t * value = reinterpret_cast<int16_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         int64_t min     = arg.min;
@@ -248,7 +255,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int32: {
         int32_t * value = reinterpret_cast<int32_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         int64_t min     = arg.min;
@@ -259,7 +267,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Number_int64: {
         int64_t * value = reinterpret_cast<int64_t *>(arg.value);
-        std::stringstream ss(argValue);
+        std::stringstream ss;
+        isHexNotation ? ss << std::hex << argValue : ss << argValue;
         ss >> *value;
 
         int64_t min     = arg.min;

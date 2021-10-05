@@ -25,7 +25,9 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
@@ -94,7 +96,9 @@ void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::Cluster
 /**
  * @brief  Cluster StopMotion Command callback (from client)
  */
-bool emberAfWindowCoveringClusterStopMotionCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+bool emberAfWindowCoveringClusterStopMotionCallback(chip::app::CommandHandler * commandObj,
+                                                    const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
+                                                    Commands::StopMotion::DecodableType & commandData)
 {
     ChipLogProgress(Zcl, "StopMotion command received");
     WindowApp::Instance().PostEvent(WindowApp::Event(WindowApp::EventId::StopMotion, endpoint));

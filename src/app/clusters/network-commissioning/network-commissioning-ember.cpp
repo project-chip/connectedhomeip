@@ -25,16 +25,21 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::NetworkCommissioning;
 
-bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(EndpointId endpoint, app::CommandHandler * commandObj,
+bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(app::CommandHandler * commandObj,
+                                                                const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
                                                                 ByteSpan operationalDataset, uint64_t breadcrumb,
-                                                                uint32_t timeoutMs)
+                                                                uint32_t timeoutMs,
+                                                                Commands::AddThreadNetwork::DecodableType & commandData)
 {
     EmberAfNetworkCommissioningError err = app::Clusters::NetworkCommissioning::OnAddThreadNetworkCommandCallbackInternal(
         nullptr, emberAfCurrentEndpoint(), operationalDataset, breadcrumb, timeoutMs);
@@ -43,8 +48,11 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(EndpointId endpo
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan ssid,
-                                                              ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                              ByteSpan ssid, ByteSpan credentials, uint64_t breadcrumb,
+                                                              uint32_t timeoutMs,
+                                                              Commands::AddWiFiNetwork::DecodableType & commandData)
 {
     EmberAfNetworkCommissioningError err = app::Clusters::NetworkCommissioning::OnAddWiFiNetworkCommandCallbackInternal(
         nullptr, emberAfCurrentEndpoint(), ssid, credentials, breadcrumb, timeoutMs);
@@ -53,8 +61,10 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(EndpointId endpoin
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterEnableNetworkCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                             ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterEnableNetworkCallback(app::CommandHandler * commandObj,
+                                                             const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                             ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs,
+                                                             Commands::EnableNetwork::DecodableType & commandData)
 {
     EmberAfNetworkCommissioningError err = app::Clusters::NetworkCommissioning::OnEnableNetworkCommandCallbackInternal(
         nullptr, emberAfCurrentEndpoint(), networkID, breadcrumb, timeoutMs);
@@ -66,40 +76,50 @@ bool emberAfNetworkCommissioningClusterEnableNetworkCallback(EndpointId endpoint
 // TODO: The following commands needed to be implemented.
 // These commands are not implemented thus not handled yet, return false so ember will return a error.
 
-bool emberAfNetworkCommissioningClusterDisableNetworkCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                              ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterDisableNetworkCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                              ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs,
+                                                              Commands::DisableNetwork::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(EndpointId endpoint,
-                                                                                 app::CommandHandler * commandObj,
-                                                                                 uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, EndpointId endpoint, uint32_t timeoutMs,
+    Commands::GetLastNetworkCommissioningResult::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                             ByteSpan NetworkID, uint64_t Breadcrumb, uint32_t TimeoutMs)
+bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(app::CommandHandler * commandObj,
+                                                             const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                             ByteSpan NetworkID, uint64_t Breadcrumb, uint32_t TimeoutMs,
+                                                             Commands::RemoveNetwork::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterScanNetworksCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan ssid,
-                                                            uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(app::CommandHandler * commandObj,
+                                                            const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                            ByteSpan ssid, uint64_t breadcrumb, uint32_t timeoutMs,
+                                                            Commands::ScanNetworks::DecodableType & commandData)
 {
     return false;
 }
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                   ByteSpan operationalDataset, uint64_t breadcrumb,
-                                                                   uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(app::CommandHandler * commandObj,
+                                                                   const app::ConcreteCommandPath & commandPath,
+                                                                   EndpointId endpoint, ByteSpan operationalDataset,
+                                                                   uint64_t breadcrumb, uint32_t timeoutMs,
+                                                                   Commands::UpdateThreadNetwork::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(EndpointId endpoint, app::CommandHandler * commandObj,
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(app::CommandHandler * commandObj,
+                                                                 const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
                                                                  ByteSpan ssid, ByteSpan credentials, uint64_t breadcrumb,
-                                                                 uint32_t timeoutMs)
+                                                                 uint32_t timeoutMs,
+                                                                 Commands::UpdateWiFiNetwork::DecodableType & commandData)
 {
     return false;
 }

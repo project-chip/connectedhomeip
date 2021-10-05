@@ -37,12 +37,348 @@ namespace DeviceTemperatureConfiguration {
 } // namespace DeviceTemperatureConfiguration
 namespace Identify {
 
+namespace Commands {
+namespace Identify {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Identify
+
+namespace IdentifyQueryResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace IdentifyQueryResponse
+
+namespace IdentifyQuery {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace IdentifyQuery
+
+namespace TriggerEffect {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace TriggerEffect
+
+} // namespace Commands
 } // namespace Identify
 namespace Groups {
 
+namespace Commands {
+namespace AddGroup {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AddGroup
+
+namespace AddGroupResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AddGroupResponse
+
+namespace ViewGroup {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ViewGroup
+
+namespace ViewGroupResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ViewGroupResponse
+
+namespace GetGroupMembership {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetGroupMembership
+
+namespace GetGroupMembershipResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetGroupMembershipResponse
+
+namespace RemoveGroup {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RemoveGroup
+
+namespace RemoveGroupResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RemoveGroupResponse
+
+namespace RemoveAllGroups {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RemoveAllGroups
+
+namespace AddGroupIfIdentifying {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AddGroupIfIdentifying
+
+} // namespace Commands
 } // namespace Groups
 namespace Scenes {
 
+namespace Commands {
+namespace AddScene {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AddScene
+
+namespace AddSceneResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AddSceneResponse
+
+namespace ViewScene {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ViewScene
+
+namespace ViewSceneResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ViewSceneResponse
+
+namespace RemoveScene {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RemoveScene
+
+namespace RemoveSceneResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RemoveSceneResponse
+
+namespace RemoveAllScenes {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RemoveAllScenes
+
+namespace RemoveAllScenesResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RemoveAllScenesResponse
+
+namespace StoreScene {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StoreScene
+
+namespace StoreSceneResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StoreSceneResponse
+
+namespace RecallScene {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RecallScene
+
+namespace GetSceneMembership {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetSceneMembership
+
+namespace GetSceneMembershipResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetSceneMembershipResponse
+
+namespace EnhancedAddScene {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnhancedAddScene
+
+namespace EnhancedAddSceneResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnhancedAddSceneResponse
+
+namespace EnhancedViewScene {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnhancedViewScene
+
+namespace EnhancedViewSceneResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnhancedViewSceneResponse
+
+namespace CopyScene {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CopyScene
+
+namespace CopySceneResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CopySceneResponse
+
+} // namespace Commands
 } // namespace Scenes
 namespace OnOff {
 // Enum for OnOffDelayedAllOffEffectVariant
@@ -64,15 +400,271 @@ enum class OnOffEffectIdentifier : uint8_t
     ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT     = 0x01,
 };
 
+namespace Commands {
+namespace Off {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Off
+
+namespace SampleMfgSpecificOffWithTransition {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SampleMfgSpecificOffWithTransition
+
+namespace On {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace On
+
+namespace SampleMfgSpecificOnWithTransition {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SampleMfgSpecificOnWithTransition
+
+namespace SampleMfgSpecificOnWithTransition2 {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SampleMfgSpecificOnWithTransition2
+
+namespace Toggle {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Toggle
+
+namespace SampleMfgSpecificToggleWithTransition {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SampleMfgSpecificToggleWithTransition
+
+namespace SampleMfgSpecificToggleWithTransition2 {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SampleMfgSpecificToggleWithTransition2
+
+namespace OffWithEffect {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace OffWithEffect
+
+namespace OnWithRecallGlobalScene {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace OnWithRecallGlobalScene
+
+namespace OnWithTimedOff {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace OnWithTimedOff
+
+} // namespace Commands
 } // namespace OnOff
 namespace OnOffSwitchConfiguration {
 
 } // namespace OnOffSwitchConfiguration
 namespace LevelControl {
 
+namespace Commands {
+namespace MoveToLevel {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveToLevel
+
+namespace Move {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Move
+
+namespace Step {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Step
+
+namespace Stop {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Stop
+
+namespace MoveToLevelWithOnOff {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveToLevelWithOnOff
+
+namespace MoveWithOnOff {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveWithOnOff
+
+namespace StepWithOnOff {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StepWithOnOff
+
+namespace StopWithOnOff {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StopWithOnOff
+
+} // namespace Commands
 } // namespace LevelControl
 namespace Alarms {
 
+namespace Commands {
+namespace ResetAlarm {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ResetAlarm
+
+namespace Alarm {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Alarm
+
+namespace ResetAllAlarms {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ResetAllAlarms
+
+namespace GetAlarmResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetAlarmResponse
+
+namespace GetAlarm {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetAlarm
+
+namespace ResetAlarmLog {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ResetAlarmLog
+
+} // namespace Commands
 } // namespace Alarms
 namespace Time {
 
@@ -82,9 +674,303 @@ namespace BinaryInputBasic {
 } // namespace BinaryInputBasic
 namespace PowerProfile {
 
+namespace Commands {
+namespace PowerProfileRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace PowerProfileRequest
+
+namespace PowerProfileNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace PowerProfileNotification
+
+namespace PowerProfileStateRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace PowerProfileStateRequest
+
+namespace PowerProfileResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace PowerProfileResponse
+
+namespace GetPowerProfilePriceResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetPowerProfilePriceResponse
+
+namespace PowerProfileStateResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace PowerProfileStateResponse
+
+namespace GetOverallSchedulePriceResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetOverallSchedulePriceResponse
+
+namespace GetPowerProfilePrice {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetPowerProfilePrice
+
+namespace EnergyPhasesScheduleNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnergyPhasesScheduleNotification
+
+namespace PowerProfilesStateNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace PowerProfilesStateNotification
+
+namespace EnergyPhasesScheduleResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnergyPhasesScheduleResponse
+
+namespace GetOverallSchedulePrice {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetOverallSchedulePrice
+
+namespace PowerProfileScheduleConstraintsRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace PowerProfileScheduleConstraintsRequest
+
+namespace EnergyPhasesScheduleRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnergyPhasesScheduleRequest
+
+namespace EnergyPhasesScheduleStateRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnergyPhasesScheduleStateRequest
+
+namespace EnergyPhasesScheduleStateResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnergyPhasesScheduleStateResponse
+
+namespace GetPowerProfilePriceExtendedResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetPowerProfilePriceExtendedResponse
+
+namespace EnergyPhasesScheduleStateNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnergyPhasesScheduleStateNotification
+
+namespace PowerProfileScheduleConstraintsNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace PowerProfileScheduleConstraintsNotification
+
+namespace PowerProfileScheduleConstraintsResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace PowerProfileScheduleConstraintsResponse
+
+namespace GetPowerProfilePriceExtended {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetPowerProfilePriceExtended
+
+} // namespace Commands
 } // namespace PowerProfile
 namespace ApplianceControl {
 
+namespace Commands {
+namespace ExecutionOfACommand {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ExecutionOfACommand
+
+namespace SignalStateResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SignalStateResponse
+
+namespace SignalState {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SignalState
+
+namespace SignalStateNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SignalStateNotification
+
+namespace WriteFunctions {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace WriteFunctions
+
+namespace OverloadPauseResume {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace OverloadPauseResume
+
+namespace OverloadPause {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace OverloadPause
+
+namespace OverloadWarning {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace OverloadWarning
+
+} // namespace Commands
 } // namespace ApplianceControl
 namespace Descriptor {
 
@@ -105,14 +991,110 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace DeviceType
 
 } // namespace Descriptor
 namespace PollControl {
 
+namespace Commands {
+namespace CheckIn {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CheckIn
+
+namespace CheckInResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CheckInResponse
+
+namespace FastPollStop {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace FastPollStop
+
+namespace SetLongPollInterval {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetLongPollInterval
+
+namespace SetShortPollInterval {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetShortPollInterval
+
+} // namespace Commands
 } // namespace PollControl
 namespace Basic {
 
+namespace Commands {
+namespace StartUp {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StartUp
+
+namespace MfgSpecificPing {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MfgSpecificPing
+
+namespace ShutDown {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ShutDown
+
+namespace Leave {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Leave
+
+} // namespace Commands
 } // namespace Basic
 namespace OtaSoftwareUpdateProvider {
 // Enum for OTAApplyUpdateAction
@@ -138,6 +1120,58 @@ enum class OTAQueryStatus : uint8_t
     OTA_QUERY_STATUS_NOT_AVAILABLE    = 0x02,
 };
 
+namespace Commands {
+namespace QueryImage {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace QueryImage
+
+namespace ApplyUpdateRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ApplyUpdateRequest
+
+namespace NotifyUpdateApplied {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace NotifyUpdateApplied
+
+namespace QueryImageResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace QueryImageResponse
+
+namespace ApplyUpdateRequestResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ApplyUpdateRequestResponse
+
+} // namespace Commands
 } // namespace OtaSoftwareUpdateProvider
 namespace OtaSoftwareUpdateRequestor {
 // Enum for OTAAnnouncementReason
@@ -148,6 +1182,18 @@ enum class OTAAnnouncementReason : uint8_t
     OTA_ANNOUNCEMENT_REASON_URGENT_UPDATE_AVAILABLE = 0x02,
 };
 
+namespace Commands {
+namespace AnnounceOtaProvider {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AnnounceOtaProvider
+
+} // namespace Commands
 } // namespace OtaSoftwareUpdateRequestor
 namespace PowerSource {
 
@@ -183,8 +1229,72 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace BasicCommissioningInfoType
 
+namespace Commands {
+namespace ArmFailSafe {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ArmFailSafe
+
+namespace ArmFailSafeResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ArmFailSafeResponse
+
+namespace SetRegulatoryConfig {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetRegulatoryConfig
+
+namespace SetRegulatoryConfigResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetRegulatoryConfigResponse
+
+namespace CommissioningComplete {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CommissioningComplete
+
+namespace CommissioningCompleteResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CommissioningCompleteResponse
+
+} // namespace Commands
 } // namespace GeneralCommissioning
 namespace NetworkCommissioning {
 // Enum for NetworkCommissioningError
@@ -227,6 +1337,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ThreadInterfaceScanResult
 namespace WiFiInterfaceScanResult {
 enum FieldId
@@ -251,8 +1363,182 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace WiFiInterfaceScanResult
 
+namespace Commands {
+namespace ScanNetworks {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ScanNetworks
+
+namespace ScanNetworksResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ScanNetworksResponse
+
+namespace AddWiFiNetwork {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AddWiFiNetwork
+
+namespace AddWiFiNetworkResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AddWiFiNetworkResponse
+
+namespace UpdateWiFiNetwork {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace UpdateWiFiNetwork
+
+namespace UpdateWiFiNetworkResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace UpdateWiFiNetworkResponse
+
+namespace AddThreadNetwork {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AddThreadNetwork
+
+namespace AddThreadNetworkResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AddThreadNetworkResponse
+
+namespace UpdateThreadNetwork {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace UpdateThreadNetwork
+
+namespace UpdateThreadNetworkResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace UpdateThreadNetworkResponse
+
+namespace RemoveNetwork {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RemoveNetwork
+
+namespace RemoveNetworkResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RemoveNetworkResponse
+
+namespace EnableNetwork {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnableNetwork
+
+namespace EnableNetworkResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnableNetworkResponse
+
+namespace DisableNetwork {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace DisableNetwork
+
+namespace DisableNetworkResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace DisableNetworkResponse
+
+namespace GetLastNetworkCommissioningResult {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetLastNetworkCommissioningResult
+
+} // namespace Commands
 } // namespace NetworkCommissioning
 namespace DiagnosticLogs {
 // Enum for LogsIntent
@@ -278,6 +1564,28 @@ enum class LogsTransferProtocol : uint8_t
     LOGS_TRANSFER_PROTOCOL_BDX              = 0x01,
 };
 
+namespace Commands {
+namespace RetrieveLogsRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RetrieveLogsRequest
+
+namespace RetrieveLogsResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RetrieveLogsResponse
+
+} // namespace Commands
 } // namespace DiagnosticLogs
 namespace GeneralDiagnostics {
 // Enum for BootReasonType
@@ -360,6 +1668,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace NetworkInterfaceType
 
 } // namespace GeneralDiagnostics
@@ -388,8 +1698,22 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ThreadMetrics
 
+namespace Commands {
+namespace ResetWatermarks {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ResetWatermarks
+
+} // namespace Commands
 } // namespace SoftwareDiagnostics
 namespace ThreadNetworkDiagnostics {
 // Enum for NetworkFault
@@ -453,6 +1777,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace NeighborTable
 namespace OperationalDatasetComponents {
 enum FieldId
@@ -491,6 +1817,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace OperationalDatasetComponents
 namespace RouteTable {
 enum FieldId
@@ -525,6 +1853,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace RouteTable
 namespace SecurityPolicy {
 enum FieldId
@@ -543,8 +1873,22 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace SecurityPolicy
 
+namespace Commands {
+namespace ResetCounts {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ResetCounts
+
+} // namespace Commands
 } // namespace ThreadNetworkDiagnostics
 namespace WiFiNetworkDiagnostics {
 // Enum for SecurityType
@@ -568,6 +1912,18 @@ enum class WiFiVersionType : uint8_t
     WI_FI_VERSION_TYPE_802__11AX = 0x05,
 };
 
+namespace Commands {
+namespace ResetCounts {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ResetCounts
+
+} // namespace Commands
 } // namespace WiFiNetworkDiagnostics
 namespace EthernetNetworkDiagnostics {
 // Enum for PHYRateType
@@ -585,9 +1941,63 @@ enum class PHYRateType : uint8_t
     PHY_RATE_TYPE_400_G  = 0x09,
 };
 
+namespace Commands {
+namespace ResetCounts {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ResetCounts
+
+} // namespace Commands
 } // namespace EthernetNetworkDiagnostics
 namespace BridgedDeviceBasic {
 
+namespace Commands {
+namespace StartUp {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StartUp
+
+namespace ShutDown {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ShutDown
+
+namespace Leave {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Leave
+
+namespace ReachableChanged {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ReachableChanged
+
+} // namespace Commands
 } // namespace BridgedDeviceBasic
 namespace Switch {
 
@@ -601,6 +2011,38 @@ enum class StatusCode : uint8_t
     STATUS_CODE_GENERAL_ERROR = 0x02,
 };
 
+namespace Commands {
+namespace OpenCommissioningWindow {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace OpenCommissioningWindow
+
+namespace OpenBasicCommissioningWindow {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace OpenBasicCommissioningWindow
+
+namespace RevokeCommissioning {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RevokeCommissioning
+
+} // namespace Commands
 } // namespace AdministratorCommissioning
 namespace OperationalCredentials {
 // Enum for NodeOperationalCertStatus
@@ -643,6 +2085,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace FabricDescriptor
 namespace NOCStruct {
 enum FieldId
@@ -661,8 +2105,142 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace NOCStruct
 
+namespace Commands {
+namespace AttestationRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AttestationRequest
+
+namespace AttestationResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AttestationResponse
+
+namespace CertificateChainRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CertificateChainRequest
+
+namespace CertificateChainResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CertificateChainResponse
+
+namespace OpCSRRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace OpCSRRequest
+
+namespace OpCSRResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace OpCSRResponse
+
+namespace AddNOC {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AddNOC
+
+namespace UpdateNOC {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace UpdateNOC
+
+namespace NOCResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace NOCResponse
+
+namespace UpdateFabricLabel {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace UpdateFabricLabel
+
+namespace RemoveFabric {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RemoveFabric
+
+namespace AddTrustedRootCertificate {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AddTrustedRootCertificate
+
+namespace RemoveTrustedRootCertificate {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RemoveTrustedRootCertificate
+
+} // namespace Commands
 } // namespace OperationalCredentials
 namespace FixedLabel {
 
@@ -683,6 +2261,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace LabelStruct
 
 } // namespace FixedLabel
@@ -691,6 +2271,548 @@ namespace ShadeConfiguration {
 } // namespace ShadeConfiguration
 namespace DoorLock {
 
+namespace Commands {
+namespace LockDoor {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LockDoor
+
+namespace LockDoorResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LockDoorResponse
+
+namespace UnlockDoor {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace UnlockDoor
+
+namespace UnlockDoorResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace UnlockDoorResponse
+
+namespace Toggle {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Toggle
+
+namespace ToggleResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ToggleResponse
+
+namespace UnlockWithTimeout {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace UnlockWithTimeout
+
+namespace UnlockWithTimeoutResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace UnlockWithTimeoutResponse
+
+namespace GetLogRecord {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetLogRecord
+
+namespace GetLogRecordResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetLogRecordResponse
+
+namespace SetPin {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetPin
+
+namespace SetPinResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetPinResponse
+
+namespace GetPin {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetPin
+
+namespace GetPinResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetPinResponse
+
+namespace ClearPin {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearPin
+
+namespace ClearPinResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearPinResponse
+
+namespace ClearAllPins {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearAllPins
+
+namespace ClearAllPinsResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearAllPinsResponse
+
+namespace SetUserStatus {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetUserStatus
+
+namespace SetUserStatusResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetUserStatusResponse
+
+namespace GetUserStatus {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetUserStatus
+
+namespace GetUserStatusResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetUserStatusResponse
+
+namespace SetWeekdaySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetWeekdaySchedule
+
+namespace SetWeekdayScheduleResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetWeekdayScheduleResponse
+
+namespace GetWeekdaySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetWeekdaySchedule
+
+namespace GetWeekdayScheduleResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetWeekdayScheduleResponse
+
+namespace ClearWeekdaySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearWeekdaySchedule
+
+namespace ClearWeekdayScheduleResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearWeekdayScheduleResponse
+
+namespace SetYeardaySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetYeardaySchedule
+
+namespace SetYeardayScheduleResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetYeardayScheduleResponse
+
+namespace GetYeardaySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetYeardaySchedule
+
+namespace GetYeardayScheduleResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetYeardayScheduleResponse
+
+namespace ClearYeardaySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearYeardaySchedule
+
+namespace ClearYeardayScheduleResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearYeardayScheduleResponse
+
+namespace SetHolidaySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetHolidaySchedule
+
+namespace SetHolidayScheduleResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetHolidayScheduleResponse
+
+namespace GetHolidaySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetHolidaySchedule
+
+namespace GetHolidayScheduleResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetHolidayScheduleResponse
+
+namespace ClearHolidaySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearHolidaySchedule
+
+namespace ClearHolidayScheduleResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearHolidayScheduleResponse
+
+namespace SetUserType {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetUserType
+
+namespace SetUserTypeResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetUserTypeResponse
+
+namespace GetUserType {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetUserType
+
+namespace GetUserTypeResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetUserTypeResponse
+
+namespace SetRfid {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetRfid
+
+namespace SetRfidResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetRfidResponse
+
+namespace GetRfid {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetRfid
+
+namespace GetRfidResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetRfidResponse
+
+namespace ClearRfid {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearRfid
+
+namespace ClearRfidResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearRfidResponse
+
+namespace ClearAllRfids {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearAllRfids
+
+namespace ClearAllRfidsResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearAllRfidsResponse
+
+namespace OperationEventNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace OperationEventNotification
+
+namespace ProgrammingEventNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ProgrammingEventNotification
+
+} // namespace Commands
 } // namespace DoorLock
 namespace WindowCovering {
 // Enum for WcEndProductType
@@ -738,9 +2860,103 @@ enum class WcType : uint8_t
     WC_TYPE_UNKNOWN                     = 0xFF,
 };
 
+namespace Commands {
+namespace UpOrOpen {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace UpOrOpen
+
+namespace DownOrClose {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace DownOrClose
+
+namespace StopMotion {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StopMotion
+
+namespace GoToLiftValue {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GoToLiftValue
+
+namespace GoToLiftPercentage {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GoToLiftPercentage
+
+namespace GoToTiltValue {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GoToTiltValue
+
+namespace GoToTiltPercentage {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GoToTiltPercentage
+
+} // namespace Commands
 } // namespace WindowCovering
 namespace BarrierControl {
 
+namespace Commands {
+namespace BarrierControlGoToPercent {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace BarrierControlGoToPercent
+
+namespace BarrierControlStop {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace BarrierControlStop
+
+} // namespace Commands
 } // namespace BarrierControl
 namespace PumpConfigurationAndControl {
 // Enum for PumpControlMode
@@ -765,6 +2981,78 @@ enum class PumpOperationMode : uint8_t
 } // namespace PumpConfigurationAndControl
 namespace Thermostat {
 
+namespace Commands {
+namespace SetpointRaiseLower {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetpointRaiseLower
+
+namespace CurrentWeeklySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CurrentWeeklySchedule
+
+namespace SetWeeklySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetWeeklySchedule
+
+namespace RelayStatusLog {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RelayStatusLog
+
+namespace GetWeeklySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetWeeklySchedule
+
+namespace ClearWeeklySchedule {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ClearWeeklySchedule
+
+namespace GetRelayStatusLog {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetRelayStatusLog
+
+} // namespace Commands
 } // namespace Thermostat
 namespace FanControl {
 
@@ -777,6 +3065,198 @@ namespace ThermostatUserInterfaceConfiguration {
 } // namespace ThermostatUserInterfaceConfiguration
 namespace ColorControl {
 
+namespace Commands {
+namespace MoveToHue {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveToHue
+
+namespace MoveHue {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveHue
+
+namespace StepHue {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StepHue
+
+namespace MoveToSaturation {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveToSaturation
+
+namespace MoveSaturation {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveSaturation
+
+namespace StepSaturation {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StepSaturation
+
+namespace MoveToHueAndSaturation {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveToHueAndSaturation
+
+namespace MoveToColor {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveToColor
+
+namespace MoveColor {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveColor
+
+namespace StepColor {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StepColor
+
+namespace MoveToColorTemperature {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveToColorTemperature
+
+namespace EnhancedMoveToHue {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnhancedMoveToHue
+
+namespace EnhancedMoveHue {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnhancedMoveHue
+
+namespace EnhancedStepHue {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnhancedStepHue
+
+namespace EnhancedMoveToHueAndSaturation {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EnhancedMoveToHueAndSaturation
+
+namespace ColorLoopSet {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ColorLoopSet
+
+namespace StopMoveStep {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StopMoveStep
+
+namespace MoveColorTemperature {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MoveColorTemperature
+
+namespace StepColorTemperature {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StepColorTemperature
+
+} // namespace Commands
 } // namespace ColorControl
 namespace BallastConfiguration {
 
@@ -894,12 +3374,298 @@ namespace SodiumConcentrationMeasurement {
 } // namespace SodiumConcentrationMeasurement
 namespace IasZone {
 
+namespace Commands {
+namespace ZoneEnrollResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ZoneEnrollResponse
+
+namespace ZoneStatusChangeNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ZoneStatusChangeNotification
+
+namespace InitiateNormalOperationMode {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace InitiateNormalOperationMode
+
+namespace ZoneEnrollRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ZoneEnrollRequest
+
+namespace InitiateTestMode {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace InitiateTestMode
+
+namespace InitiateNormalOperationModeResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace InitiateNormalOperationModeResponse
+
+namespace InitiateTestModeResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace InitiateTestModeResponse
+
+} // namespace Commands
 } // namespace IasZone
 namespace IasAce {
 
+namespace Commands {
+namespace Arm {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Arm
+
+namespace ArmResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ArmResponse
+
+namespace Bypass {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Bypass
+
+namespace GetZoneIdMapResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetZoneIdMapResponse
+
+namespace Emergency {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Emergency
+
+namespace GetZoneInformationResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetZoneInformationResponse
+
+namespace Fire {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Fire
+
+namespace ZoneStatusChanged {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ZoneStatusChanged
+
+namespace Panic {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Panic
+
+namespace PanelStatusChanged {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace PanelStatusChanged
+
+namespace GetZoneIdMap {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetZoneIdMap
+
+namespace GetPanelStatusResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetPanelStatusResponse
+
+namespace GetZoneInformation {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetZoneInformation
+
+namespace SetBypassedZoneList {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SetBypassedZoneList
+
+namespace GetPanelStatus {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetPanelStatus
+
+namespace BypassResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace BypassResponse
+
+namespace GetBypassedZoneList {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetBypassedZoneList
+
+namespace GetZoneStatusResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetZoneStatusResponse
+
+namespace GetZoneStatus {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetZoneStatus
+
+} // namespace Commands
 } // namespace IasAce
 namespace IasWd {
 
+namespace Commands {
+namespace StartWarning {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StartWarning
+
+namespace Squawk {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Squawk
+
+} // namespace Commands
 } // namespace IasWd
 namespace WakeOnLan {
 
@@ -940,6 +3706,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace TvChannelInfo
 namespace TvChannelLineupInfo {
 enum FieldId
@@ -962,8 +3730,52 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace TvChannelLineupInfo
 
+namespace Commands {
+namespace ChangeChannel {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ChangeChannel
+
+namespace ChangeChannelResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ChangeChannelResponse
+
+namespace ChangeChannelByNumber {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ChangeChannelByNumber
+
+namespace SkipChannel {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SkipChannel
+
+} // namespace Commands
 } // namespace TvChannel
 namespace TargetNavigator {
 // Enum for NavigateTargetStatus
@@ -991,8 +3803,32 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace NavigateTargetTargetInfo
 
+namespace Commands {
+namespace NavigateTarget {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace NavigateTarget
+
+namespace NavigateTargetResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace NavigateTargetResponse
+
+} // namespace Commands
 } // namespace TargetNavigator
 namespace MediaPlayback {
 // Enum for MediaPlaybackState
@@ -1031,8 +3867,232 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace MediaPlaybackPosition
 
+namespace Commands {
+namespace MediaPlay {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaPlay
+
+namespace MediaPlayResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaPlayResponse
+
+namespace MediaPause {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaPause
+
+namespace MediaPauseResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaPauseResponse
+
+namespace MediaStop {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaStop
+
+namespace MediaStopResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaStopResponse
+
+namespace MediaStartOver {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaStartOver
+
+namespace MediaStartOverResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaStartOverResponse
+
+namespace MediaPrevious {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaPrevious
+
+namespace MediaPreviousResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaPreviousResponse
+
+namespace MediaNext {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaNext
+
+namespace MediaNextResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaNextResponse
+
+namespace MediaRewind {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaRewind
+
+namespace MediaRewindResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaRewindResponse
+
+namespace MediaFastForward {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaFastForward
+
+namespace MediaFastForwardResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaFastForwardResponse
+
+namespace MediaSkipForward {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaSkipForward
+
+namespace MediaSkipForwardResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaSkipForwardResponse
+
+namespace MediaSkipBackward {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaSkipBackward
+
+namespace MediaSkipBackwardResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaSkipBackwardResponse
+
+namespace MediaSeek {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaSeek
+
+namespace MediaSeekResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MediaSeekResponse
+
+} // namespace Commands
 } // namespace MediaPlayback
 namespace MediaInput {
 // Enum for MediaInputType
@@ -1073,11 +4133,67 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace MediaInputInfo
 
+namespace Commands {
+namespace SelectInput {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SelectInput
+
+namespace ShowInputStatus {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ShowInputStatus
+
+namespace HideInputStatus {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace HideInputStatus
+
+namespace RenameInput {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RenameInput
+
+} // namespace Commands
 } // namespace MediaInput
 namespace LowPower {
 
+namespace Commands {
+namespace Sleep {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Sleep
+
+} // namespace Commands
 } // namespace LowPower
 namespace KeypadInput {
 // Enum for KeypadInputCecKeyCode
@@ -1178,6 +4294,28 @@ enum class KeypadInputStatus : uint8_t
     KEYPAD_INPUT_STATUS_INVALID_KEY_IN_CURRENT_STATE = 0x02,
 };
 
+namespace Commands {
+namespace SendKey {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SendKey
+
+namespace SendKeyResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SendKeyResponse
+
+} // namespace Commands
 } // namespace KeypadInput
 namespace ContentLauncher {
 // Enum for ContentLaunchMetricType
@@ -1232,6 +4370,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ContentLaunchAdditionalInfo
 namespace ContentLaunchParamater {
 enum FieldId
@@ -1249,7 +4389,6 @@ public:
     DataModel::List<ContentLaunchAdditionalInfo::Type> externalIDList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
 struct DecodableType
@@ -1257,8 +4396,7 @@ struct DecodableType
 public:
     ContentLaunchParameterEnum type;
     Span<const char> value;
-    DataModel::DecodableList<ContentLaunchAdditionalInfo::Type> externalIDList;
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    DataModel::DecodableList<ContentLaunchAdditionalInfo::DecodableType> externalIDList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -1288,6 +4426,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ContentLaunchBrandingInformation
 namespace ContentLaunchDimension {
 enum FieldId
@@ -1307,6 +4447,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace ContentLaunchDimension
 namespace ContentLaunchStyleInformation {
@@ -1328,8 +4470,52 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ContentLaunchStyleInformation
 
+namespace Commands {
+namespace LaunchContent {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LaunchContent
+
+namespace LaunchContentResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LaunchContentResponse
+
+namespace LaunchURL {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LaunchURL
+
+namespace LaunchURLResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LaunchURLResponse
+
+} // namespace Commands
 } // namespace ContentLauncher
 namespace AudioOutput {
 // Enum for AudioOutputType
@@ -1362,8 +4548,32 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace AudioOutputInfo
 
+namespace Commands {
+namespace SelectOutput {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace SelectOutput
+
+namespace RenameOutput {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace RenameOutput
+
+} // namespace Commands
 } // namespace AudioOutput
 namespace ApplicationLauncher {
 // Enum for ApplicationLauncherStatus
@@ -1391,8 +4601,32 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace ApplicationLauncherApp
 
+namespace Commands {
+namespace LaunchApp {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LaunchApp
+
+namespace LaunchAppResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LaunchAppResponse
+
+} // namespace Commands
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
 // Enum for ApplicationBasicStatus
@@ -1404,9 +4638,53 @@ enum class ApplicationBasicStatus : uint8_t
     APPLICATION_BASIC_STATUS_ACTIVE_VISIBLE_NOT_FOCUS = 0x03,
 };
 
+namespace Commands {
+namespace ChangeStatus {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace ChangeStatus
+
+} // namespace Commands
 } // namespace ApplicationBasic
 namespace AccountLogin {
 
+namespace Commands {
+namespace GetSetupPIN {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetSetupPIN
+
+namespace GetSetupPINResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetSetupPINResponse
+
+namespace Login {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Login
+
+} // namespace Commands
 } // namespace AccountLogin
 namespace TestCluster {
 // Enum for SimpleEnum
@@ -1441,6 +4719,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace SimpleStruct
 namespace NestedStruct {
 enum FieldId
@@ -1460,6 +4740,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
+
+using DecodableType = Type;
 
 } // namespace NestedStruct
 namespace NestedStructList {
@@ -1486,7 +4768,6 @@ public:
     DataModel::List<uint8_t> g;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
 struct DecodableType
@@ -1494,12 +4775,11 @@ struct DecodableType
 public:
     uint8_t a;
     bool b;
-    SimpleStruct::Type c;
-    DataModel::DecodableList<SimpleStruct::Type> d;
+    SimpleStruct::DecodableType c;
+    DataModel::DecodableList<SimpleStruct::DecodableType> d;
     DataModel::DecodableList<uint32_t> e;
     DataModel::DecodableList<chip::ByteSpan> f;
     DataModel::DecodableList<uint8_t> g;
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -1516,14 +4796,12 @@ public:
     DataModel::List<NestedStructList::Type> a;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
 struct DecodableType
 {
 public:
     DataModel::DecodableList<NestedStructList::DecodableType> a;
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -1545,8 +4823,82 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace TestListStructOctet
 
+namespace Commands {
+namespace Test {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Test
+
+namespace TestSpecificResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace TestSpecificResponse
+
+namespace TestNotHandled {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace TestNotHandled
+
+namespace TestAddArgumentsResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace TestAddArgumentsResponse
+
+namespace TestSpecific {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace TestSpecific
+
+namespace TestUnknownCommand {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace TestUnknownCommand
+
+namespace TestAddArguments {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace TestAddArguments
+
+} // namespace Commands
 } // namespace TestCluster
 namespace Messaging {
 // Enum for EventId
@@ -1663,6 +5015,78 @@ enum class MessagingControlTransmission : uint8_t
     MESSAGING_CONTROL_TRANSMISSION_RESERVED             = 0x03,
 };
 
+namespace Commands {
+namespace DisplayMessage {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace DisplayMessage
+
+namespace GetLastMessage {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetLastMessage
+
+namespace CancelMessage {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CancelMessage
+
+namespace MessageConfirmation {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace MessageConfirmation
+
+namespace DisplayProtectedMessage {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace DisplayProtectedMessage
+
+namespace GetMessageCancellation {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetMessageCancellation
+
+namespace CancelAllMessages {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CancelAllMessages
+
+} // namespace Commands
 } // namespace Messaging
 namespace ApplianceIdentification {
 
@@ -1672,15 +5096,183 @@ namespace MeterIdentification {
 } // namespace MeterIdentification
 namespace ApplianceEventsAndAlert {
 
+namespace Commands {
+namespace GetAlerts {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetAlerts
+
+namespace GetAlertsResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetAlertsResponse
+
+namespace AlertsNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace AlertsNotification
+
+namespace EventsNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace EventsNotification
+
+} // namespace Commands
 } // namespace ApplianceEventsAndAlert
 namespace ApplianceStatistics {
 
+namespace Commands {
+namespace LogNotification {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LogNotification
+
+namespace LogRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LogRequest
+
+namespace LogResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LogResponse
+
+namespace LogQueueRequest {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LogQueueRequest
+
+namespace LogQueueResponse {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace LogQueueResponse
+
+namespace StatisticsAvailable {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace StatisticsAvailable
+
+} // namespace Commands
 } // namespace ApplianceStatistics
 namespace ElectricalMeasurement {
 
+namespace Commands {
+namespace GetProfileInfoResponseCommand {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetProfileInfoResponseCommand
+
+namespace GetProfileInfoCommand {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetProfileInfoCommand
+
+namespace GetMeasurementProfileResponseCommand {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetMeasurementProfileResponseCommand
+
+namespace GetMeasurementProfileCommand {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace GetMeasurementProfileCommand
+
+} // namespace Commands
 } // namespace ElectricalMeasurement
 namespace Binding {
 
+namespace Commands {
+namespace Bind {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Bind
+
+namespace Unbind {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace Unbind
+
+} // namespace Commands
 } // namespace Binding
 namespace GroupKeyManagement {
 // Enum for GroupKeySecurityPolicy
@@ -1713,6 +5305,8 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace GroupKey
 namespace GroupState {
 enum FieldId
@@ -1733,14 +5327,40 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
+using DecodableType = Type;
+
 } // namespace GroupState
 
 } // namespace GroupKeyManagement
 namespace SampleMfgSpecificCluster {
 
+namespace Commands {
+namespace CommandOne {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CommandOne
+
+} // namespace Commands
 } // namespace SampleMfgSpecificCluster
 namespace SampleMfgSpecificCluster2 {
 
+namespace Commands {
+namespace CommandTwo {
+struct Type
+{
+};
+
+struct DecodableType
+{
+};
+} // namespace CommandTwo
+
+} // namespace Commands
 } // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters

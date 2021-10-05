@@ -16,10 +16,12 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/MessageDef/AttributeDataElement.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -29,6 +31,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::SoftwareDiagnostics;
 using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
 using chip::DeviceLayer::PlatformManager;
 
@@ -94,7 +97,9 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMan
 }
 } // anonymous namespace
 
-bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                              Commands::ResetWatermarks::DecodableType & commandData)
 {
     uint64_t currentHeapUsed;
 
