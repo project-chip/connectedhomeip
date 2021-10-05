@@ -146,34 +146,6 @@ CHIP_ERROR LayerImplLwIP::PostEvent(Object & aTarget, EventType aEventType, uint
 }
 
 /**
- * This is a syntactic wrapper around a platform-specific hook that effects an event loop, waiting on a queue that services this
- * instance, pulling events off of that queue, and then dispatching them for handling.
- *
- *  @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
- */
-CHIP_ERROR LayerImplLwIP::DispatchEvents()
-{
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    return PlatformEventing::DispatchEvents(*this);
-}
-
-/**
- * This dispatches the specified event for handling by this instance.
- *
- * The unmarshalling of the type and arguments from the event is handled by a platform-specific hook which should then call
- * back to Layer::HandleEvent for the actual dispatch.
- *
- *  @param[in]  aEvent  The platform-specific event object to dispatch for handling.
- *
- * @return CHIP_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
- */
-CHIP_ERROR LayerImplLwIP::DispatchEvent(Event aEvent)
-{
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    return PlatformEventing::DispatchEvent(*this, aEvent);
-}
-
-/**
  * This implements the actual dispatch and handling of a CHIP System Layer event.
  *
  *  @param[in,out]  aTarget     A reference to the layer object to which the event is targeted.

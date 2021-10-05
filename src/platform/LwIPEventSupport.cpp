@@ -55,20 +55,6 @@ CHIP_ERROR PlatformEventing::PostEvent(System::Layer & aLayer, System::Object & 
     return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR PlatformEventing::DispatchEvents(System::Layer & aLayer)
-{
-    PlatformMgr().RunEventLoop();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformEventing::DispatchEvent(System::Layer & aLayer, const ChipDeviceEvent * aEvent)
-{
-    PlatformMgr().DispatchEvent(aEvent);
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, uint32_t aMilliseconds)
 {
     return PlatformMgr().StartChipTimer(aMilliseconds);
