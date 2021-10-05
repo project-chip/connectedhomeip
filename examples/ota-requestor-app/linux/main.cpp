@@ -17,7 +17,10 @@
  */
 
 #include <app-common/zap-generated/enums.h>
+#include <app/server/Server.h> // LISS
 #include <app/util/util.h>
+#include <credentials/DeviceAttestationCredsProvider.h> // LISS
+#include <credentials/examples/DeviceAttestationCredsExample.h> // LISS
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -227,9 +230,25 @@ int main(int argc, char * argv[])
     err = mStorage.Init();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
 
+    // LISS
+    {
+        uint16_t securePort   = CHIP_PORT;
+        uint16_t unsecurePort = CHIP_UDC_PORT;
+
+        // Init ZCL Data Model and CHIP App Server
+        chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
+
+        // Initialize device attestation config
+        SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    }
+
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "failed to set UDP port: %s", chip::ErrorStr(err)));
+
+
+#if 0 // LISS
+    {
 
     // Until #9518 is fixed, the only way to open a CASE session to another node is to commission it first using the
     // DeviceController API. Thus, the ota-requestor-app must do self commissioning and then read CASE credentials from persistent
@@ -250,7 +269,8 @@ int main(int argc, char * argv[])
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "No device found: %s", chip::ErrorStr(err)));
 
     err = providerDevice->EstablishConnectivity(&mConnectionCallback, &mConnectFailCallback);
-
+    }
+#endif
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
