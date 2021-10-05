@@ -74,9 +74,10 @@ public:
     void OnStatusChange(void) override;
 
     // PersistentStorageDelegate implementation
-    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
-    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
-    CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
+    CHIP_ERROR SyncSetKeyValue(const chip::CompressedFabricId fabricId, const char * key, const void * value,
+                               uint16_t size) override;
+    CHIP_ERROR SyncGetKeyValue(const chip::CompressedFabricId fabricId, const char * key, void * buffer, uint16_t & size) override;
+    CHIP_ERROR SyncDeleteKeyValue(const chip::CompressedFabricId fabricId, const char * key) override;
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {

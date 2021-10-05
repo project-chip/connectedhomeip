@@ -19,10 +19,20 @@
 #pragma once
 
 #include <lib/core/CHIPCore.h>
+#include <lib/core/PeerId.h>
 #include <lib/support/DLLUtil.h>
 
 namespace chip {
 
+/**
+ * @brief The Persistent Storage Delegate provides a Fabric scoped storage
+ *        interface for the CHIP stack to store items.
+ *
+ *        The FabricId used here allows for storage to reuse keys within each fabric's scope
+ *        These APIs might be called with `kUndefinedCompressedFabricId` in which case
+ *        The delegate is expected to access a "global" storage scope.
+ *
+ */
 class DLL_EXPORT PersistentStorageDelegate
 {
 public:
@@ -38,7 +48,7 @@ public:
      *   Caller is responsible to take care of any special formatting needs (e.g. byte
      *   order, null terminators, consistency checks or versioning).
      *
-     *
+     * @param[in]      fabricId The compressed Fabric Id where this key is stored
      * @param[in]      key Key to lookup
      * @param[out]     buffer Value for the key
      * @param[in, out] size Input value buffer size, output length of value.
@@ -46,25 +56,27 @@ public:
      *                 such cases, the user should allocate the buffer large
      *                 enough (>= output length), and call the API again.
      */
-    virtual CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) = 0;
+    virtual CHIP_ERROR SyncGetKeyValue(const CompressedFabricId fabricId, const char * key, void * buffer, uint16_t & size) = 0;
 
     /**
      * @brief
      *   Set the value for the key to a byte buffer.
      *
+     * @param[in] fabricId The compressed Fabric Id where this key should be stored
      * @param[in] key Key to be set
      * @param[in] value Value to be set
      * @param[in] size Size of the Value
      */
-    virtual CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) = 0;
+    virtual CHIP_ERROR SyncSetKeyValue(const CompressedFabricId fabricId, const char * key, const void * value, uint16_t size) = 0;
 
     /**
      * @brief
      *   Deletes the value for the key
      *
+     * @param[in] fabricId The compressed Fabric Id where this key is stored
      * @param[in] key Key to be deleted
      */
-    virtual CHIP_ERROR SyncDeleteKeyValue(const char * key) = 0;
+    virtual CHIP_ERROR SyncDeleteKeyValue(const CompressedFabricId fabricId, const char * key) = 0;
 };
 
 } // namespace chip

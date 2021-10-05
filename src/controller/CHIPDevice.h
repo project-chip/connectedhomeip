@@ -171,7 +171,7 @@ public:
      *   still using them, it can lead to unknown behavior and crashes.
      *
      * @param[in] params       Wrapper object for transport manager etc.
-     * @param[in] fabric        Local administrator that's initializing this device object
+     * @param[in] fabric       Local administrator that's initializing this device object
      */
     void Init(ControllerDeviceInitParams params, FabricIndex fabric)
     {
@@ -186,6 +186,14 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
+        if (mFabricsTable != nullptr && mFabricIndex != kUndefinedFabricIndex)
+        {
+            FabricInfo * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+            if (fabricInfo != nullptr)
+            {
+                mCompressedFabricId = fabricInfo->GetCompressedFabricId();
+            }
+        }
     }
 
     /**
@@ -202,7 +210,7 @@ public:
      * @param[in] params       Wrapper object for transport manager etc.
      * @param[in] deviceId     Node ID of the device
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
-     * @param[in] fabric        Local administrator that's initializing this device object
+     * @param[in] fabric       Local administrator that's initializing this device object
      */
     void Init(ControllerDeviceInitParams params, NodeId deviceId, const Transport::PeerAddress & peerAddress, FabricIndex fabric)
     {
@@ -524,7 +532,8 @@ private:
     static void OnOpenPairingWindowSuccessResponse(void * context);
     static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
 
-    FabricIndex mFabricIndex = kUndefinedFabricIndex;
+    CompressedFabricId mCompressedFabricId = kUndefinedCompressedFabricId;
+    FabricIndex mFabricIndex               = kUndefinedFabricIndex;
 
     FabricTable * mFabricsTable = nullptr;
 
@@ -605,8 +614,9 @@ typedef struct SerializableDevice
     PASESessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort;  /* This field is serialized in LittleEndian byte order */
-    uint16_t mFabricIndex; /* This field is serialized in LittleEndian byte order */
+    uint16_t mDevicePort;         /* This field is serialized in LittleEndian byte order */
+    uint16_t mFabricIndex;        /* This field is serialized in LittleEndian byte order */
+    uint64_t mCompressedFabricId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceTransport;
     uint8_t mDeviceOperationalCertProvisioned;
     uint8_t mInterfaceName[kMaxInterfaceName];

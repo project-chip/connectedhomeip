@@ -65,12 +65,10 @@ void CHIPSetNextAvailableDeviceID(uint64_t id)
 
 CHIPDeviceController * InitializeCHIP(void)
 {
-    static CHIPToolPersistentStorageDelegate * storage = nil;
     static dispatch_once_t onceToken;
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
-        storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        [controller startup:storage vendorId:0 nocSigner:nil];
+        [controller startup:nil fabricId:1 vendorId:kCHIPToolTmpVendorId nocSigner:nil];
     });
 
     return controller;
@@ -117,26 +115,3 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
     NSError * error;
     [controller unpairDevice:deviceId error:&error];
 }
-
-@implementation CHIPToolPersistentStorageDelegate
-
-// MARK: CHIPPersistentStorageDelegate
-
-- (NSString *)CHIPGetKeyValue:(NSString *)key
-{
-    NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
-    NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
-    return value;
-}
-
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value
-{
-    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
-}
-
-- (void)CHIPDeleteKeyValue:(NSString *)key
-{
-    CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
-}
-
-@end

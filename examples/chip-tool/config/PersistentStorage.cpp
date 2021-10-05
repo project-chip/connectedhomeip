@@ -91,11 +91,23 @@ exit:
     return err;
 }
 
-CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
+String GetSectionName(const CompressedFabricId fabricId)
+{
+    if (fabricId == kUndefinedCompressedFabricId)
+    {
+        return kDefaultSectionName;
+    }
+    else
+    {
+        return std::to_string(fabricId);
+    }
+}
+
+CHIP_ERROR PersistentStorage::SyncGetKeyValue(const CompressedFabricId fabricId, const char * key, void * value, uint16_t & size)
 {
     std::string iniValue;
 
-    auto section = mConfig.sections[kDefaultSectionName];
+    auto section = mConfig.sections[GetSectionName(fabricId)];
     auto it      = section.find(key);
     ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_KEY_NOT_FOUND);
 
@@ -116,21 +128,22 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
+CHIP_ERROR PersistentStorage::SyncSetKeyValue(const CompressedFabricId fabricId, const char * key, const void * value,
+                                              uint16_t size)
 {
-    auto section = mConfig.sections[kDefaultSectionName];
+    auto section = mConfig.sections[GetSectionName(fabricId)];
     section[key] = StringToBase64(std::string(static_cast<const char *>(value), size));
 
-    mConfig.sections[kDefaultSectionName] = section;
+    mConfig.sections[GetSectionName(fabricId)] = section;
     return CommitConfig();
 }
 
-CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
+CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const CompressedFabricId fabricId, const char * key)
 {
-    auto section = mConfig.sections[kDefaultSectionName];
+    auto section = mConfig.sections[GetSectionName(fabricId)];
     section.erase(key);
 
-    mConfig.sections[kDefaultSectionName] = section;
+    mConfig.sections[GetSectionName(fabricId)] = section;
     return CommitConfig();
 }
 
@@ -163,7 +176,7 @@ uint16_t PersistentStorage::GetListenPort()
 
     char value[6];
     uint16_t size = static_cast<uint16_t>(sizeof(value));
-    err           = SyncGetKeyValue(kPortKey, value, size);
+    err           = SyncGetKeyValue(kUndefinedCompressedFabricId, kPortKey, value, size);
     if (CHIP_NO_ERROR == err)
     {
         uint16_t tmpValue;
@@ -185,7 +198,7 @@ LogCategory PersistentStorage::GetLoggingLevel()
 
     char value[9];
     uint16_t size = static_cast<uint16_t>(sizeof(value));
-    err           = SyncGetKeyValue(kLoggingKey, value, size);
+    err           = SyncGetKeyValue(kUndefinedCompressedFabricId, kLoggingKey, value, size);
     if (CHIP_NO_ERROR == err)
     {
         if (strcasecmp(value, "none") == 0)
@@ -215,7 +228,7 @@ NodeId PersistentStorage::GetNodeId(const char * key, NodeId defaultVal)
 
     uint64_t nodeId;
     uint16_t size = static_cast<uint16_t>(sizeof(nodeId));
-    err           = SyncGetKeyValue(key, &nodeId, size);
+    err           = SyncGetKeyValue(kUndefinedCompressedFabricId, key, &nodeId, size);
     if (err == CHIP_NO_ERROR)
     {
         return static_cast<NodeId>(Encoding::LittleEndian::HostSwap64(nodeId));
@@ -237,7 +250,7 @@ NodeId PersistentStorage::GetRemoteNodeId()
 CHIP_ERROR PersistentStorage::SetNodeId(const char * key, NodeId value)
 {
     uint64_t nodeId = Encoding::LittleEndian::HostSwap64(value);
-    return SyncSetKeyValue(key, &nodeId, sizeof(nodeId));
+    return SyncSetKeyValue(kUndefinedCompressedFabricId, key, &nodeId, sizeof(nodeId));
 }
 
 CHIP_ERROR PersistentStorage::SetLocalNodeId(NodeId nodeId)

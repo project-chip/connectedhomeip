@@ -52,14 +52,16 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     Crypto::P256SerializedKeypair serializedKey;
     uint16_t keySize = static_cast<uint16_t>(sizeof(serializedKey));
 
-    if (storage.SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
+    if (storage.SyncGetKeyValue(kUndefinedCompressedFabricId, kOperationalCredentialsIssuerKeypairStorage, &serializedKey,
+                                keySize) != CHIP_NO_ERROR)
     {
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
         ReturnErrorOnFailure(mIssuer.Initialize());
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
 
         keySize = static_cast<uint16_t>(sizeof(serializedKey));
-        ReturnErrorOnFailure(storage.SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize));
+        ReturnErrorOnFailure(storage.SyncSetKeyValue(kUndefinedCompressedFabricId, kOperationalCredentialsIssuerKeypairStorage,
+                                                     &serializedKey, keySize));
     }
     else
     {
@@ -69,15 +71,16 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 
     keySize = static_cast<uint16_t>(sizeof(serializedKey));
 
-    if (storage.SyncGetKeyValue(kOperationalCredentialsIntermediateIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
+    if (storage.SyncGetKeyValue(kUndefinedCompressedFabricId, kOperationalCredentialsIntermediateIssuerKeypairStorage,
+                                &serializedKey, keySize) != CHIP_NO_ERROR)
     {
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
         ReturnErrorOnFailure(mIntermediateIssuer.Initialize());
         ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
 
         keySize = static_cast<uint16_t>(sizeof(serializedKey));
-        ReturnErrorOnFailure(
-            storage.SyncSetKeyValue(kOperationalCredentialsIntermediateIssuerKeypairStorage, &serializedKey, keySize));
+        ReturnErrorOnFailure(storage.SyncSetKeyValue(
+            kUndefinedCompressedFabricId, kOperationalCredentialsIntermediateIssuerKeypairStorage, &serializedKey, keySize));
     }
     else
     {
@@ -107,7 +110,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
     CHIP_ERROR err      = CHIP_NO_ERROR;
     PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-                      err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
+                      err = mStorage->SyncGetKeyValue(kUndefinedCompressedFabricId, key, rcac.data(), rcacBufLen));
     if (err == CHIP_NO_ERROR)
     {
         // Found root certificate in the storage.
@@ -120,8 +123,9 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac));
 
     VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
-    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-                      err = mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size())));
+    PERSISTENT_KEY_OP(
+        fabricId, kOperationalCredentialsRootCertificateStorage, key,
+        err = mStorage->SyncSetKeyValue(kUndefinedCompressedFabricId, key, rcac.data(), static_cast<uint16_t>(rcac.size())));
 
     return err;
 }

@@ -188,14 +188,12 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     ReturnErrorOnFailure(newFabric.SetNOCCert(chipCertSpan));
     newFabric.SetVendorId(params.controllerVendorId);
 
-    FabricInfo * fabric = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
-    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(params.systemState->Fabrics()->AddNewFabric(newFabric, &mFabricIndex));
 
-    ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
-    mLocalId  = fabric->GetPeerId();
-    mVendorId = fabric->GetVendorId();
+    mLocalId  = newFabric.GetPeerId();
+    mVendorId = newFabric.GetVendorId();
 
-    mFabricId = fabric->GetFabricId();
+    mFabricId = newFabric.GetFabricId();
 
     ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64, mFabricIndex,
                     ChipLogValueX64(GetCompressedFabricId()));
@@ -266,7 +264,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             uint16_t size = sizeof(deviceInfo.inner);
 
             PERSISTENT_KEY_OP(deviceId, kPairedDeviceKeyPrefix, key,
-                              err = mStorageDelegate->SyncGetKeyValue(key, deviceInfo.inner, size));
+                              err = mStorageDelegate->SyncGetKeyValue(GetCompressedFabricId(), key, deviceInfo.inner, size));
             SuccessOrExit(err);
             VerifyOrExit(size <= sizeof(deviceInfo.inner), err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
@@ -481,7 +479,7 @@ CHIP_ERROR DeviceController::InitializePairedDeviceList()
 
         CHIP_ERROR lookupError = CHIP_NO_ERROR;
         PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
-                          lookupError = mStorageDelegate->SyncGetKeyValue(key, buffer, size));
+                          lookupError = mStorageDelegate->SyncGetKeyValue(GetCompressedFabricId(), key, buffer, size));
 
         // It's ok to not have an entry for the Paired Device list. We treat it the same as having an empty list.
         if (lookupError != CHIP_ERROR_KEY_NOT_FOUND)
@@ -527,7 +525,7 @@ void DeviceController::PersistNextKeyId()
     if (mStorageDelegate != nullptr && mState == State::Initialized)
     {
         uint16_t nextKeyID = mIDAllocator.Peek();
-        mStorageDelegate->SyncSetKeyValue(kNextAvailableKeyID, &nextKeyID, sizeof(nextKeyID));
+        mStorageDelegate->SyncSetKeyValue(GetCompressedFabricId(), kNextAvailableKeyID, &nextKeyID, sizeof(nextKeyID));
     }
 }
 
@@ -611,7 +609,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 
     uint16_t nextKeyID = 0;
     uint16_t size      = sizeof(nextKeyID);
-    CHIP_ERROR error   = mStorageDelegate->SyncGetKeyValue(kNextAvailableKeyID, &nextKeyID, size);
+    CHIP_ERROR error   = mStorageDelegate->SyncGetKeyValue(GetCompressedFabricId(), kNextAvailableKeyID, &nextKeyID, size);
     if ((error != CHIP_NO_ERROR) || (size != sizeof(nextKeyID)))
     {
         nextKeyID = 0;
@@ -752,7 +750,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     err = mPairingSession.MessageDispatch().Init(mSystemState->SessionMgr());
     SuccessOrExit(err);
 
-    device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, fabric->GetFabricIndex());
+    device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, mFabricIndex);
 
     mSystemState->SystemLayer()->StartTimer(kSessionEstablishmentTimeout, OnSessionEstablishmentTimeoutCallback, this);
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
@@ -913,7 +911,8 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 
     if (mStorageDelegate != nullptr)
     {
-        PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key, mStorageDelegate->SyncDeleteKeyValue(key));
+        PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key,
+                          mStorageDelegate->SyncDeleteKeyValue(GetCompressedFabricId(), key));
     }
 
     mPairedDevices.Remove(remoteDeviceId);
@@ -1566,8 +1565,9 @@ void DeviceCommissioner::PersistDeviceList()
     {
         mPairedDevices.Serialize([&](ByteSpan data) -> CHIP_ERROR {
             VerifyOrReturnError(data.size() <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
-            PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
-                              mStorageDelegate->SyncSetKeyValue(key, data.data(), static_cast<uint16_t>(data.size())));
+            PERSISTENT_KEY_OP(
+                static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
+                mStorageDelegate->SyncSetKeyValue(GetCompressedFabricId(), key, data.data(), static_cast<uint16_t>(data.size())));
             mPairedDevicesUpdated = false;
             return CHIP_NO_ERROR;
         });

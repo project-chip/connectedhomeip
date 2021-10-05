@@ -86,23 +86,24 @@ private:
 
     static Server sServer;
 
+    // TODO Server implementations do not separate storage based on fabric
     class ServerStorageDelegate : public PersistentStorageDelegate
     {
-        CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
+        CHIP_ERROR SyncGetKeyValue(const CompressedFabricId fabricId, const char * key, void * buffer, uint16_t & size) override
         {
             ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size));
             ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
+        CHIP_ERROR SyncSetKeyValue(const CompressedFabricId fabricId, const char * key, const void * value, uint16_t size) override
         {
             ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size));
             ChipLogProgress(AppServer, "Saved into server storage: %s", key);
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+        CHIP_ERROR SyncDeleteKeyValue(const CompressedFabricId fabricId, const char * key) override
         {
             ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key));
             ChipLogProgress(AppServer, "Deleted from server storage: %s", key);
