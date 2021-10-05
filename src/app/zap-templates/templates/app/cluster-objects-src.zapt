@@ -31,15 +31,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         {
             {{#zcl_struct_items}}
             case k{{asUpperCamelCase label}}FieldId:
-                {{#if_is_enum type}}
-                uint8_t v;
-                ReturnErrorOnFailure(DataModel::Decode(reader, v));
-                {{asLowerCamelCase label}} = static_cast<{{type}}>(v);
-                break;
-                {{else}}
                 ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
                 break;
-                {{/if_is_enum}}
             {{/zcl_struct_items}}
             default:
                 break;
