@@ -133,17 +133,17 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
 
 } // namespace
 
-void SetupEmberAfObjects(Command * command, ClusterId clusterId, CommandId commandId, EndpointId endpointId)
+void SetupEmberAfObjects(Command * command, const ConcreteCommandPath & commandPath)
 {
     Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
 
-    imCompatibilityEmberApsFrame.clusterId           = clusterId;
-    imCompatibilityEmberApsFrame.destinationEndpoint = endpointId;
+    imCompatibilityEmberApsFrame.clusterId           = commandPath.mClusterId;
+    imCompatibilityEmberApsFrame.destinationEndpoint = commandPath.mEndpointId;
     imCompatibilityEmberApsFrame.sourceEndpoint      = 1; // source endpoint is fixed to 1 for now.
     imCompatibilityEmberApsFrame.sequence =
         (commandExchangeCtx != nullptr ? static_cast<uint8_t>(commandExchangeCtx->GetExchangeId() & 0xFF) : 0);
 
-    imCompatibilityEmberAfCluster.commandId      = commandId;
+    imCompatibilityEmberAfCluster.commandId      = commandPath.mCommandId;
     imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;
     imCompatibilityEmberAfCluster.interPanHeader = &imCompatibilityInterpanHeader;
     imCompatibilityEmberAfCluster.source         = commandExchangeCtx;
@@ -184,11 +184,11 @@ namespace {
 uint8_t attributeData[kAttributeReadBufferSize];
 } // namespace
 
-bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
+bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // TODO: Currently, we are using cluster catalog from the ember library, this should be modified or replaced after several
     // updates to Commands.
-    return emberAfContainsServer(aEndPointId, aClusterId);
+    return emberAfContainsServer(aCommandPath.mEndpointId, aCommandPath.mClusterId);
 }
 
 CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)

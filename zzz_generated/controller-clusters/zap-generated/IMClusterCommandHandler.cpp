@@ -5256,98 +5256,99 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
 
 } // namespace Clusters
 
-void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, EndpointId aEndPointId, TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj)
+void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
-    ChipLogDetail(Zcl, "Received Cluster Command: Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " Endpoint=%" PRIx16,
-                  ChipLogValueMEI(aClusterId), ChipLogValueMEI(aCommandId), aEndPointId);
-    Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
-    ConcreteCommandPath commandPath(aEndPointId, aClusterId, aCommandId);
+    ChipLogDetail(Zcl, "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
+                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
+
+    Compatibility::SetupEmberAfObjects(apCommandObj, aCommandPath);
+
     TLV::TLVType dataTlvType;
     SuccessOrExit(aReader.EnterContainer(dataTlvType));
-    switch (aClusterId)
+    switch (aCommandPath.mClusterId)
     {
     default:
-        // Unrecognized cluster ID, error status will apply.
-        apCommandObj->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogError(Zcl, "Unknown cluster %" PRIx32, aClusterId);
+        ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::UnsupportedCluster);
         break;
     }
+
 exit:
-    Compatibility::ResetEmberAfObjects();
     aReader.ExitContainer(dataTlvType);
+    Compatibility::ResetEmberAfObjects();
 }
 
-void DispatchSingleClusterResponseCommand(ClusterId aClusterId, CommandId aCommandId, EndpointId aEndPointId,
-                                          TLV::TLVReader & aReader, CommandSender * apCommandObj)
+void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader,
+                                          CommandSender * apCommandObj)
 {
-    ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
-                  aCommandId, aEndPointId);
-    Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
-    ConcreteCommandPath commandPath(aEndPointId, aClusterId, aCommandId);
+    ChipLogDetail(Zcl, "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
+                  aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
+
+    Compatibility::SetupEmberAfObjects(apCommandObj, aCommandPath);
+
     TLV::TLVType dataTlvType;
     SuccessOrExit(aReader.EnterContainer(dataTlvType));
-    switch (aClusterId)
+    switch (aCommandPath.mClusterId)
     {
     case Clusters::AccountLogin::Id:
-        Clusters::AccountLogin::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::AccountLogin::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::ApplicationLauncher::Id:
-        Clusters::ApplicationLauncher::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::ApplicationLauncher::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::ContentLauncher::Id:
-        Clusters::ContentLauncher::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::ContentLauncher::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::DoorLock::Id:
-        Clusters::DoorLock::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::DoorLock::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::GeneralCommissioning::Id:
-        Clusters::GeneralCommissioning::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::GeneralCommissioning::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Groups::Id:
-        Clusters::Groups::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::Groups::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Identify::Id:
-        Clusters::Identify::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::Identify::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::KeypadInput::Id:
-        Clusters::KeypadInput::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::KeypadInput::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::MediaPlayback::Id:
-        Clusters::MediaPlayback::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::MediaPlayback::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::NetworkCommissioning::Id:
-        Clusters::NetworkCommissioning::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::NetworkCommissioning::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::OtaSoftwareUpdateProvider::Id:
-        Clusters::OtaSoftwareUpdateProvider::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::OtaSoftwareUpdateProvider::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::OperationalCredentials::Id:
-        Clusters::OperationalCredentials::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::OperationalCredentials::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Scenes::Id:
-        Clusters::Scenes::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::Scenes::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::TvChannel::Id:
-        Clusters::TvChannel::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::TvChannel::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::TargetNavigator::Id:
-        Clusters::TargetNavigator::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::TargetNavigator::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::TestCluster::Id:
-        Clusters::TestCluster::DispatchClientCommand(apCommandObj, commandPath, aReader);
+        Clusters::TestCluster::DispatchClientCommand(apCommandObj, aCommandPath, aReader);
         break;
     default:
-        // Unrecognized cluster ID, error status will apply.
-        apCommandObj->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
-                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aClusterId));
+        ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
+        apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::UnsupportedCluster);
         break;
     }
+
 exit:
-    Compatibility::ResetEmberAfObjects();
     aReader.ExitContainer(dataTlvType);
+    Compatibility::ResetEmberAfObjects();
 }
 
 } // namespace app
