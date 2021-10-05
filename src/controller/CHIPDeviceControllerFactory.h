@@ -54,7 +54,7 @@ struct SetupParams
 
     FabricId fabricId = kUndefinedFabricId;
 
-    uint16_t controllerVendorId;
+    uint16_t controllerVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
 
     // The Device Pairing Delegated used to initialize a Commissioner
     DevicePairingDelegate * pairingDelegate = nullptr;

@@ -2199,6 +2199,16 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_NO_SHARED_TRUSTED_ROOT                      CHIP_CORE_ERROR(0xc9)
 
 /**
+ * @def CHIP_ERROR_ALREADY_EXISTS
+ *
+ * @brief
+ *   The addition of a new item failed because it an existing item was found
+ *   and the container doesn't support overwriting items.
+ *
+ */
+#define CHIP_ERROR_ALREADY_EXISTS                              CHIP_CORE_ERROR(0xca)
+
+/**
  *  @}
  */
 

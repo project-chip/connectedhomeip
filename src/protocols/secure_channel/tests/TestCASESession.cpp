@@ -281,7 +281,7 @@ public:
         }
     }
 
-    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    CHIP_ERROR SyncGetKeyValue(const chip::CompressedFabricId fabricId, const char * key, void * buffer, uint16_t & size) override
     {
         for (int i = 0; i < 16; i++)
         {
@@ -298,7 +298,8 @@ public:
         return CHIP_ERROR_INTERNAL;
     }
 
-    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
+    CHIP_ERROR SyncSetKeyValue(const chip::CompressedFabricId fabricId, const char * key, const void * value,
+                               uint16_t size) override
     {
         for (int i = 0; i < 16; i++)
         {
@@ -317,7 +318,7 @@ public:
         return CHIP_ERROR_INTERNAL;
     }
 
-    CHIP_ERROR SyncDeleteKeyValue(const char * key) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR SyncDeleteKeyValue(const chip::CompressedFabricId fabricId, const char * key) override { return CHIP_NO_ERROR; }
 
 private:
     char * keys[16];

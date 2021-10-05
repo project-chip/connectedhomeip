@@ -114,10 +114,11 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     CHIP_ZERO_AT(serializable);
     CHIP_ZERO_AT(output);
 
-    serializable.mOpsCreds    = mPairing;
-    serializable.mDeviceId    = Encoding::LittleEndian::HostSwap64(mDeviceId);
-    serializable.mDevicePort  = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
-    serializable.mFabricIndex = Encoding::LittleEndian::HostSwap16(mFabricIndex);
+    serializable.mOpsCreds           = mPairing;
+    serializable.mDeviceId           = Encoding::LittleEndian::HostSwap64(mDeviceId);
+    serializable.mDevicePort         = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
+    serializable.mFabricIndex        = Encoding::LittleEndian::HostSwap16(mFabricIndex);
+    serializable.mCompressedFabricId = Encoding::LittleEndian::HostSwap64(mCompressedFabricId);
 
     // The connection state could be null if the device is moving from PASE connection to CASE connection.
     // The device parameters (e.g. mDeviceOperationalCertProvisioned) are updated during this transition.
@@ -186,6 +187,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     const uint16_t index = Encoding::LittleEndian::HostSwap16(serializable.mFabricIndex);
     mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(serializable.mLocalMessageCounter);
     mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(serializable.mPeerMessageCounter);
+    mCompressedFabricId  = Encoding::LittleEndian::HostSwap64(serializable.mCompressedFabricId);
 
     VerifyOrReturnError(CanCastTo<FabricIndex>(index), CHIP_ERROR_INVALID_ARGUMENT);
     mFabricIndex = static_cast<FabricIndex>(index);
@@ -243,8 +245,9 @@ CHIP_ERROR Device::Persist()
         ReturnErrorOnFailure(Serialize(serialized));
 
         // TODO: no need to base-64 the serialized values AGAIN
-        PERSISTENT_KEY_OP(GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                          error = mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
+        PERSISTENT_KEY_OP(
+            GetDeviceId(), kPairedDeviceKeyPrefix, key,
+            error = mStorageDelegate->SyncSetKeyValue(mCompressedFabricId, key, serialized.inner, sizeof(serialized.inner)));
         if (error != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Failed to persist device %" CHIP_ERROR_FORMAT, error.Format());

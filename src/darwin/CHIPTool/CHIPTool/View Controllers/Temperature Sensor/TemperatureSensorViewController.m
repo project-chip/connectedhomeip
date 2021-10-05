@@ -14,7 +14,6 @@
 @property (nonatomic, strong) UILabel * temperatureLabel;
 @property (nonatomic, strong) UITextField * minIntervalInSecondsTextField;
 @property (nonatomic, strong) UITextField * maxIntervalInSecondsTextField;
-@property (nonatomic, strong) UITextField * deltaInCelsiusTextField;
 @property (nonatomic, strong) UIButton * sendReportingSetup;
 @end
 
@@ -51,7 +50,6 @@
 {
     [_minIntervalInSecondsTextField resignFirstResponder];
     [_maxIntervalInSecondsTextField resignFirstResponder];
-    [_deltaInCelsiusTextField resignFirstResponder];
 }
 
 - (void)setupUI
@@ -119,17 +117,6 @@
     maxIntervalInSecondsView.translatesAutoresizingMaskIntoConstraints = false;
     [maxIntervalInSecondsView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 
-    // Delta
-    _deltaInCelsiusTextField = [UITextField new];
-    _deltaInCelsiusTextField.keyboardType = UIKeyboardTypeNumberPad;
-    UILabel * deltaInCelsiusLabel = [UILabel new];
-    [deltaInCelsiusLabel setText:@"Delta (°C):"];
-    UIView * deltaInCelsiusView = [CHIPUIViewUtils viewWithLabel:deltaInCelsiusLabel textField:_deltaInCelsiusTextField];
-    [stackView addArrangedSubview:deltaInCelsiusView];
-
-    deltaInCelsiusView.translatesAutoresizingMaskIntoConstraints = false;
-    [deltaInCelsiusView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
-
     // Reporting button
     _sendReportingSetup = [UIButton new];
     [_sendReportingSetup setTitle:@"Send reporting settings" forState:UIControlStateNormal];
@@ -194,10 +181,9 @@
 {
     int minIntervalSeconds = [_minIntervalInSecondsTextField.text intValue];
     int maxIntervalSeconds = [_maxIntervalInSecondsTextField.text intValue];
-    int deltaInCelsius = [_deltaInCelsiusTextField.text intValue];
 
     NSLog(
-        @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInCelsius));
+        @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds));
 
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
@@ -207,7 +193,6 @@
                 [cluster
                     subscribeAttributeMeasuredValueWithMinInterval:minIntervalSeconds
                                                        maxInterval:maxIntervalSeconds
-                                                            change:deltaInCelsius
                                                    responseHandler:^(NSError * error, NSDictionary * values) {
                                                        if (error == nil)
                                                            return;

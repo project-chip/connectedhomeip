@@ -97,10 +97,12 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  * check if the stack needs to be started up.
  *
  * @param[in] storageDelegate The delegate for persistent storage
+ * @param[in] fabricId The fabricId for this controller instance
  * @param[in] vendorId The vendor ID of the commissioner application
  * @param[in] nocSigner The CHIPKeypair that is used to generate and sign Node Operational Credentials
  */
 - (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+       fabricId:(uint64_t)fabricId
        vendorId:(uint16_t)vendorId
       nocSigner:(nullable id<CHIPKeypair>)nocSigner;
 

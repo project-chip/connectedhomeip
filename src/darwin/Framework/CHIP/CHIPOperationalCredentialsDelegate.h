@@ -50,6 +50,8 @@ public:
     void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
     void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
 
+    const chip::Crypto::P256PublicKey & GetIssuerPubkey() { return mIssuerKey->Pubkey(); };
+
     CHIP_ERROR GenerateNOCChainAfterValidation(chip::NodeId nodeId, chip::FabricId fabricId,
         const chip::Crypto::P256PublicKey & pubkey, chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
         chip::MutableByteSpan & noc);

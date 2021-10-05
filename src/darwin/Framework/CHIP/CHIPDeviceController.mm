@@ -35,6 +35,7 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 
@@ -51,6 +52,7 @@ static NSString * const kErrorStopPairing = @"Failure while trying to stop the p
 static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrieve a paired device";
 static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
 static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
+static NSString * const kErrorCompressedFabricIdGeneration = @"Init failure while generating the Compressed FabricId";
 
 @interface CHIPDeviceController ()
 
@@ -64,6 +66,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 @property (readonly) CHIPP256KeypairBridge keypairBridge;
 @property (readonly) chip::NodeId localDeviceId;
 @property (readonly) uint16_t listenPort;
+@property (readonly) chip::CompressedFabricId compressedFabricId;
 @end
 
 // TODO Replace Shared Controller with a Controller Factory Singleton
@@ -133,6 +136,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 }
 
 - (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+       fabricId:(uint64_t)fabricId
        vendorId:(uint16_t)vendorId
       nocSigner:(id<CHIPKeypair>)nocSigner
 {
@@ -160,8 +164,18 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
             _keypairBridge.Init(nocSigner);
             nativeBridge.reset(new chip::Crypto::CHIPP256KeypairNativeBridge(_keypairBridge));
         }
+
         errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge, std::move(nativeBridge));
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
+            return;
+        }
+
+        uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
+        chip::MutableByteSpan compressedFabricIdSpan(compressedFabricIdBuf);
+        errorCode = chip::Crypto::GenerateCompressedFabricId(
+            _operationalCredentialsDelegate->GetIssuerPubkey(), fabricId, compressedFabricIdSpan);
+        _compressedFabricId = chip::Encoding::BigEndian::Get64(compressedFabricIdBuf);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCompressedFabricIdGeneration]) {
             return;
         }
 
@@ -246,12 +260,14 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 {
     uint16_t deviceIdLength = sizeof(_localDeviceId);
     if (CHIP_NO_ERROR
-        != _persistentStorageDelegateBridge->SyncGetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, deviceIdLength)) {
+        != _persistentStorageDelegateBridge->SyncGetKeyValue(
+            _compressedFabricId, CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, deviceIdLength)) {
         _localDeviceId = arc4random();
         _localDeviceId = _localDeviceId << 32 | arc4random();
         CHIP_LOG_ERROR("Assigned %llx node ID to the controller", _localDeviceId);
 
-        _persistentStorageDelegateBridge->SyncSetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, sizeof(_localDeviceId));
+        _persistentStorageDelegateBridge->SyncSetKeyValue(
+            _compressedFabricId, CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, sizeof(_localDeviceId));
     } else {
         CHIP_LOG_ERROR("Found %llx node ID for the controller", _localDeviceId);
     }

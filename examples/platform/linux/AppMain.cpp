@@ -185,19 +185,19 @@ using namespace ::chip::Controller;
 
 class MyServerStorageDelegate : public PersistentStorageDelegate
 {
-    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    CHIP_ERROR SyncGetKeyValue(const CompressedFabricId fabricId, const char * key, void * buffer, uint16_t & size) override
     {
         ChipLogProgress(AppServer, "Retrieved value from server storage.");
         return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
-    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
+    CHIP_ERROR SyncSetKeyValue(const CompressedFabricId fabricId, const char * key, const void * value, uint16_t size) override
     {
         ChipLogProgress(AppServer, "Stored value in server storage");
         return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+    CHIP_ERROR SyncDeleteKeyValue(const CompressedFabricId fabricId, const char * key) override
     {
         ChipLogProgress(AppServer, "Delete value in server storage");
         return PersistedStorage::KeyValueStoreMgr().Delete(key);

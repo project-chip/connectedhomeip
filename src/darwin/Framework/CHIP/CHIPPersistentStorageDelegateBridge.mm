@@ -71,7 +71,8 @@ void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(_Nullable id<CHIP
     });
 }
 
-CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key, void * buffer, uint16_t & size)
+CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(
+    const chip::CompressedFabricId fabricId, const char * key, void * buffer, uint16_t & size)
 {
     __block CHIP_ERROR error = CHIP_NO_ERROR;
     NSString * keyString = [NSString stringWithUTF8String:key];
@@ -82,10 +83,12 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key
         NSString * valueString = nil;
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
+        NSNumber * compressedFabricId = [NSNumber numberWithUnsignedLongLong:fabricId];
         if (strongDelegate) {
-            valueString = [strongDelegate CHIPGetKeyValue:keyString];
+            valueString = [strongDelegate CHIPGetKeyValueForFabric:compressedFabricId key:keyString];
         } else {
-            valueString = [mDefaultPersistentStorage objectForKey:keyString];
+            NSDictionary * fabricStorage = [mDefaultPersistentStorage objectForKey:[compressedFabricId stringValue]];
+            valueString = [fabricStorage valueForKey:keyString];
         }
 
         if (valueString != nil) {
@@ -111,7 +114,8 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key
     return error;
 }
 
-CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
+CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(
+    const chip::CompressedFabricId fabricId, const char * key, const void * value, uint16_t size)
 {
     std::string base64Value = StringToBase64(std::string(static_cast<const char *>(value), size));
 
@@ -122,10 +126,17 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key
         NSLog(@"PersistentStorageDelegate Set Key %@", keyString);
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
+        NSNumber * compressedFabricId = [NSNumber numberWithUnsignedLongLong:fabricId];
         if (strongDelegate) {
-            [strongDelegate CHIPSetKeyValue:keyString value:valueString];
+            [strongDelegate CHIPSetKeyValueForFabric:compressedFabricId key:keyString value:valueString];
         } else {
-            [mDefaultPersistentStorage setObject:valueString forKey:keyString];
+            NSMutableDictionary * fabricStorage =
+                [[mDefaultPersistentStorage objectForKey:[compressedFabricId stringValue]] mutableCopy];
+            if (!fabricStorage) {
+                fabricStorage = [[NSMutableDictionary alloc] init];
+            }
+            [fabricStorage setObject:valueString forKey:keyString];
+            [mDefaultPersistentStorage setObject:fabricStorage forKey:[compressedFabricId stringValue]];
         }
     });
 
@@ -136,17 +147,27 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncDeleteKeyValue(const char * key)
+CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncDeleteKeyValue(const chip::CompressedFabricId fabricId, const char * key)
 {
     NSString * keyString = [NSString stringWithUTF8String:key];
     dispatch_sync(mWorkQueue, ^{
         NSLog(@"PersistentStorageDelegate Delete Key: %@", keyString);
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
+        NSNumber * compressedFabricId = [NSNumber numberWithUnsignedLongLong:fabricId];
         if (strongDelegate) {
-            [strongDelegate CHIPDeleteKeyValue:keyString];
+            [strongDelegate CHIPDeleteKeyValueForFabric:compressedFabricId key:keyString];
         } else {
-            [mDefaultPersistentStorage removeObjectForKey:keyString];
+            NSMutableDictionary * fabricStorage =
+                [[mDefaultPersistentStorage objectForKey:[compressedFabricId stringValue]] mutableCopy];
+            if (fabricStorage) {
+                [fabricStorage removeObjectForKey:keyString];
+                if (fabricStorage.count == 0) {
+                    [mDefaultPersistentStorage removeObjectForKey:[compressedFabricId stringValue]];
+                } else {
+                    [mDefaultPersistentStorage setObject:fabricStorage forKey:[compressedFabricId stringValue]];
+                }
+            }
         }
     });
 

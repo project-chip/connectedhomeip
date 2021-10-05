@@ -86,10 +86,11 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::SetIssuerID(CHIPPersistentStorage
 
     char issuerIdString[16];
     uint16_t idStringLen = sizeof(issuerIdString);
-    if (CHIP_NO_ERROR != storage->SyncGetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, issuerIdString, idStringLen)) {
+    if (CHIP_NO_ERROR
+        != storage->SyncGetKeyValue(kUndefinedCompressedFabricId, CHIP_COMMISSIONER_CA_ISSUER_ID, issuerIdString, idStringLen)) {
         mIssuerId = arc4random();
         CHIP_LOG_ERROR("Assigned %d certificate issuer ID to the commissioner", mIssuerId);
-        storage->SyncSetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, &mIssuerId, sizeof(mIssuerId));
+        storage->SyncSetKeyValue(kUndefinedCompressedFabricId, CHIP_COMMISSIONER_CA_ISSUER_ID, &mIssuerId, sizeof(mIssuerId));
     } else {
         CHIP_LOG_ERROR("Found %d certificate issuer ID for the commissioner", mIssuerId);
     }
@@ -208,7 +209,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (!mGenerateRootCert) {
         PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-            err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
+            err = mStorage->SyncGetKeyValue(kUndefinedCompressedFabricId, key, rcac.data(), rcacBufLen));
         if (err == CHIP_NO_ERROR) {
             // Found root certificate in the storage.
             rcac.reduce_size(rcacBufLen);
@@ -221,7 +222,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
 
     VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
     PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-        err = mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size())));
+        err = mStorage->SyncSetKeyValue(kUndefinedCompressedFabricId, key, rcac.data(), static_cast<uint16_t>(rcac.size())));
 
     mGenerateRootCert = false;
 

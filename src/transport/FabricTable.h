@@ -87,6 +87,7 @@ public:
     FabricId GetFabricId() const { return mFabricId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
     uint16_t GetVendorId() const { return mVendorId; }
+    CompressedFabricId GetCompressedFabricId() const { return mOperationalId.GetCompressedFabricId(); }
 
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
@@ -121,23 +122,25 @@ public:
     CHIP_ERROR MatchDestinationID(const ByteSpan & destinationId, const ByteSpan & initiatorRandom, const ByteSpan * ipkList,
                                   size_t ipkListEntries);
 
+    bool Matches(const FabricInfo * info) const;
+
     // TODO - Refactor storing and loading of fabric info from persistent storage.
     //        The op cert array doesn't need to be in RAM except when it's being
     //        transmitted to peer node during CASE session setup.
-    CHIP_ERROR GetRootCert(ByteSpan & cert)
+    CHIP_ERROR GetRootCert(ByteSpan & cert) const
     {
         ReturnErrorCodeIf(mRootCert.empty(), CHIP_ERROR_INCORRECT_STATE);
         cert = mRootCert;
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetICACert(ByteSpan & cert)
+    CHIP_ERROR GetICACert(ByteSpan & cert) const
     {
         cert = mICACert;
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetNOCCert(ByteSpan & cert)
+    CHIP_ERROR GetNOCCert(ByteSpan & cert) const
     {
         ReturnErrorCodeIf(mNOCCert.empty(), CHIP_ERROR_INCORRECT_STATE);
         cert = mNOCCert;
@@ -356,6 +359,7 @@ public:
 
     void ReleaseFabricIndex(FabricIndex fabricIndex);
 
+    FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
 
     FabricIndex FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,

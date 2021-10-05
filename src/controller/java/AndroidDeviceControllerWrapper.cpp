@@ -76,7 +76,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChainAfterValidation(NodeI
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
     CHIP_ERROR err      = CHIP_NO_ERROR;
     PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-                      err = SyncGetKeyValue(key, rcac.data(), rcacBufLen));
+                      err = SyncGetKeyValue(kUndefinedCompressedFabricId, key, rcac.data(), rcacBufLen));
     if (err == CHIP_NO_ERROR)
     {
         // Found root certificate in the storage.
@@ -90,7 +90,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChainAfterValidation(NodeI
 
     VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
     PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-                      err = SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size())));
+                      err = SyncSetKeyValue(kUndefinedCompressedFabricId, key, rcac.data(), static_cast<uint16_t>(rcac.size())));
 
     return err;
 }
@@ -306,13 +306,14 @@ CHIP_ERROR AndroidDeviceControllerWrapper::InitializeOperationalCredentialsIssue
 
     // TODO: Use Android keystore system instead of direct storage of private key and add specific errors to check if a specified
     // item is not found in the keystore.
-    if (SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
+    if (SyncGetKeyValue(kUndefinedCompressedFabricId, kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) !=
+        CHIP_NO_ERROR)
     {
         // If storage doesn't have an existing keypair, create one and add it to the storage.
         ReturnErrorOnFailure(mIssuer.Initialize());
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
         keySize = static_cast<uint16_t>(sizeof(serializedKey));
-        SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize);
+        SyncSetKeyValue(kUndefinedCompressedFabricId, kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize);
     }
     else
     {
@@ -328,7 +329,8 @@ void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle 
 
 void AndroidDeviceControllerWrapper::OnStatusChange(void) {}
 
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const chip::CompressedFabricId fabricId, const char * key, void * value,
+                                                           uint16_t & size)
 {
     ChipLogProgress(chipTool, "KVS: Getting key %s", key);
 
@@ -341,13 +343,14 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, voi
     return err;
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncSetKeyValue(const chip::CompressedFabricId fabricId, const char * key,
+                                                           const void * value, uint16_t size)
 {
     ChipLogProgress(chipTool, "KVS: Setting key %s", key);
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const chip::CompressedFabricId fabricId, const char * key)
 {
     ChipLogProgress(chipTool, "KVS: Deleting key %s", key);
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);

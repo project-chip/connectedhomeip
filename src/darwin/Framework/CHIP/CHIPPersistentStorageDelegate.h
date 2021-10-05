@@ -20,7 +20,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * The protocol definition for the CHIPPersistenStorageDelegate
+ * The protocol definition for the CHIPPersistentStorageDelegate
+ * Storage is expected to be split across different CompressedFabricIds.
+ * CHIP stores most of its operational data inside a "Fabric" scope with a handful
+ * of metadata items in the "global" scope
+ *
+ * A Compressed FabricId of "0" indicates the "global" scope for storage.
  *
  * All delegate methods will be called on the supplied Delegate Queue.
  */
@@ -31,19 +36,19 @@ NS_ASSUME_NONNULL_BEGIN
  * Get the value for the given key
  *
  */
-- (nullable NSString *)CHIPGetKeyValue:(NSString *)key;
+- (nullable NSString *)CHIPGetKeyValueForFabric:(NSNumber *)CompressedFabricId key:(NSString *)key;
 
 /**
  * Set the value of the key to the given value
  *
  */
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value;
+- (void)CHIPSetKeyValueForFabric:(NSNumber *)CompressedFabricId key:(NSString *)key value:(NSString *)value;
 
 /**
  * Delete the key and corresponding value
  *
  */
-- (void)CHIPDeleteKeyValue:(NSString *)key;
+- (void)CHIPDeleteKeyValueForFabric:(NSNumber *)CompressedFabricId key:(NSString *)key;
 
 @end
 

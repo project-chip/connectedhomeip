@@ -38,17 +38,18 @@ class ServerStorageDelegate : public chip::PersistentStorageDelegate
 {
 public:
     CHIP_ERROR
-    SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    SyncGetKeyValue(const chip::CompressedFabricId fabricId, const char * key, void * buffer, uint16_t & size) override
     {
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
-    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
+    CHIP_ERROR SyncSetKeyValue(const chip::CompressedFabricId fabricId, const char * key, const void * value,
+                               uint16_t size) override
     {
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+    CHIP_ERROR SyncDeleteKeyValue(const chip::CompressedFabricId fabricId, const char * key) override
     {
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
     }
