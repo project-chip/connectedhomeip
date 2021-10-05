@@ -154,7 +154,7 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
         usage = kI2RKey;
     }
 
-    ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], kAES_CCM128_Key_Length, IV, sizeof(IV),
+    ReturnErrorOnFailure(AES_CCM_encrypt(input, input_length, AAD, aadLen, mKeys[usage], Crypto::kAES_CCM128_Key_Length, IV, sizeof(IV),
                                          output, tag, taglen));
 
     mac.SetTag(&header, sessionType, tag, taglen);
@@ -189,7 +189,7 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
         usage = kR2IKey;
     }
 
-    return AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage], kAES_CCM128_Key_Length, IV, sizeof(IV),
+    return AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage], Crypto::kAES_CCM128_Key_Length, IV, sizeof(IV),
                            output);
 }
 

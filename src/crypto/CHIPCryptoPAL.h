@@ -63,6 +63,13 @@ constexpr size_t kMax_Salt_Length = 16;
 constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
 constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 
+constexpr size_t kAES_CCM128_Key_Length    = 128u / 8u;
+constexpr size_t kAES_CCM128_Block_Length  = kAES_CCM128_Key_Length;
+
+// TODO: Remove AES-256 from CryptoPAL since not required by V1 spec
+constexpr size_t kAES_CCM256_Key_Length    = 256u / 8u;
+constexpr size_t kAES_CCM256_Block_Length  = kAES_CCM256_Key_Length;
+
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
  * the implementation files.

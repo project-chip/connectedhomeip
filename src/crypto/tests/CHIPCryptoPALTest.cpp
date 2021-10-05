@@ -166,17 +166,19 @@ static void TestAES_CCM_256EncryptTestVectors(nlTestSuite * inSuite, void * inCo
         {
             numOfTestsRan++;
             chip::Platform::ScopedMemoryBuffer<uint8_t> out_ct;
-            out_ct.Alloc(vector->ct_len);
+            uint8_t * out_ct_ptr = nullptr;
             if (vector->ct_len > 0)
             {
+                out_ct.Alloc(vector->ct_len);
                 NL_TEST_ASSERT(inSuite, out_ct);
+                out_ct_ptr = out_ct.Get();
             }
             chip::Platform::ScopedMemoryBuffer<uint8_t> out_tag;
             out_tag.Alloc(vector->tag_len);
             NL_TEST_ASSERT(inSuite, out_tag);
 
             CHIP_ERROR err = AES_CCM_encrypt(vector->pt, vector->pt_len, vector->aad, vector->aad_len, vector->key, vector->key_len,
-                                             vector->iv, vector->iv_len, out_ct.Get(), out_tag.Get(), vector->tag_len);
+                                             vector->iv, vector->iv_len, out_ct_ptr, out_tag.Get(), vector->tag_len);
             NL_TEST_ASSERT(inSuite, err == vector->result);
 
             if (vector->result == CHIP_NO_ERROR)
@@ -212,13 +214,15 @@ static void TestAES_CCM_256DecryptTestVectors(nlTestSuite * inSuite, void * inCo
         {
             numOfTestsRan++;
             chip::Platform::ScopedMemoryBuffer<uint8_t> out_pt;
-            out_pt.Alloc(vector->pt_len);
+            uint8_t * out_pt_ptr = nullptr;
             if (vector->pt_len > 0)
             {
+                out_pt.Alloc(vector->pt_len);
                 NL_TEST_ASSERT(inSuite, out_pt);
+                out_pt_ptr = out_pt.Get();
             }
             CHIP_ERROR err = AES_CCM_decrypt(vector->ct, vector->ct_len, vector->aad, vector->aad_len, vector->tag, vector->tag_len,
-                                             vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt.Get());
+                                             vector->key, vector->key_len, vector->iv, vector->iv_len, out_pt_ptr);
 
             NL_TEST_ASSERT(inSuite, err == vector->result);
 
