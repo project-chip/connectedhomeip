@@ -25,43 +25,43 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PowerConfiguration {
-}
+} // namespace PowerConfiguration
 
 namespace DeviceTemperatureConfiguration {
-}
+} // namespace DeviceTemperatureConfiguration
 
 namespace Identify {
-}
+} // namespace Identify
 
 namespace Groups {
-}
+} // namespace Groups
 
 namespace Scenes {
-}
+} // namespace Scenes
 
 namespace OnOff {
-}
+} // namespace OnOff
 
 namespace OnOffSwitchConfiguration {
-}
+} // namespace OnOffSwitchConfiguration
 
 namespace LevelControl {
-}
+} // namespace LevelControl
 
 namespace Alarms {
-}
+} // namespace Alarms
 
 namespace Time {
-}
+} // namespace Time
 
 namespace BinaryInputBasic {
-}
+} // namespace BinaryInputBasic
 
 namespace PowerProfile {
-}
+} // namespace PowerProfile
 
 namespace ApplianceControl {
-}
+} // namespace ApplianceControl
 
 namespace Descriptor {
 namespace DeviceType {
@@ -75,7 +75,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -104,19 +104,19 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace Descriptor
 
 namespace PollControl {
-}
+} // namespace PollControl
 
 namespace Basic {
-}
+} // namespace Basic
 
 namespace OtaSoftwareUpdateProvider {
-}
+} // namespace OtaSoftwareUpdateProvider
 
 namespace OtaSoftwareUpdateRequestor {
-}
+} // namespace OtaSoftwareUpdateRequestor
 
 namespace PowerSource {
-}
+} // namespace PowerSource
 
 namespace GeneralCommissioning {
 namespace BasicCommissioningInfoType {
@@ -129,7 +129,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -165,7 +165,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -202,7 +202,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -240,7 +240,7 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace NetworkCommissioning
 
 namespace DiagnosticLogs {
-}
+} // namespace DiagnosticLogs
 
 namespace GeneralDiagnostics {
 namespace NetworkInterfaceType {
@@ -260,7 +260,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -317,7 +317,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -378,7 +378,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -461,7 +461,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -536,7 +536,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -597,7 +597,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -626,19 +626,19 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace ThreadNetworkDiagnostics
 
 namespace WiFiNetworkDiagnostics {
-}
+} // namespace WiFiNetworkDiagnostics
 
 namespace EthernetNetworkDiagnostics {
-}
+} // namespace EthernetNetworkDiagnostics
 
 namespace BridgedDeviceBasic {
-}
+} // namespace BridgedDeviceBasic
 
 namespace Switch {
-}
+} // namespace Switch
 
 namespace AdministratorCommissioning {
-}
+} // namespace AdministratorCommissioning
 
 namespace OperationalCredentials {
 namespace FabricDescriptor {
@@ -656,7 +656,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -705,7 +705,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -745,7 +745,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -774,160 +774,160 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace FixedLabel
 
 namespace ShadeConfiguration {
-}
+} // namespace ShadeConfiguration
 
 namespace DoorLock {
-}
+} // namespace DoorLock
 
 namespace WindowCovering {
-}
+} // namespace WindowCovering
 
 namespace BarrierControl {
-}
+} // namespace BarrierControl
 
 namespace PumpConfigurationAndControl {
-}
+} // namespace PumpConfigurationAndControl
 
 namespace Thermostat {
-}
+} // namespace Thermostat
 
 namespace FanControl {
-}
+} // namespace FanControl
 
 namespace DehumidificationControl {
-}
+} // namespace DehumidificationControl
 
 namespace ThermostatUserInterfaceConfiguration {
-}
+} // namespace ThermostatUserInterfaceConfiguration
 
 namespace ColorControl {
-}
+} // namespace ColorControl
 
 namespace BallastConfiguration {
-}
+} // namespace BallastConfiguration
 
 namespace IlluminanceMeasurement {
-}
+} // namespace IlluminanceMeasurement
 
 namespace IlluminanceLevelSensing {
-}
+} // namespace IlluminanceLevelSensing
 
 namespace TemperatureMeasurement {
-}
+} // namespace TemperatureMeasurement
 
 namespace PressureMeasurement {
-}
+} // namespace PressureMeasurement
 
 namespace FlowMeasurement {
-}
+} // namespace FlowMeasurement
 
 namespace RelativeHumidityMeasurement {
-}
+} // namespace RelativeHumidityMeasurement
 
 namespace OccupancySensing {
-}
+} // namespace OccupancySensing
 
 namespace CarbonMonoxideConcentrationMeasurement {
-}
+} // namespace CarbonMonoxideConcentrationMeasurement
 
 namespace CarbonDioxideConcentrationMeasurement {
-}
+} // namespace CarbonDioxideConcentrationMeasurement
 
 namespace EthyleneConcentrationMeasurement {
-}
+} // namespace EthyleneConcentrationMeasurement
 
 namespace EthyleneOxideConcentrationMeasurement {
-}
+} // namespace EthyleneOxideConcentrationMeasurement
 
 namespace HydrogenConcentrationMeasurement {
-}
+} // namespace HydrogenConcentrationMeasurement
 
 namespace HydrogenSulphideConcentrationMeasurement {
-}
+} // namespace HydrogenSulphideConcentrationMeasurement
 
 namespace NitricOxideConcentrationMeasurement {
-}
+} // namespace NitricOxideConcentrationMeasurement
 
 namespace NitrogenDioxideConcentrationMeasurement {
-}
+} // namespace NitrogenDioxideConcentrationMeasurement
 
 namespace OxygenConcentrationMeasurement {
-}
+} // namespace OxygenConcentrationMeasurement
 
 namespace OzoneConcentrationMeasurement {
-}
+} // namespace OzoneConcentrationMeasurement
 
 namespace SulfurDioxideConcentrationMeasurement {
-}
+} // namespace SulfurDioxideConcentrationMeasurement
 
 namespace DissolvedOxygenConcentrationMeasurement {
-}
+} // namespace DissolvedOxygenConcentrationMeasurement
 
 namespace BromateConcentrationMeasurement {
-}
+} // namespace BromateConcentrationMeasurement
 
 namespace ChloraminesConcentrationMeasurement {
-}
+} // namespace ChloraminesConcentrationMeasurement
 
 namespace ChlorineConcentrationMeasurement {
-}
+} // namespace ChlorineConcentrationMeasurement
 
 namespace FecalColiformAndEColiConcentrationMeasurement {
-}
+} // namespace FecalColiformAndEColiConcentrationMeasurement
 
 namespace FluorideConcentrationMeasurement {
-}
+} // namespace FluorideConcentrationMeasurement
 
 namespace HaloaceticAcidsConcentrationMeasurement {
-}
+} // namespace HaloaceticAcidsConcentrationMeasurement
 
 namespace TotalTrihalomethanesConcentrationMeasurement {
-}
+} // namespace TotalTrihalomethanesConcentrationMeasurement
 
 namespace TotalColiformBacteriaConcentrationMeasurement {
-}
+} // namespace TotalColiformBacteriaConcentrationMeasurement
 
 namespace TurbidityConcentrationMeasurement {
-}
+} // namespace TurbidityConcentrationMeasurement
 
 namespace CopperConcentrationMeasurement {
-}
+} // namespace CopperConcentrationMeasurement
 
 namespace LeadConcentrationMeasurement {
-}
+} // namespace LeadConcentrationMeasurement
 
 namespace ManganeseConcentrationMeasurement {
-}
+} // namespace ManganeseConcentrationMeasurement
 
 namespace SulfateConcentrationMeasurement {
-}
+} // namespace SulfateConcentrationMeasurement
 
 namespace BromodichloromethaneConcentrationMeasurement {
-}
+} // namespace BromodichloromethaneConcentrationMeasurement
 
 namespace BromoformConcentrationMeasurement {
-}
+} // namespace BromoformConcentrationMeasurement
 
 namespace ChlorodibromomethaneConcentrationMeasurement {
-}
+} // namespace ChlorodibromomethaneConcentrationMeasurement
 
 namespace ChloroformConcentrationMeasurement {
-}
+} // namespace ChloroformConcentrationMeasurement
 
 namespace SodiumConcentrationMeasurement {
-}
+} // namespace SodiumConcentrationMeasurement
 
 namespace IasZone {
-}
+} // namespace IasZone
 
 namespace IasAce {
-}
+} // namespace IasAce
 
 namespace IasWd {
-}
+} // namespace IasWd
 
 namespace WakeOnLan {
-}
+} // namespace WakeOnLan
 
 namespace TvChannel {
 namespace TvChannelInfo {
@@ -944,7 +944,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -992,7 +992,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1040,7 +1040,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1080,7 +1080,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1122,7 +1122,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1159,10 +1159,10 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace MediaInput
 
 namespace LowPower {
-}
+} // namespace LowPower
 
 namespace KeypadInput {
-}
+} // namespace KeypadInput
 
 namespace ContentLauncher {
 namespace ContentLaunchAdditionalInfo {
@@ -1176,7 +1176,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1220,7 +1220,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     TLV::TLVType outer;
     err = reader.EnterContainer(outer);
     ReturnErrorOnFailure(err);
-
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         switch (chip::TLV::TagNumFromTag(reader.GetTag()))
@@ -1240,11 +1239,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         }
     }
-
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
+
 } // namespace ContentLaunchParamater
 namespace ContentLaunchBrandingInformation {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
@@ -1261,7 +1260,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1311,7 +1310,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1354,7 +1353,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1398,7 +1397,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1443,7 +1442,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1472,10 +1471,10 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace ApplicationLauncher
 
 namespace ApplicationBasic {
-}
+} // namespace ApplicationBasic
 
 namespace AccountLogin {
-}
+} // namespace AccountLogin
 
 namespace TestCluster {
 namespace SimpleStruct {
@@ -1492,7 +1491,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1541,7 +1540,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1592,7 +1591,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     TLV::TLVType outer;
     err = reader.EnterContainer(outer);
     ReturnErrorOnFailure(err);
-
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         switch (chip::TLV::TagNumFromTag(reader.GetTag()))
@@ -1622,11 +1620,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         }
     }
-
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
+
 } // namespace NestedStructList
 namespace DoubleNestedStructList {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
@@ -1644,7 +1642,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     TLV::TLVType outer;
     err = reader.EnterContainer(outer);
     ReturnErrorOnFailure(err);
-
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         switch (chip::TLV::TagNumFromTag(reader.GetTag()))
@@ -1656,11 +1653,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         }
     }
-
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
+
 } // namespace DoubleNestedStructList
 namespace TestListStructOctet {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
@@ -1673,7 +1670,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1702,25 +1699,25 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace TestCluster
 
 namespace Messaging {
-}
+} // namespace Messaging
 
 namespace ApplianceIdentification {
-}
+} // namespace ApplianceIdentification
 
 namespace MeterIdentification {
-}
+} // namespace MeterIdentification
 
 namespace ApplianceEventsAndAlert {
-}
+} // namespace ApplianceEventsAndAlert
 
 namespace ApplianceStatistics {
-}
+} // namespace ApplianceStatistics
 
 namespace ElectricalMeasurement {
-}
+} // namespace ElectricalMeasurement
 
 namespace Binding {
-}
+} // namespace Binding
 
 namespace GroupKeyManagement {
 namespace GroupKey {
@@ -1737,7 +1734,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1786,7 +1783,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err;
     TLV::TLVType outer;
@@ -1818,10 +1815,10 @@ CHIP_ERROR Type::Decode(TLV::TLVReader & reader)
 } // namespace GroupKeyManagement
 
 namespace SampleMfgSpecificCluster {
-}
+} // namespace SampleMfgSpecificCluster
 
 namespace SampleMfgSpecificCluster2 {
-}
+} // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters
 } // namespace app

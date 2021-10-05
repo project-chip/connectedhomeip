@@ -21,46 +21,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) const{
     return CHIP_NO_ERROR;
 }
 
-{{#unless struct_contains_array}}
-CHIP_ERROR Type::Decode(TLV::TLVReader &reader) {
-    CHIP_ERROR err;
-    TLV::TLVType outer;
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
-    while ((err = reader.Next()) == CHIP_NO_ERROR) {
-        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
-        {
-            {{#zcl_struct_items}}
-            case k{{asUpperCamelCase label}}FieldId:
-                {{#if_is_enum type}}
-                uint8_t v;
-                ReturnErrorOnFailure(DataModel::Decode(reader, v));
-                {{asLowerCamelCase label}} = static_cast<{{type}}>(v);
-                break;
-                {{else if isArray}}
-                return CHIP_ERROR_NOT_IMPLEMENTED;
-                {{else}}
-                ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
-                break;
-                {{/if_is_enum}}
-            {{/zcl_struct_items}}
-            default:
-                break;
-        }
-    }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-{{/unless}}
-
-{{#if struct_contains_array}}
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
     CHIP_ERROR err;
     TLV::TLVType outer;
     err = reader.EnterContainer(outer);
     ReturnErrorOnFailure(err);
-
     while ((err = reader.Next()) == CHIP_NO_ERROR) {
         switch (chip::TLV::TagNumFromTag(reader.GetTag()))
         {
@@ -70,24 +35,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
                 uint8_t v;
                 ReturnErrorOnFailure(DataModel::Decode(reader, v));
                 {{asLowerCamelCase label}} = static_cast<{{type}}>(v);
+                break;
                 {{else}}
                 ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
-                {{/if_is_enum}}
                 break;
+                {{/if_is_enum}}
             {{/zcl_struct_items}}
             default:
                 break;
         }
     }
-
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-{{/if}}
-}
+
+} // namespace {{asType label}}
 {{/zcl_structs}}
-}
+} // namespace {{asUpperCamelCase name}}
 
 {{/zcl_clusters}}
 
