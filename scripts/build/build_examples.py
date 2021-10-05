@@ -127,7 +127,7 @@ def main(context, log_level, target, target_glob, skip_target_glob, repo, out_pr
 
     if not 'PW_PROJECT_ROOT' in os.environ:
         raise click.UsageError("""
-PW_PROJECT_ROOT not in current environment.
+PW_PROJECT_ROOT not set in the current environment.
 
 Please make sure you `source scripts/bootstrap.sh` or `source scripts/activate.sh`
 before running this script.
