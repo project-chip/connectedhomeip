@@ -508,6 +508,7 @@ public:
 } // namespace Groups
 namespace Scenes {
 
+namespace Structs {
 namespace SceneExtensionFieldSet {
 enum class Fields
 {
@@ -530,6 +531,7 @@ public:
 using DecodableType = Type;
 
 } // namespace SceneExtensionFieldSet
+} // namespace Structs
 
 namespace Commands {
 namespace AddScene {
@@ -553,7 +555,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     Span<const char> sceneName;
-    DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
+    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -568,7 +570,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     Span<const char> sceneName;
-    DataModel::DecodableList<SceneExtensionFieldSet::DecodableType> extensionFieldSets;
+    DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddScene
@@ -660,7 +662,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     Span<const char> sceneName;
-    DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
+    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -676,7 +678,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     Span<const char> sceneName;
-    DataModel::DecodableList<SceneExtensionFieldSet::DecodableType> extensionFieldSets;
+    DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ViewSceneResponse
@@ -992,7 +994,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     Span<const char> sceneName;
-    DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
+    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -1007,7 +1009,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     Span<const char> sceneName;
-    DataModel::DecodableList<SceneExtensionFieldSet::DecodableType> extensionFieldSets;
+    DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnhancedAddScene
@@ -1099,7 +1101,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     Span<const char> sceneName;
-    DataModel::List<SceneExtensionFieldSet::Type> extensionFieldSets;
+    DataModel::List<Structs::SceneExtensionFieldSet::Type> extensionFieldSets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -1115,7 +1117,7 @@ public:
     uint8_t sceneId;
     uint16_t transitionTime;
     Span<const char> sceneName;
-    DataModel::DecodableList<SceneExtensionFieldSet::DecodableType> extensionFieldSets;
+    DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnhancedViewSceneResponse
@@ -1998,6 +2000,7 @@ namespace BinaryInputBasic {
 } // namespace BinaryInputBasic
 namespace PowerProfile {
 
+namespace Structs {
 namespace PowerProfileRecord {
 enum class Fields
 {
@@ -2070,6 +2073,7 @@ public:
 using DecodableType = Type;
 
 } // namespace TransferredPhase
+} // namespace Structs
 
 namespace Commands {
 namespace PowerProfileRequest {
@@ -2119,7 +2123,7 @@ public:
     uint8_t totalProfileNum;
     uint8_t powerProfileId;
     uint8_t numOfTransferredPhases;
-    DataModel::List<TransferredPhase::Type> transferredPhases;
+    DataModel::List<Structs::TransferredPhase::Type> transferredPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -2133,7 +2137,7 @@ public:
     uint8_t totalProfileNum;
     uint8_t powerProfileId;
     uint8_t numOfTransferredPhases;
-    DataModel::DecodableList<TransferredPhase::DecodableType> transferredPhases;
+    DataModel::DecodableList<Structs::TransferredPhase::DecodableType> transferredPhases;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PowerProfileNotification
@@ -2180,7 +2184,7 @@ public:
     uint8_t totalProfileNum;
     uint8_t powerProfileId;
     uint8_t numOfTransferredPhases;
-    DataModel::List<TransferredPhase::Type> transferredPhases;
+    DataModel::List<Structs::TransferredPhase::Type> transferredPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -2194,7 +2198,7 @@ public:
     uint8_t totalProfileNum;
     uint8_t powerProfileId;
     uint8_t numOfTransferredPhases;
-    DataModel::DecodableList<TransferredPhase::DecodableType> transferredPhases;
+    DataModel::DecodableList<Structs::TransferredPhase::DecodableType> transferredPhases;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PowerProfileResponse
@@ -2250,7 +2254,7 @@ public:
     static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
 
     uint8_t powerProfileCount;
-    DataModel::List<PowerProfileRecord::Type> powerProfileRecords;
+    DataModel::List<Structs::PowerProfileRecord::Type> powerProfileRecords;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -2262,7 +2266,7 @@ public:
     static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
 
     uint8_t powerProfileCount;
-    DataModel::DecodableList<PowerProfileRecord::DecodableType> powerProfileRecords;
+    DataModel::DecodableList<Structs::PowerProfileRecord::DecodableType> powerProfileRecords;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PowerProfileStateResponse
@@ -2345,7 +2349,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::List<ScheduledPhase::Type> scheduledPhases;
+    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -2358,7 +2362,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::DecodableList<ScheduledPhase::DecodableType> scheduledPhases;
+    DataModel::DecodableList<Structs::ScheduledPhase::DecodableType> scheduledPhases;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnergyPhasesScheduleNotification
@@ -2377,7 +2381,7 @@ public:
     static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
 
     uint8_t powerProfileCount;
-    DataModel::List<PowerProfileRecord::Type> powerProfileRecords;
+    DataModel::List<Structs::PowerProfileRecord::Type> powerProfileRecords;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -2389,7 +2393,7 @@ public:
     static constexpr ClusterId GetClusterId() { return PowerProfile::Id; }
 
     uint8_t powerProfileCount;
-    DataModel::DecodableList<PowerProfileRecord::DecodableType> powerProfileRecords;
+    DataModel::DecodableList<Structs::PowerProfileRecord::DecodableType> powerProfileRecords;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PowerProfilesStateNotification
@@ -2410,7 +2414,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::List<ScheduledPhase::Type> scheduledPhases;
+    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -2423,7 +2427,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::DecodableList<ScheduledPhase::DecodableType> scheduledPhases;
+    DataModel::DecodableList<Structs::ScheduledPhase::DecodableType> scheduledPhases;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnergyPhasesScheduleResponse
@@ -2552,7 +2556,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::List<ScheduledPhase::Type> scheduledPhases;
+    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -2565,7 +2569,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::DecodableList<ScheduledPhase::DecodableType> scheduledPhases;
+    DataModel::DecodableList<Structs::ScheduledPhase::DecodableType> scheduledPhases;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnergyPhasesScheduleStateResponse
@@ -2623,7 +2627,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::List<ScheduledPhase::Type> scheduledPhases;
+    DataModel::List<Structs::ScheduledPhase::Type> scheduledPhases;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -2636,7 +2640,7 @@ public:
 
     uint8_t powerProfileId;
     uint8_t numOfScheduledPhases;
-    DataModel::DecodableList<ScheduledPhase::DecodableType> scheduledPhases;
+    DataModel::DecodableList<Structs::ScheduledPhase::DecodableType> scheduledPhases;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace EnergyPhasesScheduleStateNotification
@@ -3042,6 +3046,7 @@ public:
 } // namespace ApplianceControl
 namespace Descriptor {
 
+namespace Structs {
 namespace DeviceType {
 enum class Fields
 {
@@ -3062,6 +3067,7 @@ public:
 using DecodableType = Type;
 
 } // namespace DeviceType
+} // namespace Structs
 
 } // namespace Descriptor
 namespace PollControl {
@@ -3627,6 +3633,7 @@ enum class RegulatoryLocationType : uint8_t
 using RegulatoryLocationType               = EmberAfRegulatoryLocationType;
 #endif
 
+namespace Structs {
 namespace BasicCommissioningInfoType {
 enum class Fields
 {
@@ -3645,6 +3652,7 @@ public:
 using DecodableType = Type;
 
 } // namespace BasicCommissioningInfoType
+} // namespace Structs
 
 namespace Commands {
 namespace ArmFailSafe {
@@ -3869,6 +3877,7 @@ enum class NetworkCommissioningError : uint8_t
 using NetworkCommissioningError            = EmberAfNetworkCommissioningError;
 #endif
 
+namespace Structs {
 namespace ThreadInterfaceScanResult {
 enum class Fields
 {
@@ -3913,6 +3922,7 @@ public:
 using DecodableType = Type;
 
 } // namespace WiFiInterfaceScanResult
+} // namespace Structs
 
 namespace Commands {
 namespace ScanNetworks {
@@ -3967,8 +3977,8 @@ public:
 
     uint8_t errorCode;
     Span<const char> debugText;
-    DataModel::List<WiFiInterfaceScanResult::Type> wifiScanResults;
-    DataModel::List<ThreadInterfaceScanResult::Type> threadScanResults;
+    DataModel::List<Structs::WiFiInterfaceScanResult::Type> wifiScanResults;
+    DataModel::List<Structs::ThreadInterfaceScanResult::Type> threadScanResults;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -3981,8 +3991,8 @@ public:
 
     uint8_t errorCode;
     Span<const char> debugText;
-    DataModel::DecodableList<WiFiInterfaceScanResult::DecodableType> wifiScanResults;
-    DataModel::DecodableList<ThreadInterfaceScanResult::DecodableType> threadScanResults;
+    DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType> wifiScanResults;
+    DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType> threadScanResults;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ScanNetworksResponse
@@ -4679,6 +4689,7 @@ enum class RadioFaultType : uint8_t
 using RadioFaultType                       = EmberAfRadioFaultType;
 #endif
 
+namespace Structs {
 namespace NetworkInterfaceType {
 enum class Fields
 {
@@ -4707,10 +4718,12 @@ public:
 using DecodableType = Type;
 
 } // namespace NetworkInterfaceType
+} // namespace Structs
 
 } // namespace GeneralDiagnostics
 namespace SoftwareDiagnostics {
 
+namespace Structs {
 namespace ThreadMetrics {
 enum class Fields
 {
@@ -4737,6 +4750,7 @@ public:
 using DecodableType = Type;
 
 } // namespace ThreadMetrics
+} // namespace Structs
 
 namespace Commands {
 namespace ResetWatermarks {
@@ -4798,6 +4812,7 @@ enum class RoutingRole : uint8_t
 using RoutingRole                          = EmberAfRoutingRole;
 #endif
 
+namespace Structs {
 namespace NeighborTable {
 enum class Fields
 {
@@ -4938,6 +4953,7 @@ public:
 using DecodableType = Type;
 
 } // namespace SecurityPolicy
+} // namespace Structs
 
 namespace Commands {
 namespace ResetCounts {
@@ -5315,6 +5331,7 @@ enum class NodeOperationalCertStatus : uint8_t
 using NodeOperationalCertStatus            = EmberAfNodeOperationalCertStatus;
 #endif
 
+namespace Structs {
 namespace FabricDescriptor {
 enum class Fields
 {
@@ -5363,6 +5380,7 @@ public:
 using DecodableType = Type;
 
 } // namespace NOCStruct
+} // namespace Structs
 
 namespace Commands {
 namespace AttestationRequest {
@@ -5760,6 +5778,7 @@ public:
 } // namespace OperationalCredentials
 namespace FixedLabel {
 
+namespace Structs {
 namespace LabelStruct {
 enum class Fields
 {
@@ -5780,6 +5799,7 @@ public:
 using DecodableType = Type;
 
 } // namespace LabelStruct
+} // namespace Structs
 
 } // namespace FixedLabel
 namespace ShadeConfiguration {
@@ -9514,6 +9534,7 @@ enum class IasZoneType : uint16_t
 using IasZoneType                          = EmberAfIasZoneType;
 #endif
 
+namespace Structs {
 namespace IasAceZoneStatusResult {
 enum class Fields
 {
@@ -9534,6 +9555,7 @@ public:
 using DecodableType = Type;
 
 } // namespace IasAceZoneStatusResult
+} // namespace Structs
 
 namespace Commands {
 namespace Arm {
@@ -10104,7 +10126,7 @@ public:
 
     bool zoneStatusComplete;
     uint8_t numberOfZones;
-    DataModel::List<IasAceZoneStatusResult::Type> zoneStatusResult;
+    DataModel::List<Structs::IasAceZoneStatusResult::Type> zoneStatusResult;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -10117,7 +10139,7 @@ public:
 
     bool zoneStatusComplete;
     uint8_t numberOfZones;
-    DataModel::DecodableList<IasAceZoneStatusResult::DecodableType> zoneStatusResult;
+    DataModel::DecodableList<Structs::IasAceZoneStatusResult::DecodableType> zoneStatusResult;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetZoneStatusResponse
@@ -10258,6 +10280,7 @@ enum class TvChannelLineupInfoType : uint8_t
 using TvChannelLineupInfoType              = EmberAfTvChannelLineupInfoType;
 #endif
 
+namespace Structs {
 namespace TvChannelInfo {
 enum class Fields
 {
@@ -10308,6 +10331,7 @@ public:
 using DecodableType = Type;
 
 } // namespace TvChannelLineupInfo
+} // namespace Structs
 
 namespace Commands {
 namespace ChangeChannel {
@@ -10352,7 +10376,7 @@ public:
     static constexpr CommandId GetCommandId() { return ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
 
-    DataModel::List<TvChannelInfo::Type> channelMatch;
+    DataModel::List<Structs::TvChannelInfo::Type> channelMatch;
     TvChannelErrorType errorType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
@@ -10364,7 +10388,7 @@ public:
     static constexpr CommandId GetCommandId() { return ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return TvChannel::Id; }
 
-    DataModel::DecodableList<TvChannelInfo::DecodableType> channelMatch;
+    DataModel::DecodableList<Structs::TvChannelInfo::DecodableType> channelMatch;
     TvChannelErrorType errorType;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -10445,6 +10469,7 @@ enum class NavigateTargetStatus : uint8_t
 using NavigateTargetStatus                 = EmberAfNavigateTargetStatus;
 #endif
 
+namespace Structs {
 namespace NavigateTargetTargetInfo {
 enum class Fields
 {
@@ -10465,6 +10490,7 @@ public:
 using DecodableType = Type;
 
 } // namespace NavigateTargetTargetInfo
+} // namespace Structs
 
 namespace Commands {
 namespace NavigateTarget {
@@ -10563,6 +10589,7 @@ enum class MediaPlaybackStatus : uint8_t
 using MediaPlaybackStatus                  = EmberAfMediaPlaybackStatus;
 #endif
 
+namespace Structs {
 namespace MediaPlaybackPosition {
 enum class Fields
 {
@@ -10583,6 +10610,7 @@ public:
 using DecodableType = Type;
 
 } // namespace MediaPlaybackPosition
+} // namespace Structs
 
 namespace Commands {
 namespace MediaPlay {
@@ -11195,6 +11223,7 @@ enum class MediaInputType : uint8_t
 using MediaInputType                       = EmberAfMediaInputType;
 #endif
 
+namespace Structs {
 namespace MediaInputInfo {
 enum class Fields
 {
@@ -11219,6 +11248,7 @@ public:
 using DecodableType = Type;
 
 } // namespace MediaInputInfo
+} // namespace Structs
 
 namespace Commands {
 namespace SelectInput {
@@ -11589,6 +11619,7 @@ enum class ContentLaunchStreamingType : uint8_t
 using ContentLaunchStreamingType           = EmberAfContentLaunchStreamingType;
 #endif
 
+namespace Structs {
 namespace ContentLaunchAdditionalInfo {
 enum class Fields
 {
@@ -11622,7 +11653,7 @@ struct Type
 public:
     ContentLaunchParameterEnum type;
     Span<const char> value;
-    DataModel::List<ContentLaunchAdditionalInfo::Type> externalIDList;
+    DataModel::List<Structs::ContentLaunchAdditionalInfo::Type> externalIDList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -11632,7 +11663,7 @@ struct DecodableType
 public:
     ContentLaunchParameterEnum type;
     Span<const char> value;
-    DataModel::DecodableList<ContentLaunchAdditionalInfo::DecodableType> externalIDList;
+    DataModel::DecodableList<Structs::ContentLaunchAdditionalInfo::DecodableType> externalIDList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -11709,6 +11740,7 @@ public:
 using DecodableType = Type;
 
 } // namespace ContentLaunchStyleInformation
+} // namespace Structs
 
 namespace Commands {
 namespace LaunchContent {
@@ -11855,6 +11887,7 @@ enum class AudioOutputType : uint8_t
 using AudioOutputType                      = EmberAfAudioOutputType;
 #endif
 
+namespace Structs {
 namespace AudioOutputInfo {
 enum class Fields
 {
@@ -11877,6 +11910,7 @@ public:
 using DecodableType = Type;
 
 } // namespace AudioOutputInfo
+} // namespace Structs
 
 namespace Commands {
 namespace SelectOutput {
@@ -11955,6 +11989,7 @@ enum class ApplicationLauncherStatus : uint8_t
 using ApplicationLauncherStatus            = EmberAfApplicationLauncherStatus;
 #endif
 
+namespace Structs {
 namespace ApplicationLauncherApp {
 enum class Fields
 {
@@ -11975,6 +12010,7 @@ public:
 using DecodableType = Type;
 
 } // namespace ApplicationLauncherApp
+} // namespace Structs
 
 namespace Commands {
 namespace LaunchApp {
@@ -12199,6 +12235,7 @@ enum class SimpleEnum : uint8_t
 using SimpleEnum                           = EmberAfSimpleEnum;
 #endif
 
+namespace Structs {
 namespace SimpleStruct {
 enum class Fields
 {
@@ -12238,7 +12275,7 @@ struct Type
 public:
     uint8_t a;
     bool b;
-    SimpleStruct::Type c;
+    Structs::SimpleStruct::Type c;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -12264,8 +12301,8 @@ struct Type
 public:
     uint8_t a;
     bool b;
-    SimpleStruct::Type c;
-    DataModel::List<SimpleStruct::Type> d;
+    Structs::SimpleStruct::Type c;
+    DataModel::List<Structs::SimpleStruct::Type> d;
     DataModel::List<uint32_t> e;
     DataModel::List<chip::ByteSpan> f;
     DataModel::List<uint8_t> g;
@@ -12278,8 +12315,8 @@ struct DecodableType
 public:
     uint8_t a;
     bool b;
-    SimpleStruct::DecodableType c;
-    DataModel::DecodableList<SimpleStruct::DecodableType> d;
+    Structs::SimpleStruct::DecodableType c;
+    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> d;
     DataModel::DecodableList<uint32_t> e;
     DataModel::DecodableList<chip::ByteSpan> f;
     DataModel::DecodableList<uint8_t> g;
@@ -12296,7 +12333,7 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<NestedStructList::Type> a;
+    DataModel::List<Structs::NestedStructList::Type> a;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
 };
@@ -12304,7 +12341,7 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<NestedStructList::DecodableType> a;
+    DataModel::DecodableList<Structs::NestedStructList::DecodableType> a;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
@@ -12329,6 +12366,7 @@ public:
 using DecodableType = Type;
 
 } // namespace TestListStructOctet
+} // namespace Structs
 
 namespace Commands {
 namespace Test {
@@ -12529,8 +12567,8 @@ public:
     static constexpr CommandId GetCommandId() { return TestStructArrayArgumentResponse::Id; }
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
 
-    DataModel::List<NestedStructList::Type> arg1;
-    DataModel::List<SimpleStruct::Type> arg2;
+    DataModel::List<Structs::NestedStructList::Type> arg1;
+    DataModel::List<Structs::SimpleStruct::Type> arg2;
     DataModel::List<SimpleEnum> arg3;
     DataModel::List<bool> arg4;
     SimpleEnum arg5;
@@ -12545,8 +12583,8 @@ public:
     static constexpr CommandId GetCommandId() { return TestStructArrayArgumentResponse::Id; }
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
 
-    DataModel::DecodableList<NestedStructList::DecodableType> arg1;
-    DataModel::DecodableList<SimpleStruct::DecodableType> arg2;
+    DataModel::DecodableList<Structs::NestedStructList::DecodableType> arg1;
+    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg2;
     DataModel::DecodableList<SimpleEnum> arg3;
     DataModel::DecodableList<bool> arg4;
     SimpleEnum arg5;
@@ -12631,8 +12669,8 @@ public:
     static constexpr CommandId GetCommandId() { return TestStructArrayArgumentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
 
-    DataModel::List<NestedStructList::Type> arg1;
-    DataModel::List<SimpleStruct::Type> arg2;
+    DataModel::List<Structs::NestedStructList::Type> arg1;
+    DataModel::List<Structs::SimpleStruct::Type> arg2;
     DataModel::List<SimpleEnum> arg3;
     DataModel::List<bool> arg4;
     SimpleEnum arg5;
@@ -12647,8 +12685,8 @@ public:
     static constexpr CommandId GetCommandId() { return TestStructArrayArgumentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return TestCluster::Id; }
 
-    DataModel::DecodableList<NestedStructList::DecodableType> arg1;
-    DataModel::DecodableList<SimpleStruct::DecodableType> arg2;
+    DataModel::DecodableList<Structs::NestedStructList::DecodableType> arg1;
+    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg2;
     DataModel::DecodableList<SimpleEnum> arg3;
     DataModel::DecodableList<bool> arg4;
     SimpleEnum arg5;
@@ -13606,6 +13644,7 @@ enum class GroupKeySecurityPolicy : uint8_t
 using GroupKeySecurityPolicy               = EmberAfGroupKeySecurityPolicy;
 #endif
 
+namespace Structs {
 namespace GroupKey {
 enum class Fields
 {
@@ -13654,6 +13693,7 @@ public:
 using DecodableType = Type;
 
 } // namespace GroupState
+} // namespace Structs
 
 } // namespace GroupKeyManagement
 namespace SampleMfgSpecificCluster {
