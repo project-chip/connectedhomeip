@@ -37,6 +37,47 @@ namespace Groups {
 } // namespace Groups
 
 namespace Scenes {
+namespace SceneExtensionFieldSet {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kClusterIdFieldId), clusterId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kLengthFieldId), length));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kValueFieldId), value));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err;
+    TLV::TLVType outer;
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case kClusterIdFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, clusterId));
+            break;
+        case kLengthFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, length));
+            break;
+        case kValueFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace SceneExtensionFieldSet
 } // namespace Scenes
 
 namespace OnOff {
@@ -58,6 +99,141 @@ namespace BinaryInputBasic {
 } // namespace BinaryInputBasic
 
 namespace PowerProfile {
+namespace PowerProfileRecord {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kPowerProfileIdFieldId), powerProfileId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kEnergyPhaseIdFieldId), energyPhaseId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kPowerProfileRemoteControlFieldId), powerProfileRemoteControl));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kPowerProfileStateFieldId), powerProfileState));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err;
+    TLV::TLVType outer;
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case kPowerProfileIdFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, powerProfileId));
+            break;
+        case kEnergyPhaseIdFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, energyPhaseId));
+            break;
+        case kPowerProfileRemoteControlFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, powerProfileRemoteControl));
+            break;
+        case kPowerProfileStateFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, powerProfileState));
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace PowerProfileRecord
+namespace ScheduledPhase {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kEnergyPhaseIdFieldId), energyPhaseId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kScheduledTimeFieldId), scheduledTime));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err;
+    TLV::TLVType outer;
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case kEnergyPhaseIdFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, energyPhaseId));
+            break;
+        case kScheduledTimeFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, scheduledTime));
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace ScheduledPhase
+namespace TransferredPhase {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kEnergyPhaseIdFieldId), energyPhaseId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kMacroPhaseIdFieldId), macroPhaseId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kExpectedDurationFieldId), expectedDuration));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kPeakPowerFieldId), peakPower));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kEnergyFieldId), energy));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kMaxActivationDelayFieldId), maxActivationDelay));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err;
+    TLV::TLVType outer;
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case kEnergyPhaseIdFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, energyPhaseId));
+            break;
+        case kMacroPhaseIdFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, macroPhaseId));
+            break;
+        case kExpectedDurationFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, expectedDuration));
+            break;
+        case kPeakPowerFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, peakPower));
+            break;
+        case kEnergyFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, energy));
+            break;
+        case kMaxActivationDelayFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, maxActivationDelay));
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace TransferredPhase
 } // namespace PowerProfile
 
 namespace ApplianceControl {
@@ -919,6 +1095,43 @@ namespace IasZone {
 } // namespace IasZone
 
 namespace IasAce {
+namespace IasAceZoneStatusResult {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, uint64_t tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kZoneIdFieldId), zoneId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(kZoneStatusFieldId), zoneStatus));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err;
+    TLV::TLVType outer;
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case kZoneIdFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, zoneId));
+            break;
+        case kZoneStatusFieldId:
+            ReturnErrorOnFailure(DataModel::Decode(reader, zoneStatus));
+            break;
+        default:
+            break;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace IasAceZoneStatusResult
 } // namespace IasAce
 
 namespace IasWd {

@@ -7896,7 +7896,7 @@ CHIP_ERROR OnOffCluster::OffWithEffect(Callback::Cancelable * onSuccessCallback,
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // effectId: onOffEffectIdentifier
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), effectId));
-    // effectVariant: enum8
+    // effectVariant: onOffDelayedAllOffEffectVariant
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), effectVariant));
 
     SuccessOrExit(err = sender->FinishCommand());

@@ -36,6 +36,31 @@ namespace DeviceTemperatureConfiguration {
 
 } // namespace DeviceTemperatureConfiguration
 namespace Identify {
+// Enum for IdentifyEffectIdentifier
+enum class IdentifyEffectIdentifier : uint8_t
+{
+    IDENTIFY_EFFECT_IDENTIFIER_BLINK          = 0x00,
+    IDENTIFY_EFFECT_IDENTIFIER_BREATHE        = 0x01,
+    IDENTIFY_EFFECT_IDENTIFIER_OKAY           = 0x02,
+    IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE = 0x0B,
+    IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT  = 0xFE,
+    IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT    = 0xFF,
+};
+// Enum for IdentifyEffectVariant
+enum class IdentifyEffectVariant : uint8_t
+{
+    IDENTIFY_EFFECT_VARIANT_DEFAULT = 0x00,
+};
+// Enum for IdentifyIdentifyType
+enum class IdentifyIdentifyType : uint8_t
+{
+    IDENTIFY_IDENTIFY_TYPE_NONE          = 0x00,
+    IDENTIFY_IDENTIFY_TYPE_VISIBLE_LIGHT = 0x01,
+    IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED   = 0x02,
+    IDENTIFY_IDENTIFY_TYPE_AUDIBLE_BEEP  = 0x03,
+    IDENTIFY_IDENTIFY_TYPE_DISPLAY       = 0x04,
+    IDENTIFY_IDENTIFY_TYPE_ACTUATOR      = 0x05,
+};
 
 namespace Commands {
 namespace Identify {
@@ -186,6 +211,29 @@ struct DecodableType
 } // namespace Commands
 } // namespace Groups
 namespace Scenes {
+
+namespace SceneExtensionFieldSet {
+enum FieldId
+{
+    kClusterIdFieldId = 0,
+    kLengthFieldId    = 1,
+    kValueFieldId     = 2,
+};
+
+struct Type
+{
+public:
+    uint32_t clusterId;
+    uint8_t length;
+    uint8_t value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace SceneExtensionFieldSet
 
 namespace Commands {
 namespace AddScene {
@@ -517,6 +565,18 @@ namespace OnOffSwitchConfiguration {
 
 } // namespace OnOffSwitchConfiguration
 namespace LevelControl {
+// Enum for MoveMode
+enum class MoveMode : uint8_t
+{
+    MOVE_MODE_UP   = 0x00,
+    MOVE_MODE_DOWN = 0x01,
+};
+// Enum for StepMode
+enum class StepMode : uint8_t
+{
+    STEP_MODE_UP   = 0x00,
+    STEP_MODE_DOWN = 0x01,
+};
 
 namespace Commands {
 namespace MoveToLevel {
@@ -673,6 +733,79 @@ namespace BinaryInputBasic {
 
 } // namespace BinaryInputBasic
 namespace PowerProfile {
+
+namespace PowerProfileRecord {
+enum FieldId
+{
+    kPowerProfileIdFieldId            = 0,
+    kEnergyPhaseIdFieldId             = 1,
+    kPowerProfileRemoteControlFieldId = 2,
+    kPowerProfileStateFieldId         = 3,
+};
+
+struct Type
+{
+public:
+    uint8_t powerProfileId;
+    uint8_t energyPhaseId;
+    bool powerProfileRemoteControl;
+    uint8_t powerProfileState;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace PowerProfileRecord
+namespace ScheduledPhase {
+enum FieldId
+{
+    kEnergyPhaseIdFieldId = 0,
+    kScheduledTimeFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t energyPhaseId;
+    uint16_t scheduledTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ScheduledPhase
+namespace TransferredPhase {
+enum FieldId
+{
+    kEnergyPhaseIdFieldId      = 0,
+    kMacroPhaseIdFieldId       = 1,
+    kExpectedDurationFieldId   = 2,
+    kPeakPowerFieldId          = 3,
+    kEnergyFieldId             = 4,
+    kMaxActivationDelayFieldId = 5,
+};
+
+struct Type
+{
+public:
+    uint8_t energyPhaseId;
+    uint8_t macroPhaseId;
+    uint16_t expectedDuration;
+    uint16_t peakPower;
+    uint16_t energy;
+    uint16_t maxActivationDelay;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace TransferredPhase
 
 namespace Commands {
 namespace PowerProfileRequest {
@@ -888,6 +1021,49 @@ struct DecodableType
 } // namespace Commands
 } // namespace PowerProfile
 namespace ApplianceControl {
+// Enum for ApplianceStatus
+enum class ApplianceStatus : uint8_t
+{
+    APPLIANCE_STATUS_OFF                         = 0x01,
+    APPLIANCE_STATUS_STAND_BY                    = 0x02,
+    APPLIANCE_STATUS_PROGRAMMED                  = 0x03,
+    APPLIANCE_STATUS_PROGRAMMED_WAITING_TO_START = 0x04,
+    APPLIANCE_STATUS_RUNNING                     = 0x05,
+    APPLIANCE_STATUS_PAUSE                       = 0x06,
+    APPLIANCE_STATUS_END_PROGRAMMED              = 0x07,
+    APPLIANCE_STATUS_FAILURE                     = 0x08,
+    APPLIANCE_STATUS_PROGRAMME_INTERRUPTED       = 0x09,
+    APPLIANCE_STATUS_IDLE                        = 0x0A,
+    APPLIANCE_STATUS_RINSE_HOLD                  = 0x0B,
+    APPLIANCE_STATUS_SERVICE                     = 0x0C,
+    APPLIANCE_STATUS_SUPERFREEZING               = 0x0D,
+    APPLIANCE_STATUS_SUPERCOOLING                = 0x0E,
+    APPLIANCE_STATUS_SUPERHEATING                = 0x0F,
+};
+// Enum for CommandIdentification
+enum class CommandIdentification : uint8_t
+{
+    COMMAND_IDENTIFICATION_START                  = 0x01,
+    COMMAND_IDENTIFICATION_STOP                   = 0x02,
+    COMMAND_IDENTIFICATION_PAUSE                  = 0x03,
+    COMMAND_IDENTIFICATION_START_SUPERFREEZING    = 0x04,
+    COMMAND_IDENTIFICATION_STOP_SUPERFREEZING     = 0x05,
+    COMMAND_IDENTIFICATION_START_SUPERCOOLING     = 0x06,
+    COMMAND_IDENTIFICATION_STOP_SUPERCOOLING      = 0x07,
+    COMMAND_IDENTIFICATION_DISABLE_GAS            = 0x08,
+    COMMAND_IDENTIFICATION_ENABLE_GAS             = 0x09,
+    COMMAND_IDENTIFICATION_ENABLE_ENERGY_CONTROL  = 0x0A,
+    COMMAND_IDENTIFICATION_DISABLE_ENERGY_CONTROL = 0x0B,
+};
+// Enum for WarningEvent
+enum class WarningEvent : uint8_t
+{
+    WARNING_EVENT_WARNING1_OVERALL_POWER_ABOVE_AVAILABLE_POWER_LEVEL                                             = 0x00,
+    WARNING_EVENT_WARNING2_OVERALL_POWER_ABOVE_POWER_THRESHOLD_LEVEL                                             = 0x01,
+    WARNING_EVENT_WARNING3_OVERALL_POWER_BACK_BELOW_THE_AVAILABLE_POWER_LEVEL                                    = 0x02,
+    WARNING_EVENT_WARNING4_OVERALL_POWER_BACK_BELOW_THE_POWER_THRESHOLD_LEVEL                                    = 0x03,
+    WARNING_EVENT_WARNING5_OVERALL_POWER_WILL_BE_POTENTIALLY_ABOVE_AVAILABLE_POWER_LEVEL_IF_THE_APPLIANCE_STARTS = 0x04,
+};
 
 namespace Commands {
 namespace ExecutionOfACommand {
@@ -2270,6 +2446,62 @@ namespace ShadeConfiguration {
 
 } // namespace ShadeConfiguration
 namespace DoorLock {
+// Enum for DoorLockOperationEventCode
+enum class DoorLockOperationEventCode : uint8_t
+{
+    DOOR_LOCK_OPERATION_EVENT_CODE_UNKNOWN_OR_MFG_SPECIFIC  = 0x00,
+    DOOR_LOCK_OPERATION_EVENT_CODE_LOCK                     = 0x01,
+    DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK                   = 0x02,
+    DOOR_LOCK_OPERATION_EVENT_CODE_LOCK_INVALID_PIN_OR_ID   = 0x03,
+    DOOR_LOCK_OPERATION_EVENT_CODE_LOCK_INVALID_SCHEDULE    = 0x04,
+    DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK_INVALID_PIN_OR_ID = 0x05,
+    DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK_INVALID_SCHEDULE  = 0x06,
+    DOOR_LOCK_OPERATION_EVENT_CODE_ONE_TOUCH_LOCK           = 0x07,
+    DOOR_LOCK_OPERATION_EVENT_CODE_KEY_LOCK                 = 0x08,
+    DOOR_LOCK_OPERATION_EVENT_CODE_KEY_UNLOCK               = 0x09,
+    DOOR_LOCK_OPERATION_EVENT_CODE_AUTO_LOCK                = 0x0A,
+    DOOR_LOCK_OPERATION_EVENT_CODE_SCHEDULE_LOCK            = 0x0B,
+    DOOR_LOCK_OPERATION_EVENT_CODE_SCHEDULE_UNLOCK          = 0x0C,
+    DOOR_LOCK_OPERATION_EVENT_CODE_MANUAL_LOCK              = 0x0D,
+    DOOR_LOCK_OPERATION_EVENT_CODE_MANUAL_UNLOCK            = 0x0E,
+};
+// Enum for DoorLockProgrammingEventCode
+enum class DoorLockProgrammingEventCode : uint8_t
+{
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_UNKNOWN_OR_MFG_SPECIFIC = 0x00,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_MASTER_CODE_CHANGED     = 0x01,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_ADDED               = 0x02,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_DELETED             = 0x03,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_CHANGED             = 0x04,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_ID_ADDED                = 0x05,
+    DOOR_LOCK_PROGRAMMING_EVENT_CODE_ID_DELETED              = 0x06,
+};
+// Enum for DoorLockSetPinOrIdStatus
+enum class DoorLockSetPinOrIdStatus : uint8_t
+{
+    DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS              = 0x00,
+    DOOR_LOCK_SET_PIN_OR_ID_STATUS_GENERAL_FAILURE      = 0x01,
+    DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL          = 0x02,
+    DOOR_LOCK_SET_PIN_OR_ID_STATUS_DUPLICATE_CODE_ERROR = 0x03,
+};
+// Enum for DoorLockUserStatus
+enum class DoorLockUserStatus : uint8_t
+{
+    DOOR_LOCK_USER_STATUS_AVAILABLE         = 0x00,
+    DOOR_LOCK_USER_STATUS_OCCUPIED_ENABLED  = 0x01,
+    DOOR_LOCK_USER_STATUS_OCCUPIED_DISABLED = 0x03,
+    DOOR_LOCK_USER_STATUS_NOT_SUPPORTED     = 0xFF,
+};
+// Enum for DoorLockUserType
+enum class DoorLockUserType : uint8_t
+{
+    DOOR_LOCK_USER_TYPE_UNRESTRICTED           = 0x00,
+    DOOR_LOCK_USER_TYPE_YEAR_DAY_SCHEDULE_USER = 0x01,
+    DOOR_LOCK_USER_TYPE_WEEK_DAY_SCHEDULE_USER = 0x02,
+    DOOR_LOCK_USER_TYPE_MASTER_USER            = 0x03,
+    DOOR_LOCK_USER_TYPE_NON_ACCESS_USER        = 0x04,
+    DOOR_LOCK_USER_TYPE_NOT_SUPPORTED          = 0xFF,
+};
 
 namespace Commands {
 namespace LockDoor {
@@ -2980,6 +3212,13 @@ enum class PumpOperationMode : uint8_t
 
 } // namespace PumpConfigurationAndControl
 namespace Thermostat {
+// Enum for SetpointAdjustMode
+enum class SetpointAdjustMode : uint8_t
+{
+    SETPOINT_ADJUST_MODE_HEAT_SETPOINT           = 0x00,
+    SETPOINT_ADJUST_MODE_COOL_SETPOINT           = 0x01,
+    SETPOINT_ADJUST_MODE_HEAT_AND_COOL_SETPOINTS = 0x02,
+};
 
 namespace Commands {
 namespace SetpointRaiseLower {
@@ -3064,6 +3303,60 @@ namespace ThermostatUserInterfaceConfiguration {
 
 } // namespace ThermostatUserInterfaceConfiguration
 namespace ColorControl {
+// Enum for ColorLoopAction
+enum class ColorLoopAction : uint8_t
+{
+    COLOR_LOOP_ACTION_DEACTIVATE                                  = 0x00,
+    COLOR_LOOP_ACTION_ACTIVATE_FROM_COLOR_LOOP_START_ENHANCED_HUE = 0x01,
+    COLOR_LOOP_ACTION_ACTIVATE_FROM_ENHANCED_CURRENT_HUE          = 0x02,
+};
+// Enum for ColorLoopDirection
+enum class ColorLoopDirection : uint8_t
+{
+    COLOR_LOOP_DIRECTION_DECREMENT_HUE = 0x00,
+    COLOR_LOOP_DIRECTION_INCREMENT_HUE = 0x01,
+};
+// Enum for ColorMode
+enum class ColorMode : uint8_t
+{
+    COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION = 0x00,
+    COLOR_MODE_CURRENT_X_AND_CURRENT_Y            = 0x01,
+    COLOR_MODE_COLOR_TEMPERATURE                  = 0x02,
+};
+// Enum for HueDirection
+enum class HueDirection : uint8_t
+{
+    HUE_DIRECTION_SHORTEST_DISTANCE = 0x00,
+    HUE_DIRECTION_LONGEST_DISTANCE  = 0x01,
+    HUE_DIRECTION_UP                = 0x02,
+    HUE_DIRECTION_DOWN              = 0x03,
+};
+// Enum for HueMoveMode
+enum class HueMoveMode : uint8_t
+{
+    HUE_MOVE_MODE_STOP = 0x00,
+    HUE_MOVE_MODE_UP   = 0x01,
+    HUE_MOVE_MODE_DOWN = 0x03,
+};
+// Enum for HueStepMode
+enum class HueStepMode : uint8_t
+{
+    HUE_STEP_MODE_UP   = 0x01,
+    HUE_STEP_MODE_DOWN = 0x03,
+};
+// Enum for SaturationMoveMode
+enum class SaturationMoveMode : uint8_t
+{
+    SATURATION_MOVE_MODE_STOP = 0x00,
+    SATURATION_MOVE_MODE_UP   = 0x01,
+    SATURATION_MOVE_MODE_DOWN = 0x03,
+};
+// Enum for SaturationStepMode
+enum class SaturationStepMode : uint8_t
+{
+    SATURATION_STEP_MODE_UP   = 0x01,
+    SATURATION_STEP_MODE_DOWN = 0x03,
+};
 
 namespace Commands {
 namespace MoveToHue {
@@ -3373,6 +3666,34 @@ namespace SodiumConcentrationMeasurement {
 
 } // namespace SodiumConcentrationMeasurement
 namespace IasZone {
+// Enum for IasEnrollResponseCode
+enum class IasEnrollResponseCode : uint8_t
+{
+    IAS_ENROLL_RESPONSE_CODE_SUCCESS          = 0x00,
+    IAS_ENROLL_RESPONSE_CODE_NOT_SUPPORTED    = 0x01,
+    IAS_ENROLL_RESPONSE_CODE_NO_ENROLL_PERMIT = 0x02,
+    IAS_ENROLL_RESPONSE_CODE_TOO_MANY_ZONES   = 0x03,
+};
+// Enum for IasZoneType
+enum class IasZoneType : uint16_t
+{
+    IAS_ZONE_TYPE_STANDARD_CIE              = 0x00,
+    IAS_ZONE_TYPE_MOTION_SENSOR             = 0x0D,
+    IAS_ZONE_TYPE_CONTACT_SWITCH            = 0x15,
+    IAS_ZONE_TYPE_FIRE_SENSOR               = 0x28,
+    IAS_ZONE_TYPE_WATER_SENSOR              = 0x2A,
+    IAS_ZONE_TYPE_GAS_SENSOR                = 0x2B,
+    IAS_ZONE_TYPE_PERSONAL_EMERGENCY_DEVICE = 0x2C,
+    IAS_ZONE_TYPE_VIBRATION_MOVEMENT_SENSOR = 0x2D,
+    IAS_ZONE_TYPE_REMOTE_CONTROL            = 0x10F,
+    IAS_ZONE_TYPE_KEY_FOB                   = 0x115,
+    IAS_ZONE_TYPE_KEYPAD                    = 0x21D,
+    IAS_ZONE_TYPE_STANDARD_WARNING_DEVICE   = 0x225,
+    IAS_ZONE_TYPE_GLASS_BREAK_SENSOR        = 0x226,
+    IAS_ZONE_TYPE_CARBON_MONOXIDE_SENSOR    = 0x227,
+    IAS_ZONE_TYPE_SECURITY_REPEATER         = 0x229,
+    IAS_ZONE_TYPE_INVALID_ZONE_TYPE         = 0xFFFF,
+};
 
 namespace Commands {
 namespace ZoneEnrollResponse {
@@ -3448,6 +3769,108 @@ struct DecodableType
 } // namespace Commands
 } // namespace IasZone
 namespace IasAce {
+// Enum for IasAceAlarmStatus
+enum class IasAceAlarmStatus : uint8_t
+{
+    IAS_ACE_ALARM_STATUS_NO_ALARM        = 0x00,
+    IAS_ACE_ALARM_STATUS_BURGLAR         = 0x01,
+    IAS_ACE_ALARM_STATUS_FIRE            = 0x02,
+    IAS_ACE_ALARM_STATUS_EMERGENCY       = 0x03,
+    IAS_ACE_ALARM_STATUS_POLICE_PANIC    = 0x04,
+    IAS_ACE_ALARM_STATUS_FIRE_PANIC      = 0x05,
+    IAS_ACE_ALARM_STATUS_EMERGENCY_PANIC = 0x06,
+};
+// Enum for IasAceArmMode
+enum class IasAceArmMode : uint8_t
+{
+    IAS_ACE_ARM_MODE_DISARM                     = 0x00,
+    IAS_ACE_ARM_MODE_ARM_DAY_HOME_ZONES_ONLY    = 0x01,
+    IAS_ACE_ARM_MODE_ARM_NIGHT_SLEEP_ZONES_ONLY = 0x02,
+    IAS_ACE_ARM_MODE_ARM_ALL_ZONES              = 0x03,
+};
+// Enum for IasAceArmNotification
+enum class IasAceArmNotification : uint8_t
+{
+    IAS_ACE_ARM_NOTIFICATION_ALL_ZONES_DISARMED           = 0x00,
+    IAS_ACE_ARM_NOTIFICATION_ONLY_DAY_HOME_ZONES_ARMED    = 0x01,
+    IAS_ACE_ARM_NOTIFICATION_ONLY_NIGHT_SLEEP_ZONES_ARMED = 0x02,
+    IAS_ACE_ARM_NOTIFICATION_ALL_ZONES_ARMED              = 0x03,
+    IAS_ACE_ARM_NOTIFICATION_INVALID_ARM_DISARM_CODE      = 0x04,
+    IAS_ACE_ARM_NOTIFICATION_NOT_READY_TO_ARM             = 0x05,
+    IAS_ACE_ARM_NOTIFICATION_ALREADY_DISARMED             = 0x06,
+};
+// Enum for IasAceAudibleNotification
+enum class IasAceAudibleNotification : uint8_t
+{
+    IAS_ACE_AUDIBLE_NOTIFICATION_MUTE          = 0x00,
+    IAS_ACE_AUDIBLE_NOTIFICATION_DEFAULT_SOUND = 0x01,
+};
+// Enum for IasAceBypassResult
+enum class IasAceBypassResult : uint8_t
+{
+    IAS_ACE_BYPASS_RESULT_ZONE_BYPASSED           = 0x00,
+    IAS_ACE_BYPASS_RESULT_ZONE_NOT_BYPASSED       = 0x01,
+    IAS_ACE_BYPASS_RESULT_NOT_ALLOWED             = 0x02,
+    IAS_ACE_BYPASS_RESULT_INVALID_ZONE_ID         = 0x03,
+    IAS_ACE_BYPASS_RESULT_UNKNOWN_ZONE_ID         = 0x04,
+    IAS_ACE_BYPASS_RESULT_INVALID_ARM_DISARM_CODE = 0x05,
+};
+// Enum for IasAcePanelStatus
+enum class IasAcePanelStatus : uint8_t
+{
+    IAS_ACE_PANEL_STATUS_PANEL_DISARMED   = 0x00,
+    IAS_ACE_PANEL_STATUS_ARMED_STAY       = 0x01,
+    IAS_ACE_PANEL_STATUS_ARMED_NIGHT      = 0x02,
+    IAS_ACE_PANEL_STATUS_ARMED_AWAY       = 0x03,
+    IAS_ACE_PANEL_STATUS_EXIT_DELAY       = 0x04,
+    IAS_ACE_PANEL_STATUS_ENTRY_DELAY      = 0x05,
+    IAS_ACE_PANEL_STATUS_NOT_READY_TO_ARM = 0x06,
+    IAS_ACE_PANEL_STATUS_IN_ALARM         = 0x07,
+    IAS_ACE_PANEL_STATUS_ARMING_STAY      = 0x08,
+    IAS_ACE_PANEL_STATUS_ARMING_NIGHT     = 0x09,
+    IAS_ACE_PANEL_STATUS_ARMING_AWAY      = 0x0A,
+};
+// Enum for IasZoneType
+enum class IasZoneType : uint16_t
+{
+    IAS_ZONE_TYPE_STANDARD_CIE              = 0x00,
+    IAS_ZONE_TYPE_MOTION_SENSOR             = 0x0D,
+    IAS_ZONE_TYPE_CONTACT_SWITCH            = 0x15,
+    IAS_ZONE_TYPE_FIRE_SENSOR               = 0x28,
+    IAS_ZONE_TYPE_WATER_SENSOR              = 0x2A,
+    IAS_ZONE_TYPE_GAS_SENSOR                = 0x2B,
+    IAS_ZONE_TYPE_PERSONAL_EMERGENCY_DEVICE = 0x2C,
+    IAS_ZONE_TYPE_VIBRATION_MOVEMENT_SENSOR = 0x2D,
+    IAS_ZONE_TYPE_REMOTE_CONTROL            = 0x10F,
+    IAS_ZONE_TYPE_KEY_FOB                   = 0x115,
+    IAS_ZONE_TYPE_KEYPAD                    = 0x21D,
+    IAS_ZONE_TYPE_STANDARD_WARNING_DEVICE   = 0x225,
+    IAS_ZONE_TYPE_GLASS_BREAK_SENSOR        = 0x226,
+    IAS_ZONE_TYPE_CARBON_MONOXIDE_SENSOR    = 0x227,
+    IAS_ZONE_TYPE_SECURITY_REPEATER         = 0x229,
+    IAS_ZONE_TYPE_INVALID_ZONE_TYPE         = 0xFFFF,
+};
+
+namespace IasAceZoneStatusResult {
+enum FieldId
+{
+    kZoneIdFieldId     = 0,
+    kZoneStatusFieldId = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t zoneId;
+    uint16_t zoneStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace IasAceZoneStatusResult
 
 namespace Commands {
 namespace Arm {
@@ -5095,6 +5518,15 @@ namespace MeterIdentification {
 
 } // namespace MeterIdentification
 namespace ApplianceEventsAndAlert {
+// Enum for EventIdentification
+enum class EventIdentification : uint8_t
+{
+    EVENT_IDENTIFICATION_END_OF_CYCLE        = 0x01,
+    EVENT_IDENTIFICATION_TEMPERATURE_REACHED = 0x04,
+    EVENT_IDENTIFICATION_END_OF_COOKING      = 0x05,
+    EVENT_IDENTIFICATION_SWITCHING_OFF       = 0x06,
+    EVENT_IDENTIFICATION_WRONG_DATA          = 0x07,
+};
 
 namespace Commands {
 namespace GetAlerts {
