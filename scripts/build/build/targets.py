@@ -39,7 +39,7 @@ class Target:
         self.create_kw_args = kwargs
 
     def Extend(self, suffix, **kargs):
-        """Creates a clone of the current object extendint it build parameters.
+        """Creates a clone of the current object extending its build parameters.
 
         Arguments:
            suffix: appended with a "-" as separator to the clone name

@@ -32,7 +32,7 @@ requirement.
 
 Usage examples:
 
-1. Compiles All targets
+1. Compiles all targets
 
     ```
     ./scripts/build/build_examples.py --target all build

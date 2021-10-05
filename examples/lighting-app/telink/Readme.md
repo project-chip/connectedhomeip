@@ -26,7 +26,7 @@
 1. Run build script:
 
     ```
-    ./scripts/build/build_examples.py --target telink-arm-light build
+    ./scripts/build/build_examples.py --target telink-tlsr9518adk80d-light build
     ```
 
 1. Exit docker container and collect build artifacts. Firmware binary would be
