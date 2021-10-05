@@ -28,6 +28,12 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
+        emberAfGeneralCommissioningClusterInitCallback(endpoint);
+        break;
+    case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
+        emberAfNetworkCommissioningClusterInitCallback(endpoint);
+        break;
     case ZCL_OTA_PROVIDER_CLUSTER_ID:
         emberAfOtaSoftwareUpdateProviderClusterInitCallback(endpoint);
         break;
@@ -40,6 +46,16 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     }
 }
 
+void __attribute__((weak)) emberAfGeneralCommissioningClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
