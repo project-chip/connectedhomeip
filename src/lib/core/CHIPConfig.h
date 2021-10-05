@@ -1397,7 +1397,7 @@
  *    "Test secret for key derivation." results in the following encryption keys:
  *
  *              5E DE D2 44 E5 53 2B 3C DC 23 40 9D BA D0 52 D2
-*               A9 E0 11 B1 73 7C 6D 4B 70 E4 C0 A2 FE 66 04 76
+ *               A9 E0 11 B1 73 7C 6D 4B 70 E4 C0 A2 FE 66 04 76
  */
 #ifndef CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
 #define CHIP_CONFIG_TEST_SHARED_SECRET_VALUE "Test secret for key derivation."
