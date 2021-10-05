@@ -77,6 +77,13 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #endif
                                         >;
 
+using DeviceIPTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                          ,
+                                          Transport::UDP /* IPv4 */
+#endif
+                                          >;
+
 struct ControllerDeviceInitParams
 {
     DeviceTransportMgr * transportMgr           = nullptr;

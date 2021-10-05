@@ -620,7 +620,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     mPairingDelegate = params.pairingDelegate;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
-    mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
+    mUdcTransportMgr = chip::Platform::New<DeviceIPTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->InetLayer())
                                                     .SetAddressType(Inet::kIPAddressType_IPv6)
                                                     .SetListenPort((uint16_t)(mUdcListenPort))
@@ -630,10 +630,6 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
                                                     .SetAddressType(Inet::kIPAddressType_IPv4)
                                                     .SetListenPort((uint16_t)(mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
-#if CONFIG_NETWORK_LAYER_BLE
-                                                    ,
-                                                Transport::BleListenParameters(mSystemState->BleLayer())
-#endif // CONFIG_NETWORK_LAYER_BLE
                                                     ));
 
     mUdcServer = chip::Platform::New<UserDirectedCommissioningServer>();
