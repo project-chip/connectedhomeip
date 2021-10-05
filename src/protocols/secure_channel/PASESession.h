@@ -375,7 +375,7 @@ public:
     const char * GetR2ISessionInfo() const override { return "r2i"; }
 
 private:
-    const char * kTestSecret = "Test secret for key derivation";
+    const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
 };
 
 typedef struct PASESessionSerialized
