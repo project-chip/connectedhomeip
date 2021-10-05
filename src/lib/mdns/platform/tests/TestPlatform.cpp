@@ -181,7 +181,7 @@ void TestOperational(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, test::AddExpectedCall(operationalCall2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(operationalParams2) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.CompleteServiceUpdate() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.FinalizeServiceUpdate() == CHIP_NO_ERROR);
 }
 
 void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
@@ -217,7 +217,7 @@ void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, test::AddExpectedCall(commissionableLargeEnhanced) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(commissionableNodeParamsLargeEnhanced) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.CompleteServiceUpdate() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.FinalizeServiceUpdate() == CHIP_NO_ERROR);
 }
 
 const nlTest sTests[] = {

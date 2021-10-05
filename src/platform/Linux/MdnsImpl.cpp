@@ -798,7 +798,7 @@ CHIP_ERROR ChipMdnsRemoveServices()
     return MdnsAvahi::GetInstance().StopPublish();
 }
 
-CHIP_ERROR ChipMdnsCompleteServiceUpdate()
+CHIP_ERROR ChipMdnsFinalizeServiceUpdate()
 {
     return CHIP_NO_ERROR;
 }

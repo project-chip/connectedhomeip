@@ -52,9 +52,9 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    CHIP_ERROR CompleteServiceUpdate() override
+    CHIP_ERROR FinalizeServiceUpdate() override
     {
-        ChipLogError(Discovery, "mDNS advertising not available. Completing service update failed.");
+        ChipLogError(Discovery, "mDNS advertising not available. Finalizing service update failed.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 

@@ -294,7 +294,7 @@ private:
  * occur:
  * 1. Call the `RemoveServices` method.
  * 2. Call one of the `Advertise` methods for each service to be added or updated.
- * 3. Call the `CompleteServiceUpdate` method to complete the update and apply all pending changes.
+ * 3. Call the `FinalizeServiceUpdate` method to finalize the update and apply all pending changes.
  */
 class ServiceAdvertiser
 {
@@ -318,7 +318,7 @@ public:
      * Removes or marks all services being advertised for removal.
      *
      * Depending on the implementation, the method may either stop advertising existing services
-     * immediately, or mark them for removal upon the subsequent `CompleteServiceUpdate` method call.
+     * immediately, or mark them for removal upon the subsequent `FinalizeServiceUpdate` method call.
      */
     virtual CHIP_ERROR RemoveServices() = 0;
 
@@ -333,12 +333,12 @@ public:
     virtual CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) = 0;
 
     /**
-     * Completes updating advertised services.
+     * Finalizes updating advertised services.
      *
      * This method can be used by some implementations to apply changes made with the `RemoveServices`
      * and `Advertise` methods in case they could not be applied immediately.
      */
-    virtual CHIP_ERROR CompleteServiceUpdate() = 0;
+    virtual CHIP_ERROR FinalizeServiceUpdate() = 0;
 
     /**
      * Returns the commissionable node service instance name formatted as hex string.

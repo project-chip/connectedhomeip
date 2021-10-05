@@ -132,7 +132,7 @@ CHIP_ERROR ChipMdnsShutdown();
  * Removes or marks all services being advertised for removal.
  *
  * Depending on the implementation, the function may either stop advertising existing services
- * immediately, or mark them for removal upon the subsequent `ChipMdnsCompleteServiceUpdate` call.
+ * immediately, or mark them for removal upon the subsequent `ChipMdnsFinalizeServiceUpdate` call.
  *
  * @retval CHIP_NO_ERROR  The removal succeeds.
  * @retval Error code     The removal fails.
@@ -156,17 +156,17 @@ CHIP_ERROR ChipMdnsRemoveServices();
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service);
 
 /**
- * Completes updating advertised services.
+ * Finalizes updating advertised services.
  *
  * This function can be used by some implementations to apply changes made with the
  * `ChipMdnsRemoveServices` and `ChipMdnsPublishService` functions in case they could
  * not be applied immediately (like in case of, but not limited to, implementations
- * using SRP).
+ * using SRP or requiring asynchronous interactions with a DNS-SD implementation).
  *
- * @retval CHIP_NO_ERROR  The service update completion succeeds.
- * @retval Error code     The service update completion fails.
+ * @retval CHIP_NO_ERROR  The service update finalization succeeds.
+ * @retval Error code     The service update finalization fails.
  */
-CHIP_ERROR ChipMdnsCompleteServiceUpdate();
+CHIP_ERROR ChipMdnsFinalizeServiceUpdate();
 
 /**
  * This function browses the services published by mdns

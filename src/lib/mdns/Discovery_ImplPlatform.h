@@ -44,7 +44,7 @@ public:
     CHIP_ERROR RemoveServices() override;
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
-    CHIP_ERROR CompleteServiceUpdate() override;
+    CHIP_ERROR FinalizeServiceUpdate() override;
     CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
 
     // Members that implement Resolver interface.

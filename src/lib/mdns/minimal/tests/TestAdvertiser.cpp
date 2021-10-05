@@ -221,7 +221,7 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     // Start a single operational advertiser
     ChipLogProgress(Discovery, "Testing single operational advertiser");
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.CompleteServiceUpdate() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.FinalizeServiceUpdate() == CHIP_NO_ERROR);
 
     // Test for PTR response to _services request.
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
@@ -258,7 +258,7 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
 
     // If we try to re-advertise with the same operational parameters, we should not get duplicates
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams1) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.CompleteServiceUpdate() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.FinalizeServiceUpdate() == CHIP_NO_ERROR);
     ChipLogProgress(Discovery, "Testing single operational advertiser with Advertise called twice");
     // We should get a single PTR back for _services
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
@@ -284,7 +284,7 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     server.Reset();
     // Mac is the same, peer id is different
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams2) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.CompleteServiceUpdate() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.FinalizeServiceUpdate() == CHIP_NO_ERROR);
 
     // For now, we'll get back two copies of the PTR. Not sure if that's totally correct, but for now, that's expected.
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
@@ -350,7 +350,7 @@ void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
     ChipLogProgress(Discovery, "Testing commissionable advertiser");
     // Start very basic - only the mandatory values (short and long discriminator and commissioning modes)
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsSmall) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.CompleteServiceUpdate() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.FinalizeServiceUpdate() == CHIP_NO_ERROR);
 
     // Test for PTR response to _services request.
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local for small parameters");
@@ -389,7 +389,7 @@ void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
     // Add more parameters, check that the subtypes and TXT values get set correctly.
     // Also check that we get proper values when the discriminators are small (no leading 0's)
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsLargeBasic) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.CompleteServiceUpdate() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.FinalizeServiceUpdate() == CHIP_NO_ERROR);
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local for large basic parameters");
     server.Reset();
     server.AddExpectedRecord(&ptrCommissionableNodeService);
@@ -421,7 +421,7 @@ void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
 
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsLargeEnhanced) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.CompleteServiceUpdate() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.FinalizeServiceUpdate() == CHIP_NO_ERROR);
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local for large enhanced parameters");
     server.Reset();
     server.AddExpectedRecord(&ptrCommissionableNodeService);
@@ -466,7 +466,7 @@ void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams1) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsLargeEnhanced) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.CompleteServiceUpdate() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.FinalizeServiceUpdate() == CHIP_NO_ERROR);
 
     // Services listing should have two operational ptrs, the base commissionable node ptr and the various _sub ptrs
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");

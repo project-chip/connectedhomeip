@@ -536,7 +536,7 @@ CHIP_ERROR ChipMdnsRemoveServices()
     return MdnsContexts::GetInstance().Removes(ContextType::Register);
 }
 
-CHIP_ERROR ChipMdnsCompleteServiceUpdate()
+CHIP_ERROR ChipMdnsFinalizeServiceUpdate()
 {
     return CHIP_NO_ERROR;
 }

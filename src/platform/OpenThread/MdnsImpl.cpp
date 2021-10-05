@@ -72,7 +72,7 @@ CHIP_ERROR ChipMdnsRemoveServices()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 }
 
-CHIP_ERROR ChipMdnsCompleteServiceUpdate()
+CHIP_ERROR ChipMdnsFinalizeServiceUpdate()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     return ThreadStackMgr().RemoveInvalidSrpServices();

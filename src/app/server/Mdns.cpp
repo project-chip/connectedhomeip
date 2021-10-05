@@ -176,10 +176,10 @@ bool MdnsServer::OnExpiration(uint64_t expirationMs)
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-    err = Mdns::ServiceAdvertiser::Instance().CompleteServiceUpdate();
+    err = Mdns::ServiceAdvertiser::Instance().FinalizeServiceUpdate();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to complete service update: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to finalize service update: %s", chip::ErrorStr(err));
     }
 
     return true;
@@ -477,10 +477,10 @@ void MdnsServer::StartServer(chip::Mdns::CommissioningMode mode)
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-    err = Mdns::ServiceAdvertiser::Instance().CompleteServiceUpdate();
+    err = Mdns::ServiceAdvertiser::Instance().FinalizeServiceUpdate();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to complete service update: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to finalize service update: %s", chip::ErrorStr(err));
     }
 }
 

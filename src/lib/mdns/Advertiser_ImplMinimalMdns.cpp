@@ -120,7 +120,7 @@ public:
     CHIP_ERROR RemoveServices() override;
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
-    CHIP_ERROR CompleteServiceUpdate() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR FinalizeServiceUpdate() override { return CHIP_NO_ERROR; }
     CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
 
     // MdnsPacketDelegate

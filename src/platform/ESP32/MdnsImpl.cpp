@@ -113,7 +113,7 @@ CHIP_ERROR ChipMdnsRemoveServices()
     return mdns_service_remove_all() == ESP_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
-CHIP_ERROR ChipMdnsCompleteServiceUpdate()
+CHIP_ERROR ChipMdnsFinalizeServiceUpdate()
 {
     return CHIP_NO_ERROR;
 }

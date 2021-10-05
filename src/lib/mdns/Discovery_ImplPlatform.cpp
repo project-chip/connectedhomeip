@@ -91,7 +91,7 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
         {
             publisher->Advertise(publisher->mCommissionerAdvertisingParams);
         }
-        publisher->CompleteServiceUpdate();
+        publisher->FinalizeServiceUpdate();
     }
     else
     {
@@ -443,9 +443,9 @@ CHIP_ERROR DiscoveryImplPlatform::RemoveServices()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiscoveryImplPlatform::CompleteServiceUpdate()
+CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
 {
-    return ChipMdnsCompleteServiceUpdate();
+    return ChipMdnsFinalizeServiceUpdate();
 }
 
 CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)

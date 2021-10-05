@@ -51,7 +51,7 @@ CHIP_ERROR ChipMdnsRemoveServices()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ChipMdnsCompleteServiceUpdate()
+CHIP_ERROR ChipMdnsFinalizeServiceUpdate()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
