@@ -68,18 +68,14 @@ namespace app {
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
-    chip::app::CommandPathParams commandPathParams = { aEndPointId, // Endpoint
-                                                       0,           // GroupId
-                                                       aClusterId,  // ClusterId
-                                                       aCommandId,  // CommandId
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    chip::app::ConcreteCommandPath commandPath(aEndPointId, aClusterId, aCommandId);
 
     ChipLogDetail(Controller,
                   "Received Cluster Command: Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " Endpoint=%" PRIx16,
                   ChipLogValueMEI(aClusterId), ChipLogValueMEI(aCommandId), aEndPointId);
 
-    apCommandObj->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::Success);
+    apCommandObj->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
+                                Protocols::InteractionModel::Status::Success);
 
     chip::isCommandDispatched = true;
 }
@@ -196,8 +192,12 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
 
     if (aNeedStatusCode)
     {
-        apCommand->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
-                                 Protocols::SecureChannel::Id, Protocols::InteractionModel::Status::Success);
+        chip::app::ConcreteCommandPath commandPath(1, // Endpoint
+                                                   3, // ClusterId
+                                                   4  // CommandId
+        );
+        apCommand->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
+                                 Protocols::InteractionModel::Status::Success);
     }
     else
     {

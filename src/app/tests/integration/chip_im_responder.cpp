@@ -74,8 +74,12 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     // Add command data here
     if (statusCodeFlipper)
     {
+        chip::app::ConcreteCommandPath commandPath(kTestEndpointId, // Endpoint
+                                                   kTestClusterId,  // ClusterId
+                                                   kTestCommandId   // CommandId
+        );
         printf("responder constructing status code in command");
-        apCommandObj->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+        apCommandObj->AddStatusCode(commandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
                                     Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Success);
     }
     else

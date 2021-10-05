@@ -160,14 +160,11 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
         return false;
     }
 
-    chip::app::CommandPathParams returnStatusParam = { imCompatibilityEmberApsFrame.destinationEndpoint,
-                                                       0, // GroupId
-                                                       imCompatibilityEmberApsFrame.clusterId,
-                                                       imCompatibilityEmberAfCluster.commandId,
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    chip::app::ConcreteCommandPath commandPath(imCompatibilityEmberApsFrame.destinationEndpoint,
+                                               imCompatibilityEmberApsFrame.clusterId, imCompatibilityEmberAfCluster.commandId);
 
     CHIP_ERROR err = currentCommandObject->AddStatusCode(
-        returnStatusParam,
+        commandPath,
         status == EMBER_ZCL_STATUS_SUCCESS ? chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess
                                            : chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,
         chip::Protocols::InteractionModel::Id, static_cast<Protocols::InteractionModel::Status>(ToInteractionModelStatus(status)));

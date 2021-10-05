@@ -109,9 +109,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        chip::app::CommandPathParams returnStatusParam = { endpointId,
-                                                           0, // GroupId
-                                                           clusterId, commandId, (chip::app::CommandPathFlags::kEndpointIdValid) };
+        chip::app::ConcreteCommandPath path(endpointId, clusterId, commandId);
 
         // The Path is the path in the request if there are any error occurred before we dispatch the command to clusters.
         // Currently, it could be failed to decode Path or failed to find cluster / command on desired endpoint.
@@ -123,7 +121,7 @@ exit:
                           endpointId);
         }
 
-        AddStatusCode(returnStatusParam,
+        AddStatusCode(path,
                       err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
                       Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::InvalidCommand);
     }
@@ -132,14 +130,19 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathParams,
+CHIP_ERROR CommandHandler::AddStatusCode(const ConcreteCommandPath & aCommandPath,
                                          const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                          const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
 
-    err = PrepareCommand(aCommandPathParams, false /* aStartDataStruct */);
+    chip::app::CommandPathParams commandPathParams = { aCommandPath.mEndpointId,
+                                                       0, // GroupId
+                                                       aCommandPath.mClusterId, aCommandPath.mCommandId,
+                                                       chip::app::CommandPathFlags::kEndpointIdValid };
+
+    err = PrepareCommand(commandPathParams, false /* aStartDataStruct */);
     SuccessOrExit(err);
 
     statusElementBuilder =
