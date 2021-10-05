@@ -27,9 +27,10 @@ class Builder(ABC):
 
     """
 
-    def __init__(self, root, runner):
+    def __init__(self, root, runner, output_prefix: str = 'out'):
         self.root = os.path.abspath(root)
         self._runner = runner
+        self.output_prefix = output_prefix
         self._enable_flashbundle = False
 
         # Set post-init once actual build target is known
@@ -115,3 +116,9 @@ class Builder(ABC):
 
             shutil.copyfile(source_name, target_full_name)
             shutil.copymode(source_name, target_full_name)
+
+    def SetIdentifier(self, platform: str, board: str, app: str, enable_rpcs: bool = False):
+        self.identifier = '-'.join([platform, board, app])
+        if enable_rpcs:
+            self.identifier = self.identifier + "-rpc"
+        self.output_dir = os.path.join(self.output_prefix, self.identifier)

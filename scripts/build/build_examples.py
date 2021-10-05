@@ -14,9 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from glob_matcher import GlobMatcher
 from runner import PrintOnlyRunner, ShellRunner
-
 import build
 import coloredlogs
 import click
@@ -35,10 +33,6 @@ __LOG_LEVELS__ = {
     'warn': logging.WARN,
     'fatal': logging.FATAL,
 }
-
-
-def CommaSeparate(items) -> str:
-    return ', '.join([x for x in items])
 
 
 def ValidateRepoPath(context, parameter, value):
@@ -63,22 +57,25 @@ def ValidateRepoPath(context, parameter, value):
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.option(
-    '--target',
-    default=['all'],
-    type=click.Choice(
-        ['all'] + [t.name for t in build.ALL_TARGETS], case_sensitive=False),
+    '--platform',
+    default=[],
+    type=click.Choice(build.PLATFORMS + ['all'], case_sensitive=False),
     multiple=True,
-    help='Build target(s)'
+    help='Platform to use for compilation. Empty will default to a linux host build'
 )
 @click.option(
-    '--target-glob',
-    default=None,
-    help='Glob matching for targets to include'
+    '--board',
+    default=[],
+    type=click.Choice(build.BOARDS, case_sensitive=False),
+    multiple=True,
+    help='Specific board to compile for. Empty will use --platform to determine suitable boards.'
 )
 @click.option(
-    '--skip-target-glob',
-    default=None,
-    help='Glob matching for targets to explicitly exclude'
+    '--app',
+    default=[],
+    type=click.Choice(build.APPLICATIONS, case_sensitive=False),
+    multiple=True,
+    help='What example application to build. Empty will find suitable applications.'
 )
 @click.option(
     '--enable-flashbundle',
@@ -116,9 +113,15 @@ def ValidateRepoPath(context, parameter, value):
     default=False,
     is_flag=True,
     help='Skip timestaps in log output')
+@click.option(
+    '--rpc',
+    default=False,
+    is_flag=True,
+    help='Build with debug RPCs enabled.'
+)
 @click.pass_context
-def main(context, log_level, target, target_glob, skip_target_glob, repo, out_prefix, clean,
-         dry_run, dry_run_output, enable_flashbundle, no_log_timestamps):
+def main(context, log_level, platform, board, app, repo, out_prefix, clean,
+         dry_run, dry_run_output, enable_flashbundle, no_log_timestamps, rpc):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -127,46 +130,29 @@ def main(context, log_level, target, target_glob, skip_target_glob, repo, out_pr
 
     if not 'PW_PROJECT_ROOT' in os.environ:
         raise click.UsageError("""
-PW_PROJECT_ROOT not set in the current environment.
+PW_PROJECT_ROOT not in current environment.
 
 Please make sure you `source scripts/bootstrap.sh` or `source scripts/activate.sh`
 before running this script.
 """.strip())
+
+    # Support an 'all platforms' choice
+    if 'all' in platform:
+        platform = build.PLATFORMS
 
     if dry_run:
         runner = PrintOnlyRunner(dry_run_output)
     else:
         runner = ShellRunner()
 
-    if 'all' in target:
-        targets = build.ALL_TARGETS
-    else:
-        requested_targets = set([t.lower for t in target])
-        targets = [
-            target for target in build.ALL_TARGETS if target.name.lower in requested_targets]
-
-        actual_targes = set([t.name.lower for t in targets])
-        if requested_targets != actual_targes:
-            logging.error('Targets not found: %s',
-                          CommaSeparate(actual_targes))
-
-    if target_glob:
-        matcher = GlobMatcher(target_glob)
-        targets = [t for t in targets if matcher.matches(t.name)]
-
-    if skip_target_glob:
-        matcher = GlobMatcher(skip_target_glob)
-        targets = [t for t in targets if not matcher.matches(t.name)]
-
-    # force consistent sorting
-    targets.sort(key=lambda t: t.name)
-    logging.info('Building targets: %s',
-                 CommaSeparate([t.name for t in targets]))
-
     context.obj = build.Context(
         repository_path=repo, output_prefix=out_prefix, runner=runner)
     context.obj.SetupBuilders(
-        targets=targets, enable_flashbundle=enable_flashbundle)
+        platforms=[build.Platform.FromArgName(name) for name in platform],
+        boards=[build.Board.FromArgName(name) for name in board],
+        applications=[build.Application.FromArgName(name) for name in app],
+        enable_rpcs=rpc,
+        enable_flashbundle=enable_flashbundle)
 
     if clean:
         context.obj.CleanOutputDirectories()
@@ -177,14 +163,6 @@ before running this script.
 @click.pass_context
 def cmd_generate(context):
     context.obj.Generate()
-
-
-@main.command(
-    'targets', help='List the targets that would be generated/built given the input arguments')
-@click.pass_context
-def cmd_generate(context):
-    for builder in context.obj.builders:
-        print(builder.identifier)
 
 
 @main.command('build', help='generate and run ninja/make as needed to compile')

@@ -53,8 +53,8 @@ class AndroidBoard(Enum):
 
 class AndroidBuilder(Builder):
 
-    def __init__(self, root, runner, board: AndroidBoard):
-        super(AndroidBuilder, self).__init__(root, runner)
+    def __init__(self, root, runner, output_prefix: str, board: AndroidBoard):
+        super(AndroidBuilder, self).__init__(root, runner, output_prefix)
         self.board = board
 
     def validate_build_environment(self):

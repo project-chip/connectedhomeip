@@ -17,7 +17,7 @@ import os
 
 from enum import Enum, auto
 
-from .gn import GnBuilder
+from .builder import Builder
 
 
 class TizenApp(Enum):
@@ -46,29 +46,48 @@ class TizenBoard(Enum):
             raise Exception('Unknown board type: %r' % self)
 
 
-class TizenBuilder(GnBuilder):
+class TizenBuilder(Builder):
 
     def __init__(self,
                  root,
                  runner,
+                 output_prefix: str,
                  app: TizenApp = TizenApp.LIGHT,
                  board: TizenBoard = TizenBoard.ARM):
         super(TizenBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExampleName(), 'linux'),
-            runner=runner)
+            runner=runner,
+            output_prefix=output_prefix)
         self.app = app
         self.board = board
 
-    def GnBuildArgs(self):
-        if 'TIZEN_HOME' not in os.environ:
-            raise Exception(
-                "Environment TIZEN_HOME missing, cannot build tizen libraries")
+    def generate(self):
+        if not os.path.exists(self.output_dir):
+            if not self._runner.dry_run:
+                if 'TIZEN_HOME' not in os.environ:
+                    raise Exception(
+                        "Environment TIZEN_HOME missing, cannot build tizen libraries")
 
-        return [
-            'target_os="tizen"',
-            'target_cpu="%s"' % self.board.TargetCpuName(),
-            'sysroot="%s"' % os.environ['TIZEN_HOME'],
-        ]
+            cmd = '''\
+gn gen --check --fail-on-unused-args --root=%s '--args=''' % self.root
+
+            gn_args = {}
+            gn_args['target_os'] = 'tizen'
+            gn_args['target_cpu'] = self.board.TargetCpuName()
+            gn_args['sysroot'] = os.environ['TIZEN_HOME']
+
+            cmd += ' %s\' %s' % (' '.join([
+                '%s="%s"' % (key, value)
+                for key, value in gn_args.items()]), self.output_dir)
+
+            self._Execute(['bash', '-c', cmd],
+                          title='Generating ' + self.identifier)
+
+    def _build(self):
+        logging.info('Compiling Tizen at %s', self.output_dir)
+
+        self._Execute(['ninja', '-C', self.output_dir],
+                      title='Building ' + self.identifier)
 
     def build_outputs(self):
         items = {

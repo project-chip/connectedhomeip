@@ -57,8 +57,8 @@ jobs:
             - name: Build android examples
               run: |
                 ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-*' build"
+                  "./scripts/build/build_examples.py --no-log-timestamps --platform android build"
             - name: Run Android build rule tests
               run: |
                 ./scripts/run_in_build_env.sh \
-                  "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test.tests"
+                  "ninja -C out/android-arm64-chip_tool build/chip/java/tests:java_build_test.tests"

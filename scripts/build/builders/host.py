@@ -81,10 +81,11 @@ class HostBoard(Enum):
 
 class HostBuilder(GnBuilder):
 
-    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE):
+    def __init__(self, root, runner, output_prefix: str, app: HostApp, board=HostBoard.NATIVE):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
-            runner=runner)
+            runner=runner,
+            output_prefix=output_prefix)
 
         self.app_name = app.BinaryName()
         self.map_name = self.app_name + '.map'
@@ -123,3 +124,8 @@ class HostBuilder(GnBuilder):
             self.app_name: os.path.join(self.output_dir, self.app_name),
             self.map_name: os.path.join(self.output_dir, self.map_name)
         }
+
+# todo
+    def SetIdentifier(self, platform: str, board: str, app: str, enable_rpcs: bool = False):
+        super(HostBuilder, self).SetIdentifier(
+            self.board.PlatformName(), self.board.BoardName(), app, enable_rpcs)

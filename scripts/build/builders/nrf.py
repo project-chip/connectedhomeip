@@ -93,10 +93,11 @@ class NrfConnectBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
+                 output_prefix: str,
                  app: NrfApp = NrfApp.LIGHT,
                  board: NrfBoard = NrfBoard.NRF52840,
                  enable_rpcs: bool = False):
-        super(NrfConnectBuilder, self).__init__(root, runner)
+        super(NrfConnectBuilder, self).__init__(root, runner, output_prefix)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
