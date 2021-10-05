@@ -474,6 +474,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     memcpy(&advDataBuf[index], (void *) &mDeviceIdInfo, mDeviceIdInfoLength); // AD value
     index = static_cast<uint8_t>(index + mDeviceIdInfoLength);
 
+    // TODO remove device name issue #10221
     advDataBuf[index++] = static_cast<uint8_t>(mDeviceNameLength + 1); // length
     advDataBuf[index++] = CHIP_ADV_DATA_TYPE_NAME;                     // AD type : name
     memcpy(&advDataBuf[index], deviceName, mDeviceNameLength);         // AD value
