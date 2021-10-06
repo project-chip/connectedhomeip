@@ -16877,7 +16877,7 @@ exit:
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readPHYRateAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16915,7 +16915,7 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readPHYRateAttribute)
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readFullDuplexAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17143,7 +17143,7 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readOverrunCountAttribute)
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readCarrierDetectAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17181,7 +17181,7 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readCarrierDetectAttribute)
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readTimeSinceResetAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
