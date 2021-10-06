@@ -210,11 +210,18 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     result = EVP_EncryptUpdate(context, Uint8::to_uchar(ciphertext), &bytesWritten, Uint8::to_const_uchar(plaintext),
                                static_cast<int>(plaintext_length));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit((ciphertext_was_null && bytesWritten == 0) || (bytesWritten >= 0), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(bytesWritten >= 0, error = CHIP_ERROR_INTERNAL);
     ciphertext_length = static_cast<unsigned int>(bytesWritten);
 
     // Finalize encryption
-    result = EVP_EncryptFinal_ex(context, ciphertext + ciphertext_length, &bytesWritten);
+    if (ciphertext_was_null)
+    {
+        result = EVP_EncryptFinal_ex(context, ciphertext + ciphertext_length, &bytesWritten);
+    }
+    else
+    {
+        result = EVP_EncryptFinal_ex(context, ciphertext, &bytesWritten);
+    }
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(bytesWritten >= 0 && bytesWritten <= static_cast<int>(plaintext_length), error = CHIP_ERROR_INTERNAL);
 
