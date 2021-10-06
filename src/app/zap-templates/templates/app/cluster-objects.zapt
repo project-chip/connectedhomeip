@@ -7,6 +7,9 @@
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/util/basic-types.h>
+#include <protocols/interaction_model/Constants.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
 namespace chip {
 namespace app {
@@ -25,9 +28,9 @@ enum class {{asType label}} : {{asUnderlyingZclType type}} {
 
 {{#zcl_structs}}
 namespace {{name}} {
-    enum FieldId {
+    enum class Fields {
     {{#zcl_struct_items}}
-    k{{asUpperCamelCase label}}FieldId = {{index}},
+    k{{asUpperCamelCase label}} = {{index}},
     {{/zcl_struct_items}}
     };
 
@@ -50,7 +53,7 @@ namespace {{name}} {
     {{#if struct_contains_array}}
     struct DecodableType {
     public:
-        {{#zcl_struct_items checkForDoubleNestedArray="true"}}
+        {{#zcl_struct_items}}
         {{#if isArray}}
         DataModel::DecodableList<{{#if_is_enum type}}{{type}}{{else}}{{zapTypeToDecodableClusterObjectType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
         {{else}}
@@ -71,11 +74,45 @@ namespace {{name}} {
 namespace Commands {
 {{/first}}
 namespace {{asUpperCamelCase name}} {
-struct Type {};
+enum class Fields {
+    {{#zcl_command_arguments}}
+    k{{asUpperCamelCase label}} = {{index}},
+    {{/zcl_command_arguments}}
+};
 
-struct DecodableType {};
-} // namespace {{asUpperCamelCase name}}
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return {{asUpperCamelCase name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
 
+    {{#zcl_command_arguments}}
+    {{#if isArray}}
+    DataModel::List<{{#if_is_enum type}}{{type}}{{else}}{{zapTypeToEncodableClusterObjectType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
+    {{else}}
+    {{#if_is_enum type}}{{type}}{{else}}{{zapTypeToEncodableClusterObjectType type}}{{/if_is_enum}} {{asLowerCamelCase label}};
+    {{/if}}
+    {{/zcl_command_arguments}}
+
+    CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) const;
+};
+
+struct DecodableType {
+public:
+    static constexpr CommandId GetCommandId() { return {{asUpperCamelCase name}}::Id; }
+    static constexpr ClusterId GetClusterId() { return {{asUpperCamelCase parent.name}}::Id; }
+
+    {{#zcl_command_arguments}}
+    {{#if isArray}}
+    DataModel::DecodableList<{{#if_is_enum type}}{{type}}{{else}}{{zapTypeToDecodableClusterObjectType type}}{{/if_is_enum}}> {{asLowerCamelCase label}};
+    {{else}}
+    {{#if_is_enum type}}{{type}}{{else}}{{zapTypeToDecodableClusterObjectType type}}{{/if_is_enum}} {{asLowerCamelCase label}};
+    {{/if}}
+    {{/zcl_command_arguments}}
+    CHIP_ERROR Decode(TLV::TLVReader &reader);
+};
+}; // namespace {{asUpperCamelCase name}}
 {{#last}}
 } // namespace Commands
 {{/last}}
