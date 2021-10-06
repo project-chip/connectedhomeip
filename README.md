@@ -15,7 +15,7 @@
 ![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)
 ![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)
 
-![ZAP Templates](https://github.com/project-chip/connectedhomeip/workflows/ZAP/badge.svg)
+![ZAP Templates](https://github.com/project-chip/6connectedhomeip/workflows/ZAP/badge.svg)
 
 # What is Project Connected Home over IP?
 

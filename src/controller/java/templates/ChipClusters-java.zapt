@@ -61,6 +61,15 @@ public class ChipClusters {
     }
   }
 
+  public static Map<String, Class> getClusterMapping() {
+    Map<String, Class> clusterMap;
+    {{#chip_client_clusters}}
+      clusterMap.put("{{asUpperCamelCase name}}", {{asUpperCamelCase name}}Cluster.getClass());
+    {{/chip_client_clusters}}
+    return clusterMap;
+    }
+  }
+
   {{#chip_client_clusters}}
   public static class {{asUpperCamelCase name}}Cluster extends BaseChipCluster {
     public {{asUpperCamelCase name}}Cluster(long devicePtr, int endpointId) {
