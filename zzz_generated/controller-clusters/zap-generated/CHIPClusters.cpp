@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -68,7 +69,9 @@ CHIP_ERROR AccountLoginCluster::GetSetupPIN(Callback::Cancelable * onSuccessCall
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // tempAccountIdentifier: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), tempAccountIdentifier));
+    SuccessOrExit(err = writer->PutString(
+                      TLV::ContextTag(argSeqNumber++),
+                      Span<const char>(Uint8::to_const_char(tempAccountIdentifier.data()), tempAccountIdentifier.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -109,9 +112,12 @@ CHIP_ERROR AccountLoginCluster::Login(Callback::Cancelable * onSuccessCallback, 
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // tempAccountIdentifier: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), tempAccountIdentifier));
+    SuccessOrExit(err = writer->PutString(
+                      TLV::ContextTag(argSeqNumber++),
+                      Span<const char>(Uint8::to_const_char(tempAccountIdentifier.data()), tempAccountIdentifier.size())));
     // setupPIN: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), setupPIN));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(setupPIN.data()), setupPIN.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -457,11 +463,13 @@ CHIP_ERROR ApplicationLauncherCluster::LaunchApp(Callback::Cancelable * onSucces
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // data: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), data));
+    SuccessOrExit(
+        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(data.data()), data.size())));
     // catalogVendorId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
     // applicationId: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), applicationId));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(applicationId.data()), applicationId.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -554,7 +562,8 @@ CHIP_ERROR AudioOutputCluster::RenameOutput(Callback::Cancelable * onSuccessCall
     // index: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), index));
     // name: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), name));
+    SuccessOrExit(
+        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(name.data()), name.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3451,7 +3460,8 @@ CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSucces
     // autoPlay: boolean
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), autoPlay));
     // data: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), data));
+    SuccessOrExit(
+        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(data.data()), data.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3492,9 +3502,11 @@ CHIP_ERROR ContentLauncherCluster::LaunchURL(Callback::Cancelable * onSuccessCal
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // contentURL: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), contentURL));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(contentURL.data()), contentURL.size())));
     // displayString: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), displayString));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(displayString.data()), displayString.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -5213,7 +5225,8 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable
     // location: regulatoryLocationType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
     // countryCode: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), countryCode));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(countryCode.data()), countryCode.size())));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
@@ -5427,7 +5440,8 @@ CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Cal
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // groupName: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupName));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(groupName.data()), groupName.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -5470,7 +5484,8 @@ CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccess
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // groupName: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupName));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(groupName.data()), groupName.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6425,7 +6440,8 @@ CHIP_ERROR MediaInputCluster::RenameInput(Callback::Cancelable * onSuccessCallba
     // index: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), index));
     // name: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), name));
+    SuccessOrExit(
+        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(name.data()), name.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -7672,7 +7688,8 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     // protocolsSupported: oTADownloadProtocol
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
     // location: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(location.data()), location.size())));
     // requestorCanConsent: boolean
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), requestorCanConsent));
     // metadataForProvider: octetString
@@ -8657,7 +8674,8 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // label: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), label));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(label.data()), label.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -9202,7 +9220,8 @@ CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Cal
     // transitionTime: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // sceneName: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), sceneName));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(sceneName.data()), sceneName.size())));
     // clusterId: clusterId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
     // length: int8u
@@ -9725,7 +9744,8 @@ CHIP_ERROR TvChannelCluster::ChangeChannel(Callback::Cancelable * onSuccessCallb
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // match: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), match));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
+                                          Span<const char>(Uint8::to_const_char(match.data()), match.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -9903,7 +9923,8 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTarget(Callback::Cancelable * onSucce
     // target: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), target));
     // data: charString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), data));
+    SuccessOrExit(
+        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(data.data()), data.size())));
 
     SuccessOrExit(err = sender->FinishCommand());
 
