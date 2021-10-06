@@ -22,7 +22,7 @@ In one terminal:
 In a second terminal:
 
 ```
-./chip-tool pairing onnetwork 0 20202021 3840 ::1 5540
+./chip-tool pairing onnetwork-long 20202021 3840
 ./chip-ota-requestor-app [-p <provider node id>]
 ```
 
