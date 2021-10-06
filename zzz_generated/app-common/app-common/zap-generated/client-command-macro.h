@@ -2376,7 +2376,7 @@
 /** @brief Command description for LockDoor
  *
  * Command: LockDoor
- * @param PIN CHAR_STRING
+ * @param PIN OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterLockDoor(PIN) emberAfFillExternalBuffer(mask,                                                                       \
@@ -2396,7 +2396,7 @@
 /** @brief Command description for UnlockDoor
  *
  * Command: UnlockDoor
- * @param PIN CHAR_STRING
+ * @param PIN OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterUnlockDoor(PIN) emberAfFillExternalBuffer(mask,                                                                     \
@@ -2458,7 +2458,7 @@
 /** @brief Command description for UnlockWithTimeout
  *
  * Command: UnlockWithTimeout
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterUnlockWithTimeout(pin) emberAfFillExternalBuffer(mask,                                                              \
@@ -2484,7 +2484,7 @@
  * @param source INT8U
  * @param eventIdOrAlarmCode INT8U
  * @param userId INT16U
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterGetLogRecordResponse(logEntryId, timestamp, eventType, source, eventIdOrAlarmCode, userId, pin)                     \
@@ -2518,7 +2518,7 @@
  * Command: SetPin
  * @param userStatus DoorLockUserStatus
  * @param userType DoorLockUserType
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterSetPin(userStatus, userType, pin)                                                                                   \
@@ -2542,7 +2542,7 @@
  * @param userId INT16U
  * @param userStatus DoorLockUserStatus
  * @param userType DoorLockUserType
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterGetPinResponse(userId, userStatus, userType, pin)                                                                   \
@@ -3026,7 +3026,7 @@
  * Command: SetRfid
  * @param userStatus DoorLockUserStatus
  * @param userType DoorLockUserType
- * @param id CHAR_STRING
+ * @param id OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterSetRfid(userStatus, userType, id)                                                                                   \
@@ -3050,7 +3050,7 @@
  * @param userId INT16U
  * @param userStatus DoorLockUserStatus
  * @param userType DoorLockUserType
- * @param rfid CHAR_STRING
+ * @param rfid OCTET_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
     LockClusterGetRfidResponse(userId, userStatus, userType, rfid)                                                                 \
@@ -3103,7 +3103,7 @@
  * @param source INT8U
  * @param eventCode DoorLockOperationEventCode
  * @param userId INT16U
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  * @param timeStamp epoch_s
  * @param data CHAR_STRING
  */
@@ -3119,7 +3119,7 @@
  * @param source INT8U
  * @param eventCode DoorLockProgrammingEventCode
  * @param userId INT16U
- * @param pin CHAR_STRING
+ * @param pin OCTET_STRING
  * @param userType DoorLockUserType
  * @param userStatus DoorLockUserStatus
  * @param timeStamp epoch_s

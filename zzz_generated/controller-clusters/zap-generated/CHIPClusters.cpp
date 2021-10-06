@@ -4259,7 +4259,7 @@ CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, C
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // pin: charString
+    // pin: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -4354,7 +4354,7 @@ CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Cal
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userStatus));
     // userType: doorLockUserType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userType));
-    // pin: charString
+    // pin: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -4401,7 +4401,7 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Ca
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userStatus));
     // userType: doorLockUserType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userType));
-    // id: charString
+    // id: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), id));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -4586,7 +4586,7 @@ CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback,
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // pin: charString
+    // pin: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -4629,7 +4629,7 @@ CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCa
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // timeoutInSeconds: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutInSeconds));
-    // pin: charString
+    // pin: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
 
     SuccessOrExit(err = sender->FinishCommand());

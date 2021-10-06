@@ -607,7 +607,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getUserType:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler;
 - (void)getWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler;
 - (void)getYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId responseHandler:(ResponseHandler)responseHandler;
-- (void)lockDoor:(NSString *)pin responseHandler:(ResponseHandler)responseHandler;
+- (void)lockDoor:(NSData *)pin responseHandler:(ResponseHandler)responseHandler;
 - (void)setHolidaySchedule:(uint8_t)scheduleId
                 localStartTime:(uint32_t)localStartTime
                   localEndTime:(uint32_t)localEndTime
@@ -616,12 +616,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setPin:(uint16_t)userId
          userStatus:(uint8_t)userStatus
            userType:(uint8_t)userType
-                pin:(NSString *)pin
+                pin:(NSData *)pin
     responseHandler:(ResponseHandler)responseHandler;
 - (void)setRfid:(uint16_t)userId
          userStatus:(uint8_t)userStatus
            userType:(uint8_t)userType
-                 id:(NSString *)id
+                 id:(NSData *)id
     responseHandler:(ResponseHandler)responseHandler;
 - (void)setUserType:(uint16_t)userId userType:(uint8_t)userType responseHandler:(ResponseHandler)responseHandler;
 - (void)setWeekdaySchedule:(uint8_t)scheduleId
@@ -637,8 +637,8 @@ NS_ASSUME_NONNULL_BEGIN
             localStartTime:(uint32_t)localStartTime
               localEndTime:(uint32_t)localEndTime
            responseHandler:(ResponseHandler)responseHandler;
-- (void)unlockDoor:(NSString *)pin responseHandler:(ResponseHandler)responseHandler;
-- (void)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(NSString *)pin responseHandler:(ResponseHandler)responseHandler;
+- (void)unlockDoor:(NSData *)pin responseHandler:(ResponseHandler)responseHandler;
+- (void)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(NSData *)pin responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeLockStateWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)subscribeAttributeLockStateWithMinInterval:(uint16_t)minInterval

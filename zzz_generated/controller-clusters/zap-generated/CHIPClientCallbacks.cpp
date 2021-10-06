@@ -1822,7 +1822,7 @@ bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(EndpointId endpoin
 
 bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t logEntryId,
                                                         uint32_t timestamp, uint8_t eventType, uint8_t source,
-                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin)
 {
     ChipLogProgress(Zcl, "GetLogRecordResponse:");
     ChipLogProgress(Zcl, "  logEntryId: %" PRIu16 "", logEntryId);
@@ -1831,8 +1831,7 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app
     ChipLogProgress(Zcl, "  source: %" PRIu8 "", source);
     ChipLogProgress(Zcl, "  eventIdOrAlarmCode: %" PRIu8 "", eventIdOrAlarmCode);
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  pin: %.*s", pin.size(), pin.data());
+    ChipLogProgress(Zcl, "  pin: %zu", pin.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetLogRecordResponseCallback");
 
@@ -1843,14 +1842,13 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app
 }
 
 bool emberAfDoorLockClusterGetPinResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                  uint8_t userStatus, uint8_t userType, uint8_t * pin)
+                                                  uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
 {
     ChipLogProgress(Zcl, "GetPinResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  pin: %.*s", pin.size(), pin.data());
+    ChipLogProgress(Zcl, "  pin: %zu", pin.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetPinResponseCallback");
 
@@ -1861,14 +1859,13 @@ bool emberAfDoorLockClusterGetPinResponseCallback(EndpointId endpoint, app::Comm
 }
 
 bool emberAfDoorLockClusterGetRfidResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                   uint8_t userStatus, uint8_t userType, uint8_t * rfid)
+                                                   uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid)
 {
     ChipLogProgress(Zcl, "GetRfidResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits ByteSpan
-    // ChipLogProgress(Zcl, "  rfid: %.*s", rfid.size(), rfid.data());
+    ChipLogProgress(Zcl, "  rfid: %zu", rfid.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetRfidResponseCallback");
 

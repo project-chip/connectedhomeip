@@ -1225,7 +1225,7 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "LockDoor",
                     "args": {
-                        "pin": "str",
+                        "pin": "bytes",
                     },
                 },
             0x00000011: {
@@ -1245,7 +1245,7 @@ class ChipClusters:
                         "userId": "int",
                         "userStatus": "int",
                         "userType": "int",
-                        "pin": "str",
+                        "pin": "bytes",
                     },
                 },
             0x00000016: {
@@ -1255,7 +1255,7 @@ class ChipClusters:
                         "userId": "int",
                         "userStatus": "int",
                         "userType": "int",
-                        "id": "str",
+                        "id": "bytes",
                     },
                 },
             0x00000014: {
@@ -1293,7 +1293,7 @@ class ChipClusters:
                     "commandId": 0x00000001,
                     "commandName": "UnlockDoor",
                     "args": {
-                        "pin": "str",
+                        "pin": "bytes",
                     },
                 },
             0x00000003: {
@@ -1301,7 +1301,7 @@ class ChipClusters:
                     "commandName": "UnlockWithTimeout",
                     "args": {
                         "timeoutInSeconds": "int",
-                        "pin": "str",
+                        "pin": "bytes",
                     },
                 },
             },
@@ -4212,7 +4212,6 @@ class ChipClusters:
                 device, ZCLendpoint, ZCLgroupid, scheduleId, userId
         )
     def ClusterDoorLock_CommandLockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
-        pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor(
                 device, ZCLendpoint, ZCLgroupid, pin, len(pin)
         )
@@ -4221,12 +4220,10 @@ class ChipClusters:
                 device, ZCLendpoint, ZCLgroupid, scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday
         )
     def ClusterDoorLock_CommandSetPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, pin: bytes):
-        pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin(
                 device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, pin, len(pin)
         )
     def ClusterDoorLock_CommandSetRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, id: bytes):
-        id = id.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid(
                 device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, id, len(id)
         )
@@ -4243,12 +4240,10 @@ class ChipClusters:
                 device, ZCLendpoint, ZCLgroupid, scheduleId, userId, localStartTime, localEndTime
         )
     def ClusterDoorLock_CommandUnlockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
-        pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor(
                 device, ZCLendpoint, ZCLgroupid, pin, len(pin)
         )
     def ClusterDoorLock_CommandUnlockWithTimeout(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutInSeconds: int, pin: bytes):
-        pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout(
                 device, ZCLendpoint, ZCLgroupid, timeoutInSeconds, pin, len(pin)
         )
