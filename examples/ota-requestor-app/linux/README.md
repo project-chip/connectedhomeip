@@ -33,9 +33,9 @@ In a second terminal:
 -   Code for running a full BDX download exists in BDX
 -   Sends QueryImage command
 -   Takes a peer Node ID as an argument
--   Takes an optional udpPort command argument which when present disables
-    the self-commissioning and automatic image download logic and instead makes
-    the Requestor initialize like a standard Matter application. The udpPort
+-   Takes an optional udpPort command argument which when present disables the
+    self-commissioning and automatic image download logic and instead makes the
+    Requestor initialize like a standard Matter application. The udpPort
     parameter specifies the UDP Port that the Requestor listens on for secure
     connections.
 
