@@ -926,7 +926,7 @@
  *
  * Command: OffWithEffect
  * @param EffectId OnOffEffectIdentifier
- * @param EffectVariant enum8
+ * @param EffectVariant OnOffDelayedAllOffEffectVariant
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
@@ -1114,7 +1114,7 @@
  * @param status Status
  * @param alarmCode ENUM8
  * @param clusterId CLUSTER_ID
- * @param timeStamp INT32U
+ * @param timeStamp epoch_s
  */
 #define emberAfFillCommandAlarmsClusterGetAlarmResponse(status, alarmCode, clusterId, timeStamp)                                   \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -1545,7 +1545,7 @@
  * Command: SignalStateResponse
  * @param applianceStatus ApplianceStatus
  * @param remoteEnableFlagsAndDeviceStatus2 RemoteEnableFlagsAndDeviceStatus2
- * @param applianceStatus2 INT24U
+ * @param applianceStatus2 ApplianceStatus
  */
 #define emberAfFillCommandAppliance                                                                                                \
     ControlClusterSignalStateResponse(applianceStatus, remoteEnableFlagsAndDeviceStatus2, applianceStatus2)                        \
@@ -1568,7 +1568,7 @@
  * Command: SignalStateNotification
  * @param applianceStatus ApplianceStatus
  * @param remoteEnableFlagsAndDeviceStatus2 RemoteEnableFlagsAndDeviceStatus2
- * @param applianceStatus2 INT24U
+ * @param applianceStatus2 ApplianceStatus
  */
 #define emberAfFillCommandAppliance                                                                                                \
     ControlClusterSignalStateNotification(applianceStatus, remoteEnableFlagsAndDeviceStatus2, applianceStatus2)                    \
@@ -2107,7 +2107,7 @@
  * Command: RetrieveLogsResponse
  * @param status LogsStatus
  * @param content OCTET_STRING
- * @param timeStamp UTC
+ * @param timeStamp epoch_s
  * @param timeSinceBoot INT32U
  */
 #define emberAfFillCommandDiagnostic                                                                                               \
@@ -3104,7 +3104,7 @@
  * @param eventCode DoorLockOperationEventCode
  * @param userId INT16U
  * @param pin CHAR_STRING
- * @param timeStamp INT32U
+ * @param timeStamp epoch_s
  * @param data CHAR_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
@@ -3122,7 +3122,7 @@
  * @param pin CHAR_STRING
  * @param userType DoorLockUserType
  * @param userStatus DoorLockUserStatus
- * @param timeStamp INT32U
+ * @param timeStamp epoch_s
  * @param data CHAR_STRING
  */
 #define emberAfFillCommandDoor                                                                                                     \
@@ -4731,7 +4731,7 @@
  * Command: DisplayMessage
  * @param messageId INT32U
  * @param messageControl MessagingControlMask
- * @param startTime UTC
+ * @param startTime epoch_s
  * @param durationInMinutes INT16U
  * @param message CHAR_STRING
  * @param optionalExtendedMessageControl MessagingExtendedControlMask
@@ -4776,7 +4776,7 @@
 /** @brief Command description for MessageConfirmation
  *
  * Command: MessageConfirmation
- * @param confirmationTime UTC
+ * @param confirmationTime epoch_s
  * @param messageConfirmationControl BITMAP8
  * @param messageResponse OCTET_STRING
  */
@@ -4799,7 +4799,7 @@
 /** @brief Command description for GetMessageCancellation
  *
  * Command: GetMessageCancellation
- * @param earliestImplementationTime UTC
+ * @param earliestImplementationTime epoch_s
  */
 #define emberAfFillCommandMessagingClusterGetMessageCancellation(earliestImplementationTime)                                       \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -4810,7 +4810,7 @@
  *
  * Command: DisplayProtectedMessage
  * @param messageControl MessagingControlMask
- * @param startTime UTC
+ * @param startTime epoch_s
  * @param durationInMinutes INT16U
  * @param message CHAR_STRING
  * @param optionalExtendedMessageControl MessagingExtendedControlMask
@@ -4825,7 +4825,7 @@
 /** @brief Command description for CancelAllMessages
  *
  * Command: CancelAllMessages
- * @param implementationDateTime UTC
+ * @param implementationDateTime epoch_s
  */
 #define emberAfFillCommandMessagingClusterCancelAllMessages(implementationDateTime)                                                \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -4845,27 +4845,23 @@
  *
  * Command: GetAlertsResponse
  * @param alertsCount AlertCount
- * @param alertStructures AlertStructure []
- * @param alertStructuresLen int
  */
 #define emberAfFillCommandAppliance                                                                                                \
-    Events and AlertClusterGetAlertsResponse(alertsCount, alertStructures, alertStructuresLen)                                     \
+    Events and AlertClusterGetAlertsResponse(alertsCount)                                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_GET_ALERTS_RESPONSE_COMMAND_ID, "ub", alertsCount, alertStructures, alertStructuresLen);
+                                  ZCL_GET_ALERTS_RESPONSE_COMMAND_ID, "u", alertsCount);
 
 /** @brief Command description for AlertsNotification
  *
  * Command: AlertsNotification
  * @param alertsCount AlertCount
- * @param alertStructures AlertStructure []
- * @param alertStructuresLen int
  */
 #define emberAfFillCommandAppliance                                                                                                \
-    Events and AlertClusterAlertsNotification(alertsCount, alertStructures, alertStructuresLen)                                    \
+    Events and AlertClusterAlertsNotification(alertsCount)                                                                         \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ALERTS_NOTIFICATION_COMMAND_ID, "ub", alertsCount, alertStructures, alertStructuresLen);
+                                  ZCL_ALERTS_NOTIFICATION_COMMAND_ID, "u", alertsCount);
 
 /** @brief Command description for EventsNotification
  *
@@ -4882,7 +4878,7 @@
 /** @brief Command description for LogNotification
  *
  * Command: LogNotification
- * @param timeStamp TIME_OF_DAY
+ * @param timeStamp epoch_s
  */
 #define emberAfFillCommandAppliance                                                                                                \
     StatisticsClusterLogNotification(timeStamp) emberAfFillExternalBuffer(mask,                                                    \
@@ -4925,7 +4921,7 @@
 /** @brief Command description for LogResponse
  *
  * Command: LogResponse
- * @param timeStamp TIME_OF_DAY
+ * @param timeStamp epoch_s
  * @param logId INT32U
  * @param logLength INT32U
  * @param logPayload INT8U []
