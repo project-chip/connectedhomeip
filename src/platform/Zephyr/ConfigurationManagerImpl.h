@@ -88,7 +88,7 @@ inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
     return ConfigurationManagerImpl::sInstance;
 }
 
-inline bool ConfigurationManagerImpl::_CanFactoryReset()
+inline bool ConfigurationManagerImpl::CanFactoryReset()
 {
     return true;
 }
