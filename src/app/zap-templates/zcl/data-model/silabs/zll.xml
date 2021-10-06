@@ -85,7 +85,7 @@ limitations under the License.
       <description>
         Command description for EnhancedAddSceneResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
     </command>
@@ -93,7 +93,7 @@ limitations under the License.
       <description>
         Command description for EnhancedViewSceneResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
       <arg name="transitionTime" type="INT16U"/>
@@ -104,7 +104,7 @@ limitations under the License.
       <description>
         Command description for CopySceneResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupIdFrom" type="INT16U"/>
       <arg name="sceneIdFrom" type="INT8U"/>
     </command>
