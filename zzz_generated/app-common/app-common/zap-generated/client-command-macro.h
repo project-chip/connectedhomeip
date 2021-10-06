@@ -4697,6 +4697,17 @@
                                                                                                                                    \
                                                            ZCL_TEST_SPECIFIC_COMMAND_ID, "", );
 
+/** @brief Command description for TestSimpleArgumentResponse
+ *
+ * Command: TestSimpleArgumentResponse
+ * @param returnValue BOOLEAN
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestSimpleArgumentResponse(returnValue)                                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_SIMPLE_ARGUMENT_RESPONSE_COMMAND_ID, "u", returnValue);
+
 /** @brief Command description for TestUnknownCommand
  *
  * Command: TestUnknownCommand
@@ -4705,6 +4716,27 @@
     ClusterClusterTestUnknownCommand() emberAfFillExternalBuffer(mask,                                                             \
                                                                                                                                    \
                                                                  ZCL_TEST_UNKNOWN_COMMAND_COMMAND_ID, "", );
+
+/** @brief Command description for TestStructArrayArgumentResponse
+ *
+ * Command: TestStructArrayArgumentResponse
+ * @param arg1 NestedStructList []
+ * @param arg1Len int
+ * @param arg2 SimpleStruct []
+ * @param arg2Len int
+ * @param arg3 SimpleEnum []
+ * @param arg3Len int
+ * @param arg4 BOOLEAN []
+ * @param arg4Len int
+ * @param arg5 SimpleEnum
+ * @param arg6 BOOLEAN
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestStructArrayArgumentResponse(arg1, arg1Len, arg2, arg2Len, arg3, arg3Len, arg4, arg4Len, arg5, arg6)          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_STRUCT_ARRAY_ARGUMENT_RESPONSE_COMMAND_ID, "bbbbuu", arg1, arg1Len, arg2, arg2Len,      \
+                                  arg3, arg3Len, arg4, arg4Len, arg5, arg6);
 
 /** @brief Command description for TestAddArguments
  *
@@ -4716,6 +4748,38 @@
     ClusterClusterTestAddArguments(arg1, arg2) emberAfFillExternalBuffer(mask,                                                     \
                                                                                                                                    \
                                                                          ZCL_TEST_ADD_ARGUMENTS_COMMAND_ID, "uu", arg1, arg2);
+
+/** @brief Command description for TestSimpleArgumentRequest
+ *
+ * Command: TestSimpleArgumentRequest
+ * @param arg1 BOOLEAN
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestSimpleArgumentRequest(arg1)                                                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_SIMPLE_ARGUMENT_REQUEST_COMMAND_ID, "u", arg1);
+
+/** @brief Command description for TestStructArrayArgumentRequest
+ *
+ * Command: TestStructArrayArgumentRequest
+ * @param arg1 NestedStructList []
+ * @param arg1Len int
+ * @param arg2 SimpleStruct []
+ * @param arg2Len int
+ * @param arg3 SimpleEnum []
+ * @param arg3Len int
+ * @param arg4 BOOLEAN []
+ * @param arg4Len int
+ * @param arg5 SimpleEnum
+ * @param arg6 BOOLEAN
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestStructArrayArgumentRequest(arg1, arg1Len, arg2, arg2Len, arg3, arg3Len, arg4, arg4Len, arg5, arg6)           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_STRUCT_ARRAY_ARGUMENT_REQUEST_COMMAND_ID, "bbbbuu", arg1, arg1Len, arg2, arg2Len, arg3, \
+                                  arg3Len, arg4, arg4Len, arg5, arg6);
 
 /** @brief Command description for GetLastMessage
  *
