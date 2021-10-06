@@ -20,13 +20,12 @@
 
 #include <app/ClusterInfo.h>
 #include <app/MessageDef/AttributeDataElement.h>
-#include <app/TagBoundTLVEncoder.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h> // So we can encode lists
+#include <app/data-model/TagBoundEncoder.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
-#include <lib/support/CodeUtils.h>
 
 /**
  * Callback class that clusters can implement in order to interpose custom
@@ -41,11 +40,10 @@
 namespace chip {
 namespace app {
 
-class AttributeValueEncoder : protected TagBoundTLVEncoder
+class AttributeValueEncoder : protected TagBoundEncoder
 {
 public:
-    AttributeValueEncoder(TLV::TLVWriter * aWriter) :
-        TagBoundTLVEncoder(aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data))
+    AttributeValueEncoder(TLV::TLVWriter * aWriter) : TagBoundEncoder(aWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data))
     {}
 
     template <typename... Ts>
@@ -56,11 +54,11 @@ public:
         {
             return CHIP_NO_ERROR;
         }
-        return TagBoundTLVEncoder::Encode(std::forward<Ts>(aArgs)...);
+        return TagBoundEncoder::Encode(std::forward<Ts>(aArgs)...);
     }
 
     /**
-     * aCallback is expected to take a const TagBoundTLVEncoder& argument and
+     * aCallback is expected to take a const TagBoundEncoder& argument and
      * Encode() on it as many times as needed to encode all the list elements
      * one by one.  If any of those Encode() calls returns failure, aCallback
      * must stop encoding and return failure.  When all items are encoded
@@ -77,10 +75,7 @@ public:
         {
             return CHIP_NO_ERROR;
         }
-        TLV::TLVType outerType;
-        ReturnErrorOnFailure(mWriter->StartContainer(mTag, TLV::kTLVType_Array, outerType));
-        ReturnErrorOnFailure(aCallback(TagBoundTLVEncoder(mWriter, TLV::AnonymousTag)));
-        return mWriter->EndContainer(outerType);
+        return TagBoundEncoder::EncodeList(aCallback);
     }
 
     bool TriedEncode() const { return mTriedEncode; }
