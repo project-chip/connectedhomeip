@@ -21,6 +21,7 @@
  *          statistics(extracted from /proc/net/wireless) on Linux platforms.
  */
 
+#include <app-common/zap-generated/enums.h>
 #include <platform/Linux/ConnectivityUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -425,6 +426,118 @@ CHIP_ERROR ConnectivityUtils::GetWiFiCurrentMaxRate(int skfd, const char * ifnam
     }
 
     return CHIP_ERROR_READ_FAILED;
+}
+
+CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
+{
+    CHIP_ERROR ret          = CHIP_ERROR_READ_FAILED;
+    struct ifaddrs * ifaddr = nullptr;
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+    }
+    else
+    {
+        struct ifaddrs * ifa = nullptr;
+
+        /* Walk through linked list, maintaining head pointer so we
+          can free list later */
+        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if (GetInterfaceConnectionType(ifa->ifa_name) == ConnectionType::kConnectionEthernet)
+            {
+                strncpy(ifname, ifa->ifa_name, bufSize);
+                ifname[bufSize - 1] = '\0';
+                ret                 = CHIP_NO_ERROR;
+                break;
+            }
+        }
+
+        freeifaddrs(ifaddr);
+    }
+
+    return ret;
+}
+
+CHIP_ERROR ConnectivityUtils::GetEthPHYRate(int skfd, const char * ifname, uint8_t & pHYRate)
+{
+    CHIP_ERROR ret = CHIP_NO_ERROR;
+
+    uint32_t speed          = 0;
+    struct ethtool_cmd ecmd = {};
+    ecmd.cmd                = ETHTOOL_GSET;
+    struct ifreq ifr        = {};
+
+    ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
+    strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+
+    if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Cannot get device settings");
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    speed = (ecmd.speed_hi << 16) | ecmd.speed;
+    switch (speed)
+    {
+    case 10:
+        pHYRate = static_cast<uint8_t>(EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_10_M);
+        break;
+    case 100:
+        pHYRate = static_cast<uint8_t>(EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_100_M);
+        break;
+    case 1000:
+        pHYRate = static_cast<uint8_t>(EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_1000_M);
+        break;
+    case 25000:
+        pHYRate = static_cast<uint8_t>(EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_2__5_G);
+        break;
+    case 5000:
+        pHYRate = static_cast<uint8_t>(EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_5_G);
+        break;
+    case 10000:
+        pHYRate = static_cast<uint8_t>(EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_10_G);
+        break;
+    case 40000:
+        pHYRate = static_cast<uint8_t>(EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_40_G);
+        break;
+    case 100000:
+        pHYRate = static_cast<uint8_t>(EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_100_G);
+        break;
+    case 200000:
+        pHYRate = static_cast<uint8_t>(EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_200_G);
+        break;
+    case 400000:
+        pHYRate = static_cast<uint8_t>(EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_400_G);
+        break;
+    default:
+        ChipLogError(DeviceLayer, "Undefined speed! (%d)\n", speed);
+        ret = CHIP_ERROR_READ_FAILED;
+        break;
+    };
+
+    return ret;
+}
+
+CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(int skfd, const char * ifname, bool & fullDuplex)
+{
+    struct ethtool_cmd ecmd = {};
+    ecmd.cmd                = ETHTOOL_GSET;
+    struct ifreq ifr        = {};
+
+    ifr.ifr_data = reinterpret_cast<char *>(&ecmd);
+    strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+
+    if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
+    {
+        ChipLogError(DeviceLayer, "Cannot get device settings");
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    fullDuplex = (ecmd.duplex == DUPLEX_FULL) ? true : false;
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal

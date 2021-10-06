@@ -694,6 +694,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resetCounts:(ResponseHandler)responseHandler;
 
+- (void)readAttributePHYRateWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeFullDuplexWithResponseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributePacketRxCountWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributePacketTxCountWithResponseHandler:(ResponseHandler)responseHandler;
@@ -703,6 +707,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeCollisionCountWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeCarrierDetectWithResponseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeTimeSinceResetWithResponseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
