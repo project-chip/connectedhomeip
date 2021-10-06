@@ -70,8 +70,8 @@ Complete the following steps to prepare the CHIP build:
     source scripts/bootstrap.sh
     ```
 
-3. Choose how you want to build the Android CHIPTool. There are **two** ways: from
-   script, or from source within Android Studio.
+3. Choose how you want to build the Android CHIPTool. There are **two** ways:
+   from script, or from source within Android Studio.
 
 <a name="building-scripts"></a>
 
