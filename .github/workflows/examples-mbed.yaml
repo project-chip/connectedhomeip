@@ -93,8 +93,6 @@ jobs:
                      /tmp/output_binaries/$BUILD_TYPE-build/lock-app-$APP_TARGET-$APP_PROFILE.hex
                   cp examples/lighting-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-lighting-app-example.hex \
                      /tmp/output_binaries/$BUILD_TYPE-build/lighting-app-$APP_TARGET-$APP_PROFILE.hex
-                  cp src/test_driver/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-unit-tests.hex \
-                     /tmp/output_binaries/$BUILD_TYPE-build/unit-tests-$APP_TARGET-$APP_PROFILE.hex
 
             - name: Binary artifacts suffix
               id: outsuffix
