@@ -244,13 +244,14 @@ CHIP_ERROR MdnsServer::AdvertiseOperational()
     {
         if (fabricInfo.IsInitialized())
         {
-            uint8_t mac[8];
+            uint8_t macBuffer[DeviceLayer::ConfigurationManager::kMACAddressLength];
+            MutableByteSpan mac(macBuffer);
             chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
 
             const auto advertiseParameters =
                 chip::Mdns::OperationalAdvertisingParameters()
                     .SetPeerId(fabricInfo.GetPeerId())
-                    .SetMac(chip::ByteSpan(mac, 8))
+                    .SetMac(mac)
                     .SetPort(GetSecuredPort())
                     .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL),
                                           Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
@@ -282,9 +283,10 @@ CHIP_ERROR MdnsServer::Advertise(bool commissionableNode, chip::Mdns::Commission
 
     char pairingInst[chip::Mdns::kKeyPairingInstructionMaxLength + 1];
 
-    uint8_t mac[8];
+    uint8_t macBuffer[DeviceLayer::ConfigurationManager::kMACAddressLength];
+    MutableByteSpan mac(macBuffer);
     chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
-    advertiseParameters.SetMac(chip::ByteSpan(mac, 8));
+    advertiseParameters.SetMac(mac);
 
     uint16_t value;
     if (DeviceLayer::ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
