@@ -185,7 +185,7 @@ exit:
 #if CHIP_PROGRESS_LOGGING
 #if CONFIG_NETWORK_LAYER_BLE
         chip::RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
-#else // CONFIG_NETWORK_LAYER_BLE
+#else  // CONFIG_NETWORK_LAYER_BLE
         chip::RendezvousInformationFlag rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
@@ -195,7 +195,8 @@ exit:
         SetupPayload setupPayload;
         // Failing to get a setup payload here should not be fatal.
         CHIP_ERROR setupErr = GetSetupPayload(setupPayload, rendezvousFlags);
-        if (setupErr == CHIP_NO_ERROR) {
+        if (setupErr == CHIP_NO_ERROR)
+        {
             PrintOnboardingCodes(setupPayload);
         }
 #endif // CHIP_PROGRESS_LOGGING

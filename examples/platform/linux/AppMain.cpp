@@ -108,10 +108,10 @@ static bool EnsureWifiIsStarted()
 
 int ChipLinuxAppInit(int argc, char ** argv)
 {
-    CHIP_ERROR err                                   = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE
     chip::RendezvousInformationFlags rendezvousFlags = chip::RendezvousInformationFlag::kBLE;
-#else // CONFIG_NETWORK_LAYER_BLE
+#else  // CONFIG_NETWORK_LAYER_BLE
     chip::RendezvousInformationFlag rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
