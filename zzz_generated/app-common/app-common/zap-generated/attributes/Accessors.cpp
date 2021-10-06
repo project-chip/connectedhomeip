@@ -1419,13 +1419,13 @@ namespace Attributes {
 
 namespace Time {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** time)
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * time)
 {
     return emberAfReadServerAttribute(endpoint, Time::Id, Time::Id, (uint8_t *) time, sizeof(*time));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * time)
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t time)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, Time::Id, (uint8_t *) &time, ZCL_UTC_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Time::Id, Time::Id, (uint8_t *) &time, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Time
@@ -1523,26 +1523,27 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t localTime)
 
 namespace LastSetTime {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** lastSetTime)
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * lastSetTime)
 {
     return emberAfReadServerAttribute(endpoint, Time::Id, LastSetTime::Id, (uint8_t *) lastSetTime, sizeof(*lastSetTime));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * lastSetTime)
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t lastSetTime)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, LastSetTime::Id, (uint8_t *) &lastSetTime, ZCL_UTC_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Time::Id, LastSetTime::Id, (uint8_t *) &lastSetTime, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace LastSetTime
 
 namespace ValidUntilTime {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** validUntilTime)
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * validUntilTime)
 {
     return emberAfReadServerAttribute(endpoint, Time::Id, ValidUntilTime::Id, (uint8_t *) validUntilTime, sizeof(*validUntilTime));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * validUntilTime)
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t validUntilTime)
 {
-    return emberAfWriteServerAttribute(endpoint, Time::Id, ValidUntilTime::Id, (uint8_t *) &validUntilTime, ZCL_UTC_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Time::Id, ValidUntilTime::Id, (uint8_t *) &validUntilTime,
+                                       ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ValidUntilTime
@@ -5899,15 +5900,15 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t setpointChangeAmount)
 
 namespace SetpointChangeSourceTimestamp {
 
-EmberAfStatus Get(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** setpointChangeSourceTimestamp)
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * setpointChangeSourceTimestamp)
 {
     return emberAfReadServerAttribute(endpoint, Thermostat::Id, SetpointChangeSourceTimestamp::Id,
                                       (uint8_t *) setpointChangeSourceTimestamp, sizeof(*setpointChangeSourceTimestamp));
 }
-EmberAfStatus Set(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * setpointChangeSourceTimestamp)
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t setpointChangeSourceTimestamp)
 {
     return emberAfWriteServerAttribute(endpoint, Thermostat::Id, SetpointChangeSourceTimestamp::Id,
-                                       (uint8_t *) &setpointChangeSourceTimestamp, ZCL_UTC_ATTRIBUTE_TYPE);
+                                       (uint8_t *) &setpointChangeSourceTimestamp, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace SetpointChangeSourceTimestamp

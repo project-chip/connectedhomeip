@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,31 +16,21 @@
  *    limitations under the License.
  */
 
-#include <pthread.h>
+#pragma once
+
+#include <lib/mdns/Resolver.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
-/** A scoped lock/unlock around a mutex. */
-struct StackLockGuard
+namespace Controller {
+
+/// Callbacks for CHIP device discovery
+class DLL_EXPORT DeviceDiscoveryDelegate
 {
 public:
-    StackLockGuard(pthread_mutex_t * mutex) : mMutex(mutex) { pthread_mutex_lock(mMutex); }
-    ~StackLockGuard() { pthread_mutex_unlock(mMutex); }
-
-private:
-    pthread_mutex_t * mMutex;
+    virtual ~DeviceDiscoveryDelegate() {}
+    virtual void OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData) = 0;
 };
 
-/**
- * Use StackUnlockGuard to temporarily unlock the CHIP BLE stack, e.g. when calling application
- * or Android BLE code as a result of a BLE event.
- */
-struct StackUnlockGuard
-{
-public:
-    StackUnlockGuard(pthread_mutex_t * mutex) : mMutex(mutex) { pthread_mutex_unlock(mMutex); }
-    ~StackUnlockGuard() { pthread_mutex_lock(mMutex); }
-
-private:
-    pthread_mutex_t * mMutex;
-};
+} // namespace Controller
 } // namespace chip

@@ -832,7 +832,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDia
  */
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(
-    AttributeId attributeId, const app::AttributeValueEncoder & encoder)
+    AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
     CHIP_ERROR err;
 
@@ -1739,7 +1739,24 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveAllSrpServices()
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_InvalidateAllSrpServices()
+{
+    Impl()->LockThreadStack();
+
+    for (typename SrpClient::Service & service : mSrpClient.mServices)
+    {
+        if (service.IsUsed())
+        {
+            service.mIsInvalid = true;
+        }
+    }
+
+    Impl()->UnlockThreadStack();
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSrpServices()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -1747,11 +1764,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveAllSrpSer
 
     for (typename SrpClient::Service & service : mSrpClient.mServices)
     {
-        if (!service.IsUsed())
-            continue;
-
-        error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
-        SuccessOrExit(error);
+        if (service.IsUsed() && service.mIsInvalid)
+        {
+            ChipLogProgress(DeviceLayer, "removing srp service: %s.%s", service.mService.mInstanceName, service.mService.mName);
+            error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
+            SuccessOrExit(error);
+        }
     }
 
 exit:

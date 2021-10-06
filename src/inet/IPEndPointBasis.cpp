@@ -345,7 +345,7 @@ CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
         {
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        case kLwIPEndPointType_UDP:
+        case LwIPEndPointType::UDP:
             udp_set_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
             break;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
@@ -361,7 +361,7 @@ CHIP_ERROR IPEndPointBasis::SetMulticastLoopback(IPVersion aIPVersion, bool aLoo
         {
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        case kLwIPEndPointType_UDP:
+        case LwIPEndPointType::UDP:
             udp_clear_flags(mUDP, UDP_FLAGS_MULTICAST_LOOP);
             break;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
@@ -907,7 +907,7 @@ CHIP_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
 
 CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int aProtocol)
 {
-    if (mSocket == INET_INVALID_SOCKET_FD)
+    if (mSocket == kInvalidSocketFd)
     {
         const int one = 1;
         int family;

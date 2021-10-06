@@ -468,7 +468,9 @@ CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, Mutabl
  * @brief A function that implements AES-CCM encryption
  *
  * This implements the CHIP_Crypto_AEAD_GenerateEncrypt() cryptographic primitive
- * from the specification.
+ * from the specification. For an empty plaintext, the user of the API can provide
+ * an empty string, or a nullptr, and provide plaintext_length as 0. The output buffer,
+ * ciphertext can also be an empty string, or a nullptr for this case.
  *
  * @param plaintext Plaintext to encrypt
  * @param plaintext_length Length of plain_text
@@ -491,7 +493,9 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @brief A function that implements AES-CCM decryption
  *
  * This implements the CHIP_Crypto_AEAD_DecryptVerify() cryptographic primitive
- * from the specification.
+ * from the specification. For an empty ciphertext, the user of the API can provide
+ * an empty string, or a nullptr, and provide ciphertext_length as 0. The output buffer,
+ * plaintext can also be an empty string, or a nullptr for this case.
  *
  * @param ciphertext Ciphertext to decrypt
  * @param ciphertext_length Length of ciphertext

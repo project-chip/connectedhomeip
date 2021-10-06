@@ -50,8 +50,10 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 
@@ -60,6 +62,7 @@
 #endif // EMBER_AF_PLUGIN_SCENES
 
 using namespace chip;
+using namespace chip::app::Clusters::Groups;
 
 static bool isGroupPresent(EndpointId endpoint, GroupId groupId);
 
@@ -151,8 +154,9 @@ static EmberAfStatus removeEntryFromGroupTable(EndpointId endpoint, GroupId grou
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-bool emberAfGroupsClusterAddGroupCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId,
-                                          uint8_t * groupName)
+bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                          EndpointId endpoint, GroupId groupId, uint8_t * groupName,
+                                          Commands::AddGroup::DecodableType & commandData)
 {
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -188,7 +192,8 @@ exit:
     return true;
 }
 
-bool emberAfGroupsClusterViewGroupCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId)
+bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                           EndpointId endpoint, GroupId groupId, Commands::ViewGroup::DecodableType & commandData)
 {
     EmberAfStatus status                                          = EMBER_ZCL_STATUS_NOT_FOUND;
     CHIP_ERROR err                                                = CHIP_NO_ERROR;
@@ -230,8 +235,9 @@ exit:
     return true;
 }
 
-bool emberAfGroupsClusterGetGroupMembershipCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t groupCount,
-                                                    uint8_t * groupList)
+bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                    EndpointId endpoint, uint8_t groupCount, uint8_t * groupList,
+                                                    Commands::GetGroupMembership::DecodableType & commandData)
 {
     EmberStatus status = EMBER_ZCL_STATUS_FAILURE;
     uint8_t i, j;
@@ -328,7 +334,9 @@ exit:
     return true;
 }
 
-bool emberAfGroupsClusterRemoveGroupCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId)
+bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                             EndpointId endpoint, GroupId groupId,
+                                             Commands::RemoveGroup::DecodableType & commandData)
 {
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -366,7 +374,8 @@ exit:
     return true;
 }
 
-bool emberAfGroupsClusterRemoveAllGroupsCallback(EndpointId aEndpoint, app::CommandHandler * commandObj)
+bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                 EndpointId aEndpoint, Commands::RemoveAllGroups::DecodableType & commandData)
 {
     EmberStatus sendStatus = EMBER_SUCCESS;
     uint8_t i;
@@ -414,8 +423,10 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(EndpointId aEndpoint, app::Comm
     return true;
 }
 
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId,
-                                                       uint8_t * groupName)
+bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                       GroupId groupId, uint8_t * groupName,
+                                                       Commands::AddGroupIfIdentifying::DecodableType & commandData)
 {
     EmberAfStatus status;
     EmberStatus sendStatus = EMBER_SUCCESS;

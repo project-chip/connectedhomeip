@@ -22,7 +22,6 @@ static_library("messaging") {
     "ApplicationExchangeDispatch.h",
     "ErrorCategory.cpp",
     "ErrorCategory.h",
-    "ExchangeACL.h",
     "ExchangeContext.cpp",
     "ExchangeContext.h",
     "ExchangeDelegate.h",

@@ -94,6 +94,8 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = Pair(remoteId, PeerAddress::BLE());
         break;
     case PairingMode::OnNetwork:
+        err = PairWithMdns(remoteId);
+        break;
     case PairingMode::SoftAP:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
@@ -129,30 +131,12 @@ void PairingCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId
 
 CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
 {
-    SetupPayload payload;
-    ReturnErrorOnFailure(QRCodeSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
-
-    chip::RendezvousInformationFlags rendezvousInformation = payload.rendezvousInformation;
-    ReturnErrorCodeIf(rendezvousInformation != RendezvousInformationFlag::kBLE, CHIP_ERROR_INVALID_ARGUMENT);
-
-    return PairWithCode(remoteId, payload);
+    return GetExecContext()->commissioner->PairDevice(remoteId, mOnboardingPayload);
 }
 
 CHIP_ERROR PairingCommand::PairWithManualCode(NodeId remoteId)
 {
-    SetupPayload payload;
-    ReturnErrorOnFailure(ManualSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
-    return PairWithCode(remoteId, payload);
-}
-
-CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId, SetupPayload payload)
-{
-    RendezvousParameters params = RendezvousParameters()
-                                      .SetSetupPINCode(payload.setUpPINCode)
-                                      .SetDiscriminator(payload.discriminator)
-                                      .SetPeerAddress(PeerAddress::BLE());
-
-    return GetExecContext()->commissioner->PairDevice(remoteId, params);
+    return GetExecContext()->commissioner->PairDevice(remoteId, mOnboardingPayload);
 }
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
@@ -161,6 +145,35 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
         RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
 
     return GetExecContext()->commissioner->PairDevice(remoteId, params);
+}
+
+CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
+{
+    Mdns::DiscoveryFilter filter(mFilterType);
+    switch (mFilterType)
+    {
+    case chip::Mdns::DiscoveryFilterType::kNone:
+        break;
+    case chip::Mdns::DiscoveryFilterType::kShort:
+    case chip::Mdns::DiscoveryFilterType::kLong:
+    case chip::Mdns::DiscoveryFilterType::kCompressedFabricId:
+    case chip::Mdns::DiscoveryFilterType::kVendor:
+    case chip::Mdns::DiscoveryFilterType::kDeviceType:
+        filter.code = mDiscoveryFilterCode;
+        break;
+    case chip::Mdns::DiscoveryFilterType::kCommissioningMode:
+        break;
+    case chip::Mdns::DiscoveryFilterType::kCommissioner:
+        filter.code = 1;
+        break;
+    case chip::Mdns::DiscoveryFilterType::kInstanceName:
+        filter.code         = 0;
+        filter.instanceName = mDiscoveryFilterInstanceName;
+        break;
+    }
+
+    GetExecContext()->commissioner->RegisterDeviceDiscoveryDelegate(this);
+    return GetExecContext()->commissioner->DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress address)
@@ -436,6 +449,25 @@ void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
     {
         // Set exit status only if the address update failed.
         // Otherwise wait for OnCommissioningComplete() callback.
+        SetCommandExitStatus(err);
+    }
+}
+
+void PairingCommand::OnDiscoveredDevice(const chip::Mdns::DiscoveredNodeData & nodeData)
+{
+    const uint16_t port = nodeData.port;
+    char buf[chip::Inet::kMaxIPAddressStringLength];
+    nodeData.ipAddress[0].ToString(buf);
+    ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
+
+    // Stop Mdns discovery. Is it the right method ?
+    GetExecContext()->commissioner->RegisterDeviceDiscoveryDelegate(nullptr);
+
+    Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId[0] : INET_NULL_INTERFACEID;
+    PeerAddress peerAddress       = PeerAddress::UDP(nodeData.ipAddress[0], port, interfaceId);
+    CHIP_ERROR err                = Pair(mRemoteId, peerAddress);
+    if (CHIP_NO_ERROR != err)
+    {
         SetCommandExitStatus(err);
     }
 }

@@ -466,6 +466,25 @@ public:
     CHIP_ERROR Get(chip::ByteSpan & v);
 
     /**
+     * Get the value of the current element as an enum value, if it's an integer
+     * value that fits in the enum type.
+     *
+     * @param[out] v Receives the value associated with current TLV element.
+     */
+    template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
+    CHIP_ERROR Get(T & v)
+    {
+        std::underlying_type_t<T> val;
+        CHIP_ERROR err = Get(val);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+        v = static_cast<T>(val);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      * Get the value of the current byte or UTF8 string element.
      *
      * To determine the required input buffer size, call the GetLength() method before calling GetBytes().

@@ -25,13 +25,16 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 
 constexpr int16_t kDefaultAbsMinHeatSetpointLimit    = 700;  // 7C (44.5 F) is the default
@@ -253,27 +256,35 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
     return status;
 }
 
-bool emberAfThermostatClusterClearWeeklyScheduleCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj)
+bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * commandObj,
+                                                         const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
+                                                         Commands::ClearWeeklySchedule::DecodableType & commandData)
 {
     // TODO
     return false;
 }
-bool emberAfThermostatClusterGetRelayStatusLogCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj)
+bool emberAfThermostatClusterGetRelayStatusLogCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
+                                                       Commands::GetRelayStatusLog::DecodableType & commandData)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterGetWeeklyScheduleCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj,
-                                                       uint8_t daysToReturn, uint8_t modeToReturn)
+bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
+                                                       uint8_t daysToReturn, uint8_t modeToReturn,
+                                                       Commands::GetWeeklySchedule::DecodableType & commandData)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterSetWeeklyScheduleCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj,
+bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
                                                        uint8_t numberOfTransitionsForSequence, uint8_t daysOfWeekForSequence,
-                                                       uint8_t modeForSequence, uint8_t * payload)
+                                                       uint8_t modeForSequence, uint8_t * payload,
+                                                       Commands::SetWeeklySchedule::DecodableType & commandData)
 {
     // TODO
     return false;
@@ -422,8 +433,10 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
 
     return CoolingSetpoint;
 }
-bool emberAfThermostatClusterSetpointRaiseLowerCallback(EndpointId aEndpointId, chip::app::CommandHandler * commandObj,
-                                                        uint8_t mode, int8_t amount)
+bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * commandObj,
+                                                        const app::ConcreteCommandPath & commandPath, EndpointId aEndpointId,
+                                                        uint8_t mode, int8_t amount,
+                                                        Commands::SetpointRaiseLower::DecodableType & commandData)
 {
     int16_t HeatingSetpoint = kDefaultHeatingSetpoint, CoolingSetpoint = kDefaultCoolingSetpoint; // Set to defaults to be safe
     EmberAfStatus status                     = EMBER_ZCL_STATUS_FAILURE;

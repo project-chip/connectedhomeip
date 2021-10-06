@@ -187,7 +187,7 @@ exit:
 
 void Server::Shutdown()
 {
-    chip::Mdns::ServiceAdvertiser::Instance().StopPublishDevice();
+    chip::Mdns::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     mExchangeMgr.Shutdown();
     mSessions.Shutdown();

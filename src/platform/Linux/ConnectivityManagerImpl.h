@@ -155,6 +155,7 @@ private:
     CHIP_ERROR _GetEthTxErrCount(uint64_t & txErrCount);
     CHIP_ERROR _GetEthCollisionCount(uint64_t & collisionCount);
     CHIP_ERROR _GetEthOverrunCount(uint64_t & overrunCount);
+    CHIP_ERROR _ResetEthNetworkDiagnosticsCounts();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR _GetWiFiChannelNumber(uint16_t & channelNumber);
@@ -170,6 +171,12 @@ private:
 #endif
 
     // ==================== ConnectivityManager Private Methods ====================
+
+    CHIP_ERROR ResetEthernetStatsCount();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    CHIP_ERROR ResetWiFiStatsCount();
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void DriveAPState();
@@ -187,6 +194,12 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
+    uint64_t mEthPacketRxCount  = 0;
+    uint64_t mEthPacketTxCount  = 0;
+    uint64_t mEthTxErrCount     = 0;
+    uint64_t mEthCollisionCount = 0;
+    uint64_t mEthOverrunCount   = 0;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
@@ -197,6 +210,12 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    uint32_t mBeaconLostCount        = 0;
+    uint32_t mPacketMulticastRxCount = 0;
+    uint32_t mPacketMulticastTxCount = 0;
+    uint32_t mPacketUnicastRxCount   = 0;
+    uint32_t mPacketUnicastTxCount   = 0;
+    uint64_t mOverrunCount           = 0;
     char mWiFiIfName[IFNAMSIZ];
 #endif
 };
