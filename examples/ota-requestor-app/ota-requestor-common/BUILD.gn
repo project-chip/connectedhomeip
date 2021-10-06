@@ -37,5 +37,5 @@ chip_data_model("ota-requestor-common") {
 
   is_server = true
 
-public_configs = [ ":config" ]
+  public_configs = [ ":config" ]
 }
