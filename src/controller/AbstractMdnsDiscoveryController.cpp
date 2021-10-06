@@ -66,10 +66,10 @@ void AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(const chip::Mdns::
 
 CHIP_ERROR AbstractMdnsDiscoveryController::SetUpNodeDiscovery()
 {
-    ReturnErrorOnFailure(mResolver->SetResolverDelegate(this));
 #if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(mResolver->StartResolver(&DeviceLayer::InetLayer, kMdnsPort));
+    ReturnErrorOnFailure(mResolver->Init(&DeviceLayer::InetLayer));
 #endif
+    mResolver->SetResolverDelegate(this);
 
     auto discoveredNodes = GetDiscoveredNodes();
     for (auto & discoveredNode : discoveredNodes)

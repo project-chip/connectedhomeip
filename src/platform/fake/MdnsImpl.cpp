@@ -105,14 +105,14 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     return test::CheckExpected(test::CallType::kStart, service);
 }
 
-CHIP_ERROR ChipMdnsStopPublish()
+CHIP_ERROR ChipMdnsRemoveServices()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
+CHIP_ERROR ChipMdnsFinalizeServiceUpdate()
 {
-    return test::CheckExpected(test::CallType::kStart, service);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip::Inet::IPAddressType addressType,

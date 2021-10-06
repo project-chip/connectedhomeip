@@ -43,30 +43,20 @@ MdnsCache<CHIP_CONFIG_MDNS_CACHE_SIZE> DiscoveryImplPlatform::sMdnsCache;
 
 DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
 
-CHIP_ERROR DiscoveryImplPlatform::Init()
+CHIP_ERROR DiscoveryImplPlatform::InitImpl()
 {
-    if (!mMdnsInitialized)
-    {
-        ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
-        mCommissionInstanceName = GetRandU64();
-        mMdnsInitialized        = true;
-    }
+    ReturnErrorCodeIf(mMdnsInitialized, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
+    mCommissionInstanceName = GetRandU64();
+    mMdnsInitialized        = true;
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t port)
+void DiscoveryImplPlatform::Shutdown()
 {
-    ReturnErrorOnFailure(Init());
-
-    CHIP_ERROR error = ChipMdnsStopPublish();
-
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to initialize platform mdns: %s", ErrorStr(error));
-    }
-
-    return error;
+    VerifyOrReturn(mMdnsInitialized);
+    ChipMdnsShutdown();
 }
 
 void DiscoveryImplPlatform::HandleMdnsInit(void * context, CHIP_ERROR initError)
@@ -101,6 +91,7 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
         {
             publisher->Advertise(publisher->mCommissionerAdvertisingParams);
         }
+        publisher->FinalizeServiceUpdate();
     }
     else
     {
@@ -441,28 +432,25 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     return error;
 }
 
-CHIP_ERROR DiscoveryImplPlatform::StopPublishDevice()
+CHIP_ERROR DiscoveryImplPlatform::RemoveServices()
 {
-    CHIP_ERROR error = ChipMdnsStopPublish();
+    ReturnErrorOnFailure(ChipMdnsRemoveServices());
 
-    if (error == CHIP_NO_ERROR)
-    {
-        mIsOperationalPublishing        = false;
-        mIsCommissionableNodePublishing = false;
-        mIsCommissionerPublishing       = false;
-    }
-    return error;
+    mIsOperationalPublishing        = false;
+    mIsCommissionableNodePublishing = false;
+    mIsCommissionerPublishing       = false;
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegate)
+CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
 {
-    mResolverDelegate = delegate;
-    return CHIP_NO_ERROR;
+    return ChipMdnsFinalizeServiceUpdate();
 }
 
 CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
-    ReturnErrorOnFailure(Init());
+    ReturnErrorOnFailure(InitImpl());
 
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     Inet::IPAddress addr;
@@ -541,7 +529,7 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, MdnsService * resu
 
 CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
 {
-    ReturnErrorOnFailure(Init());
+    ReturnErrorOnFailure(InitImpl());
     char serviceName[kMaxCommisisonableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
@@ -551,7 +539,7 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter
 
 CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
 {
-    ReturnErrorOnFailure(Init());
+    ReturnErrorOnFailure(InitImpl());
     char serviceName[kMaxCommisisonerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
 
