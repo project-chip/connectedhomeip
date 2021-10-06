@@ -49,7 +49,7 @@ function atomicType(arg)
   case 'fabric_idx':
     return 'chip::FabricIndex';
   case 'status':
-    return 'chip::StatusCode';
+    return 'chip::Protocols::InteractionModel::Status'
   case 'octet_string':
   case 'long_octet_string':
     return 'chip::ByteSpan';

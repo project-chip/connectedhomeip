@@ -301,14 +301,14 @@ limitations under the License.
       <description>
         Command description for AddGroupResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
     </command>
     <command source="server" code="0x01" name="ViewGroupResponse" optional="false" disableDefaultResponse="true">
       <description>
         Command description for ViewGroupResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="groupName" type="CHAR_STRING"/>
     </command>
@@ -324,7 +324,7 @@ limitations under the License.
       <description>
         Command description for RemoveGroupResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
     </command>
   </cluster>
@@ -399,7 +399,7 @@ limitations under the License.
       <description>
         Command description for AddSceneResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
     </command>
@@ -407,7 +407,7 @@ limitations under the License.
       <description>
         Command description for ViewSceneResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
       <arg name="transitionTime" type="INT16U" presentIf="status==0"/>
@@ -418,7 +418,7 @@ limitations under the License.
       <description>
         Command description for RemoveSceneResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
     </command>
@@ -426,14 +426,14 @@ limitations under the License.
       <description>
         Command description for RemoveAllScenesResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
     </command>
     <command source="server" code="0x04" name="StoreSceneResponse" optional="false" disableDefaultResponse="true">
       <description>
         Command description for StoreSceneResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneId" type="INT8U"/>
     </command>
@@ -441,7 +441,7 @@ limitations under the License.
       <description>
         Command description for GetSceneMembershipResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="capacity" type="INT8U"/>
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneCount" type="INT8U" arrayLength="true" presentIf="status==0"/>
@@ -583,7 +583,7 @@ limitations under the License.
       <description>
         Command description for GetAlarmResponse
       </description>
-      <arg name="status" type="Status"/>
+      <arg name="status" type="ENUM8"/>
       <arg name="alarmCode" type="ENUM8"/>
       <arg name="clusterId" type="CLUSTER_ID"/>
       <arg name="timeStamp" type="epoch_s"/>

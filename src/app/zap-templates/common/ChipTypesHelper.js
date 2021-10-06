@@ -27,6 +27,7 @@ function asBasicType(type)
   case 'chip::VendorId':
   case 'chip::Percent100ths':
     return 'uint16_t';
+  case 'chip::Protocols::InteractionModel::Status':
   case 'chip::ClusterId':
   case 'chip::AttributeId':
   case 'chip::FieldId':
