@@ -220,25 +220,33 @@ void emAfPluginScenesServerPrintInfo(void)
 }
 
 bool emberAfScenesClusterAddSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          EndpointId endpoint, GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
-                                          uint8_t * sceneName, uint8_t * extensionFieldSets,
-                                          Commands::AddScene::DecodableType & commandData)
+                                          const Commands::AddScene::DecodableType & commandData)
 {
+    auto & groupId            = commandData.groupId;
+    auto & sceneId            = commandData.sceneId;
+    auto & transitionTime     = commandData.transitionTime;
+    auto & sceneName          = commandData.sceneName;
+    auto & extensionFieldSets = commandData.extensionFieldSets;
+
     return emberAfPluginScenesServerParseAddScene(commandObj, emberAfCurrentCommand(), groupId, sceneId, transitionTime, sceneName,
                                                   extensionFieldSets);
 }
 
 bool emberAfScenesClusterViewSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                           EndpointId endpoint, GroupId groupId, uint8_t sceneId,
-                                           Commands::ViewScene::DecodableType & commandData)
+                                           const Commands::ViewScene::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+    auto & sceneId = commandData.sceneId;
+
     return emberAfPluginScenesServerParseViewScene(commandObj, emberAfCurrentCommand(), groupId, sceneId);
 }
 
 bool emberAfScenesClusterRemoveSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                             EndpointId endpoint, GroupId groupId, uint8_t sceneId,
-                                             Commands::RemoveScene::DecodableType & commandData)
+                                             const Commands::RemoveScene::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+    auto & sceneId = commandData.sceneId;
+
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     CHIP_ERROR err       = CHIP_NO_ERROR;
 
@@ -292,9 +300,10 @@ exit:
 }
 
 bool emberAfScenesClusterRemoveAllScenesCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                 EndpointId endpoint, GroupId groupId,
-                                                 Commands::RemoveAllScenes::DecodableType & commandData)
+                                                 const Commands::RemoveAllScenes::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
     CHIP_ERROR err       = CHIP_NO_ERROR;
 
@@ -343,9 +352,11 @@ exit:
 }
 
 bool emberAfScenesClusterStoreSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                            EndpointId endpoint, GroupId groupId, uint8_t sceneId,
-                                            Commands::StoreScene::DecodableType & commandData)
+                                            const Commands::StoreScene::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+    auto & sceneId = commandData.sceneId;
+
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
     emberAfScenesClusterPrintln("RX: StoreScene 0x%2x, 0x%x", groupId, sceneId);
@@ -376,9 +387,12 @@ exit:
 }
 
 bool emberAfScenesClusterRecallSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                             EndpointId endpoint, GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
-                                             Commands::RecallScene::DecodableType & commandData)
+                                             const Commands::RecallScene::DecodableType & commandData)
 {
+    auto & groupId        = commandData.groupId;
+    auto & sceneId        = commandData.sceneId;
+    auto & transitionTime = commandData.transitionTime;
+
     // NOTE: TransitionTime field in the RecallScene command is currently
     // ignored. Per Zigbee Alliance ZCL 7 (07-5123-07):
     //
@@ -411,9 +425,10 @@ bool emberAfScenesClusterRecallSceneCallback(app::CommandHandler * commandObj, c
 }
 
 bool emberAfScenesClusterGetSceneMembershipCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                    EndpointId endpoint, GroupId groupId,
-                                                    Commands::GetSceneMembership::DecodableType & commandData)
+                                                    const Commands::GetSceneMembership::DecodableType & commandData)
 {
+    auto & groupId = commandData.groupId;
+
     CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     uint8_t sceneCount   = 0;

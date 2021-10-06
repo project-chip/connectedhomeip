@@ -299,11 +299,12 @@ static void sendDefaultResponse(EmberAfStatus status)
     }
 }
 
-bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(app::CommandHandler * commandObj,
-                                                                   const app::ConcreteCommandPath & commandPath,
-                                                                   EndpointId aEndpoint, uint8_t percentOpen,
-                                                                   Commands::BarrierControlGoToPercent::DecodableType & commandData)
+bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::BarrierControlGoToPercent::DecodableType & commandData)
 {
+    auto & percentOpen = commandData.percentOpen;
+
     EndpointId endpoint  = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -345,8 +346,8 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(app::CommandH
 }
 
 bool emberAfBarrierControlClusterBarrierControlStopCallback(app::CommandHandler * commandObj,
-                                                            const app::ConcreteCommandPath & commandPath, EndpointId aEndpoint,
-                                                            Commands::BarrierControlStop::DecodableType & commandData)
+                                                            const app::ConcreteCommandPath & commandPath,
+                                                            const Commands::BarrierControlStop::DecodableType & commandData)
 {
     EndpointId endpoint = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
     emberAfDeactivateServerTick(endpoint, BarrierControl::Id);

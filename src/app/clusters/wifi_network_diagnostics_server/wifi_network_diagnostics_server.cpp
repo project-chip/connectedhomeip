@@ -124,8 +124,8 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, AttributeV
 } // anonymous namespace
 
 bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
-                                                             const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                             Commands::ResetCounts::DecodableType & commandData)
+                                                             const app::ConcreteCommandPath & commandPath,
+                                                             const Commands::ResetCounts::DecodableType & commandData)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 

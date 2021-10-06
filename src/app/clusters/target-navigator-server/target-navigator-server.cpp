@@ -56,10 +56,12 @@ exit:
 }
 
 bool emberAfTargetNavigatorClusterNavigateTargetCallback(app::CommandHandler * command,
-                                                         const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                         uint8_t target, uint8_t * data,
-                                                         Commands::NavigateTarget::DecodableType & commandData)
+                                                         const app::ConcreteCommandPath & commandPath,
+                                                         const Commands::NavigateTarget::DecodableType & commandData)
 {
+    auto & target = commandData.target;
+    auto & data   = commandData.data;
+
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string dataString(reinterpret_cast<char *>(data));
     TargetNavigatorResponse response = targetNavigatorClusterNavigateTarget(target, dataString);

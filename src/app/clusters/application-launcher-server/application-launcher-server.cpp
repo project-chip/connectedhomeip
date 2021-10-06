@@ -73,10 +73,12 @@ exit:
 }
 
 bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                        EndpointId endpoint, uint8_t * requestData,
-                                                        uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId,
-                                                        Commands::LaunchApp::DecodableType & commandData)
+                                                        const Commands::LaunchApp::DecodableType & commandData)
 {
+    auto & requestData                       = commandData.requestData;
+    auto & requestApplicationCatalogVendorId = commandData.requestApplicationCatalogVendorId;
+    auto & requestApplicationId              = commandData.requestApplicationId;
+
     ::ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
     // TODO: Char is not null terminated, verify this code once #7963 gets merged.
     std::string reqestDataString(reinterpret_cast<char *>(requestData));

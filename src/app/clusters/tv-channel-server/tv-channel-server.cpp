@@ -74,9 +74,10 @@ exit:
 }
 
 bool emberAfTvChannelClusterChangeChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                  EndpointId endpoint, uint8_t * match,
-                                                  Commands::ChangeChannel::DecodableType & commandData)
+                                                  const Commands::ChangeChannel::DecodableType & commandData)
 {
+    auto & match = commandData.match;
+
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string matchString(reinterpret_cast<char *>(match));
     // TODO: Enable this once struct as param is supported
@@ -87,10 +88,12 @@ bool emberAfTvChannelClusterChangeChannelCallback(app::CommandHandler * command,
 }
 
 bool emberAfTvChannelClusterChangeChannelByNumberCallback(app::CommandHandler * command,
-                                                          const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                          uint16_t majorNumber, uint16_t minorNumber,
-                                                          Commands::ChangeChannelByNumber::DecodableType & commandData)
+                                                          const app::ConcreteCommandPath & commandPath,
+                                                          const Commands::ChangeChannelByNumber::DecodableType & commandData)
 {
+    auto & majorNumber = commandData.majorNumber;
+    auto & minorNumber = commandData.minorNumber;
+
     bool success         = tvChannelClusterChangeChannelByNumber(majorNumber, minorNumber);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
@@ -98,9 +101,10 @@ bool emberAfTvChannelClusterChangeChannelByNumberCallback(app::CommandHandler * 
 }
 
 bool emberAfTvChannelClusterSkipChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                EndpointId endpoint, uint16_t count,
-                                                Commands::SkipChannel::DecodableType & commandData)
+                                                const Commands::SkipChannel::DecodableType & commandData)
 {
+    auto & count = commandData.count;
+
     bool success         = tvChannelClusterSkipChannel(count);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);

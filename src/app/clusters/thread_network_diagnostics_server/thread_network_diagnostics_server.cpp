@@ -79,8 +79,8 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(ClusterInfo & aClusterInfo, Attribut
 } // anonymous namespace
 
 bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
-                                                               const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                               Commands::ResetCounts::DecodableType & commandData)
+                                                               const app::ConcreteCommandPath & commandPath,
+                                                               const Commands::ResetCounts::DecodableType & commandData)
 {
     EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::OverrunCount::Set(endpoint, 0);
     if (status != EMBER_ZCL_STATUS_SUCCESS)

@@ -71,12 +71,13 @@ bool SendStatusIfDelegateNull(EndpointId endpoint)
  * @param newVersion The SoftwareVersion value of the new Software Image that the client is ready to apply.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(app::CommandHandler * commandObj,
-                                                                       const app::ConcreteCommandPath & commandPath,
-                                                                       EndpointId endpoint, ByteSpan updateToken,
-                                                                       uint32_t newVersion,
-                                                                       Commands::ApplyUpdateRequest::DecodableType & commandData)
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::ApplyUpdateRequest::DecodableType & commandData)
 {
+    auto & updateToken = commandData.updateToken;
+    auto & newVersion  = commandData.newVersion;
+
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
@@ -111,12 +112,13 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(app::Comm
  *                       OTA Requestor's Basic Information Cluster.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(app::CommandHandler * commandObj,
-                                                                        const app::ConcreteCommandPath & commandPath,
-                                                                        EndpointId endpoint, chip::ByteSpan updateToken,
-                                                                        uint32_t softwareVersion,
-                                                                        Commands::NotifyUpdateApplied::DecodableType & commandData)
+bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::NotifyUpdateApplied::DecodableType & commandData)
 {
+    auto & updateToken     = commandData.updateToken;
+    auto & softwareVersion = commandData.softwareVersion;
+
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 

@@ -210,16 +210,17 @@ void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttr
 }
 
 bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                            EndpointId endpoint, uint16_t identifyTime,
-                                            Commands::Identify::DecodableType & commandData)
+                                            const Commands::Identify::DecodableType & commandData)
 {
+    auto & identifyTime = commandData.identifyTime;
+
     // cmd Identify
     return EMBER_SUCCESS ==
         emberAfSendImmediateDefaultResponse(Clusters::Identify::Attributes::IdentifyTime::Set(endpoint, identifyTime));
 }
 
 bool emberAfIdentifyClusterIdentifyQueryCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                 EndpointId endpoint, Commands::IdentifyQuery::DecodableType & commandData)
+                                                 const Commands::IdentifyQuery::DecodableType & commandData)
 {
     // cmd IdentifyQuery
     uint16_t identifyTime  = 0;
@@ -273,9 +274,11 @@ exit:
 }
 
 bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                 EndpointId endpoint, uint8_t effectIdentifier, uint8_t effectVariant,
-                                                 Commands::TriggerEffect::DecodableType & commandData)
+                                                 const Commands::TriggerEffect::DecodableType & commandData)
 {
+    auto & effectIdentifier = commandData.effectIdentifier;
+    auto & effectVariant    = commandData.effectVariant;
+
     // cmd TriggerEffect
     Identify * identify                      = inst(endpoint);
     uint16_t identifyTime                    = 0;

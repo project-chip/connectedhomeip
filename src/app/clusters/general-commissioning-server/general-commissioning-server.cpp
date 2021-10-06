@@ -33,20 +33,22 @@ using namespace chip;
 using namespace chip::app::Clusters::GeneralCommissioning;
 
 bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler * commandObj,
-                                                           const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                           uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs,
-                                                           Commands::ArmFailSafe::DecodableType & commandData)
+                                                           const app::ConcreteCommandPath & commandPath,
+                                                           const Commands::ArmFailSafe::DecodableType & commandData)
 {
+    auto & expiryLengthSeconds = commandData.expiryLengthSeconds;
+    auto & breadcrumb          = commandData.breadcrumb;
+    auto & timeoutMs           = commandData.timeoutMs;
+
     CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().ArmFailSafe(expiryLengthSeconds);
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(app::CommandHandler * commandObj,
-                                                                     const app::ConcreteCommandPath & commandPath,
-                                                                     EndpointId endpoint,
-                                                                     Commands::CommissioningComplete::DecodableType & commandData)
+bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::CommissioningComplete::DecodableType & commandData)
 {
     CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().CommissioningComplete();
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
@@ -56,10 +58,13 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(app::Comman
 
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandHandler * commandObj,
                                                                    const app::ConcreteCommandPath & commandPath,
-                                                                   EndpointId endpoint, uint8_t location, uint8_t * countryCode,
-                                                                   uint64_t breadcrumb, uint32_t timeoutMs,
-                                                                   Commands::SetRegulatoryConfig::DecodableType & commandData)
+                                                                   const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
+    auto & location    = commandData.location;
+    auto & countryCode = commandData.countryCode;
+    auto & breadcrumb  = commandData.breadcrumb;
+    auto & timeoutMs   = commandData.timeoutMs;
+
     CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().SetRegulatoryConfig(
         location, reinterpret_cast<const char *>(countryCode), breadcrumb);
 

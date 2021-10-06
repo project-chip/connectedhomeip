@@ -106,9 +106,11 @@ static void sendResponse(const char * responseName, ContentLaunchResponse launch
 }
 
 bool emberAfContentLauncherClusterLaunchContentCallback(
-    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    bool autoplay, unsigned char * data, chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
+    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
+    auto & autoplay = commandData.autoplay;
+    auto & data     = commandData.data;
 
     string dataString(reinterpret_cast<char *>(data));
     list<ContentLaunchParamater> parameterList;
@@ -118,10 +120,12 @@ bool emberAfContentLauncherClusterLaunchContentCallback(
 }
 
 bool emberAfContentLauncherClusterLaunchURLCallback(
-    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
-    unsigned char * contentUrl, unsigned char * displayString,
-    chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
+    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
+    auto & contentUrl    = commandData.contentUrl;
+    auto & displayString = commandData.displayString;
+
     string contentUrlString(reinterpret_cast<char *>(contentUrl));
     string displayStringString(reinterpret_cast<char *>(displayString));
     ContentLaunchBrandingInformation brandingInformation;
