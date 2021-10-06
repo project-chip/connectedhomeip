@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 
 project(chip_main)
 
-set(dir_chip "${sdk_root}/../connectedhomeip")
+set(dir_chip "${ameba_matter_root}")
 set(dir "${sdk_root}/component/common/api")
 set(chip_main chip_main)
 set(list_chip_main_sources chip_main_sources)
@@ -53,7 +53,7 @@ list(
 
     ${dir_chip}/src/app/clusters/on-off-server/on-off-server.cpp
     ${dir_chip}/src/app/clusters/level-control/level-control.cpp
-    ${dir_chip}/src/app/clusters/identify/identify.cpp
+    ${dir_chip}/src/app/clusters/identify-server/identify-server.cpp
     ${dir_chip}/src/app/clusters/barrier-control-server/barrier-control-server.cpp
     ${dir_chip}/src/app/clusters/groups-server/groups-server.cpp
     ${dir_chip}/src/app/clusters/color-control-server/color-control-server.cpp
@@ -136,9 +136,11 @@ target_include_directories(
 list(
     APPEND chip_main_flags
 
+    -DINET_CONFIG_ENABLE_IPV4=1
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DUSE_ZAP_CONFIG
+    -DCHIP_HAVE_CONFIG_H
 )
 
 list(
