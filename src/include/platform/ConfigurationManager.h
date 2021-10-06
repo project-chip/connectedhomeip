@@ -26,9 +26,9 @@
 
 #include <cstdint>
 
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/PersistedStorage.h>
-#include <lib/support/Span.h>
 
 namespace chip {
 namespace Ble {
