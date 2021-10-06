@@ -309,7 +309,7 @@
 /** @brief Command description for AddGroupResponse
  *
  * Command: AddGroupResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandGroupsClusterAddGroupResponse(status)                                                                    \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -349,7 +349,7 @@
 /** @brief Command description for ViewGroupResponse
  *
  * Command: ViewGroupResponse
- * @param status Status
+ * @param status ENUM8
  * @param groupId INT16U
  * @param groupName CHAR_STRING
  */
@@ -414,7 +414,7 @@
 /** @brief Command description for RemoveGroupResponse
  *
  * Command: RemoveGroupResponse
- * @param status Status
+ * @param status ENUM8
  * @param groupId INT16U
  */
 #define emberAfFillCommandGroupsClusterRemoveGroupResponse(status, groupId)                                                        \
@@ -455,7 +455,7 @@
 /** @brief Command description for AddSceneResponse
  *
  * Command: AddSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterAddSceneResponse(status)                                                                    \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -527,7 +527,7 @@
 /** @brief Command description for ViewSceneResponse
  *
  * Command: ViewSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterViewSceneResponse(status)                                                                   \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -574,7 +574,7 @@
 /** @brief Command description for RemoveSceneResponse
  *
  * Command: RemoveSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterRemoveSceneResponse(status)                                                                 \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -615,7 +615,7 @@
 /** @brief Command description for RemoveAllScenesResponse
  *
  * Command: RemoveAllScenesResponse
- * @param status Status
+ * @param status ENUM8
  * @param groupId INT16U
  */
 #define emberAfFillCommandScenesClusterRemoveAllScenesResponse(status, groupId)                                                    \
@@ -636,7 +636,7 @@
 /** @brief Command description for StoreSceneResponse
  *
  * Command: StoreSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterStoreSceneResponse(status)                                                                  \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -689,7 +689,7 @@
 /** @brief Command description for GetSceneMembershipResponse
  *
  * Command: GetSceneMembershipResponse
- * @param status Status
+ * @param status ENUM8
  * @param capacity INT8U
  * @param groupId INT16U
  * @param sceneCount INT8U
@@ -715,7 +715,7 @@
 /** @brief Command description for EnhancedAddSceneResponse
  *
  * Command: EnhancedAddSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterEnhancedAddSceneResponse(status)                                                            \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -787,7 +787,7 @@
 /** @brief Command description for EnhancedViewSceneResponse
  *
  * Command: EnhancedViewSceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterEnhancedViewSceneResponse(status)                                                           \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -834,7 +834,7 @@
 /** @brief Command description for CopySceneResponse
  *
  * Command: CopySceneResponse
- * @param status Status
+ * @param status ENUM8
  */
 #define emberAfFillCommandScenesClusterCopySceneResponse(status)                                                                   \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -1111,7 +1111,7 @@
 /** @brief Command description for GetAlarmResponse
  *
  * Command: GetAlarmResponse
- * @param status Status
+ * @param status ENUM8
  * @param alarmCode ENUM8
  * @param clusterId CLUSTER_ID
  * @param timeStamp epoch_s
