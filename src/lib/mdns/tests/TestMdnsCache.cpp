@@ -83,7 +83,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     }
 
     tMdnsCache.DumpCache();
-    sleep(ttl + 1);
+    usleep(static_cast<useconds_t>((ttl + 1) * 1000 * 1000));
     id   = 0x200;
     port = 3000;
     for (uint16_t i = 0; i < sizeOfCache; i++)

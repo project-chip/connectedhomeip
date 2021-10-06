@@ -26,6 +26,7 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
@@ -1479,3 +1480,5 @@ int TestReliableMessageProtocol()
 
     return (nlTestRunnerStats(&sSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestReliableMessageProtocol)

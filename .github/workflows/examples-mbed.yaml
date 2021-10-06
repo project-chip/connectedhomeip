@@ -82,6 +82,10 @@ jobs:
                     examples/lighting-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-lighting-app-example \
                     /tmp/bloat_reports/
 
+            - name: Build unit tests
+              timeout-minutes: 10
+              run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
+
             - name: Copy aside build products
               run: |
                   mkdir -p /tmp/output_binaries/$BUILD_TYPE-build
@@ -104,7 +108,7 @@ jobs:
               if: ${{ !env.ACT }}
               with:
                   name:
-                      ${{ env.BUILD_TYPE }}-binaries-${{env.APP_TARGET}}-${{ env.APP_PROFILE}}-build-${{
+                      ${{ env.BUILD_TYPE }}-binaries-${{ env.APP_TARGET }}-${{ env.APP_PROFILE }}-build-${{
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
 
