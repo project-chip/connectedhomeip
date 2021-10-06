@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 
 project(chip-gn)
 
-set(chip_dir "${sdk_root}/../connectedhomeip")
+set(chip_dir "${ameba_matter_root}")
 set(chip_dir_output "${chip_dir}/examples/all-clusters-app/ameba/build/chip")
 set(chip_c_flags "")
 set(chip_cpp_flags "")
