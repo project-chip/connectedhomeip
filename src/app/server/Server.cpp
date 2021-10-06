@@ -20,6 +20,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/Mdns.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
@@ -180,6 +181,24 @@ exit:
     }
     else
     {
+        DeviceLayer::ConfigurationMgr().LogDeviceConfig();
+#if CHIP_PROGRESS_LOGGING
+#if CONFIG_NETWORK_LAYER_BLE
+        chip::RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kBLE;
+#else // CONFIG_NETWORK_LAYER_BLE
+        chip::RendezvousInformationFlag rendezvousFlags = RendezvousInformationFlag::kOnNetwork;
+#endif // CONFIG_NETWORK_LAYER_BLE
+
+#ifdef CONFIG_RENDEZVOUS_MODE
+        rendezvousFlags = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+#endif
+        SetupPayload setupPayload;
+        // Failing to get a setup payload here should not be fatal.
+        CHIP_ERROR setupErr = GetSetupPayload(setupPayload, rendezvousFlags);
+        if (setupErr == CHIP_NO_ERROR) {
+            PrintOnboardingCodes(setupPayload);
+        }
+#endif // CHIP_PROGRESS_LOGGING
         ChipLogProgress(AppServer, "Server Listening...");
     }
     return err;
