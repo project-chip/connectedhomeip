@@ -17128,17 +17128,43 @@ bool emberAfTestClusterClusterTestSpecificCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
     chip::app::Clusters::TestCluster::Commands::TestSpecific::DecodableType & fields);
 /**
+ * @brief Test Cluster Cluster TestSimpleArgumentResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestSimpleArgumentResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                                 bool returnValue);
+/**
  * @brief Test Cluster Cluster TestUnknownCommand Command callback (from client)
  */
 bool emberAfTestClusterClusterTestUnknownCommandCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
     chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::DecodableType & fields);
 /**
+ * @brief Test Cluster Cluster TestStructArrayArgumentResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestStructArrayArgumentResponseCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, /* TYPE WARNING: array array defaults to */ uint8_t * arg1,
+    /* TYPE WARNING: array array defaults to */ uint8_t * arg2, /* TYPE WARNING: array array defaults to */ uint8_t * arg3,
+    /* TYPE WARNING: array array defaults to */ uint8_t * arg4, uint8_t arg5, bool arg6);
+/**
  * @brief Test Cluster Cluster TestAddArguments Command callback (from client)
  */
 bool emberAfTestClusterClusterTestAddArgumentsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
     uint8_t arg1, uint8_t arg2, chip::app::Clusters::TestCluster::Commands::TestAddArguments::DecodableType & fields);
+/**
+ * @brief Test Cluster Cluster TestSimpleArgumentRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestSimpleArgumentRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
+    bool arg1, chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentRequest::DecodableType & fields);
+/**
+ * @brief Test Cluster Cluster TestStructArrayArgumentRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestStructArrayArgumentRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, chip::EndpointId endpoint,
+    /* TYPE WARNING: array array defaults to */ uint8_t * arg1, /* TYPE WARNING: array array defaults to */ uint8_t * arg2,
+    /* TYPE WARNING: array array defaults to */ uint8_t * arg3, /* TYPE WARNING: array array defaults to */ uint8_t * arg4,
+    uint8_t arg5, bool arg6, chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentRequest::DecodableType & fields);
 /**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */

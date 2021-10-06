@@ -29,7 +29,7 @@ limitations under the License.
     <item name="ValueB" value="0x02"/>
     <item name="ValueC" value="0x03"/>
   </enum>
-  
+
   <struct name="SimpleStruct">
     <cluster code="0x050F"/>
     <item name="a" type="INT8U" optional="false"/>
@@ -111,48 +111,86 @@ limitations under the License.
     <!-- Test Commands -->
     <command source="client" code="0x00" name="Test" optional="false">
       <description>
-          Simple command without any parameters and without a specific response
+        Simple command without any parameters and without a specific response
       </description>
     </command>
 
     <command source="client" code="0x01" name="TestNotHandled" optional="false">
       <description>
-          Simple command without any parameters and without a specific response not handled by the server
+        Simple command without any parameters and without a specific response not handled by the server
       </description>
     </command>
 
     <command source="client" code="0x02" name="TestSpecific" optional="false">
       <description>
-          Simple command without any parameters and with a specific response
+        Simple command without any parameters and with a specific response
       </description>
     </command>
 
     <command source="client" code="0x03" name="TestUnknownCommand" optional="true">
       <description>
-          Simple command that should not be added to the server.
+        Simple command that should not be added to the server.
       </description>
     </command>
 
     <command source="client" code="0x04" name="TestAddArguments" optional="false">
       <description>
-          Command that takes two arguments and returns their sum.
+        Command that takes two arguments and returns their sum.
       </description>
       <arg name="arg1" type="INT8U"/>
       <arg name="arg2" type="INT8U"/>
     </command>
 
+    <command source="client" code="0x05" name="TestSimpleArgumentRequest" optional="false">
+      <description>
+        Command that takes an argument which is bool
+      </description>
+      <arg name="arg1" type="BOOLEAN"/>
+    </command>
+
+    <command source="client" code="0x06" name="TestStructArrayArgumentRequest" optional="false">
+      <description>
+        Command that takes various arguments that are arrays, including an array of structs which have a list member.
+      </description>
+      <arg name="arg1" type="NestedStructList" array="true"/>
+      <arg name="arg2" type="SimpleStruct" array="true"/>
+      <arg name="arg3" type="SimpleEnum" array="true"/>
+      <arg name="arg4" type="BOOLEAN" array="true"/>
+      <arg name="arg5" type="SimpleEnum"/>
+      <arg name="arg6" type="BOOLEAN"/>
+    </command>
+
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
       <description>
-          Simple response for TestWithResponse with a simple return value
+        Simple response for TestWithResponse with a simple return value
       </description>
       <arg name="returnValue" type="INT8U"/>
     </command>
 
     <command source="server" code="0x01" name="TestAddArgumentsResponse" optional="false" disableDefaultResponse="true">
       <description>
-          Response for TestAddArguments that returns the sum.
+        Response for TestAddArguments that returns the sum.
       </description>
       <arg name="returnValue" type="INT8U"/>
+    </command>
+
+    <command source="server" code="0x02" name="TestSimpleArgumentResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Simple response for TestSimpleArgumentRequest with a simple return value
+      </description>
+      <arg name="returnValue" type="BOOLEAN"/>
+    </command>
+
+    <command source="server" code="0x03" name="TestStructArrayArgumentResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Response for TestStructArrayArgumentRequest with complicated return arguments
+      </description>
+      <arg name="arg1" type="NestedStructList" array="true"/>
+      <arg name="arg2" type="SimpleStruct" array="true"/>
+      <arg name="arg3" type="SimpleEnum" array="true"/>
+      <arg name="arg4" type="BOOLEAN" array="true"/>
+      <arg name="arg5" type="SimpleEnum"/>
+      <arg name="arg6" type="BOOLEAN"/>
     </command>
 
   </cluster>

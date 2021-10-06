@@ -415,7 +415,7 @@ function zapTypeToClusterObjectType(type, isDecodable)
       case 'uint32_t':
       case 'int64_t':
       case 'uint64_t':
-        return basicType;
+        return zclType;
       default:
         if (isDecodable) {
           return type + '::DecodableType'
