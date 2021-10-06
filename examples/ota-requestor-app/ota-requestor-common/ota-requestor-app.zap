@@ -3581,7 +3581,7 @@
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 0,
       "profileId": 259,
-      "endpointId": 1,
+      "endpointId": 0,
       "networkId": 0,
       "endpointVersion": 1,
       "deviceIdentifier": 0
