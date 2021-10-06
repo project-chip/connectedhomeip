@@ -60,7 +60,7 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
     size_t highWatermarkHeapSize;
 
     qvCHIP_GetHeapStats(&freeHeapSize, &usedHeapSize, &highWatermarkHeapSize);
-    currentHeapFree     = static_cast<uint64_t>(freeHeapSize);
+    currentHeapFree = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
 }
 
