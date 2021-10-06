@@ -50,6 +50,76 @@ public:
     PairOnNetwork() : PairingCommand("onnetwork", PairingMode::OnNetwork, PairingNetworkType::None) {}
 };
 
+class PairOnNetworkShort : public PairingCommand
+{
+public:
+    PairOnNetworkShort() :
+        PairingCommand("onnetwork-short", PairingMode::OnNetwork, PairingNetworkType::None, chip::Mdns::DiscoveryFilterType::kShort)
+    {}
+};
+
+class PairOnNetworkLong : public PairingCommand
+{
+public:
+    PairOnNetworkLong() :
+        PairingCommand("onnetwork-long", PairingMode::OnNetwork, PairingNetworkType::None, chip::Mdns::DiscoveryFilterType::kLong)
+    {}
+};
+
+class PairOnNetworkVendor : public PairingCommand
+{
+public:
+    PairOnNetworkVendor() :
+        PairingCommand("onnetwork-vendor", PairingMode::OnNetwork, PairingNetworkType::None,
+                       chip::Mdns::DiscoveryFilterType::kVendor)
+    {}
+};
+
+class PairOnNetworkFabric : public PairingCommand
+{
+public:
+    PairOnNetworkFabric() :
+        PairingCommand("onnetwork-fabric", PairingMode::OnNetwork, PairingNetworkType::None,
+                       chip::Mdns::DiscoveryFilterType::kCompressedFabricId)
+    {}
+};
+
+class PairOnNetworkCommissioningMode : public PairingCommand
+{
+public:
+    PairOnNetworkCommissioningMode() :
+        PairingCommand("onnetwork-commissioning-mode", PairingMode::OnNetwork, PairingNetworkType::None,
+                       chip::Mdns::DiscoveryFilterType::kCommissioningMode)
+    {}
+};
+
+class PairOnNetworkCommissioner : public PairingCommand
+{
+public:
+    PairOnNetworkCommissioner() :
+        PairingCommand("onnetwork-commissioner", PairingMode::OnNetwork, PairingNetworkType::None,
+                       chip::Mdns::DiscoveryFilterType::kCommissioner)
+    {}
+};
+
+class PairOnNetworkDeviceType : public PairingCommand
+{
+public:
+    PairOnNetworkDeviceType() :
+        PairingCommand("onnetwork-device-type", PairingMode::OnNetwork, PairingNetworkType::None,
+                       chip::Mdns::DiscoveryFilterType::kDeviceType)
+    {}
+};
+
+class PairOnNetworkInstanceName : public PairingCommand
+{
+public:
+    PairOnNetworkInstanceName() :
+        PairingCommand("onnetwork-instance-name", PairingMode::OnNetwork, PairingNetworkType::None,
+                       chip::Mdns::DiscoveryFilterType::kInstanceName)
+    {}
+};
+
 class PairBleWiFi : public PairingCommand
 {
 public:
@@ -87,11 +157,24 @@ void registerCommandsPairing(Commands & commands)
     const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
-        make_unique<Unpair>(),        make_unique<PairBypass>(),
-        make_unique<PairQRCode>(),    make_unique<PairManualCode>(),
-        make_unique<PairBleWiFi>(),   make_unique<PairBleThread>(),
-        make_unique<PairSoftAP>(),    make_unique<Ethernet>(),
-        make_unique<PairOnNetwork>(), make_unique<OpenCommissioningWindow>(),
+        make_unique<Unpair>(),
+        make_unique<PairBypass>(),
+        make_unique<PairQRCode>(),
+        make_unique<PairManualCode>(),
+        make_unique<PairBleWiFi>(),
+        make_unique<PairBleThread>(),
+        make_unique<PairSoftAP>(),
+        make_unique<Ethernet>(),
+        make_unique<PairOnNetwork>(),
+        make_unique<PairOnNetworkShort>(),
+        make_unique<PairOnNetworkLong>(),
+        make_unique<PairOnNetworkVendor>(),
+        make_unique<PairOnNetworkCommissioningMode>(),
+        make_unique<PairOnNetworkCommissioner>(),
+        make_unique<PairOnNetworkDeviceType>(),
+        make_unique<PairOnNetworkDeviceType>(),
+        make_unique<PairOnNetworkInstanceName>(),
+        make_unique<OpenCommissioningWindow>(),
     };
 
     commands.Register(clusterName, clusterCommands);

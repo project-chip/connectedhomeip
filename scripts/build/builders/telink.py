@@ -52,10 +52,9 @@ class TelinkBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
-                 output_prefix: str,
                  app: TelinkApp = TelinkApp.LIGHT,
                  board: TelinkBoard = TelinkBoard.TLSR9518ADK80D):
-        super(TelinkBuilder, self).__init__(root, runner, output_prefix)
+        super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
 

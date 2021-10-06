@@ -135,9 +135,10 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     params.systemState->ExchangeMgr()->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    ReturnErrorOnFailure(Mdns::Resolver::Instance().SetResolverDelegate(this));
+    Mdns::Resolver::Instance().Init(params.systemState->InetLayer());
+    Mdns::Resolver::Instance().SetResolverDelegate(this);
     RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
-    Mdns::Resolver::Instance().StartResolver(params.systemState->InetLayer(), kMdnsPort);
+    RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     InitDataModelHandler(params.systemState->ExchangeMgr());
@@ -155,7 +156,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
 CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParams & params)
 {
-    Transport::FabricInfo newFabric;
+    FabricInfo newFabric;
 
     ReturnErrorCodeIf(params.ephemeralKeypair == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     newFabric.SetEphemeralKey(params.ephemeralKeypair);
@@ -187,7 +188,7 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     ReturnErrorOnFailure(newFabric.SetNOCCert(chipCertSpan));
     newFabric.SetVendorId(params.controllerVendorId);
 
-    Transport::FabricInfo * fabric = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
+    FabricInfo * fabric = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
@@ -216,7 +217,7 @@ CHIP_ERROR DeviceController::Shutdown()
     mState = State::NotInitialized;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    Mdns::Resolver::Instance().ShutdownResolver();
+    Mdns::Resolver::Instance().Shutdown();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     mStorageDelegate = nullptr;
@@ -230,6 +231,7 @@ CHIP_ERROR DeviceController::Shutdown()
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     Mdns::Resolver::Instance().SetResolverDelegate(nullptr);
     mDeviceAddressUpdateDelegate = nullptr;
+    mDeviceDiscoveryDelegate     = nullptr;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     return CHIP_NO_ERROR;
@@ -596,7 +598,7 @@ DeviceCommissioner::DeviceCommissioner() :
     mOnAttestationFailureCallback(OnAttestationFailureResponse, this), mOnCSRFailureCallback(OnCSRFailureResponse, this),
     mOnCertFailureCallback(OnAddNOCFailureResponse, this), mOnRootCertFailureCallback(OnRootCertFailureResponse, this),
     mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
-    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this)
+    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {
     mPairingDelegate      = nullptr;
     mDeviceBeingPaired    = kNumMaxActiveDevices;
@@ -618,7 +620,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     mPairingDelegate = params.pairingDelegate;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
-    mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
+    mUdcTransportMgr = chip::Platform::New<DeviceIPTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->InetLayer())
                                                     .SetAddressType(Inet::kIPAddressType_IPv6)
                                                     .SetListenPort((uint16_t)(mUdcListenPort))
@@ -628,10 +630,6 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
                                                     .SetAddressType(Inet::kIPAddressType_IPv4)
                                                     .SetListenPort((uint16_t)(mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
-#if CONFIG_NETWORK_LAYER_BLE
-                                                    ,
-                                                Transport::BleListenParameters(mSystemState->BleLayer())
-#endif // CONFIG_NETWORK_LAYER_BLE
                                                     ));
 
     mUdcServer = chip::Platform::New<UserDirectedCommissioningServer>();
@@ -640,6 +638,10 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     mUdcServer->SetInstanceNameResolver(this);
     mUdcServer->SetUserConfirmationProvider(this);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+#if CONFIG_NETWORK_LAYER_BLE
+    mSetUpCodePairer.SetBleLayer(mSystemState->BleLayer());
+#endif // CONFIG_NETWORK_LAYER_BLE
     return CHIP_NO_ERROR;
 }
 
@@ -672,6 +674,11 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode)
+{
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode);
+}
+
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params)
 {
     CHIP_ERROR err                     = CHIP_NO_ERROR;
@@ -683,7 +690,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     uint16_t keyID = 0;
 
-    Transport::FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
+    FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
 
     VerifyOrExit(IsOperationalNodeId(remoteDeviceId), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
@@ -770,7 +777,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     }
 #endif
     session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress());
-    VerifyOrExit(session.HasValue(), CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &mPairingSession);
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
@@ -1645,7 +1652,8 @@ void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNod
     {
         mUdcServer->OnCommissionableNodeFound(nodeData);
     }
-    return AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(nodeData);
+
+    AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(nodeData);
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

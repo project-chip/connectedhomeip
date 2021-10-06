@@ -274,7 +274,7 @@ void ChannelContext::EnterCasePairingState()
     ExchangeContext * ctxt = mExchangeManager->NewContext(session.Value(), prepare.mCasePairingSession);
     VerifyOrReturn(ctxt != nullptr);
 
-    Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
     VerifyOrReturn(fabric != nullptr);
     CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(addr, fabric, prepare.mBuilder.GetPeerNodeId(),
                                                                    mExchangeManager->GetNextKeyId(), ctxt, this);

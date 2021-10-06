@@ -379,6 +379,10 @@ public:
     EthernetNetworkDiagnosticsClusterTest() : EthernetNetworkDiagnosticsCluster() {}
     ~EthernetNetworkDiagnosticsClusterTest() {}
 
+    CHIP_ERROR WriteAttributePHYRate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint8_t value);
+    CHIP_ERROR WriteAttributeFullDuplex(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        bool value);
     CHIP_ERROR WriteAttributePacketRxCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                            uint64_t value);
     CHIP_ERROR WriteAttributePacketTxCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -389,6 +393,10 @@ public:
                                             uint64_t value);
     CHIP_ERROR WriteAttributeOverrunCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint64_t value);
+    CHIP_ERROR WriteAttributeCarrierDetect(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           bool value);
+    CHIP_ERROR WriteAttributeTimeSinceReset(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint64_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -475,6 +483,8 @@ public:
     IdentifyClusterTest() : IdentifyCluster() {}
     ~IdentifyClusterTest() {}
 
+    CHIP_ERROR WriteAttributeIdentifyType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -1013,6 +1023,22 @@ public:
     CHIP_ERROR WriteAttributeChannelNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                            uint16_t value);
     CHIP_ERROR WriteAttributeRssi(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int8_t value);
+    CHIP_ERROR WriteAttributeBeaconLostCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint32_t value);
+    CHIP_ERROR WriteAttributeBeaconRxCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint32_t value);
+    CHIP_ERROR WriteAttributePacketMulticastRxCount(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint32_t value);
+    CHIP_ERROR WriteAttributePacketMulticastTxCount(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint32_t value);
+    CHIP_ERROR WriteAttributePacketUnicastRxCount(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint32_t value);
+    CHIP_ERROR WriteAttributePacketUnicastTxCount(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint32_t value);
+    CHIP_ERROR WriteAttributeCurrentMaxRate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint64_t value);
+    CHIP_ERROR WriteAttributeOverrunCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint64_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

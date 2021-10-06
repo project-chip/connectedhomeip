@@ -1409,6 +1409,16 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x00000000: {
+                    "attributeName": "PHYRate",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000001: {
+                    "attributeName": "FullDuplex",
+                    "attributeId": 0x00000001,
+                    "type": "bool",
+                },
                 0x00000002: {
                     "attributeName": "PacketRxCount",
                     "attributeId": 0x00000002,
@@ -1432,6 +1442,16 @@ class ChipClusters:
                 0x00000006: {
                     "attributeName": "OverrunCount",
                     "attributeId": 0x00000006,
+                    "type": "int",
+                },
+                0x00000007: {
+                    "attributeName": "CarrierDetect",
+                    "attributeId": 0x00000007,
+                    "type": "bool",
+                },
+                0x00000008: {
+                    "attributeName": "TimeSinceReset",
+                    "attributeId": 0x00000008,
                     "type": "int",
                 },
                 0x0000FFFD: {
@@ -1676,6 +1696,14 @@ class ChipClusters:
                     "args": {
                     },
                 },
+            0x00000040: {
+                    "commandId": 0x00000040,
+                    "commandName": "TriggerEffect",
+                    "args": {
+                        "effectIdentifier": "int",
+                        "effectVariant": "int",
+                    },
+                },
             },
             "attributes": {
                 0x00000000: {
@@ -1683,6 +1711,11 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "int",
                     "writable": True,
+                },
+                0x00000001: {
+                    "attributeName": "IdentifyType",
+                    "attributeId": 0x00000001,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -2107,7 +2140,7 @@ class ChipClusters:
                     "commandName": "NotifyUpdateApplied",
                     "args": {
                         "updateToken": "bytes",
-                        "currentVersion": "int",
+                        "softwareVersion": "int",
                     },
                 },
             0x00000000: {
@@ -2116,9 +2149,8 @@ class ChipClusters:
                     "args": {
                         "vendorId": "int",
                         "productId": "int",
-                        "imageType": "int",
                         "hardwareVersion": "int",
-                        "currentVersion": "int",
+                        "softwareVersion": "int",
                         "protocolsSupported": "int",
                         "location": "str",
                         "requestorCanConsent": "bool",
@@ -2142,7 +2174,7 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "AnnounceOtaProvider",
                     "args": {
-                        "serverLocation": "bytes",
+                        "providerLocation": "bytes",
                         "vendorId": "int",
                         "announcementReason": "int",
                         "metadataForNode": "bytes",
@@ -3594,6 +3626,46 @@ class ChipClusters:
                     "attributeId": 0x00000004,
                     "type": "int",
                 },
+                0x00000005: {
+                    "attributeName": "BeaconLostCount",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                },
+                0x00000006: {
+                    "attributeName": "BeaconRxCount",
+                    "attributeId": 0x00000006,
+                    "type": "int",
+                },
+                0x00000007: {
+                    "attributeName": "PacketMulticastRxCount",
+                    "attributeId": 0x00000007,
+                    "type": "int",
+                },
+                0x00000008: {
+                    "attributeName": "PacketMulticastTxCount",
+                    "attributeId": 0x00000008,
+                    "type": "int",
+                },
+                0x00000009: {
+                    "attributeName": "PacketUnicastRxCount",
+                    "attributeId": 0x00000009,
+                    "type": "int",
+                },
+                0x0000000A: {
+                    "attributeName": "PacketUnicastTxCount",
+                    "attributeId": 0x0000000A,
+                    "type": "int",
+                },
+                0x0000000B: {
+                    "attributeName": "CurrentMaxRate",
+                    "attributeId": 0x0000000B,
+                    "type": "int",
+                },
+                0x0000000C: {
+                    "attributeName": "OverrunCount",
+                    "attributeId": 0x0000000C,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -4231,6 +4303,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery(
                 device, ZCLendpoint, ZCLgroupid
         )
+    def ClusterIdentify_CommandTriggerEffect(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, effectIdentifier: int, effectVariant: int):
+        return self._chipLib.chip_ime_AppendCommand_Identify_TriggerEffect(
+                device, ZCLendpoint, ZCLgroupid, effectIdentifier, effectVariant
+        )
     def ClusterKeypadInput_CommandSendKey(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, keyCode: int):
         return self._chipLib.chip_ime_AppendCommand_KeypadInput_SendKey(
                 device, ZCLendpoint, ZCLgroupid, keyCode
@@ -4372,18 +4448,18 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_ApplyUpdateRequest(
                 device, ZCLendpoint, ZCLgroupid, updateToken, len(updateToken), newVersion
         )
-    def ClusterOtaSoftwareUpdateProvider_CommandNotifyUpdateApplied(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, updateToken: bytes, currentVersion: int):
+    def ClusterOtaSoftwareUpdateProvider_CommandNotifyUpdateApplied(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, updateToken: bytes, softwareVersion: int):
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_NotifyUpdateApplied(
-                device, ZCLendpoint, ZCLgroupid, updateToken, len(updateToken), currentVersion
+                device, ZCLendpoint, ZCLgroupid, updateToken, len(updateToken), softwareVersion
         )
-    def ClusterOtaSoftwareUpdateProvider_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, imageType: int, hardwareVersion: int, currentVersion: int, protocolsSupported: int, location: bytes, requestorCanConsent: bool, metadataForProvider: bytes):
+    def ClusterOtaSoftwareUpdateProvider_CommandQueryImage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int, productId: int, hardwareVersion: int, softwareVersion: int, protocolsSupported: int, location: bytes, requestorCanConsent: bool, metadataForProvider: bytes):
         location = location.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
-                device, ZCLendpoint, ZCLgroupid, vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported, location, len(location), requestorCanConsent, metadataForProvider, len(metadataForProvider)
+                device, ZCLendpoint, ZCLgroupid, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported, location, len(location), requestorCanConsent, metadataForProvider, len(metadataForProvider)
         )
-    def ClusterOtaSoftwareUpdateRequestor_CommandAnnounceOtaProvider(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, serverLocation: bytes, vendorId: int, announcementReason: int, metadataForNode: bytes):
+    def ClusterOtaSoftwareUpdateRequestor_CommandAnnounceOtaProvider(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, providerLocation: bytes, vendorId: int, announcementReason: int, metadataForNode: bytes):
         return self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider(
-                device, ZCLendpoint, ZCLgroupid, serverLocation, len(serverLocation), vendorId, announcementReason, metadataForNode, len(metadataForNode)
+                device, ZCLendpoint, ZCLgroupid, providerLocation, len(providerLocation), vendorId, announcementReason, metadataForNode, len(metadataForNode)
         )
     def ClusterOnOff_CommandOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_Off(
@@ -4909,6 +4985,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMax(device, ZCLendpoint, ZCLgroupid)
     def ClusterElectricalMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterEthernetNetworkDiagnostics_ReadAttributePHYRate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PHYRate(device, ZCLendpoint, ZCLgroupid)
+    def ClusterEthernetNetworkDiagnostics_ReadAttributeFullDuplex(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FullDuplex(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributePacketRxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketRxCount(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributePacketTxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -4919,6 +4999,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_CollisionCount(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributeOverrunCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_OverrunCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterEthernetNetworkDiagnostics_ReadAttributeCarrierDetect(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_CarrierDetect(device, ZCLendpoint, ZCLgroupid)
+    def ClusterEthernetNetworkDiagnostics_ReadAttributeTimeSinceReset(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_TimeSinceReset(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterFixedLabel_ReadAttributeLabelList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -4967,6 +5051,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyTime(device, ZCLendpoint, ZCLgroupid)
     def ClusterIdentify_WriteAttributeIdentifyTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_Identify_IdentifyTime(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterIdentify_ReadAttributeIdentifyType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyType(device, ZCLendpoint, ZCLgroupid)
     def ClusterIdentify_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterKeypadInput_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -5485,6 +5571,22 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ChannelNumber(device, ZCLendpoint, ZCLgroupid)
     def ClusterWiFiNetworkDiagnostics_ReadAttributeRssi(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Rssi(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributeBeaconLostCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconLostCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributeBeaconRxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconRxCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributePacketMulticastRxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastRxCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributePacketMulticastTxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastTxCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributePacketUnicastRxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastRxCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributePacketUnicastTxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastTxCount(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributeCurrentMaxRate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_CurrentMaxRate(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWiFiNetworkDiagnostics_ReadAttributeOverrunCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_OverrunCount(device, ZCLendpoint, ZCLgroupid)
     def ClusterWiFiNetworkDiagnostics_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterWindowCovering_ReadAttributeType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -6245,6 +6347,12 @@ class ChipClusters:
         # Cluster EthernetNetworkDiagnostics Command ResetCounts
         self._chipLib.chip_ime_AppendCommand_EthernetNetworkDiagnostics_ResetCounts.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_EthernetNetworkDiagnostics_ResetCounts.restype = ctypes.c_uint32
+        # Cluster EthernetNetworkDiagnostics ReadAttribute PHYRate
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PHYRate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PHYRate.restype = ctypes.c_uint32
+        # Cluster EthernetNetworkDiagnostics ReadAttribute FullDuplex
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FullDuplex.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FullDuplex.restype = ctypes.c_uint32
         # Cluster EthernetNetworkDiagnostics ReadAttribute PacketRxCount
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketRxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketRxCount.restype = ctypes.c_uint32
@@ -6260,6 +6368,12 @@ class ChipClusters:
         # Cluster EthernetNetworkDiagnostics ReadAttribute OverrunCount
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_OverrunCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_OverrunCount.restype = ctypes.c_uint32
+        # Cluster EthernetNetworkDiagnostics ReadAttribute CarrierDetect
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_CarrierDetect.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_CarrierDetect.restype = ctypes.c_uint32
+        # Cluster EthernetNetworkDiagnostics ReadAttribute TimeSinceReset
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_TimeSinceReset.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_TimeSinceReset.restype = ctypes.c_uint32
         # Cluster EthernetNetworkDiagnostics ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision.restype = ctypes.c_uint32
@@ -6366,12 +6480,18 @@ class ChipClusters:
         # Cluster Identify Command IdentifyQuery
         self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery.restype = ctypes.c_uint32
+        # Cluster Identify Command TriggerEffect
+        self._chipLib.chip_ime_AppendCommand_Identify_TriggerEffect.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Identify_TriggerEffect.restype = ctypes.c_uint32
         # Cluster Identify ReadAttribute IdentifyTime
         self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyTime.restype = ctypes.c_uint32
         # Cluster Identify WriteAttribute IdentifyTime
         self._chipLib.chip_ime_WriteAttribute_Identify_IdentifyTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_WriteAttribute_Identify_IdentifyTime.restype = ctypes.c_uint32
+        # Cluster Identify ReadAttribute IdentifyType
+        self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyType.restype = ctypes.c_uint32
         # Cluster Identify ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision.restype = ctypes.c_uint32
@@ -6548,7 +6668,7 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_NotifyUpdateApplied.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_NotifyUpdateApplied.restype = ctypes.c_uint32
         # Cluster OtaSoftwareUpdateProvider Command QueryImage
-        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_bool, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_bool, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage.restype = ctypes.c_uint32
         # Cluster OtaSoftwareUpdateProvider ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -7405,6 +7525,30 @@ class ChipClusters:
         # Cluster WiFiNetworkDiagnostics ReadAttribute Rssi
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Rssi.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Rssi.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute BeaconLostCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconLostCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconLostCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute BeaconRxCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconRxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconRxCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute PacketMulticastRxCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastRxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastRxCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute PacketMulticastTxCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastTxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastTxCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute PacketUnicastRxCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastRxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastRxCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute PacketUnicastTxCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastTxCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastTxCount.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute CurrentMaxRate
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_CurrentMaxRate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_CurrentMaxRate.restype = ctypes.c_uint32
+        # Cluster WiFiNetworkDiagnostics ReadAttribute OverrunCount
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_OverrunCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_OverrunCount.restype = ctypes.c_uint32
         # Cluster WiFiNetworkDiagnostics ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ClusterRevision.restype = ctypes.c_uint32

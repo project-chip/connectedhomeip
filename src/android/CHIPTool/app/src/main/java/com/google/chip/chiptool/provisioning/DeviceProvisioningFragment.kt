@@ -143,28 +143,16 @@ class DeviceProvisioningFragment : Fragment() {
       Log.d(TAG, "onConnectDeviceComplete")
     }
 
-    /**
-     * This would only happen in the on-network case. In other cases, we need network commissioning
-     * first before this callback can be invoked, so we would use the callback implementation in
-     * EnterNetworkFragment.
-     */
-    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-      Log.d(TAG, "Commissioning complete for $nodeId with errorCode $errorCode")
-      FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
-        ?.onCommissioningComplete(0)
-    }
-
     override fun onStatusUpdate(status: Int) {
       Log.d(TAG, "Pairing status update: $status")
     }
 
     override fun onPairingComplete(code: Int) {
       Log.d(TAG, "onPairingComplete: $code")
-
-      // In IP commissioning, commissioning complete will already be called at this point, and the
-      // next fragment will be shown. As a result, this fragment will be in a destroyed state and
-      // should not be operated on.
+      
       if (deviceInfo.ipAddress != null) {
+        FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
+          ?.onCommissioningComplete(0)
         return
       }
 

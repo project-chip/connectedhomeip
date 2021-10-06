@@ -37,9 +37,12 @@ static_library("controller") {
     "CHIPDeviceControllerFactory.cpp",
     "CHIPDeviceControllerFactory.h",
     "DeviceAddressUpdateDelegate.h",
+    "DeviceDiscoveryDelegate.h",
     "EmptyDataModelHandler.cpp",
     "ExampleOperationalCredentialsIssuer.cpp",
     "ExampleOperationalCredentialsIssuer.h",
+    "SetUpCodePairer.cpp",
+    "SetUpCodePairer.h",
   ]
 
   cflags = [ "-Wconversion" ]

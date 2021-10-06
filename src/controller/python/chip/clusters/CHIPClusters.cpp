@@ -2712,6 +2712,26 @@ chip::ChipError::StorageType chip_ime_AppendCommand_EthernetNetworkDiagnostics_R
     return cluster.ResetCounts(nullptr, nullptr).AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PHYRate(chip::Controller::Device * device,
+                                                                                       chip::EndpointId ZCLendpointId,
+                                                                                       chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePHYRate(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_FullDuplex(chip::Controller::Device * device,
+                                                                                          chip::EndpointId ZCLendpointId,
+                                                                                          chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeFullDuplex(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketRxCount(chip::Controller::Device * device,
                                                                                              chip::EndpointId ZCLendpointId,
                                                                                              chip::GroupId /* ZCLgroupId */)
@@ -2760,6 +2780,26 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_O
     chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ReadAttributeOverrunCount(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_CarrierDetect(chip::Controller::Device * device,
+                                                                                             chip::EndpointId ZCLendpointId,
+                                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCarrierDetect(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_TimeSinceReset(chip::Controller::Device * device,
+                                                                                              chip::EndpointId ZCLendpointId,
+                                                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeTimeSinceReset(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision(chip::Controller::Device * device,
@@ -3116,6 +3156,15 @@ chip::ChipError::StorageType chip_ime_AppendCommand_Identify_IdentifyQuery(chip:
     cluster.Associate(device, ZCLendpointId);
     return cluster.IdentifyQuery(nullptr, nullptr).AsInteger();
 }
+chip::ChipError::StorageType chip_ime_AppendCommand_Identify_TriggerEffect(chip::Controller::Device * device,
+                                                                           chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                           uint8_t effectIdentifier, uint8_t effectVariant)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IdentifyCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TriggerEffect(nullptr, nullptr, effectIdentifier, effectVariant).AsInteger();
+}
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_Identify_IdentifyTime(chip::Controller::Device * device,
                                                                           chip::EndpointId ZCLendpointId,
@@ -3137,6 +3186,16 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_Identify_IdentifyTime(chip:
     return cluster.WriteAttributeIdentifyTime(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value)
         .AsInteger();
 }
+chip::ChipError::StorageType chip_ime_ReadAttribute_Identify_IdentifyType(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId,
+                                                                          chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::IdentifyCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeIdentifyType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_Identify_ClusterRevision(chip::Controller::Device * device,
                                                                              chip::EndpointId ZCLendpointId,
                                                                              chip::GroupId /* ZCLgroupId */)
@@ -3694,23 +3753,23 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_Ap
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_NotifyUpdateApplied(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * updateToken,
-    uint32_t updateToken_Len, uint32_t currentVersion)
+    uint32_t updateToken_Len, uint32_t softwareVersion)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.NotifyUpdateApplied(nullptr, nullptr, chip::ByteSpan(updateToken, updateToken_Len), currentVersion).AsInteger();
+    return cluster.NotifyUpdateApplied(nullptr, nullptr, chip::ByteSpan(updateToken, updateToken_Len), softwareVersion).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t vendorId, uint16_t productId,
-    uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion, uint8_t protocolsSupported, const uint8_t * location,
-    uint32_t location_Len, bool requestorCanConsent, const uint8_t * metadataForProvider, uint32_t metadataForProvider_Len)
+    uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported, const uint8_t * location, uint32_t location_Len,
+    bool requestorCanConsent, const uint8_t * metadataForProvider, uint32_t metadataForProvider_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .QueryImage(nullptr, nullptr, vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
+        .QueryImage(nullptr, nullptr, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
                     chip::ByteSpan(location, location_Len), requestorCanConsent,
                     chip::ByteSpan(metadataForProvider, metadataForProvider_Len))
         .AsInteger();
@@ -3730,15 +3789,15 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_Cl
 // Cluster OtaSoftwareUpdateRequestor
 
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateRequestor_AnnounceOtaProvider(
-    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * serverLocation,
-    uint32_t serverLocation_Len, uint16_t vendorId, uint8_t announcementReason, const uint8_t * metadataForNode,
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * providerLocation,
+    uint32_t providerLocation_Len, uint16_t vendorId, uint8_t announcementReason, const uint8_t * metadataForNode,
     uint32_t metadataForNode_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .AnnounceOtaProvider(nullptr, nullptr, chip::ByteSpan(serverLocation, serverLocation_Len), vendorId, announcementReason,
+        .AnnounceOtaProvider(nullptr, nullptr, chip::ByteSpan(providerLocation, providerLocation_Len), vendorId, announcementReason,
                              chip::ByteSpan(metadataForNode, metadataForNode_Len))
         .AsInteger();
 }
@@ -6600,6 +6659,90 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Rssi(
     chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.ReadAttributeRssi(gInt8sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconLostCount(chip::Controller::Device * device,
+                                                                                           chip::EndpointId ZCLendpointId,
+                                                                                           chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBeaconLostCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_BeaconRxCount(chip::Controller::Device * device,
+                                                                                         chip::EndpointId ZCLendpointId,
+                                                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeBeaconRxCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastRxCount(chip::Controller::Device * device,
+                                                                                                  chip::EndpointId ZCLendpointId,
+                                                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePacketMulticastRxCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketMulticastTxCount(chip::Controller::Device * device,
+                                                                                                  chip::EndpointId ZCLendpointId,
+                                                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePacketMulticastTxCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastRxCount(chip::Controller::Device * device,
+                                                                                                chip::EndpointId ZCLendpointId,
+                                                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePacketUnicastRxCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_PacketUnicastTxCount(chip::Controller::Device * device,
+                                                                                                chip::EndpointId ZCLendpointId,
+                                                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePacketUnicastTxCount(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_CurrentMaxRate(chip::Controller::Device * device,
+                                                                                          chip::EndpointId ZCLendpointId,
+                                                                                          chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCurrentMaxRate(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_OverrunCount(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOverrunCount(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_ClusterRevision(chip::Controller::Device * device,

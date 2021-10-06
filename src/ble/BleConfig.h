@@ -165,7 +165,7 @@
  *
  */
 #ifndef BLE_MAX_RECEIVE_WINDOW_SIZE
-#define BLE_MAX_RECEIVE_WINDOW_SIZE                            3
+#define BLE_MAX_RECEIVE_WINDOW_SIZE 6
 #endif
 
 #if (BLE_MAX_RECEIVE_WINDOW_SIZE < 3)
@@ -180,7 +180,7 @@
  *
  */
 #ifndef BLE_CONFIG_ERROR_MIN
-#define BLE_CONFIG_ERROR_MIN                               6000
+#define BLE_CONFIG_ERROR_MIN 6000
 #endif // BLE_CONFIG_ERROR_MIN
 
 /**
@@ -191,7 +191,7 @@
  *
  */
 #ifndef BLE_CONFIG_ERROR_MAX
-#define BLE_CONFIG_ERROR_MAX                               6999
+#define BLE_CONFIG_ERROR_MAX 6999
 #endif // BLE_CONFIG_ERROR_MAX
 
 /**
@@ -203,7 +203,7 @@
  *
  */
 #ifndef BLE_CONFIG_ERROR
-#define BLE_CONFIG_ERROR(e)                               (BLE_CONFIG_ERROR_MIN + (e))
+#define BLE_CONFIG_ERROR(e) (BLE_CONFIG_ERROR_MIN + (e))
 #endif // BLE_CONFIG_ERROR
 
 // clang-format on

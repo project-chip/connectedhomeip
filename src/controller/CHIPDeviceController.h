@@ -35,7 +35,7 @@
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/DeviceControllerInteractionModelDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
-#include <credentials/CHIPOperationalCredentials.h>
+#include <controller/SetUpCodePairer.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
@@ -63,6 +63,7 @@
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <controller/DeviceAddressUpdateDelegate.h>
+#include <controller/DeviceDiscoveryDelegate.h>
 #include <lib/mdns/Resolver.h>
 #endif
 
@@ -87,6 +88,7 @@ struct ControllerInitParams
     DeviceControllerSystemState * systemState   = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * deviceAddressUpdateDelegate = nullptr;
+    DeviceDiscoveryDelegate * deviceDiscoveryDelegate         = nullptr;
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
@@ -245,6 +247,7 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
+    void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
 #endif
 
     /**
@@ -307,7 +310,7 @@ protected:
 
     void PersistNextKeyId();
 
-    FabricIndex mFabricIndex = Transport::kMinValidFabricIndex;
+    FabricIndex mFabricIndex = kMinValidFabricIndex;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
@@ -377,6 +380,21 @@ public:
     CHIP_ERROR Shutdown() override;
 
     // ----- Connection Management -----
+    /**
+     * @brief
+     *   Pair a CHIP device with the provided code. The code can be either a QRCode
+     *   or a Manual Setup Code.
+     *   Use registered DevicePairingDelegate object to receive notifications on
+     *   pairing status updates.
+     *
+     *   Note: Pairing process requires that the caller has registered PersistentStorageDelegate
+     *         in the Init() call.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] setUpCode             The setup code for connecting to the device
+     */
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode);
+
     /**
      * @brief
      *   Pair a CHIP device with the provided Rendezvous connection parameters.
@@ -560,8 +578,8 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
-    DeviceTransportMgr * mUdcTransportMgr = nullptr;
-    uint16_t mUdcListenPort               = CHIP_UDC_PORT;
+    DeviceIPTransportMgr * mUdcTransportMgr = nullptr;
+    uint16_t mUdcListenPort                 = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void PersistDeviceList();
@@ -686,6 +704,7 @@ private:
     Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
+    SetUpCodePairer mSetUpCodePairer;
 
     PASESession mPairingSession;
 };

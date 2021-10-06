@@ -36,8 +36,8 @@ using System::PacketBufferHandle;
 
 namespace SecureMessageCodec {
 
-CHIP_ERROR Encode(Transport::SecureSession * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                  System::PacketBufferHandle & msgBuf, MessageCounter & counter)
+CHIP_ERROR Encrypt(Transport::SecureSession * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+                   System::PacketBufferHandle & msgBuf, MessageCounter & counter)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -72,8 +72,8 @@ CHIP_ERROR Encode(Transport::SecureSession * state, PayloadHeader & payloadHeade
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Decode(Transport::SecureSession * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
-                  System::PacketBufferHandle & msg)
+CHIP_ERROR Decrypt(Transport::SecureSession * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
+                   System::PacketBufferHandle & msg)
 {
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 

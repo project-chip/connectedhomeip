@@ -466,7 +466,7 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
 void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
 
 CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                               const app::AttributeValueEncoder & encoder)
+                                                                               app::AttributeValueEncoder & encoder)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

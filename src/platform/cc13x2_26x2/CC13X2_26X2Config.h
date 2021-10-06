@@ -63,10 +63,6 @@ public:
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
-    static const Key kConfigKey_OperationalDeviceId;
-    static const Key kConfigKey_OperationalDeviceCert;
-    static const Key kConfigKey_OperationalDeviceICACerts;
-    static const Key kConfigKey_OperationalDevicePrivateKey;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_Breadcrumb;

@@ -209,7 +209,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
-    mStartTimeMilliseconds = System::Clock::GetMonotonicMilliseconds();
+    mStartTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
 
 exit:
     return err;
@@ -295,7 +295,7 @@ CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
 
 CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
 {
-    uint64_t currentTimeMilliseconds = System::Clock::GetMonotonicMilliseconds();
+    uint64_t currentTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
 
     if (currentTimeMilliseconds >= mStartTimeMilliseconds)
     {

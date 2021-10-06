@@ -68,8 +68,8 @@ public:
      * @param role               Role of the new session (initiator or responder)
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
-                    const ByteSpan & salt, SessionInfoType infoType, SessionRole role);
+    CHIP_ERROR InitFromKeyPair(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
+                               const ByteSpan & salt, SessionInfoType infoType, SessionRole role);
 
     /**
      * @brief

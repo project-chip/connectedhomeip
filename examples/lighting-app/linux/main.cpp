@@ -51,7 +51,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
         return;
     }
 
-    if (attributeId != OnOff::Attributes::Ids::OnOff)
+    if (attributeId != OnOff::Attributes::OnOff::Id)
     {
         ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
         return;

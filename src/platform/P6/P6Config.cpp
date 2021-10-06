@@ -62,18 +62,14 @@ const P6Config::Key P6Config::kConfigKey_CountryCode         = { kConfigNamespac
 const P6Config::Key P6Config::kConfigKey_Breadcrumb          = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
 // Keys stored in the chip-config namespace
-const P6Config::Key P6Config::kConfigKey_FabricId                    = { kConfigNamespace_ChipConfig, "fabric-id" };
-const P6Config::Key P6Config::kConfigKey_ServiceConfig               = { kConfigNamespace_ChipConfig, "service-config" };
-const P6Config::Key P6Config::kConfigKey_PairedAccountId             = { kConfigNamespace_ChipConfig, "account-id" };
-const P6Config::Key P6Config::kConfigKey_ServiceId                   = { kConfigNamespace_ChipConfig, "service-id" };
-const P6Config::Key P6Config::kConfigKey_GroupKeyIndex               = { kConfigNamespace_ChipConfig, "group-key-index" };
-const P6Config::Key P6Config::kConfigKey_LastUsedEpochKeyId          = { kConfigNamespace_ChipConfig, "last-ek-id" };
-const P6Config::Key P6Config::kConfigKey_FailSafeArmed               = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const P6Config::Key P6Config::kConfigKey_WiFiStationSecType          = { kConfigNamespace_ChipConfig, "sta-sec-type" };
-const P6Config::Key P6Config::kConfigKey_OperationalDeviceId         = { kConfigNamespace_ChipConfig, "op-device-id" };
-const P6Config::Key P6Config::kConfigKey_OperationalDeviceCert       = { kConfigNamespace_ChipConfig, "op-device-cert" };
-const P6Config::Key P6Config::kConfigKey_OperationalDeviceICACerts   = { kConfigNamespace_ChipConfig, "op-device-ca-certs" };
-const P6Config::Key P6Config::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_ChipConfig, "op-device-key" };
+const P6Config::Key P6Config::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
+const P6Config::Key P6Config::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
+const P6Config::Key P6Config::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
+const P6Config::Key P6Config::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
+const P6Config::Key P6Config::kConfigKey_GroupKeyIndex      = { kConfigNamespace_ChipConfig, "group-key-index" };
+const P6Config::Key P6Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
+const P6Config::Key P6Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
+const P6Config::Key P6Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 
 // Prefix used for keys that contain Chip group encryption keys.
 const char P6Config::kGroupKeyNamePrefix[] = "gk-";
@@ -208,18 +204,9 @@ bool P6Config::ConfigValueExists(Key key)
 // Clear out keys in config namespace
 CHIP_ERROR P6Config::FactoryResetConfig(void)
 {
-    const Key * config_keys[] = { &kConfigKey_FabricId,
-                                  &kConfigKey_ServiceConfig,
-                                  &kConfigKey_PairedAccountId,
-                                  &kConfigKey_ServiceId,
-                                  &kConfigKey_GroupKeyIndex,
-                                  &kConfigKey_LastUsedEpochKeyId,
-                                  &kConfigKey_FailSafeArmed,
-                                  &kConfigKey_WiFiStationSecType,
-                                  &kConfigKey_OperationalDeviceId,
-                                  &kConfigKey_OperationalDeviceCert,
-                                  &kConfigKey_OperationalDeviceICACerts,
-                                  &kConfigKey_OperationalDevicePrivateKey };
+    const Key * config_keys[] = { &kConfigKey_FabricId,      &kConfigKey_ServiceConfig,     &kConfigKey_PairedAccountId,
+                                  &kConfigKey_ServiceId,     &kConfigKey_GroupKeyIndex,     &kConfigKey_LastUsedEpochKeyId,
+                                  &kConfigKey_FailSafeArmed, &kConfigKey_WiFiStationSecType };
 
     for (uint32_t i = 0; i < (sizeof(config_keys) / sizeof(config_keys[0])); i++)
     {

@@ -234,8 +234,7 @@ CHIP_ERROR CASESession::Init(uint16_t localSessionId, SessionEstablishmentDelega
 }
 
 CHIP_ERROR
-CASESession::ListenForSessionEstablishment(uint16_t localSessionId, Transport::FabricTable * fabrics,
-                                           SessionEstablishmentDelegate * delegate)
+CASESession::ListenForSessionEstablishment(uint16_t localSessionId, FabricTable * fabrics, SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(Init(localSessionId, delegate));
@@ -249,8 +248,8 @@ CASESession::ListenForSessionEstablishment(uint16_t localSessionId, Transport::F
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress, Transport::FabricInfo * fabric,
-                                         NodeId peerNodeId, uint16_t localSessionId, ExchangeContext * exchangeCtxt,
+CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId,
+                                         uint16_t localSessionId, ExchangeContext * exchangeCtxt,
                                          SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -356,7 +355,7 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), ByteSpan(mInitiatorRandom)));
     // Retrieve Session Identifier
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId(), true));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId()));
     // Generate a Destination Identifier
     {
         MutableByteSpan destinationIdSpan(destinationIdentifier);
@@ -431,7 +430,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     ByteSpan initiatorPubKey;
 
     const ByteSpan * ipkListSpan = GetIPKList();
-    FabricIndex fabricIndex      = Transport::kUndefinedFabricIndex;
+    FabricIndex fabricIndex      = kUndefinedFabricIndex;
 
     SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ msg->Start(), msg->DataLength() }));
 
@@ -463,7 +462,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     fabricIndex =
         mFabricsTable->FindDestinationIDCandidate(destinationIdentifier, initiatorRandom, ipkListSpan, GetIPKListEntries());
-    VerifyOrExit(fabricIndex != Transport::kUndefinedFabricIndex, err = CHIP_ERROR_KEY_NOT_FOUND);
+    VerifyOrExit(fabricIndex != kUndefinedFabricIndex, err = CHIP_ERROR_KEY_NOT_FOUND);
 
     mFabricInfo = mFabricsTable->FindFabricWithIndex(fabricIndex);
     VerifyOrExit(mFabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -518,7 +517,7 @@ CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
 
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), resumeMICSpan));
 
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId(), true));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId()));
 
     // TODO: Add support for optional MRP parameters
 
@@ -641,7 +640,7 @@ CHIP_ERROR CASESession::SendSigma2()
     tlvWriterMsg2.Init(std::move(msg_R2));
     ReturnErrorOnFailure(tlvWriterMsg2.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(TLV::ContextTag(1), &msg_rand[0], sizeof(msg_rand)));
-    ReturnErrorOnFailure(tlvWriterMsg2.Put(TLV::ContextTag(2), GetLocalSessionId(), true));
+    ReturnErrorOnFailure(tlvWriterMsg2.Put(TLV::ContextTag(2), GetLocalSessionId()));
     ReturnErrorOnFailure(
         tlvWriterMsg2.PutBytes(TLV::ContextTag(3), mEphemeralKey.Pubkey(), static_cast<uint32_t>(mEphemeralKey.Pubkey().Length())));
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(TLV::ContextTag(4), msg_R2_Encrypted.Get(),
@@ -686,12 +685,12 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    VerifyOrExit(tlvReader.GetLength() == kCASEResumptionIDSize, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrExit(tlvReader.GetLength() == kCASEResumptionIDSize, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(mResumptionId, kCASEResumptionIDSize));
 
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    VerifyOrExit(tlvReader.GetLength() == kTAGSize, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrExit(tlvReader.GetLength() == kTAGSize, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
     SuccessOrExit(err = tlvReader.GetBytes(sigma2ResumeMIC, kTAGSize));
 
     SuccessOrExit(err = ValidateSigmaResumeMIC(ByteSpan(sigma2ResumeMIC), ByteSpan(mInitiatorRandom), ByteSpan(mResumptionId),

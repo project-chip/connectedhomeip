@@ -68,20 +68,15 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_SetupPinCode        = { kConf
 const AndroidConfig::Key AndroidConfig::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
 
 // Keys stored in the Chip-config namespace
-const AndroidConfig::Key AndroidConfig::kConfigKey_FabricId                    = { kConfigNamespace_ChipConfig, "fabric-id" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_ServiceConfig               = { kConfigNamespace_ChipConfig, "service-config" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_PairedAccountId             = { kConfigNamespace_ChipConfig, "account-id" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_ServiceId                   = { kConfigNamespace_ChipConfig, "service-id" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_FabricSecret                = { kConfigNamespace_ChipConfig, "fabric-secret" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_GroupKeyIndex               = { kConfigNamespace_ChipConfig, "group-key-index" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_LastUsedEpochKeyId          = { kConfigNamespace_ChipConfig, "last-ek-id" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_FailSafeArmed               = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_WiFiStationSecType          = { kConfigNamespace_ChipConfig, "sta-sec-type" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_OperationalDeviceId         = { kConfigNamespace_ChipConfig, "op-device-id" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_OperationalDeviceCert       = { kConfigNamespace_ChipConfig, "op-device-cert" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_OperationalDeviceICACerts   = { kConfigNamespace_ChipConfig,
-                                                                                 "op-device-ca-certs" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_ChipConfig, "op-device-key" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_FabricSecret       = { kConfigNamespace_ChipConfig, "fabric-secret" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_GroupKeyIndex      = { kConfigNamespace_ChipConfig, "group-key-index" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
@@ -191,6 +186,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, uint32_t & val)
 
 CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, uint64_t & val)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gReadConfigValueLongMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -216,6 +212,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValue(Key key, uint64_t & val)
 
 CHIP_ERROR AndroidConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gReadConfigValueStrMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -244,6 +241,7 @@ CHIP_ERROR AndroidConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize
 
 CHIP_ERROR AndroidConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gReadConfigValueBinMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -290,6 +288,7 @@ CHIP_ERROR AndroidConfig::WriteConfigValue(Key key, uint32_t val)
 
 CHIP_ERROR AndroidConfig::WriteConfigValue(Key key, uint64_t val)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gWriteConfigValueLongMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -314,6 +313,7 @@ CHIP_ERROR AndroidConfig::WriteConfigValue(Key key, uint64_t val)
 
 CHIP_ERROR AndroidConfig::WriteConfigValueStr(Key key, const char * str)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gWriteConfigValueStrMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -363,6 +363,7 @@ exit:
 
 CHIP_ERROR AndroidConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gWriteConfigValueBinMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -387,6 +388,7 @@ CHIP_ERROR AndroidConfig::WriteConfigValueBin(Key key, const uint8_t * data, siz
 
 CHIP_ERROR AndroidConfig::ClearConfigValue(Key key)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(gClearConfigValueMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -410,6 +412,7 @@ CHIP_ERROR AndroidConfig::ClearConfigValue(Key key)
 
 bool AndroidConfig::ConfigValueExists(Key key)
 {
+    chip::DeviceLayer::StackUnlock unlock;
     ReturnErrorCodeIf(gAndroidConfigObject == nullptr, false);
     ReturnErrorCodeIf(gConfigValueExistsMethod == nullptr, false);
 

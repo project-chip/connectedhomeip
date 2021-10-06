@@ -37,7 +37,6 @@ using namespace chip::Transport;
 using namespace chip::Controller;
 using namespace chip::Messaging;
 
-#if INET_CONFIG_ENABLE_IPV4
 namespace {
 
 using TestTransportMgr = TransportMgr<Transport::UDP>;
@@ -62,7 +61,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     systemLayer.Init();
     inetLayer.Init(systemLayer, nullptr);
     transportMgr.Init(
-        UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPAddressType_IPv4).SetListenPort(CHIP_PORT)
+        UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPAddressType_IPv6).SetListenPort(CHIP_PORT)
 #if INET_CONFIG_ENABLE_IPV4
             ,
         UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(CHIP_PORT)
@@ -72,7 +71,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
         BleListenParameters(&blelayer)
 #endif
     );
-    sessionManager.Init(&systemLayer, &transportMgr, fabrics, &messageCounterManager);
+    sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager);
     exchangeMgr.Init(&sessionManager);
     messageCounterManager.Init(&exchangeMgr);
 
@@ -89,7 +88,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     NodeId mockNodeId           = 1;
     FabricIndex mockFabricIndex = 1;
     Inet::IPAddress mockAddr;
-    Inet::IPAddress::FromString("127.0.0.1", mockAddr);
+    Inet::IPAddress::FromString("::1", mockAddr);
     PeerAddress addr = PeerAddress::UDP(mockAddr, CHIP_PORT);
     device.Init(params, mockNodeId, addr, mockFabricIndex);
 
@@ -125,5 +124,3 @@ int TestDevice()
 }
 
 CHIP_REGISTER_TEST_SUITE(TestDevice)
-
-#endif // INET_CONFIG_ENABLE_IPV4
