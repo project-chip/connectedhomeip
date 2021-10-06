@@ -160,10 +160,14 @@ class BaseTestHelper:
         self.logger.info(
             "Send EnableNetwork command to device {}".format(nodeid))
         try:
-            self.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", nodeid, endpoint, group, {
+            err, resp = self.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", nodeid, endpoint, group, {
                 "networkID": bytes.fromhex(network_id),
                 "breadcrumb": 0,
                 "timeoutMs": 1000}, blocking=True)
+            if err != 0 or resp is None or resp.ProtocolCode != 0:
+                self.logger.error(
+                    "failed to send enable network: error is {} with im response{}".format(err, resp))
+                return False
         except Exception as ex:
             self.logger.exception("Failed to send EnableNetwork command")
             return False
