@@ -56,10 +56,12 @@ class AmebaBuilder(Builder):
 
     def generate(self):
         cmd = '$AMEBA_BUILD/build.sh ninja %s' % (self.identifier)
-        self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
+        self._Execute(['bash', '-c', cmd],
+                      title='Generating ' + self.identifier)
 
     def _build(self):
-        self._Execute(['ninja', '-C', self.output_dir], title='Building ' + self.identifier)
+        self._Execute(['ninja', '-C', self.output_dir],
+                      title='Building ' + self.identifier)
         cmd = '''
             cp $AMEBA_BUILD/project_lp/asdk/image/km0_boot_all.bin %s/out/%s/asdk/image/km0_boot_all.bin
             cp $AMEBA_BUILD/project_hp/asdk/image/km4_boot_all.bin %s/out/%s/asdk/image/km4_boot_all.bin
