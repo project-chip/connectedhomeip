@@ -62,12 +62,11 @@ public class ChipClusters {
   }
 
   public static Map<String, Class> getClusterMapping() {
-    Map<String, Class> clusterMap;
+    Map<String, Class> clusterMap = new HashMap<>();
     {{#chip_client_clusters}}
-      clusterMap.put("{{asUpperCamelCase name}}", {{asUpperCamelCase name}}Cluster.getClass());
+      clusterMap.put("{{asUpperCamelCase name}}", {{asUpperCamelCase name}}Cluster.class);
     {{/chip_client_clusters}}
     return clusterMap;
-    }
   }
 
   {{#chip_client_clusters}}
