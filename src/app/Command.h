@@ -55,11 +55,11 @@ public:
 
     enum class CommandState
     {
-        Idle,                   ///< Default state that the object starts out in, where no work has commenced
-        AddingCommand,          ///< In the process of adding a command.
-        AddedCommand,           ///< A command has been completely encoded and is awaiting transmission.
-        CommandSent,            ///< The command has been sent successfully.
-        AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
+        Idle,                ///< Default state that the object starts out in, where no work has commenced
+        AddingCommand,       ///< In the process of adding a command.
+        AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
+        CommandSent,         ///< The command has been sent successfully.
+        AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
     Command(Messaging::ExchangeManager * apExchangeMgr);
@@ -131,7 +131,7 @@ private:
 
     friend class TestCommandInteraction;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
-    bool mBuffersAllocated = false;
+    bool mBuffersAllocated                 = false;
 };
 } // namespace app
 } // namespace chip

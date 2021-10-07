@@ -61,6 +61,7 @@ public:
     CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
                              const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
                              const Protocols::InteractionModel::Status aStatus) override;
+
 private:
     //
     // Called internally to signal the completion of all work on this object, gracefully close the
@@ -73,7 +74,7 @@ private:
     CHIP_ERROR SendCommandResponse();
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 
-    Callback *mpCallback = nullptr;
+    Callback * mpCallback = nullptr;
 };
 } // namespace app
 } // namespace chip

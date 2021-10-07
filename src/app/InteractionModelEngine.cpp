@@ -61,7 +61,7 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
 void InteractionModelEngine::Shutdown()
 {
-    mCommandHandlerObjs.ForEachActiveObject([] (CommandHandler *obj) -> bool {
+    mCommandHandlerObjs.ForEachActiveObject([](CommandHandler * obj) -> bool {
         obj->~CommandHandler();
         return true;
     });
@@ -169,7 +169,7 @@ CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext *
     return err;
 }
 
-void InteractionModelEngine::OnDone(CommandHandler *apCommandObj)
+void InteractionModelEngine::OnDone(CommandHandler * apCommandObj)
 {
     mCommandHandlerObjs.ReleaseObject(apCommandObj);
 }
@@ -178,11 +178,13 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
                                                           const PayloadHeader & aPayloadHeader,
                                                           System::PacketBufferHandle && aPayload)
 {
-    CommandHandler *commandHandler = mCommandHandlerObjs.CreateObject(mpExchangeMgr, this);
-    if (commandHandler) {
+    CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(mpExchangeMgr, this);
+    if (commandHandler)
+    {
         return commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
-    else {
+    else
+    {
         apExchangeContext->Abort();
         return CHIP_NO_ERROR;
     }

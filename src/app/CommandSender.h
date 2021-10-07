@@ -77,8 +77,8 @@ public:
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
          * - CHIP_ERROR_IM: An invoke response containing a status code denoting an error was received.
-         *                  When the protocol ID in the received status is IM, aInteractionModelStatus will contain the IM status code.
-         *                  Otherwise, aInteractionModelStatus will always be set to IM::Status::Failure.
+         *                  When the protocol ID in the received status is IM, aInteractionModelStatus will contain the IM status
+         * code. Otherwise, aInteractionModelStatus will always be set to IM::Status::Failure.
          * - CHIP_ERROR*: All other cases.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait till it receives

@@ -36,10 +36,9 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 
-CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr)
-    : Command(apExchangeMgr), mpCallback(apCallback)
-{
-}
+CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr) :
+    Command(apExchangeMgr), mpCallback(apCallback)
+{}
 
 CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
                                              uint32_t timeout)
@@ -112,7 +111,8 @@ void CommandSender::Close()
 
     Command::Close();
 
-    if (mpCallback) {
+    if (mpCallback)
+    {
         mpCallback->OnDone(this);
     }
 }
@@ -147,13 +147,14 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         else if (CHIP_END_OF_TLV == err)
         {
             hasDataResponse = true;
-            err                        = aCommandElement.GetData(&commandDataReader);
+            err             = aCommandElement.GetData(&commandDataReader);
         }
         SuccessOrExit(err);
 
         if (mpCallback != nullptr)
         {
-            if (statusElement.protocolId == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm()) {
+            if (statusElement.protocolId == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm())
+            {
                 if (statusElement.protocolCode == to_underlying(Protocols::InteractionModel::Status::Success))
                 {
                     mpCallback->OnResponse(this, commandPath, hasDataResponse ? &commandDataReader : nullptr);
@@ -164,7 +165,8 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
                                         CHIP_ERROR_IM);
                 }
             }
-            else {
+            else
+            {
                 mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, CHIP_ERROR_IM);
             }
         }

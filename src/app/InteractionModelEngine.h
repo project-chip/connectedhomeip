@@ -148,7 +148,7 @@ private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
 
-    void OnDone(CommandHandler *apCommandObj);
+    void OnDone(CommandHandler * apCommandObj);
 
     CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                 System::PacketBufferHandle && aPayload);

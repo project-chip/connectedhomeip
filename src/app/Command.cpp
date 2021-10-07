@@ -43,7 +43,8 @@ CHIP_ERROR Command::AllocateBuffers()
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandList::Builder commandListBuilder;
 
-    if (!mBuffersAllocated) {
+    if (!mBuffersAllocated)
+    {
         mCommandMessageWriter.Reset();
 
         System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
@@ -148,10 +149,12 @@ exit:
 
 TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
 {
-    if (mState != CommandState::AddingCommand) {
-       return nullptr;
+    if (mState != CommandState::AddingCommand)
+    {
+        return nullptr;
     }
-    else {
+    else
+    {
         return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().GetWriter();
     }
 }

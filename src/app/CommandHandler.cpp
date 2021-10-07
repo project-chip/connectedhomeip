@@ -36,10 +36,9 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 
-CommandHandler::CommandHandler(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback)
-    : Command(apExchangeMgr), mpCallback(apCallback)
-{
-}
+CommandHandler::CommandHandler(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback) :
+    Command(apExchangeMgr), mpCallback(apCallback)
+{}
 
 CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                                   System::PacketBufferHandle && payload)
@@ -71,7 +70,8 @@ void CommandHandler::Close()
 
     Command::Close();
 
-    if (mpCallback) {
+    if (mpCallback)
+    {
         mpCallback->OnDone(this);
     }
 }
@@ -84,7 +84,8 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(Finalize(commandPacket));
-    ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket)));
+    ReturnErrorOnFailure(
+        mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket)));
 
     MoveToState(CommandState::CommandSent);
 

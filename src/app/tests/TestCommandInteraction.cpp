@@ -91,7 +91,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
                   "Received Cluster Command: Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " Endpoint=%" PRIx16,
                   ChipLogValueMEI(aClusterId), ChipLogValueMEI(aCommandId), aEndPointId);
 
-    if (sendResponse) {
+    if (sendResponse)
+    {
         if (aCommandId == kTestCommandId)
         {
             apCommandObj->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
@@ -151,9 +152,7 @@ public:
 class MockCommandHandlerCallback : public CommandHandler::Callback
 {
 public:
-    void OnDone(chip::app::CommandHandler * apCommandHandler) final {
-        onFinalCalledTimes++;
-    }
+    void OnDone(chip::app::CommandHandler * apCommandHandler) final { onFinalCalledTimes++; }
 
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;
@@ -185,7 +184,10 @@ public:
 
     static void TestCommandSenderAbruptDestruction(nlTestSuite * apSuite, void * apContext);
 
-    static size_t GetNumActiveHandlerObjects() { return chip::app::InteractionModelEngine::GetInstance()->mCommandHandlerObjs.Allocated(); }
+    static size_t GetNumActiveHandlerObjects()
+    {
+        return chip::app::InteractionModelEngine::GetInstance()->mCommandHandlerObjs.Allocated();
+    }
 
 private:
     static void GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
@@ -301,7 +303,6 @@ void TestCommandInteraction::TestCommandSenderWithWrongState(nlTestSuite * apSui
 
     err = commandSender.SendCommandRequest(kTestDeviceNodeId, gFabricIndex, Optional<SessionHandle>::Missing());
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
-
 }
 
 void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSuite, void * apContext)
@@ -545,7 +546,7 @@ void TestCommandInteraction::TestCommandSenderAbruptDestruction(nlTestSuite * ap
         //
         NL_TEST_ASSERT(apSuite,
                        mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 0 &&
-                       mockCommandSenderDelegate.onErrorCalledTimes == 0);
+                           mockCommandSenderDelegate.onErrorCalledTimes == 0);
 
         NL_TEST_ASSERT(apSuite, gExchangeManager->GetNumActiveExchanges() == 1);
     }
@@ -557,7 +558,6 @@ void TestCommandInteraction::TestCommandSenderAbruptDestruction(nlTestSuite * ap
 
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
 }
-
 
 } // namespace app
 } // namespace chip

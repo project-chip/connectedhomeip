@@ -102,7 +102,8 @@ public:
      */
     ExchangeContext * NewContext(SessionHandle session, ExchangeDelegate * delegate);
 
-    void ReleaseContext(ExchangeContext * ec) {
+    void ReleaseContext(ExchangeContext * ec)
+    {
         mExchgCount--;
         printf("--EC = %d\n", mExchgCount);
         mContextPool.ReleaseObject(ec);
