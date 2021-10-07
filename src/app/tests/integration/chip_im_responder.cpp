@@ -105,9 +105,9 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
                                           CommandSender * apCommandObj)
 {
     // Nothing todo.
-    (void)aCommandPath;
-    (void)aReader;
-    (void)apCommandObj;
+    (void) aCommandPath;
+    (void) aReader;
+    (void) apCommandObj;
 }
 
 CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
