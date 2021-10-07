@@ -47,11 +47,11 @@ class MultiAdminClientFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
-    // TODO: use the fabric ID that was used to commission the device
-    val testFabricId = "5544332211"
+    // TODO: use the discriminator and setupPinCode that was used to commission the device
     val testDiscriminator = "3840"
     val testSetupPinCode = 20202021L
-    multiAdminClusterFabricIdEd.setText(testFabricId)
+    val compressedFabricId = deviceController.compressedFabricId
+    multiAdminClusterFabricIdEd.setText(compressedFabricId.toULong().toString(16).padStart(16,'0'))
     multiAdminClusterDeviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
     discriminatorEd.setText(testDiscriminator)
     setupPinCodeEd.setText(testSetupPinCode.toString())
@@ -85,8 +85,8 @@ class MultiAdminClientFragment : Fragment() {
   private fun updateAddressClick() {
     try{
       deviceController.updateDevice(
-              multiAdminClusterFabricIdEd.text.toString().toULong().toLong(),
-              multiAdminClusterDeviceIdEd.text.toString().toULong().toLong()
+        multiAdminClusterFabricIdEd.text.toString().toULong(16).toLong(),
+        multiAdminClusterDeviceIdEd.text.toString().toULong().toLong()
       )
       showMessage("Address update started")
     } catch (ex: Exception) {
