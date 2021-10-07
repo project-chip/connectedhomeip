@@ -48,23 +48,28 @@ class AmebaBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
-                 output_prefix: str,
                  board: AmebaBoard = AmebaBoard.AMEBAD,
                  app: AmebaApp = AmebaApp.ALL_CLUSTERS):
-        super(AmebaBuilder, self).__init__(root, runner, output_prefix)
+        super(AmebaBuilder, self).__init__(root, runner)
         self.board = board
         self.app = app
 
     def generate(self):
-        logging.info('Generating Ameba at %s', self.output_dir)
+        cmd = '$AMEBA_BUILD/build.sh ninja %s' % (self.identifier)
+        self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
     def _build(self):
-        logging.info('Compiling Ameba at %s', self.output_dir)
+        self._Execute(['ninja', '-C', self.output_dir], title='Building ' + self.identifier)
+        cmd = '''
+            cp $AMEBA_BUILD/project_lp/asdk/image/km0_boot_all.bin %s/out/%s/asdk/image/km0_boot_all.bin
+            cp $AMEBA_BUILD/project_hp/asdk/image/km4_boot_all.bin %s/out/%s/asdk/image/km4_boot_all.bin
+            ''' % (self.root, self.identifier, self.root, self.identifier)
+        self._Execute(['bash', '-c', cmd], title='Building ' + self.identifier)
 
     def build_outputs(self):
         return {
-            self.app.AppNamePrefix + '.elf':
-                os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),
+            self.app.AppNamePrefix + '.axf':
+                os.path.join(self.output_dir, 'asdk', 'target_image2.axf'),
             self.app.AppNamePrefix + '.map':
-                os.path.join(self.output_dir, self.app.AppNamePrefix + '.map'),
+                os.path.join(self.output_dir, 'asdk', 'target_image2.map'),
         }
