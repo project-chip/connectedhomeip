@@ -164,6 +164,17 @@ public:
     /**
      * General Diagnostics methods.
      */
+
+    enum
+    {
+        RST_UNSPECIFIED, //Reboot reason unspecified
+        RST_POWERON,     //Reboot due to power on
+        RST_BROWNOUT,    //Brownout reest
+        RST_SW_WD,       //Reboot due to software watchdog timer
+        RST_HW_WD,       //Reboot due to hardware watchdog timer
+        RST_SW_UPDATED,  //Reboot due to completed software update
+        RST_SW           //Reboot due to software
+    };
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount);
     CHIP_ERROR GetUpTime(uint64_t & upTime);
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);

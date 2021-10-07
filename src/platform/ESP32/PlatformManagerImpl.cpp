@@ -85,6 +85,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
     esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
+    mStartTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
 
     // Initialize the ESP WiFi layer.
     cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -133,6 +134,80 @@ CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
     currentHeapHighWatermark = heap_caps_get_total_size(MALLOC_CAP_DEFAULT) - esp_get_minimum_free_heap_size();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
+{
+    uint32_t count = 0;
+
+    CHIP_ERROR err = ConfigurationMgrImpl().GetRebootCount(count);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        rebootCount = static_cast<uint16_t>(count);
+    }
+
+    return err;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
+{
+    uint64_t currentTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+
+    if (currentTimeMilliseconds >= mStartTimeMilliseconds)
+    {
+        upTime = (currentTimeMilliseconds - mStartTimeMilliseconds) / 1000;
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_INVALID_TIME;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    uint64_t upTime = 0;
+
+    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalHours = 0;
+        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
+        }
+    }
+
+    return CHIP_ERROR_INVALID_TIME;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReason)
+{
+    bootReason = 0;
+    uint8_t reason;
+    reason = static_cast<uint8_t>(esp_reset_reason());
+    if (reason == ESP_RST_UNKNOWN)
+    {
+        bootReason = RST_UNSPECIFIED;
+    }
+    else if (reason == ESP_RST_POWERON)
+    {
+       bootReason = RST_POWERON;
+    }
+    else if (reason == ESP_RST_BROWNOUT)
+    {
+       bootReason = RST_BROWNOUT;
+    }
+    else if (reason == ESP_RST_SW)
+    {
+        bootReason = RST_SW;
+    }
+    else if (reason == ESP_RST_INT_WDT)
+    {
+        bootReason = RST_SW_WD;
+        /* Reboot can be due to hardware or software watchdog*/
+    }
     return CHIP_NO_ERROR;
 }
 
