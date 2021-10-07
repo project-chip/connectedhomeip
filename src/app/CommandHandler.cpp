@@ -169,7 +169,14 @@ CHIP_ERROR CommandHandler::AddStatusCode(const ConcreteCommandPath & aCommandPat
 
     statusElementBuilder =
         mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusElementBuilder();
-    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), chip::to_underlying(aStatus))
+
+    //
+    // TODO: Most of the callers are incorrectly passing SecureChannel as the protocol ID, when in fact, the status code provided
+    // above is always an IM code. Instead of fixing all the callers (which is a fairly sizeable change), we'll embark on fixing
+    // this more completely when we fix #9530.
+    //
+    statusElementBuilder
+        .EncodeStatusElement(aGeneralCode, Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(), chip::to_underlying(aStatus))
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);

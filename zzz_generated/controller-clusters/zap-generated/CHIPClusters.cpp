@@ -5762,10 +5762,9 @@ exit:
 CHIP_ERROR IdentifyCluster::TriggerEffect(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint8_t effectIdentifier, uint8_t effectVariant)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    app::CommandSender * sender = nullptr;
-    TLV::TLVWriter * writer     = nullptr;
-    uint8_t argSeqNumber        = 0;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
 
     // Used when encoding non-empty command. Suppress error message when encoding empty commands.
     (void) writer;
@@ -5776,7 +5775,10 @@ CHIP_ERROR IdentifyCluster::TriggerEffect(Callback::Cancelable * onSuccessCallba
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Identify::Commands::TriggerEffect::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -5789,16 +5791,14 @@ CHIP_ERROR IdentifyCluster::TriggerEffect(Callback::Cancelable * onSuccessCallba
     SuccessOrExit(err = sender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    err = mDevice->SendCommands(sender);
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
 
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
 exit:
-    // On error, we are responsible to close the sender.
-    if (err != CHIP_NO_ERROR && sender != nullptr)
-    {
-        sender->Shutdown();
-    }
     return err;
 }
 

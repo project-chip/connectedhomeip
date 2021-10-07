@@ -1659,7 +1659,7 @@ void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNod
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 void DeviceControllerInteractionModelDelegate::OnResponse(const app::CommandSender * apCommandSender,
-                                                          const app::CommandPath::Type & aPath, TLV::TLVReader * aData)
+                                                          const app::ConcreteCommandPath & aPath, TLV::TLVReader * aData)
 {
     // Generally IM has more detailed errors than ember library, here we always use the, the actual handling of the
     // commands should implement full IMDelegate.
@@ -1669,8 +1669,7 @@ void DeviceControllerInteractionModelDelegate::OnResponse(const app::CommandSend
     if (aData != nullptr)
     {
         // TODO: We are using const_cast, this line will be removed by implementing #8971
-        chip::app::DispatchSingleClusterResponseCommand(aPath.clusterId, aPath.commandId, aPath.endpointId, *aData,
-                                                        const_cast<chip::app::CommandSender *>(apCommandSender));
+        chip::app::DispatchSingleClusterResponseCommand(aPath, *aData, const_cast<chip::app::CommandSender *>(apCommandSender));
     }
     else
     {

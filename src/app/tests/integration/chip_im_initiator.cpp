@@ -24,6 +24,7 @@
  *
  */
 
+#include "system/SystemClock.h"
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
@@ -101,33 +102,35 @@ TestCommandResult gLastCommandResult = TestCommandResult::kUndefined;
 
 void HandleReadComplete()
 {
-    uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
-    uint32_t transitTime = respTime - gLastMessageTime;
+    auto respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
+    auto transitTime = respTime - gLastMessageTime;
 
     gReadRespCount++;
 
     printf("Read Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gReadRespCount, gReadCount,
-           static_cast<double>(gReadRespCount) * 100 / gReadCount, static_cast<double>(transitTime) / 1000);
+           static_cast<double>(gReadRespCount) * 100 / static_cast<double>(gReadCount), static_cast<double>(transitTime) / 1000);
 }
 
 void HandleWriteComplete()
 {
-    uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
-    uint32_t transitTime = respTime - gLastMessageTime;
+    auto respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
+    auto transitTime = respTime - gLastMessageTime;
 
     gWriteRespCount++;
 
     printf("Write Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gWriteRespCount, gWriteCount,
-           static_cast<double>(gWriteRespCount) * 100 / gWriteCount, static_cast<double>(transitTime) / 1000);
+           static_cast<double>(gWriteRespCount) * 100 / static_cast<double>(gWriteCount), static_cast<double>(transitTime) / 1000);
 }
 
 void HandleSubscribeReportComplete()
 {
-    uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
-    uint32_t transitTime = respTime - gLastMessageTime;
+    auto respTime    = chip::System::SystemClock().GetMonotonicMilliseconds();
+    auto transitTime = respTime - gLastMessageTime;
+
     gSubRespCount++;
+
     printf("Subscribe Complete: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gSubRespCount, gSubCount,
-           static_cast<double>(gSubRespCount) * 100 / gSubCount, static_cast<double>(transitTime) / 1000);
+           static_cast<double>(gSubRespCount) * 100 / static_cast<double>(gSubCount), static_cast<double>(transitTime) / 1000);
 }
 
 class MockInteractionModelApp : public chip::app::InteractionModelDelegate, public ::chip::app::CommandSender::Callback
@@ -171,19 +174,21 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnResponse(const chip::app::CommandSender * apCommandSender, const chip::app::CommandPath::Type & aPath,
+    void OnResponse(const chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
                     chip::TLV::TLVReader * aData) override
     {
-        printf("Command Response Success with EndpointId %d, ClusterId %d, CommandId %d", aPath.endpointId, aPath.clusterId,
-               aPath.commandId);
-        gLastCommandResult   = TestCommandResult::kSuccess;
-        uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
-        uint32_t transitTime = respTime - gLastMessageTime;
+        printf("Command Response Success with EndpointId %d, ClusterId %d, CommandId %d", aPath.mEndpointId, aPath.mClusterId,
+               aPath.mCommandId);
+
+        gLastCommandResult = TestCommandResult::kSuccess;
+        auto respTime      = chip::System::SystemClock().GetMonotonicMilliseconds();
+        auto transitTime   = respTime - gLastMessageTime;
 
         gCommandRespCount++;
 
         printf("Command Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gCommandRespCount, gCommandCount,
-               static_cast<double>(gCommandRespCount) * 100 / gCommandCount, static_cast<double>(transitTime) / 1000);
+               static_cast<double>(gCommandRespCount) * 100 / static_cast<double>(gCommandCount),
+               static_cast<double>(transitTime) / 1000);
     }
     void OnError(const chip::app::CommandSender * apCommandSender, chip::Protocols::InteractionModel::Status aProtocolCode,
                  CHIP_ERROR aError) override
@@ -213,10 +218,9 @@ CHIP_ERROR SendCommandRequest(std::unique_ptr<chip::app::CommandSender> && comma
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    chip::app::CommandPathParams commandPathParams = { kTestEndpointId, // Endpoint
-                                                       kTestGroupId,    // GroupId
-                                                       kTestClusterId,  // ClusterId
-                                                       kTestCommandId,  // CommandId
+    chip::app::CommandPathParams commandPathParams = { kTestEndpointId, 0,
+                                                       kTestClusterId, // ClusterId
+                                                       kTestCommandId, // CommandId
                                                        chip::app::CommandPathFlags::kEndpointIdValid };
 
     // Add command data here

@@ -123,10 +123,21 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     chip::ClusterId clusterId;
     chip::CommandId commandId;
     chip::EndpointId endpointId;
-    
+
     {
-         CommandPath::Parser commandPath;
-	
+        CommandPath::Parser commandPath;
+
+        err = aCommandElement.GetCommandPath(&commandPath);
+        SuccessOrExit(err);
+
+        err = commandPath.GetClusterId(&clusterId);
+        SuccessOrExit(err);
+
+        err = commandPath.GetCommandId(&commandId);
+        SuccessOrExit(err);
+
+        err = commandPath.GetEndpointId(&endpointId);
+        SuccessOrExit(err);
     }
 
     {
@@ -156,7 +167,8 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
             {
                 if (statusElement.protocolCode == to_underlying(Protocols::InteractionModel::Status::Success))
                 {
-                    mpCallback->OnResponse(this, commandPath, hasDataResponse ? &commandDataReader : nullptr);
+                    mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId),
+                                           hasDataResponse ? &commandDataReader : nullptr);
                 }
                 else
                 {

@@ -68,7 +68,7 @@ public:
          * @param[in] aPath: The command path field in invoke command response.
          * @param[in] aData: The command data, will be nullptr if the server returns a StatusElement.
          */
-        virtual void OnResponse(const CommandSender * apCommandSender, const CommandPath::Type & aPath, TLV::TLVReader * aData) {}
+        virtual void OnResponse(const CommandSender * apCommandSender, const ConcreteCommandPath & aPath, TLV::TLVReader * aData) {}
 
         /**
          * OnError will be called when an error occurr *after* a successful call to SendCommandRequest(). The following

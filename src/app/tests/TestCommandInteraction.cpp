@@ -87,14 +87,17 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 
     if (sendResponse)
     {
-        if (aCommandId == kTestCommandId)
+        if (aCommandPath.mCommandId == kTestCommandId)
         {
-    apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
-                                Protocols::InteractionModel::Status::Success);
+            apCommandObj->AddStatusCode(aCommandPath, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                        Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::Success);
         }
         else
         {
-            apCommandObj->PrepareCommand(commandPathParams);
+            CommandPathParams responseParams = { aCommandPath.mEndpointId, /* groupId */ 0, aCommandPath.mClusterId,
+                                                 aCommandPath.mCommandId, (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+            apCommandObj->PrepareCommand(responseParams);
             chip::TLV::TLVWriter * writer = apCommandObj->GetCommandDataElementTLVWriter();
             writer->PutBoolean(chip::TLV::ContextTag(1), true);
             apCommandObj->FinishCommand();
@@ -116,13 +119,13 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
 class MockCommandSenderCallback : public CommandSender::Callback
 {
 public:
-    void OnResponse(const chip::app::CommandSender * apCommandSender, const chip::app::CommandPath::Type & aPath,
+    void OnResponse(const chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
                     chip::TLV::TLVReader * aData) override
     {
         IgnoreUnusedVariable(apCommandSender);
         IgnoreUnusedVariable(aData);
         ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16,
-                      aPath.clusterId, aPath.commandId, aPath.endpointId);
+                      aPath.mClusterId, aPath.mCommandId, aPath.mEndpointId);
         onResponseCalledTimes++;
     }
     void OnError(const chip::app::CommandSender * apCommandSender, chip::Protocols::InteractionModel::Status aProtocolCode,
@@ -208,6 +211,11 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
+CommandPathParams MakeTestCommandPath(CommandId aCommandId = kTestCommandId)
+{
+    return CommandPathParams(kTestEndpointId, 0, kTestClusterId, aCommandId, (chip::app::CommandPathFlags::kEndpointIdValid));
+}
+
 void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
                                                      bool aNeedCommandData, EndpointId aEndpointId, ClusterId aClusterId,
                                                      CommandId aCommandId)
@@ -262,12 +270,8 @@ void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void
 void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void * apContext, Command * apCommand,
                                                    bool aNeedStatusCode, CommandId aCommandId)
 {
-    CHIP_ERROR err                                 = CHIP_NO_ERROR;
-    chip::app::CommandPathParams commandPathParams = { 1,          // Endpoint
-                                                       2,          // GroupId
-                                                       3,          // ClusterId
-                                                       aCommandId, // CommandId
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    auto commandPathParams = MakeTestCommandPath(aCommandId);
 
     if (aNeedStatusCode)
     {
@@ -310,12 +314,9 @@ void TestCommandInteraction::TestCommandSenderWithWrongState(nlTestSuite * apSui
 
 void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err                                 = CHIP_NO_ERROR;
-    chip::app::CommandPathParams commandPathParams = { 1, // Endpoint
-                                                       2, // GroupId
-                                                       3, // ClusterId
-                                                       4, // CommandId
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    auto commandPathParams = MakeTestCommandPath();
+
     app::CommandHandler commandHandler(gExchangeManager, &mockCommandHandlerDelegate);
 
     err = commandHandler.PrepareCommand(commandPathParams);
@@ -349,12 +350,9 @@ void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSu
 
 void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err                                 = CHIP_NO_ERROR;
-    chip::app::CommandPathParams commandPathParams = { 1, // Endpoint
-                                                       2, // GroupId
-                                                       3, // ClusterId
-                                                       4, // CommandId
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    auto commandPathParams = MakeTestCommandPath();
+
     app::CommandHandler commandHandler(gExchangeManager, &mockCommandHandlerDelegate);
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
@@ -434,23 +432,18 @@ struct Fields
 void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    app::CommandHandler commandHandler;
+    app::CommandHandler commandHandler(gExchangeManager, nullptr);
     System::PacketBufferHandle commandPacket;
-    err = commandHandler.Init(&chip::gExchangeManager, nullptr);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    commandHandler.mpExchangeCtx = gExchangeManager.NewContext(SessionHandle(0, 0, 0, 0), nullptr);
+    commandHandler.mpExchangeCtx = gExchangeManager->NewContext(SessionHandle(0, 0, 0, 0), nullptr);
     TestExchangeDelegate delegate;
     commandHandler.mpExchangeCtx->SetDelegate(&delegate);
 
-    ConcreteCommandPath path(1, // Endpoint
-                             3, // ClusterId
-                             4  // CommandId
-    );
+    auto path = MakeTestCommandPath();
 
-    err = commandHandler.AddResponseData(path, Fields());
+    err = commandHandler.AddResponseData(ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId), Fields());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = commandHandler.FinalizeCommandsMessage(commandPacket);
+    err = commandHandler.Finalize(commandPacket);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK

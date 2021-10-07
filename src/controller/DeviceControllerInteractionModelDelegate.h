@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 
+#include <app/CommandSender.h>
 #include <app/InteractionModelDelegate.h>
 
 namespace chip {
@@ -17,7 +18,7 @@ class DeviceControllerInteractionModelDelegate : public chip::app::InteractionMo
                                                  public chip::app::CommandSender::Callback
 {
 public:
-    void OnResponse(const app::CommandSender * apCommandSender, const app::CommandPath::Type & aPath,
+    void OnResponse(const app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
                     TLV::TLVReader * aData) override;
     void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aInteractionModelStatus,
                  CHIP_ERROR aProtocolError) override;

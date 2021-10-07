@@ -32,14 +32,14 @@ namespace Controller {
 
 PythonInteractionModelDelegate gPythonInteractionModelDelegate;
 
-void PythonInteractionModelDelegate::OnResponse(const app::CommandSender * apCommandSender, const app::CommandPath::Type & aPath,
+void PythonInteractionModelDelegate::OnResponse(const app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath,
                                                 TLV::TLVReader * aData)
 {
     CommandStatus status{ Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(),
                           to_underlying(Protocols::InteractionModel::Status::Success),
-                          aPath.endpointId,
-                          aPath.clusterId,
-                          aPath.commandId,
+                          aPath.mEndpointId,
+                          aPath.mClusterId,
+                          aPath.mCommandId,
                           1 };
     if (commandResponseStatusFunct != nullptr)
     {
