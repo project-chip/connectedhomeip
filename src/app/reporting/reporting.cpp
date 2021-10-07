@@ -781,12 +781,12 @@ static void scheduleTick(void)
     }
     if (delayMs != MAX_INT32U_VALUE)
     {
-        emberAfDebugPrintln("sched report event in %d ms", delayMs);
+        emberAfDebugPrintln("Scheduled reporting tick in %d ms", delayMs);
         emberEventControlSetDelayMS(&emberAfPluginReportingTickEventControl, delayMs);
     }
     else
     {
-        emberAfDebugPrintln("deactivate report event");
+        emberAfDebugPrintln("Reporting tick timer set to inactive");
         emberEventControlSetInactive(&emberAfPluginReportingTickEventControl);
     }
 }

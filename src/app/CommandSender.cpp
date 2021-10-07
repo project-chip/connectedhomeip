@@ -142,6 +142,8 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     {
         err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
         SuccessOrExit(err);
+        ChipLogProgress(DataManagement, "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=%" PRIu32 " Status=0x%" PRIx16,
+            static_cast<uint16_t>(endpointId), ChipLogValueMEI(clusterId), static_cast<uint32_t>(commandId), static_cast<uint16_t>(generalCode));
         if (mpDelegate != nullptr)
         {
             mpDelegate->CommandResponseStatus(this, generalCode, protocolId, protocolCode, endpointId, clusterId, commandId,
@@ -153,14 +155,20 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         // TODO(Spec#3258): The endpoint id in response command is not clear, so we cannot do "ClientClusterCommandExists" check.
         err = aCommandElement.GetData(&commandDataReader);
         SuccessOrExit(err);
+        ChipLogProgress(DataManagement, "Received Command Response, Endpoint=%" PRIu16 " Cluster=0x" ChipLogFormatMEI " Command=%" PRIu32,
+            static_cast<uint16_t>(endpointId), ChipLogValueMEI(clusterId), static_cast<uint32_t>(commandId));
         // TODO(#4503): Should call callbacks of cluster that sends the command.
         DispatchSingleClusterResponseCommand(ConcreteCommandPath(endpointId, clusterId, commandId), commandDataReader, this);
     }
 
 exit:
-    if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
+    if (err != CHIP_NO_ERROR)
     {
-        mpDelegate->CommandResponseProtocolError(this, mCommandIndex);
+        ChipLogError(DataManagement, "Received malformed Command Response, err=%s", err.AsString());
+        if (mpDelegate != nullptr)
+        {
+            mpDelegate->CommandResponseProtocolError(this, mCommandIndex);
+        }
     }
     return err;
 }
