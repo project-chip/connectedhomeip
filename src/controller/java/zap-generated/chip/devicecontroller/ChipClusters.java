@@ -83,65 +83,6 @@ public class ChipClusters {
     }
   }
 
-  public static Map<String, Class> getClusterMapping() {
-    Map<String, Class> clusterMap = new HashMap<>();
-    clusterMap.put("AccountLogin", AccountLoginCluster.class);
-    clusterMap.put("AdministratorCommissioning", AdministratorCommissioningCluster.class);
-    clusterMap.put("ApplicationBasic", ApplicationBasicCluster.class);
-    clusterMap.put("ApplicationLauncher", ApplicationLauncherCluster.class);
-    clusterMap.put("AudioOutput", AudioOutputCluster.class);
-    clusterMap.put("BarrierControl", BarrierControlCluster.class);
-    clusterMap.put("Basic", BasicCluster.class);
-    clusterMap.put("BinaryInputBasic", BinaryInputBasicCluster.class);
-    clusterMap.put("Binding", BindingCluster.class);
-    clusterMap.put("BridgedDeviceBasic", BridgedDeviceBasicCluster.class);
-    clusterMap.put("ColorControl", ColorControlCluster.class);
-    clusterMap.put("ContentLauncher", ContentLauncherCluster.class);
-    clusterMap.put("Descriptor", DescriptorCluster.class);
-    clusterMap.put("DiagnosticLogs", DiagnosticLogsCluster.class);
-    clusterMap.put("DoorLock", DoorLockCluster.class);
-    clusterMap.put("ElectricalMeasurement", ElectricalMeasurementCluster.class);
-    clusterMap.put("EthernetNetworkDiagnostics", EthernetNetworkDiagnosticsCluster.class);
-    clusterMap.put("FixedLabel", FixedLabelCluster.class);
-    clusterMap.put("FlowMeasurement", FlowMeasurementCluster.class);
-    clusterMap.put("GeneralCommissioning", GeneralCommissioningCluster.class);
-    clusterMap.put("GeneralDiagnostics", GeneralDiagnosticsCluster.class);
-    clusterMap.put("GroupKeyManagement", GroupKeyManagementCluster.class);
-    clusterMap.put("Groups", GroupsCluster.class);
-    clusterMap.put("Identify", IdentifyCluster.class);
-    clusterMap.put("KeypadInput", KeypadInputCluster.class);
-    clusterMap.put("LevelControl", LevelControlCluster.class);
-    clusterMap.put("LowPower", LowPowerCluster.class);
-    clusterMap.put("MediaInput", MediaInputCluster.class);
-    clusterMap.put("MediaPlayback", MediaPlaybackCluster.class);
-    clusterMap.put("NetworkCommissioning", NetworkCommissioningCluster.class);
-    clusterMap.put("OtaSoftwareUpdateProvider", OtaSoftwareUpdateProviderCluster.class);
-    clusterMap.put("OtaSoftwareUpdateRequestor", OtaSoftwareUpdateRequestorCluster.class);
-    clusterMap.put("OccupancySensing", OccupancySensingCluster.class);
-    clusterMap.put("OnOff", OnOffCluster.class);
-    clusterMap.put("OnOffSwitchConfiguration", OnOffSwitchConfigurationCluster.class);
-    clusterMap.put("OperationalCredentials", OperationalCredentialsCluster.class);
-    clusterMap.put("PowerSource", PowerSourceCluster.class);
-    clusterMap.put("PressureMeasurement", PressureMeasurementCluster.class);
-    clusterMap.put("PumpConfigurationAndControl", PumpConfigurationAndControlCluster.class);
-    clusterMap.put("RelativeHumidityMeasurement", RelativeHumidityMeasurementCluster.class);
-    clusterMap.put("Scenes", ScenesCluster.class);
-    clusterMap.put("SoftwareDiagnostics", SoftwareDiagnosticsCluster.class);
-    clusterMap.put("Switch", SwitchCluster.class);
-    clusterMap.put("TvChannel", TvChannelCluster.class);
-    clusterMap.put("TargetNavigator", TargetNavigatorCluster.class);
-    clusterMap.put("TemperatureMeasurement", TemperatureMeasurementCluster.class);
-    clusterMap.put("TestCluster", TestClusterCluster.class);
-    clusterMap.put("Thermostat", ThermostatCluster.class);
-    clusterMap.put(
-        "ThermostatUserInterfaceConfiguration", ThermostatUserInterfaceConfigurationCluster.class);
-    clusterMap.put("ThreadNetworkDiagnostics", ThreadNetworkDiagnosticsCluster.class);
-    clusterMap.put("WakeOnLan", WakeOnLanCluster.class);
-    clusterMap.put("WiFiNetworkDiagnostics", WiFiNetworkDiagnosticsCluster.class);
-    clusterMap.put("WindowCovering", WindowCoveringCluster.class);
-    return clusterMap;
-  }
-
   public static class AccountLoginCluster extends BaseChipCluster {
     public AccountLoginCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

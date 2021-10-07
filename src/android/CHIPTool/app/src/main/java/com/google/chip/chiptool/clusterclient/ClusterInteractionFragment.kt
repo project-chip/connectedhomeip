@@ -5,16 +5,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
+import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.SelectActionFragment
 import com.google.chip.chiptool.util.DeviceIdUtil
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.*
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.enrollDeviceBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.commandStatusTv
@@ -45,15 +47,18 @@ class ClusterInteractionFragment: Fragment() {
         fabricId.text.toString().toULong().toLong(),
         deviceId.text.toString().toULong().toLong()
       )
-//      showMessage("Address update started")
+      showMessage("Address update started")
     } catch (ex: Exception) {
-//      showMessage("Address update failed: $ex")
+      showMessage("Address update failed: $ex")
     }
   }
 
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread {
-      commandStatusTv.text = msg
+      Toast.makeText(
+        requireContext(),
+        msg,
+        Toast.LENGTH_SHORT).show()
     }
   }
 
@@ -71,7 +76,6 @@ class ClusterInteractionFragment: Fragment() {
     override fun onConnectDeviceComplete() {}
 
     override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-      Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
     }
 
     override fun onNotifyChipConnectionClosed() {
