@@ -102,7 +102,11 @@ public:
      */
     ExchangeContext * NewContext(SessionHandle session, ExchangeDelegate * delegate);
 
-    void ReleaseContext(ExchangeContext * ec) { mContextPool.ReleaseObject(ec); }
+    void ReleaseContext(ExchangeContext * ec) {
+        mExchgCount--;
+        printf("--EC = %d\n", mExchgCount);
+        mContextPool.ReleaseObject(ec); 
+    }
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier. This handler would be
@@ -194,6 +198,8 @@ public:
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
 
+    size_t GetNumActiveExchanges() { return mContextPool.Allocated(); }
+
 private:
     enum class State
     {
@@ -233,6 +239,8 @@ private:
     ApplicationExchangeDispatch mDefaultExchangeDispatch;
 
     FabricIndex mFabricIndex = 0;
+
+    int mExchgCount = 0;
 
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
 

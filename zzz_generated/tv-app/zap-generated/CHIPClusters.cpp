@@ -65,11 +65,11 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuc
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, GeneralCommissioning::Commands::Ids::ArmFailSafe,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -111,11 +111,11 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelab
                                          GeneralCommissioning::Commands::Ids::CommissioningComplete,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     // Command takes no arguments.
@@ -152,11 +152,11 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable
                                          GeneralCommissioning::Commands::Ids::SetRegulatoryConfig,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -256,11 +256,11 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
                                          NetworkCommissioning::Commands::Ids::DisableNetwork,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -303,11 +303,11 @@ CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onS
                                          NetworkCommissioning::Commands::Ids::EnableNetwork,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -350,11 +350,11 @@ CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callba
                                          NetworkCommissioning::Commands::Ids::GetLastNetworkCommissioningResult,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -393,11 +393,11 @@ CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onS
                                          NetworkCommissioning::Commands::Ids::RemoveNetwork,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -439,11 +439,11 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, NetworkCommissioning::Commands::Ids::ScanNetworks,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -499,11 +499,11 @@ CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSucces
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OperationalCredentials::Commands::Ids::AddNOC,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -550,11 +550,11 @@ CHIP_ERROR OperationalCredentialsCluster::AddTrustedRootCertificate(Callback::Ca
                                          OperationalCredentials::Commands::Ids::AddTrustedRootCertificate,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -593,11 +593,11 @@ CHIP_ERROR OperationalCredentialsCluster::AttestationRequest(Callback::Cancelabl
                                          OperationalCredentials::Commands::Ids::AttestationRequest,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -635,11 +635,11 @@ CHIP_ERROR OperationalCredentialsCluster::CertificateChainRequest(Callback::Canc
                                          OperationalCredentials::Commands::Ids::CertificateChainRequest,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -677,11 +677,11 @@ CHIP_ERROR OperationalCredentialsCluster::OpCSRRequest(Callback::Cancelable * on
                                          OperationalCredentials::Commands::Ids::OpCSRRequest,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -719,11 +719,11 @@ CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * on
                                          OperationalCredentials::Commands::Ids::RemoveFabric,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -761,11 +761,11 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
                                          OperationalCredentials::Commands::Ids::UpdateFabricLabel,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

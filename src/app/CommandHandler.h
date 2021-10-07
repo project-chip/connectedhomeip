@@ -42,18 +42,38 @@ namespace app {
 class CommandHandler : public Command
 {
 public:
+    class Callback
+    {
+    public:
+        virtual ~Callback() = default;
+
+        /*
+         * Method that signals to a registered callback that this object
+         * has completed doing useful work and is now safe for release/destruction.
+         */
+        virtual void OnDone(CommandHandler * apCommandObj) = 0;
+    };
+
+    CommandHandler(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback);
+
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                       System::PacketBufferHandle && payload);
     CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
                              const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
                              const Protocols::InteractionModel::Status aStatus) override;
-    void Shutdown();
-
 private:
+    //
+    // Called internally to signal the completion of all work on this object, gracefully close the
+    // exchange (by calling into the base class) and finally, signal to a registerd callback that it's
+    // safe to release this object.
+    //
+    void Close();
+
     friend class TestCommandInteraction;
-    void ShutdownInternal();
     CHIP_ERROR SendCommandResponse();
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
+
+    Callback *mpCallback = nullptr;
 };
 } // namespace app
 } // namespace chip

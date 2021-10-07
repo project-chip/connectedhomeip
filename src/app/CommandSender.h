@@ -55,10 +55,13 @@ public:
         virtual ~Callback() = default;
 
         /**
-         * OnResponse will be called when the response from server arrived.
-         *  - When StatusElement is received and it is Success, aData will be nullptr.
-         *  - When command specific response is received, aData will be a valid TLVReader initialized with a struct of command
-         * specify response.
+         * OnResponse will be called when a successful response from server has been received and processed. Specifically:
+         *  - When a status code is received and it is IM::Success, aData will be nullptr.
+         *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
+         *    that contains the data payload (callee will still need to open and process the container).
+         *
+         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait till it receives
+         * an OnDone call to destroy the object.
          *
          * @param[in] apCommandSender: The command sender object that initialized the command transaction continue to exist after
          * this call completes.
@@ -68,51 +71,61 @@ public:
         virtual void OnResponse(const CommandSender * apCommandSender, const CommandPath::Type & aPath, TLV::TLVReader * aData) {}
 
         /**
-         * OnError will be called when error occurred when receiving / handling response from server:
-         * - CHIP_ERROR_TIMEOUT: The CommandSender failed to receive a expected response.
-         * - TLV Related erros: The CommandSender received a malformed response from server.
-         * - CHIP_ERROR_IM: The CommandSender received a legal response from server, but the protocol code indicates a error status
-         * presended in aInteractionModelStatus.
+         * OnError will be called when an error occurr *after* a successful call to SendCommandRequest(). The following
+         * errors will be delivered through this call in the aError field:
          *
-         * @param[in] apCommandSender: The command sender object that initialized the command transaction,  continue to exist after
-         * this call completes.
-         * @param[in] aInteractionModelStatus: The interaction model protocol status code, will be Failure if the CommandSender
-         * failed to recieve the response (aError != CHIP_NO_ERROR). This argument will never be Success when this function is
-         * called.
-         * @param[in] aProtocolError: The error occurred during the invoke command interaction, will be CHIP_NO_ERROR when the
-         * CommandSender received a valid response from server.
+         * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
+         * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
+         * - CHIP_ERROR_IM: An invoke response containing a status code denoting an error was received.
+         *                  When the protocol ID in the received status is IM, aInteractionModelStatus will contain the IM status code.
+         *                  Otherwise, aInteractionModelStatus will always be set to IM::Status::Failure.
+         * - CHIP_ERROR*: All other cases.
+         *
+         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait till it receives
+         * an OnDone call to destroy and free the object.
+         *
+         * @param[in] apCommandSender: The command sender object that initialized the command transaction.
+         * @param[in] aInteractionModelStatus: Contains an IM status code. This SHALL never be IM::Success, and will contain a valid
+         * server-side emitted error if aProtocolError == CHIP_ERROR_IM.
+         * @param[in] aError: A system error code that conveys the overall error code.
          */
         virtual void OnError(const CommandSender * apCommandSender, Protocols::InteractionModel::Status aInteractionModelStatus,
-                             CHIP_ERROR aProtocolError)
+                             CHIP_ERROR aError)
         {}
 
         /**
-         * OnFinal will be called when CommandSender has finished all the works, and it is safe to release the
-         * allocated CommandSender object if needed.
+         * OnDone will be called when CommandSender has finished all work and is safe to destory and free the
+         * allocated CommandSender object.
+         *
+         * This function will:
+         *      - Always be called exactly *once* for a given CommandSender instance.
+         *      - Be called even in error circumstances.
+         *      - Only called after a successful call to SendCommandRequest as been made.
          *
          * This function is marked as must be implemented to make application aware of releasing the object.
-         *
-         * After the command being sent, this function will always be called exactly once for a single command sender.
-         *
+         * 
          * @param[in] apCommandSender: The command sender object of the terminated invoke command transaction.
          */
-        virtual void OnFinal(CommandSender * apCommandSender) = 0;
+        virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
-    CommandSender(Callback * apCallback) : mpCallback(apCallback){};
-
-    ~CommandSender() { AbortExistingExchangeContext(); }
+    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr);
 
     // TODO: issue #6792 - the secure session parameter should be made non-optional and passed by reference.
-    // Once SendCommandRequest returns successfully, the CommandSender will
-    // handle calling Shutdown on itself once it decides it's done with waiting
-    // for a response (i.e. times out or gets a response).
+    //
+    // Sends a queued up command request to the target encapsulated by the secureSession handle.
+    //
+    // Upon successful return from this call, all subsequent errors that occur during this interaction
+    // will be conveyed through the OnError callback above. In addition, upon completion of work regardless of
+    // whether it was successful or not, the OnDone callback will be invoked to indicate completion of work on this
+    // object and to indicate to the application that it can destory and free this object.
+    //
+    // Applications can however, destruct this object at any time after this call as well and it will safely clean-up
+    // all underlying resources.
     //
     // Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
     // Default timeout value will be used otherwise.
     //
-    // If SendCommandRequest is never called, or the call fails, the API
-    // consumer is responsible for calling Shutdown on the CommandSender.
     CHIP_ERROR SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
                                   uint32_t timeout = kImMessageTimeoutMsec);
 
@@ -124,8 +137,12 @@ private:
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
-    // CommandSender does not have "Shutdown" method, the user will destruct it directly.
-    void ShutdownInternal();
+    //
+    // Called internally to signal the completion of all work on this object, gracefully close the
+    // exchange (by calling into the base class) and finally, signal to the application that it's
+    // safe to release this object.
+    //
+    void Close();
 
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 

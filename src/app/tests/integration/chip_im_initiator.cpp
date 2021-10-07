@@ -192,7 +192,7 @@ public:
         gLastCommandResult = TestCommandResult::kFailure;
         printf("CommandResponseError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
-    void OnFinal(chip::app::CommandSender * apCommandSender) override {}
+    void OnDone(chip::app::CommandSender * apCommandSender) override {}
 };
 
 MockInteractionModelApp gMockDelegate;
@@ -453,9 +453,8 @@ void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appSta
 
     if (gCommandRespCount < kMaxCommandMessageCount)
     {
-        auto commandSender = std::make_unique<chip::app::CommandSender>(&gMockDelegate);
+        auto commandSender = std::make_unique<chip::app::CommandSender>(&gMockDelegate, &gExchangeManager);
         VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        SuccessOrExit(err = commandSender->Init(&gExchangeManager));
 
         err = SendCommandRequest(std::move(commandSender));
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send command request with error: %s\n", chip::ErrorStr(err)));
@@ -480,9 +479,8 @@ void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * app
 {
     // Test with invalid endpoint / cluster / command combination.
     CHIP_ERROR err     = CHIP_NO_ERROR;
-    auto commandSender = std::make_unique<chip::app::CommandSender>(&gMockDelegate);
+    auto commandSender = std::make_unique<chip::app::CommandSender>(&gMockDelegate, &gExchangeManager);
     VerifyOrExit(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    SuccessOrExit(err = commandSender->Init(&gExchangeManager));
 
     err = SendBadCommandRequest(std::move(commandSender));
     VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send bad command request with error: %s\n", chip::ErrorStr(err)));

@@ -21,7 +21,7 @@ public:
                     TLV::TLVReader * aData) override;
     void OnError(const app::CommandSender * apCommandSender, Protocols::InteractionModel::Status aInteractionModelStatus,
                  CHIP_ERROR aProtocolError) override;
-    void OnFinal(app::CommandSender * apCommandSender) override;
+    void OnDone(app::CommandSender * apCommandSender) override;
 
     app::CommandSender * NewCommandSender();
 

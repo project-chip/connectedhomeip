@@ -133,11 +133,11 @@ CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, C
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, LevelControl::Commands::Ids::Move,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -180,11 +180,11 @@ CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Cancelable * onSuccessCall
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, LevelControl::Commands::Ids::MoveToLevel,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -228,11 +228,11 @@ CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Cancelable * onSu
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, LevelControl::Commands::Ids::MoveToLevelWithOnOff,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -271,11 +271,11 @@ CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Cancelable * onSuccessCa
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, LevelControl::Commands::Ids::MoveWithOnOff,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -315,11 +315,11 @@ CHIP_ERROR LevelControlCluster::Step(Callback::Cancelable * onSuccessCallback, C
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, LevelControl::Commands::Ids::Step,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -364,11 +364,11 @@ CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Cancelable * onSuccessCa
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, LevelControl::Commands::Ids::StepWithOnOff,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -409,11 +409,11 @@ CHIP_ERROR LevelControlCluster::Stop(Callback::Cancelable * onSuccessCallback, C
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, LevelControl::Commands::Ids::Stop,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -451,11 +451,11 @@ CHIP_ERROR LevelControlCluster::StopWithOnOff(Callback::Cancelable * onSuccessCa
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, LevelControl::Commands::Ids::StopWithOnOff,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     // Command takes no arguments.
@@ -534,11 +534,11 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::Ids::Off,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     // Command takes no arguments.
@@ -572,11 +572,11 @@ CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::Ids::On,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     // Command takes no arguments.
@@ -610,11 +610,11 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callba
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::Ids::Toggle,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    CommandSenderHandler sender(Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate()));
+    CommandSenderHandler sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
     VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    SuccessOrExit(err = sender->Init(mDevice->GetExchangeManager()));
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     // Command takes no arguments.
