@@ -398,8 +398,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 {
     auto & NOCValue      = commandData.NOCValue;
     auto & ICACValue     = commandData.ICACValue;
-    auto & IPKValue      = commandData.IPKValue;
-    auto & adminNodeId   = commandData.adminNodeId;
     auto & adminVendorId = commandData.adminVendorId;
 
     EmberAfNodeOperationalCertStatus nocResponse = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;

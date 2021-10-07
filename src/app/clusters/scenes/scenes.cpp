@@ -389,9 +389,8 @@ exit:
 bool emberAfScenesClusterRecallSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                              const Commands::RecallScene::DecodableType & commandData)
 {
-    auto & groupId        = commandData.groupId;
-    auto & sceneId        = commandData.sceneId;
-    auto & transitionTime = commandData.transitionTime;
+    auto & groupId = commandData.groupId;
+    auto & sceneId = commandData.sceneId;
 
     // NOTE: TransitionTime field in the RecallScene command is currently
     // ignored. Per Zigbee Alliance ZCL 7 (07-5123-07):

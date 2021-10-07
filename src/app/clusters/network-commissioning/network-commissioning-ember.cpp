@@ -88,10 +88,6 @@ bool emberAfNetworkCommissioningClusterDisableNetworkCallback(app::CommandHandle
                                                               const app::ConcreteCommandPath & commandPath,
                                                               const Commands::DisableNetwork::DecodableType & commandData)
 {
-    auto & networkID  = commandData.networkID;
-    auto & breadcrumb = commandData.breadcrumb;
-    auto & timeoutMs  = commandData.timeoutMs;
-
     return false;
 }
 
@@ -99,8 +95,6 @@ bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::GetLastNetworkCommissioningResult::DecodableType & commandData)
 {
-    auto & timeoutMs = commandData.timeoutMs;
-
     return false;
 }
 
@@ -108,10 +102,6 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(app::CommandHandler
                                                              const app::ConcreteCommandPath & commandPath,
                                                              const Commands::RemoveNetwork::DecodableType & commandData)
 {
-    auto & NetworkID  = commandData.NetworkID;
-    auto & Breadcrumb = commandData.Breadcrumb;
-    auto & TimeoutMs  = commandData.TimeoutMs;
-
     return false;
 }
 
@@ -119,20 +109,12 @@ bool emberAfNetworkCommissioningClusterScanNetworksCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::ScanNetworks::DecodableType & commandData)
 {
-    auto & ssid       = commandData.ssid;
-    auto & breadcrumb = commandData.breadcrumb;
-    auto & timeoutMs  = commandData.timeoutMs;
-
     return false;
 }
 bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(app::CommandHandler * commandObj,
                                                                    const app::ConcreteCommandPath & commandPath,
                                                                    const Commands::UpdateThreadNetwork::DecodableType & commandData)
 {
-    auto & operationalDataset = commandData.operationalDataset;
-    auto & breadcrumb         = commandData.breadcrumb;
-    auto & timeoutMs          = commandData.timeoutMs;
-
     return false;
 }
 
@@ -140,10 +122,5 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(app::CommandHan
                                                                  const app::ConcreteCommandPath & commandPath,
                                                                  const Commands::UpdateWiFiNetwork::DecodableType & commandData)
 {
-    auto & ssid        = commandData.ssid;
-    auto & credentials = commandData.credentials;
-    auto & breadcrumb  = commandData.breadcrumb;
-    auto & timeoutMs   = commandData.timeoutMs;
-
     return false;
 }

@@ -278,9 +278,6 @@ bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * com
                                                        const app::ConcreteCommandPath & commandPath,
                                                        const Commands::GetWeeklySchedule::DecodableType & commandData)
 {
-    auto & daysToReturn = commandData.daysToReturn;
-    auto & modeToReturn = commandData.modeToReturn;
-
     // TODO
     return false;
 }
@@ -289,11 +286,6 @@ bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * com
                                                        const app::ConcreteCommandPath & commandPath,
                                                        const Commands::SetWeeklySchedule::DecodableType & commandData)
 {
-    auto & numberOfTransitionsForSequence = commandData.numberOfTransitionsForSequence;
-    auto & daysOfWeekForSequence          = commandData.daysOfWeekForSequence;
-    auto & modeForSequence                = commandData.modeForSequence;
-    auto & payload                        = commandData.payload;
-
     // TODO
     return false;
 }

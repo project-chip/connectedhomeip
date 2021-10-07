@@ -27,10 +27,6 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(app::CommandHandler
                                                              const app::ConcreteCommandPath & commandPath,
                                                              const Commands::RetrieveLogsRequest::DecodableType & commandData)
 {
-    auto & intent                 = commandData.intent;
-    auto & requestedProtocol      = commandData.requestedProtocol;
-    auto & transferFileDesignator = commandData.transferFileDesignator;
-
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
