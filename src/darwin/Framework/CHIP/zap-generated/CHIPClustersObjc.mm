@@ -73,7 +73,7 @@ using chip::Callback::Cancelable;
 }
 
 - (void)openCommissioningWindow:(uint16_t)commissioningTimeout
-                   pAKEVerifier:(NSData *)pAKEVerifier
+                   PAKEVerifier:(NSData *)PAKEVerifier
                   discriminator:(uint16_t)discriminator
                      iterations:(uint32_t)iterations
                            salt:(NSData *)salt
@@ -81,7 +81,7 @@ using chip::Callback::Cancelable;
                 responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPDefaultSuccessCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.OpenCommissioningWindow(success, failure, commissioningTimeout, [self asSpan:pAKEVerifier],
+        return self.cppCluster.OpenCommissioningWindow(success, failure, commissioningTimeout, [self asSpan:PAKEVerifier],
             discriminator, iterations, [self asSpan:salt], passcodeID);
     });
 }
@@ -3288,16 +3288,16 @@ using chip::Callback::Cancelable;
     return &_cppCluster;
 }
 
-- (void)addNOC:(NSData *)nOCValue
-          iCACValue:(NSData *)iCACValue
-           iPKValue:(NSData *)iPKValue
+- (void)addNOC:(NSData *)NOCValue
+          ICACValue:(NSData *)ICACValue
+           IPKValue:(NSData *)IPKValue
       caseAdminNode:(uint64_t)caseAdminNode
       adminVendorId:(uint16_t)adminVendorId
     responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.AddNOC(success, failure, [self asSpan:nOCValue], [self asSpan:iCACValue], [self asSpan:iPKValue],
+            return self.cppCluster.AddNOC(success, failure, [self asSpan:NOCValue], [self asSpan:ICACValue], [self asSpan:IPKValue],
                 caseAdminNode, adminVendorId);
         });
 }
@@ -3325,11 +3325,11 @@ using chip::Callback::Cancelable;
         });
 }
 
-- (void)opCSRRequest:(NSData *)cSRNonce responseHandler:(ResponseHandler)responseHandler
+- (void)opCSRRequest:(NSData *)CSRNonce responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.OpCSRRequest(success, failure, [self asSpan:cSRNonce]);
+            return self.cppCluster.OpCSRRequest(success, failure, [self asSpan:CSRNonce]);
         });
 }
 
@@ -3356,11 +3356,11 @@ using chip::Callback::Cancelable;
         });
 }
 
-- (void)updateNOC:(NSData *)nOCValue iCACValue:(NSData *)iCACValue responseHandler:(ResponseHandler)responseHandler
+- (void)updateNOC:(NSData *)NOCValue ICACValue:(NSData *)ICACValue responseHandler:(ResponseHandler)responseHandler
 {
     new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(
         self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.UpdateNOC(success, failure, [self asSpan:nOCValue], [self asSpan:iCACValue]);
+            return self.cppCluster.UpdateNOC(success, failure, [self asSpan:NOCValue], [self asSpan:ICACValue]);
         });
 }
 

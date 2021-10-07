@@ -139,7 +139,7 @@ public class ChipClusters {
     public void openCommissioningWindow(
         DefaultClusterCallback callback,
         int commissioningTimeout,
-        byte[] pAKEVerifier,
+        byte[] PAKEVerifier,
         int discriminator,
         long iterations,
         byte[] salt,
@@ -148,7 +148,7 @@ public class ChipClusters {
           chipClusterPtr,
           callback,
           commissioningTimeout,
-          pAKEVerifier,
+          PAKEVerifier,
           discriminator,
           iterations,
           salt,
@@ -166,7 +166,7 @@ public class ChipClusters {
         long chipClusterPtr,
         DefaultClusterCallback callback,
         int commissioningTimeout,
-        byte[] pAKEVerifier,
+        byte[] PAKEVerifier,
         int discriminator,
         long iterations,
         byte[] salt,
@@ -4014,12 +4014,12 @@ public class ChipClusters {
 
     public void addNOC(
         NOCResponseCallback callback,
-        byte[] nOCValue,
-        byte[] iCACValue,
-        byte[] iPKValue,
+        byte[] NOCValue,
+        byte[] ICACValue,
+        byte[] IPKValue,
         long caseAdminNode,
         int adminVendorId) {
-      addNOC(chipClusterPtr, callback, nOCValue, iCACValue, iPKValue, caseAdminNode, adminVendorId);
+      addNOC(chipClusterPtr, callback, NOCValue, ICACValue, IPKValue, caseAdminNode, adminVendorId);
     }
 
     public void addTrustedRootCertificate(DefaultClusterCallback callback, byte[] rootCertificate) {
@@ -4035,8 +4035,8 @@ public class ChipClusters {
       certificateChainRequest(chipClusterPtr, callback, certificateType);
     }
 
-    public void opCSRRequest(OpCSRResponseCallback callback, byte[] cSRNonce) {
-      opCSRRequest(chipClusterPtr, callback, cSRNonce);
+    public void opCSRRequest(OpCSRResponseCallback callback, byte[] CSRNonce) {
+      opCSRRequest(chipClusterPtr, callback, CSRNonce);
     }
 
     public void removeFabric(NOCResponseCallback callback, int fabricIndex) {
@@ -4052,16 +4052,16 @@ public class ChipClusters {
       updateFabricLabel(chipClusterPtr, callback, label);
     }
 
-    public void updateNOC(NOCResponseCallback callback, byte[] nOCValue, byte[] iCACValue) {
-      updateNOC(chipClusterPtr, callback, nOCValue, iCACValue);
+    public void updateNOC(NOCResponseCallback callback, byte[] NOCValue, byte[] ICACValue) {
+      updateNOC(chipClusterPtr, callback, NOCValue, ICACValue);
     }
 
     private native void addNOC(
         long chipClusterPtr,
         NOCResponseCallback callback,
-        byte[] nOCValue,
-        byte[] iCACValue,
-        byte[] iPKValue,
+        byte[] NOCValue,
+        byte[] ICACValue,
+        byte[] IPKValue,
         long caseAdminNode,
         int adminVendorId);
 
@@ -4075,7 +4075,7 @@ public class ChipClusters {
         long chipClusterPtr, CertificateChainResponseCallback callback, int certificateType);
 
     private native void opCSRRequest(
-        long chipClusterPtr, OpCSRResponseCallback callback, byte[] cSRNonce);
+        long chipClusterPtr, OpCSRResponseCallback callback, byte[] CSRNonce);
 
     private native void removeFabric(
         long chipClusterPtr, NOCResponseCallback callback, int fabricIndex);
@@ -4087,7 +4087,7 @@ public class ChipClusters {
         long chipClusterPtr, NOCResponseCallback callback, String label);
 
     private native void updateNOC(
-        long chipClusterPtr, NOCResponseCallback callback, byte[] nOCValue, byte[] iCACValue);
+        long chipClusterPtr, NOCResponseCallback callback, byte[] NOCValue, byte[] ICACValue);
 
     public interface AttestationResponseCallback {
       void onSuccess(byte[] AttestationElements, byte[] Signature);
@@ -5615,8 +5615,8 @@ public class ChipClusters {
       public int routerId;
       public int nextHop;
       public int pathCost;
-      public int lQIIn;
-      public int lQIOut;
+      public int LQIIn;
+      public int LQIOut;
       public int age;
       public boolean allocated;
       public boolean linkEstablished;
@@ -5627,8 +5627,8 @@ public class ChipClusters {
           int routerId,
           int nextHop,
           int pathCost,
-          int lQIIn,
-          int lQIOut,
+          int LQIIn,
+          int LQIOut,
           int age,
           boolean allocated,
           boolean linkEstablished) {
@@ -5637,8 +5637,8 @@ public class ChipClusters {
         this.routerId = routerId;
         this.nextHop = nextHop;
         this.pathCost = pathCost;
-        this.lQIIn = lQIIn;
-        this.lQIOut = lQIOut;
+        this.LQIIn = LQIIn;
+        this.LQIOut = LQIOut;
         this.age = age;
         this.allocated = allocated;
         this.linkEstablished = linkEstablished;
