@@ -42,6 +42,7 @@
 #include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
@@ -203,10 +204,10 @@ private:
     ClusterInfo * mpNextAvailableClusterInfo = nullptr;
 };
 
-void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj);
-void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                          chip::TLV::TLVReader & aReader, CommandSender * apCommandObj);
+void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
+                                  CommandHandler * apCommandObj);
+void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
+                                          CommandSender * apCommandObj);
 
 /**
  *  Check whether the given cluster exists on the given endpoint and supports the given command.
@@ -218,7 +219,7 @@ void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::Comm
  *  @retval  True if the endpoint contains the server side of the given cluster and that cluster implements the given command, false
  * otherwise.
  */
-bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId);
+bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
 
 /**
  *  Fetch attribute value and version info and write to the TLVWriter provided.

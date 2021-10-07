@@ -202,7 +202,7 @@ class DeviceMgrCmd(Cmd):
         "resolve",
         "zcl",
         "zclread",
-        "zclconfigure",
+        "zclsubscribe",
 
         "discover",
 
@@ -805,10 +805,10 @@ class DeviceMgrCmd(Cmd):
             print("An exception occurred during processing input:")
             print(str(ex))
 
-    def do_zclconfigure(self, line):
+    def do_zclsubscribe(self, line):
         """
-        To configure ZCL attribute reporting:
-        zclconfigure <cluster> <attribute> <nodeid> <endpoint> <minInterval> <maxInterval> <change>
+        To subscribe ZCL attribute reporting:
+        zclsubscribe <cluster> <attribute> <nodeid> <endpoint> <minInterval> <maxInterval>
         """
         try:
             args = shlex.split(line)
@@ -821,13 +821,13 @@ class DeviceMgrCmd(Cmd):
                 cluster_attrs = all_attrs.get(args[1], {})
                 print('\n'.join([key for key in cluster_attrs.keys(
                 ) if cluster_attrs[key].get("reportable", False)]))
-            elif len(args) == 7:
+            elif len(args) == 6:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                self.devCtrl.ZCLConfigureAttribute(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), int(args[5]), int(args[6]))
+                self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), int(args[5]))
             else:
-                self.do_help("zclconfigure")
+                self.do_help("zclsubscribe")
         except exceptions.ChipStackException as ex:
             print("An exception occurred during configuring reporting of ZCL attribute:")
             print(str(ex))

@@ -332,7 +332,7 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
 class MinMdnsResolver : public Resolver, public MdnsPacketDelegate
 {
 public:
-    MinMdnsResolver() : mActiveResolves(chip::System::Internal::gClockBase)
+    MinMdnsResolver() : mActiveResolves(&chip::System::SystemClock())
     {
         GlobalMinimalMdnsServer::Instance().SetResponseDelegate(this);
     }
@@ -341,9 +341,9 @@ public:
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
 
     ///// Resolver implementation
-    CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
-    void ShutdownResolver() override;
-    CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
+    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override;
+    void Shutdown() override;
+    void SetResolverDelegate(ResolverDelegate * delegate) override { mDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
@@ -398,7 +398,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
     }
 }
 
-CHIP_ERROR MinMdnsResolver::StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port)
+CHIP_ERROR MinMdnsResolver::Init(chip::Inet::InetLayer * inetLayer)
 {
     /// Note: we do not double-check the port as we assume the APP will always use
     /// the same inetLayer and port for mDNS.
@@ -409,18 +409,12 @@ CHIP_ERROR MinMdnsResolver::StartResolver(chip::Inet::InetLayer * inetLayer, uin
 
     mSystemLayer = inetLayer->SystemLayer();
 
-    return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, port);
+    return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, kMdnsPort);
 }
 
-void MinMdnsResolver::ShutdownResolver()
+void MinMdnsResolver::Shutdown()
 {
     GlobalMinimalMdnsServer::Instance().ShutdownServer();
-}
-
-CHIP_ERROR MinMdnsResolver::SetResolverDelegate(ResolverDelegate * delegate)
-{
-    mDelegate = delegate;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type)

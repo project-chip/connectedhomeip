@@ -116,8 +116,7 @@ void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apRead
         if (CHIP_NO_ERROR == err)
         {
             AttributePath path{ .endpointId = aPath.mEndpointId, .clusterId = aPath.mClusterId, .fieldId = aPath.mFieldId };
-            onReportDataFunct(apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId(),
-                              apReadClient->GetAppIdentifier(),
+            onReportDataFunct(apReadClient->GetPeerNodeId(), apReadClient->GetAppIdentifier(),
                               /* TODO: Use real SubscriptionId */ apReadClient->IsSubscriptionType() ? 1 : 0, &path, sizeof(path),
                               writerBuffer, writer.GetLengthWritten(), to_underlying(status));
         }

@@ -44,8 +44,9 @@ public:
     AttributeValueEncoder(TLV::TLVWriter * aWriter) : mWriter(aWriter) {}
 
     template <typename... Ts>
-    CHIP_ERROR Encode(Ts... aArgs) const
+    CHIP_ERROR Encode(Ts... aArgs)
     {
+        mTriedEncode = true;
         if (mWriter == nullptr)
         {
             return CHIP_NO_ERROR;
@@ -53,12 +54,20 @@ public:
         return DataModel::Encode(*mWriter, TLV::ContextTag(AttributeDataElement::kCsTag_Data), std::forward<Ts>(aArgs)...);
     }
 
+    bool TriedEncode() const { return mTriedEncode; }
+
     // For consumers that can't just do a single Encode call for some reason
     // (e.g. they're encoding a list a bit at a time).
-    TLV::TLVWriter * GetWriter() const { return mWriter; }
+    TLV::TLVWriter * PrepareManualEncode()
+    {
+        // If this is called, the consumer is trying to encode a value.
+        mTriedEncode = true;
+        return mWriter;
+    }
 
 private:
     TLV::TLVWriter * mWriter;
+    bool mTriedEncode = false;
 };
 
 class AttributeAccessInterface
@@ -77,18 +86,15 @@ public:
      * Callback for reading attributes.
      *
      * @param [in] aClusterInfo indicates which exact data is being read.
-     * @param [in] aTLVWriter the tlv writer to put the data into.  The data
-     *                        must use the AttributeDataElement::kCsTag_Data
-     *                        context tag.
-     * @param [out] aDataRead whether we actually tried to provide data.  If
-     *                        this function returns success and aDataRead is
-     *                        false, the AttributeAccessInterface did not try
-     *                        to provide any data.  In this case, normal
-     *                        attribute access will happen for the read.  This
-     *                        may involve reading from the attribute store or
-     *                        external attribute callbacks.
+     * @param [in] aEncoder the AttributeValueEncoder to use for encoding the
+     *             data.  If this function returns scucess and no attempt is
+     *             made to encode data using aEncoder, the
+     *             AttributeAccessInterface did not try to provide any data.  In
+     *             this case, normal attribute access will happen for the read.
+     *             This may involve reading from the attribute store or external
+     *             attribute callbacks.
      */
-    virtual CHIP_ERROR Read(ClusterInfo & aClusterInfo, const AttributeValueEncoder & aEncoder, bool * aDataRead) = 0;
+    virtual CHIP_ERROR Read(ClusterInfo & aClusterInfo, AttributeValueEncoder & aEncoder) = 0;
 
     /**
      * Mechanism for keeping track of a chain of AttributeAccessInterfaces.

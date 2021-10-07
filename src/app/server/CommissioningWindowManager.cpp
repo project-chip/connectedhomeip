@@ -95,6 +95,9 @@ void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
     mFailedCommissioningAttempts++;
     ChipLogError(AppServer, "Commissioning failed (attempt %d): %s", mFailedCommissioningAttempts, ErrorStr(err));
 
+#if CONFIG_NETWORK_LAYER_BLE
+    mServer->getBleLayerObject()->mBleEndPoint->ReleaseBleConnection();
+#endif
     if (mFailedCommissioningAttempts < kMaxFailedCommissioningAttempts)
     {
         // If the number of commissioning attempts have not exceeded maximum retries, let's reopen

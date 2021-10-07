@@ -46,7 +46,8 @@ typedef uint8_t FabricIndex;
 typedef uint32_t FieldId;
 typedef uint16_t ListIndex;
 typedef uint32_t TransactionId;
-typedef uint32_t StatusCode;
 typedef uint8_t Percent;
 typedef uint16_t Percent100ths;
+
+static constexpr FabricIndex kUndefinedFabricIndex = 0;
 } // namespace chip

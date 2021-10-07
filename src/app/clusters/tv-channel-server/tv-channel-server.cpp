@@ -40,17 +40,20 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::TvChannel;
 
-TvChannelInfo tvChannelClusterChangeChannel(std::string match);
+::TvChannelInfo tvChannelClusterChangeChannel(std::string match);
 bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumer, uint16_t minorNumber);
 bool tvChannelClusterSkipChannel(uint16_t count);
 
-void sendResponse(app::CommandHandler * command, TvChannelInfo channelInfo)
+void sendResponse(app::CommandHandler * command, ::TvChannelInfo channelInfo)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
     app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TV_CHANNEL_CLUSTER_ID,
@@ -70,7 +73,9 @@ exit:
     }
 }
 
-bool emberAfTvChannelClusterChangeChannelCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t * match)
+bool emberAfTvChannelClusterChangeChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                  EndpointId endpoint, uint8_t * match,
+                                                  Commands::ChangeChannel::DecodableType & commandData)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string matchString(reinterpret_cast<char *>(match));
@@ -81,8 +86,10 @@ bool emberAfTvChannelClusterChangeChannelCallback(EndpointId endpoint, app::Comm
     return true;
 }
 
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(EndpointId endpoint, app::CommandHandler * command, uint16_t majorNumber,
-                                                          uint16_t minorNumber)
+bool emberAfTvChannelClusterChangeChannelByNumberCallback(app::CommandHandler * command,
+                                                          const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                          uint16_t majorNumber, uint16_t minorNumber,
+                                                          Commands::ChangeChannelByNumber::DecodableType & commandData)
 {
     bool success         = tvChannelClusterChangeChannelByNumber(majorNumber, minorNumber);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -90,7 +97,9 @@ bool emberAfTvChannelClusterChangeChannelByNumberCallback(EndpointId endpoint, a
     return true;
 }
 
-bool emberAfTvChannelClusterSkipChannelCallback(EndpointId endpoint, app::CommandHandler * command, uint16_t count)
+bool emberAfTvChannelClusterSkipChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                EndpointId endpoint, uint16_t count,
+                                                Commands::SkipChannel::DecodableType & commandData)
 {
     bool success         = tvChannelClusterSkipChannel(count);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;

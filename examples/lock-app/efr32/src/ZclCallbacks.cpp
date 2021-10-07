@@ -39,7 +39,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
         return;
     }
 
-    if (attributeId != OnOff::Attributes::Ids::OnOff)
+    if (attributeId != OnOff::Attributes::OnOff::Id)
     {
         EFR32_LOG("Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
         return;

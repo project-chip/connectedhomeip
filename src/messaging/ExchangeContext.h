@@ -28,7 +28,6 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/ReferenceCountedHandle.h>
 #include <lib/support/TypeTraits.h>
-#include <messaging/ExchangeACL.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
@@ -150,20 +149,6 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    ExchangeACL * GetExchangeACL(Transport::FabricTable & table)
-    {
-        if (mExchangeACL == nullptr)
-        {
-            Transport::FabricInfo * fabric = table.FindFabricWithIndex(mSecureSession.Value().GetFabricIndex());
-            if (fabric != nullptr)
-            {
-                mExchangeACL = chip::Platform::New<CASEExchangeACL>(fabric);
-            }
-        }
-
-        return mExchangeACL;
-    }
-
     SessionHandle GetSecureSession() { return mSecureSession.Value(); }
     bool HasSecureSession() const { return mSecureSession.HasValue(); }
 
@@ -183,7 +168,6 @@ private:
     Timeout mResponseTimeout       = 0; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
-    ExchangeACL * mExchangeACL     = nullptr;
 
     ExchangeMessageDispatch * mDispatch = nullptr;
 

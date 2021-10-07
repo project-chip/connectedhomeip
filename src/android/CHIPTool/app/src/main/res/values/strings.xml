@@ -92,4 +92,14 @@
     <string name="enter_setup_pin_code_hint_text">Enter Setup PIN Code</string>
     <string name="enhanced_commissioning_method_btn_text">Enhanced Commissioning Method</string>
     <string name="revoke_btn_text">Revoke</string>
+
+    <string name="op_cred_client_btn_text">Operational Credentials cluster</string>
+    <string name="op_cred_client_read_supported_fabric_btn_text">Read Supported Fabric count</string>
+    <string name="op_cred_client_read_commissioned_fabric_btn_text">Read Commissioned Fabric count</string>
+
+    <string name="basic_cluster_btn_text">Basic cluster</string>
+    <string name="basic_cluster_read_user_label_btn_text">Read User Label</string>
+    <string name="basic_cluster_write_user_label_btn_text">Write User Label</string>
+    <string name="basic_cluster_write_user_label_hint_text">Enter User Label</string>
+    <string name="basic_cluster_read_product_name_btn_text">Read Product Name</string>
 </resources>

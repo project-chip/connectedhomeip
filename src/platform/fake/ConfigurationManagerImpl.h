@@ -63,13 +63,6 @@ private:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
     CHIP_ERROR _GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-    CHIP_ERROR _StoreDeviceId(uint64_t deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreDeviceCertificate(const uint8_t * cert, size_t certLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreDeviceIntermediateCACerts(const uint8_t * certs, size_t certsLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _StoreDevicePrivateKey(const uint8_t * key, size_t keyLen) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _ClearOperationalDeviceCredentials(void) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-#endif
     CHIP_ERROR _GetManufacturerDeviceId(uint64_t & deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreManufacturerDeviceId(uint64_t deviceId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen)
@@ -139,10 +132,6 @@ private:
     bool _IsPairedToAccount() { return false; }
     bool _IsFullyProvisioned() { return false; }
     CHIP_ERROR _ComputeProvisioningHash(uint8_t * hashBuf, size_t hashBufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-    bool _OperationalDeviceCredentialsProvisioned() { return false; }
-    void _UseManufacturerCredentialsAsOperational(bool val) { return false; }
-#endif
     void _UseManufacturerCredentialsAsOperational(bool val) {}
     void _LogDeviceConfig() {}
     bool _CanFactoryReset() { return true; }

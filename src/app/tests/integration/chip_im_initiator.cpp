@@ -209,7 +209,7 @@ CHIP_ERROR SendCommandRequest(std::unique_ptr<chip::app::CommandSender> && comma
 
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -259,7 +259,7 @@ CHIP_ERROR SendBadCommandRequest(std::unique_ptr<chip::app::CommandSender> && co
 
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -333,7 +333,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVWriter * writer;
-    gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
     chip::app::AttributePathParams attributePathParams;
 
     printf("\nSend write request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
@@ -367,7 +367,7 @@ exit:
 CHIP_ERROR SendSubscribeRequest()
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
-    gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
+    gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
 
     chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex));
     chip::app::EventPathParams eventPathParams[2];
@@ -429,7 +429,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         printf("Establish secure session failed, err: %s\n", chip::ErrorStr(err));
-        gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
+        gLastMessageTime = chip::System::SystemClock().GetMonotonicMilliseconds();
     }
     else
     {
@@ -602,22 +602,23 @@ exit:
 namespace chip {
 namespace app {
 
-bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
+bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // Always return true in test.
     return true;
 }
 
-void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
+void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
+                                  CommandHandler * apCommandObj)
 {
     // Nothing todo.
 }
 
-void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                          chip::TLV::TLVReader & aReader, CommandSender * apCommandObj)
+void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
+                                          CommandSender * apCommandObj)
 {
-    if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndpointId)
+    if (aCommandPath.mClusterId != kTestClusterId || aCommandPath.mCommandId != kTestCommandId ||
+        aCommandPath.mEndpointId != kTestEndpointId)
     {
         return;
     }
@@ -660,7 +661,6 @@ int main(int argc, char * argv[])
 
     std::mutex mutex;
     std::unique_lock<std::mutex> lock(mutex);
-    chip::Transport::FabricTable fabrics;
 
     if (argc <= 1)
     {
@@ -679,11 +679,11 @@ int main(int argc, char * argv[])
     InitializeChip();
 
     err = gTransportManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
-                                     .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                                     .SetAddressType(chip::Inet::kIPAddressType_IPv6)
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &fabrics, &gMessageCounterManager);
+    err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);

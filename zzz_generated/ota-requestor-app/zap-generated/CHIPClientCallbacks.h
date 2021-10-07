@@ -38,10 +38,8 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint1
 // Cluster Specific Response Callbacks
 typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback)(void * context, uint8_t action,
                                                                                    uint32_t delayedActionTime);
-typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(void * context, uint8_t status,
-                                                                           uint32_t delayedActionTime, uint8_t * imageURI,
-                                                                           uint32_t softwareVersion, chip::ByteSpan updateToken,
-                                                                           bool userConsentNeeded,
-                                                                           chip::ByteSpan metadataForRequestor);
+typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(
+    void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
+    uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 
 // List specific responses

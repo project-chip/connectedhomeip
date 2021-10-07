@@ -115,7 +115,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus)
+CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandDataElement::Builder commandDataElement;
@@ -135,7 +135,7 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams,
     err = ConstructCommandPath(aCommandPathParams, commandDataElement);
     SuccessOrExit(err);
 
-    if (!aIsStatus)
+    if (aStartDataStruct)
     {
         err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data),
                                                              TLV::kTLVType_Structure, mDataElementContainerType);
@@ -165,14 +165,14 @@ CHIP_ERROR Command::Finalize(System::PacketBufferHandle & commandPacket)
     return mCommandMessageWriter.Finalize(&commandPacket);
 }
 
-CHIP_ERROR Command::FinishCommand(bool aIsStatus)
+CHIP_ERROR Command::FinishCommand(bool aEndDataStruct)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mState == CommandState::AddingCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
     CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
-    if (!aIsStatus)
+    if (aEndDataStruct)
     {
         ReturnErrorOnFailure(commandDataElement.GetWriter()->EndContainer(mDataElementContainerType));
     }

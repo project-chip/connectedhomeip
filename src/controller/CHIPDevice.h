@@ -32,7 +32,6 @@
 #include <app/util/basic-types.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/DeviceControllerInteractionModelDelegate.h>
-#include <credentials/CHIPOperationalCredentials.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
@@ -78,6 +77,13 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #endif
                                         >;
 
+using DeviceIPTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                          ,
+                                          Transport::UDP /* IPv4 */
+#endif
+                                          >;
+
 struct ControllerDeviceInitParams
 {
     DeviceTransportMgr * transportMgr           = nullptr;
@@ -89,7 +95,7 @@ struct ControllerDeviceInitParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
-    Transport::FabricTable * fabricsTable                 = nullptr;
+    FabricTable * fabricsTable                            = nullptr;
     DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 };
 
@@ -165,15 +171,13 @@ public:
      *   still using them, it can lead to unknown behavior and crashes.
      *
      * @param[in] params       Wrapper object for transport manager etc.
-     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] fabric        Local administrator that's initializing this device object
      */
-    void Init(ControllerDeviceInitParams params, uint16_t listenPort, FabricIndex fabric)
+    void Init(ControllerDeviceInitParams params, FabricIndex fabric)
     {
         mSessionManager  = params.sessionManager;
         mExchangeMgr     = params.exchangeMgr;
         mInetLayer       = params.inetLayer;
-        mListenPort      = listenPort;
         mFabricIndex     = fabric;
         mStorageDelegate = params.storageDelegate;
         mIDAllocator     = params.idAllocator;
@@ -196,15 +200,13 @@ public:
      *   is actually paired.
      *
      * @param[in] params       Wrapper object for transport manager etc.
-     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
      * @param[in] fabric        Local administrator that's initializing this device object
      */
-    void Init(ControllerDeviceInitParams params, uint16_t listenPort, NodeId deviceId, const Transport::PeerAddress & peerAddress,
-              FabricIndex fabric)
+    void Init(ControllerDeviceInitParams params, NodeId deviceId, const Transport::PeerAddress & peerAddress, FabricIndex fabric)
     {
-        Init(params, mListenPort, fabric);
+        Init(params, fabric);
         mDeviceId = deviceId;
         mState    = ConnectionState::Connecting;
 
@@ -524,11 +526,9 @@ private:
     static void OnOpenPairingWindowSuccessResponse(void * context);
     static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
 
-    uint16_t mListenPort;
+    FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
-    FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
-
-    Transport::FabricTable * mFabricsTable = nullptr;
+    FabricTable * mFabricsTable = nullptr;
 
     bool mDeviceOperationalCertProvisioned = false;
 

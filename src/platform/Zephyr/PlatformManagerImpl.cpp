@@ -27,12 +27,12 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_Zephyr.cpp>
 
 #include <drivers/entropy.h>
-
-#include <lib/support/logging/CHIPLogging.h>
+#include <malloc.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -85,6 +85,42 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+{
+#ifdef CONFIG_NEWLIB_LIBC
+    // This will return the amount of memory which has been allocated from the system, but is not
+    // used right now. Ideally, this value should be increased by the amount of memory which can
+    // be allocated from the system, but Zephyr does not expose that number.
+    currentHeapFree = mallinfo().fordblks;
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+{
+#ifdef CONFIG_NEWLIB_LIBC
+    currentHeapUsed = mallinfo().uordblks;
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+{
+#ifdef CONFIG_NEWLIB_LIBC
+    // ARM newlib does not provide a way to obtain the peak heap usage, so for now just return
+    // the amount of memory allocated from the system which should be an upper bound of the peak
+    // usage provided that the heap is not very fragmented.
+    currentHeapHighWatermark = mallinfo().arena;
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
 }
 
 } // namespace DeviceLayer

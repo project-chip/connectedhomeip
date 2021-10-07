@@ -164,15 +164,35 @@ public:
     bool IsThreadAttached();
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
-
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
+    void ResetThreadNetworkDiagnosticsCounts();
+    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     // Ethernet network diagnostics methods
+    CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
+    CHIP_ERROR GetEthFullDuplex(bool & fullDuplex);
+    CHIP_ERROR GetEthCarrierDetect(bool & carrierDetect);
+    CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset);
     CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount);
     CHIP_ERROR GetEthPacketTxCount(uint64_t & packetTxCount);
     CHIP_ERROR GetEthTxErrCount(uint64_t & txErrCount);
     CHIP_ERROR GetEthCollisionCount(uint64_t & collisionCount);
     CHIP_ERROR GetEthOverrunCount(uint64_t & overrunCount);
+    CHIP_ERROR ResetEthNetworkDiagnosticsCounts();
+
+    // WiFi network diagnostics methods
+    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
+    CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
+    CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber);
+    CHIP_ERROR GetWiFiRssi(int8_t & rssi);
+    CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount);
+    CHIP_ERROR GetWiFiBeaconRxCount(uint32_t & beaconRxCount);
+    CHIP_ERROR GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount);
+    CHIP_ERROR GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount);
+    CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount);
+    CHIP_ERROR GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount);
+    CHIP_ERROR GetWiFiCurrentMaxRate(uint64_t & currentMaxRate);
+    CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount);
+    CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts();
 
     // CHIPoBLE service methods
     Ble::BleLayer * GetBleLayer();
@@ -370,6 +390,26 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
 }
 
+inline CHIP_ERROR ConnectivityManager::GetEthPHYRate(uint8_t & pHYRate)
+{
+    return static_cast<ImplClass *>(this)->_GetEthPHYRate(pHYRate);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetEthFullDuplex(bool & fullDuplex)
+{
+    return static_cast<ImplClass *>(this)->_GetEthFullDuplex(fullDuplex);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetEthCarrierDetect(bool & carrierDetect)
+{
+    return static_cast<ImplClass *>(this)->_GetEthCarrierDetect(carrierDetect);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetEthTimeSinceReset(uint64_t & timeSinceReset)
+{
+    return static_cast<ImplClass *>(this)->_GetEthTimeSinceReset(timeSinceReset);
+}
+
 inline CHIP_ERROR ConnectivityManager::GetEthPacketRxCount(uint64_t & packetRxCount)
 {
     return static_cast<ImplClass *>(this)->_GetEthPacketRxCount(packetRxCount);
@@ -393,6 +433,76 @@ inline CHIP_ERROR ConnectivityManager::GetEthCollisionCount(uint64_t & collision
 inline CHIP_ERROR ConnectivityManager::GetEthOverrunCount(uint64_t & overrunCount)
 {
     return static_cast<ImplClass *>(this)->_GetEthOverrunCount(overrunCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::ResetEthNetworkDiagnosticsCounts()
+{
+    return static_cast<ImplClass *>(this)->_ResetEthNetworkDiagnosticsCounts();
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiSecurityType(uint8_t & securityType)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiSecurityType(securityType);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiVersion(uint8_t & wiFiVersion)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiVersion(wiFiVersion);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiChannelNumber(uint16_t & channelNumber)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiChannelNumber(channelNumber);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiRssi(int8_t & rssi)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiRssi(rssi);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiBeaconLostCount(beaconLostCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiBeaconRxCount(beaconRxCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiPacketMulticastRxCount(packetMulticastRxCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiPacketMulticastTxCount(packetMulticastTxCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiPacketUnicastRxCount(packetUnicastRxCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiPacketUnicastTxCount(packetUnicastTxCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiCurrentMaxRate(currentMaxRate);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetWiFiOverrunCount(uint64_t & overrunCount)
+{
+    return static_cast<ImplClass *>(this)->_GetWiFiOverrunCount(overrunCount);
+}
+
+inline CHIP_ERROR ConnectivityManager::ResetWiFiNetworkDiagnosticsCounts()
+{
+    return static_cast<ImplClass *>(this)->_ResetWiFiNetworkDiagnosticsCounts();
 }
 
 inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode()
@@ -450,6 +560,11 @@ inline void ConnectivityManager::ErasePersistentInfo()
     static_cast<ImplClass *>(this)->_ErasePersistentInfo();
 }
 
+inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
+{
+    static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
+}
+
 /*
  * @brief Get runtime value from the thread network based on the given attribute ID.
  *        The info is encoded via the AttributeValueEncoder.
@@ -464,7 +579,7 @@ inline void ConnectivityManager::ErasePersistentInfo()
  *         All other errors should be treated as a read error and reported as such.
  */
 inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                  const app::AttributeValueEncoder & encoder)
+                                                                                  app::AttributeValueEncoder & encoder)
 {
     return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }

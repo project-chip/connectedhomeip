@@ -20,14 +20,14 @@
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
-#include <controller/java/CHIPJNIError.h>
-#include <controller/java/JniReferences.h>
-#include <controller/java/JniTypeWrappers.h>
-#include <controller/java/StackLock.h>
 #include <jni.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 #include <lib/support/Span.h>
+#include <platform/PlatformManager.h>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
@@ -136,7 +136,7 @@ public:
 
     static void CallbackFn(void * context)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         jmethodID javaMethod;
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -205,7 +205,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         jmethodID javaMethod;
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -276,7 +276,7 @@ public:
 
     static void CallbackFn(void * context, bool value)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -331,7 +331,7 @@ public:
 
     static void CallbackFn(void * context, const chip::ByteSpan value)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -389,7 +389,7 @@ public:
 
     static void CallbackFn(void * context, int8_t value)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -444,7 +444,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t value)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -499,7 +499,7 @@ public:
 
     static void CallbackFn(void * context, int16_t value)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -554,7 +554,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t value)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -609,7 +609,7 @@ public:
 
     static void CallbackFn(void * context, int32_t value)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -664,7 +664,7 @@ public:
 
     static void CallbackFn(void * context, uint32_t value)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -719,7 +719,7 @@ public:
 
     static void CallbackFn(void * context, int64_t value)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -774,7 +774,7 @@ public:
 
     static void CallbackFn(void * context, uint64_t value)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -829,7 +829,7 @@ public:
 
     static void CallbackFn(void * context, const chip::ByteSpan value)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -892,7 +892,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t * setupPIN)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -963,7 +963,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status, uint8_t * data)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1034,7 +1034,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1105,7 +1105,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1175,7 +1175,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1243,7 +1243,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1312,7 +1312,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1380,7 +1380,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1448,7 +1448,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1517,7 +1517,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1586,7 +1586,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1656,7 +1656,7 @@ public:
     static void CallbackFn(void * context, uint8_t scheduleId, uint8_t status, uint32_t localStartTime, uint32_t localEndTime,
                            uint8_t operatingModeDuringHoliday)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1727,7 +1727,7 @@ public:
     static void CallbackFn(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source,
                            uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1800,7 +1800,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1871,7 +1871,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -1942,7 +1942,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t userId, uint8_t userType)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2012,7 +2012,7 @@ public:
     static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t status, uint8_t daysMask, uint8_t startHour,
                            uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2084,7 +2084,7 @@ public:
     static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t status, uint32_t localStartTime,
                            uint32_t localEndTime)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2153,7 +2153,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2222,7 +2222,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2290,7 +2290,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2358,7 +2358,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2426,7 +2426,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2495,7 +2495,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2564,7 +2564,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2632,7 +2632,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2701,7 +2701,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2770,7 +2770,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2841,7 +2841,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2912,7 +2912,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -2982,7 +2982,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status, uint16_t groupId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3052,7 +3052,7 @@ public:
     static void CallbackFn(void * context, uint8_t capacity, uint8_t groupCount,
                            /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3123,7 +3123,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status, uint16_t groupId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3191,7 +3191,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t * groupName)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3262,7 +3262,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t timeout)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3330,7 +3330,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3399,7 +3399,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3467,7 +3467,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3535,7 +3535,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3603,7 +3603,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3672,7 +3672,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3741,7 +3741,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3809,7 +3809,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3878,7 +3878,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -3947,7 +3947,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4016,7 +4016,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4084,7 +4084,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t mediaPlaybackStatus)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4153,7 +4153,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4224,7 +4224,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4295,7 +4295,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4366,7 +4366,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4437,7 +4437,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4510,7 +4510,7 @@ public:
                            /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
                            /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4586,7 +4586,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4657,7 +4657,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4728,7 +4728,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t action, uint32_t delayedActionTime)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4796,9 +4796,10 @@ public:
     };
 
     static void CallbackFn(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-                           chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
+                           uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded,
+                           chip::ByteSpan metadataForRequestor)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4806,6 +4807,8 @@ public:
         CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback * cppCallback = nullptr;
         // ByteSpan is not properly returned yet, temporarily use empty string
         UtfString imageURIStr(env, "");
+        // ByteSpan is not properly returned yet, temporarily use empty string
+        UtfString softwareVersionStringStr(env, "");
         jbyteArray updateTokenArr;
         jbyteArray metadataForRequestorArr;
 
@@ -4817,8 +4820,8 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IJLjava/lang/String;J[BZ[B)V",
-                                                      &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
+                                                      "(IJLjava/lang/String;JLjava/lang/String;[BZ[B)V", &javaMethod);
         SuccessOrExit(err);
 
         updateTokenArr = env->NewByteArray(updateToken.size());
@@ -4834,8 +4837,8 @@ public:
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jlong>(delayedActionTime),
-                            imageURIStr.jniValue(), static_cast<jlong>(softwareVersion), updateTokenArr,
-                            static_cast<jboolean>(userConsentNeeded), metadataForRequestorArr);
+                            imageURIStr.jniValue(), static_cast<jlong>(softwareVersion), softwareVersionStringStr.jniValue(),
+                            updateTokenArr, static_cast<jboolean>(userConsentNeeded), metadataForRequestorArr);
 
         env->DeleteLocalRef(updateTokenArr);
         env->DeleteLocalRef(metadataForRequestorArr);
@@ -4889,7 +4892,7 @@ public:
 
     static void CallbackFn(void * context, chip::ByteSpan AttestationElements, chip::ByteSpan Signature)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -4975,7 +4978,7 @@ public:
 
     static void CallbackFn(void * context, chip::ByteSpan Certificate)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5053,7 +5056,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5132,7 +5135,7 @@ public:
 
     static void CallbackFn(void * context, chip::ByteSpan NOCSRElements, chip::ByteSpan AttestationSignature)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5217,7 +5220,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5288,7 +5291,7 @@ public:
     static void CallbackFn(void * context, uint8_t status, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
                            /* TYPE WARNING: array array defaults to */ uint8_t * sceneList)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5360,7 +5363,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status, uint16_t groupId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5428,7 +5431,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5497,7 +5500,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5567,7 +5570,7 @@ public:
     static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
                            uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5641,7 +5644,7 @@ public:
 
     static void CallbackFn(void * context, /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch, uint8_t ErrorType)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5715,7 +5718,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t status, uint8_t * data)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5786,7 +5789,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t returnValue)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5854,7 +5857,7 @@ public:
 
     static void CallbackFn(void * context, uint8_t returnValue)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5913,7 +5916,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, uint16_t * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -5982,7 +5985,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _AudioOutputInfo * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6067,7 +6070,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, chip::ByteSpan * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6135,7 +6138,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, uint8_t * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6204,7 +6207,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _DeviceType * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6285,7 +6288,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, chip::ClusterId * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6354,7 +6357,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, chip::ClusterId * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6423,7 +6426,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, chip::EndpointId * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6492,7 +6495,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _LabelStruct * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6576,7 +6579,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _BasicCommissioningInfoType * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6662,7 +6665,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _NetworkInterfaceType * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6754,7 +6757,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _GroupState * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6836,7 +6839,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _GroupKey * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -6924,7 +6927,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _MediaInputInfo * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7011,7 +7014,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _FabricDescriptor * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7102,7 +7105,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, uint8_t * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7171,7 +7174,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _TvChannelInfo * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7262,7 +7265,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _NavigateTargetTargetInfo * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7346,7 +7349,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, uint8_t * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7415,7 +7418,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, chip::ByteSpan * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7483,7 +7486,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _TestListStructOctet * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7568,7 +7571,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _NeighborTable * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7666,7 +7669,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _RouteTable * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7759,7 +7762,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _SecurityPolicy * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7843,7 +7846,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, _OperationalDatasetComponents * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7944,7 +7947,7 @@ public:
 
     static void CallbackFn(void * context, uint16_t count, uint8_t * entries)
     {
-        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
         JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
         jobject javaCallbackRef;
@@ -7993,7 +7996,7 @@ private:
 
 JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlong clusterPtr)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ClusterBase * cluster = reinterpret_cast<ClusterBase *>(clusterPtr);
     if (cluster != nullptr)
     {
@@ -8003,7 +8006,7 @@ JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlo
 
 JNI_METHOD(jlong, AccountLoginCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     AccountLoginCluster * cppCluster = new AccountLoginCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -8013,7 +8016,7 @@ JNI_METHOD(jlong, AccountLoginCluster, initWithDevice)(JNIEnv * env, jobject sel
 JNI_METHOD(void, AccountLoginCluster, getSetupPIN)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring tempAccountIdentifier)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
 
@@ -8062,7 +8065,7 @@ exit:
 JNI_METHOD(void, AccountLoginCluster, login)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring tempAccountIdentifier, jstring setupPIN)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
 
@@ -8112,7 +8115,7 @@ exit:
 
 JNI_METHOD(void, AccountLoginCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8148,7 +8151,7 @@ JNI_METHOD(void, AccountLoginCluster, readClusterRevisionAttribute)(JNIEnv * env
 }
 JNI_METHOD(jlong, AdministratorCommissioningCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     AdministratorCommissioningCluster * cppCluster = new AdministratorCommissioningCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -8158,7 +8161,7 @@ JNI_METHOD(jlong, AdministratorCommissioningCluster, initWithDevice)(JNIEnv * en
 JNI_METHOD(void, AdministratorCommissioningCluster, openBasicCommissioningWindow)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint commissioningTimeout)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AdministratorCommissioningCluster * cppCluster;
 
@@ -8205,7 +8208,7 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openCommissioningWindow)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint commissioningTimeout, jbyteArray pAKEVerifier,
  jint discriminator, jlong iterations, jbyteArray salt, jint passcodeID)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AdministratorCommissioningCluster * cppCluster;
 
@@ -8256,7 +8259,7 @@ exit:
 JNI_METHOD(void, AdministratorCommissioningCluster, revokeCommissioning)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AdministratorCommissioningCluster * cppCluster;
 
@@ -8303,7 +8306,7 @@ exit:
 JNI_METHOD(void, AdministratorCommissioningCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8339,7 +8342,7 @@ JNI_METHOD(void, AdministratorCommissioningCluster, readClusterRevisionAttribute
 }
 JNI_METHOD(jlong, ApplicationBasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ApplicationBasicCluster * cppCluster = new ApplicationBasicCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -8348,7 +8351,7 @@ JNI_METHOD(jlong, ApplicationBasicCluster, initWithDevice)(JNIEnv * env, jobject
 
 JNI_METHOD(void, ApplicationBasicCluster, changeStatus)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint status)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationBasicCluster * cppCluster;
 
@@ -8394,7 +8397,7 @@ exit:
 
 JNI_METHOD(void, ApplicationBasicCluster, readVendorNameAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8431,7 +8434,7 @@ JNI_METHOD(void, ApplicationBasicCluster, readVendorNameAttribute)(JNIEnv * env,
 
 JNI_METHOD(void, ApplicationBasicCluster, readVendorIdAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8469,7 +8472,7 @@ JNI_METHOD(void, ApplicationBasicCluster, readVendorIdAttribute)(JNIEnv * env, j
 JNI_METHOD(void, ApplicationBasicCluster, readApplicationNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8506,7 +8509,7 @@ JNI_METHOD(void, ApplicationBasicCluster, readApplicationNameAttribute)
 
 JNI_METHOD(void, ApplicationBasicCluster, readProductIdAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8544,7 +8547,7 @@ JNI_METHOD(void, ApplicationBasicCluster, readProductIdAttribute)(JNIEnv * env, 
 JNI_METHOD(void, ApplicationBasicCluster, readApplicationIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8582,7 +8585,7 @@ JNI_METHOD(void, ApplicationBasicCluster, readApplicationIdAttribute)
 JNI_METHOD(void, ApplicationBasicCluster, readCatalogVendorIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8620,7 +8623,7 @@ JNI_METHOD(void, ApplicationBasicCluster, readCatalogVendorIdAttribute)
 JNI_METHOD(void, ApplicationBasicCluster, readApplicationStatusAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8658,7 +8661,7 @@ JNI_METHOD(void, ApplicationBasicCluster, readApplicationStatusAttribute)
 JNI_METHOD(void, ApplicationBasicCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8694,7 +8697,7 @@ JNI_METHOD(void, ApplicationBasicCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, ApplicationLauncherCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ApplicationLauncherCluster * cppCluster = new ApplicationLauncherCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -8704,7 +8707,7 @@ JNI_METHOD(jlong, ApplicationLauncherCluster, initWithDevice)(JNIEnv * env, jobj
 JNI_METHOD(void, ApplicationLauncherCluster, launchApp)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring data, jint catalogVendorId, jstring applicationId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationLauncherCluster * cppCluster;
 
@@ -8755,7 +8758,7 @@ exit:
 JNI_METHOD(void, ApplicationLauncherCluster, readApplicationLauncherListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPApplicationLauncherApplicationLauncherListAttributeCallback * onSuccess =
         new CHIPApplicationLauncherApplicationLauncherListAttributeCallback(callback);
     if (!onSuccess)
@@ -8794,7 +8797,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, readApplicationLauncherListAttribut
 JNI_METHOD(void, ApplicationLauncherCluster, readCatalogVendorIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8832,7 +8835,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, readCatalogVendorIdAttribute)
 JNI_METHOD(void, ApplicationLauncherCluster, readApplicationIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8870,7 +8873,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, readApplicationIdAttribute)
 JNI_METHOD(void, ApplicationLauncherCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -8906,7 +8909,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, AudioOutputCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     AudioOutputCluster * cppCluster = new AudioOutputCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -8916,7 +8919,7 @@ JNI_METHOD(jlong, AudioOutputCluster, initWithDevice)(JNIEnv * env, jobject self
 JNI_METHOD(void, AudioOutputCluster, renameOutput)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint index, jstring name)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AudioOutputCluster * cppCluster;
 
@@ -8963,7 +8966,7 @@ exit:
 }
 JNI_METHOD(void, AudioOutputCluster, selectOutput)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint index)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AudioOutputCluster * cppCluster;
 
@@ -9009,7 +9012,7 @@ exit:
 
 JNI_METHOD(void, AudioOutputCluster, readAudioOutputListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPAudioOutputAudioOutputListAttributeCallback * onSuccess = new CHIPAudioOutputAudioOutputListAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9047,7 +9050,7 @@ JNI_METHOD(void, AudioOutputCluster, readAudioOutputListAttribute)(JNIEnv * env,
 JNI_METHOD(void, AudioOutputCluster, readCurrentAudioOutputAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9084,7 +9087,7 @@ JNI_METHOD(void, AudioOutputCluster, readCurrentAudioOutputAttribute)
 
 JNI_METHOD(void, AudioOutputCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9120,7 +9123,7 @@ JNI_METHOD(void, AudioOutputCluster, readClusterRevisionAttribute)(JNIEnv * env,
 }
 JNI_METHOD(jlong, BarrierControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     BarrierControlCluster * cppCluster = new BarrierControlCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -9130,7 +9133,7 @@ JNI_METHOD(jlong, BarrierControlCluster, initWithDevice)(JNIEnv * env, jobject s
 JNI_METHOD(void, BarrierControlCluster, barrierControlGoToPercent)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint percentOpen)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     BarrierControlCluster * cppCluster;
 
@@ -9175,7 +9178,7 @@ exit:
 }
 JNI_METHOD(void, BarrierControlCluster, barrierControlStop)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     BarrierControlCluster * cppCluster;
 
@@ -9222,7 +9225,7 @@ exit:
 JNI_METHOD(void, BarrierControlCluster, readBarrierMovingStateAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9260,7 +9263,7 @@ JNI_METHOD(void, BarrierControlCluster, readBarrierMovingStateAttribute)
 JNI_METHOD(void, BarrierControlCluster, readBarrierSafetyStatusAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9298,7 +9301,7 @@ JNI_METHOD(void, BarrierControlCluster, readBarrierSafetyStatusAttribute)
 JNI_METHOD(void, BarrierControlCluster, readBarrierCapabilitiesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9336,7 +9339,7 @@ JNI_METHOD(void, BarrierControlCluster, readBarrierCapabilitiesAttribute)
 JNI_METHOD(void, BarrierControlCluster, readBarrierPositionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9374,7 +9377,7 @@ JNI_METHOD(void, BarrierControlCluster, readBarrierPositionAttribute)
 JNI_METHOD(void, BarrierControlCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9410,7 +9413,7 @@ JNI_METHOD(void, BarrierControlCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, BasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     BasicCluster * cppCluster = new BasicCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -9419,7 +9422,7 @@ JNI_METHOD(jlong, BasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlon
 
 JNI_METHOD(void, BasicCluster, mfgSpecificPing)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     BasicCluster * cppCluster;
 
@@ -9465,7 +9468,7 @@ exit:
 
 JNI_METHOD(void, BasicCluster, readInteractionModelVersionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9502,7 +9505,7 @@ JNI_METHOD(void, BasicCluster, readInteractionModelVersionAttribute)(JNIEnv * en
 
 JNI_METHOD(void, BasicCluster, readVendorNameAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9539,7 +9542,7 @@ JNI_METHOD(void, BasicCluster, readVendorNameAttribute)(JNIEnv * env, jobject se
 
 JNI_METHOD(void, BasicCluster, readVendorIDAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9576,7 +9579,7 @@ JNI_METHOD(void, BasicCluster, readVendorIDAttribute)(JNIEnv * env, jobject self
 
 JNI_METHOD(void, BasicCluster, readProductNameAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9613,7 +9616,7 @@ JNI_METHOD(void, BasicCluster, readProductNameAttribute)(JNIEnv * env, jobject s
 
 JNI_METHOD(void, BasicCluster, readProductIDAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9650,7 +9653,7 @@ JNI_METHOD(void, BasicCluster, readProductIDAttribute)(JNIEnv * env, jobject sel
 
 JNI_METHOD(void, BasicCluster, readUserLabelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9688,7 +9691,7 @@ JNI_METHOD(void, BasicCluster, readUserLabelAttribute)(JNIEnv * env, jobject sel
 JNI_METHOD(void, BasicCluster, writeUserLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -9727,7 +9730,7 @@ JNI_METHOD(void, BasicCluster, writeUserLabelAttribute)
 
 JNI_METHOD(void, BasicCluster, readLocationAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9765,7 +9768,7 @@ JNI_METHOD(void, BasicCluster, readLocationAttribute)(JNIEnv * env, jobject self
 JNI_METHOD(void, BasicCluster, writeLocationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -9804,7 +9807,7 @@ JNI_METHOD(void, BasicCluster, writeLocationAttribute)
 
 JNI_METHOD(void, BasicCluster, readHardwareVersionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9841,7 +9844,7 @@ JNI_METHOD(void, BasicCluster, readHardwareVersionAttribute)(JNIEnv * env, jobje
 
 JNI_METHOD(void, BasicCluster, readHardwareVersionStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9878,7 +9881,7 @@ JNI_METHOD(void, BasicCluster, readHardwareVersionStringAttribute)(JNIEnv * env,
 
 JNI_METHOD(void, BasicCluster, readSoftwareVersionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9915,7 +9918,7 @@ JNI_METHOD(void, BasicCluster, readSoftwareVersionAttribute)(JNIEnv * env, jobje
 
 JNI_METHOD(void, BasicCluster, readSoftwareVersionStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9952,7 +9955,7 @@ JNI_METHOD(void, BasicCluster, readSoftwareVersionStringAttribute)(JNIEnv * env,
 
 JNI_METHOD(void, BasicCluster, readManufacturingDateAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -9989,7 +9992,7 @@ JNI_METHOD(void, BasicCluster, readManufacturingDateAttribute)(JNIEnv * env, job
 
 JNI_METHOD(void, BasicCluster, readPartNumberAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10026,7 +10029,7 @@ JNI_METHOD(void, BasicCluster, readPartNumberAttribute)(JNIEnv * env, jobject se
 
 JNI_METHOD(void, BasicCluster, readProductURLAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10063,7 +10066,7 @@ JNI_METHOD(void, BasicCluster, readProductURLAttribute)(JNIEnv * env, jobject se
 
 JNI_METHOD(void, BasicCluster, readProductLabelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10100,7 +10103,7 @@ JNI_METHOD(void, BasicCluster, readProductLabelAttribute)(JNIEnv * env, jobject 
 
 JNI_METHOD(void, BasicCluster, readSerialNumberAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10137,7 +10140,7 @@ JNI_METHOD(void, BasicCluster, readSerialNumberAttribute)(JNIEnv * env, jobject 
 
 JNI_METHOD(void, BasicCluster, readLocalConfigDisabledAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10175,7 +10178,7 @@ JNI_METHOD(void, BasicCluster, readLocalConfigDisabledAttribute)(JNIEnv * env, j
 JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -10212,7 +10215,7 @@ JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
 
 JNI_METHOD(void, BasicCluster, readReachableAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10249,7 +10252,7 @@ JNI_METHOD(void, BasicCluster, readReachableAttribute)(JNIEnv * env, jobject sel
 
 JNI_METHOD(void, BasicCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10285,7 +10288,7 @@ JNI_METHOD(void, BasicCluster, readClusterRevisionAttribute)(JNIEnv * env, jobje
 }
 JNI_METHOD(jlong, BinaryInputBasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     BinaryInputBasicCluster * cppCluster = new BinaryInputBasicCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -10294,7 +10297,7 @@ JNI_METHOD(jlong, BinaryInputBasicCluster, initWithDevice)(JNIEnv * env, jobject
 
 JNI_METHOD(void, BinaryInputBasicCluster, readOutOfServiceAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10332,7 +10335,7 @@ JNI_METHOD(void, BinaryInputBasicCluster, readOutOfServiceAttribute)(JNIEnv * en
 JNI_METHOD(void, BinaryInputBasicCluster, writeOutOfServiceAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -10369,7 +10372,7 @@ JNI_METHOD(void, BinaryInputBasicCluster, writeOutOfServiceAttribute)
 
 JNI_METHOD(void, BinaryInputBasicCluster, readPresentValueAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10407,7 +10410,7 @@ JNI_METHOD(void, BinaryInputBasicCluster, readPresentValueAttribute)(JNIEnv * en
 JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -10444,7 +10447,7 @@ JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
 
 JNI_METHOD(void, BinaryInputBasicCluster, readStatusFlagsAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10482,7 +10485,7 @@ JNI_METHOD(void, BinaryInputBasicCluster, readStatusFlagsAttribute)(JNIEnv * env
 JNI_METHOD(void, BinaryInputBasicCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10518,7 +10521,7 @@ JNI_METHOD(void, BinaryInputBasicCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, BindingCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     BindingCluster * cppCluster = new BindingCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -10528,7 +10531,7 @@ JNI_METHOD(jlong, BindingCluster, initWithDevice)(JNIEnv * env, jobject self, jl
 JNI_METHOD(void, BindingCluster, bind)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong nodeId, jint groupId, jint endpointId, jlong clusterId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     BindingCluster * cppCluster;
 
@@ -10574,7 +10577,7 @@ exit:
 JNI_METHOD(void, BindingCluster, unbind)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong nodeId, jint groupId, jint endpointId, jlong clusterId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     BindingCluster * cppCluster;
 
@@ -10620,7 +10623,7 @@ exit:
 
 JNI_METHOD(void, BindingCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10656,7 +10659,7 @@ JNI_METHOD(void, BindingCluster, readClusterRevisionAttribute)(JNIEnv * env, job
 }
 JNI_METHOD(jlong, BridgedDeviceBasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     BridgedDeviceBasicCluster * cppCluster = new BridgedDeviceBasicCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -10665,7 +10668,7 @@ JNI_METHOD(jlong, BridgedDeviceBasicCluster, initWithDevice)(JNIEnv * env, jobje
 
 JNI_METHOD(void, BridgedDeviceBasicCluster, readVendorNameAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10702,7 +10705,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readVendorNameAttribute)(JNIEnv * en
 
 JNI_METHOD(void, BridgedDeviceBasicCluster, readVendorIDAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10740,7 +10743,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readVendorIDAttribute)(JNIEnv * env,
 JNI_METHOD(void, BridgedDeviceBasicCluster, readProductNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10777,7 +10780,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readProductNameAttribute)
 
 JNI_METHOD(void, BridgedDeviceBasicCluster, readUserLabelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10815,7 +10818,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readUserLabelAttribute)(JNIEnv * env
 JNI_METHOD(void, BridgedDeviceBasicCluster, writeUserLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -10855,7 +10858,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, writeUserLabelAttribute)
 JNI_METHOD(void, BridgedDeviceBasicCluster, readHardwareVersionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10893,7 +10896,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readHardwareVersionAttribute)
 JNI_METHOD(void, BridgedDeviceBasicCluster, readHardwareVersionStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10931,7 +10934,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readHardwareVersionStringAttribute)
 JNI_METHOD(void, BridgedDeviceBasicCluster, readSoftwareVersionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -10969,7 +10972,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readSoftwareVersionAttribute)
 JNI_METHOD(void, BridgedDeviceBasicCluster, readSoftwareVersionStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -11007,7 +11010,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readSoftwareVersionStringAttribute)
 JNI_METHOD(void, BridgedDeviceBasicCluster, readManufacturingDateAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -11044,7 +11047,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readManufacturingDateAttribute)
 
 JNI_METHOD(void, BridgedDeviceBasicCluster, readPartNumberAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -11081,7 +11084,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readPartNumberAttribute)(JNIEnv * en
 
 JNI_METHOD(void, BridgedDeviceBasicCluster, readProductURLAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -11119,7 +11122,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readProductURLAttribute)(JNIEnv * en
 JNI_METHOD(void, BridgedDeviceBasicCluster, readProductLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -11157,7 +11160,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readProductLabelAttribute)
 JNI_METHOD(void, BridgedDeviceBasicCluster, readSerialNumberAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -11194,7 +11197,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readSerialNumberAttribute)
 
 JNI_METHOD(void, BridgedDeviceBasicCluster, readReachableAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -11232,7 +11235,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readReachableAttribute)(JNIEnv * env
 JNI_METHOD(void, BridgedDeviceBasicCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -11268,7 +11271,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, ColorControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ColorControlCluster * cppCluster = new ColorControlCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -11279,7 +11282,7 @@ JNI_METHOD(void, ColorControlCluster, colorLoopSet)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint updateFlags, jint action, jint direction, jint time,
  jint startHue, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11326,7 +11329,7 @@ exit:
 JNI_METHOD(void, ColorControlCluster, enhancedMoveHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11373,7 +11376,7 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint enhancedHue, jint direction, jint transitionTime,
  jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11421,7 +11424,7 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHueAndSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint enhancedHue, jint saturation, jint transitionTime,
  jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11469,7 +11472,7 @@ JNI_METHOD(void, ColorControlCluster, enhancedStepHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime,
  jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11516,7 +11519,7 @@ exit:
 JNI_METHOD(void, ColorControlCluster, moveColor)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint rateX, jint rateY, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11563,7 +11566,7 @@ JNI_METHOD(void, ColorControlCluster, moveColorTemperature)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate, jint colorTemperatureMinimum,
  jint colorTemperatureMaximum, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11610,7 +11613,7 @@ exit:
 JNI_METHOD(void, ColorControlCluster, moveHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11656,7 +11659,7 @@ exit:
 JNI_METHOD(void, ColorControlCluster, moveSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11703,7 +11706,7 @@ JNI_METHOD(void, ColorControlCluster, moveToColor)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint colorX, jint colorY, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11751,7 +11754,7 @@ JNI_METHOD(void, ColorControlCluster, moveToColorTemperature)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint colorTemperature, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11799,7 +11802,7 @@ JNI_METHOD(void, ColorControlCluster, moveToHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint hue, jint direction, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11847,7 +11850,7 @@ JNI_METHOD(void, ColorControlCluster, moveToHueAndSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint hue, jint saturation, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11895,7 +11898,7 @@ JNI_METHOD(void, ColorControlCluster, moveToSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint saturation, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11943,7 +11946,7 @@ JNI_METHOD(void, ColorControlCluster, stepColor)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepX, jint stepY, jint transitionTime, jint optionsMask,
  jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -11991,7 +11994,7 @@ JNI_METHOD(void, ColorControlCluster, stepColorTemperature)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime,
  jint colorTemperatureMinimum, jint colorTemperatureMaximum, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -12039,7 +12042,7 @@ JNI_METHOD(void, ColorControlCluster, stepHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime,
  jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -12087,7 +12090,7 @@ JNI_METHOD(void, ColorControlCluster, stepSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime,
  jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -12134,7 +12137,7 @@ exit:
 JNI_METHOD(void, ColorControlCluster, stopMoveStep)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint optionsMask, jint optionsOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
@@ -12180,7 +12183,7 @@ exit:
 
 JNI_METHOD(void, ColorControlCluster, readCurrentHueAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12218,7 +12221,7 @@ JNI_METHOD(void, ColorControlCluster, readCurrentHueAttribute)(JNIEnv * env, job
 JNI_METHOD(void, ColorControlCluster, readCurrentSaturationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12255,7 +12258,7 @@ JNI_METHOD(void, ColorControlCluster, readCurrentSaturationAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readRemainingTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12292,7 +12295,7 @@ JNI_METHOD(void, ColorControlCluster, readRemainingTimeAttribute)(JNIEnv * env, 
 
 JNI_METHOD(void, ColorControlCluster, readCurrentXAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12329,7 +12332,7 @@ JNI_METHOD(void, ColorControlCluster, readCurrentXAttribute)(JNIEnv * env, jobje
 
 JNI_METHOD(void, ColorControlCluster, readCurrentYAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12367,7 +12370,7 @@ JNI_METHOD(void, ColorControlCluster, readCurrentYAttribute)(JNIEnv * env, jobje
 JNI_METHOD(void, ColorControlCluster, readDriftCompensationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12404,7 +12407,7 @@ JNI_METHOD(void, ColorControlCluster, readDriftCompensationAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readCompensationTextAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12441,7 +12444,7 @@ JNI_METHOD(void, ColorControlCluster, readCompensationTextAttribute)(JNIEnv * en
 
 JNI_METHOD(void, ColorControlCluster, readColorTemperatureAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12478,7 +12481,7 @@ JNI_METHOD(void, ColorControlCluster, readColorTemperatureAttribute)(JNIEnv * en
 
 JNI_METHOD(void, ColorControlCluster, readColorModeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12516,7 +12519,7 @@ JNI_METHOD(void, ColorControlCluster, readColorModeAttribute)(JNIEnv * env, jobj
 JNI_METHOD(void, ColorControlCluster, readColorControlOptionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12554,7 +12557,7 @@ JNI_METHOD(void, ColorControlCluster, readColorControlOptionsAttribute)
 JNI_METHOD(void, ColorControlCluster, writeColorControlOptionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -12592,7 +12595,7 @@ JNI_METHOD(void, ColorControlCluster, writeColorControlOptionsAttribute)
 JNI_METHOD(void, ColorControlCluster, readNumberOfPrimariesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12629,7 +12632,7 @@ JNI_METHOD(void, ColorControlCluster, readNumberOfPrimariesAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readPrimary1XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12666,7 +12669,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary1XAttribute)(JNIEnv * env, jobj
 
 JNI_METHOD(void, ColorControlCluster, readPrimary1YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12704,7 +12707,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary1YAttribute)(JNIEnv * env, jobj
 JNI_METHOD(void, ColorControlCluster, readPrimary1IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12741,7 +12744,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary1IntensityAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readPrimary2XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12778,7 +12781,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary2XAttribute)(JNIEnv * env, jobj
 
 JNI_METHOD(void, ColorControlCluster, readPrimary2YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12816,7 +12819,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary2YAttribute)(JNIEnv * env, jobj
 JNI_METHOD(void, ColorControlCluster, readPrimary2IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12853,7 +12856,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary2IntensityAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readPrimary3XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12890,7 +12893,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary3XAttribute)(JNIEnv * env, jobj
 
 JNI_METHOD(void, ColorControlCluster, readPrimary3YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12928,7 +12931,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary3YAttribute)(JNIEnv * env, jobj
 JNI_METHOD(void, ColorControlCluster, readPrimary3IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -12965,7 +12968,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary3IntensityAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readPrimary4XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13002,7 +13005,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary4XAttribute)(JNIEnv * env, jobj
 
 JNI_METHOD(void, ColorControlCluster, readPrimary4YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13040,7 +13043,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary4YAttribute)(JNIEnv * env, jobj
 JNI_METHOD(void, ColorControlCluster, readPrimary4IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13077,7 +13080,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary4IntensityAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readPrimary5XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13114,7 +13117,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary5XAttribute)(JNIEnv * env, jobj
 
 JNI_METHOD(void, ColorControlCluster, readPrimary5YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13152,7 +13155,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary5YAttribute)(JNIEnv * env, jobj
 JNI_METHOD(void, ColorControlCluster, readPrimary5IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13189,7 +13192,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary5IntensityAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readPrimary6XAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13226,7 +13229,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary6XAttribute)(JNIEnv * env, jobj
 
 JNI_METHOD(void, ColorControlCluster, readPrimary6YAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13264,7 +13267,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary6YAttribute)(JNIEnv * env, jobj
 JNI_METHOD(void, ColorControlCluster, readPrimary6IntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13301,7 +13304,7 @@ JNI_METHOD(void, ColorControlCluster, readPrimary6IntensityAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readWhitePointXAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13339,7 +13342,7 @@ JNI_METHOD(void, ColorControlCluster, readWhitePointXAttribute)(JNIEnv * env, jo
 JNI_METHOD(void, ColorControlCluster, writeWhitePointXAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -13376,7 +13379,7 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointXAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readWhitePointYAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13414,7 +13417,7 @@ JNI_METHOD(void, ColorControlCluster, readWhitePointYAttribute)(JNIEnv * env, jo
 JNI_METHOD(void, ColorControlCluster, writeWhitePointYAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -13451,7 +13454,7 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointYAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readColorPointRXAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13489,7 +13492,7 @@ JNI_METHOD(void, ColorControlCluster, readColorPointRXAttribute)(JNIEnv * env, j
 JNI_METHOD(void, ColorControlCluster, writeColorPointRXAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -13526,7 +13529,7 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRXAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readColorPointRYAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13564,7 +13567,7 @@ JNI_METHOD(void, ColorControlCluster, readColorPointRYAttribute)(JNIEnv * env, j
 JNI_METHOD(void, ColorControlCluster, writeColorPointRYAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -13602,7 +13605,7 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRYAttribute)
 JNI_METHOD(void, ColorControlCluster, readColorPointRIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13640,7 +13643,7 @@ JNI_METHOD(void, ColorControlCluster, readColorPointRIntensityAttribute)
 JNI_METHOD(void, ColorControlCluster, writeColorPointRIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -13677,7 +13680,7 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRIntensityAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readColorPointGXAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13715,7 +13718,7 @@ JNI_METHOD(void, ColorControlCluster, readColorPointGXAttribute)(JNIEnv * env, j
 JNI_METHOD(void, ColorControlCluster, writeColorPointGXAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -13752,7 +13755,7 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGXAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readColorPointGYAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13790,7 +13793,7 @@ JNI_METHOD(void, ColorControlCluster, readColorPointGYAttribute)(JNIEnv * env, j
 JNI_METHOD(void, ColorControlCluster, writeColorPointGYAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -13828,7 +13831,7 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGYAttribute)
 JNI_METHOD(void, ColorControlCluster, readColorPointGIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13866,7 +13869,7 @@ JNI_METHOD(void, ColorControlCluster, readColorPointGIntensityAttribute)
 JNI_METHOD(void, ColorControlCluster, writeColorPointGIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -13903,7 +13906,7 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGIntensityAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readColorPointBXAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -13941,7 +13944,7 @@ JNI_METHOD(void, ColorControlCluster, readColorPointBXAttribute)(JNIEnv * env, j
 JNI_METHOD(void, ColorControlCluster, writeColorPointBXAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -13978,7 +13981,7 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBXAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readColorPointBYAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14016,7 +14019,7 @@ JNI_METHOD(void, ColorControlCluster, readColorPointBYAttribute)(JNIEnv * env, j
 JNI_METHOD(void, ColorControlCluster, writeColorPointBYAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -14054,7 +14057,7 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBYAttribute)
 JNI_METHOD(void, ColorControlCluster, readColorPointBIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14092,7 +14095,7 @@ JNI_METHOD(void, ColorControlCluster, readColorPointBIntensityAttribute)
 JNI_METHOD(void, ColorControlCluster, writeColorPointBIntensityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -14130,7 +14133,7 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBIntensityAttribute)
 JNI_METHOD(void, ColorControlCluster, readEnhancedCurrentHueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14168,7 +14171,7 @@ JNI_METHOD(void, ColorControlCluster, readEnhancedCurrentHueAttribute)
 JNI_METHOD(void, ColorControlCluster, readEnhancedColorModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14205,7 +14208,7 @@ JNI_METHOD(void, ColorControlCluster, readEnhancedColorModeAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readColorLoopActiveAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14243,7 +14246,7 @@ JNI_METHOD(void, ColorControlCluster, readColorLoopActiveAttribute)(JNIEnv * env
 JNI_METHOD(void, ColorControlCluster, readColorLoopDirectionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14280,7 +14283,7 @@ JNI_METHOD(void, ColorControlCluster, readColorLoopDirectionAttribute)
 
 JNI_METHOD(void, ColorControlCluster, readColorLoopTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14318,7 +14321,7 @@ JNI_METHOD(void, ColorControlCluster, readColorLoopTimeAttribute)(JNIEnv * env, 
 JNI_METHOD(void, ColorControlCluster, readColorLoopStartEnhancedHueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14356,7 +14359,7 @@ JNI_METHOD(void, ColorControlCluster, readColorLoopStartEnhancedHueAttribute)
 JNI_METHOD(void, ColorControlCluster, readColorLoopStoredEnhancedHueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14394,7 +14397,7 @@ JNI_METHOD(void, ColorControlCluster, readColorLoopStoredEnhancedHueAttribute)
 JNI_METHOD(void, ColorControlCluster, readColorCapabilitiesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14432,7 +14435,7 @@ JNI_METHOD(void, ColorControlCluster, readColorCapabilitiesAttribute)
 JNI_METHOD(void, ColorControlCluster, readColorTempPhysicalMinAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14470,7 +14473,7 @@ JNI_METHOD(void, ColorControlCluster, readColorTempPhysicalMinAttribute)
 JNI_METHOD(void, ColorControlCluster, readColorTempPhysicalMaxAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14508,7 +14511,7 @@ JNI_METHOD(void, ColorControlCluster, readColorTempPhysicalMaxAttribute)
 JNI_METHOD(void, ColorControlCluster, readCoupleColorTempToLevelMinMiredsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14546,7 +14549,7 @@ JNI_METHOD(void, ColorControlCluster, readCoupleColorTempToLevelMinMiredsAttribu
 JNI_METHOD(void, ColorControlCluster, readStartUpColorTemperatureMiredsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14584,7 +14587,7 @@ JNI_METHOD(void, ColorControlCluster, readStartUpColorTemperatureMiredsAttribute
 JNI_METHOD(void, ColorControlCluster, writeStartUpColorTemperatureMiredsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -14622,7 +14625,7 @@ JNI_METHOD(void, ColorControlCluster, writeStartUpColorTemperatureMiredsAttribut
 
 JNI_METHOD(void, ColorControlCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14658,7 +14661,7 @@ JNI_METHOD(void, ColorControlCluster, readClusterRevisionAttribute)(JNIEnv * env
 }
 JNI_METHOD(jlong, ContentLauncherCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ContentLauncherCluster * cppCluster = new ContentLauncherCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -14668,7 +14671,7 @@ JNI_METHOD(jlong, ContentLauncherCluster, initWithDevice)(JNIEnv * env, jobject 
 JNI_METHOD(void, ContentLauncherCluster, launchContent)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean autoPlay, jstring data)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ContentLauncherCluster * cppCluster;
 
@@ -14716,7 +14719,7 @@ exit:
 JNI_METHOD(void, ContentLauncherCluster, launchURL)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring contentURL, jstring displayString)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ContentLauncherCluster * cppCluster;
 
@@ -14767,7 +14770,7 @@ exit:
 JNI_METHOD(void, ContentLauncherCluster, readAcceptsHeaderListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPContentLauncherAcceptsHeaderListAttributeCallback * onSuccess =
         new CHIPContentLauncherAcceptsHeaderListAttributeCallback(callback);
     if (!onSuccess)
@@ -14806,7 +14809,7 @@ JNI_METHOD(void, ContentLauncherCluster, readAcceptsHeaderListAttribute)
 JNI_METHOD(void, ContentLauncherCluster, readSupportedStreamingTypesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPContentLauncherSupportedStreamingTypesAttributeCallback * onSuccess =
         new CHIPContentLauncherSupportedStreamingTypesAttributeCallback(callback);
     if (!onSuccess)
@@ -14845,7 +14848,7 @@ JNI_METHOD(void, ContentLauncherCluster, readSupportedStreamingTypesAttribute)
 JNI_METHOD(void, ContentLauncherCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14881,7 +14884,7 @@ JNI_METHOD(void, ContentLauncherCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, DescriptorCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     DescriptorCluster * cppCluster = new DescriptorCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -14890,7 +14893,7 @@ JNI_METHOD(jlong, DescriptorCluster, initWithDevice)(JNIEnv * env, jobject self,
 
 JNI_METHOD(void, DescriptorCluster, readDeviceListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDescriptorDeviceListAttributeCallback * onSuccess = new CHIPDescriptorDeviceListAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14927,7 +14930,7 @@ JNI_METHOD(void, DescriptorCluster, readDeviceListAttribute)(JNIEnv * env, jobje
 
 JNI_METHOD(void, DescriptorCluster, readServerListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDescriptorServerListAttributeCallback * onSuccess = new CHIPDescriptorServerListAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -14964,7 +14967,7 @@ JNI_METHOD(void, DescriptorCluster, readServerListAttribute)(JNIEnv * env, jobje
 
 JNI_METHOD(void, DescriptorCluster, readClientListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDescriptorClientListAttributeCallback * onSuccess = new CHIPDescriptorClientListAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -15001,7 +15004,7 @@ JNI_METHOD(void, DescriptorCluster, readClientListAttribute)(JNIEnv * env, jobje
 
 JNI_METHOD(void, DescriptorCluster, readPartsListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDescriptorPartsListAttributeCallback * onSuccess = new CHIPDescriptorPartsListAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -15038,7 +15041,7 @@ JNI_METHOD(void, DescriptorCluster, readPartsListAttribute)(JNIEnv * env, jobjec
 
 JNI_METHOD(void, DescriptorCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -15074,7 +15077,7 @@ JNI_METHOD(void, DescriptorCluster, readClusterRevisionAttribute)(JNIEnv * env, 
 }
 JNI_METHOD(jlong, DiagnosticLogsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     DiagnosticLogsCluster * cppCluster = new DiagnosticLogsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -15085,7 +15088,7 @@ JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint intent, jint requestedProtocol,
  jbyteArray transferFileDesignator)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DiagnosticLogsCluster * cppCluster;
 
@@ -15133,7 +15136,7 @@ exit:
 }
 JNI_METHOD(jlong, DoorLockCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     DoorLockCluster * cppCluster = new DoorLockCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -15142,7 +15145,7 @@ JNI_METHOD(jlong, DoorLockCluster, initWithDevice)(JNIEnv * env, jobject self, j
 
 JNI_METHOD(void, DoorLockCluster, clearAllPins)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15187,7 +15190,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, clearAllRfids)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15233,7 +15236,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, clearHolidaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15278,7 +15281,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, clearPin)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15323,7 +15326,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, clearRfid)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15369,7 +15372,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, clearWeekdaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15415,7 +15418,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, clearYeardaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15461,7 +15464,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, getHolidaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15506,7 +15509,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, getLogRecord)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint logIndex)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15551,7 +15554,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, getPin)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15596,7 +15599,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, getRfid)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15641,7 +15644,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, getUserType)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15687,7 +15690,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, getWeekdaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15733,7 +15736,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, getYeardaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15778,7 +15781,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, lockDoor)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring pin)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15827,7 +15830,7 @@ JNI_METHOD(void, DoorLockCluster, setHolidaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jlong localStartTime, jlong localEndTime,
  jint operatingModeDuringHoliday)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15874,7 +15877,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, setPin)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId, jint userStatus, jint userType, jstring pin)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15922,7 +15925,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, setRfid)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId, jint userStatus, jint userType, jstring id)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -15970,7 +15973,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, setUserType)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint userId, jint userType)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -16017,7 +16020,7 @@ JNI_METHOD(void, DoorLockCluster, setWeekdaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId, jint daysMask, jint startHour,
  jint startMinute, jint endHour, jint endMinute)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -16065,7 +16068,7 @@ JNI_METHOD(void, DoorLockCluster, setYeardaySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint scheduleId, jint userId, jlong localStartTime,
  jlong localEndTime)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -16111,7 +16114,7 @@ exit:
 }
 JNI_METHOD(void, DoorLockCluster, unlockDoor)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring pin)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -16159,7 +16162,7 @@ exit:
 JNI_METHOD(void, DoorLockCluster, unlockWithTimeout)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint timeoutInSeconds, jstring pin)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
@@ -16207,7 +16210,7 @@ exit:
 
 JNI_METHOD(void, DoorLockCluster, readLockStateAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16244,7 +16247,7 @@ JNI_METHOD(void, DoorLockCluster, readLockStateAttribute)(JNIEnv * env, jobject 
 
 JNI_METHOD(void, DoorLockCluster, readLockTypeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16281,7 +16284,7 @@ JNI_METHOD(void, DoorLockCluster, readLockTypeAttribute)(JNIEnv * env, jobject s
 
 JNI_METHOD(void, DoorLockCluster, readActuatorEnabledAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16318,7 +16321,7 @@ JNI_METHOD(void, DoorLockCluster, readActuatorEnabledAttribute)(JNIEnv * env, jo
 
 JNI_METHOD(void, DoorLockCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16354,7 +16357,7 @@ JNI_METHOD(void, DoorLockCluster, readClusterRevisionAttribute)(JNIEnv * env, jo
 }
 JNI_METHOD(jlong, ElectricalMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ElectricalMeasurementCluster * cppCluster = new ElectricalMeasurementCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -16364,7 +16367,7 @@ JNI_METHOD(jlong, ElectricalMeasurementCluster, initWithDevice)(JNIEnv * env, jo
 JNI_METHOD(void, ElectricalMeasurementCluster, readMeasurementTypeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16402,7 +16405,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readMeasurementTypeAttribute)
 JNI_METHOD(void, ElectricalMeasurementCluster, readTotalActivePowerAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32sAttributeCallback * onSuccess = new CHIPInt32sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16440,7 +16443,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readTotalActivePowerAttribute)
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16478,7 +16481,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageAttribute)
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageMinAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16516,7 +16519,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageMinAttribute)
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageMaxAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16554,7 +16557,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsVoltageMaxAttribute)
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16592,7 +16595,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentAttribute)
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentMinAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16630,7 +16633,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentMinAttribute)
 JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentMaxAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16668,7 +16671,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readRmsCurrentMaxAttribute)
 JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16706,7 +16709,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerAttribute)
 JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerMinAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16744,7 +16747,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerMinAttribute)
 JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerMaxAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16782,7 +16785,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readActivePowerMaxAttribute)
 JNI_METHOD(void, ElectricalMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16818,7 +16821,7 @@ JNI_METHOD(void, ElectricalMeasurementCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, EthernetNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     EthernetNetworkDiagnosticsCluster * cppCluster = new EthernetNetworkDiagnosticsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -16827,7 +16830,7 @@ JNI_METHOD(jlong, EthernetNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * en
 
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     EthernetNetworkDiagnosticsCluster * cppCluster;
 
@@ -16871,10 +16874,86 @@ exit:
     }
 }
 
+JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readPHYRateAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    EthernetNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<EthernetNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributePHYRate(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
+JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readFullDuplexAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    EthernetNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<EthernetNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributeFullDuplex(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readPacketRxCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16912,7 +16991,7 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readPacketRxCountAttribute)
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readPacketTxCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16950,7 +17029,7 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readPacketTxCountAttribute)
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readTxErrCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -16988,7 +17067,7 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readTxErrCountAttribute)
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readCollisionCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17026,7 +17105,7 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readCollisionCountAttribute)
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readOverrunCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17061,10 +17140,86 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readOverrunCountAttribute)
     }
 }
 
+JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readCarrierDetectAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    EthernetNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<EthernetNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributeCarrierDetect(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
+JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readTimeSinceResetAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    EthernetNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<EthernetNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributeTimeSinceReset(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17100,7 +17255,7 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, readClusterRevisionAttribute
 }
 JNI_METHOD(jlong, FixedLabelCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     FixedLabelCluster * cppCluster = new FixedLabelCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -17109,7 +17264,7 @@ JNI_METHOD(jlong, FixedLabelCluster, initWithDevice)(JNIEnv * env, jobject self,
 
 JNI_METHOD(void, FixedLabelCluster, readLabelListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPFixedLabelLabelListAttributeCallback * onSuccess = new CHIPFixedLabelLabelListAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17146,7 +17301,7 @@ JNI_METHOD(void, FixedLabelCluster, readLabelListAttribute)(JNIEnv * env, jobjec
 
 JNI_METHOD(void, FixedLabelCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17182,7 +17337,7 @@ JNI_METHOD(void, FixedLabelCluster, readClusterRevisionAttribute)(JNIEnv * env, 
 }
 JNI_METHOD(jlong, FlowMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     FlowMeasurementCluster * cppCluster = new FlowMeasurementCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -17191,7 +17346,7 @@ JNI_METHOD(jlong, FlowMeasurementCluster, initWithDevice)(JNIEnv * env, jobject 
 
 JNI_METHOD(void, FlowMeasurementCluster, readMeasuredValueAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17229,7 +17384,7 @@ JNI_METHOD(void, FlowMeasurementCluster, readMeasuredValueAttribute)(JNIEnv * en
 JNI_METHOD(void, FlowMeasurementCluster, readMinMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17267,7 +17422,7 @@ JNI_METHOD(void, FlowMeasurementCluster, readMinMeasuredValueAttribute)
 JNI_METHOD(void, FlowMeasurementCluster, readMaxMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17305,7 +17460,7 @@ JNI_METHOD(void, FlowMeasurementCluster, readMaxMeasuredValueAttribute)
 JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17341,7 +17496,7 @@ JNI_METHOD(void, FlowMeasurementCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, GeneralCommissioningCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     GeneralCommissioningCluster * cppCluster = new GeneralCommissioningCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -17351,7 +17506,7 @@ JNI_METHOD(jlong, GeneralCommissioningCluster, initWithDevice)(JNIEnv * env, job
 JNI_METHOD(void, GeneralCommissioningCluster, armFailSafe)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint expiryLengthSeconds, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
 
@@ -17396,7 +17551,7 @@ exit:
 }
 JNI_METHOD(void, GeneralCommissioningCluster, commissioningComplete)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
 
@@ -17443,7 +17598,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint location, jstring countryCode, jlong breadcrumb,
  jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
 
@@ -17493,7 +17648,7 @@ exit:
 JNI_METHOD(void, GeneralCommissioningCluster, readBreadcrumbAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17531,7 +17686,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, readBreadcrumbAttribute)
 JNI_METHOD(void, GeneralCommissioningCluster, writeBreadcrumbAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -17569,7 +17724,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, writeBreadcrumbAttribute)
 JNI_METHOD(void, GeneralCommissioningCluster, readBasicCommissioningInfoListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback * onSuccess =
         new CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback(callback);
     if (!onSuccess)
@@ -17608,7 +17763,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, readBasicCommissioningInfoListAttr
 JNI_METHOD(void, GeneralCommissioningCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17644,7 +17799,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, GeneralDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     GeneralDiagnosticsCluster * cppCluster = new GeneralDiagnosticsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -17654,7 +17809,7 @@ JNI_METHOD(jlong, GeneralDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobje
 JNI_METHOD(void, GeneralDiagnosticsCluster, readNetworkInterfacesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback * onSuccess =
         new CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback(callback);
     if (!onSuccess)
@@ -17693,7 +17848,7 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, readNetworkInterfacesAttribute)
 JNI_METHOD(void, GeneralDiagnosticsCluster, readRebootCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17730,7 +17885,7 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, readRebootCountAttribute)
 
 JNI_METHOD(void, GeneralDiagnosticsCluster, readUpTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17768,7 +17923,7 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, readUpTimeAttribute)(JNIEnv * env, j
 JNI_METHOD(void, GeneralDiagnosticsCluster, readTotalOperationalHoursAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17806,7 +17961,7 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, readTotalOperationalHoursAttribute)
 JNI_METHOD(void, GeneralDiagnosticsCluster, readBootReasonsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17844,7 +17999,7 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, readBootReasonsAttribute)
 JNI_METHOD(void, GeneralDiagnosticsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17880,7 +18035,7 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, GroupKeyManagementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     GroupKeyManagementCluster * cppCluster = new GroupKeyManagementCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -17889,7 +18044,7 @@ JNI_METHOD(jlong, GroupKeyManagementCluster, initWithDevice)(JNIEnv * env, jobje
 
 JNI_METHOD(void, GroupKeyManagementCluster, readGroupsAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPGroupKeyManagementGroupsAttributeCallback * onSuccess = new CHIPGroupKeyManagementGroupsAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17926,7 +18081,7 @@ JNI_METHOD(void, GroupKeyManagementCluster, readGroupsAttribute)(JNIEnv * env, j
 
 JNI_METHOD(void, GroupKeyManagementCluster, readGroupKeysAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPGroupKeyManagementGroupKeysAttributeCallback * onSuccess = new CHIPGroupKeyManagementGroupKeysAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -17964,7 +18119,7 @@ JNI_METHOD(void, GroupKeyManagementCluster, readGroupKeysAttribute)(JNIEnv * env
 JNI_METHOD(void, GroupKeyManagementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -18000,7 +18155,7 @@ JNI_METHOD(void, GroupKeyManagementCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, GroupsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     GroupsCluster * cppCluster = new GroupsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -18010,7 +18165,7 @@ JNI_METHOD(jlong, GroupsCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
 JNI_METHOD(void, GroupsCluster, addGroup)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jstring groupName)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -18058,7 +18213,7 @@ exit:
 JNI_METHOD(void, GroupsCluster, addGroupIfIdentifying)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jstring groupName)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -18106,7 +18261,7 @@ exit:
 JNI_METHOD(void, GroupsCluster, getGroupMembership)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupCount, jint groupList)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -18151,7 +18306,7 @@ exit:
 }
 JNI_METHOD(void, GroupsCluster, removeAllGroups)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -18196,7 +18351,7 @@ exit:
 }
 JNI_METHOD(void, GroupsCluster, removeGroup)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -18241,7 +18396,7 @@ exit:
 }
 JNI_METHOD(void, GroupsCluster, viewGroup)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
@@ -18287,7 +18442,7 @@ exit:
 
 JNI_METHOD(void, GroupsCluster, readNameSupportAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -18324,7 +18479,7 @@ JNI_METHOD(void, GroupsCluster, readNameSupportAttribute)(JNIEnv * env, jobject 
 
 JNI_METHOD(void, GroupsCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -18360,7 +18515,7 @@ JNI_METHOD(void, GroupsCluster, readClusterRevisionAttribute)(JNIEnv * env, jobj
 }
 JNI_METHOD(jlong, IdentifyCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     IdentifyCluster * cppCluster = new IdentifyCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -18369,7 +18524,7 @@ JNI_METHOD(jlong, IdentifyCluster, initWithDevice)(JNIEnv * env, jobject self, j
 
 JNI_METHOD(void, IdentifyCluster, identify)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint identifyTime)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     IdentifyCluster * cppCluster;
 
@@ -18414,7 +18569,7 @@ exit:
 }
 JNI_METHOD(void, IdentifyCluster, identifyQuery)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     IdentifyCluster * cppCluster;
 
@@ -18457,10 +18612,56 @@ exit:
         env->CallVoidMethod(callback, method, exception);
     }
 }
+JNI_METHOD(void, IdentifyCluster, triggerEffect)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint effectIdentifier, jint effectVariant)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    IdentifyCluster * cppCluster;
+
+    CHIPDefaultSuccessCallback * onSuccess;
+    CHIPDefaultFailureCallback * onFailure;
+
+    cppCluster = reinterpret_cast<IdentifyCluster *>(clusterPtr);
+    VerifyOrExit(cppCluster != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    onSuccess = new CHIPDefaultSuccessCallback(callback);
+    VerifyOrExit(onSuccess != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    onFailure = new CHIPDefaultFailureCallback(callback);
+    VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = cppCluster->TriggerEffect(onSuccess->Cancel(), onFailure->Cancel(), effectIdentifier, effectVariant);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+
+        jthrowable exception;
+        jmethodID method;
+
+        err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+
+        err = CreateIllegalStateException(env, "Error invoking cluster", err.Format(), exception);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        env->CallVoidMethod(callback, method, exception);
+    }
+}
 
 JNI_METHOD(void, IdentifyCluster, readIdentifyTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -18498,7 +18699,7 @@ JNI_METHOD(void, IdentifyCluster, readIdentifyTimeAttribute)(JNIEnv * env, jobje
 JNI_METHOD(void, IdentifyCluster, writeIdentifyTimeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -18533,9 +18734,46 @@ JNI_METHOD(void, IdentifyCluster, writeIdentifyTimeAttribute)
     }
 }
 
+JNI_METHOD(void, IdentifyCluster, readIdentifyTypeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    IdentifyCluster * cppCluster = reinterpret_cast<IdentifyCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributeIdentifyType(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
 JNI_METHOD(void, IdentifyCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -18571,7 +18809,7 @@ JNI_METHOD(void, IdentifyCluster, readClusterRevisionAttribute)(JNIEnv * env, jo
 }
 JNI_METHOD(jlong, KeypadInputCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     KeypadInputCluster * cppCluster = new KeypadInputCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -18580,7 +18818,7 @@ JNI_METHOD(jlong, KeypadInputCluster, initWithDevice)(JNIEnv * env, jobject self
 
 JNI_METHOD(void, KeypadInputCluster, sendKey)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint keyCode)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     KeypadInputCluster * cppCluster;
 
@@ -18626,7 +18864,7 @@ exit:
 
 JNI_METHOD(void, KeypadInputCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -18662,7 +18900,7 @@ JNI_METHOD(void, KeypadInputCluster, readClusterRevisionAttribute)(JNIEnv * env,
 }
 JNI_METHOD(jlong, LevelControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     LevelControlCluster * cppCluster = new LevelControlCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -18672,7 +18910,7 @@ JNI_METHOD(jlong, LevelControlCluster, initWithDevice)(JNIEnv * env, jobject sel
 JNI_METHOD(void, LevelControlCluster, move)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate, jint optionMask, jint optionOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -18719,7 +18957,7 @@ JNI_METHOD(void, LevelControlCluster, moveToLevel)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint level, jint transitionTime, jint optionMask,
  jint optionOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -18765,7 +19003,7 @@ exit:
 JNI_METHOD(void, LevelControlCluster, moveToLevelWithOnOff)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint level, jint transitionTime)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -18811,7 +19049,7 @@ exit:
 JNI_METHOD(void, LevelControlCluster, moveWithOnOff)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint moveMode, jint rate)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -18858,7 +19096,7 @@ JNI_METHOD(void, LevelControlCluster, step)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime, jint optionMask,
  jint optionOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -18905,7 +19143,7 @@ exit:
 JNI_METHOD(void, LevelControlCluster, stepWithOnOff)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint stepMode, jint stepSize, jint transitionTime)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -18951,7 +19189,7 @@ exit:
 JNI_METHOD(void, LevelControlCluster, stop)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint optionMask, jint optionOverride)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -18996,7 +19234,7 @@ exit:
 }
 JNI_METHOD(void, LevelControlCluster, stopWithOnOff)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
@@ -19042,7 +19280,7 @@ exit:
 
 JNI_METHOD(void, LevelControlCluster, readCurrentLevelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -19079,7 +19317,7 @@ JNI_METHOD(void, LevelControlCluster, readCurrentLevelAttribute)(JNIEnv * env, j
 
 JNI_METHOD(void, LevelControlCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -19115,7 +19353,7 @@ JNI_METHOD(void, LevelControlCluster, readClusterRevisionAttribute)(JNIEnv * env
 }
 JNI_METHOD(jlong, LowPowerCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     LowPowerCluster * cppCluster = new LowPowerCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -19124,7 +19362,7 @@ JNI_METHOD(jlong, LowPowerCluster, initWithDevice)(JNIEnv * env, jobject self, j
 
 JNI_METHOD(void, LowPowerCluster, sleep)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     LowPowerCluster * cppCluster;
 
@@ -19170,7 +19408,7 @@ exit:
 
 JNI_METHOD(void, LowPowerCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -19206,7 +19444,7 @@ JNI_METHOD(void, LowPowerCluster, readClusterRevisionAttribute)(JNIEnv * env, jo
 }
 JNI_METHOD(jlong, MediaInputCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     MediaInputCluster * cppCluster = new MediaInputCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -19215,7 +19453,7 @@ JNI_METHOD(jlong, MediaInputCluster, initWithDevice)(JNIEnv * env, jobject self,
 
 JNI_METHOD(void, MediaInputCluster, hideInputStatus)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
@@ -19261,7 +19499,7 @@ exit:
 JNI_METHOD(void, MediaInputCluster, renameInput)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint index, jstring name)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
@@ -19308,7 +19546,7 @@ exit:
 }
 JNI_METHOD(void, MediaInputCluster, selectInput)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint index)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
@@ -19353,7 +19591,7 @@ exit:
 }
 JNI_METHOD(void, MediaInputCluster, showInputStatus)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
@@ -19399,7 +19637,7 @@ exit:
 
 JNI_METHOD(void, MediaInputCluster, readMediaInputListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPMediaInputMediaInputListAttributeCallback * onSuccess = new CHIPMediaInputMediaInputListAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -19436,7 +19674,7 @@ JNI_METHOD(void, MediaInputCluster, readMediaInputListAttribute)(JNIEnv * env, j
 
 JNI_METHOD(void, MediaInputCluster, readCurrentMediaInputAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -19473,7 +19711,7 @@ JNI_METHOD(void, MediaInputCluster, readCurrentMediaInputAttribute)(JNIEnv * env
 
 JNI_METHOD(void, MediaInputCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -19509,7 +19747,7 @@ JNI_METHOD(void, MediaInputCluster, readClusterRevisionAttribute)(JNIEnv * env, 
 }
 JNI_METHOD(jlong, MediaPlaybackCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     MediaPlaybackCluster * cppCluster = new MediaPlaybackCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -19518,7 +19756,7 @@ JNI_METHOD(jlong, MediaPlaybackCluster, initWithDevice)(JNIEnv * env, jobject se
 
 JNI_METHOD(void, MediaPlaybackCluster, mediaFastForward)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -19563,7 +19801,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaNext)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -19608,7 +19846,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaPause)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -19653,7 +19891,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaPlay)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -19698,7 +19936,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaPrevious)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -19743,7 +19981,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaRewind)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -19788,7 +20026,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaSeek)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong position)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -19834,7 +20072,7 @@ exit:
 JNI_METHOD(void, MediaPlaybackCluster, mediaSkipBackward)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong deltaPositionMilliseconds)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -19880,7 +20118,7 @@ exit:
 JNI_METHOD(void, MediaPlaybackCluster, mediaSkipForward)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong deltaPositionMilliseconds)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -19925,7 +20163,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaStartOver)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -19970,7 +20208,7 @@ exit:
 }
 JNI_METHOD(void, MediaPlaybackCluster, mediaStop)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
@@ -20016,7 +20254,7 @@ exit:
 
 JNI_METHOD(void, MediaPlaybackCluster, readPlaybackStateAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -20053,7 +20291,7 @@ JNI_METHOD(void, MediaPlaybackCluster, readPlaybackStateAttribute)(JNIEnv * env,
 
 JNI_METHOD(void, MediaPlaybackCluster, readStartTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -20090,7 +20328,7 @@ JNI_METHOD(void, MediaPlaybackCluster, readStartTimeAttribute)(JNIEnv * env, job
 
 JNI_METHOD(void, MediaPlaybackCluster, readDurationAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -20128,7 +20366,7 @@ JNI_METHOD(void, MediaPlaybackCluster, readDurationAttribute)(JNIEnv * env, jobj
 JNI_METHOD(void, MediaPlaybackCluster, readPositionUpdatedAtAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -20165,7 +20403,7 @@ JNI_METHOD(void, MediaPlaybackCluster, readPositionUpdatedAtAttribute)
 
 JNI_METHOD(void, MediaPlaybackCluster, readPositionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -20202,7 +20440,7 @@ JNI_METHOD(void, MediaPlaybackCluster, readPositionAttribute)(JNIEnv * env, jobj
 
 JNI_METHOD(void, MediaPlaybackCluster, readPlaybackSpeedAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -20239,7 +20477,7 @@ JNI_METHOD(void, MediaPlaybackCluster, readPlaybackSpeedAttribute)(JNIEnv * env,
 
 JNI_METHOD(void, MediaPlaybackCluster, readSeekRangeEndAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -20276,7 +20514,7 @@ JNI_METHOD(void, MediaPlaybackCluster, readSeekRangeEndAttribute)(JNIEnv * env, 
 
 JNI_METHOD(void, MediaPlaybackCluster, readSeekRangeStartAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -20313,7 +20551,7 @@ JNI_METHOD(void, MediaPlaybackCluster, readSeekRangeStartAttribute)(JNIEnv * env
 
 JNI_METHOD(void, MediaPlaybackCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -20349,7 +20587,7 @@ JNI_METHOD(void, MediaPlaybackCluster, readClusterRevisionAttribute)(JNIEnv * en
 }
 JNI_METHOD(jlong, NetworkCommissioningCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     NetworkCommissioningCluster * cppCluster = new NetworkCommissioningCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -20359,7 +20597,7 @@ JNI_METHOD(jlong, NetworkCommissioningCluster, initWithDevice)(JNIEnv * env, job
 JNI_METHOD(void, NetworkCommissioningCluster, addThreadNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray operationalDataset, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -20409,7 +20647,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, addWiFiNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jbyteArray credentials, jlong breadcrumb,
  jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -20459,7 +20697,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, disableNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -20508,7 +20746,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, enableNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -20557,7 +20795,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, getLastNetworkCommissioningResult)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -20603,7 +20841,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -20652,7 +20890,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -20700,7 +20938,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, updateThreadNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray operationalDataset, jlong breadcrumb, jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -20750,7 +20988,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, updateWiFiNetwork)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jbyteArray credentials, jlong breadcrumb,
  jlong timeoutMs)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
@@ -20801,7 +21039,7 @@ exit:
 JNI_METHOD(void, NetworkCommissioningCluster, readFeatureMapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -20839,7 +21077,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, readFeatureMapAttribute)
 JNI_METHOD(void, NetworkCommissioningCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -20875,7 +21113,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, OtaSoftwareUpdateProviderCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     OtaSoftwareUpdateProviderCluster * cppCluster = new OtaSoftwareUpdateProviderCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -20885,7 +21123,7 @@ JNI_METHOD(jlong, OtaSoftwareUpdateProviderCluster, initWithDevice)(JNIEnv * env
 JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, applyUpdateRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray updateToken, jlong newVersion)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateProviderCluster * cppCluster;
 
@@ -20932,9 +21170,9 @@ exit:
     }
 }
 JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, notifyUpdateApplied)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray updateToken, jlong currentVersion)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray updateToken, jlong softwareVersion)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateProviderCluster * cppCluster;
 
@@ -20952,7 +21190,7 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, notifyUpdateApplied)
 
     err = cppCluster->NotifyUpdateApplied(onSuccess->Cancel(), onFailure->Cancel(),
                                           chip::ByteSpan((const uint8_t *) updateTokenArr.data(), updateTokenArr.size()),
-                                          currentVersion);
+                                          softwareVersion);
     SuccessOrExit(err);
 
 exit:
@@ -20981,11 +21219,10 @@ exit:
     }
 }
 JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint vendorId, jint productId, jint imageType,
- jint hardwareVersion, jlong currentVersion, jint protocolsSupported, jstring location, jboolean requestorCanConsent,
- jbyteArray metadataForProvider)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint vendorId, jint productId, jint hardwareVersion,
+ jlong softwareVersion, jint protocolsSupported, jstring location, jboolean requestorCanConsent, jbyteArray metadataForProvider)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateProviderCluster * cppCluster;
 
@@ -21002,9 +21239,9 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
     onFailure = new CHIPDefaultFailureCallback(callback);
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = cppCluster->QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, imageType, hardwareVersion,
-                                 currentVersion, protocolsSupported,
-                                 chip::ByteSpan((const uint8_t *) location, strlen(locationStr.c_str())), requestorCanConsent,
+    err = cppCluster->QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, hardwareVersion, softwareVersion,
+                                 protocolsSupported, chip::ByteSpan((const uint8_t *) location, strlen(locationStr.c_str())),
+                                 requestorCanConsent,
                                  chip::ByteSpan((const uint8_t *) metadataForProviderArr.data(), metadataForProviderArr.size()));
     SuccessOrExit(err);
 
@@ -21037,7 +21274,7 @@ exit:
 JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21073,7 +21310,7 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, OtaSoftwareUpdateRequestorCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     OtaSoftwareUpdateRequestorCluster * cppCluster = new OtaSoftwareUpdateRequestorCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -21081,14 +21318,14 @@ JNI_METHOD(jlong, OtaSoftwareUpdateRequestorCluster, initWithDevice)(JNIEnv * en
 }
 
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray serverLocation, jint vendorId, jint announcementReason,
- jbyteArray metadataForNode)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray providerLocation, jint vendorId,
+ jint announcementReason, jbyteArray metadataForNode)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateRequestorCluster * cppCluster;
 
-    JniByteArray serverLocationArr(env, serverLocation);
+    JniByteArray providerLocationArr(env, providerLocation);
     JniByteArray metadataForNodeArr(env, metadataForNode);
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -21102,7 +21339,7 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->AnnounceOtaProvider(onSuccess->Cancel(), onFailure->Cancel(),
-                                          chip::ByteSpan((const uint8_t *) serverLocationArr.data(), serverLocationArr.size()),
+                                          chip::ByteSpan((const uint8_t *) providerLocationArr.data(), providerLocationArr.size()),
                                           vendorId, announcementReason,
                                           chip::ByteSpan((const uint8_t *) metadataForNodeArr.data(), metadataForNodeArr.size()));
     SuccessOrExit(err);
@@ -21136,7 +21373,7 @@ exit:
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, readDefaultOtaProviderAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21174,7 +21411,7 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, readDefaultOtaProviderAttrib
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProviderAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -21214,7 +21451,7 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProviderAttri
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, readUpdatePossibleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21252,7 +21489,7 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, readUpdatePossibleAttribute)
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21288,7 +21525,7 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, readClusterRevisionAttribute
 }
 JNI_METHOD(jlong, OccupancySensingCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     OccupancySensingCluster * cppCluster = new OccupancySensingCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -21297,7 +21534,7 @@ JNI_METHOD(jlong, OccupancySensingCluster, initWithDevice)(JNIEnv * env, jobject
 
 JNI_METHOD(void, OccupancySensingCluster, readOccupancyAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21335,7 +21572,7 @@ JNI_METHOD(void, OccupancySensingCluster, readOccupancyAttribute)(JNIEnv * env, 
 JNI_METHOD(void, OccupancySensingCluster, readOccupancySensorTypeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21373,7 +21610,7 @@ JNI_METHOD(void, OccupancySensingCluster, readOccupancySensorTypeAttribute)
 JNI_METHOD(void, OccupancySensingCluster, readOccupancySensorTypeBitmapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21411,7 +21648,7 @@ JNI_METHOD(void, OccupancySensingCluster, readOccupancySensorTypeBitmapAttribute
 JNI_METHOD(void, OccupancySensingCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21447,7 +21684,7 @@ JNI_METHOD(void, OccupancySensingCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, OnOffCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     OnOffCluster * cppCluster = new OnOffCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -21456,7 +21693,7 @@ JNI_METHOD(jlong, OnOffCluster, initWithDevice)(JNIEnv * env, jobject self, jlon
 
 JNI_METHOD(void, OnOffCluster, off)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
@@ -21502,7 +21739,7 @@ exit:
 JNI_METHOD(void, OnOffCluster, offWithEffect)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint effectId, jint effectVariant)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
@@ -21547,7 +21784,7 @@ exit:
 }
 JNI_METHOD(void, OnOffCluster, on)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
@@ -21592,7 +21829,7 @@ exit:
 }
 JNI_METHOD(void, OnOffCluster, onWithRecallGlobalScene)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
@@ -21638,7 +21875,7 @@ exit:
 JNI_METHOD(void, OnOffCluster, onWithTimedOff)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint onOffControl, jint onTime, jint offWaitTime)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
@@ -21683,7 +21920,7 @@ exit:
 }
 JNI_METHOD(void, OnOffCluster, toggle)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
@@ -21729,7 +21966,7 @@ exit:
 
 JNI_METHOD(void, OnOffCluster, readOnOffAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21766,7 +22003,7 @@ JNI_METHOD(void, OnOffCluster, readOnOffAttribute)(JNIEnv * env, jobject self, j
 
 JNI_METHOD(void, OnOffCluster, readGlobalSceneControlAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21803,7 +22040,7 @@ JNI_METHOD(void, OnOffCluster, readGlobalSceneControlAttribute)(JNIEnv * env, jo
 
 JNI_METHOD(void, OnOffCluster, readOnTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21840,7 +22077,7 @@ JNI_METHOD(void, OnOffCluster, readOnTimeAttribute)(JNIEnv * env, jobject self, 
 
 JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -21877,7 +22114,7 @@ JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)(JNIEnv * env, jobject self,
 
 JNI_METHOD(void, OnOffCluster, readOffWaitTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21915,7 +22152,7 @@ JNI_METHOD(void, OnOffCluster, readOffWaitTimeAttribute)(JNIEnv * env, jobject s
 JNI_METHOD(void, OnOffCluster, writeOffWaitTimeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -21952,7 +22189,7 @@ JNI_METHOD(void, OnOffCluster, writeOffWaitTimeAttribute)
 
 JNI_METHOD(void, OnOffCluster, readStartUpOnOffAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -21990,7 +22227,7 @@ JNI_METHOD(void, OnOffCluster, readStartUpOnOffAttribute)(JNIEnv * env, jobject 
 JNI_METHOD(void, OnOffCluster, writeStartUpOnOffAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -22027,7 +22264,7 @@ JNI_METHOD(void, OnOffCluster, writeStartUpOnOffAttribute)
 
 JNI_METHOD(void, OnOffCluster, readFeatureMapAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -22064,7 +22301,7 @@ JNI_METHOD(void, OnOffCluster, readFeatureMapAttribute)(JNIEnv * env, jobject se
 
 JNI_METHOD(void, OnOffCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -22100,7 +22337,7 @@ JNI_METHOD(void, OnOffCluster, readClusterRevisionAttribute)(JNIEnv * env, jobje
 }
 JNI_METHOD(jlong, OnOffSwitchConfigurationCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     OnOffSwitchConfigurationCluster * cppCluster = new OnOffSwitchConfigurationCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -22110,7 +22347,7 @@ JNI_METHOD(jlong, OnOffSwitchConfigurationCluster, initWithDevice)(JNIEnv * env,
 JNI_METHOD(void, OnOffSwitchConfigurationCluster, readSwitchTypeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -22148,7 +22385,7 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, readSwitchTypeAttribute)
 JNI_METHOD(void, OnOffSwitchConfigurationCluster, readSwitchActionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -22186,7 +22423,7 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, readSwitchActionsAttribute)
 JNI_METHOD(void, OnOffSwitchConfigurationCluster, writeSwitchActionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -22224,7 +22461,7 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, writeSwitchActionsAttribute)
 JNI_METHOD(void, OnOffSwitchConfigurationCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -22260,7 +22497,7 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, OperationalCredentialsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     OperationalCredentialsCluster * cppCluster = new OperationalCredentialsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -22271,7 +22508,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, addNOC)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray nOCValue, jbyteArray iCACValue, jbyteArray iPKValue,
  jlong caseAdminNode, jint adminVendorId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -22323,7 +22560,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, addTrustedRootCertificate)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray rootCertificate)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -22372,7 +22609,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, attestationRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray attestationNonce)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -22420,7 +22657,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint certificateType)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -22466,7 +22703,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray cSRNonce)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -22514,7 +22751,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, removeFabric)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint fabricIndex)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -22560,7 +22797,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, removeTrustedRootCertificate)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray trustedRootIdentifier)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -22609,7 +22846,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, updateFabricLabel)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring label)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -22657,7 +22894,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, updateNOC)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray nOCValue, jbyteArray iCACValue)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
@@ -22708,7 +22945,7 @@ exit:
 JNI_METHOD(void, OperationalCredentialsCluster, readFabricsListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPOperationalCredentialsFabricsListAttributeCallback * onSuccess =
         new CHIPOperationalCredentialsFabricsListAttributeCallback(callback);
     if (!onSuccess)
@@ -22747,7 +22984,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, readFabricsListAttribute)
 JNI_METHOD(void, OperationalCredentialsCluster, readSupportedFabricsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -22785,7 +23022,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, readSupportedFabricsAttribute)
 JNI_METHOD(void, OperationalCredentialsCluster, readCommissionedFabricsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -22823,7 +23060,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, readCommissionedFabricsAttribute
 JNI_METHOD(void, OperationalCredentialsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -22859,7 +23096,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, PowerSourceCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     PowerSourceCluster * cppCluster = new PowerSourceCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -22868,7 +23105,7 @@ JNI_METHOD(jlong, PowerSourceCluster, initWithDevice)(JNIEnv * env, jobject self
 
 JNI_METHOD(void, PowerSourceCluster, readStatusAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -22905,7 +23142,7 @@ JNI_METHOD(void, PowerSourceCluster, readStatusAttribute)(JNIEnv * env, jobject 
 
 JNI_METHOD(void, PowerSourceCluster, readOrderAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -22942,7 +23179,7 @@ JNI_METHOD(void, PowerSourceCluster, readOrderAttribute)(JNIEnv * env, jobject s
 
 JNI_METHOD(void, PowerSourceCluster, readDescriptionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -22979,7 +23216,7 @@ JNI_METHOD(void, PowerSourceCluster, readDescriptionAttribute)(JNIEnv * env, job
 
 JNI_METHOD(void, PowerSourceCluster, readBatteryVoltageAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23017,7 +23254,7 @@ JNI_METHOD(void, PowerSourceCluster, readBatteryVoltageAttribute)(JNIEnv * env, 
 JNI_METHOD(void, PowerSourceCluster, readBatteryPercentRemainingAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23055,7 +23292,7 @@ JNI_METHOD(void, PowerSourceCluster, readBatteryPercentRemainingAttribute)
 JNI_METHOD(void, PowerSourceCluster, readBatteryTimeRemainingAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23093,7 +23330,7 @@ JNI_METHOD(void, PowerSourceCluster, readBatteryTimeRemainingAttribute)
 JNI_METHOD(void, PowerSourceCluster, readBatteryChargeLevelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23131,7 +23368,7 @@ JNI_METHOD(void, PowerSourceCluster, readBatteryChargeLevelAttribute)
 JNI_METHOD(void, PowerSourceCluster, readActiveBatteryFaultsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPPowerSourceActiveBatteryFaultsAttributeCallback * onSuccess =
         new CHIPPowerSourceActiveBatteryFaultsAttributeCallback(callback);
     if (!onSuccess)
@@ -23170,7 +23407,7 @@ JNI_METHOD(void, PowerSourceCluster, readActiveBatteryFaultsAttribute)
 JNI_METHOD(void, PowerSourceCluster, readBatteryChargeStateAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23207,7 +23444,7 @@ JNI_METHOD(void, PowerSourceCluster, readBatteryChargeStateAttribute)
 
 JNI_METHOD(void, PowerSourceCluster, readFeatureMapAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23244,7 +23481,7 @@ JNI_METHOD(void, PowerSourceCluster, readFeatureMapAttribute)(JNIEnv * env, jobj
 
 JNI_METHOD(void, PowerSourceCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23280,7 +23517,7 @@ JNI_METHOD(void, PowerSourceCluster, readClusterRevisionAttribute)(JNIEnv * env,
 }
 JNI_METHOD(jlong, PressureMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     PressureMeasurementCluster * cppCluster = new PressureMeasurementCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -23290,7 +23527,7 @@ JNI_METHOD(jlong, PressureMeasurementCluster, initWithDevice)(JNIEnv * env, jobj
 JNI_METHOD(void, PressureMeasurementCluster, readMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23328,7 +23565,7 @@ JNI_METHOD(void, PressureMeasurementCluster, readMeasuredValueAttribute)
 JNI_METHOD(void, PressureMeasurementCluster, readMinMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23366,7 +23603,7 @@ JNI_METHOD(void, PressureMeasurementCluster, readMinMeasuredValueAttribute)
 JNI_METHOD(void, PressureMeasurementCluster, readMaxMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23404,7 +23641,7 @@ JNI_METHOD(void, PressureMeasurementCluster, readMaxMeasuredValueAttribute)
 JNI_METHOD(void, PressureMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23440,7 +23677,7 @@ JNI_METHOD(void, PressureMeasurementCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, PumpConfigurationAndControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     PumpConfigurationAndControlCluster * cppCluster = new PumpConfigurationAndControlCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -23450,7 +23687,7 @@ JNI_METHOD(jlong, PumpConfigurationAndControlCluster, initWithDevice)(JNIEnv * e
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readMaxPressureAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23488,7 +23725,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readMaxPressureAttribute)
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readMaxSpeedAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23526,7 +23763,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readMaxSpeedAttribute)
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readMaxFlowAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23564,7 +23801,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readMaxFlowAttribute)
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readEffectiveOperationModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23602,7 +23839,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readEffectiveOperationModeA
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readEffectiveControlModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23640,7 +23877,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readEffectiveControlModeAtt
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readCapacityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23678,7 +23915,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readCapacityAttribute)
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readOperationModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23716,7 +23953,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readOperationModeAttribute)
 JNI_METHOD(void, PumpConfigurationAndControlCluster, writeOperationModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -23754,7 +23991,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeOperationModeAttribute
 JNI_METHOD(void, PumpConfigurationAndControlCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23790,7 +24027,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readClusterRevisionAttribut
 }
 JNI_METHOD(jlong, RelativeHumidityMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     RelativeHumidityMeasurementCluster * cppCluster = new RelativeHumidityMeasurementCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -23800,7 +24037,7 @@ JNI_METHOD(jlong, RelativeHumidityMeasurementCluster, initWithDevice)(JNIEnv * e
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23838,7 +24075,7 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMeasuredValueAttribute)
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMinMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23876,7 +24113,7 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMinMeasuredValueAttribu
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMaxMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23914,7 +24151,7 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, readMaxMeasuredValueAttribu
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -23950,7 +24187,7 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, readClusterRevisionAttribut
 }
 JNI_METHOD(jlong, ScenesCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ScenesCluster * cppCluster = new ScenesCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -23961,7 +24198,7 @@ JNI_METHOD(void, ScenesCluster, addScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jint sceneId, jint transitionTime, jstring sceneName,
  jlong clusterId, jint length, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -24008,7 +24245,7 @@ exit:
 }
 JNI_METHOD(void, ScenesCluster, getSceneMembership)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -24054,7 +24291,7 @@ exit:
 JNI_METHOD(void, ScenesCluster, recallScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jint sceneId, jint transitionTime)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -24099,7 +24336,7 @@ exit:
 }
 JNI_METHOD(void, ScenesCluster, removeAllScenes)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -24145,7 +24382,7 @@ exit:
 JNI_METHOD(void, ScenesCluster, removeScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jint sceneId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -24191,7 +24428,7 @@ exit:
 JNI_METHOD(void, ScenesCluster, storeScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jint sceneId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -24237,7 +24474,7 @@ exit:
 JNI_METHOD(void, ScenesCluster, viewScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint groupId, jint sceneId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
@@ -24283,7 +24520,7 @@ exit:
 
 JNI_METHOD(void, ScenesCluster, readSceneCountAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24320,7 +24557,7 @@ JNI_METHOD(void, ScenesCluster, readSceneCountAttribute)(JNIEnv * env, jobject s
 
 JNI_METHOD(void, ScenesCluster, readCurrentSceneAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24357,7 +24594,7 @@ JNI_METHOD(void, ScenesCluster, readCurrentSceneAttribute)(JNIEnv * env, jobject
 
 JNI_METHOD(void, ScenesCluster, readCurrentGroupAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24394,7 +24631,7 @@ JNI_METHOD(void, ScenesCluster, readCurrentGroupAttribute)(JNIEnv * env, jobject
 
 JNI_METHOD(void, ScenesCluster, readSceneValidAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24431,7 +24668,7 @@ JNI_METHOD(void, ScenesCluster, readSceneValidAttribute)(JNIEnv * env, jobject s
 
 JNI_METHOD(void, ScenesCluster, readNameSupportAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24468,7 +24705,7 @@ JNI_METHOD(void, ScenesCluster, readNameSupportAttribute)(JNIEnv * env, jobject 
 
 JNI_METHOD(void, ScenesCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24504,7 +24741,7 @@ JNI_METHOD(void, ScenesCluster, readClusterRevisionAttribute)(JNIEnv * env, jobj
 }
 JNI_METHOD(jlong, SoftwareDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     SoftwareDiagnosticsCluster * cppCluster = new SoftwareDiagnosticsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -24513,7 +24750,7 @@ JNI_METHOD(jlong, SoftwareDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobj
 
 JNI_METHOD(void, SoftwareDiagnosticsCluster, resetWatermarks)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     SoftwareDiagnosticsCluster * cppCluster;
 
@@ -24560,7 +24797,7 @@ exit:
 JNI_METHOD(void, SoftwareDiagnosticsCluster, readCurrentHeapFreeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24598,7 +24835,7 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, readCurrentHeapFreeAttribute)
 JNI_METHOD(void, SoftwareDiagnosticsCluster, readCurrentHeapUsedAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24636,7 +24873,7 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, readCurrentHeapUsedAttribute)
 JNI_METHOD(void, SoftwareDiagnosticsCluster, readCurrentHeapHighWatermarkAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24674,7 +24911,7 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, readCurrentHeapHighWatermarkAttribu
 JNI_METHOD(void, SoftwareDiagnosticsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24710,7 +24947,7 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, SwitchCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     SwitchCluster * cppCluster = new SwitchCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -24719,7 +24956,7 @@ JNI_METHOD(jlong, SwitchCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
 
 JNI_METHOD(void, SwitchCluster, readNumberOfPositionsAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24756,7 +24993,7 @@ JNI_METHOD(void, SwitchCluster, readNumberOfPositionsAttribute)(JNIEnv * env, jo
 
 JNI_METHOD(void, SwitchCluster, readCurrentPositionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24793,7 +25030,7 @@ JNI_METHOD(void, SwitchCluster, readCurrentPositionAttribute)(JNIEnv * env, jobj
 
 JNI_METHOD(void, SwitchCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -24829,7 +25066,7 @@ JNI_METHOD(void, SwitchCluster, readClusterRevisionAttribute)(JNIEnv * env, jobj
 }
 JNI_METHOD(jlong, TvChannelCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     TvChannelCluster * cppCluster = new TvChannelCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -24838,7 +25075,7 @@ JNI_METHOD(jlong, TvChannelCluster, initWithDevice)(JNIEnv * env, jobject self, 
 
 JNI_METHOD(void, TvChannelCluster, changeChannel)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring match)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TvChannelCluster * cppCluster;
 
@@ -24886,7 +25123,7 @@ exit:
 JNI_METHOD(void, TvChannelCluster, changeChannelByNumber)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint majorNumber, jint minorNumber)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TvChannelCluster * cppCluster;
 
@@ -24931,7 +25168,7 @@ exit:
 }
 JNI_METHOD(void, TvChannelCluster, skipChannel)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint count)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TvChannelCluster * cppCluster;
 
@@ -24977,7 +25214,7 @@ exit:
 
 JNI_METHOD(void, TvChannelCluster, readTvChannelListAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPTvChannelTvChannelListAttributeCallback * onSuccess = new CHIPTvChannelTvChannelListAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25014,7 +25251,7 @@ JNI_METHOD(void, TvChannelCluster, readTvChannelListAttribute)(JNIEnv * env, job
 
 JNI_METHOD(void, TvChannelCluster, readTvChannelLineupAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25051,7 +25288,7 @@ JNI_METHOD(void, TvChannelCluster, readTvChannelLineupAttribute)(JNIEnv * env, j
 
 JNI_METHOD(void, TvChannelCluster, readCurrentTvChannelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25088,7 +25325,7 @@ JNI_METHOD(void, TvChannelCluster, readCurrentTvChannelAttribute)(JNIEnv * env, 
 
 JNI_METHOD(void, TvChannelCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25124,7 +25361,7 @@ JNI_METHOD(void, TvChannelCluster, readClusterRevisionAttribute)(JNIEnv * env, j
 }
 JNI_METHOD(jlong, TargetNavigatorCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     TargetNavigatorCluster * cppCluster = new TargetNavigatorCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -25134,7 +25371,7 @@ JNI_METHOD(jlong, TargetNavigatorCluster, initWithDevice)(JNIEnv * env, jobject 
 JNI_METHOD(void, TargetNavigatorCluster, navigateTarget)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint target, jstring data)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TargetNavigatorCluster * cppCluster;
 
@@ -25183,7 +25420,7 @@ exit:
 JNI_METHOD(void, TargetNavigatorCluster, readTargetNavigatorListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPTargetNavigatorTargetNavigatorListAttributeCallback * onSuccess =
         new CHIPTargetNavigatorTargetNavigatorListAttributeCallback(callback);
     if (!onSuccess)
@@ -25222,7 +25459,7 @@ JNI_METHOD(void, TargetNavigatorCluster, readTargetNavigatorListAttribute)
 JNI_METHOD(void, TargetNavigatorCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25258,7 +25495,7 @@ JNI_METHOD(void, TargetNavigatorCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, TemperatureMeasurementCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     TemperatureMeasurementCluster * cppCluster = new TemperatureMeasurementCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -25268,7 +25505,7 @@ JNI_METHOD(jlong, TemperatureMeasurementCluster, initWithDevice)(JNIEnv * env, j
 JNI_METHOD(void, TemperatureMeasurementCluster, readMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25306,7 +25543,7 @@ JNI_METHOD(void, TemperatureMeasurementCluster, readMeasuredValueAttribute)
 JNI_METHOD(void, TemperatureMeasurementCluster, readMinMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25344,7 +25581,7 @@ JNI_METHOD(void, TemperatureMeasurementCluster, readMinMeasuredValueAttribute)
 JNI_METHOD(void, TemperatureMeasurementCluster, readMaxMeasuredValueAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25382,7 +25619,7 @@ JNI_METHOD(void, TemperatureMeasurementCluster, readMaxMeasuredValueAttribute)
 JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25418,7 +25655,7 @@ JNI_METHOD(void, TemperatureMeasurementCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, TestClusterCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     TestClusterCluster * cppCluster = new TestClusterCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -25427,7 +25664,7 @@ JNI_METHOD(jlong, TestClusterCluster, initWithDevice)(JNIEnv * env, jobject self
 
 JNI_METHOD(void, TestClusterCluster, test)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
@@ -25473,7 +25710,7 @@ exit:
 JNI_METHOD(void, TestClusterCluster, testAddArguments)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint arg1, jint arg2)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
@@ -25518,7 +25755,7 @@ exit:
 }
 JNI_METHOD(void, TestClusterCluster, testNotHandled)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
@@ -25563,7 +25800,7 @@ exit:
 }
 JNI_METHOD(void, TestClusterCluster, testSpecific)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
@@ -25608,7 +25845,7 @@ exit:
 }
 JNI_METHOD(void, TestClusterCluster, testUnknownCommand)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
@@ -25654,7 +25891,7 @@ exit:
 
 JNI_METHOD(void, TestClusterCluster, readBooleanAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25692,7 +25929,7 @@ JNI_METHOD(void, TestClusterCluster, readBooleanAttribute)(JNIEnv * env, jobject
 JNI_METHOD(void, TestClusterCluster, writeBooleanAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -25729,7 +25966,7 @@ JNI_METHOD(void, TestClusterCluster, writeBooleanAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readBitmap8Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25767,7 +26004,7 @@ JNI_METHOD(void, TestClusterCluster, readBitmap8Attribute)(JNIEnv * env, jobject
 JNI_METHOD(void, TestClusterCluster, writeBitmap8Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -25804,7 +26041,7 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap8Attribute)
 
 JNI_METHOD(void, TestClusterCluster, readBitmap16Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25842,7 +26079,7 @@ JNI_METHOD(void, TestClusterCluster, readBitmap16Attribute)(JNIEnv * env, jobjec
 JNI_METHOD(void, TestClusterCluster, writeBitmap16Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -25879,7 +26116,7 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap16Attribute)
 
 JNI_METHOD(void, TestClusterCluster, readBitmap32Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25917,7 +26154,7 @@ JNI_METHOD(void, TestClusterCluster, readBitmap32Attribute)(JNIEnv * env, jobjec
 JNI_METHOD(void, TestClusterCluster, writeBitmap32Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -25954,7 +26191,7 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap32Attribute)
 
 JNI_METHOD(void, TestClusterCluster, readBitmap64Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -25992,7 +26229,7 @@ JNI_METHOD(void, TestClusterCluster, readBitmap64Attribute)(JNIEnv * env, jobjec
 JNI_METHOD(void, TestClusterCluster, writeBitmap64Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26029,7 +26266,7 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap64Attribute)
 
 JNI_METHOD(void, TestClusterCluster, readInt8uAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26067,7 +26304,7 @@ JNI_METHOD(void, TestClusterCluster, readInt8uAttribute)(JNIEnv * env, jobject s
 JNI_METHOD(void, TestClusterCluster, writeInt8uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26104,7 +26341,7 @@ JNI_METHOD(void, TestClusterCluster, writeInt8uAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readInt16uAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26142,7 +26379,7 @@ JNI_METHOD(void, TestClusterCluster, readInt16uAttribute)(JNIEnv * env, jobject 
 JNI_METHOD(void, TestClusterCluster, writeInt16uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26179,7 +26416,7 @@ JNI_METHOD(void, TestClusterCluster, writeInt16uAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readInt32uAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26217,7 +26454,7 @@ JNI_METHOD(void, TestClusterCluster, readInt32uAttribute)(JNIEnv * env, jobject 
 JNI_METHOD(void, TestClusterCluster, writeInt32uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26254,7 +26491,7 @@ JNI_METHOD(void, TestClusterCluster, writeInt32uAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readInt64uAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26292,7 +26529,7 @@ JNI_METHOD(void, TestClusterCluster, readInt64uAttribute)(JNIEnv * env, jobject 
 JNI_METHOD(void, TestClusterCluster, writeInt64uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26329,7 +26566,7 @@ JNI_METHOD(void, TestClusterCluster, writeInt64uAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readInt8sAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8sAttributeCallback * onSuccess = new CHIPInt8sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26367,7 +26604,7 @@ JNI_METHOD(void, TestClusterCluster, readInt8sAttribute)(JNIEnv * env, jobject s
 JNI_METHOD(void, TestClusterCluster, writeInt8sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26404,7 +26641,7 @@ JNI_METHOD(void, TestClusterCluster, writeInt8sAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readInt16sAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26442,7 +26679,7 @@ JNI_METHOD(void, TestClusterCluster, readInt16sAttribute)(JNIEnv * env, jobject 
 JNI_METHOD(void, TestClusterCluster, writeInt16sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26479,7 +26716,7 @@ JNI_METHOD(void, TestClusterCluster, writeInt16sAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readInt32sAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32sAttributeCallback * onSuccess = new CHIPInt32sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26517,7 +26754,7 @@ JNI_METHOD(void, TestClusterCluster, readInt32sAttribute)(JNIEnv * env, jobject 
 JNI_METHOD(void, TestClusterCluster, writeInt32sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26554,7 +26791,7 @@ JNI_METHOD(void, TestClusterCluster, writeInt32sAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readInt64sAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64sAttributeCallback * onSuccess = new CHIPInt64sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26592,7 +26829,7 @@ JNI_METHOD(void, TestClusterCluster, readInt64sAttribute)(JNIEnv * env, jobject 
 JNI_METHOD(void, TestClusterCluster, writeInt64sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26629,7 +26866,7 @@ JNI_METHOD(void, TestClusterCluster, writeInt64sAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readEnum8Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26667,7 +26904,7 @@ JNI_METHOD(void, TestClusterCluster, readEnum8Attribute)(JNIEnv * env, jobject s
 JNI_METHOD(void, TestClusterCluster, writeEnum8Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26704,7 +26941,7 @@ JNI_METHOD(void, TestClusterCluster, writeEnum8Attribute)
 
 JNI_METHOD(void, TestClusterCluster, readEnum16Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26742,7 +26979,7 @@ JNI_METHOD(void, TestClusterCluster, readEnum16Attribute)(JNIEnv * env, jobject 
 JNI_METHOD(void, TestClusterCluster, writeEnum16Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26779,7 +27016,7 @@ JNI_METHOD(void, TestClusterCluster, writeEnum16Attribute)
 
 JNI_METHOD(void, TestClusterCluster, readOctetStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26817,7 +27054,7 @@ JNI_METHOD(void, TestClusterCluster, readOctetStringAttribute)(JNIEnv * env, job
 JNI_METHOD(void, TestClusterCluster, writeOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -26856,7 +27093,7 @@ JNI_METHOD(void, TestClusterCluster, writeOctetStringAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readListInt8uAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPTestClusterListInt8uAttributeCallback * onSuccess = new CHIPTestClusterListInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26893,7 +27130,7 @@ JNI_METHOD(void, TestClusterCluster, readListInt8uAttribute)(JNIEnv * env, jobje
 
 JNI_METHOD(void, TestClusterCluster, readListOctetStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPTestClusterListOctetStringAttributeCallback * onSuccess = new CHIPTestClusterListOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -26931,7 +27168,7 @@ JNI_METHOD(void, TestClusterCluster, readListOctetStringAttribute)(JNIEnv * env,
 JNI_METHOD(void, TestClusterCluster, readListStructOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPTestClusterListStructOctetStringAttributeCallback * onSuccess =
         new CHIPTestClusterListStructOctetStringAttributeCallback(callback);
     if (!onSuccess)
@@ -26969,7 +27206,7 @@ JNI_METHOD(void, TestClusterCluster, readListStructOctetStringAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readLongOctetStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27007,7 +27244,7 @@ JNI_METHOD(void, TestClusterCluster, readLongOctetStringAttribute)(JNIEnv * env,
 JNI_METHOD(void, TestClusterCluster, writeLongOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -27046,7 +27283,7 @@ JNI_METHOD(void, TestClusterCluster, writeLongOctetStringAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readCharStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27084,7 +27321,7 @@ JNI_METHOD(void, TestClusterCluster, readCharStringAttribute)(JNIEnv * env, jobj
 JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -27123,7 +27360,7 @@ JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readLongCharStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27161,7 +27398,7 @@ JNI_METHOD(void, TestClusterCluster, readLongCharStringAttribute)(JNIEnv * env, 
 JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -27200,7 +27437,7 @@ JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readEpochUsAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27238,7 +27475,7 @@ JNI_METHOD(void, TestClusterCluster, readEpochUsAttribute)(JNIEnv * env, jobject
 JNI_METHOD(void, TestClusterCluster, writeEpochUsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -27275,7 +27512,7 @@ JNI_METHOD(void, TestClusterCluster, writeEpochUsAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readEpochSAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27313,7 +27550,7 @@ JNI_METHOD(void, TestClusterCluster, readEpochSAttribute)(JNIEnv * env, jobject 
 JNI_METHOD(void, TestClusterCluster, writeEpochSAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jlong value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -27350,7 +27587,7 @@ JNI_METHOD(void, TestClusterCluster, writeEpochSAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readUnsupportedAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPBooleanAttributeCallback * onSuccess = new CHIPBooleanAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27388,7 +27625,7 @@ JNI_METHOD(void, TestClusterCluster, readUnsupportedAttribute)(JNIEnv * env, job
 JNI_METHOD(void, TestClusterCluster, writeUnsupportedAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -27425,7 +27662,7 @@ JNI_METHOD(void, TestClusterCluster, writeUnsupportedAttribute)
 
 JNI_METHOD(void, TestClusterCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27461,7 +27698,7 @@ JNI_METHOD(void, TestClusterCluster, readClusterRevisionAttribute)(JNIEnv * env,
 }
 JNI_METHOD(jlong, ThermostatCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ThermostatCluster * cppCluster = new ThermostatCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -27470,7 +27707,7 @@ JNI_METHOD(jlong, ThermostatCluster, initWithDevice)(JNIEnv * env, jobject self,
 
 JNI_METHOD(void, ThermostatCluster, clearWeeklySchedule)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
@@ -27515,7 +27752,7 @@ exit:
 }
 JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
@@ -27561,7 +27798,7 @@ exit:
 JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint daysToReturn, jint modeToReturn)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
@@ -27608,7 +27845,7 @@ JNI_METHOD(void, ThermostatCluster, setWeeklySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint numberOfTransitionsForSequence, jint dayOfWeekForSequence,
  jint modeForSequence, jint payload)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
@@ -27655,7 +27892,7 @@ exit:
 JNI_METHOD(void, ThermostatCluster, setpointRaiseLower)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint mode, jint amount)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
@@ -27701,7 +27938,7 @@ exit:
 
 JNI_METHOD(void, ThermostatCluster, readLocalTemperatureAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27739,7 +27976,7 @@ JNI_METHOD(void, ThermostatCluster, readLocalTemperatureAttribute)(JNIEnv * env,
 JNI_METHOD(void, ThermostatCluster, readAbsMinHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27777,7 +28014,7 @@ JNI_METHOD(void, ThermostatCluster, readAbsMinHeatSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, readAbsMaxHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27815,7 +28052,7 @@ JNI_METHOD(void, ThermostatCluster, readAbsMaxHeatSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, readAbsMinCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27853,7 +28090,7 @@ JNI_METHOD(void, ThermostatCluster, readAbsMinCoolSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, readAbsMaxCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27891,7 +28128,7 @@ JNI_METHOD(void, ThermostatCluster, readAbsMaxCoolSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, readOccupiedCoolingSetpointAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -27929,7 +28166,7 @@ JNI_METHOD(void, ThermostatCluster, readOccupiedCoolingSetpointAttribute)
 JNI_METHOD(void, ThermostatCluster, writeOccupiedCoolingSetpointAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -27967,7 +28204,7 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedCoolingSetpointAttribute)
 JNI_METHOD(void, ThermostatCluster, readOccupiedHeatingSetpointAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28005,7 +28242,7 @@ JNI_METHOD(void, ThermostatCluster, readOccupiedHeatingSetpointAttribute)
 JNI_METHOD(void, ThermostatCluster, writeOccupiedHeatingSetpointAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -28043,7 +28280,7 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedHeatingSetpointAttribute)
 JNI_METHOD(void, ThermostatCluster, readMinHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28081,7 +28318,7 @@ JNI_METHOD(void, ThermostatCluster, readMinHeatSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, writeMinHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -28119,7 +28356,7 @@ JNI_METHOD(void, ThermostatCluster, writeMinHeatSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, readMaxHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28157,7 +28394,7 @@ JNI_METHOD(void, ThermostatCluster, readMaxHeatSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, writeMaxHeatSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -28195,7 +28432,7 @@ JNI_METHOD(void, ThermostatCluster, writeMaxHeatSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, readMinCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28233,7 +28470,7 @@ JNI_METHOD(void, ThermostatCluster, readMinCoolSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, writeMinCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -28271,7 +28508,7 @@ JNI_METHOD(void, ThermostatCluster, writeMinCoolSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, readMaxCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16sAttributeCallback * onSuccess = new CHIPInt16sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28309,7 +28546,7 @@ JNI_METHOD(void, ThermostatCluster, readMaxCoolSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -28347,7 +28584,7 @@ JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
 JNI_METHOD(void, ThermostatCluster, readControlSequenceOfOperationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28385,7 +28622,7 @@ JNI_METHOD(void, ThermostatCluster, readControlSequenceOfOperationAttribute)
 JNI_METHOD(void, ThermostatCluster, writeControlSequenceOfOperationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -28423,7 +28660,7 @@ JNI_METHOD(void, ThermostatCluster, writeControlSequenceOfOperationAttribute)
 
 JNI_METHOD(void, ThermostatCluster, readSystemModeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28461,7 +28698,7 @@ JNI_METHOD(void, ThermostatCluster, readSystemModeAttribute)(JNIEnv * env, jobje
 JNI_METHOD(void, ThermostatCluster, writeSystemModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -28498,7 +28735,7 @@ JNI_METHOD(void, ThermostatCluster, writeSystemModeAttribute)
 
 JNI_METHOD(void, ThermostatCluster, readStartOfWeekAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28536,7 +28773,7 @@ JNI_METHOD(void, ThermostatCluster, readStartOfWeekAttribute)(JNIEnv * env, jobj
 JNI_METHOD(void, ThermostatCluster, readNumberOfWeeklyTransitionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28574,7 +28811,7 @@ JNI_METHOD(void, ThermostatCluster, readNumberOfWeeklyTransitionsAttribute)
 JNI_METHOD(void, ThermostatCluster, readNumberOfDailyTransitionsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28611,7 +28848,7 @@ JNI_METHOD(void, ThermostatCluster, readNumberOfDailyTransitionsAttribute)
 
 JNI_METHOD(void, ThermostatCluster, readFeatureMapAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28648,7 +28885,7 @@ JNI_METHOD(void, ThermostatCluster, readFeatureMapAttribute)(JNIEnv * env, jobje
 
 JNI_METHOD(void, ThermostatCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28685,7 +28922,7 @@ JNI_METHOD(void, ThermostatCluster, readClusterRevisionAttribute)(JNIEnv * env, 
 JNI_METHOD(jlong, ThermostatUserInterfaceConfigurationCluster, initWithDevice)
 (JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ThermostatUserInterfaceConfigurationCluster * cppCluster = new ThermostatUserInterfaceConfigurationCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -28695,7 +28932,7 @@ JNI_METHOD(jlong, ThermostatUserInterfaceConfigurationCluster, initWithDevice)
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readTemperatureDisplayModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28734,7 +28971,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readTemperatureDis
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDisplayModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -28773,7 +29010,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDi
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readKeypadLockoutAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28812,7 +29049,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readKeypadLockoutA
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockoutAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -28851,7 +29088,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockout
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readScheduleProgrammingVisibilityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28890,7 +29127,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readScheduleProgra
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgrammingVisibilityAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -28930,7 +29167,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgr
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -28967,7 +29204,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readClusterRevisio
 }
 JNI_METHOD(jlong, ThreadNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     ThreadNetworkDiagnosticsCluster * cppCluster = new ThreadNetworkDiagnosticsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -28976,7 +29213,7 @@ JNI_METHOD(jlong, ThreadNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env,
 
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThreadNetworkDiagnosticsCluster * cppCluster;
 
@@ -29023,7 +29260,7 @@ exit:
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChannelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29061,7 +29298,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChannelAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRoutingRoleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29099,7 +29336,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRoutingRoleAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readNetworkNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29137,7 +29374,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readNetworkNameAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPanIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29175,7 +29412,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPanIdAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readExtendedPanIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29213,7 +29450,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readExtendedPanIdAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readMeshLocalPrefixAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29251,7 +29488,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readMeshLocalPrefixAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readOverrunCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29289,7 +29526,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readOverrunCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readNeighborTableListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback * onSuccess =
         new CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback(callback);
     if (!onSuccess)
@@ -29328,7 +29565,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readNeighborTableListAttribute
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRouteTableListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback * onSuccess =
         new CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback(callback);
     if (!onSuccess)
@@ -29367,7 +29604,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRouteTableListAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPartitionIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29405,7 +29642,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPartitionIdAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readWeightingAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29443,7 +29680,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readWeightingAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readDataVersionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29481,7 +29718,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readDataVersionAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readStableDataVersionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29519,7 +29756,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readStableDataVersionAttribute
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readLeaderRouterIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29557,7 +29794,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readLeaderRouterIdAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readDetachedRoleCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29595,7 +29832,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readDetachedRoleCountAttribute
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChildRoleCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29633,7 +29870,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChildRoleCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRouterRoleCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29671,7 +29908,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRouterRoleCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readLeaderRoleCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29709,7 +29946,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readLeaderRoleCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readAttachAttemptCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29747,7 +29984,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readAttachAttemptCountAttribut
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPartitionIdChangeCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29785,7 +30022,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPartitionIdChangeCountAttr
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readBetterPartitionAttachAttemptCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29823,7 +30060,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readBetterPartitionAttachAttem
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readParentChangeCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29861,7 +30098,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readParentChangeCountAttribute
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxTotalCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29899,7 +30136,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxTotalCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxUnicastCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29937,7 +30174,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxUnicastCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBroadcastCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -29975,7 +30212,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBroadcastCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxAckRequestedCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30013,7 +30250,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxAckRequestedCountAttribu
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxAckedCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30051,7 +30288,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxAckedCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxNoAckRequestedCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30089,7 +30326,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxNoAckRequestedCountAttri
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDataCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30127,7 +30364,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDataCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDataPollCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30165,7 +30402,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDataPollCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBeaconCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30203,7 +30440,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBeaconCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBeaconRequestCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30241,7 +30478,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxBeaconRequestCountAttrib
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxOtherCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30279,7 +30516,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxOtherCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxRetryCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30317,7 +30554,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxRetryCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDirectMaxRetryExpiryCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30355,7 +30592,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxDirectMaxRetryExpiryCoun
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxIndirectMaxRetryExpiryCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30393,7 +30630,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxIndirectMaxRetryExpiryCo
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrCcaCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30431,7 +30668,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrCcaCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrAbortCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30469,7 +30706,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrAbortCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrBusyChannelCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30507,7 +30744,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readTxErrBusyChannelCountAttri
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxTotalCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30545,7 +30782,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxTotalCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxUnicastCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30583,7 +30820,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxUnicastCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBroadcastCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30621,7 +30858,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBroadcastCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDataCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30659,7 +30896,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDataCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDataPollCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30697,7 +30934,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDataPollCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBeaconCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30735,7 +30972,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBeaconCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBeaconRequestCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30773,7 +31010,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxBeaconRequestCountAttrib
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxOtherCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30811,7 +31048,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxOtherCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxAddressFilteredCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30849,7 +31086,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxAddressFilteredCountAttr
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDestAddrFilteredCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30887,7 +31124,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDestAddrFilteredCountAtt
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDuplicatedCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30925,7 +31162,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxDuplicatedCountAttribute
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrNoFrameCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -30963,7 +31200,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrNoFrameCountAttribute
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrUnknownNeighborCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31001,7 +31238,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrUnknownNeighborCountA
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrInvalidSrcAddrCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31039,7 +31276,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrInvalidSrcAddrCountAt
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrSecCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31077,7 +31314,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrSecCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrFcsCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31115,7 +31352,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrFcsCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrOtherCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31153,7 +31390,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readRxErrOtherCountAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readActiveTimestampAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31191,7 +31428,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readActiveTimestampAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPendingTimestampAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31229,7 +31466,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readPendingTimestampAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readDelayAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31267,7 +31504,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readDelayAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readSecurityPolicyAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback * onSuccess =
         new CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback(callback);
     if (!onSuccess)
@@ -31306,7 +31543,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readSecurityPolicyAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChannelMaskAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31344,7 +31581,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readChannelMaskAttribute)
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readOperationalDatasetComponentsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback * onSuccess =
         new CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback(callback);
     if (!onSuccess)
@@ -31383,7 +31620,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readOperationalDatasetComponen
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readActiveNetworkFaultsListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback * onSuccess =
         new CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback(callback);
     if (!onSuccess)
@@ -31422,7 +31659,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readActiveNetworkFaultsListAtt
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31458,7 +31695,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, WakeOnLanCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     WakeOnLanCluster * cppCluster = new WakeOnLanCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -31467,7 +31704,7 @@ JNI_METHOD(jlong, WakeOnLanCluster, initWithDevice)(JNIEnv * env, jobject self, 
 
 JNI_METHOD(void, WakeOnLanCluster, readWakeOnLanMacAddressAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31504,7 +31741,7 @@ JNI_METHOD(void, WakeOnLanCluster, readWakeOnLanMacAddressAttribute)(JNIEnv * en
 
 JNI_METHOD(void, WakeOnLanCluster, readClusterRevisionAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31540,7 +31777,7 @@ JNI_METHOD(void, WakeOnLanCluster, readClusterRevisionAttribute)(JNIEnv * env, j
 }
 JNI_METHOD(jlong, WiFiNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     WiFiNetworkDiagnosticsCluster * cppCluster = new WiFiNetworkDiagnosticsCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -31549,7 +31786,7 @@ JNI_METHOD(jlong, WiFiNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env, j
 
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     WiFiNetworkDiagnosticsCluster * cppCluster;
 
@@ -31595,7 +31832,7 @@ exit:
 
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readBssidAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31633,7 +31870,7 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readBssidAttribute)(JNIEnv * env
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readSecurityTypeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31671,7 +31908,7 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readSecurityTypeAttribute)
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readWiFiVersionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31709,7 +31946,7 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readWiFiVersionAttribute)
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readChannelNumberAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31746,7 +31983,7 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readChannelNumberAttribute)
 
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readRssiAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8sAttributeCallback * onSuccess = new CHIPInt8sAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31781,10 +32018,314 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readRssiAttribute)(JNIEnv * env,
     }
 }
 
+JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readBeaconLostCountAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    WiFiNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<WiFiNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributeBeaconLostCount(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
+JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readBeaconRxCountAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    WiFiNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<WiFiNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributeBeaconRxCount(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
+JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readPacketMulticastRxCountAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    WiFiNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<WiFiNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributePacketMulticastRxCount(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
+JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readPacketMulticastTxCountAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    WiFiNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<WiFiNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributePacketMulticastTxCount(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
+JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readPacketUnicastRxCountAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    WiFiNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<WiFiNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributePacketUnicastRxCount(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
+JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readPacketUnicastTxCountAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPInt32uAttributeCallback * onSuccess = new CHIPInt32uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    WiFiNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<WiFiNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributePacketUnicastTxCount(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
+JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readCurrentMaxRateAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    WiFiNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<WiFiNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributeCurrentMaxRate(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
+JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readOverrunCountAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIPInt64uAttributeCallback * onSuccess = new CHIPInt64uAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    WiFiNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<WiFiNetworkDiagnosticsCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributeOverrunCount(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
+    }
+}
+
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -31820,7 +32361,7 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readClusterRevisionAttribute)
 }
 JNI_METHOD(jlong, WindowCoveringCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     WindowCoveringCluster * cppCluster = new WindowCoveringCluster();
 
     cppCluster->Associate(reinterpret_cast<Device *>(devicePtr), endpointId);
@@ -31829,7 +32370,7 @@ JNI_METHOD(jlong, WindowCoveringCluster, initWithDevice)(JNIEnv * env, jobject s
 
 JNI_METHOD(void, WindowCoveringCluster, downOrClose)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -31875,7 +32416,7 @@ exit:
 JNI_METHOD(void, WindowCoveringCluster, goToLiftPercentage)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint liftPercentageValue, jint liftPercent100thsValue)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -31921,7 +32462,7 @@ exit:
 JNI_METHOD(void, WindowCoveringCluster, goToLiftValue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint liftValue)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -31967,7 +32508,7 @@ exit:
 JNI_METHOD(void, WindowCoveringCluster, goToTiltPercentage)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint tiltPercentageValue, jint tiltPercent100thsValue)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -32013,7 +32554,7 @@ exit:
 JNI_METHOD(void, WindowCoveringCluster, goToTiltValue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint tiltValue)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -32058,7 +32599,7 @@ exit:
 }
 JNI_METHOD(void, WindowCoveringCluster, stopMotion)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -32103,7 +32644,7 @@ exit:
 }
 JNI_METHOD(void, WindowCoveringCluster, upOrOpen)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
@@ -32149,7 +32690,7 @@ exit:
 
 JNI_METHOD(void, WindowCoveringCluster, readTypeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32187,7 +32728,7 @@ JNI_METHOD(void, WindowCoveringCluster, readTypeAttribute)(JNIEnv * env, jobject
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32225,7 +32766,7 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftAttribute)
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32262,7 +32803,7 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltAttribute)
 
 JNI_METHOD(void, WindowCoveringCluster, readConfigStatusAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32300,7 +32841,7 @@ JNI_METHOD(void, WindowCoveringCluster, readConfigStatusAttribute)(JNIEnv * env,
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftPercentageAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32338,7 +32879,7 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftPercentageAttribu
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltPercentageAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32376,7 +32917,7 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltPercentageAttribu
 JNI_METHOD(void, WindowCoveringCluster, readOperationalStatusAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32414,7 +32955,7 @@ JNI_METHOD(void, WindowCoveringCluster, readOperationalStatusAttribute)
 JNI_METHOD(void, WindowCoveringCluster, readTargetPositionLiftPercent100thsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32452,7 +32993,7 @@ JNI_METHOD(void, WindowCoveringCluster, readTargetPositionLiftPercent100thsAttri
 JNI_METHOD(void, WindowCoveringCluster, readTargetPositionTiltPercent100thsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32489,7 +33030,7 @@ JNI_METHOD(void, WindowCoveringCluster, readTargetPositionTiltPercent100thsAttri
 
 JNI_METHOD(void, WindowCoveringCluster, readEndProductTypeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32527,7 +33068,7 @@ JNI_METHOD(void, WindowCoveringCluster, readEndProductTypeAttribute)(JNIEnv * en
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftPercent100thsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32565,7 +33106,7 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionLiftPercent100thsAttr
 JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltPercent100thsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32603,7 +33144,7 @@ JNI_METHOD(void, WindowCoveringCluster, readCurrentPositionTiltPercent100thsAttr
 JNI_METHOD(void, WindowCoveringCluster, readInstalledOpenLimitLiftAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32641,7 +33182,7 @@ JNI_METHOD(void, WindowCoveringCluster, readInstalledOpenLimitLiftAttribute)
 JNI_METHOD(void, WindowCoveringCluster, readInstalledClosedLimitLiftAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32679,7 +33220,7 @@ JNI_METHOD(void, WindowCoveringCluster, readInstalledClosedLimitLiftAttribute)
 JNI_METHOD(void, WindowCoveringCluster, readInstalledOpenLimitTiltAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32717,7 +33258,7 @@ JNI_METHOD(void, WindowCoveringCluster, readInstalledOpenLimitTiltAttribute)
 JNI_METHOD(void, WindowCoveringCluster, readInstalledClosedLimitTiltAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32754,7 +33295,7 @@ JNI_METHOD(void, WindowCoveringCluster, readInstalledClosedLimitTiltAttribute)
 
 JNI_METHOD(void, WindowCoveringCluster, readModeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32792,7 +33333,7 @@ JNI_METHOD(void, WindowCoveringCluster, readModeAttribute)(JNIEnv * env, jobject
 JNI_METHOD(void, WindowCoveringCluster, writeModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
@@ -32829,7 +33370,7 @@ JNI_METHOD(void, WindowCoveringCluster, writeModeAttribute)
 
 JNI_METHOD(void, WindowCoveringCluster, readSafetyStatusAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
@@ -32867,7 +33408,7 @@ JNI_METHOD(void, WindowCoveringCluster, readSafetyStatusAttribute)(JNIEnv * env,
 JNI_METHOD(void, WindowCoveringCluster, readClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    chip::DeviceLayer::StackLock lock;
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {

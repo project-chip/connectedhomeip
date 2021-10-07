@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2020-2021 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,40 +18,35 @@
 package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
-import chip.devicecontroller.mdns.ChipMdnsCallback;
-import chip.devicecontroller.mdns.ServiceResolver;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
   private static final String TAG = ChipDeviceController.class.getSimpleName();
   private long deviceControllerPtr;
   private int connectionId;
-  private BluetoothGatt bleGatt;
   private CompletionListener completionListener;
 
-  public ChipDeviceController(
-      KeyValueStoreManager manager, ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback) {
-    deviceControllerPtr = newDeviceController(manager, resolver, chipMdnsCallback);
+  /**
+   * To load class and jni, we need to new AndroidChipPlatform after jni load but before new
+   * ChipDeviceController
+   */
+  public static void loadJni() {
+    return;
+  }
+
+  public ChipDeviceController() {
+    deviceControllerPtr = newDeviceController();
   }
 
   public void setCompletionListener(CompletionListener listener) {
     completionListener = listener;
   }
 
-  public BluetoothGatt getBluetoothGatt() {
-    return bleGatt;
-  }
-
-  public BluetoothGattCallback getCallback() {
-    return AndroidChipStack.getInstance().getCallback();
-  }
-
-  public void pairDevice(BluetoothGatt bleServer, long deviceId, long setupPincode) {
-    pairDevice(bleServer, deviceId, setupPincode, null);
+  public void pairDevice(BluetoothGatt bleServer, int connId, long deviceId, long setupPincode) {
+    pairDevice(bleServer, connId, deviceId, setupPincode, null);
   }
 
   /**
@@ -60,17 +55,21 @@ public class ChipDeviceController {
    * <p>TODO(#7985): Annotate csrNonce as Nullable.
    *
    * @param bleServer the BluetoothGatt representing the BLE connection to the device
+   * @param connId the BluetoothGatt Id representing the BLE connection to the device
    * @param deviceId the node ID to assign to the device
    * @param setupPincode the pincode for the device
    * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
    *     generated CSR nonce.
    */
   public void pairDevice(
-      BluetoothGatt bleServer, long deviceId, long setupPincode, @Nullable byte[] csrNonce) {
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      @Nullable byte[] csrNonce) {
     if (connectionId == 0) {
-      bleGatt = bleServer;
+      connectionId = connId;
 
-      connectionId = AndroidChipStack.getInstance().addConnection(this);
       if (connectionId == 0) {
         Log.e(TAG, "Failed to add Bluetooth connection.");
         completionListener.onError(new Exception("Failed to add Bluetooth connection."));
@@ -161,10 +160,7 @@ public class ChipDeviceController {
   }
 
   public void onNotifyChipConnectionClosed(int connId) {
-    // Clear connection state.
-    AndroidChipStack.getInstance().removeConnection(connId);
     connectionId = 0;
-    bleGatt = null;
 
     Log.d(TAG, "Calling onNotifyChipConnectionClosed()");
     completionListener.onNotifyChipConnectionClosed();
@@ -194,13 +190,7 @@ public class ChipDeviceController {
 
     Log.d(TAG, "Closing GATT and removing connection for " + connId);
 
-    // Close gatt
-    bleGatt.close();
-
-    // Clear connection state.
-    AndroidChipStack.getInstance().removeConnection(connId);
     connectionId = 0;
-    bleGatt = null;
     return true;
   }
 
@@ -226,8 +216,7 @@ public class ChipDeviceController {
     return isActive(deviceControllerPtr, deviceId);
   }
 
-  private native long newDeviceController(
-      KeyValueStoreManager manager, ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
+  private native long newDeviceController();
 
   private native void pairDevice(
       long deviceControllerPtr,

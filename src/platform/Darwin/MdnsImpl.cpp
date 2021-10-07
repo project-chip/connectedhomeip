@@ -431,6 +431,8 @@ static CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint
     }
 
     DNSServiceProtocol protocol;
+
+#if INET_CONFIG_ENABLE_IPV4
     if (addressType == chip::Inet::kIPAddressType_IPv4)
     {
         protocol = kDNSServiceProtocol_IPv4;
@@ -443,6 +445,10 @@ static CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint
     {
         protocol = kDNSServiceProtocol_IPv4 | kDNSServiceProtocol_IPv6;
     }
+#else
+    // without IPv4, IPv6 is the only option
+    protocol = kDNSServiceProtocol_IPv6;
+#endif
 
     err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, protocol, hostname, OnGetAddrInfo, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
@@ -519,7 +525,7 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     return Register(interfaceId, regtype.c_str(), service->mName, service->mPort, &record);
 }
 
-CHIP_ERROR ChipMdnsStopPublish()
+CHIP_ERROR ChipMdnsRemoveServices()
 {
     GenericContext * sdCtx = nullptr;
     if (CHIP_ERROR_KEY_NOT_FOUND == MdnsContexts::GetInstance().Get(ContextType::Register, &sdCtx))
@@ -530,9 +536,9 @@ CHIP_ERROR ChipMdnsStopPublish()
     return MdnsContexts::GetInstance().Removes(ContextType::Register);
 }
 
-CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
+CHIP_ERROR ChipMdnsFinalizeServiceUpdate()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip::Inet::IPAddressType addressType,

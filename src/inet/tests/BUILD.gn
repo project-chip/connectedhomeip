@@ -34,13 +34,16 @@ static_library("helpers") {
     "TestInetCommonOptions.cpp",
     "TestInetCommonOptions.h",
     "TestInetCommonPosix.cpp",
-    "TestInetLayer.cpp",
     "TestInetLayerCommon.cpp",
     "TestSetupFaultInjection.h",
     "TestSetupFaultInjectionPosix.cpp",
     "TestSetupSignalling.h",
     "TestSetupSignallingPosix.cpp",
   ]
+
+  if (current_os != "mbed") {
+    sources += [ "TestInetLayer.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 

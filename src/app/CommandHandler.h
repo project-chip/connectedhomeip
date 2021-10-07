@@ -25,7 +25,11 @@
 #pragma once
 
 #include <app/Command.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/MessageDef/CommandDataElement.h>
+#include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -58,9 +62,30 @@ public:
 
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                       System::PacketBufferHandle && payload);
-    CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
+    CHIP_ERROR AddStatusCode(const ConcreteCommandPath & aCommandPath,
                              const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
                              const Protocols::InteractionModel::Status aStatus) override;
+
+    /**
+     * API for adding a data response.  The template parameter T is generally
+     * expected to be a ClusterName::Commands::CommandName::Type struct, but any
+     * object that can be encoded using the DataModel::Encode machinery and
+     * exposes the right command id will work.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] aData the data for the response.
+     */
+    template <typename CommandData>
+    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    {
+        ReturnErrorOnFailure(PrepareResponse(aRequestCommandPath, CommandData::CommandId));
+        TLV::TLVWriter * writer = GetCommandDataElementTLVWriter();
+        VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataElement::kCsTag_Data), aData));
+
+        return FinishCommand(/* aEndDataStruct = */ false);
+    }
 
 private:
     //
@@ -73,7 +98,7 @@ private:
     friend class TestCommandInteraction;
     CHIP_ERROR SendCommandResponse();
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
-
+    CHIP_ERROR PrepareResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommand);
     Callback * mpCallback = nullptr;
 };
 } // namespace app

@@ -1387,6 +1387,23 @@
 #endif // CHIP_CONFIG_SECURITY_TEST_MODE
 
 /**
+ *  @def CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
+ *
+ *  @brief
+ *    Shared secret to use for unit tests or when CHIP_CONFIG_SECURITY_TEST_MODE is enabled.
+ *
+ *    This parameter is 32 bytes to maximize entropy passed to the CryptoContext::InitWithSecret KDF,
+ *    and can be initialized either as a raw string or array of bytes. The default test secret of
+ *    "Test secret for key derivation." results in the following encryption keys:
+ *
+ *              5E DE D2 44 E5 53 2B 3C DC 23 40 9D BA D0 52 D2
+ *              A9 E0 11 B1 73 7C 6D 4B 70 E4 C0 A2 FE 66 04 76
+ */
+#ifndef CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
+#define CHIP_CONFIG_TEST_SHARED_SECRET_VALUE "Test secret for key derivation."
+#endif // CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
+
+/**
  *  @def CHIP_CONFIG_ENABLE_DNS_RESOLVER
  *
  *  @brief
@@ -2505,6 +2522,41 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
 #define CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES 64
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+ *
+ * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
+ *
+ * Binds to number of GroupState entries to support per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 1
+#endif
+
+// TODO: Need to cap number of KeySets
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+ *
+ * @brief Defines the number of "endpoint->controlling group" mappings per fabric.
+ *
+ * Binds to number of GroupMapping entries per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
+ *
+ * @brief Defines the number of simultaneous Group iterators that can be allocated
+ *
+ * Number of iterator instances that can be allocated at any one time
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS 2
 #endif
 
 /**

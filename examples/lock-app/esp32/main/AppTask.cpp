@@ -59,6 +59,7 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 } // namespace
 
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::System;
 
 AppTask AppTask::sAppTask;
 
@@ -113,7 +114,7 @@ CHIP_ERROR AppTask::Init()
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
-    uint64_t mLastChangeTimeUS = 0;
+    Clock::MonotonicMicroseconds mLastChangeTimeUS = 0;
 
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
@@ -169,10 +170,10 @@ void AppTask::AppTaskMain(void * pvParameter)
         sStatusLED.Animate();
         sLockLED.Animate();
 
-        uint64_t nowUS            = chip::System::Clock::GetMonotonicMicroseconds();
-        uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
+        Clock::MonotonicMicroseconds nowUS            = SystemClock().GetMonotonicMicroseconds();
+        Clock::MonotonicMicroseconds nextChangeTimeUS = Clock::AddOffset(mLastChangeTimeUS, 5 * 1000 * 1000UL);
 
-        if (nowUS > nextChangeTimeUS)
+        if (Clock::IsEarlier(nextChangeTimeUS, nowUS))
         {
             mLastChangeTimeUS = nowUS;
         }

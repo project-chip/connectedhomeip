@@ -21,9 +21,12 @@ import android.content.Context
 import android.util.Log
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
-import chip.devicecontroller.PreferencesKeyValueStoreManager
-import chip.devicecontroller.mdns.ChipMdnsCallbackImpl
-import chip.devicecontroller.mdns.NsdManagerServiceResolver
+import chip.platform.AndroidBleManager
+import chip.platform.AndroidChipPlatform
+import chip.platform.ChipMdnsCallbackImpl
+import chip.platform.NsdManagerServiceResolver
+import chip.platform.PreferencesConfigurationManager
+import chip.platform.PreferencesKeyValueStoreManager
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -32,16 +35,24 @@ import kotlin.coroutines.suspendCoroutine
 object ChipClient {
   private const val TAG = "ChipClient"
   private lateinit var chipDeviceController: ChipDeviceController
+  private lateinit var androidPlatform: AndroidChipPlatform
 
   fun getDeviceController(context: Context): ChipDeviceController {
+    getAndroidChipPlatform(context)
+
     if (!this::chipDeviceController.isInitialized) {
-      chipDeviceController = ChipDeviceController(
-        PreferencesKeyValueStoreManager(context),
-        NsdManagerServiceResolver(context),
-        ChipMdnsCallbackImpl()
-      )
+      chipDeviceController = ChipDeviceController()
     }
     return chipDeviceController
+  }
+
+  fun getAndroidChipPlatform(context: Context?): AndroidChipPlatform {
+    if (!this::androidPlatform.isInitialized && context != null) {
+      //force ChipDeviceController load jni
+      ChipDeviceController.loadJni()
+      androidPlatform = AndroidChipPlatform(AndroidBleManager(), PreferencesKeyValueStoreManager(context), PreferencesConfigurationManager(context), NsdManagerServiceResolver(context), ChipMdnsCallbackImpl())
+    }
+    return androidPlatform
   }
 
   /**

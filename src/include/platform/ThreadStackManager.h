@@ -99,7 +99,8 @@ public:
                              const Span<const char * const> & aSubTypes, const Span<const Mdns::TextEntry> & aTxtEntries,
                              uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
-    CHIP_ERROR RemoveAllSrpServices();
+    CHIP_ERROR InvalidateAllSrpServices(); ///< Mark all SRP services as invalid
+    CHIP_ERROR RemoveInvalidSrpServices(); ///< Remove SRP services marked as invalid
     CHIP_ERROR SetupSrpHost(const char * aHostName);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
@@ -108,7 +109,8 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, const app::AttributeValueEncoder & encoder);
+    void ResetThreadNetworkDiagnosticsCounts(void);
+    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
 private:
     // ===== Members for internal use by the following friends.
@@ -258,9 +260,14 @@ inline CHIP_ERROR ThreadStackManager::RemoveSrpService(const char * aInstanceNam
     return static_cast<ImplClass *>(this)->_RemoveSrpService(aInstanceName, aName);
 }
 
-inline CHIP_ERROR ThreadStackManager::RemoveAllSrpServices()
+inline CHIP_ERROR ThreadStackManager::InvalidateAllSrpServices()
 {
-    return static_cast<ImplClass *>(this)->_RemoveAllSrpServices();
+    return static_cast<ImplClass *>(this)->_InvalidateAllSrpServices();
+}
+
+inline CHIP_ERROR ThreadStackManager::RemoveInvalidSrpServices()
+{
+    return static_cast<ImplClass *>(this)->_RemoveInvalidSrpServices();
 }
 
 inline CHIP_ERROR ThreadStackManager::SetupSrpHost(const char * aHostName)
@@ -373,6 +380,11 @@ inline CHIP_ERROR ThreadStackManager::JoinerStart()
     return static_cast<ImplClass *>(this)->_JoinerStart();
 }
 
+inline void ThreadStackManager::ResetThreadNetworkDiagnosticsCounts()
+{
+    static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
+}
+
 /*
  * @brief Get runtime value from the thread network based on the given attribute ID.
  *        The info is encoded via the AttributeValueEncoder.
@@ -387,7 +399,7 @@ inline CHIP_ERROR ThreadStackManager::JoinerStart()
  *         All other errors should be treated as a read error and reported as such.
  */
 inline CHIP_ERROR ThreadStackManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                 const app::AttributeValueEncoder & encoder)
+                                                                                 app::AttributeValueEncoder & encoder)
 {
     return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }

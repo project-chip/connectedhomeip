@@ -120,14 +120,13 @@ void CommandSender::Close()
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    mCommandIndex++;
-
-    CommandPath::Type commandPath;
+    chip::ClusterId clusterId;
+    chip::CommandId commandId;
+    chip::EndpointId endpointId;
+    
     {
-        TLV::TLVReader commandPathReader;
-        SuccessOrExit(
-            err = aCommandElement.GetReaderOnTag(TLV::ContextTag(CommandDataElement::kCsTag_CommandPath), &commandPathReader));
-        SuccessOrExit(err = commandPath.Decode(commandPathReader));
+         CommandPath::Parser commandPath;
+	
     }
 
     {

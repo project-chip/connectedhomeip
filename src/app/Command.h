@@ -25,6 +25,7 @@
 #pragma once
 
 #include <app/CommandPathParams.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/CommandDataElement.h>
 #include <app/MessageDef/CommandList.h>
@@ -75,11 +76,11 @@ public:
     /*
      * A set of methods to construct command request or response payloads
      */
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus = false);
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
     TLV::TLVWriter * GetCommandDataElementTLVWriter();
-    CHIP_ERROR FinishCommand(bool aIsStatus = false);
+    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
-    virtual CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
+    virtual CHIP_ERROR AddStatusCode(const ConcreteCommandPath & aCommandPath,
                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                      const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
     {

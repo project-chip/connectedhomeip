@@ -30,8 +30,11 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
+namespace {
+
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 class TestDataModelSerialization
 {
@@ -156,13 +159,13 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
     // Encode
     //
     {
-        clusters::TestCluster::SimpleStruct::Type t;
+        TestCluster::SimpleStruct::Type t;
         uint8_t buf[4]  = { 0, 1, 2, 3 };
         char strbuf[10] = "chip";
 
         t.a = 20;
         t.b = true;
-        t.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
+        t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
         t.d = buf;
 
         t.e = Span<char>{ strbuf, strlen(strbuf) };
@@ -180,7 +183,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
     // Decode
     //
     {
-        clusters::TestCluster::SimpleStruct::Type t;
+        TestCluster::SimpleStruct::Type t;
 
         _this->SetupReader();
 
@@ -189,7 +192,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
 
         NL_TEST_ASSERT(apSuite, t.a == 20);
         NL_TEST_ASSERT(apSuite, t.b == true);
-        NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
+        NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
 
         NL_TEST_ASSERT(apSuite, t.d.size() == 4);
 
@@ -214,7 +217,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
     // Encode
     //
     {
-        clusters::TestCluster::NestedStruct::Type t;
+        TestCluster::NestedStruct::Type t;
         uint8_t buf[4]  = { 0, 1, 2, 3 };
         char strbuf[10] = "chip";
 
@@ -222,7 +225,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
         t.b   = true;
         t.c.a = 11;
         t.c.b = true;
-        t.c.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B;
+        t.c.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B;
         t.c.d = buf;
 
         t.c.e = Span<char>{ strbuf, strlen(strbuf) };
@@ -240,7 +243,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
     // Decode
     //
     {
-        clusters::TestCluster::NestedStruct::Type t;
+        TestCluster::NestedStruct::DecodableType t;
 
         _this->SetupReader();
 
@@ -251,7 +254,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
         NL_TEST_ASSERT(apSuite, t.b == true);
         NL_TEST_ASSERT(apSuite, t.c.a == 11);
         NL_TEST_ASSERT(apSuite, t.c.b == true);
-        NL_TEST_ASSERT(apSuite, t.c.c == clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B);
+        NL_TEST_ASSERT(apSuite, t.c.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B);
 
         NL_TEST_ASSERT(apSuite, t.c.d.size() == 4);
 
@@ -277,11 +280,11 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
     // Encode
     //
     {
-        clusters::TestCluster::NestedStructList::Type t;
+        TestCluster::NestedStructList::Type t;
         uint8_t buf[4]     = { 0, 1, 2, 3 };
         uint32_t intBuf[4] = { 10000, 10001, 10002, 10003 };
         char strbuf[10]    = "chip";
-        clusters::TestCluster::SimpleStruct::Type structList[4];
+        TestCluster::SimpleStruct::Type structList[4];
         uint8_t i = 0;
         ByteSpan spanList[4];
 
@@ -289,7 +292,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
         t.b   = true;
         t.c.a = 11;
         t.c.b = true;
-        t.c.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B;
+        t.c.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B;
         t.c.d = buf;
         t.e   = intBuf;
 
@@ -325,7 +328,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
     // Decode
     //
     {
-        clusters::TestCluster::NestedStructList::DecodableType t;
+        TestCluster::NestedStructList::DecodableType t;
         int i;
 
         _this->SetupReader();
@@ -337,7 +340,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
         NL_TEST_ASSERT(apSuite, t.b == true);
         NL_TEST_ASSERT(apSuite, t.c.a == 11);
         NL_TEST_ASSERT(apSuite, t.c.b == true);
-        NL_TEST_ASSERT(apSuite, t.c.c == clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B);
+        NL_TEST_ASSERT(apSuite, t.c.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_B);
         NL_TEST_ASSERT(apSuite, StringMatches(t.c.e, "chip"));
 
         {
@@ -421,9 +424,9 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDo
     // Encode
     //
     {
-        clusters::TestCluster::DoubleNestedStructList::Type t;
-        clusters::TestCluster::NestedStructList::Type n[4];
-        clusters::TestCluster::SimpleStruct::Type structList[4];
+        TestCluster::DoubleNestedStructList::Type t;
+        TestCluster::NestedStructList::Type n[4];
+        TestCluster::SimpleStruct::Type structList[4];
         uint8_t i;
 
         t.a = n;
@@ -453,7 +456,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDo
     // Decode
     //
     {
-        clusters::TestCluster::DoubleNestedStructList::DecodableType t;
+        TestCluster::DoubleNestedStructList::DecodableType t;
 
         _this->SetupReader();
 
@@ -498,13 +501,13 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
     // Encode
     //
     {
-        clusters::TestCluster::SimpleStruct::Type t;
+        TestCluster::SimpleStruct::Type t;
         uint8_t buf[4]  = { 0, 1, 2, 3 };
         char strbuf[10] = "chip";
 
         t.a = 20;
         t.b = true;
-        t.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
+        t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
         t.d = buf;
 
         t.e = Span<char>{ strbuf, strlen(strbuf) };
@@ -512,10 +515,10 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
         // Encode every field manually except a.
         {
             err = EncodeStruct(_this->mWriter, TLV::AnonymousTag,
-                               MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kBFieldId), t.b),
-                               MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kCFieldId), t.c),
-                               MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kDFieldId), t.d),
-                               MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kEFieldId), t.e));
+                               MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kB)), t.b),
+                               MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kC)), t.c),
+                               MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kD)), t.d),
+                               MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kE)), t.e));
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         }
 
@@ -529,7 +532,7 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
     // Decode
     //
     {
-        clusters::TestCluster::SimpleStruct::Type t;
+        TestCluster::SimpleStruct::DecodableType t;
 
         _this->SetupReader();
 
@@ -543,7 +546,7 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
         NL_TEST_ASSERT(apSuite, t.a == 150);
 
         NL_TEST_ASSERT(apSuite, t.b == true);
-        NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
+        NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
 
         NL_TEST_ASSERT(apSuite, t.d.size() == 4);
 
@@ -568,13 +571,13 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
     // Encode
     //
     {
-        clusters::TestCluster::SimpleStruct::Type t;
+        TestCluster::SimpleStruct::Type t;
         uint8_t buf[4]  = { 0, 1, 2, 3 };
         char strbuf[10] = "chip";
 
         t.a = 20;
         t.b = true;
-        t.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
+        t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
         t.d = buf;
 
         t.e = Span<char>{ strbuf, strlen(strbuf) };
@@ -582,12 +585,12 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
         // Encode every field + an extra field.
         {
             err = EncodeStruct(_this->mWriter, TLV::AnonymousTag,
-                               MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kAFieldId), t.a),
-                               MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kBFieldId), t.b),
-                               MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kCFieldId), t.c),
-                               MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kDFieldId), t.d),
-                               MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kEFieldId), t.e),
-                               MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kEFieldId + 1), t.a));
+                               MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kA)), t.a),
+                               MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kB)), t.b),
+                               MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kC)), t.c),
+                               MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kD)), t.d),
+                               MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kE)), t.e),
+                               MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kE) + 1), t.a));
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         }
 
@@ -601,7 +604,7 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
     // Decode
     //
     {
-        clusters::TestCluster::SimpleStruct::Type t;
+        TestCluster::SimpleStruct::DecodableType t;
 
         _this->SetupReader();
 
@@ -611,7 +614,7 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
 
         NL_TEST_ASSERT(apSuite, t.a == 20);
         NL_TEST_ASSERT(apSuite, t.b == true);
-        NL_TEST_ASSERT(apSuite, t.c == clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
+        NL_TEST_ASSERT(apSuite, t.c == TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A);
 
         NL_TEST_ASSERT(apSuite, t.d.size() == 4);
 
@@ -640,13 +643,13 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
         // Encode
         //
         {
-            clusters::TestCluster::SimpleStruct::Type t;
+            TestCluster::SimpleStruct::Type t;
             uint8_t buf[4]  = { 0, 1, 2, 3 };
             char strbuf[10] = "chip";
 
             t.a = 20;
             t.b = true;
-            t.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
+            t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
             t.d = buf;
 
             t.e = Span<char>{ strbuf, strlen(strbuf) };
@@ -654,11 +657,11 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
             // Encode every field manually except a.
             {
                 err = EncodeStruct(_this->mWriter, TLV::AnonymousTag,
-                                   MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kAFieldId), t.b),
-                                   MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kBFieldId), t.b),
-                                   MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kCFieldId), t.c),
-                                   MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kDFieldId), t.d),
-                                   MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kEFieldId), t.e));
+                                   MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kA)), t.b),
+                                   MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kB)), t.b),
+                                   MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kC)), t.c),
+                                   MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kD)), t.d),
+                                   MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kE)), t.e));
                 NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
             }
 
@@ -672,7 +675,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
         // Decode
         //
         {
-            clusters::TestCluster::SimpleStruct::Type t;
+            TestCluster::SimpleStruct::DecodableType t;
 
             _this->SetupReader();
 
@@ -691,13 +694,13 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
         // Encode
         //
         {
-            clusters::TestCluster::SimpleStruct::Type t;
+            TestCluster::SimpleStruct::Type t;
             uint8_t buf[4]  = { 0, 1, 2, 3 };
             char strbuf[10] = "chip";
 
             t.a = 20;
             t.b = true;
-            t.c = clusters::TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
+            t.c = TestCluster::SimpleEnum::SIMPLE_ENUM_VALUE_A;
             t.d = buf;
 
             t.e = Span<char>{ strbuf, strlen(strbuf) };
@@ -705,11 +708,11 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
             // Encode every field manually except a.
             {
                 err = EncodeStruct(_this->mWriter, TLV::AnonymousTag,
-                                   MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kAFieldId), t.a),
-                                   MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kBFieldId), t.b),
-                                   MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kCFieldId), t.c),
-                                   MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kDFieldId), t.e),
-                                   MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::SimpleStruct::kEFieldId), t.e));
+                                   MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kA)), t.a),
+                                   MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kB)), t.b),
+                                   MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kC)), t.c),
+                                   MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kD)), t.e),
+                                   MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::SimpleStruct::Fields::kE)), t.e));
                 NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
             }
 
@@ -723,7 +726,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
         // Decode
         //
         {
-            clusters::TestCluster::SimpleStruct::Type t;
+            TestCluster::SimpleStruct::DecodableType t;
 
             _this->SetupReader();
 
@@ -745,7 +748,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
     // Encode
     //
     {
-        clusters::TestCluster::NestedStructList::Type t;
+        TestCluster::NestedStructList::Type t;
         uint32_t intBuf[4] = { 10000, 10001, 10002, 10003 };
 
         t.e = intBuf;
@@ -753,7 +756,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
         // Encode a list of integers for field d instead of a list of structs.
         {
             err = EncodeStruct(_this->mWriter, TLV::AnonymousTag,
-                               MakeTagValuePair(TLV::ContextTag(clusters::TestCluster::NestedStructList::kDFieldId), t.e));
+                               MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::NestedStructList::Fields::kD)), t.e));
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         }
 
@@ -767,7 +770,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
     // Decode
     //
     {
-        clusters::TestCluster::NestedStructList::DecodableType t;
+        TestCluster::NestedStructList::DecodableType t;
 
         _this->SetupReader();
 
@@ -799,6 +802,8 @@ int Finalize(void * aContext)
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
+
+} // namespace
 
 // clang-format off
 const nlTest sTests[] =

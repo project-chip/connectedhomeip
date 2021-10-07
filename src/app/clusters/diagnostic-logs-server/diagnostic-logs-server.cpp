@@ -15,13 +15,19 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::DiagnosticLogs;
 
-bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t intent,
-                                                             uint8_t requestedProtocol, ByteSpan transferFileDesignator)
+bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(app::CommandHandler * commandObj,
+                                                             const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
+                                                             uint8_t intent, uint8_t requestedProtocol,
+                                                             ByteSpan transferFileDesignator,
+                                                             Commands::RetrieveLogsRequest::DecodableType & commandData)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);

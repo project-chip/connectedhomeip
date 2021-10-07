@@ -41,14 +41,13 @@
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/FabricTable.h>
 #include <transport/SessionManager.h>
 
+using chip::kMinValidFabricIndex;
 using chip::RendezvousInformationFlag;
 using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 using chip::Inet::IPAddressType;
 using chip::Transport::BleListenParameters;
-using chip::Transport::kMinValidFabricIndex;
 using chip::Transport::PeerAddress;
 using chip::Transport::UdpListenParameters;
 
@@ -112,9 +111,12 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     );
 
+#if CONFIG_NETWORK_LAYER_BLE
+    mBleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
+#endif
     SuccessOrExit(err);
 
-    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mFabrics, &mMessageCounterManager);
+    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager);
     SuccessOrExit(err);
 
     err = mExchangeMgr.Init(&mSessions);
@@ -185,7 +187,7 @@ exit:
 
 void Server::Shutdown()
 {
-    chip::Mdns::ServiceAdvertiser::Instance().StopPublishDevice();
+    chip::Mdns::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     mExchangeMgr.Shutdown();
     mSessions.Shutdown();

@@ -141,18 +141,18 @@ limitations under the License.
   </enum>
 
   <struct name="WiredFaultChangeType">
-    <item name="current" type="ARRAY" entryType="ENUM8" length="8"/>
-    <item name="previous" type="ARRAY" entryType="ENUM8" length="8"/>
+    <item name="current" type="WiredFaultType" array="true" length="8"/>
+    <item name="previous" type="WiredFaultType" array="true" length="8"/>
   </struct>
 
   <struct name="BatFaultChangeType">
-    <item name="current" type="ARRAY" entryType="ENUM8" length="8"/>
-    <item name="previous" type="ARRAY" entryType="ENUM8" length="8"/>
+    <item name="current" type="BatFaultType" array="true" length="8"/>
+    <item name="previous" type="BatFaultType" array="true" length="8"/>
   </struct>
 
   <struct name="BatChargeFaultChangeType">
-    <item name="current" type="ARRAY" entryType="ENUM8" length="16"/>
-    <item name="previous" type="ARRAY" entryType="ENUM8" length="16"/>
+    <item name="current" type="BatChargeFaultType" array="true" length="16"/>
+    <item name="previous" type="BatChargeFaultType" array="true" length="16"/>
   </struct>
 
 </configurator>
