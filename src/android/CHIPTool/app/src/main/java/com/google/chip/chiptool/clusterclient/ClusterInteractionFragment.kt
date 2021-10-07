@@ -18,7 +18,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.*
-import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.enrollDeviceBtn
+import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.updateAddressBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.commandStatusTv
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,10 +38,10 @@ class ClusterInteractionFragment: Fragment() {
   ): View {
     return inflater.inflate(R.layout.cluster_interaction_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
-      enrollDeviceBtn.setOnClickListener { enrollDeviceClick() }
+      updateAddressBtn.setOnClickListener { updateAddressClick() }
 } }
 
-  private fun enrollDeviceClick() {
+  private fun updateAddressClick() {
     try{
       deviceController.updateDevice(
         fabricId.text.toString().toULong().toLong(),
@@ -61,8 +61,6 @@ class ClusterInteractionFragment: Fragment() {
         Toast.LENGTH_SHORT).show()
     }
   }
-
-
 
   override fun onStart() {
     super.onStart()
