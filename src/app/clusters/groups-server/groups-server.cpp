@@ -92,7 +92,7 @@ void emberAfGroupsClusterServerInitCallback(EndpointId endpoint)
 // The first two bytes of the identifier is set to the groupId
 // The local endpoint is set to the endpoint that is mapped to this group
 // --------------------------
-static EmberAfStatus addEntryToGroupTable(EndpointId endpoint, GroupId groupId, uint8_t * groupName)
+static EmberAfStatus addEntryToGroupTable(EndpointId endpoint, GroupId groupId, const CharSpan & groupName)
 {
     uint8_t i;
 
@@ -141,8 +141,7 @@ static EmberAfStatus removeEntryFromGroupTable(EndpointId endpoint, GroupId grou
         EmberStatus status   = emberDeleteBinding(bindingIndex);
         if (status == EMBER_SUCCESS)
         {
-            uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
-            emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
+            emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, CharSpan());
             return EMBER_ZCL_STATUS_SUCCESS;
         }
         else
@@ -163,9 +162,7 @@ bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, cons
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    emberAfGroupsClusterPrint("RX: AddGroup 0x%2x, \"", groupId);
-    emberAfGroupsClusterPrintString(groupName);
-    emberAfGroupsClusterPrintln("\"");
+    emberAfGroupsClusterPrintln("RX: AddGroup 0x%2x, \"%.*s\"", groupId, groupName.size(), groupName.data());
 
     status = addEntryToGroupTable(emberAfCurrentEndpoint(), groupId, groupName);
 
@@ -406,9 +403,8 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
                 }
                 else
                 {
-                    uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
-                    GroupId groupId                                               = binding.groupId;
-                    emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
+                    GroupId groupId = binding.groupId;
+                    emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, CharSpan());
                     success = true && success;
 
                     // EMAPPFWKV2-1414: if we remove a group, we should remove any scene
@@ -440,9 +436,7 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
     EmberAfStatus status;
     EmberStatus sendStatus = EMBER_SUCCESS;
 
-    emberAfGroupsClusterPrint("RX: AddGroupIfIdentifying 0x%2x, \"", groupId);
-    emberAfGroupsClusterPrintString(groupName);
-    emberAfGroupsClusterPrintln("\"");
+    emberAfGroupsClusterPrintln("RX: AddGroupIfIdentifying 0x%2x, \"%.*s\"", groupId, groupName.size(), groupName.data());
 
     if (!emberAfIsDeviceIdentifying(emberAfCurrentEndpoint()))
     {
@@ -533,4 +527,4 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(EndpointId endpoint)
     return false;
 }
 
-void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, uint8_t * groupName) {}
+void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, const CharSpan & groupName) {}

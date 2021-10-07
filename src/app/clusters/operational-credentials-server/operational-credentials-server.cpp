@@ -99,7 +99,7 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
                                     index + 1);
 }
 
-EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel,
+EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nodeId, uint16_t vendorId, CharSpan & fabricLabel,
                           Credentials::P256PublicKeySpan rootPubkey, uint8_t index)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -113,10 +113,9 @@ EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nod
     fabricDescriptor->VendorId = vendorId;
     fabricDescriptor->FabricId = fabricId;
     fabricDescriptor->NodeId   = nodeId;
-    if (fabricLabel != nullptr)
+    if (!fabricLabel.empty())
     {
-        size_t lengthToStore    = strnlen(Uint8::to_const_char(fabricLabel), kFabricLabelMaxLengthInBytes);
-        fabricDescriptor->Label = ByteSpan(fabricLabel, lengthToStore);
+        fabricDescriptor->Label = ByteSpan(Uint8::from_const_char(fabricLabel.data()), fabricLabel.size());
     }
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG,
@@ -137,10 +136,10 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     uint8_t fabricIndex = 0;
     for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
     {
-        NodeId nodeId               = fabricInfo.GetPeerId().GetNodeId();
-        uint64_t fabricId           = fabricInfo.GetFabricId();
-        uint16_t vendorId           = fabricInfo.GetVendorId();
-        const uint8_t * fabricLabel = fabricInfo.GetFabricLabel();
+        NodeId nodeId        = fabricInfo.GetPeerId().GetNodeId();
+        uint64_t fabricId    = fabricInfo.GetFabricId();
+        uint16_t vendorId    = fabricInfo.GetVendorId();
+        CharSpan fabricLabel = fabricInfo.GetFabricLabel();
 
         // Skip over uninitialized fabrics
         if (nodeId == kUndefinedNodeId)
@@ -311,7 +310,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
                                                                    const app::ConcreteCommandPath & commandPath,
                                                                    const Commands::UpdateFabricLabel::DecodableType & commandData)
 {
-    auto & Label = commandData.Label;
+    auto & Label = commandData.label;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
 

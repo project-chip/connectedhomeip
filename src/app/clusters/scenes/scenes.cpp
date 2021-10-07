@@ -747,7 +747,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
 }
 
 bool emberAfPluginScenesServerParseAddScene(app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId,
-                                            uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+                                            uint8_t sceneId, uint16_t transitionTime, const CharSpan & sceneName,
                                             uint8_t * extensionFieldSets)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -761,10 +761,8 @@ bool emberAfPluginScenesServerParseAddScene(app::CommandHandler * commandObj, co
     EndpointId endpoint              = cmd->apsFrame->destinationEndpoint;
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
 
-    emberAfScenesClusterPrint("RX: %pAddScene 0x%2x, 0x%x, 0x%2x, \"", (enhanced ? "Enhanced" : ""), groupId, sceneId,
-                              transitionTime);
-    emberAfScenesClusterPrintString(sceneName);
-    emberAfScenesClusterPrint("\", ");
+    emberAfScenesClusterPrint("RX: %pAddScene 0x%2x, 0x%x, 0x%2x, \"%.*s\", ", (enhanced ? "Enhanced" : ""), groupId, sceneId,
+                              transitionTime, sceneName.size(), sceneName.data());
     emberAfScenesClusterPrintBuffer(extensionFieldSets, extensionFieldSetsLen, false);
     emberAfScenesClusterPrintln("");
 

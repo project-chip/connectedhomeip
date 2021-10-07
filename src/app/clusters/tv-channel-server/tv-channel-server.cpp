@@ -78,8 +78,7 @@ bool emberAfTvChannelClusterChangeChannelCallback(app::CommandHandler * command,
 {
     auto & match = commandData.match;
 
-    // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string matchString(reinterpret_cast<char *>(match));
+    std::string matchString(match.data(), match.size());
     // TODO: Enable this once struct as param is supported
     // TvChannelInfo channelInfo = tvChannelClusterChangeChannel(matchString);
     // sendResponse(command, channelInfo);

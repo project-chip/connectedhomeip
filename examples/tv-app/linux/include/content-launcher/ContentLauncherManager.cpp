@@ -112,7 +112,7 @@ bool emberAfContentLauncherClusterLaunchContentCallback(
     auto & autoplay = commandData.autoPlay;
     auto & data     = commandData.data;
 
-    string dataString(reinterpret_cast<char *>(data));
+    string dataString(data.data(), data.size());
     list<ContentLaunchParamater> parameterList;
     ContentLaunchResponse response = ContentLauncherManager().proxyLaunchContentRequest(parameterList, autoplay, dataString);
     sendResponse("LaunchContent", response, ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID);
@@ -126,8 +126,8 @@ bool emberAfContentLauncherClusterLaunchURLCallback(
     auto & contentUrl    = commandData.contentURL;
     auto & displayString = commandData.displayString;
 
-    string contentUrlString(reinterpret_cast<char *>(contentUrl));
-    string displayStringString(reinterpret_cast<char *>(displayString));
+    string contentUrlString(contentUrl.data(), contentUrl.size());
+    string displayStringString(displayString.data(), displayString.size());
     ContentLaunchBrandingInformation brandingInformation;
     ContentLaunchResponse response =
         ContentLauncherManager().proxyLaunchUrlRequest(contentUrlString, displayStringString, brandingInformation);

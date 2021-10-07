@@ -31,7 +31,7 @@ using namespace chip;
 using namespace chip::app::Clusters::AudioOutput;
 
 bool audioOutputClusterSelectOutput(uint8_t index);
-bool audioOutputClusterRenameOutput(uint8_t index, uint8_t * name);
+bool audioOutputClusterRenameOutput(uint8_t index, const CharSpan & name);
 
 bool emberAfAudioOutputClusterRenameOutputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                    const Commands::RenameOutput::DecodableType & commandData)

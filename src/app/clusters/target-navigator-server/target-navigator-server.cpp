@@ -63,7 +63,7 @@ bool emberAfTargetNavigatorClusterNavigateTargetCallback(app::CommandHandler * c
     auto & data   = commandData.data;
 
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string dataString(reinterpret_cast<char *>(data));
+    std::string dataString(data.data(), data.size());
     TargetNavigatorResponse response = targetNavigatorClusterNavigateTarget(target, dataString);
     sendResponse(command, response);
     return true;
