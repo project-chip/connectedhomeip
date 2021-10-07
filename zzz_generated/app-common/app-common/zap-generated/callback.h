@@ -28,8 +28,10 @@
 #include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/Constants.h>
 
 /** @brief Cluster Init
  *
@@ -918,43 +920,17 @@ void emberAfPowerConfigurationClusterClientInitCallback(chip::EndpointId endpoin
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPowerConfigurationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterPowerConfigurationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Power Configuration Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPowerConfigurationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Power Configuration Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPowerConfigurationClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        uint16_t manufacturerCode);
-
-/** @brief Power Configuration Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPowerConfigurationClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        uint16_t manufacturerCode);
+void MatterPowerConfigurationClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Power Configuration Cluster Server Message Sent
  *
@@ -988,31 +964,25 @@ void emberAfPowerConfigurationClusterClientMessageSentCallback(const chip::Messa
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPowerConfigurationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                EmberAfAttributeType attributeType, uint16_t size,
-                                                                                uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterPowerConfigurationClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Power Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPowerConfigurationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                EmberAfAttributeType attributeType, uint16_t size,
-                                                                                uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterPowerConfigurationClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Power Configuration Cluster Server Tick
  *
@@ -1054,45 +1024,19 @@ void emberAfDeviceTemperatureConfigurationClusterClientInitCallback(chip::Endpoi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDeviceTemperatureConfigurationClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId);
+void MatterDeviceTemperatureConfigurationClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Device Temperature Configuration Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDeviceTemperatureConfigurationClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId);
-
-/** @brief Device Temperature Configuration Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDeviceTemperatureConfigurationClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                    chip::AttributeId attributeId,
-                                                                                                    uint16_t manufacturerCode);
-
-/** @brief Device Temperature Configuration Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDeviceTemperatureConfigurationClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                    chip::AttributeId attributeId,
-                                                                                                    uint16_t manufacturerCode);
+void MatterDeviceTemperatureConfigurationClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Device Temperature Configuration Cluster Server Message Sent
  *
@@ -1126,31 +1070,25 @@ void emberAfDeviceTemperatureConfigurationClusterClientMessageSentCallback(const
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDeviceTemperatureConfigurationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            EmberAfAttributeType attributeType,
-                                                                                            uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterDeviceTemperatureConfigurationClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Device Temperature Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDeviceTemperatureConfigurationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            EmberAfAttributeType attributeType,
-                                                                                            uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterDeviceTemperatureConfigurationClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Device Temperature Configuration Cluster Server Tick
  *
@@ -1192,43 +1130,17 @@ void emberAfIdentifyClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIdentifyClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterIdentifyClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Identify Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIdentifyClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Identify Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIdentifyClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              uint16_t manufacturerCode);
-
-/** @brief Identify Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIdentifyClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              uint16_t manufacturerCode);
+void MatterIdentifyClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Identify Cluster Server Message Sent
  *
@@ -1260,29 +1172,27 @@ void emberAfIdentifyClusterClientMessageSentCallback(const chip::MessageSendDest
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIdentifyClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                      EmberAfAttributeType attributeType, uint16_t size,
-                                                                      uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterIdentifyClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                       EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Identify Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIdentifyClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                      EmberAfAttributeType attributeType, uint16_t size,
-                                                                      uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterIdentifyClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                       EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Identify Cluster Server Tick
  *
@@ -1324,43 +1234,17 @@ void emberAfGroupsClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfGroupsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterGroupsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Groups Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfGroupsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Groups Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfGroupsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            uint16_t manufacturerCode);
-
-/** @brief Groups Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfGroupsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            uint16_t manufacturerCode);
+void MatterGroupsClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Groups Cluster Server Message Sent
  *
@@ -1392,29 +1276,27 @@ void emberAfGroupsClusterClientMessageSentCallback(const chip::MessageSendDestin
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfGroupsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
-                                                                    uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterGroupsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Groups Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfGroupsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
-                                                                    uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterGroupsClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Groups Cluster Server Tick
  *
@@ -1456,43 +1338,17 @@ void emberAfScenesClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfScenesClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterScenesClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Scenes Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfScenesClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Scenes Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfScenesClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            uint16_t manufacturerCode);
-
-/** @brief Scenes Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfScenesClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            uint16_t manufacturerCode);
+void MatterScenesClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Scenes Cluster Server Message Sent
  *
@@ -1524,29 +1380,27 @@ void emberAfScenesClusterClientMessageSentCallback(const chip::MessageSendDestin
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfScenesClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
-                                                                    uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterScenesClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Scenes Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfScenesClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
-                                                                    uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterScenesClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Scenes Cluster Server Tick
  *
@@ -1588,41 +1442,17 @@ void emberAfOnOffClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOnOffClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterOnOffClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief On/Off Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOnOffClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief On/Off Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           uint16_t manufacturerCode);
-
-/** @brief On/Off Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOnOffClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           uint16_t manufacturerCode);
+void MatterOnOffClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief On/Off Cluster Server Message Sent
  *
@@ -1654,29 +1484,27 @@ void emberAfOnOffClusterClientMessageSentCallback(const chip::MessageSendDestina
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOnOffClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
-                                                                   uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterOnOffClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief On/Off Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOnOffClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
-                                                                   uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterOnOffClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief On/Off Cluster Server Tick
  *
@@ -1718,43 +1546,17 @@ void emberAfOnOffSwitchConfigurationClusterClientInitCallback(chip::EndpointId e
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOnOffSwitchConfigurationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterOnOffSwitchConfigurationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief On/off Switch Configuration Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOnOffSwitchConfigurationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief On/off Switch Configuration Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOnOffSwitchConfigurationClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              uint16_t manufacturerCode);
-
-/** @brief On/off Switch Configuration Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOnOffSwitchConfigurationClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              uint16_t manufacturerCode);
+void MatterOnOffSwitchConfigurationClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief On/off Switch Configuration Cluster Server Message Sent
  *
@@ -1788,31 +1590,25 @@ void emberAfOnOffSwitchConfigurationClusterClientMessageSentCallback(const chip:
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOnOffSwitchConfigurationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      EmberAfAttributeType attributeType,
-                                                                                      uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOnOffSwitchConfigurationClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief On/off Switch Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOnOffSwitchConfigurationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      EmberAfAttributeType attributeType,
-                                                                                      uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOnOffSwitchConfigurationClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief On/off Switch Configuration Cluster Server Tick
  *
@@ -1854,43 +1650,17 @@ void emberAfLevelControlClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfLevelControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterLevelControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Level Control Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfLevelControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Level Control Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfLevelControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  uint16_t manufacturerCode);
-
-/** @brief Level Control Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfLevelControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  uint16_t manufacturerCode);
+void MatterLevelControlClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Level Control Cluster Server Message Sent
  *
@@ -1922,29 +1692,27 @@ void emberAfLevelControlClusterClientMessageSentCallback(const chip::MessageSend
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfLevelControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          EmberAfAttributeType attributeType, uint16_t size,
-                                                                          uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterLevelControlClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Level Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfLevelControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          EmberAfAttributeType attributeType, uint16_t size,
-                                                                          uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterLevelControlClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Level Control Cluster Server Tick
  *
@@ -1986,43 +1754,17 @@ void emberAfAlarmsClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfAlarmsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterAlarmsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Alarms Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfAlarmsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Alarms Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfAlarmsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            uint16_t manufacturerCode);
-
-/** @brief Alarms Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfAlarmsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            uint16_t manufacturerCode);
+void MatterAlarmsClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Alarms Cluster Server Message Sent
  *
@@ -2054,29 +1796,27 @@ void emberAfAlarmsClusterClientMessageSentCallback(const chip::MessageSendDestin
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfAlarmsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
-                                                                    uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterAlarmsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Alarms Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfAlarmsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
-                                                                    uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterAlarmsClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Alarms Cluster Server Tick
  *
@@ -2118,41 +1858,17 @@ void emberAfTimeClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTimeClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterTimeClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Time Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTimeClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Time Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTimeClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          uint16_t manufacturerCode);
-
-/** @brief Time Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTimeClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          uint16_t manufacturerCode);
+void MatterTimeClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Time Cluster Server Message Sent
  *
@@ -2184,29 +1900,27 @@ void emberAfTimeClusterClientMessageSentCallback(const chip::MessageSendDestinat
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTimeClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                  EmberAfAttributeType attributeType, uint16_t size,
-                                                                  uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTimeClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                   EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Time Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTimeClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                  EmberAfAttributeType attributeType, uint16_t size,
-                                                                  uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTimeClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                   EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Time Cluster Server Tick
  *
@@ -2248,43 +1962,17 @@ void emberAfBinaryInputBasicClusterClientInitCallback(chip::EndpointId endpoint)
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBinaryInputBasicClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterBinaryInputBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Binary Input (Basic) Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBinaryInputBasicClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Binary Input (Basic) Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBinaryInputBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      uint16_t manufacturerCode);
-
-/** @brief Binary Input (Basic) Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBinaryInputBasicClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      uint16_t manufacturerCode);
+void MatterBinaryInputBasicClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Binary Input (Basic) Cluster Server Message Sent
  *
@@ -2318,31 +2006,27 @@ void emberAfBinaryInputBasicClusterClientMessageSentCallback(const chip::Message
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBinaryInputBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              EmberAfAttributeType attributeType, uint16_t size,
-                                                                              uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterBinaryInputBasicClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Binary Input (Basic) Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBinaryInputBasicClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              EmberAfAttributeType attributeType, uint16_t size,
-                                                                              uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterBinaryInputBasicClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Binary Input (Basic) Cluster Server Tick
  *
@@ -2384,43 +2068,17 @@ void emberAfPowerProfileClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPowerProfileClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterPowerProfileClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Power Profile Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPowerProfileClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Power Profile Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPowerProfileClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  uint16_t manufacturerCode);
-
-/** @brief Power Profile Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPowerProfileClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  uint16_t manufacturerCode);
+void MatterPowerProfileClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Power Profile Cluster Server Message Sent
  *
@@ -2452,29 +2110,27 @@ void emberAfPowerProfileClusterClientMessageSentCallback(const chip::MessageSend
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPowerProfileClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          EmberAfAttributeType attributeType, uint16_t size,
-                                                                          uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterPowerProfileClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Power Profile Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPowerProfileClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          EmberAfAttributeType attributeType, uint16_t size,
-                                                                          uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterPowerProfileClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Power Profile Cluster Server Tick
  *
@@ -2516,43 +2172,17 @@ void emberAfApplianceControlClusterClientInitCallback(chip::EndpointId endpoint)
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplianceControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterApplianceControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Appliance Control Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplianceControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Appliance Control Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplianceControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      uint16_t manufacturerCode);
-
-/** @brief Appliance Control Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplianceControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      uint16_t manufacturerCode);
+void MatterApplianceControlClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Appliance Control Cluster Server Message Sent
  *
@@ -2586,31 +2216,27 @@ void emberAfApplianceControlClusterClientMessageSentCallback(const chip::Message
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplianceControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              EmberAfAttributeType attributeType, uint16_t size,
-                                                                              uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterApplianceControlClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Appliance Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplianceControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              EmberAfAttributeType attributeType, uint16_t size,
-                                                                              uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterApplianceControlClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Appliance Control Cluster Server Tick
  *
@@ -2652,43 +2278,17 @@ void emberAfDescriptorClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDescriptorClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterDescriptorClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Descriptor Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDescriptorClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Descriptor Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDescriptorClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                uint16_t manufacturerCode);
-
-/** @brief Descriptor Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDescriptorClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                uint16_t manufacturerCode);
+void MatterDescriptorClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Descriptor Cluster Server Message Sent
  *
@@ -2720,29 +2320,27 @@ void emberAfDescriptorClusterClientMessageSentCallback(const chip::MessageSendDe
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDescriptorClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterDescriptorClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Descriptor Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDescriptorClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterDescriptorClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Descriptor Cluster Server Tick
  *
@@ -2784,43 +2382,17 @@ void emberAfPollControlClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPollControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterPollControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Poll Control Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPollControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Poll Control Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPollControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 uint16_t manufacturerCode);
-
-/** @brief Poll Control Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPollControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 uint16_t manufacturerCode);
+void MatterPollControlClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Poll Control Cluster Server Message Sent
  *
@@ -2852,29 +2424,27 @@ void emberAfPollControlClusterClientMessageSentCallback(const chip::MessageSendD
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType, uint16_t size,
-                                                                         uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterPollControlClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Poll Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPollControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType, uint16_t size,
-                                                                         uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterPollControlClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Poll Control Cluster Server Tick
  *
@@ -2916,41 +2486,17 @@ void emberAfBasicClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBasicClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Basic Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBasicClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Basic Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           uint16_t manufacturerCode);
-
-/** @brief Basic Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBasicClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           uint16_t manufacturerCode);
+void MatterBasicClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Basic Cluster Server Message Sent
  *
@@ -2982,29 +2528,27 @@ void emberAfBasicClusterClientMessageSentCallback(const chip::MessageSendDestina
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
-                                                                   uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterBasicClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Basic Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBasicClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
-                                                                   uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterBasicClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Basic Cluster Server Tick
  *
@@ -3046,45 +2590,17 @@ void emberAfOtaSoftwareUpdateProviderClusterClientInitCallback(chip::EndpointId 
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOtaSoftwareUpdateProviderClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                           chip::AttributeId attributeId);
+void MatterOtaSoftwareUpdateProviderClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief OTA Software Update Provider Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOtaSoftwareUpdateProviderClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                           chip::AttributeId attributeId);
-
-/** @brief OTA Software Update Provider Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOtaSoftwareUpdateProviderClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId,
-                                                                                               uint16_t manufacturerCode);
-
-/** @brief OTA Software Update Provider Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOtaSoftwareUpdateProviderClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId,
-                                                                                               uint16_t manufacturerCode);
+void MatterOtaSoftwareUpdateProviderClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief OTA Software Update Provider Cluster Server Message Sent
  *
@@ -3118,31 +2634,25 @@ void emberAfOtaSoftwareUpdateProviderClusterClientMessageSentCallback(const chip
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOtaSoftwareUpdateProviderClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                       chip::AttributeId attributeId,
-                                                                                       EmberAfAttributeType attributeType,
-                                                                                       uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOtaSoftwareUpdateProviderClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief OTA Software Update Provider Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOtaSoftwareUpdateProviderClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                       chip::AttributeId attributeId,
-                                                                                       EmberAfAttributeType attributeType,
-                                                                                       uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOtaSoftwareUpdateProviderClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief OTA Software Update Provider Cluster Server Tick
  *
@@ -3184,45 +2694,17 @@ void emberAfOtaSoftwareUpdateRequestorClusterClientInitCallback(chip::EndpointId
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOtaSoftwareUpdateRequestorClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId);
+void MatterOtaSoftwareUpdateRequestorClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief OTA Software Update Requestor Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOtaSoftwareUpdateRequestorClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId);
-
-/** @brief OTA Software Update Requestor Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOtaSoftwareUpdateRequestorClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                chip::AttributeId attributeId,
-                                                                                                uint16_t manufacturerCode);
-
-/** @brief OTA Software Update Requestor Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOtaSoftwareUpdateRequestorClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                chip::AttributeId attributeId,
-                                                                                                uint16_t manufacturerCode);
+void MatterOtaSoftwareUpdateRequestorClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief OTA Software Update Requestor Cluster Server Message Sent
  *
@@ -3256,31 +2738,25 @@ void emberAfOtaSoftwareUpdateRequestorClusterClientMessageSentCallback(const chi
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOtaSoftwareUpdateRequestorClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        EmberAfAttributeType attributeType,
-                                                                                        uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOtaSoftwareUpdateRequestorClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief OTA Software Update Requestor Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOtaSoftwareUpdateRequestorClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        EmberAfAttributeType attributeType,
-                                                                                        uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOtaSoftwareUpdateRequestorClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief OTA Software Update Requestor Cluster Server Tick
  *
@@ -3322,43 +2798,17 @@ void emberAfPowerSourceClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPowerSourceClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterPowerSourceClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Power Source Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPowerSourceClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Power Source Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPowerSourceClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 uint16_t manufacturerCode);
-
-/** @brief Power Source Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPowerSourceClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 uint16_t manufacturerCode);
+void MatterPowerSourceClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Power Source Cluster Server Message Sent
  *
@@ -3390,29 +2840,27 @@ void emberAfPowerSourceClusterClientMessageSentCallback(const chip::MessageSendD
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPowerSourceClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType, uint16_t size,
-                                                                         uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterPowerSourceClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Power Source Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPowerSourceClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType, uint16_t size,
-                                                                         uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterPowerSourceClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Power Source Cluster Server Tick
  *
@@ -3454,43 +2902,17 @@ void emberAfGeneralCommissioningClusterClientInitCallback(chip::EndpointId endpo
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfGeneralCommissioningClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterGeneralCommissioningClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief General Commissioning Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfGeneralCommissioningClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief General Commissioning Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfGeneralCommissioningClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                          chip::AttributeId attributeId,
-                                                                                          uint16_t manufacturerCode);
-
-/** @brief General Commissioning Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfGeneralCommissioningClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                          chip::AttributeId attributeId,
-                                                                                          uint16_t manufacturerCode);
+void MatterGeneralCommissioningClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief General Commissioning Cluster Server Message Sent
  *
@@ -3524,31 +2946,25 @@ void emberAfGeneralCommissioningClusterClientMessageSentCallback(const chip::Mes
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfGeneralCommissioningClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  EmberAfAttributeType attributeType, uint16_t size,
-                                                                                  uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterGeneralCommissioningClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief General Commissioning Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfGeneralCommissioningClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  EmberAfAttributeType attributeType, uint16_t size,
-                                                                                  uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterGeneralCommissioningClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief General Commissioning Cluster Server Tick
  *
@@ -3590,43 +3006,17 @@ void emberAfNetworkCommissioningClusterClientInitCallback(chip::EndpointId endpo
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfNetworkCommissioningClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterNetworkCommissioningClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Network Commissioning Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfNetworkCommissioningClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Network Commissioning Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfNetworkCommissioningClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                          chip::AttributeId attributeId,
-                                                                                          uint16_t manufacturerCode);
-
-/** @brief Network Commissioning Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfNetworkCommissioningClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                          chip::AttributeId attributeId,
-                                                                                          uint16_t manufacturerCode);
+void MatterNetworkCommissioningClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Network Commissioning Cluster Server Message Sent
  *
@@ -3660,31 +3050,25 @@ void emberAfNetworkCommissioningClusterClientMessageSentCallback(const chip::Mes
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfNetworkCommissioningClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  EmberAfAttributeType attributeType, uint16_t size,
-                                                                                  uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterNetworkCommissioningClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Network Commissioning Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfNetworkCommissioningClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  EmberAfAttributeType attributeType, uint16_t size,
-                                                                                  uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterNetworkCommissioningClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Network Commissioning Cluster Server Tick
  *
@@ -3726,43 +3110,17 @@ void emberAfDiagnosticLogsClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDiagnosticLogsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterDiagnosticLogsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Diagnostic Logs Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDiagnosticLogsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Diagnostic Logs Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDiagnosticLogsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    uint16_t manufacturerCode);
-
-/** @brief Diagnostic Logs Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDiagnosticLogsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    uint16_t manufacturerCode);
+void MatterDiagnosticLogsClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Diagnostic Logs Cluster Server Message Sent
  *
@@ -3796,31 +3154,27 @@ void emberAfDiagnosticLogsClusterClientMessageSentCallback(const chip::MessageSe
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDiagnosticLogsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            EmberAfAttributeType attributeType, uint16_t size,
-                                                                            uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterDiagnosticLogsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Diagnostic Logs Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDiagnosticLogsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            EmberAfAttributeType attributeType, uint16_t size,
-                                                                            uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterDiagnosticLogsClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Diagnostic Logs Cluster Server Tick
  *
@@ -3862,43 +3216,17 @@ void emberAfGeneralDiagnosticsClusterClientInitCallback(chip::EndpointId endpoin
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfGeneralDiagnosticsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterGeneralDiagnosticsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief General Diagnostics Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfGeneralDiagnosticsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief General Diagnostics Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfGeneralDiagnosticsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        uint16_t manufacturerCode);
-
-/** @brief General Diagnostics Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfGeneralDiagnosticsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        uint16_t manufacturerCode);
+void MatterGeneralDiagnosticsClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief General Diagnostics Cluster Server Message Sent
  *
@@ -3932,31 +3260,25 @@ void emberAfGeneralDiagnosticsClusterClientMessageSentCallback(const chip::Messa
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfGeneralDiagnosticsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                EmberAfAttributeType attributeType, uint16_t size,
-                                                                                uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterGeneralDiagnosticsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief General Diagnostics Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfGeneralDiagnosticsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                EmberAfAttributeType attributeType, uint16_t size,
-                                                                                uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterGeneralDiagnosticsClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief General Diagnostics Cluster Server Tick
  *
@@ -3998,43 +3320,17 @@ void emberAfSoftwareDiagnosticsClusterClientInitCallback(chip::EndpointId endpoi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSoftwareDiagnosticsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterSoftwareDiagnosticsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Software Diagnostics Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSoftwareDiagnosticsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Software Diagnostics Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSoftwareDiagnosticsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         uint16_t manufacturerCode);
-
-/** @brief Software Diagnostics Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSoftwareDiagnosticsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         uint16_t manufacturerCode);
+void MatterSoftwareDiagnosticsClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Software Diagnostics Cluster Server Message Sent
  *
@@ -4068,31 +3364,25 @@ void emberAfSoftwareDiagnosticsClusterClientMessageSentCallback(const chip::Mess
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSoftwareDiagnosticsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 EmberAfAttributeType attributeType, uint16_t size,
-                                                                                 uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSoftwareDiagnosticsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Software Diagnostics Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSoftwareDiagnosticsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 EmberAfAttributeType attributeType, uint16_t size,
-                                                                                 uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSoftwareDiagnosticsClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Software Diagnostics Cluster Server Tick
  *
@@ -4134,43 +3424,17 @@ void emberAfThreadNetworkDiagnosticsClusterClientInitCallback(chip::EndpointId e
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfThreadNetworkDiagnosticsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterThreadNetworkDiagnosticsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Thread Network Diagnostics Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfThreadNetworkDiagnosticsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Thread Network Diagnostics Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfThreadNetworkDiagnosticsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              uint16_t manufacturerCode);
-
-/** @brief Thread Network Diagnostics Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfThreadNetworkDiagnosticsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              uint16_t manufacturerCode);
+void MatterThreadNetworkDiagnosticsClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Thread Network Diagnostics Cluster Server Message Sent
  *
@@ -4204,31 +3468,25 @@ void emberAfThreadNetworkDiagnosticsClusterClientMessageSentCallback(const chip:
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfThreadNetworkDiagnosticsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      EmberAfAttributeType attributeType,
-                                                                                      uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterThreadNetworkDiagnosticsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Thread Network Diagnostics Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfThreadNetworkDiagnosticsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      EmberAfAttributeType attributeType,
-                                                                                      uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterThreadNetworkDiagnosticsClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Thread Network Diagnostics Cluster Server Tick
  *
@@ -4270,43 +3528,17 @@ void emberAfWiFiNetworkDiagnosticsClusterClientInitCallback(chip::EndpointId end
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfWiFiNetworkDiagnosticsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterWiFiNetworkDiagnosticsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief WiFi Network Diagnostics Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfWiFiNetworkDiagnosticsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief WiFi Network Diagnostics Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfWiFiNetworkDiagnosticsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            uint16_t manufacturerCode);
-
-/** @brief WiFi Network Diagnostics Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfWiFiNetworkDiagnosticsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            uint16_t manufacturerCode);
+void MatterWiFiNetworkDiagnosticsClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief WiFi Network Diagnostics Cluster Server Message Sent
  *
@@ -4340,31 +3572,25 @@ void emberAfWiFiNetworkDiagnosticsClusterClientMessageSentCallback(const chip::M
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfWiFiNetworkDiagnosticsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    EmberAfAttributeType attributeType,
-                                                                                    uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterWiFiNetworkDiagnosticsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief WiFi Network Diagnostics Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfWiFiNetworkDiagnosticsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    EmberAfAttributeType attributeType,
-                                                                                    uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterWiFiNetworkDiagnosticsClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief WiFi Network Diagnostics Cluster Server Tick
  *
@@ -4406,45 +3632,17 @@ void emberAfEthernetNetworkDiagnosticsClusterClientInitCallback(chip::EndpointId
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfEthernetNetworkDiagnosticsClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId);
+void MatterEthernetNetworkDiagnosticsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Ethernet Network Diagnostics Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfEthernetNetworkDiagnosticsClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId);
-
-/** @brief Ethernet Network Diagnostics Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfEthernetNetworkDiagnosticsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                chip::AttributeId attributeId,
-                                                                                                uint16_t manufacturerCode);
-
-/** @brief Ethernet Network Diagnostics Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfEthernetNetworkDiagnosticsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                chip::AttributeId attributeId,
-                                                                                                uint16_t manufacturerCode);
+void MatterEthernetNetworkDiagnosticsClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Ethernet Network Diagnostics Cluster Server Message Sent
  *
@@ -4478,31 +3676,25 @@ void emberAfEthernetNetworkDiagnosticsClusterClientMessageSentCallback(const chi
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfEthernetNetworkDiagnosticsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        EmberAfAttributeType attributeType,
-                                                                                        uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterEthernetNetworkDiagnosticsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Ethernet Network Diagnostics Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfEthernetNetworkDiagnosticsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        EmberAfAttributeType attributeType,
-                                                                                        uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterEthernetNetworkDiagnosticsClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Ethernet Network Diagnostics Cluster Server Tick
  *
@@ -4544,43 +3736,17 @@ void emberAfBridgedDeviceBasicClusterClientInitCallback(chip::EndpointId endpoin
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBridgedDeviceBasicClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterBridgedDeviceBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Bridged Device Basic Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBridgedDeviceBasicClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Bridged Device Basic Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBridgedDeviceBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        uint16_t manufacturerCode);
-
-/** @brief Bridged Device Basic Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBridgedDeviceBasicClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        uint16_t manufacturerCode);
+void MatterBridgedDeviceBasicClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Bridged Device Basic Cluster Server Message Sent
  *
@@ -4614,31 +3780,25 @@ void emberAfBridgedDeviceBasicClusterClientMessageSentCallback(const chip::Messa
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBridgedDeviceBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                EmberAfAttributeType attributeType, uint16_t size,
-                                                                                uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterBridgedDeviceBasicClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Bridged Device Basic Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBridgedDeviceBasicClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                EmberAfAttributeType attributeType, uint16_t size,
-                                                                                uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterBridgedDeviceBasicClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Bridged Device Basic Cluster Server Tick
  *
@@ -4680,43 +3840,17 @@ void emberAfSwitchClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSwitchClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterSwitchClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Switch Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSwitchClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Switch Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSwitchClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            uint16_t manufacturerCode);
-
-/** @brief Switch Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSwitchClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            uint16_t manufacturerCode);
+void MatterSwitchClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Switch Cluster Server Message Sent
  *
@@ -4748,29 +3882,27 @@ void emberAfSwitchClusterClientMessageSentCallback(const chip::MessageSendDestin
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSwitchClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
-                                                                    uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterSwitchClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Switch Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSwitchClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
-                                                                    uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterSwitchClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Switch Cluster Server Tick
  *
@@ -4812,45 +3944,17 @@ void emberAfAdministratorCommissioningClusterClientInitCallback(chip::EndpointId
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfAdministratorCommissioningClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId);
+void MatterAdministratorCommissioningClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief AdministratorCommissioning Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfAdministratorCommissioningClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId);
-
-/** @brief AdministratorCommissioning Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfAdministratorCommissioningClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                chip::AttributeId attributeId,
-                                                                                                uint16_t manufacturerCode);
-
-/** @brief AdministratorCommissioning Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfAdministratorCommissioningClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                chip::AttributeId attributeId,
-                                                                                                uint16_t manufacturerCode);
+void MatterAdministratorCommissioningClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief AdministratorCommissioning Cluster Server Message Sent
  *
@@ -4884,31 +3988,25 @@ void emberAfAdministratorCommissioningClusterClientMessageSentCallback(const chi
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfAdministratorCommissioningClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        EmberAfAttributeType attributeType,
-                                                                                        uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterAdministratorCommissioningClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief AdministratorCommissioning Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfAdministratorCommissioningClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        EmberAfAttributeType attributeType,
-                                                                                        uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterAdministratorCommissioningClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief AdministratorCommissioning Cluster Server Tick
  *
@@ -4950,43 +4048,17 @@ void emberAfOperationalCredentialsClusterClientInitCallback(chip::EndpointId end
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOperationalCredentialsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterOperationalCredentialsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Operational Credentials Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOperationalCredentialsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Operational Credentials Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOperationalCredentialsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            uint16_t manufacturerCode);
-
-/** @brief Operational Credentials Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOperationalCredentialsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            uint16_t manufacturerCode);
+void MatterOperationalCredentialsClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Operational Credentials Cluster Server Message Sent
  *
@@ -5020,31 +4092,25 @@ void emberAfOperationalCredentialsClusterClientMessageSentCallback(const chip::M
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOperationalCredentialsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    EmberAfAttributeType attributeType,
-                                                                                    uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOperationalCredentialsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Operational Credentials Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOperationalCredentialsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    EmberAfAttributeType attributeType,
-                                                                                    uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOperationalCredentialsClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Operational Credentials Cluster Server Tick
  *
@@ -5086,43 +4152,17 @@ void emberAfFixedLabelClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfFixedLabelClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterFixedLabelClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Fixed Label Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfFixedLabelClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Fixed Label Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfFixedLabelClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                uint16_t manufacturerCode);
-
-/** @brief Fixed Label Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfFixedLabelClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                uint16_t manufacturerCode);
+void MatterFixedLabelClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Fixed Label Cluster Server Message Sent
  *
@@ -5154,29 +4194,27 @@ void emberAfFixedLabelClusterClientMessageSentCallback(const chip::MessageSendDe
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfFixedLabelClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterFixedLabelClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Fixed Label Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfFixedLabelClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterFixedLabelClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Fixed Label Cluster Server Tick
  *
@@ -5218,43 +4256,17 @@ void emberAfShadeConfigurationClusterClientInitCallback(chip::EndpointId endpoin
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfShadeConfigurationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterShadeConfigurationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Shade Configuration Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfShadeConfigurationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Shade Configuration Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfShadeConfigurationClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        uint16_t manufacturerCode);
-
-/** @brief Shade Configuration Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfShadeConfigurationClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        uint16_t manufacturerCode);
+void MatterShadeConfigurationClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Shade Configuration Cluster Server Message Sent
  *
@@ -5288,31 +4300,25 @@ void emberAfShadeConfigurationClusterClientMessageSentCallback(const chip::Messa
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfShadeConfigurationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                EmberAfAttributeType attributeType, uint16_t size,
-                                                                                uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterShadeConfigurationClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Shade Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfShadeConfigurationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                EmberAfAttributeType attributeType, uint16_t size,
-                                                                                uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterShadeConfigurationClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Shade Configuration Cluster Server Tick
  *
@@ -5354,43 +4360,17 @@ void emberAfDoorLockClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDoorLockClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterDoorLockClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Door Lock Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDoorLockClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Door Lock Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDoorLockClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              uint16_t manufacturerCode);
-
-/** @brief Door Lock Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDoorLockClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              uint16_t manufacturerCode);
+void MatterDoorLockClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Door Lock Cluster Server Message Sent
  *
@@ -5422,29 +4402,27 @@ void emberAfDoorLockClusterClientMessageSentCallback(const chip::MessageSendDest
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDoorLockClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                      EmberAfAttributeType attributeType, uint16_t size,
-                                                                      uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                       EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Door Lock Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDoorLockClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                      EmberAfAttributeType attributeType, uint16_t size,
-                                                                      uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterDoorLockClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                       EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Door Lock Cluster Server Tick
  *
@@ -5486,43 +4464,17 @@ void emberAfWindowCoveringClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfWindowCoveringClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterWindowCoveringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Window Covering Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfWindowCoveringClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Window Covering Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfWindowCoveringClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    uint16_t manufacturerCode);
-
-/** @brief Window Covering Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfWindowCoveringClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    uint16_t manufacturerCode);
+void MatterWindowCoveringClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Window Covering Cluster Server Message Sent
  *
@@ -5556,31 +4508,27 @@ void emberAfWindowCoveringClusterClientMessageSentCallback(const chip::MessageSe
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfWindowCoveringClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            EmberAfAttributeType attributeType, uint16_t size,
-                                                                            uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterWindowCoveringClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Window Covering Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfWindowCoveringClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            EmberAfAttributeType attributeType, uint16_t size,
-                                                                            uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterWindowCoveringClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Window Covering Cluster Server Tick
  *
@@ -5622,43 +4570,17 @@ void emberAfBarrierControlClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBarrierControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterBarrierControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Barrier Control Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBarrierControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Barrier Control Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBarrierControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    uint16_t manufacturerCode);
-
-/** @brief Barrier Control Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBarrierControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    uint16_t manufacturerCode);
+void MatterBarrierControlClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Barrier Control Cluster Server Message Sent
  *
@@ -5692,31 +4614,27 @@ void emberAfBarrierControlClusterClientMessageSentCallback(const chip::MessageSe
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBarrierControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            EmberAfAttributeType attributeType, uint16_t size,
-                                                                            uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterBarrierControlClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Barrier Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBarrierControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            EmberAfAttributeType attributeType, uint16_t size,
-                                                                            uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterBarrierControlClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Barrier Control Cluster Server Tick
  *
@@ -5758,45 +4676,17 @@ void emberAfPumpConfigurationAndControlClusterClientInitCallback(chip::EndpointI
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPumpConfigurationAndControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId);
+void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Pump Configuration and Control Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPumpConfigurationAndControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId);
-
-/** @brief Pump Configuration and Control Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPumpConfigurationAndControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                 chip::AttributeId attributeId,
-                                                                                                 uint16_t manufacturerCode);
-
-/** @brief Pump Configuration and Control Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPumpConfigurationAndControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                 chip::AttributeId attributeId,
-                                                                                                 uint16_t manufacturerCode);
+void MatterPumpConfigurationAndControlClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Pump Configuration and Control Cluster Server Message Sent
  *
@@ -5830,31 +4720,25 @@ void emberAfPumpConfigurationAndControlClusterClientMessageSentCallback(const ch
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPumpConfigurationAndControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         EmberAfAttributeType attributeType,
-                                                                                         uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Pump Configuration and Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPumpConfigurationAndControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         EmberAfAttributeType attributeType,
-                                                                                         uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Pump Configuration and Control Cluster Server Tick
  *
@@ -5896,43 +4780,17 @@ void emberAfThermostatClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfThermostatClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterThermostatClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Thermostat Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfThermostatClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Thermostat Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfThermostatClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                uint16_t manufacturerCode);
-
-/** @brief Thermostat Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfThermostatClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                uint16_t manufacturerCode);
+void MatterThermostatClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Thermostat Cluster Server Message Sent
  *
@@ -5964,29 +4822,27 @@ void emberAfThermostatClusterClientMessageSentCallback(const chip::MessageSendDe
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterThermostatClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Thermostat Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfThermostatClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterThermostatClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Thermostat Cluster Server Tick
  *
@@ -6028,43 +4884,17 @@ void emberAfFanControlClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfFanControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterFanControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Fan Control Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfFanControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Fan Control Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfFanControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                uint16_t manufacturerCode);
-
-/** @brief Fan Control Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfFanControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                uint16_t manufacturerCode);
+void MatterFanControlClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Fan Control Cluster Server Message Sent
  *
@@ -6096,29 +4926,27 @@ void emberAfFanControlClusterClientMessageSentCallback(const chip::MessageSendDe
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfFanControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterFanControlClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Fan Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfFanControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterFanControlClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Fan Control Cluster Server Tick
  *
@@ -6160,43 +4988,17 @@ void emberAfDehumidificationControlClusterClientInitCallback(chip::EndpointId en
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDehumidificationControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterDehumidificationControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Dehumidification Control Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDehumidificationControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Dehumidification Control Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDehumidificationControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             uint16_t manufacturerCode);
-
-/** @brief Dehumidification Control Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDehumidificationControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             uint16_t manufacturerCode);
+void MatterDehumidificationControlClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Dehumidification Control Cluster Server Message Sent
  *
@@ -6230,31 +5032,25 @@ void emberAfDehumidificationControlClusterClientMessageSentCallback(const chip::
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDehumidificationControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     EmberAfAttributeType attributeType,
-                                                                                     uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterDehumidificationControlClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Dehumidification Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDehumidificationControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     EmberAfAttributeType attributeType,
-                                                                                     uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterDehumidificationControlClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Dehumidification Control Cluster Server Tick
  *
@@ -6296,43 +5092,19 @@ void emberAfThermostatUserInterfaceConfigurationClusterClientInitCallback(chip::
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfThermostatUserInterfaceConfigurationClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId);
+void MatterThermostatUserInterfaceConfigurationClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Thermostat User Interface Configuration Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfThermostatUserInterfaceConfigurationClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId);
-
-/** @brief Thermostat User Interface Configuration Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfThermostatUserInterfaceConfigurationClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Thermostat User Interface Configuration Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfThermostatUserInterfaceConfigurationClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterThermostatUserInterfaceConfigurationClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Thermostat User Interface Configuration Cluster Server Message Sent
  *
@@ -6366,27 +5138,25 @@ void emberAfThermostatUserInterfaceConfigurationClusterClientMessageSentCallback
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfThermostatUserInterfaceConfigurationClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterThermostatUserInterfaceConfigurationClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Thermostat User Interface Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfThermostatUserInterfaceConfigurationClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterThermostatUserInterfaceConfigurationClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Thermostat User Interface Configuration Cluster Server Tick
  *
@@ -6428,43 +5198,17 @@ void emberAfColorControlClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfColorControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterColorControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Color Control Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfColorControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Color Control Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfColorControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  uint16_t manufacturerCode);
-
-/** @brief Color Control Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfColorControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  uint16_t manufacturerCode);
+void MatterColorControlClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Color Control Cluster Server Message Sent
  *
@@ -6496,29 +5240,27 @@ void emberAfColorControlClusterClientMessageSentCallback(const chip::MessageSend
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfColorControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          EmberAfAttributeType attributeType, uint16_t size,
-                                                                          uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterColorControlClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Color Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfColorControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          EmberAfAttributeType attributeType, uint16_t size,
-                                                                          uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterColorControlClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Color Control Cluster Server Tick
  *
@@ -6560,43 +5302,17 @@ void emberAfBallastConfigurationClusterClientInitCallback(chip::EndpointId endpo
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBallastConfigurationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterBallastConfigurationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Ballast Configuration Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBallastConfigurationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Ballast Configuration Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBallastConfigurationClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                          chip::AttributeId attributeId,
-                                                                                          uint16_t manufacturerCode);
-
-/** @brief Ballast Configuration Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBallastConfigurationClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                          chip::AttributeId attributeId,
-                                                                                          uint16_t manufacturerCode);
+void MatterBallastConfigurationClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Ballast Configuration Cluster Server Message Sent
  *
@@ -6630,31 +5346,25 @@ void emberAfBallastConfigurationClusterClientMessageSentCallback(const chip::Mes
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBallastConfigurationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  EmberAfAttributeType attributeType, uint16_t size,
-                                                                                  uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterBallastConfigurationClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Ballast Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBallastConfigurationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  EmberAfAttributeType attributeType, uint16_t size,
-                                                                                  uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterBallastConfigurationClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Ballast Configuration Cluster Server Tick
  *
@@ -6696,43 +5406,17 @@ void emberAfIlluminanceMeasurementClusterClientInitCallback(chip::EndpointId end
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIlluminanceMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterIlluminanceMeasurementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Illuminance Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIlluminanceMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Illuminance Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIlluminanceMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            uint16_t manufacturerCode);
-
-/** @brief Illuminance Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIlluminanceMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            uint16_t manufacturerCode);
+void MatterIlluminanceMeasurementClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Illuminance Measurement Cluster Server Message Sent
  *
@@ -6766,31 +5450,25 @@ void emberAfIlluminanceMeasurementClusterClientMessageSentCallback(const chip::M
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIlluminanceMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    EmberAfAttributeType attributeType,
-                                                                                    uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterIlluminanceMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Illuminance Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIlluminanceMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    EmberAfAttributeType attributeType,
-                                                                                    uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterIlluminanceMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Illuminance Measurement Cluster Server Tick
  *
@@ -6832,43 +5510,17 @@ void emberAfIlluminanceLevelSensingClusterClientInitCallback(chip::EndpointId en
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIlluminanceLevelSensingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterIlluminanceLevelSensingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Illuminance Level Sensing Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIlluminanceLevelSensingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Illuminance Level Sensing Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIlluminanceLevelSensingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             uint16_t manufacturerCode);
-
-/** @brief Illuminance Level Sensing Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIlluminanceLevelSensingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             uint16_t manufacturerCode);
+void MatterIlluminanceLevelSensingClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Illuminance Level Sensing Cluster Server Message Sent
  *
@@ -6902,31 +5554,25 @@ void emberAfIlluminanceLevelSensingClusterClientMessageSentCallback(const chip::
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIlluminanceLevelSensingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     EmberAfAttributeType attributeType,
-                                                                                     uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterIlluminanceLevelSensingClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Illuminance Level Sensing Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIlluminanceLevelSensingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     EmberAfAttributeType attributeType,
-                                                                                     uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterIlluminanceLevelSensingClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Illuminance Level Sensing Cluster Server Tick
  *
@@ -6968,43 +5614,17 @@ void emberAfTemperatureMeasurementClusterClientInitCallback(chip::EndpointId end
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTemperatureMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterTemperatureMeasurementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Temperature Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTemperatureMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Temperature Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTemperatureMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            uint16_t manufacturerCode);
-
-/** @brief Temperature Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTemperatureMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            uint16_t manufacturerCode);
+void MatterTemperatureMeasurementClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Temperature Measurement Cluster Server Message Sent
  *
@@ -7038,31 +5658,25 @@ void emberAfTemperatureMeasurementClusterClientMessageSentCallback(const chip::M
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTemperatureMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    EmberAfAttributeType attributeType,
-                                                                                    uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterTemperatureMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Temperature Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTemperatureMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId,
-                                                                                    EmberAfAttributeType attributeType,
-                                                                                    uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterTemperatureMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Temperature Measurement Cluster Server Tick
  *
@@ -7104,43 +5718,17 @@ void emberAfPressureMeasurementClusterClientInitCallback(chip::EndpointId endpoi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPressureMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterPressureMeasurementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Pressure Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfPressureMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Pressure Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPressureMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         uint16_t manufacturerCode);
-
-/** @brief Pressure Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfPressureMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         uint16_t manufacturerCode);
+void MatterPressureMeasurementClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Pressure Measurement Cluster Server Message Sent
  *
@@ -7174,31 +5762,25 @@ void emberAfPressureMeasurementClusterClientMessageSentCallback(const chip::Mess
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPressureMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 EmberAfAttributeType attributeType, uint16_t size,
-                                                                                 uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterPressureMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Pressure Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfPressureMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 EmberAfAttributeType attributeType, uint16_t size,
-                                                                                 uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterPressureMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Pressure Measurement Cluster Server Tick
  *
@@ -7240,43 +5822,17 @@ void emberAfFlowMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfFlowMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterFlowMeasurementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Flow Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfFlowMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Flow Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfFlowMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     uint16_t manufacturerCode);
-
-/** @brief Flow Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfFlowMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     uint16_t manufacturerCode);
+void MatterFlowMeasurementClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Flow Measurement Cluster Server Message Sent
  *
@@ -7310,31 +5866,27 @@ void emberAfFlowMeasurementClusterClientMessageSentCallback(const chip::MessageS
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfFlowMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId,
-                                                                             EmberAfAttributeType attributeType, uint16_t size,
-                                                                             uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterFlowMeasurementClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Flow Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfFlowMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId,
-                                                                             EmberAfAttributeType attributeType, uint16_t size,
-                                                                             uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterFlowMeasurementClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Flow Measurement Cluster Server Tick
  *
@@ -7376,45 +5928,17 @@ void emberAfRelativeHumidityMeasurementClusterClientInitCallback(chip::EndpointI
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfRelativeHumidityMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId);
+void MatterRelativeHumidityMeasurementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Relative Humidity Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfRelativeHumidityMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId);
-
-/** @brief Relative Humidity Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfRelativeHumidityMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                 chip::AttributeId attributeId,
-                                                                                                 uint16_t manufacturerCode);
-
-/** @brief Relative Humidity Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfRelativeHumidityMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                 chip::AttributeId attributeId,
-                                                                                                 uint16_t manufacturerCode);
+void MatterRelativeHumidityMeasurementClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Relative Humidity Measurement Cluster Server Message Sent
  *
@@ -7448,31 +5972,25 @@ void emberAfRelativeHumidityMeasurementClusterClientMessageSentCallback(const ch
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfRelativeHumidityMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         EmberAfAttributeType attributeType,
-                                                                                         uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterRelativeHumidityMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Relative Humidity Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfRelativeHumidityMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         EmberAfAttributeType attributeType,
-                                                                                         uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterRelativeHumidityMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Relative Humidity Measurement Cluster Server Tick
  *
@@ -7514,43 +6032,17 @@ void emberAfOccupancySensingClusterClientInitCallback(chip::EndpointId endpoint)
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOccupancySensingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterOccupancySensingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Occupancy Sensing Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOccupancySensingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Occupancy Sensing Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOccupancySensingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      uint16_t manufacturerCode);
-
-/** @brief Occupancy Sensing Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOccupancySensingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      uint16_t manufacturerCode);
+void MatterOccupancySensingClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Occupancy Sensing Cluster Server Message Sent
  *
@@ -7584,31 +6076,27 @@ void emberAfOccupancySensingClusterClientMessageSentCallback(const chip::Message
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOccupancySensingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              EmberAfAttributeType attributeType, uint16_t size,
-                                                                              uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterOccupancySensingClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Occupancy Sensing Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOccupancySensingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              EmberAfAttributeType attributeType, uint16_t size,
-                                                                              uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterOccupancySensingClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Occupancy Sensing Cluster Server Tick
  *
@@ -7650,43 +6138,19 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterClientInitCallback(chip
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfCarbonMonoxideConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId);
+void MatterCarbonMonoxideConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Carbon Monoxide Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfCarbonMonoxideConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId);
-
-/** @brief Carbon Monoxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfCarbonMonoxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Carbon Monoxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfCarbonMonoxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterCarbonMonoxideConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Carbon Monoxide Concentration Measurement Cluster Server Message Sent
  *
@@ -7720,27 +6184,25 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterClientMessageSentCallba
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfCarbonMonoxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterCarbonMonoxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Carbon Monoxide Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfCarbonMonoxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterCarbonMonoxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Carbon Monoxide Concentration Measurement Cluster Server Tick
  *
@@ -7782,43 +6244,19 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterClientInitCallback(chip:
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfCarbonDioxideConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                       chip::AttributeId attributeId);
+void MatterCarbonDioxideConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Carbon Dioxide Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfCarbonDioxideConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                       chip::AttributeId attributeId);
-
-/** @brief Carbon Dioxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfCarbonDioxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Carbon Dioxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfCarbonDioxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterCarbonDioxideConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Carbon Dioxide Concentration Measurement Cluster Server Message Sent
  *
@@ -7852,27 +6290,25 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterClientMessageSentCallbac
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfCarbonDioxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterCarbonDioxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Carbon Dioxide Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfCarbonDioxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterCarbonDioxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Carbon Dioxide Concentration Measurement Cluster Server Tick
  *
@@ -7914,45 +6350,19 @@ void emberAfEthyleneConcentrationMeasurementClusterClientInitCallback(chip::Endp
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfEthyleneConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId);
+void MatterEthyleneConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Ethylene Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfEthyleneConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId);
-
-/** @brief Ethylene Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfEthyleneConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                      chip::AttributeId attributeId,
-                                                                                                      uint16_t manufacturerCode);
-
-/** @brief Ethylene Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfEthyleneConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                      chip::AttributeId attributeId,
-                                                                                                      uint16_t manufacturerCode);
+void MatterEthyleneConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Ethylene Concentration Measurement Cluster Server Message Sent
  *
@@ -7986,31 +6396,25 @@ void emberAfEthyleneConcentrationMeasurementClusterClientMessageSentCallback(con
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfEthyleneConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              EmberAfAttributeType attributeType,
-                                                                                              uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterEthyleneConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Ethylene Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfEthyleneConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              EmberAfAttributeType attributeType,
-                                                                                              uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterEthyleneConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Ethylene Concentration Measurement Cluster Server Tick
  *
@@ -8052,43 +6456,19 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterClientInitCallback(chip:
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfEthyleneOxideConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                       chip::AttributeId attributeId);
+void MatterEthyleneOxideConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Ethylene Oxide Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfEthyleneOxideConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                       chip::AttributeId attributeId);
-
-/** @brief Ethylene Oxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfEthyleneOxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Ethylene Oxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfEthyleneOxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterEthyleneOxideConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Ethylene Oxide Concentration Measurement Cluster Server Message Sent
  *
@@ -8122,27 +6502,25 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterClientMessageSentCallbac
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfEthyleneOxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterEthyleneOxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Ethylene Oxide Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfEthyleneOxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterEthyleneOxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Ethylene Oxide Concentration Measurement Cluster Server Tick
  *
@@ -8184,45 +6562,19 @@ void emberAfHydrogenConcentrationMeasurementClusterClientInitCallback(chip::Endp
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfHydrogenConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId);
+void MatterHydrogenConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Hydrogen Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfHydrogenConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId);
-
-/** @brief Hydrogen Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfHydrogenConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                      chip::AttributeId attributeId,
-                                                                                                      uint16_t manufacturerCode);
-
-/** @brief Hydrogen Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfHydrogenConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                      chip::AttributeId attributeId,
-                                                                                                      uint16_t manufacturerCode);
+void MatterHydrogenConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Hydrogen Concentration Measurement Cluster Server Message Sent
  *
@@ -8256,31 +6608,25 @@ void emberAfHydrogenConcentrationMeasurementClusterClientMessageSentCallback(con
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfHydrogenConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              EmberAfAttributeType attributeType,
-                                                                                              uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterHydrogenConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Hydrogen Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfHydrogenConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              EmberAfAttributeType attributeType,
-                                                                                              uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterHydrogenConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Hydrogen Concentration Measurement Cluster Server Tick
  *
@@ -8322,43 +6668,19 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterClientInitCallback(ch
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfHydrogenSulphideConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                          chip::AttributeId attributeId);
+void MatterHydrogenSulphideConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfHydrogenSulphideConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                          chip::AttributeId attributeId);
-
-/** @brief Hydrogen Sulphide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfHydrogenSulphideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Hydrogen Sulphide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfHydrogenSulphideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterHydrogenSulphideConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Server Message Sent
  *
@@ -8392,27 +6714,25 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterClientMessageSentCall
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfHydrogenSulphideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterHydrogenSulphideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfHydrogenSulphideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterHydrogenSulphideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Server Tick
  *
@@ -8454,43 +6774,19 @@ void emberAfNitricOxideConcentrationMeasurementClusterClientInitCallback(chip::E
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfNitricOxideConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId);
+void MatterNitricOxideConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Nitric Oxide Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfNitricOxideConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId);
-
-/** @brief Nitric Oxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfNitricOxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Nitric Oxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfNitricOxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterNitricOxideConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Nitric Oxide Concentration Measurement Cluster Server Message Sent
  *
@@ -8524,31 +6820,25 @@ void emberAfNitricOxideConcentrationMeasurementClusterClientMessageSentCallback(
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfNitricOxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                 chip::AttributeId attributeId,
-                                                                                                 EmberAfAttributeType attributeType,
-                                                                                                 uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterNitricOxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Nitric Oxide Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfNitricOxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                 chip::AttributeId attributeId,
-                                                                                                 EmberAfAttributeType attributeType,
-                                                                                                 uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterNitricOxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Nitric Oxide Concentration Measurement Cluster Server Tick
  *
@@ -8590,43 +6880,19 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterClientInitCallback(chi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfNitrogenDioxideConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId);
+void MatterNitrogenDioxideConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfNitrogenDioxideConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId);
-
-/** @brief Nitrogen Dioxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfNitrogenDioxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Nitrogen Dioxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfNitrogenDioxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterNitrogenDioxideConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Server Message Sent
  *
@@ -8660,27 +6926,25 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterClientMessageSentCallb
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfNitrogenDioxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterNitrogenDioxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfNitrogenDioxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterNitrogenDioxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Server Tick
  *
@@ -8722,45 +6986,19 @@ void emberAfOxygenConcentrationMeasurementClusterClientInitCallback(chip::Endpoi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOxygenConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId);
+void MatterOxygenConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Oxygen Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOxygenConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId);
-
-/** @brief Oxygen Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOxygenConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                    chip::AttributeId attributeId,
-                                                                                                    uint16_t manufacturerCode);
-
-/** @brief Oxygen Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOxygenConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                    chip::AttributeId attributeId,
-                                                                                                    uint16_t manufacturerCode);
+void MatterOxygenConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Oxygen Concentration Measurement Cluster Server Message Sent
  *
@@ -8794,31 +7032,25 @@ void emberAfOxygenConcentrationMeasurementClusterClientMessageSentCallback(const
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOxygenConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            EmberAfAttributeType attributeType,
-                                                                                            uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOxygenConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Oxygen Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOxygenConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            EmberAfAttributeType attributeType,
-                                                                                            uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOxygenConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Oxygen Concentration Measurement Cluster Server Tick
  *
@@ -8860,45 +7092,19 @@ void emberAfOzoneConcentrationMeasurementClusterClientInitCallback(chip::Endpoin
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOzoneConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                               chip::AttributeId attributeId);
+void MatterOzoneConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Ozone Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfOzoneConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                               chip::AttributeId attributeId);
-
-/** @brief Ozone Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOzoneConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                   chip::AttributeId attributeId,
-                                                                                                   uint16_t manufacturerCode);
-
-/** @brief Ozone Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfOzoneConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                   chip::AttributeId attributeId,
-                                                                                                   uint16_t manufacturerCode);
+void MatterOzoneConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Ozone Concentration Measurement Cluster Server Message Sent
  *
@@ -8932,31 +7138,25 @@ void emberAfOzoneConcentrationMeasurementClusterClientMessageSentCallback(const 
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOzoneConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                           chip::AttributeId attributeId,
-                                                                                           EmberAfAttributeType attributeType,
-                                                                                           uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOzoneConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Ozone Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfOzoneConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                           chip::AttributeId attributeId,
-                                                                                           EmberAfAttributeType attributeType,
-                                                                                           uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterOzoneConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Ozone Concentration Measurement Cluster Server Tick
  *
@@ -8998,43 +7198,19 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterClientInitCallback(chip:
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSulfurDioxideConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                       chip::AttributeId attributeId);
+void MatterSulfurDioxideConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSulfurDioxideConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                       chip::AttributeId attributeId);
-
-/** @brief Sulfur Dioxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSulfurDioxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Sulfur Dioxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSulfurDioxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterSulfurDioxideConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Server Message Sent
  *
@@ -9068,27 +7244,25 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterClientMessageSentCallbac
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSulfurDioxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSulfurDioxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSulfurDioxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSulfurDioxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Server Tick
  *
@@ -9130,43 +7304,19 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterClientInitCallback(chi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDissolvedOxygenConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId);
+void MatterDissolvedOxygenConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfDissolvedOxygenConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId);
-
-/** @brief Dissolved Oxygen Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDissolvedOxygenConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Dissolved Oxygen Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfDissolvedOxygenConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterDissolvedOxygenConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Server Message Sent
  *
@@ -9200,27 +7350,25 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterClientMessageSentCallb
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDissolvedOxygenConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterDissolvedOxygenConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfDissolvedOxygenConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterDissolvedOxygenConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Server Tick
  *
@@ -9262,45 +7410,19 @@ void emberAfBromateConcentrationMeasurementClusterClientInitCallback(chip::Endpo
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBromateConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId);
+void MatterBromateConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Bromate Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBromateConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId);
-
-/** @brief Bromate Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBromateConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                     chip::AttributeId attributeId,
-                                                                                                     uint16_t manufacturerCode);
-
-/** @brief Bromate Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBromateConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                     chip::AttributeId attributeId,
-                                                                                                     uint16_t manufacturerCode);
+void MatterBromateConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Bromate Concentration Measurement Cluster Server Message Sent
  *
@@ -9334,31 +7456,25 @@ void emberAfBromateConcentrationMeasurementClusterClientMessageSentCallback(cons
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBromateConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             EmberAfAttributeType attributeType,
-                                                                                             uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterBromateConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Bromate Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBromateConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             EmberAfAttributeType attributeType,
-                                                                                             uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterBromateConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Bromate Concentration Measurement Cluster Server Tick
  *
@@ -9400,43 +7516,19 @@ void emberAfChloraminesConcentrationMeasurementClusterClientInitCallback(chip::E
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfChloraminesConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId);
+void MatterChloraminesConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Chloramines Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfChloraminesConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId);
-
-/** @brief Chloramines Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfChloraminesConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Chloramines Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfChloraminesConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterChloraminesConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Chloramines Concentration Measurement Cluster Server Message Sent
  *
@@ -9470,31 +7562,25 @@ void emberAfChloraminesConcentrationMeasurementClusterClientMessageSentCallback(
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfChloraminesConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                 chip::AttributeId attributeId,
-                                                                                                 EmberAfAttributeType attributeType,
-                                                                                                 uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterChloraminesConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Chloramines Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfChloraminesConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                 chip::AttributeId attributeId,
-                                                                                                 EmberAfAttributeType attributeType,
-                                                                                                 uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterChloraminesConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Chloramines Concentration Measurement Cluster Server Tick
  *
@@ -9536,45 +7622,19 @@ void emberAfChlorineConcentrationMeasurementClusterClientInitCallback(chip::Endp
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfChlorineConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId);
+void MatterChlorineConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Chlorine Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfChlorineConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId);
-
-/** @brief Chlorine Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfChlorineConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                      chip::AttributeId attributeId,
-                                                                                                      uint16_t manufacturerCode);
-
-/** @brief Chlorine Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfChlorineConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                      chip::AttributeId attributeId,
-                                                                                                      uint16_t manufacturerCode);
+void MatterChlorineConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Chlorine Concentration Measurement Cluster Server Message Sent
  *
@@ -9608,31 +7668,25 @@ void emberAfChlorineConcentrationMeasurementClusterClientMessageSentCallback(con
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfChlorineConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              EmberAfAttributeType attributeType,
-                                                                                              uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterChlorineConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Chlorine Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfChlorineConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              EmberAfAttributeType attributeType,
-                                                                                              uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterChlorineConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Chlorine Concentration Measurement Cluster Server Tick
  *
@@ -9674,43 +7728,19 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientInitCallba
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId);
+void MatterFecalColiformAndEColiConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId);
-
-/** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterFecalColiformAndEColiConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Server Message Sent
  *
@@ -9744,27 +7774,27 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientMessageSen
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterFecalColiformAndEColiConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterFecalColiformAndEColiConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Server Tick
  *
@@ -9806,45 +7836,19 @@ void emberAfFluorideConcentrationMeasurementClusterClientInitCallback(chip::Endp
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfFluorideConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId);
+void MatterFluorideConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Fluoride Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfFluorideConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId);
-
-/** @brief Fluoride Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfFluorideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                      chip::AttributeId attributeId,
-                                                                                                      uint16_t manufacturerCode);
-
-/** @brief Fluoride Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfFluorideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                      chip::AttributeId attributeId,
-                                                                                                      uint16_t manufacturerCode);
+void MatterFluorideConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Fluoride Concentration Measurement Cluster Server Message Sent
  *
@@ -9878,31 +7882,25 @@ void emberAfFluorideConcentrationMeasurementClusterClientMessageSentCallback(con
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfFluorideConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              EmberAfAttributeType attributeType,
-                                                                                              uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterFluorideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Fluoride Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfFluorideConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              EmberAfAttributeType attributeType,
-                                                                                              uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterFluorideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Fluoride Concentration Measurement Cluster Server Tick
  *
@@ -9944,43 +7942,19 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientInitCallback(chi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId);
+void MatterHaloaceticAcidsConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Haloacetic Acids Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId);
-
-/** @brief Haloacetic Acids Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Haloacetic Acids Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterHaloaceticAcidsConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Haloacetic Acids Concentration Measurement Cluster Server Message Sent
  *
@@ -10014,27 +7988,25 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientMessageSentCallb
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfHaloaceticAcidsConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterHaloaceticAcidsConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Haloacetic Acids Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfHaloaceticAcidsConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterHaloaceticAcidsConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Haloacetic Acids Concentration Measurement Cluster Server Tick
  *
@@ -10076,43 +8048,19 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientInitCallbac
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId);
+void MatterTotalTrihalomethanesConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId);
-
-/** @brief Total Trihalomethanes Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Total Trihalomethanes Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterTotalTrihalomethanesConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Server Message Sent
  *
@@ -10146,27 +8094,27 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientMessageSent
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTotalTrihalomethanesConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTotalTrihalomethanesConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Server Tick
  *
@@ -10208,43 +8156,19 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientInitCallba
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId);
+void MatterTotalColiformBacteriaConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId);
-
-/** @brief Total Coliform Bacteria Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Total Coliform Bacteria Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterTotalColiformBacteriaConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Server Message Sent
  *
@@ -10278,27 +8202,27 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientMessageSen
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTotalColiformBacteriaConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTotalColiformBacteriaConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Server Tick
  *
@@ -10340,43 +8264,19 @@ void emberAfTurbidityConcentrationMeasurementClusterClientInitCallback(chip::End
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTurbidityConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId);
+void MatterTurbidityConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Turbidity Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTurbidityConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId);
-
-/** @brief Turbidity Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTurbidityConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Turbidity Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTurbidityConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterTurbidityConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Turbidity Concentration Measurement Cluster Server Message Sent
  *
@@ -10410,31 +8310,25 @@ void emberAfTurbidityConcentrationMeasurementClusterClientMessageSentCallback(co
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTurbidityConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId,
-                                                                                               EmberAfAttributeType attributeType,
-                                                                                               uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterTurbidityConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Turbidity Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTurbidityConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId,
-                                                                                               EmberAfAttributeType attributeType,
-                                                                                               uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterTurbidityConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Turbidity Concentration Measurement Cluster Server Tick
  *
@@ -10476,45 +8370,19 @@ void emberAfCopperConcentrationMeasurementClusterClientInitCallback(chip::Endpoi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfCopperConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId);
+void MatterCopperConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Copper Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfCopperConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId);
-
-/** @brief Copper Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfCopperConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                    chip::AttributeId attributeId,
-                                                                                                    uint16_t manufacturerCode);
-
-/** @brief Copper Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfCopperConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                    chip::AttributeId attributeId,
-                                                                                                    uint16_t manufacturerCode);
+void MatterCopperConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Copper Concentration Measurement Cluster Server Message Sent
  *
@@ -10548,31 +8416,25 @@ void emberAfCopperConcentrationMeasurementClusterClientMessageSentCallback(const
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfCopperConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            EmberAfAttributeType attributeType,
-                                                                                            uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterCopperConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Copper Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfCopperConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            EmberAfAttributeType attributeType,
-                                                                                            uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterCopperConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Copper Concentration Measurement Cluster Server Tick
  *
@@ -10614,45 +8476,19 @@ void emberAfLeadConcentrationMeasurementClusterClientInitCallback(chip::Endpoint
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfLeadConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId);
+void MatterLeadConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Lead Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfLeadConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId);
-
-/** @brief Lead Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfLeadConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                  chip::AttributeId attributeId,
-                                                                                                  uint16_t manufacturerCode);
-
-/** @brief Lead Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfLeadConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                  chip::AttributeId attributeId,
-                                                                                                  uint16_t manufacturerCode);
+void MatterLeadConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Lead Concentration Measurement Cluster Server Message Sent
  *
@@ -10686,31 +8522,25 @@ void emberAfLeadConcentrationMeasurementClusterClientMessageSentCallback(const c
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfLeadConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                          chip::AttributeId attributeId,
-                                                                                          EmberAfAttributeType attributeType,
-                                                                                          uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterLeadConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Lead Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfLeadConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                          chip::AttributeId attributeId,
-                                                                                          EmberAfAttributeType attributeType,
-                                                                                          uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterLeadConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Lead Concentration Measurement Cluster Server Tick
  *
@@ -10752,43 +8582,19 @@ void emberAfManganeseConcentrationMeasurementClusterClientInitCallback(chip::End
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfManganeseConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId);
+void MatterManganeseConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Manganese Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfManganeseConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId);
-
-/** @brief Manganese Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfManganeseConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Manganese Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfManganeseConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterManganeseConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Manganese Concentration Measurement Cluster Server Message Sent
  *
@@ -10822,31 +8628,25 @@ void emberAfManganeseConcentrationMeasurementClusterClientMessageSentCallback(co
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfManganeseConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId,
-                                                                                               EmberAfAttributeType attributeType,
-                                                                                               uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterManganeseConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Manganese Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfManganeseConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId,
-                                                                                               EmberAfAttributeType attributeType,
-                                                                                               uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterManganeseConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Manganese Concentration Measurement Cluster Server Tick
  *
@@ -10888,45 +8688,19 @@ void emberAfSulfateConcentrationMeasurementClusterClientInitCallback(chip::Endpo
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSulfateConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId);
+void MatterSulfateConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Sulfate Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSulfateConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId);
-
-/** @brief Sulfate Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSulfateConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                     chip::AttributeId attributeId,
-                                                                                                     uint16_t manufacturerCode);
-
-/** @brief Sulfate Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSulfateConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                     chip::AttributeId attributeId,
-                                                                                                     uint16_t manufacturerCode);
+void MatterSulfateConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Sulfate Concentration Measurement Cluster Server Message Sent
  *
@@ -10960,31 +8734,25 @@ void emberAfSulfateConcentrationMeasurementClusterClientMessageSentCallback(cons
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSulfateConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             EmberAfAttributeType attributeType,
-                                                                                             uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSulfateConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Sulfate Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSulfateConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             EmberAfAttributeType attributeType,
-                                                                                             uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSulfateConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Sulfate Concentration Measurement Cluster Server Tick
  *
@@ -11026,43 +8794,19 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterClientInitCallbac
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBromodichloromethaneConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId);
+void MatterBromodichloromethaneConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Bromodichloromethane Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBromodichloromethaneConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId);
-
-/** @brief Bromodichloromethane Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBromodichloromethaneConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Bromodichloromethane Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBromodichloromethaneConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterBromodichloromethaneConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Bromodichloromethane Concentration Measurement Cluster Server Message Sent
  *
@@ -11096,27 +8840,27 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterClientMessageSent
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBromodichloromethaneConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterBromodichloromethaneConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Bromodichloromethane Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBromodichloromethaneConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterBromodichloromethaneConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Bromodichloromethane Concentration Measurement Cluster Server Tick
  *
@@ -11158,43 +8902,19 @@ void emberAfBromoformConcentrationMeasurementClusterClientInitCallback(chip::End
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBromoformConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId);
+void MatterBromoformConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Bromoform Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBromoformConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId);
-
-/** @brief Bromoform Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBromoformConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Bromoform Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBromoformConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterBromoformConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Bromoform Concentration Measurement Cluster Server Message Sent
  *
@@ -11228,31 +8948,25 @@ void emberAfBromoformConcentrationMeasurementClusterClientMessageSentCallback(co
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBromoformConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId,
-                                                                                               EmberAfAttributeType attributeType,
-                                                                                               uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterBromoformConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Bromoform Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBromoformConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId,
-                                                                                               EmberAfAttributeType attributeType,
-                                                                                               uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterBromoformConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Bromoform Concentration Measurement Cluster Server Tick
  *
@@ -11294,43 +9008,19 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientInitCallbac
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId);
+void MatterChlorodibromomethaneConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId);
-
-/** @brief Chlorodibromomethane Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Chlorodibromomethane Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterChlorodibromomethaneConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Server Message Sent
  *
@@ -11364,27 +9054,27 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientMessageSent
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfChlorodibromomethaneConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterChlorodibromomethaneConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfChlorodibromomethaneConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterChlorodibromomethaneConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Server Tick
  *
@@ -11426,43 +9116,19 @@ void emberAfChloroformConcentrationMeasurementClusterClientInitCallback(chip::En
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfChloroformConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId);
+void MatterChloroformConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Chloroform Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfChloroformConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                    chip::AttributeId attributeId);
-
-/** @brief Chloroform Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfChloroformConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
-
-/** @brief Chloroform Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfChloroformConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void MatterChloroformConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Chloroform Concentration Measurement Cluster Server Message Sent
  *
@@ -11496,31 +9162,25 @@ void emberAfChloroformConcentrationMeasurementClusterClientMessageSentCallback(c
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfChloroformConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                chip::AttributeId attributeId,
-                                                                                                EmberAfAttributeType attributeType,
-                                                                                                uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterChloroformConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Chloroform Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfChloroformConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                chip::AttributeId attributeId,
-                                                                                                EmberAfAttributeType attributeType,
-                                                                                                uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterChloroformConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Chloroform Concentration Measurement Cluster Server Tick
  *
@@ -11562,45 +9222,19 @@ void emberAfSodiumConcentrationMeasurementClusterClientInitCallback(chip::Endpoi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSodiumConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId);
+void MatterSodiumConcentrationMeasurementClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Sodium Concentration Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSodiumConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId);
-
-/** @brief Sodium Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSodiumConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                    chip::AttributeId attributeId,
-                                                                                                    uint16_t manufacturerCode);
-
-/** @brief Sodium Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSodiumConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                                    chip::AttributeId attributeId,
-                                                                                                    uint16_t manufacturerCode);
+void MatterSodiumConcentrationMeasurementClusterClientAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Sodium Concentration Measurement Cluster Server Message Sent
  *
@@ -11634,31 +9268,25 @@ void emberAfSodiumConcentrationMeasurementClusterClientMessageSentCallback(const
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSodiumConcentrationMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            EmberAfAttributeType attributeType,
-                                                                                            uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSodiumConcentrationMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Sodium Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSodiumConcentrationMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                            chip::AttributeId attributeId,
-                                                                                            EmberAfAttributeType attributeType,
-                                                                                            uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSodiumConcentrationMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Sodium Concentration Measurement Cluster Server Tick
  *
@@ -11700,43 +9328,17 @@ void emberAfIasZoneClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIasZoneClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterIasZoneClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief IAS Zone Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIasZoneClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief IAS Zone Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIasZoneClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId,
-                                                                             uint16_t manufacturerCode);
-
-/** @brief IAS Zone Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIasZoneClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId,
-                                                                             uint16_t manufacturerCode);
+void MatterIasZoneClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief IAS Zone Cluster Server Message Sent
  *
@@ -11768,29 +9370,27 @@ void emberAfIasZoneClusterClientMessageSentCallback(const chip::MessageSendDesti
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint16_t size,
-                                                                     uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterIasZoneClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief IAS Zone Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIasZoneClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint16_t size,
-                                                                     uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterIasZoneClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief IAS Zone Cluster Server Tick
  *
@@ -11832,43 +9432,17 @@ void emberAfIasAceClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIasAceClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterIasAceClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief IAS ACE Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIasAceClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief IAS ACE Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIasAceClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            uint16_t manufacturerCode);
-
-/** @brief IAS ACE Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIasAceClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                            chip::AttributeId attributeId,
-                                                                            uint16_t manufacturerCode);
+void MatterIasAceClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief IAS ACE Cluster Server Message Sent
  *
@@ -11900,29 +9474,27 @@ void emberAfIasAceClusterClientMessageSentCallback(const chip::MessageSendDestin
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIasAceClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
-                                                                    uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterIasAceClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief IAS ACE Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIasAceClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
-                                                                    uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterIasAceClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief IAS ACE Cluster Server Tick
  *
@@ -11964,41 +9536,17 @@ void emberAfIasWdClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIasWdClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterIasWdClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief IAS WD Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfIasWdClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief IAS WD Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIasWdClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           uint16_t manufacturerCode);
-
-/** @brief IAS WD Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfIasWdClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           uint16_t manufacturerCode);
+void MatterIasWdClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief IAS WD Cluster Server Message Sent
  *
@@ -12030,29 +9578,27 @@ void emberAfIasWdClusterClientMessageSentCallback(const chip::MessageSendDestina
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIasWdClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
-                                                                   uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterIasWdClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief IAS WD Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfIasWdClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
-                                                                   uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterIasWdClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief IAS WD Cluster Server Tick
  *
@@ -12094,43 +9640,17 @@ void emberAfWakeOnLanClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfWakeOnLanClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterWakeOnLanClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Wake on LAN Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfWakeOnLanClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Wake on LAN Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfWakeOnLanClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                               chip::AttributeId attributeId,
-                                                                               uint16_t manufacturerCode);
-
-/** @brief Wake on LAN Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfWakeOnLanClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                               chip::AttributeId attributeId,
-                                                                               uint16_t manufacturerCode);
+void MatterWakeOnLanClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Wake on LAN Cluster Server Message Sent
  *
@@ -12162,29 +9682,27 @@ void emberAfWakeOnLanClusterClientMessageSentCallback(const chip::MessageSendDes
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfWakeOnLanClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                       EmberAfAttributeType attributeType, uint16_t size,
-                                                                       uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterWakeOnLanClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Wake on LAN Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfWakeOnLanClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                       EmberAfAttributeType attributeType, uint16_t size,
-                                                                       uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterWakeOnLanClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Wake on LAN Cluster Server Tick
  *
@@ -12226,43 +9744,17 @@ void emberAfTvChannelClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTvChannelClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterTvChannelClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief TV Channel Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTvChannelClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief TV Channel Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTvChannelClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                               chip::AttributeId attributeId,
-                                                                               uint16_t manufacturerCode);
-
-/** @brief TV Channel Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTvChannelClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                               chip::AttributeId attributeId,
-                                                                               uint16_t manufacturerCode);
+void MatterTvChannelClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief TV Channel Cluster Server Message Sent
  *
@@ -12294,29 +9786,27 @@ void emberAfTvChannelClusterClientMessageSentCallback(const chip::MessageSendDes
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTvChannelClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                       EmberAfAttributeType attributeType, uint16_t size,
-                                                                       uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTvChannelClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief TV Channel Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTvChannelClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                       EmberAfAttributeType attributeType, uint16_t size,
-                                                                       uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTvChannelClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief TV Channel Cluster Server Tick
  *
@@ -12358,43 +9848,17 @@ void emberAfTargetNavigatorClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTargetNavigatorClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterTargetNavigatorClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Target Navigator Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTargetNavigatorClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Target Navigator Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTargetNavigatorClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     uint16_t manufacturerCode);
-
-/** @brief Target Navigator Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTargetNavigatorClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     uint16_t manufacturerCode);
+void MatterTargetNavigatorClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Target Navigator Cluster Server Message Sent
  *
@@ -12428,31 +9892,27 @@ void emberAfTargetNavigatorClusterClientMessageSentCallback(const chip::MessageS
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTargetNavigatorClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId,
-                                                                             EmberAfAttributeType attributeType, uint16_t size,
-                                                                             uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTargetNavigatorClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Target Navigator Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTargetNavigatorClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId,
-                                                                             EmberAfAttributeType attributeType, uint16_t size,
-                                                                             uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTargetNavigatorClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Target Navigator Cluster Server Tick
  *
@@ -12494,43 +9954,17 @@ void emberAfMediaPlaybackClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfMediaPlaybackClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterMediaPlaybackClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Media Playback Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfMediaPlaybackClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Media Playback Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfMediaPlaybackClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId,
-                                                                                   uint16_t manufacturerCode);
-
-/** @brief Media Playback Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfMediaPlaybackClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId,
-                                                                                   uint16_t manufacturerCode);
+void MatterMediaPlaybackClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Media Playback Cluster Server Message Sent
  *
@@ -12564,29 +9998,27 @@ void emberAfMediaPlaybackClusterClientMessageSentCallback(const chip::MessageSen
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfMediaPlaybackClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           EmberAfAttributeType attributeType, uint16_t size,
-                                                                           uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterMediaPlaybackClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                            EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Media Playback Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfMediaPlaybackClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                           EmberAfAttributeType attributeType, uint16_t size,
-                                                                           uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterMediaPlaybackClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                            EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Media Playback Cluster Server Tick
  *
@@ -12628,43 +10060,17 @@ void emberAfMediaInputClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfMediaInputClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterMediaInputClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Media Input Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfMediaInputClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Media Input Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfMediaInputClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                uint16_t manufacturerCode);
-
-/** @brief Media Input Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfMediaInputClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                uint16_t manufacturerCode);
+void MatterMediaInputClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Media Input Cluster Server Message Sent
  *
@@ -12696,29 +10102,27 @@ void emberAfMediaInputClusterClientMessageSentCallback(const chip::MessageSendDe
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfMediaInputClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterMediaInputClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Media Input Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfMediaInputClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
-                                                                        uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterMediaInputClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Media Input Cluster Server Tick
  *
@@ -12760,43 +10164,17 @@ void emberAfLowPowerClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfLowPowerClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterLowPowerClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Low Power Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfLowPowerClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Low Power Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfLowPowerClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              uint16_t manufacturerCode);
-
-/** @brief Low Power Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfLowPowerClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              uint16_t manufacturerCode);
+void MatterLowPowerClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Low Power Cluster Server Message Sent
  *
@@ -12828,29 +10206,27 @@ void emberAfLowPowerClusterClientMessageSentCallback(const chip::MessageSendDest
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfLowPowerClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                      EmberAfAttributeType attributeType, uint16_t size,
-                                                                      uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterLowPowerClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                       EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Low Power Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfLowPowerClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                      EmberAfAttributeType attributeType, uint16_t size,
-                                                                      uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterLowPowerClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                       EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Low Power Cluster Server Tick
  *
@@ -12892,43 +10268,17 @@ void emberAfKeypadInputClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfKeypadInputClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterKeypadInputClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Keypad Input Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfKeypadInputClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Keypad Input Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfKeypadInputClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 uint16_t manufacturerCode);
-
-/** @brief Keypad Input Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfKeypadInputClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 uint16_t manufacturerCode);
+void MatterKeypadInputClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Keypad Input Cluster Server Message Sent
  *
@@ -12960,29 +10310,27 @@ void emberAfKeypadInputClusterClientMessageSentCallback(const chip::MessageSendD
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfKeypadInputClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType, uint16_t size,
-                                                                         uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterKeypadInputClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Keypad Input Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfKeypadInputClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType, uint16_t size,
-                                                                         uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterKeypadInputClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Keypad Input Cluster Server Tick
  *
@@ -13024,43 +10372,17 @@ void emberAfContentLauncherClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfContentLauncherClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterContentLauncherClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Content Launcher Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfContentLauncherClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Content Launcher Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfContentLauncherClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     uint16_t manufacturerCode);
-
-/** @brief Content Launcher Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfContentLauncherClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     uint16_t manufacturerCode);
+void MatterContentLauncherClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Content Launcher Cluster Server Message Sent
  *
@@ -13094,31 +10416,27 @@ void emberAfContentLauncherClusterClientMessageSentCallback(const chip::MessageS
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfContentLauncherClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId,
-                                                                             EmberAfAttributeType attributeType, uint16_t size,
-                                                                             uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterContentLauncherClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Content Launcher Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfContentLauncherClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId,
-                                                                             EmberAfAttributeType attributeType, uint16_t size,
-                                                                             uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterContentLauncherClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Content Launcher Cluster Server Tick
  *
@@ -13160,43 +10478,17 @@ void emberAfAudioOutputClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfAudioOutputClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterAudioOutputClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Audio Output Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfAudioOutputClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Audio Output Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfAudioOutputClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 uint16_t manufacturerCode);
-
-/** @brief Audio Output Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfAudioOutputClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 uint16_t manufacturerCode);
+void MatterAudioOutputClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Audio Output Cluster Server Message Sent
  *
@@ -13228,29 +10520,27 @@ void emberAfAudioOutputClusterClientMessageSentCallback(const chip::MessageSendD
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfAudioOutputClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType, uint16_t size,
-                                                                         uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterAudioOutputClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Audio Output Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfAudioOutputClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType, uint16_t size,
-                                                                         uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterAudioOutputClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Audio Output Cluster Server Tick
  *
@@ -13292,43 +10582,17 @@ void emberAfApplicationLauncherClusterClientInitCallback(chip::EndpointId endpoi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplicationLauncherClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterApplicationLauncherClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Application Launcher Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplicationLauncherClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Application Launcher Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplicationLauncherClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         uint16_t manufacturerCode);
-
-/** @brief Application Launcher Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplicationLauncherClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         uint16_t manufacturerCode);
+void MatterApplicationLauncherClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Application Launcher Cluster Server Message Sent
  *
@@ -13362,31 +10626,25 @@ void emberAfApplicationLauncherClusterClientMessageSentCallback(const chip::Mess
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplicationLauncherClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 EmberAfAttributeType attributeType, uint16_t size,
-                                                                                 uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterApplicationLauncherClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Application Launcher Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplicationLauncherClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 EmberAfAttributeType attributeType, uint16_t size,
-                                                                                 uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterApplicationLauncherClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Application Launcher Cluster Server Tick
  *
@@ -13428,43 +10686,17 @@ void emberAfApplicationBasicClusterClientInitCallback(chip::EndpointId endpoint)
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplicationBasicClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterApplicationBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Application Basic Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplicationBasicClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Application Basic Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplicationBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      uint16_t manufacturerCode);
-
-/** @brief Application Basic Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplicationBasicClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      uint16_t manufacturerCode);
+void MatterApplicationBasicClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Application Basic Cluster Server Message Sent
  *
@@ -13498,31 +10730,27 @@ void emberAfApplicationBasicClusterClientMessageSentCallback(const chip::Message
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplicationBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              EmberAfAttributeType attributeType, uint16_t size,
-                                                                              uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterApplicationBasicClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Application Basic Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplicationBasicClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                              chip::AttributeId attributeId,
-                                                                              EmberAfAttributeType attributeType, uint16_t size,
-                                                                              uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterApplicationBasicClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Application Basic Cluster Server Tick
  *
@@ -13564,43 +10792,17 @@ void emberAfAccountLoginClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfAccountLoginClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterAccountLoginClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Account Login Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfAccountLoginClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Account Login Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfAccountLoginClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  uint16_t manufacturerCode);
-
-/** @brief Account Login Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfAccountLoginClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                  chip::AttributeId attributeId,
-                                                                                  uint16_t manufacturerCode);
+void MatterAccountLoginClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Account Login Cluster Server Message Sent
  *
@@ -13632,29 +10834,27 @@ void emberAfAccountLoginClusterClientMessageSentCallback(const chip::MessageSend
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfAccountLoginClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          EmberAfAttributeType attributeType, uint16_t size,
-                                                                          uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterAccountLoginClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Account Login Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfAccountLoginClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          EmberAfAttributeType attributeType, uint16_t size,
-                                                                          uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterAccountLoginClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Account Login Cluster Server Tick
  *
@@ -13696,43 +10896,17 @@ void emberAfTestClusterClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTestClusterClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterTestClusterClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Test Cluster Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfTestClusterClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Test Cluster Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTestClusterClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 uint16_t manufacturerCode);
-
-/** @brief Test Cluster Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfTestClusterClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 uint16_t manufacturerCode);
+void MatterTestClusterClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Test Cluster Cluster Server Message Sent
  *
@@ -13764,29 +10938,27 @@ void emberAfTestClusterClusterClientMessageSentCallback(const chip::MessageSendD
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTestClusterClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType, uint16_t size,
-                                                                         uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTestClusterClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Test Cluster Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfTestClusterClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType, uint16_t size,
-                                                                         uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterTestClusterClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Test Cluster Cluster Server Tick
  *
@@ -13828,43 +11000,17 @@ void emberAfMessagingClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfMessagingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterMessagingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Messaging Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfMessagingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Messaging Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfMessagingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                               chip::AttributeId attributeId,
-                                                                               uint16_t manufacturerCode);
-
-/** @brief Messaging Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfMessagingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                               chip::AttributeId attributeId,
-                                                                               uint16_t manufacturerCode);
+void MatterMessagingClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Messaging Cluster Server Message Sent
  *
@@ -13896,29 +11042,27 @@ void emberAfMessagingClusterClientMessageSentCallback(const chip::MessageSendDes
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfMessagingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                       EmberAfAttributeType attributeType, uint16_t size,
-                                                                       uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterMessagingClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Messaging Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfMessagingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                       EmberAfAttributeType attributeType, uint16_t size,
-                                                                       uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterMessagingClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Messaging Cluster Server Tick
  *
@@ -13960,43 +11104,17 @@ void emberAfApplianceIdentificationClusterClientInitCallback(chip::EndpointId en
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplianceIdentificationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterApplianceIdentificationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Appliance Identification Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplianceIdentificationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Appliance Identification Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplianceIdentificationClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             uint16_t manufacturerCode);
-
-/** @brief Appliance Identification Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplianceIdentificationClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             uint16_t manufacturerCode);
+void MatterApplianceIdentificationClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Appliance Identification Cluster Server Message Sent
  *
@@ -14030,31 +11148,25 @@ void emberAfApplianceIdentificationClusterClientMessageSentCallback(const chip::
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplianceIdentificationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     EmberAfAttributeType attributeType,
-                                                                                     uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterApplianceIdentificationClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Appliance Identification Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplianceIdentificationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     EmberAfAttributeType attributeType,
-                                                                                     uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterApplianceIdentificationClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Appliance Identification Cluster Server Tick
  *
@@ -14096,43 +11208,17 @@ void emberAfMeterIdentificationClusterClientInitCallback(chip::EndpointId endpoi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfMeterIdentificationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterMeterIdentificationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Meter Identification Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfMeterIdentificationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Meter Identification Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfMeterIdentificationClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         uint16_t manufacturerCode);
-
-/** @brief Meter Identification Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfMeterIdentificationClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         uint16_t manufacturerCode);
+void MatterMeterIdentificationClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Meter Identification Cluster Server Message Sent
  *
@@ -14166,31 +11252,25 @@ void emberAfMeterIdentificationClusterClientMessageSentCallback(const chip::Mess
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfMeterIdentificationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 EmberAfAttributeType attributeType, uint16_t size,
-                                                                                 uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterMeterIdentificationClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Meter Identification Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfMeterIdentificationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 EmberAfAttributeType attributeType, uint16_t size,
-                                                                                 uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterMeterIdentificationClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Meter Identification Cluster Server Tick
  *
@@ -14232,43 +11312,17 @@ void emberAfApplianceEventsAndAlertClusterClientInitCallback(chip::EndpointId en
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplianceEventsAndAlertClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterApplianceEventsAndAlertClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Appliance Events and Alert Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplianceEventsAndAlertClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Appliance Events and Alert Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplianceEventsAndAlertClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             uint16_t manufacturerCode);
-
-/** @brief Appliance Events and Alert Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplianceEventsAndAlertClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                             chip::AttributeId attributeId,
-                                                                                             uint16_t manufacturerCode);
+void MatterApplianceEventsAndAlertClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Appliance Events and Alert Cluster Server Message Sent
  *
@@ -14302,31 +11356,25 @@ void emberAfApplianceEventsAndAlertClusterClientMessageSentCallback(const chip::
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplianceEventsAndAlertClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     EmberAfAttributeType attributeType,
-                                                                                     uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterApplianceEventsAndAlertClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Appliance Events and Alert Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplianceEventsAndAlertClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                     chip::AttributeId attributeId,
-                                                                                     EmberAfAttributeType attributeType,
-                                                                                     uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterApplianceEventsAndAlertClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Appliance Events and Alert Cluster Server Tick
  *
@@ -14368,43 +11416,17 @@ void emberAfApplianceStatisticsClusterClientInitCallback(chip::EndpointId endpoi
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplianceStatisticsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterApplianceStatisticsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Appliance Statistics Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfApplianceStatisticsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Appliance Statistics Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplianceStatisticsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         uint16_t manufacturerCode);
-
-/** @brief Appliance Statistics Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfApplianceStatisticsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                         chip::AttributeId attributeId,
-                                                                                         uint16_t manufacturerCode);
+void MatterApplianceStatisticsClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Appliance Statistics Cluster Server Message Sent
  *
@@ -14438,31 +11460,25 @@ void emberAfApplianceStatisticsClusterClientMessageSentCallback(const chip::Mess
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplianceStatisticsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 EmberAfAttributeType attributeType, uint16_t size,
-                                                                                 uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterApplianceStatisticsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Appliance Statistics Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfApplianceStatisticsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                 chip::AttributeId attributeId,
-                                                                                 EmberAfAttributeType attributeType, uint16_t size,
-                                                                                 uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterApplianceStatisticsClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Appliance Statistics Cluster Server Tick
  *
@@ -14504,43 +11520,17 @@ void emberAfElectricalMeasurementClusterClientInitCallback(chip::EndpointId endp
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfElectricalMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterElectricalMeasurementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Electrical Measurement Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfElectricalMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Electrical Measurement Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfElectricalMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                           chip::AttributeId attributeId,
-                                                                                           uint16_t manufacturerCode);
-
-/** @brief Electrical Measurement Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfElectricalMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                           chip::AttributeId attributeId,
-                                                                                           uint16_t manufacturerCode);
+void MatterElectricalMeasurementClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Electrical Measurement Cluster Server Message Sent
  *
@@ -14574,31 +11564,25 @@ void emberAfElectricalMeasurementClusterClientMessageSentCallback(const chip::Me
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfElectricalMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId,
-                                                                                   EmberAfAttributeType attributeType,
-                                                                                   uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterElectricalMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Electrical Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfElectricalMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                   chip::AttributeId attributeId,
-                                                                                   EmberAfAttributeType attributeType,
-                                                                                   uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterElectricalMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Electrical Measurement Cluster Server Tick
  *
@@ -14640,43 +11624,17 @@ void emberAfBindingClusterClientInitCallback(chip::EndpointId endpoint);
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBindingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterBindingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Binding Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfBindingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Binding Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBindingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId,
-                                                                             uint16_t manufacturerCode);
-
-/** @brief Binding Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfBindingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                             chip::AttributeId attributeId,
-                                                                             uint16_t manufacturerCode);
+void MatterBindingClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Binding Cluster Server Message Sent
  *
@@ -14708,29 +11666,27 @@ void emberAfBindingClusterClientMessageSentCallback(const chip::MessageSendDesti
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBindingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint16_t size,
-                                                                     uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterBindingClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Binding Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfBindingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint16_t size,
-                                                                     uint8_t * value);
+chip::Protocols::InteractionModel::Status
+MatterBindingClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Binding Cluster Server Tick
  *
@@ -14772,43 +11728,17 @@ void emberAfGroupKeyManagementClusterClientInitCallback(chip::EndpointId endpoin
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfGroupKeyManagementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterGroupKeyManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Group Key Management Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfGroupKeyManagementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Group Key Management Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfGroupKeyManagementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        uint16_t manufacturerCode);
-
-/** @brief Group Key Management Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfGroupKeyManagementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                        chip::AttributeId attributeId,
-                                                                                        uint16_t manufacturerCode);
+void MatterGroupKeyManagementClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Group Key Management Cluster Server Message Sent
  *
@@ -14842,31 +11772,25 @@ void emberAfGroupKeyManagementClusterClientMessageSentCallback(const chip::Messa
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfGroupKeyManagementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                EmberAfAttributeType attributeType, uint16_t size,
-                                                                                uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterGroupKeyManagementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Group Key Management Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfGroupKeyManagementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                chip::AttributeId attributeId,
-                                                                                EmberAfAttributeType attributeType, uint16_t size,
-                                                                                uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterGroupKeyManagementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Group Key Management Cluster Server Tick
  *
@@ -14908,43 +11832,17 @@ void emberAfSampleMfgSpecificClusterClusterClientInitCallback(chip::EndpointId e
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSampleMfgSpecificClusterClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void MatterSampleMfgSpecificClusterClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Sample Mfg Specific Cluster Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSampleMfgSpecificClusterClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
-
-/** @brief Sample Mfg Specific Cluster Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSampleMfgSpecificClusterClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              uint16_t manufacturerCode);
-
-/** @brief Sample Mfg Specific Cluster Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSampleMfgSpecificClusterClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                              chip::AttributeId attributeId,
-                                                                                              uint16_t manufacturerCode);
+void MatterSampleMfgSpecificClusterClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Sample Mfg Specific Cluster Cluster Server Message Sent
  *
@@ -14978,31 +11876,25 @@ void emberAfSampleMfgSpecificClusterClusterClientMessageSentCallback(const chip:
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSampleMfgSpecificClusterClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      EmberAfAttributeType attributeType,
-                                                                                      uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSampleMfgSpecificClusterClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Sample Mfg Specific Cluster Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSampleMfgSpecificClusterClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                      chip::AttributeId attributeId,
-                                                                                      EmberAfAttributeType attributeType,
-                                                                                      uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSampleMfgSpecificClusterClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Sample Mfg Specific Cluster Cluster Server Tick
  *
@@ -15044,45 +11936,17 @@ void emberAfSampleMfgSpecificCluster2ClusterClientInitCallback(chip::EndpointId 
  *
  * Server Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSampleMfgSpecificCluster2ClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                           chip::AttributeId attributeId);
+void MatterSampleMfgSpecificCluster2ClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Sample Mfg Specific Cluster 2 Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
- * @param endpoint    Endpoint that is being initialized
- * @param attributeId Attribute that changed
+ * @param attributePath Concrete attribute path that changed
  */
-void emberAfSampleMfgSpecificCluster2ClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                           chip::AttributeId attributeId);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Server Manufacturer Specific Attribute Changed
- *
- * Server Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSampleMfgSpecificCluster2ClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId,
-                                                                                               uint16_t manufacturerCode);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Client Manufacturer Specific Attribute Changed
- *
- * Client Manufacturer Specific Attribute Changed
- *
- * @param endpoint          Endpoint that is being initialized
- * @param attributeId       Attribute that changed
- * @param manufacturerCode  Manufacturer Code of the attribute that changed
- */
-void emberAfSampleMfgSpecificCluster2ClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                               chip::AttributeId attributeId,
-                                                                                               uint16_t manufacturerCode);
+void MatterSampleMfgSpecificCluster2ClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Sample Mfg Specific Cluster 2 Cluster Server Message Sent
  *
@@ -15116,31 +11980,25 @@ void emberAfSampleMfgSpecificCluster2ClusterClientMessageSentCallback(const chip
  *
  * Server Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSampleMfgSpecificCluster2ClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                       chip::AttributeId attributeId,
-                                                                                       EmberAfAttributeType attributeType,
-                                                                                       uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSampleMfgSpecificCluster2ClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Sample Mfg Specific Cluster 2 Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
- * @param endpoint      Endpoint that is being initialized
- * @param attributeId   Attribute to be changed
+ * @param attributePath Concrete attribute path to be changed
  * @param attributeType Attribute type
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAfSampleMfgSpecificCluster2ClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
-                                                                                       chip::AttributeId attributeId,
-                                                                                       EmberAfAttributeType attributeType,
-                                                                                       uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterSampleMfgSpecificCluster2ClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Sample Mfg Specific Cluster 2 Cluster Server Tick
  *
@@ -17565,45 +14423,6 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
 bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
                                 uint8_t * message, EmberStatus status);
 
-/** @brief Pre Attribute Change
- *
- * This function is called by the application framework before it changes an
- * attribute value.  The value passed into this callback is the value to which
- * the attribute is to be set by the framework.  The application should return
- * ::EMBER_ZCL_STATUS_SUCCESS to permit the change or any other ::EmberAfStatus
- * to reject it.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param size   Ver.: always
- * @param value   Ver.: always
- */
-EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size,
-                                                uint8_t * value);
-
-/** @brief Post Attribute Change
- *
- * This function is called by the application framework after it changes an
- * attribute value. The value passed into this callback is the value to which
- * the attribute was set by the framework.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param size   Ver.: always
- * @param value   Ver.: always
- */
-void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
-
 /** @brief External Attribute Read
  *
  * Like emberAfExternalAttributeWriteCallback above, this function is called
@@ -17767,3 +14586,36 @@ EmberStatus emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, u
  *
  */
 bool emberAfStartMoveCallback();
+
+/** @brief Pre Attribute Change
+ *
+ * This function is called by the application framework before it changes an
+ * attribute value.  The value passed into this callback is the value to which
+ * the attribute is to be set by the framework.  The application should return
+ * chip::Protocols::InteractionModel::Status::Success to permit the change or
+ * any other code to reject it.
+ *
+ * @param attributePath
+ * @param mask
+ * @param type
+ * @param size
+ * @param value
+ */
+chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                           uint8_t mask, uint8_t type, uint16_t size,
+                                                                           uint8_t * value);
+
+/** @brief Post Attribute Change
+ *
+ * This function is called by the application framework after it changes an
+ * attribute value. The value passed into this callback is the value to which
+ * the attribute was set by the framework.
+ *
+ * @param attributePath
+ * @param mask
+ * @param type
+ * @param size
+ * @param value
+ */
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                       uint16_t size, uint8_t * value);
