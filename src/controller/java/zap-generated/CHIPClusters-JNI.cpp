@@ -7718,14 +7718,14 @@ public:
             jint routerId            = entries[i].RouterId;
             jint nextHop             = entries[i].NextHop;
             jint pathCost            = entries[i].PathCost;
-            jint lQIIn               = entries[i].LQIIn;
-            jint lQIOut              = entries[i].LQIOut;
+            jint LQIIn               = entries[i].LQIIn;
+            jint LQIOut              = entries[i].LQIOut;
             jint age                 = entries[i].Age;
             jboolean allocated       = entries[i].Allocated;
             jboolean linkEstablished = entries[i].LinkEstablished;
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, extAddress, rloc16, routerId, nextHop, pathCost,
-                                                  lQIIn, lQIOut, age, allocated, linkEstablished);
+                                                  LQIIn, LQIOut, age, allocated, linkEstablished);
             VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create RouteTableListAttribute object"));
 
             env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
@@ -8205,14 +8205,14 @@ exit:
     }
 }
 JNI_METHOD(void, AdministratorCommissioningCluster, openCommissioningWindow)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint commissioningTimeout, jbyteArray pAKEVerifier,
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint commissioningTimeout, jbyteArray PAKEVerifier,
  jint discriminator, jlong iterations, jbyteArray salt, jint passcodeID)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AdministratorCommissioningCluster * cppCluster;
 
-    JniByteArray pAKEVerifierArr(env, pAKEVerifier);
+    JniByteArray PAKEVerifierArr(env, PAKEVerifier);
     JniByteArray saltArr(env, salt);
     CHIPDefaultSuccessCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
@@ -8226,7 +8226,7 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openCommissioningWindow)
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->OpenCommissioningWindow(onSuccess->Cancel(), onFailure->Cancel(), commissioningTimeout,
-                                              chip::ByteSpan((const uint8_t *) pAKEVerifierArr.data(), pAKEVerifierArr.size()),
+                                              chip::ByteSpan((const uint8_t *) PAKEVerifierArr.data(), PAKEVerifierArr.size()),
                                               discriminator, iterations,
                                               chip::ByteSpan((const uint8_t *) saltArr.data(), saltArr.size()), passcodeID);
     SuccessOrExit(err);
@@ -22505,16 +22505,16 @@ JNI_METHOD(jlong, OperationalCredentialsCluster, initWithDevice)(JNIEnv * env, j
 }
 
 JNI_METHOD(void, OperationalCredentialsCluster, addNOC)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray nOCValue, jbyteArray iCACValue, jbyteArray iPKValue,
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray NOCValue, jbyteArray ICACValue, jbyteArray IPKValue,
  jlong caseAdminNode, jint adminVendorId)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
-    JniByteArray nOCValueArr(env, nOCValue);
-    JniByteArray iCACValueArr(env, iCACValue);
-    JniByteArray iPKValueArr(env, iPKValue);
+    JniByteArray NOCValueArr(env, NOCValue);
+    JniByteArray ICACValueArr(env, ICACValue);
+    JniByteArray IPKValueArr(env, IPKValue);
     CHIPOperationalCredentialsClusterNOCResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -22527,9 +22527,9 @@ JNI_METHOD(void, OperationalCredentialsCluster, addNOC)
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->AddNOC(
-        onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) nOCValueArr.data(), nOCValueArr.size()),
-        chip::ByteSpan((const uint8_t *) iCACValueArr.data(), iCACValueArr.size()),
-        chip::ByteSpan((const uint8_t *) iPKValueArr.data(), iPKValueArr.size()), caseAdminNode, adminVendorId);
+        onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) NOCValueArr.data(), NOCValueArr.size()),
+        chip::ByteSpan((const uint8_t *) ICACValueArr.data(), ICACValueArr.size()),
+        chip::ByteSpan((const uint8_t *) IPKValueArr.data(), IPKValueArr.size()), caseAdminNode, adminVendorId);
     SuccessOrExit(err);
 
 exit:
@@ -22701,13 +22701,13 @@ exit:
     }
 }
 JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray cSRNonce)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray CSRNonce)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
-    JniByteArray cSRNonceArr(env, cSRNonce);
+    JniByteArray CSRNonceArr(env, CSRNonce);
     CHIPOperationalCredentialsClusterOpCSRResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -22720,7 +22720,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->OpCSRRequest(onSuccess->Cancel(), onFailure->Cancel(),
-                                   chip::ByteSpan((const uint8_t *) cSRNonceArr.data(), cSRNonceArr.size()));
+                                   chip::ByteSpan((const uint8_t *) CSRNonceArr.data(), CSRNonceArr.size()));
     SuccessOrExit(err);
 
 exit:
@@ -22892,14 +22892,14 @@ exit:
     }
 }
 JNI_METHOD(void, OperationalCredentialsCluster, updateNOC)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray nOCValue, jbyteArray iCACValue)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray NOCValue, jbyteArray ICACValue)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
-    JniByteArray nOCValueArr(env, nOCValue);
-    JniByteArray iCACValueArr(env, iCACValue);
+    JniByteArray NOCValueArr(env, NOCValue);
+    JniByteArray ICACValueArr(env, ICACValue);
     CHIPOperationalCredentialsClusterNOCResponseCallback * onSuccess;
     CHIPDefaultFailureCallback * onFailure;
 
@@ -22912,8 +22912,8 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateNOC)
     VerifyOrExit(onFailure != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = cppCluster->UpdateNOC(onSuccess->Cancel(), onFailure->Cancel(),
-                                chip::ByteSpan((const uint8_t *) nOCValueArr.data(), nOCValueArr.size()),
-                                chip::ByteSpan((const uint8_t *) iCACValueArr.data(), iCACValueArr.size()));
+                                chip::ByteSpan((const uint8_t *) NOCValueArr.data(), NOCValueArr.size()),
+                                chip::ByteSpan((const uint8_t *) ICACValueArr.data(), ICACValueArr.size()));
     SuccessOrExit(err);
 
 exit:
