@@ -174,8 +174,8 @@ template("chip_data_model") {
 
       if (_use_tests_apis) {
         sources += [
-          "${invoker.zap_pregenerated_dir}/tests/CHIPClusters.cpp",
-          "${invoker.zap_pregenerated_dir}/tests/CHIPClusters.h",
+          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.cpp",
+          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h",
         ]
       }
     }
@@ -186,6 +186,7 @@ template("chip_data_model") {
 
     public_deps += [
       "${chip_root}/src/app",
+      "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/controller",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",

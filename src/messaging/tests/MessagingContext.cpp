@@ -30,9 +30,7 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
 
     mIOContext = ioContext;
 
-    mFabrics.Reset();
-
-    ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mFabrics, &mMessageCounterManager));
+    ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));

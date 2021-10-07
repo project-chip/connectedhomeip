@@ -35,18 +35,18 @@ void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
     InitInetLayerBasis(aInetLayer, aAppState);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    mLwIPEndPointType = kLwIPEndPointType_Unknown;
+    mLwIPEndPointType = LwIPEndPointType::Unknown;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    mSocket = INET_INVALID_SOCKET_FD;
+    mSocket = kInvalidSocketFd;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErrorTactic aTactic)
+void EndPointBasis::DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic)
 {
-    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || IsLWIPEndPoint())
+    if (!CHIP_SYSTEM_CONFIG_USE_SOCKETS || (mVoid != nullptr))
     {
         DeferredRelease(static_cast<System::LayerLwIP *>(Layer().SystemLayer()), aTactic);
     }

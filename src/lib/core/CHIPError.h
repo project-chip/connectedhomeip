@@ -2182,6 +2182,23 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_MESSAGE_COUNTER_OUT_OF_WINDOW               CHIP_CORE_ERROR(0xc7)
 
 /**
+ * @def CHIP_ERROR_REBOOT_SIGNAL_RECEIVED
+ *
+ * @brief
+ *   Termination signal is received
+ */
+#define CHIP_ERROR_REBOOT_SIGNAL_RECEIVED                      CHIP_CORE_ERROR(0xc8)
+
+/**
+ * @def CHIP_ERROR_NO_SHARED_TRUSTED_ROOT
+ *
+ * @brief
+ *   The CASE session could not be established as peer's credentials do not have
+ *   a common root of trust.
+ */
+#define CHIP_ERROR_NO_SHARED_TRUSTED_ROOT                      CHIP_CORE_ERROR(0xc9)
+
+/**
  *  @}
  */
 

@@ -69,9 +69,6 @@ public:
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
-    bool _HaveIPv4InternetConnectivity(void);
-    bool _HaveIPv6InternetConnectivity(void);
-    bool _HaveServiceConnectivity(void);
     CHIP_ERROR _Init(void);
     void _ProcessInterfaceChange(nsapi_connection_status_t new_status);
     void OnInterfaceEvent(nsapi_event_t event, intptr_t data);
@@ -124,20 +121,6 @@ inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode(v
 inline uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS(void)
 {
     return mWiFiStationReconnectIntervalMS;
-}
-inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
-{
-    return mWiFiStationState == kWiFiStationState_Connected && mIp4Address != Inet::IPAddress::Any;
-}
-
-inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
-{
-    return mWiFiStationState == kWiFiStationState_Connected && mIp6Address != Inet::IPAddress::Any;
-}
-
-inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
-{
-    return HaveServiceConnectivityViaThread();
 }
 
 /**

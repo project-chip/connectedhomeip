@@ -17,94 +17,48 @@
  */
 
 /**
- *    @file
- *      This file contains the basis class for reference counting
- *      objects by the Inet layer as well as a class for representing
- *      the pending or resulting I/O events on a socket.
+ *    This file contains the basis class for reference counting objects by the Inet layer.
  */
 
 #pragma once
 
-#include <inet/InetConfig.h>
-
-#include <lib/support/BitFlags.h>
-#include <lib/support/DLLUtil.h>
 #include <system/SystemObject.h>
-
-#include <stdint.h>
-#include <type_traits>
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <sys/select.h>
-#endif
 
 namespace chip {
 namespace Inet {
 
-//--- Forward declaration of InetLayer singleton class
 class InetLayer;
 
 /**
- *  @class InetLayerBasis
- *
- *  @brief
- *    This is the basis class of reference-counted objects managed by an
- *    InetLayer object.
- *
+ *  This is the basis class of reference-counted objects managed by an InetLayer object.
  */
 class InetLayerBasis : public chip::System::Object
 {
 public:
-    InetLayer & Layer() const;
-    bool IsCreatedByInetLayer(const InetLayer & aInetLayer) const;
+    /**
+     *  Returns a reference to the Inet layer object that owns this basis object.
+     */
+    InetLayer & Layer() const { return *mInetLayer; }
+
+    /**
+     *  Returns \c true if the basis object was obtained by the specified Inet layer instance.
+     *
+     *  @note
+     *      Does not check whether the object is actually obtained by the system layer instance associated with the Inet layer
+     *      instance. It merely tests whether \c aInetLayer is the Inet layer instance that was provided to \c InitInetLayerBasis.
+     */
+    bool IsCreatedByInetLayer(const InetLayer & aInetLayer) const { return mInetLayer == &aInetLayer; }
 
 protected:
-    void InitInetLayerBasis(InetLayer & aInetLayer, void * aAppState = nullptr);
+    void InitInetLayerBasis(InetLayer & aInetLayer, void * aAppState = nullptr)
+    {
+        AppState   = aAppState;
+        mInetLayer = &aInetLayer;
+    }
 
 private:
     InetLayer * mInetLayer; /**< Pointer to the InetLayer object that owns this object. */
 };
-
-/**
- *  Returns a reference to the Inet layer object that owns this basis object.
- */
-inline InetLayer & InetLayerBasis::Layer() const
-{
-    return *mInetLayer;
-}
-
-/**
- *  Returns \c true if the basis object was obtained by the specified INET layer instance.
- *
- *  @param[in]  aInetLayer    An instance of the INET layer.
- *
- *  @return     \c true if owned by \c aInetLayer, otherwise \c false.
- *
- *  @note
- *      Does not check whether the object is actually obtained by the system layer instance associated with the INET layer
- *      instance. It merely tests whether \c aInetLayer is the INET layer instance that was provided to \c InitInetLayerBasis.
- */
-inline bool InetLayerBasis::IsCreatedByInetLayer(const InetLayer & aInetLayer) const
-{
-    return mInetLayer == &aInetLayer;
-}
-
-inline void InetLayerBasis::InitInetLayerBasis(InetLayer & aInetLayer, void * aAppState)
-{
-    AppState   = aAppState;
-    mInetLayer = &aInetLayer;
-}
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-/**
- *  @def INET_INVALID_SOCKET_FD
- *
- *  @brief
- *    This is the invalid socket file descriptor identifier.
- */
-#define INET_INVALID_SOCKET_FD (-1)
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
 } // namespace chip

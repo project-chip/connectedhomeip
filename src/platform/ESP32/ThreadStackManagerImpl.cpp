@@ -24,6 +24,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/ThreadStackManager.h>
+
 #include <platform/ESP32/ESPThreadConfig.h>
 #include <platform/ESP32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
@@ -36,6 +38,7 @@
 #include "esp_openthread_netif_glue.h"
 #include "esp_openthread_types.h"
 #include "esp_vfs_eventfd.h"
+#include "lib/core/CHIPError.h"
 #include <lib/support/CodeUtils.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -49,41 +52,12 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    esp_netif_t * openthread_netif          = NULL;
-    esp_netif_config_t netif_cfg            = ESP_NETIF_DEFAULT_OPENTHREAD();
-    esp_openthread_platform_config_t config = {
-        .radio_config = ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG(),
-        .host_config  = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
-        .port_config  = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
-    };
-
-    esp_vfs_eventfd_config_t eventfd_config = {
-        .max_fds = 3,
-    };
-    VerifyOrExit(esp_netif_init() == ESP_OK, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(esp_vfs_eventfd_register(&eventfd_config) == ESP_OK, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(esp_openthread_init(&config) == ESP_OK, err = CHIP_ERROR_INTERNAL);
-    openthread_netif = esp_netif_new(&netif_cfg);
-    VerifyOrExit(openthread_netif != NULL, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(esp_netif_attach(openthread_netif, esp_openthread_netif_glue_init(&config)) == ESP_OK, err = CHIP_ERROR_INTERNAL);
-    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(NULL);
-exit:
-    return err;
+    return GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
 {
-    if (mThreadTask != NULL)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-    xTaskCreate(ESPThreadTask, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME, CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE / sizeof(StackType_t),
-                this, CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY, &mThreadTask);
-    if (mThreadTask == NULL)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    // Intentionally empty.
     return CHIP_NO_ERROR;
 }
 
@@ -126,8 +100,3 @@ void ThreadStackManagerImpl::ESPThreadTask(void * arg)
 
 } // namespace DeviceLayer
 } // namespace chip
-
-extern "C" void otTaskletsSignalPending(otInstance * p_instance)
-{
-    // Intentionally empty
-}

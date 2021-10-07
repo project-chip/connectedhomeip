@@ -35,7 +35,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:latest
+            image: connectedhomeip/chip-build-telink:0.5.11
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -47,13 +47,14 @@ jobs:
             - name: Build example Telink Lighting App
               run: |
                 ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --platform telink --app light build"
+                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'telink-*' build"
                 .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                   telink tlsr9518adk80d lighting-app \
                   out/telink-tlsr9518adk80d-light/zephyr/zephyr.elf \
                   /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
               with:
                   name: Size,Telink-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
                   path: |

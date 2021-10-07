@@ -43,7 +43,6 @@
 
 #pragma once
 
-#include <credentials/CHIPOperationalCredentials.h>
 #include <inet/IPAddress.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -97,23 +96,6 @@ public:
         return *this;
     }
 
-    Credentials::OperationalCredentialSet & GetOperationalCredentialSet() const
-    {
-        return *mCaseParameters.mOperationalCredentialSet;
-    }
-    ChannelBuilder & SetOperationalCredentialSet(Credentials::OperationalCredentialSet * operationalCredentialSet)
-    {
-        mCaseParameters.mOperationalCredentialSet = operationalCredentialSet;
-        return *this;
-    }
-
-    uint8_t GetOperationalCredentialSetIndex() const { return mCaseParameters.mOperationalCredentialSetIndex; }
-    ChannelBuilder & SetOperationalCredentialSetIndex(uint8_t operationalCredentialSetIndex)
-    {
-        mCaseParameters.mOperationalCredentialSetIndex = operationalCredentialSetIndex;
-        return *this;
-    }
-
     Optional<Inet::IPAddress> GetForcePeerAddress() const { return mForcePeerAddr; }
     ChannelBuilder & SetForcePeerAddress(Inet::IPAddress peerAddr)
     {
@@ -127,8 +109,6 @@ private:
     struct
     {
         uint16_t mPeerSessionId;
-        Credentials::OperationalCredentialSet * mOperationalCredentialSet;
-        uint8_t mOperationalCredentialSetIndex;
     } mCaseParameters;
 
     Optional<Inet::IPAddress> mForcePeerAddr;

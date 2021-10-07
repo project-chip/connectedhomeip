@@ -298,13 +298,7 @@ void WindowAppImpl::UpdateLEDs()
     }
     else
     {
-        // Consider the system to be "fully connected" if it has service
-        // connectivity
-        if (mState.haveServiceConnectivity)
-        {
-            mStatusLED.Set(true);
-        }
-        else if (mState.isThreadProvisioned && mState.isThreadEnabled)
+        if (mState.isThreadProvisioned && mState.isThreadEnabled)
         {
             mStatusLED.Blink(950, 50);
         }
@@ -348,8 +342,8 @@ void WindowAppImpl::UpdateLCD()
         EmberAfWcType type = TypeGet(cover.mEndpoint);
         uint16_t lift      = 0;
         uint16_t tilt      = 0;
-        Attributes::GetCurrentPositionLift(cover.mEndpoint, &lift);
-        Attributes::GetCurrentPositionTilt(cover.mEndpoint, &tilt);
+        Attributes::CurrentPositionLift::Get(cover.mEndpoint, &lift);
+        Attributes::CurrentPositionTilt::Get(cover.mEndpoint, &tilt);
         LcdPainter::Paint(type, static_cast<uint8_t>(lift), static_cast<uint8_t>(tilt), mIcon);
     }
     else

@@ -382,7 +382,7 @@ void UDPEndPoint::Close()
         {
             udp_remove(mUDP);
             mUDP              = NULL;
-            mLwIPEndPointType = kLwIPEndPointType_Unknown;
+            mLwIPEndPointType = LwIPEndPointType::Unknown;
         }
 
         // Unlock LwIP stack
@@ -392,11 +392,11 @@ void UDPEndPoint::Close()
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-        if (mSocket != INET_INVALID_SOCKET_FD)
+        if (mSocket != kInvalidSocketFd)
         {
             static_cast<System::LayerSockets *>(Layer().SystemLayer())->StopWatchingSocket(&mWatch);
             close(mSocket);
-            mSocket = INET_INVALID_SOCKET_FD;
+            mSocket = kInvalidSocketFd;
         }
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH

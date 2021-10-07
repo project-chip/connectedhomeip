@@ -175,7 +175,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     if (val)
     {
-        mAdvertiseStartTime = System::Clock::GetMonotonicMilliseconds();
+        mAdvertiseStartTime = System::SystemClock().GetMonotonicMilliseconds();
         ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
         ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
@@ -194,7 +194,7 @@ void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void 
 
 void BLEManagerImpl::HandleAdvertisementTimer()
 {
-    uint64_t currentTimestamp = System::Clock::GetMonotonicMilliseconds();
+    uint64_t currentTimestamp = System::SystemClock().GetMonotonicMilliseconds();
 
     if (currentTimestamp - mAdvertiseStartTime >= kAdvertiseTimeout)
     {
@@ -210,7 +210,7 @@ void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, v
 
 void BLEManagerImpl::HandleFastAdvertisementTimer()
 {
-    uint64_t currentTimestamp = System::Clock::GetMonotonicMilliseconds();
+    uint64_t currentTimestamp = System::SystemClock().GetMonotonicMilliseconds();
 
     if (currentTimestamp - mAdvertiseStartTime >= kFastAdvertiseTimeout)
     {

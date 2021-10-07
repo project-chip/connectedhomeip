@@ -63,7 +63,7 @@ template <>
 class TimeSource<Source::kSystem>
 {
 public:
-    uint64_t GetCurrentMonotonicTimeMs() { return System::Clock::GetMonotonicMicroseconds(); }
+    uint64_t GetCurrentMonotonicTimeMs() { return System::SystemClock().GetMonotonicMilliseconds(); }
 };
 
 /**

@@ -19,7 +19,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "DeviceNetworkProvisioningDelegateImpl.h"
-#include "ServiceProvisioning.h"
+#include "WiFiProvisioning.h"
 
 namespace chip {
 namespace DeviceLayer {
