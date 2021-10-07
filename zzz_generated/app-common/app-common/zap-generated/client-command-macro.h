@@ -79,59 +79,6 @@
     emberAfFillExternalBuffer(mask, clusterId, ZCL_WRITE_ATTRIBUTES_NO_RESPONSE_COMMAND_ID, "b", writeAttributeRecords,            \
                               writeAttributeRecordsLen);
 
-/** @brief Command description for ConfigureReporting
- *
- * Command: ConfigureReporting
- * @param configureReportingRecords ConfigureReportingRecord []
- * @param configureReportingRecordsLen int
- */
-#define emberAfFillCommandGlobalConfigureReporting(clusterId, configureReportingRecords, configureReportingRecordsLen)             \
-    emberAfFillExternalBuffer(mask, clusterId, ZCL_CONFIGURE_REPORTING_COMMAND_ID, "b", configureReportingRecords,                 \
-                              configureReportingRecordsLen);
-
-/** @brief Command description for ConfigureReportingResponse
- *
- * Command: ConfigureReportingResponse
- * @param configureReportingStatusRecords ConfigureReportingStatusRecord []
- * @param configureReportingStatusRecordsLen int
- */
-#define emberAfFillCommandGlobalConfigureReportingResponse(clusterId, configureReportingStatusRecords,                             \
-                                                           configureReportingStatusRecordsLen)                                     \
-    emberAfFillExternalBuffer(mask, clusterId, ZCL_CONFIGURE_REPORTING_RESPONSE_COMMAND_ID, "b", configureReportingStatusRecords,  \
-                              configureReportingStatusRecordsLen);
-
-/** @brief Command description for ReadReportingConfiguration
- *
- * Command: ReadReportingConfiguration
- * @param readReportingConfigurationAttributeRecords ReadReportingConfigurationAttributeRecord []
- * @param readReportingConfigurationAttributeRecordsLen int
- */
-#define emberAfFillCommandGlobalReadReportingConfiguration(clusterId, readReportingConfigurationAttributeRecords,                  \
-                                                           readReportingConfigurationAttributeRecordsLen)                          \
-    emberAfFillExternalBuffer(mask, clusterId, ZCL_READ_REPORTING_CONFIGURATION_COMMAND_ID, "b",                                   \
-                              readReportingConfigurationAttributeRecords, readReportingConfigurationAttributeRecordsLen);
-
-/** @brief Command description for ReadReportingConfigurationResponse
- *
- * Command: ReadReportingConfigurationResponse
- * @param readReportingConfigurationRecords ReadReportingConfigurationRecord []
- * @param readReportingConfigurationRecordsLen int
- */
-#define emberAfFillCommandGlobalReadReportingConfigurationResponse(clusterId, readReportingConfigurationRecords,                   \
-                                                                   readReportingConfigurationRecordsLen)                           \
-    emberAfFillExternalBuffer(mask, clusterId, ZCL_READ_REPORTING_CONFIGURATION_RESPONSE_COMMAND_ID, "b",                          \
-                              readReportingConfigurationRecords, readReportingConfigurationRecordsLen);
-
-/** @brief Command description for ReportAttributes
- *
- * Command: ReportAttributes
- * @param reportAttributeRecords ReportAttributeRecord []
- * @param reportAttributeRecordsLen int
- */
-#define emberAfFillCommandGlobalReportAttributes(clusterId, reportAttributeRecords, reportAttributeRecordsLen)                     \
-    emberAfFillExternalBuffer(mask, clusterId, ZCL_REPORT_ATTRIBUTES_COMMAND_ID, "b", reportAttributeRecords,                      \
-                              reportAttributeRecordsLen);
-
 /** @brief Command description for DefaultResponse
  *
  * Command: DefaultResponse
