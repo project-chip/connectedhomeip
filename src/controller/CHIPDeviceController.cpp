@@ -1823,7 +1823,7 @@ void DeviceControllerInteractionModelDelegate::OnError(const app::CommandSender 
     IMDefaultResponseCallback(apCommandSender, app::ToEmberAfStatus(aProtocolCode));
 }
 
-void DeviceControllerInteractionModelDelegate::OnFinal(app::CommandSender * apCommandSender)
+void DeviceControllerInteractionModelDelegate::OnDone(app::CommandSender * apCommandSender)
 {
     return chip::Platform::Delete(apCommandSender);
 }

@@ -26,6 +26,8 @@
 #include "Command.h"
 #include "CommandHandler.h"
 #include "InteractionModelEngine.h"
+#include "protocols/Protocols.h"
+#include "protocols/interaction_model/Constants.h"
 
 #include <protocols/secure_channel/Constants.h>
 
@@ -34,37 +36,34 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 
+CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr) :
+    Command(apExchangeMgr), mpCallback(apCallback)
+{}
+
 CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
                                              uint32_t timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle commandPacket;
 
-    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == CommandState::AddedCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = FinalizeCommandsMessage(commandPacket);
+    err = Finalize(commandPacket);
     SuccessOrExit(err);
-
-    // Discard any existing exchange context. Effectively we can only have one exchange per CommandSender
-    // at any one time.
-    AbortExistingExchangeContext();
 
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(secureSession.ValueOr(SessionHandle(aNodeId, 0, 0, aFabricIndex)), this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
     mpExchangeCtx->SetResponseTimeout(timeout);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(commandPacket),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
-    MoveToState(CommandState::Sending);
+
+    MoveToState(CommandState::CommandSent);
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        AbortExistingExchangeContext();
-    }
-
     return err;
 }
 
@@ -80,7 +79,6 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     SuccessOrExit(err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId));
 
 exit:
-
     if (mpCallback != nullptr)
     {
         if (err != CHIP_NO_ERROR)
@@ -89,7 +87,8 @@ exit:
         }
     }
 
-    ShutdownInternal();
+    Close();
+
     return err;
 }
 
@@ -103,7 +102,19 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
         mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, CHIP_ERROR_TIMEOUT);
     }
 
-    ShutdownInternal();
+    Close();
+}
+
+void CommandSender::Close()
+{
+    MoveToState(CommandState::AwaitingDestruction);
+
+    Command::Close();
+
+    if (mpCallback)
+    {
+        mpCallback->OnDone(this);
+    }
 }
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
@@ -120,10 +131,10 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     }
 
     {
-        bool hasCommandSpecificResponse = false;
+        bool hasDataResponse = false;
         chip::TLV::TLVReader commandDataReader;
 
-        // Default to success when command specify response is received.
+        // Default to success when an invoke response is received.
         StatusElement::Type statusElement{ chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess,
                                            chip::Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm(),
                                            to_underlying(Protocols::InteractionModel::Status::Success) };
@@ -135,21 +146,28 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         }
         else if (CHIP_END_OF_TLV == err)
         {
-            hasCommandSpecificResponse = true;
-            err                        = aCommandElement.GetData(&commandDataReader);
+            hasDataResponse = true;
+            err             = aCommandElement.GetData(&commandDataReader);
         }
         SuccessOrExit(err);
 
         if (mpCallback != nullptr)
         {
-            if (statusElement.protocolCode == to_underlying(Protocols::InteractionModel::Status::Success))
+            if (statusElement.protocolId == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm())
             {
-                mpCallback->OnResponse(this, commandPath, hasCommandSpecificResponse ? &commandDataReader : nullptr);
+                if (statusElement.protocolCode == to_underlying(Protocols::InteractionModel::Status::Success))
+                {
+                    mpCallback->OnResponse(this, commandPath, hasDataResponse ? &commandDataReader : nullptr);
+                }
+                else
+                {
+                    mpCallback->OnError(this, static_cast<Protocols::InteractionModel::Status>(statusElement.protocolCode),
+                                        CHIP_ERROR_IM);
+                }
             }
             else
             {
-                mpCallback->OnError(this, static_cast<Protocols::InteractionModel::Status>(statusElement.protocolCode),
-                                    CHIP_ERROR_IM);
+                mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, CHIP_ERROR_IM);
             }
         }
     }
@@ -159,17 +177,8 @@ exit:
     {
         mpCallback->OnError(this, Protocols::InteractionModel::Status::Failure, err);
     }
-    return err;
-}
 
-void CommandSender::ShutdownInternal()
-{
-    // For CommandSender, ExchangeContext is the only thing it holds ownership by pointer.
-    AbortExistingExchangeContext();
-    if (mpCallback != nullptr)
-    {
-        mpCallback->OnFinal(this);
-    }
+    return err;
 }
 
 } // namespace app

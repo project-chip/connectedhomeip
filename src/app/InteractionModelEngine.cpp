@@ -61,13 +61,10 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
 void InteractionModelEngine::Shutdown()
 {
-    for (auto & commandHandler : mCommandHandlerObjs)
-    {
-        if (!commandHandler.IsFree())
-        {
-            commandHandler.Shutdown();
-        }
-    }
+    mCommandHandlerObjs.ForEachActiveObject([](CommandHandler * obj) -> bool {
+        obj->~CommandHandler();
+        return true;
+    });
 
     for (auto & readClient : mReadClients)
     {
@@ -172,31 +169,25 @@ CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext *
     return err;
 }
 
+void InteractionModelEngine::OnDone(CommandHandler * apCommandObj)
+{
+    mCommandHandlerObjs.ReleaseObject(apCommandObj);
+}
+
 CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
                                                           const PayloadHeader & aPayloadHeader,
                                                           System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    for (auto & commandHandler : mCommandHandlerObjs)
+    CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(mpExchangeMgr, this);
+    if (commandHandler)
     {
-        if (commandHandler.IsFree())
-        {
-            err = commandHandler.Init(mpExchangeMgr);
-            SuccessOrExit(err);
-            err               = commandHandler.OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
-            apExchangeContext = nullptr;
-            break;
-        }
+        return commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
-
-exit:
-
-    if (nullptr != apExchangeContext)
+    else
     {
         apExchangeContext->Abort();
+        return CHIP_NO_ERROR;
     }
-    return err;
 }
 
 CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,

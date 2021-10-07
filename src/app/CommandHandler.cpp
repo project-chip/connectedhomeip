@@ -26,6 +26,7 @@
 #include "Command.h"
 #include "CommandSender.h"
 #include "InteractionModelEngine.h"
+#include "messaging/ExchangeMgr.h"
 
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
@@ -34,11 +35,18 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 
 namespace chip {
 namespace app {
+
+CommandHandler::CommandHandler(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback) :
+    Command(apExchangeMgr), mpCallback(apCallback)
+{}
+
 CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                                   System::PacketBufferHandle && payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
+
+    VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
 
     // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
     // Exchange Manager for unsolicited InvokeCommand Requests.
@@ -49,30 +57,39 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
     SuccessOrExit(err);
 
     err = SendCommandResponse();
+    SuccessOrExit(err);
 
 exit:
+    Close();
     return err;
+}
+
+void CommandHandler::Close()
+{
+    MoveToState(CommandState::AwaitingDestruction);
+
+    Command::Close();
+
+    if (mpCallback)
+    {
+        mpCallback->OnDone(this);
+    }
 }
 
 CHIP_ERROR CommandHandler::SendCommandResponse()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle commandPacket;
 
-    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == CommandState::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    err = FinalizeCommandsMessage(commandPacket);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Finalize(commandPacket));
+    ReturnErrorOnFailure(
+        mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket)));
 
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket));
-    SuccessOrExit(err);
+    MoveToState(CommandState::CommandSent);
 
-    MoveToState(CommandState::Sending);
-
-exit:
-    ShutdownInternal();
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
@@ -127,6 +144,7 @@ exit:
                       err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
                       Protocols::InteractionModel::Id, Protocols::InteractionModel::Status::InvalidCommand);
     }
+
     // We have handled the error status above and put the error status in response, now return success status so we can process
     // other commands in the invoke request.
     return CHIP_NO_ERROR;
@@ -153,24 +171,6 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathP
 
 exit:
     return err;
-}
-
-void CommandHandler::ShutdownInternal()
-{
-    mCommandMessageWriter.Reset();
-
-    mpExchangeMgr = nullptr;
-    mpExchangeCtx = nullptr;
-    ClearState();
-
-    mCommandIndex = 0;
-}
-
-void CommandHandler::Shutdown()
-{
-    VerifyOrReturn(mState != CommandState::Uninitialized);
-    AbortExistingExchangeContext();
-    ShutdownInternal();
 }
 
 } // namespace app

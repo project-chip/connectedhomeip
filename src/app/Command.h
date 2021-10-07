@@ -55,39 +55,30 @@ public:
 
     enum class CommandState
     {
-        Uninitialized = 0, ///< The invoke command message has not been initialized
-        Initialized,       ///< The invoke command message has been initialized and is ready
-        AddCommand,        ///< The invoke command message has added Command
-        Sending,           ///< The invoke command message has sent out the invoke command
+        Idle,                ///< Default state that the object starts out in, where no work has commenced
+        AddingCommand,       ///< In the process of adding a command.
+        AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
+        CommandSent,         ///< The command has been sent successfully.
+        AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
-    /**
-     *  Initialize the Command object. Within the lifetime
-     *  of this instance, this method is invoked once after object
-     *  construction until a call to Shutdown is made to terminate the
-     *  instance.
-     *
-     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
-     *          CommandState::NotInitialized.
-     *  @retval #CHIP_NO_ERROR On success.
-     *
-     */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr);
+    Command(Messaging::ExchangeManager * apExchangeMgr);
 
-    /**
-     * Finalize Command Message TLV Builder and finalize command message
+    /*
+     * Destructor - as part of destruction, it will abort the exchange context
+     * if a valid one still exists.
      *
-     * @return CHIP_ERROR
-     *
+     * See Abort() for details on when that might occur.
      */
-    CHIP_ERROR FinalizeCommandsMessage(System::PacketBufferHandle & commandPacket);
+    virtual ~Command() { Abort(); }
 
+    /*
+     * A set of methods to construct command request or response payloads
+     */
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aIsStatus = false);
     TLV::TLVWriter * GetCommandDataElementTLVWriter();
     CHIP_ERROR FinishCommand(bool aIsStatus = false);
+    CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
     virtual CHIP_ERROR AddStatusCode(const CommandPathParams & aCommandPathParams,
                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                      const Protocols::Id aProtocolId, const Protocols::InteractionModel::Status aStatus)
@@ -104,15 +95,18 @@ public:
      */
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
-    CHIP_ERROR Reset();
-
-    virtual ~Command() = default;
-
-    bool IsFree() const { return mState == CommandState::Uninitialized; };
     virtual CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) = 0;
 
 protected:
-    CHIP_ERROR AbortExistingExchangeContext();
+    CHIP_ERROR AllocateBuffers();
+
+    /*
+     * The actual closure of the exchange happens automatically in the exchange layer.
+     * This function just sets the internally tracked exchange pointer to null to align
+     * with the exchange layer so as to prevent further closure if Abort() is called later.
+     */
+    void Close();
+
     void MoveToState(const CommandState aTargetState);
     CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId);
     CHIP_ERROR ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandDataElement::Builder aCommandDataElement);
@@ -123,12 +117,21 @@ protected:
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     uint8_t mCommandIndex                      = 0;
-    CommandState mState                        = CommandState::Uninitialized;
+    CommandState mState                        = CommandState::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
 
 private:
+    /*
+     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() above. This can only
+     * arise due to application-initiated destruction of the object when this object is handling receiving/sending
+     * message payloads.
+     */
+    void Abort();
+
     friend class TestCommandInteraction;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
+    bool mBuffersAllocated                 = false;
 };
 } // namespace app
 } // namespace chip
