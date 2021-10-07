@@ -38,6 +38,8 @@ list(
     ${chip_dir}/examples/all-clusters-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/DeviceCallbacks.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/CHIPDeviceManager.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/Globals.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/LEDWidget.cpp
 )
 
 add_library(
@@ -81,6 +83,7 @@ list(
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
+    -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
 )
 
 list(

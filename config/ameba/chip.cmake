@@ -26,7 +26,7 @@ list(
     -DCONFIG_FUNCION_O0_OPTIMIZE
     -DDM_ODM_SUPPORT_TYPE=32
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
-    -DMBEDTLS_CONFIG_FILE=\\\"mbedtls_config.h\\\"
+    -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
 )
 
 list(

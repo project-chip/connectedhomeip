@@ -1,11 +1,11 @@
-# CHIP Ameba All Clusters Example
+# CHIP Ameba-D All Clusters Example
 
 A prototype application that demonstrates device commissioning and cluster
 control.
 
 ---
 
--   [CHIP Ameba All Clusters Example](#chip-ameba-all-clusters-example)
+-   [CHIP AMBD All Clusters Example](#chip-ameba-d-all-clusters-example)
     -   [Supported Device](#supported-device)
     -   [Building the Example Application](#building-the-example-application)
     -   [Commissioning and cluster control](#commissioning-and-cluster-control)
@@ -14,12 +14,10 @@ control.
 
 ---
 
+
 ## Supported Device
 
-The CHIP demo application is supported on
-[Ameba RTL8722DM Board](https://www.amebaiot.com/en/amebad).
-
-## Building the Example Application
+The CHIP demo application is supported on [Ameba-D](https://www.amebaiot.com/en/amebad).
 
 -   Pull docker image:
 
@@ -52,14 +50,12 @@ The CHIP demo application is supported on
 ## Commissioning and Cluster Control
 
 ### Commissioning
-
 The commissioning is carried out via WiFi.
 
-1.  After download all-cluster example to Ameba board, boot up the board by
-    pressing the reset button.
-2.  Use ATW commands to setup network.
-3.  Use ATS\$ command to run all-cluster example.
-4.  Use
+  1.  After download all-cluster example to Ameba-D board, boot up the board by pressing the reset button.
+  2.  Use ATW commands to setup network.
+  3.  Use ATS$ command to run all-cluster example.
+  4.  Use
     [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
     to communicate with the device.
 
