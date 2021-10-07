@@ -78,6 +78,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
     auto & updateToken = commandData.updateToken;
     auto & newVersion  = commandData.newVersion;
 
+    EndpointId endpoint = commandPath.mEndpointId;
+
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
@@ -118,6 +120,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
 {
     auto & updateToken     = commandData.updateToken;
     auto & softwareVersion = commandData.softwareVersion;
+
+    EndpointId endpoint = commandPath.mEndpointId;
 
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);

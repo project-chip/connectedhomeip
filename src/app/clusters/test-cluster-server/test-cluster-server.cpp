@@ -183,7 +183,7 @@ exit:
 bool emberAfTestClusterClusterTestSpecificCallback(app::CommandHandler * apCommandObj, const app::ConcreteCommandPath & commandPath,
                                                    const Commands::TestSpecific::DecodableType & commandData)
 {
-    return sendNumericResponse(endpoint, apCommandObj, Commands::TestSpecificResponse::Id, 7);
+    return sendNumericResponse(commandPath.mEndpointId, apCommandObj, Commands::TestSpecificResponse::Id, 7);
 }
 
 bool emberAfTestClusterClusterTestNotHandledCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
@@ -204,5 +204,6 @@ bool emberAfTestClusterClusterTestAddArgumentsCallback(app::CommandHandler * apC
         return emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    return sendNumericResponse(endpoint, apCommandObj, Commands::TestAddArgumentsResponse::Id, static_cast<uint8_t>(arg1 + arg2));
+    return sendNumericResponse(commandPath.mEndpointId, apCommandObj, Commands::TestAddArgumentsResponse::Id,
+                               static_cast<uint8_t>(arg1 + arg2));
 }

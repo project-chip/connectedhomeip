@@ -102,7 +102,7 @@ bool emberAfWindowCoveringClusterStopMotionCallback(chip::app::CommandHandler * 
                                                     const Commands::StopMotion::DecodableType & commandData)
 {
     ChipLogProgress(Zcl, "StopMotion command received");
-    WindowApp::Instance().PostEvent(WindowApp::Event(WindowApp::EventId::StopMotion, endpoint));
+    WindowApp::Instance().PostEvent(WindowApp::Event(WindowApp::EventId::StopMotion, commandPath.mEndpointId));
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }

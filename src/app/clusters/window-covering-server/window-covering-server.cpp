@@ -384,6 +384,8 @@ void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                   const Commands::UpOrOpen::DecodableType & commandData)
 {
+    EndpointId endpoint = commandPath.mEndpointId;
+
     emberAfWindowCoveringClusterPrint("UpOrOpen command received");
     if (HasFeature(endpoint, Features::Lift))
     {
@@ -403,6 +405,8 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
 bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::DownOrClose::DecodableType & commandData)
 {
+    EndpointId endpoint = commandPath.mEndpointId;
+
     emberAfWindowCoveringClusterPrint("DownOrClose command received");
     if (HasFeature(endpoint, Features::Lift))
     {
@@ -438,6 +442,8 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
 {
     auto & liftValue = commandData.liftValue;
 
+    EndpointId endpoint = commandPath.mEndpointId;
+
     bool hasLift         = HasFeature(endpoint, Features::Lift);
     bool isPositionAware = HasFeature(endpoint, Features::PositionAware);
 
@@ -464,6 +470,8 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
 {
     auto & liftPercentageValue    = commandData.liftPercentageValue;
     auto & liftPercent100thsValue = commandData.liftPercent100thsValue;
+
+    EndpointId endpoint = commandPath.mEndpointId;
 
     bool hasLift         = HasFeature(endpoint, Features::Lift);
     bool isPositionAware = HasFeature(endpoint, Features::PositionAware);
@@ -492,6 +500,8 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
 {
     auto & tiltValue = commandData.tiltValue;
 
+    EndpointId endpoint = commandPath.mEndpointId;
+
     bool hasTilt         = HasFeature(endpoint, Features::Tilt);
     bool isPositionAware = HasFeature(endpoint, Features::PositionAware);
 
@@ -518,6 +528,8 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 {
     auto & tiltPercentageValue    = commandData.tiltPercentageValue;
     auto & tiltPercent100thsValue = commandData.tiltPercent100thsValue;
+
+    EndpointId endpoint = commandPath.mEndpointId;
 
     bool hasTilt         = HasFeature(endpoint, Features::Tilt);
     bool isPositionAware = HasFeature(endpoint, Features::PositionAware);

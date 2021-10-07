@@ -448,6 +448,8 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
     auto & mode   = commandData.mode;
     auto & amount = commandData.amount;
 
+    EndpointId aEndpointId = commandPath.mEndpointId;
+
     int16_t HeatingSetpoint = kDefaultHeatingSetpoint, CoolingSetpoint = kDefaultCoolingSetpoint; // Set to defaults to be safe
     EmberAfStatus status                     = EMBER_ZCL_STATUS_FAILURE;
     EmberAfStatus ReadStatus                 = EMBER_ZCL_STATUS_FAILURE;

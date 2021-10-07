@@ -216,12 +216,15 @@ bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const a
 
     // cmd Identify
     return EMBER_SUCCESS ==
-        emberAfSendImmediateDefaultResponse(Clusters::Identify::Attributes::IdentifyTime::Set(endpoint, identifyTime));
+        emberAfSendImmediateDefaultResponse(
+               Clusters::Identify::Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime));
 }
 
 bool emberAfIdentifyClusterIdentifyQueryCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::IdentifyQuery::DecodableType & commandData)
 {
+    EndpointId endpoint = commandPath.mEndpointId;
+
     // cmd IdentifyQuery
     uint16_t identifyTime  = 0;
     EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
@@ -278,6 +281,8 @@ bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, co
 {
     auto & effectIdentifier = commandData.effectIdentifier;
     auto & effectVariant    = commandData.effectVariant;
+
+    EndpointId endpoint = commandPath.mEndpointId;
 
     // cmd TriggerEffect
     Identify * identify                      = inst(endpoint);
