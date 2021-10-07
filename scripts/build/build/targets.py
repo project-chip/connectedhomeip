@@ -80,12 +80,19 @@ def HostTargets():
 
 
 def Esp32Targets():
-    target = Target('esp32', Esp32Builder)
+    esp32_target = Target('esp32', Esp32Builder)
 
-    yield target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
-    yield target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
+    yield esp32_target.Extend('c3devkit-all-clusters', board=Esp32Board.C3DevKit, app=Esp32App.ALL_CLUSTERS)
 
-    devkitc = target.Extend('devkitc', board=Esp32Board.DevKitC)
+    rpc_aware_targets = [
+        esp32_target.Extend('m5stack-all-clusters', board=Esp32Board.M5Stack, app=Esp32App.ALL_CLUSTERS)
+    ]
+
+    for target in rpc_aware_targets:
+        yield target
+        yield target.Extend('rpc', enable_rpcs=True)
+
+    devkitc = esp32_target.Extend('devkitc', board=Esp32Board.DevKitC)
 
     yield devkitc.Extend('all-clusters', app=Esp32App.ALL_CLUSTERS)
     yield devkitc.Extend('shell', app=Esp32App.SHELL)
