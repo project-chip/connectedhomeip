@@ -76,7 +76,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
                                                         const Commands::LaunchApp::DecodableType & commandData)
 {
     auto & requestData                       = commandData.requestData;
-    auto & requestApplicationCatalogVendorId = commandData.requestApplicationCatalogVendorId;
+    auto & requestApplicationCatalogVendorId = commandData.catalogVendorId;
     auto & requestApplicationId              = commandData.requestApplicationId;
 
     ::ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);

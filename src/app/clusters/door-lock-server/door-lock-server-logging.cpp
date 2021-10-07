@@ -123,7 +123,7 @@ bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoo
 bool emberAfDoorLockClusterGetLogRecordCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                 const Commands::GetLogRecord::DecodableType & commandData)
 {
-    auto & entryId = commandData.entryId;
+    auto & entryId = commandData.logIndex;
 
     EmberStatus status;
     EmberAfPluginDoorLockServerLogEntry entry;

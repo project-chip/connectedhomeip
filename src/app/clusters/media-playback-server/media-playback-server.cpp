@@ -176,7 +176,7 @@ bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(app::CommandHandler * c
 bool emberAfMediaPlaybackClusterMediaSeekCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                   const Commands::MediaSeek::DecodableType & commandData)
 {
-    auto & positionMilliseconds = commandData.positionMilliseconds;
+    auto & positionMilliseconds = commandData.position;
 
     EmberAfMediaPlaybackStatus status =
         mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds);

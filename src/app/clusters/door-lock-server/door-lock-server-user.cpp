@@ -486,7 +486,7 @@ bool emberAfDoorLockClusterSetRfidCallback(app::CommandHandler * commandObj, con
     auto & userId     = commandData.userId;
     auto & userStatus = commandData.userStatus;
     auto & userType   = commandData.userType;
-    auto & rfid       = commandData.rfid;
+    auto & rfid       = commandData.id;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t status =
@@ -658,7 +658,7 @@ static bool verifyPin(ByteSpan & pin, uint8_t * userId)
 bool emberAfDoorLockClusterLockDoorCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                             const Commands::LockDoor::DecodableType & commandData)
 {
-    auto & PIN = commandData.PIN;
+    auto & PIN = commandData.pin;
 
     uint8_t userId                = 0;
     bool pinVerified              = verifyPin(PIN, &userId);
@@ -920,7 +920,7 @@ void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttr
 bool emberAfDoorLockClusterUnlockWithTimeoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::UnlockWithTimeout::DecodableType & commandData)
 {
-    auto & timeoutS = commandData.timeoutS;
+    auto & timeoutS = commandData.timeoutInSeconds;
     auto & pin      = commandData.pin;
 
     uint8_t userId;

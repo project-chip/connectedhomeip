@@ -52,7 +52,7 @@ static void storeCurrentInput(EndpointId endpoint, uint8_t currentInput)
 bool emberAfMediaInputClusterSelectInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::SelectInput::DecodableType & commandData)
 {
-    auto & input = commandData.input;
+    auto & input = commandData.index;
 
     bool success         = mediaInputClusterSelectInput(input);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -85,7 +85,7 @@ bool emberAfMediaInputClusterHideInputStatusCallback(app::CommandHandler * comma
 bool emberAfMediaInputClusterRenameInputCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::RenameInput::DecodableType & commandData)
 {
-    auto & input = commandData.input;
+    auto & input = commandData.index;
     auto & name  = commandData.name;
 
     // TODO: char is not null terminated, verify this code once #7963 gets merged.

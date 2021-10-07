@@ -40,7 +40,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     const Commands::OpenCommissioningWindow::DecodableType & commandData)
 {
     auto & commissioningTimeout = commandData.commissioningTimeout;
-    auto & pakeVerifier         = commandData.pakeVerifier;
+    auto & pakeVerifier         = commandData.PAKEVerifier;
     auto & discriminator        = commandData.discriminator;
     auto & iterations           = commandData.iterations;
     auto & salt                 = commandData.salt;

@@ -68,7 +68,7 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
                                              const Commands::Login::DecodableType & commandData)
 {
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
-    auto & tempSetupPin          = commandData.tempSetupPin;
+    auto & tempSetupPin          = commandData.setupPIN;
 
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));

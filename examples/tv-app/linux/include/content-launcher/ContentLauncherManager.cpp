@@ -109,7 +109,7 @@ bool emberAfContentLauncherClusterLaunchContentCallback(
     chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
-    auto & autoplay = commandData.autoplay;
+    auto & autoplay = commandData.autoPlay;
     auto & data     = commandData.data;
 
     string dataString(reinterpret_cast<char *>(data));
@@ -123,7 +123,7 @@ bool emberAfContentLauncherClusterLaunchURLCallback(
     chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
-    auto & contentUrl    = commandData.contentUrl;
+    auto & contentUrl    = commandData.contentURL;
     auto & displayString = commandData.displayString;
 
     string contentUrlString(reinterpret_cast<char *>(contentUrl));

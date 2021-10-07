@@ -132,8 +132,8 @@ bool emberAfDoorLockClusterSetWeekdayScheduleCallback(app::CommandHandler * comm
     auto & daysMask    = commandData.daysMask;
     auto & startHour   = commandData.startHour;
     auto & startMinute = commandData.startMinute;
-    auto & stopHour    = commandData.stopHour;
-    auto & stopMinute  = commandData.stopMinute;
+    auto & stopHour    = commandData.endHour;
+    auto & stopMinute  = commandData.endMinute;
 
     uint8_t status                  = 0x00;
     uint8_t userPin                 = 0x00;
@@ -402,7 +402,7 @@ bool emberAfDoorLockClusterSetHolidayScheduleCallback(app::CommandHandler * comm
                                                       const app::ConcreteCommandPath & commandPath,
                                                       const Commands::SetHolidaySchedule::DecodableType & commandData)
 {
-    auto & holidayScheduleId          = commandData.holidayScheduleId;
+    auto & holidayScheduleId          = commandData.scheduleId;
     auto & localStartTime             = commandData.localStartTime;
     auto & localEndTime               = commandData.localEndTime;
     auto & operatingModeDuringHoliday = commandData.operatingModeDuringHoliday;
@@ -446,7 +446,7 @@ bool emberAfDoorLockClusterGetHolidayScheduleCallback(app::CommandHandler * comm
                                                       const app::ConcreteCommandPath & commandPath,
                                                       const Commands::GetHolidaySchedule::DecodableType & commandData)
 {
-    auto & holidayScheduleId = commandData.holidayScheduleId;
+    auto & holidayScheduleId = commandData.scheduleId;
 
     EmberAfPluginDoorLockServerHolidayScheduleEntry * entry = &holidayScheduleTable[0];
     EmberAfStatus zclStatus;
@@ -494,7 +494,7 @@ bool emberAfDoorLockClusterClearHolidayScheduleCallback(app::CommandHandler * co
                                                         const app::ConcreteCommandPath & commandPath,
                                                         const Commands::ClearHolidaySchedule::DecodableType & commandData)
 {
-    auto & holidayScheduleId = commandData.holidayScheduleId;
+    auto & holidayScheduleId = commandData.scheduleId;
 
     uint8_t status;
     CHIP_ERROR err = CHIP_NO_ERROR;

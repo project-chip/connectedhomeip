@@ -2315,7 +2315,7 @@ bool emberAfColorControlClusterMoveToHueCallback(app::CommandHandler * commandOb
                                                  const Commands::MoveToHue::DecodableType & commandData)
 {
     auto & hue             = commandData.hue;
-    auto & hueMoveMode     = commandData.hueMoveMode;
+    auto & hueMoveMode     = commandData.direction;
     auto & transitionTime  = commandData.transitionTime;
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;

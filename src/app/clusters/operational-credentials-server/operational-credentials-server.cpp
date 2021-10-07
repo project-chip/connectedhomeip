@@ -274,7 +274,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
                                                               const app::ConcreteCommandPath & commandPath,
                                                               const Commands::RemoveFabric::DecodableType & commandData)
 {
-    auto & fabricBeingRemoved = commandData.fabricBeingRemoved;
+    auto & fabricBeingRemoved = commandData.fabricIndex;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
@@ -702,7 +702,7 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::AddTrustedRootCertificate::DecodableType & commandData)
 {
-    auto & RootCertificate = commandData.RootCertificate;
+    auto & RootCertificate = commandData.rootCertificate;
 
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -725,8 +725,6 @@ bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::RemoveTrustedRootCertificate::DecodableType & commandData)
 {
-    auto & TrustedRootIdentifier = commandData.TrustedRootIdentifier;
-
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;

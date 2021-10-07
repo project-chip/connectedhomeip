@@ -38,7 +38,7 @@ bool emberAfApplicationBasicClusterChangeStatusCallback(app::CommandHandler * co
                                                         const app::ConcreteCommandPath & commandPath,
                                                         const Commands::ChangeStatus::DecodableType & commandData)
 {
-    auto & newApplicationStatus = commandData.newApplicationStatus;
+    auto & newApplicationStatus = commandData.status;
 
     bool success = applicationBasicClusterChangeApplicationStatus(static_cast<EmberAfApplicationBasicStatus>(newApplicationStatus),
                                                                   emberAfCurrentEndpoint());
