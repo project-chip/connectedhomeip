@@ -446,14 +446,14 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     if (!mFlags.Has(Flags::kDeviceNameSet))
     {
-        snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
+        snprintf(deviceName, sizeof(deviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
 
         deviceName[kMaxDeviceNameLength] = 0;
         err                              = MapBLEError(qvCHIP_BleSetDeviceName(deviceName));
         SuccessOrExit(err);
     }
 
-    mDeviceNameLength   = static_cast<uint8_t>(strlen(mDeviceName));
+    mDeviceNameLength   = static_cast<uint8_t>(strlen(deviceName));
     mDeviceIdInfoLength = sizeof(mDeviceIdInfo);
 
     // Check sizes
@@ -474,13 +474,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     memcpy(&advDataBuf[index], (void *) &mDeviceIdInfo, mDeviceIdInfoLength); // AD value
     index = static_cast<uint8_t>(index + mDeviceIdInfoLength);
 
-    // TODO remove device name issue #10221
-    advDataBuf[index++] = static_cast<uint8_t>(mDeviceNameLength + 1); // length
-    advDataBuf[index++] = CHIP_ADV_DATA_TYPE_NAME;                     // AD type : name
-    memcpy(&advDataBuf[index], deviceName, mDeviceNameLength);         // AD value
-    index = static_cast<uint8_t>(index + mDeviceNameLength);
-
-    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_ADV, index, mAdvDataBuf);
+    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_ADV, index, advDataBuf);
 
     // Fill in scan response data
     index                    = 0;
@@ -489,7 +483,14 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     scanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[1]; // AD value
     scanRespDataBuf[index++] = chipUUID_CHIPoBLE_Service[0];
 
-    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_SCAN, index, mScanRespDataBuf);
+    VerifyOrExit(index + (mDeviceNameLength + 2) <= kMaxAdvertisementDataSetSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    scanRespDataBuf[index++] = static_cast<uint8_t>(mDeviceNameLength + 1); // length
+    scanRespDataBuf[index++] = CHIP_ADV_DATA_TYPE_NAME;                     // AD type : name
+    memcpy(&scanRespDataBuf[index], deviceName, mDeviceNameLength);         // AD value
+    index = static_cast<uint8_t>(index + mDeviceNameLength);
+
+    qvCHIP_BleSetAdvData(QV_ADV_DATA_LOC_SCAN, index, scanRespDataBuf);
 
 exit:
     return err;
