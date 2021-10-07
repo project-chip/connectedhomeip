@@ -301,7 +301,7 @@ void TestCommandInteraction::TestCommandSenderWithWrongState(nlTestSuite * apSui
 
     err = commandSender.SendCommandRequest(kTestDeviceNodeId, gFabricIndex, Optional<SessionHandle>::Missing());
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
-    
+
 }
 
 void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSuite, void * apContext)
@@ -532,7 +532,7 @@ void TestCommandInteraction::TestCommandSenderAbruptDestruction(nlTestSuite * ap
     sendResponse = false;
 
     mockCommandSenderDelegate.ResetCounter();
-    
+
     {
         app::CommandSender commandSender(&mockCommandSenderDelegate, gExchangeManager);
 

@@ -103,7 +103,7 @@ public:
          *      - Only called after a successful call to SendCommandRequest as been made.
          *
          * This function is marked as must be implemented to make application aware of releasing the object.
-         * 
+         *
          * @param[in] apCommandSender: The command sender object of the terminated invoke command transaction.
          */
         virtual void OnDone(CommandSender * apCommandSender) = 0;

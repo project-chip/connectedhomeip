@@ -105,7 +105,7 @@ public:
     void ReleaseContext(ExchangeContext * ec) {
         mExchgCount--;
         printf("--EC = %d\n", mExchgCount);
-        mContextPool.ReleaseObject(ec); 
+        mContextPool.ReleaseObject(ec);
     }
 
     /**

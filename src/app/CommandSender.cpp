@@ -109,7 +109,7 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
 void CommandSender::Close()
 {
     MoveToState(CommandState::AwaitingDestruction);
-    
+
     Command::Close();
 
     if (mpCallback) {

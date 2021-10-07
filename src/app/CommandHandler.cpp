@@ -68,7 +68,7 @@ exit:
 void CommandHandler::Close()
 {
     MoveToState(CommandState::AwaitingDestruction);
-    
+
     Command::Close();
 
     if (mpCallback) {

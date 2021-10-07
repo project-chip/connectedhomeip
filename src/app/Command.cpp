@@ -141,7 +141,7 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams & aCommandPathParams,
     }
 
     MoveToState(CommandState::AddingCommand);
-    
+
 exit:
     return err;
 }
@@ -151,7 +151,7 @@ TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
     if (mState != CommandState::AddingCommand) {
        return nullptr;
     }
-    else { 
+    else {
         return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().GetWriter();
     }
 }
@@ -177,7 +177,7 @@ CHIP_ERROR Command::FinishCommand(bool aIsStatus)
     ReturnErrorOnFailure(commandDataElement.EndOfCommandDataElement().GetError());
     ReturnErrorOnFailure(mInvokeCommandBuilder.GetCommandListBuilder().EndOfCommandList().GetError());
     ReturnErrorOnFailure(mInvokeCommandBuilder.EndOfInvokeCommand().GetError());
-    
+
     MoveToState(CommandState::AddedCommand);
 
     return CHIP_NO_ERROR;

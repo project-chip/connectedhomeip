@@ -55,7 +55,7 @@ public:
 
     enum class CommandState
     {
-        Idle,                   ///< Default state that the object starts out in, where no work has commenced    
+        Idle,                   ///< Default state that the object starts out in, where no work has commenced
         AddingCommand,          ///< In the process of adding a command.
         AddedCommand,           ///< A command has been completely encoded and is awaiting transmission.
         CommandSent,            ///< The command has been sent successfully.
@@ -128,7 +128,7 @@ private:
      * message payloads.
      */
     void Abort();
-    
+
     friend class TestCommandInteraction;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     bool mBuffersAllocated = false;
