@@ -83,7 +83,7 @@ class MultiAdminClientFragment : Fragment() {
   }
 
   private fun updateAddressClick() {
-    try{
+    try {
       deviceController.updateDevice(
         multiAdminClusterFabricIdEd.text.toString().toULong(16).toLong(),
         multiAdminClusterDeviceIdEd.text.toString().toULong().toLong()
